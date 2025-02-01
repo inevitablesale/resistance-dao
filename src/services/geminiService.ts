@@ -35,17 +35,22 @@ const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { 
   const expertiseScores = Object.values(serviceExpertise);
   const averageExpertise = expertiseScores.reduce((a, b) => a + b, 0) / expertiseScores.length;
 
-  // Normalize years (max 20 years = 1.0)
-  const normalizedYears = Math.min(totalYears / 20, 1);
-  
-  // Normalize expertise (already on 0-10 scale, convert to 0-1)
-  const normalizedExpertise = averageExpertise / 10;
+  // For high-level executives and experienced consultants, boost the score
+  const seniorityBoost = experiences.some(exp => 
+    exp.title.toLowerCase().includes('ceo') || 
+    exp.title.toLowerCase().includes('chief') ||
+    (exp.title.toLowerCase().includes('consultant') && totalYears >= 5)
+  ) ? 0.2 : 0;
 
-  // Calculate voting power (50% experience weight, 50% expertise weight)
-  const votingPower = (normalizedYears * 0.5) + (normalizedExpertise * 0.5);
+  // Calculate voting power (40% experience, 40% expertise, 20% seniority)
+  const votingPower = Math.min(
+    ((totalYears / 20) * 0.4) + 
+    ((averageExpertise / 10) * 0.4) + 
+    seniorityBoost,
+    1
+  );
 
-  // Round to 3 decimal places
-  return Math.round(votingPower * 1000) / 1000;
+  return Math.round(votingPower * 100) / 100;
 };
 
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
@@ -54,37 +59,36 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     const model = genAI.getGenerativeModel({ 
       model: "gemini-pro",
       generationConfig: {
-        temperature: 1,
-        topP: 0.95,
+        temperature: 0.7,
+        topP: 0.8,
         maxOutputTokens: 8192,
       },
     });
 
     const prompt = `
-      You are an AI Agent designed to process LinkedIn profile data into standardized NFT metadata objects.
-      Your goal is to analyze, categorize, and generate structured attributes based on the user's experience, expertise, and role in the professional services industry.
+      Analyze this LinkedIn profile data and generate NFT metadata that accurately represents the professional's experience and expertise in the accounting and professional services industry. Pay special attention to their roles, responsibilities, and duration of experience.
 
       Required Output Format:
       {
         "fullName": "string",
-        "publicIdentifier": "string",
-        "profilePic": "string (URL)",
+        "publicIdentifier": "string (LinkedIn handle)",
+        "profilePic": "string (URL from input)",
         "attributes": [
           {
             "trait_type": "Experience Level",
-            "value": "string"
+            "value": "string (e.g., CEO & Consultant, Senior Manager, etc.)"
           },
           {
             "trait_type": "Specialty",
-            "value": "string"
+            "value": "string (Main focus area)"
           },
           {
             "trait_type": "Years in Practice",
-            "value": "string"
+            "value": "string (e.g., 5+, 10+)"
           },
           {
             "trait_type": "Client Base",
-            "value": "string"
+            "value": "string (Types of clients served)"
           },
           {
             "trait_type": "Service Line Expertise",
@@ -100,17 +104,18 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
             }
           }
         ],
-        "experiences": [
-          {
-            "title": "string",
-            "company": "string",
-            "duration": "string",
-            "location": "string"
-          }
-        ]
+        "experiences": [Array of most recent positions with exact details from input]
       }
 
-      Analyze this LinkedIn profile and generate the NFT metadata according to the specified format:
+      Guidelines:
+      1. Experience Level should reflect their most senior role and expertise level
+      2. Specialty should focus on their primary area of expertise
+      3. Years in Practice should be based on their total relevant experience
+      4. Client Base should reflect the types of organizations they serve
+      5. Service Line Expertise scores should be based on their experience and roles
+      6. Keep company names and durations exactly as provided in the input
+
+      Input LinkedIn Data:
       ${JSON.stringify(linkedInData)}
     `;
 
