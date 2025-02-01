@@ -15,6 +15,11 @@ export const PostOnboardingView = () => {
     }
   }, [user?.verifications?.completedOnboarding]);
 
+  const handleCodeComplete = () => {
+    console.log("Code entered completely");
+    setShowVerificationView(false);
+  };
+
   if (!showVerificationView) {
     return (
       <div className="space-y-8 animate-fade-in max-w-4xl mx-auto">
