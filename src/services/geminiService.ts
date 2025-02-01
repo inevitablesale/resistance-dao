@@ -20,6 +20,34 @@ interface NFTMetadata {
   }>;
 }
 
+const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { [key: string]: number }) => {
+  // Calculate years of experience
+  const totalYears = experiences.reduce((acc, exp) => {
+    const duration = exp.duration;
+    const years = duration.includes('yr') ? 
+      parseInt(duration.split(' ')[0]) :
+      duration.includes('mos') ? 
+        parseInt(duration.split(' ')[0]) / 12 : 0;
+    return acc + years;
+  }, 0);
+
+  // Calculate average expertise score
+  const expertiseScores = Object.values(serviceExpertise);
+  const averageExpertise = expertiseScores.reduce((a, b) => a + b, 0) / expertiseScores.length;
+
+  // Normalize years (max 20 years = 1.0)
+  const normalizedYears = Math.min(totalYears / 20, 1);
+  
+  // Normalize expertise (already on 0-10 scale, convert to 0-1)
+  const normalizedExpertise = averageExpertise / 10;
+
+  // Calculate voting power (50% experience weight, 50% expertise weight)
+  const votingPower = (normalizedYears * 0.5) + (normalizedExpertise * 0.5);
+
+  // Round to 3 decimal places
+  return Math.round(votingPower * 1000) / 1000;
+};
+
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
   try {
     console.log('Initializing Gemini model...');
@@ -59,14 +87,6 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
             "value": "string"
           },
           {
-            "trait_type": "Governance Voting Power",
-            "value": number (0.0-1.0)
-          },
-          {
-            "trait_type": "Fractional Ownership",
-            "value": null
-          },
-          {
             "trait_type": "Service Line Expertise",
             "value": {
               "Accounting Technology": number (0-10),
@@ -102,6 +122,25 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     try {
       console.log('Parsing Gemini response...');
       const metadata = JSON.parse(text);
+      
+      // Calculate and add Governance Voting Power
+      const votingPower = calculateGovernanceVotingPower(
+        metadata.experiences,
+        metadata.attributes.find((a: any) => a.trait_type === "Service Line Expertise")?.value || {}
+      );
+
+      // Add Governance Voting Power to attributes
+      metadata.attributes.push({
+        trait_type: "Governance Voting Power",
+        value: votingPower
+      });
+
+      // Add Fractional Ownership placeholder
+      metadata.attributes.push({
+        trait_type: "Fractional Ownership",
+        value: null
+      });
+
       console.log('Generated NFT Metadata:', metadata);
       return metadata;
     } catch (parseError) {
