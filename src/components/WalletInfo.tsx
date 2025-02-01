@@ -26,10 +26,12 @@ export const WalletInfo = () => {
   }, [primaryWallet]);
 
   const handleAnalyzeProfile = async () => {
-    if (!user?.verifications?.customFields?.["LinkedIn Profile URL"]) {
+    const linkedInUrl = user?.verifications?.customFields?.["LinkedIn Profile URL"];
+    
+    if (!linkedInUrl) {
       toast({
         title: "LinkedIn Profile Not Found",
-        description: "Please make sure your LinkedIn profile is connected.",
+        description: "Please add your LinkedIn profile URL in your wallet settings.",
         variant: "destructive",
       });
       return;
@@ -37,12 +39,10 @@ export const WalletInfo = () => {
 
     setIsAnalyzing(true);
     try {
-      const profileData = await analyzeLinkedInProfile(
-        user.verifications.customFields["LinkedIn Profile URL"]
-      );
+      const profileData = await analyzeLinkedInProfile(linkedInUrl);
       
       if (profileData.success) {
-        setProgress(50); // Move to next step
+        setProgress(50);
         toast({
           title: "Profile Analysis Complete",
           description: "Your professional NFT attributes are being generated.",
