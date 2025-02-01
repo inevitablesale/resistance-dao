@@ -1,12 +1,14 @@
-import { UserProfile } from "@dynamic-labs/sdk-react-core";
-
 declare module "@dynamic-labs/sdk-react-core" {
-  interface UserProfile {
+  export interface UserProfile {
     verifications?: {
       completedOnboarding?: boolean;
-      customFields?: {
-        "LinkedIn Profile URL"?: string;
-      };
     };
   }
+
+  export interface DynamicContext {
+    user: UserProfile | null;
+    primaryWallet: any; // Keep the existing type for primaryWallet
+  }
+
+  export function useDynamicContext(): DynamicContext;
 }
