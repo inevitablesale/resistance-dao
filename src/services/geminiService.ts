@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, type GenerateContentResult } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI("AIzaSyArsLfJI0fawJid7fD403HFjQEtqPe8iec");
 
@@ -22,10 +22,50 @@ interface NFTMetadata {
 
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-pro",
+      generationConfig: {
+        temperature: 1,
+        topP: 0.95,
+        maxOutputTokens: 8192,
+      },
+    });
 
     const prompt = `
       You are an AI Agent designed to process LinkedIn profile data into standardized NFT metadata objects.
+      Your goal is to analyze, categorize, and generate structured attributes based on the user's experience, expertise, and role in the professional services industry.
+
+      Standardized Field Rules:
+      - Personal & Identification Fields:
+        fullName: The full name of the individual
+        publicIdentifier: LinkedIn username or public profile identifier
+        profilePic: The profile image URL
+
+      - Professional Experience:
+        experiences: List of key professional roles, including:
+          title: Position title
+          company: Organization name
+          duration: Time spent in the role
+          location: City/remote work status
+
+      - Trait Categories & Scoring:
+        attributes: Standardized NFT trait assignments:
+          - Experience Level: (e.g., Founder & Advisor, CEO, Director, Consultant)
+          - Specialty: Determined by the primary industries they influence
+          - Years in Practice: Extracted from the earliest experience date
+          - Client Base: The primary market served (e.g., SMBs, Accounting Firms, Private Equity)
+          - Governance Voting Power: Scale 0.0 - 1.0 based on role, influence, and industry contributions
+          - Fractional Ownership: Defaults to null unless ownership is assigned
+          - Service Line Expertise: Scores (0.0 - 10.0) based on experience and industry focus across:
+            * Accounting Technology
+            * Media & Thought Leadership
+            * Advisory Services
+            * Automation & Workflow
+            * Small Business Accounting
+            * Tax Planning & Compliance
+            * M&A / Exit Planning
+            * Wealth Management
+
       Please analyze this LinkedIn profile data and generate NFT metadata according to the specified format:
       ${JSON.stringify(linkedInData)}
     `;
