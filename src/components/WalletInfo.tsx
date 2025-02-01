@@ -44,27 +44,31 @@ export const WalletInfo = () => {
   }
 
   return (
-    <div className="mt-6 p-6 bg-gradient-to-r from-polygon-primary/10 to-polygon-secondary/10 rounded-lg backdrop-blur-sm">
-      <h2 className="text-2xl font-bold mb-4 text-polygon-primary">Wallet Information</h2>
-      <div className="space-y-2">
-        <p className="text-gray-700">
-          <span className="font-semibold">Address:</span>{" "}
-          {primaryWallet?.address ? (
-            <span className="font-mono">
-              {`${primaryWallet.address.slice(0, 6)}...${primaryWallet.address.slice(-4)}`}
+    <div className="mt-6 space-y-4">
+      <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+        <h2 className="text-xl font-semibold text-white mb-4">Wallet Details</h2>
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400">Address</span>
+            <span className="text-white font-mono">
+              {primaryWallet?.address
+                ? `${primaryWallet.address.slice(0, 6)}...${primaryWallet.address.slice(-4)}`
+                : "Not connected"}
             </span>
-          ) : (
-            "Not connected"
-          )}
-        </p>
-        <p className="text-gray-700">
-          <span className="font-semibold">Balance:</span>{" "}
-          {isLoading ? (
-            <span className="animate-pulse-slow">Loading...</span>
-          ) : (
-            `${balance} MATIC`
-          )}
-        </p>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400">Balance</span>
+            <span className="text-white">
+              {isLoading ? (
+                <span className="animate-pulse">Loading...</span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  {balance} <span className="text-polygon-primary">MATIC</span>
+                </span>
+              )}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
