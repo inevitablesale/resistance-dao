@@ -1,7 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI("AIzaSyArsLfJI0fawJid7fD403HFjQEtqPe8iec");
-
 interface NFTMetadata {
   fullName: string;
   publicIdentifier: string;
@@ -22,16 +18,8 @@ interface NFTMetadata {
 
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
   try {
-    console.log('Initializing Gemini model...');
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-pro",
-      generationConfig: {
-        temperature: 1,
-        topP: 0.95,
-        maxOutputTokens: 8192,
-      },
-    });
-
+    console.log('Initializing API call to Gemini...');
+    
     const prompt = `
       You are an AI Agent designed to process LinkedIn profile data into standardized NFT metadata objects.
       Your goal is to analyze, categorize, and generate structured attributes based on the user's experience, expertise, and role in the professional services industry.
@@ -79,19 +67,40 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       ${JSON.stringify(linkedInData)}
     `;
 
-    console.log('Generating content with Gemini...');
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    
+    const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_GEMINI_API_KEY}`
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      console.error('Gemini API Response not OK:', await response.text());
+      throw new Error('Failed to generate NFT metadata');
+    }
+
+    const result = await response.json();
+    console.log('Gemini API Response:', result);
+
+    // Extract the generated text from the response
+    const generatedText = result.candidates[0].content.parts[0].text;
+
+    // Parse the JSON response from the generated text
     try {
-      console.log('Parsing Gemini response...');
-      const metadata = JSON.parse(text);
-      console.log('Generated NFT Metadata:', metadata);
+      const metadata = JSON.parse(generatedText);
+      console.log('Parsed NFT Metadata:', metadata);
       return metadata;
     } catch (parseError) {
       console.error('Error parsing Gemini response:', parseError);
-      throw new Error('Failed to parse Gemini response');
+      throw new Error('Failed to parse NFT metadata from Gemini response');
     }
   } catch (error) {
     console.error('Error generating NFT metadata:', error);
