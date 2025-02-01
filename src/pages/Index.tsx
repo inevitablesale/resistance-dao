@@ -1,5 +1,6 @@
 import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
-import { EthereumWalletConnectors, ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum";
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+import { ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum-all";
 import { WalletInfo } from "@/components/WalletInfo";
 
 const Index = () => {
