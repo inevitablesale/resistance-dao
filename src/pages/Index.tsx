@@ -10,7 +10,10 @@ const Index = () => {
     <DynamicContextProvider
       settings={{
         environmentId: "2b74d425-6827-4ff1-af57-f9543d71cca0",
-        walletConnectors: [DynamicEthereum.EthereumWalletConnectors]
+        walletConnectors: [
+          DynamicEthereum.EthereumWalletConnectors,
+          DynamicEthereum.ZeroDevSmartWalletConnectors
+        ]
       }}
     >
       <div className="min-h-screen bg-gradient-to-b from-white to-purple-50">
