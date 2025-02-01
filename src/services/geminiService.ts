@@ -22,7 +22,7 @@ interface NFTMetadata {
 
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
   try {
-    // Initialize the model with specific configuration
+    console.log('Initializing Gemini model...');
     const model = genAI.getGenerativeModel({ 
       model: "gemini-pro",
       generationConfig: {
@@ -32,7 +32,6 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       },
     });
 
-    // Construct the prompt with clear instructions
     const prompt = `
       You are an AI Agent designed to process LinkedIn profile data into standardized NFT metadata objects.
       Your goal is to analyze, categorize, and generate structured attributes based on the user's experience, expertise, and role in the professional services industry.
@@ -95,22 +94,22 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       ${JSON.stringify(linkedInData)}
     `;
 
-    // Generate content using the model
+    console.log('Generating content with Gemini...');
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
     
-    // Parse and validate the response
     try {
+      console.log('Parsing Gemini response...');
       const metadata = JSON.parse(text);
-      console.log("Generated NFT Metadata:", metadata);
+      console.log('Generated NFT Metadata:', metadata);
       return metadata;
     } catch (parseError) {
-      console.error("Error parsing Gemini response:", parseError);
-      throw new Error("Failed to parse Gemini response");
+      console.error('Error parsing Gemini response:', parseError);
+      throw new Error('Failed to parse Gemini response');
     }
   } catch (error) {
-    console.error("Error generating NFT metadata:", error);
+    console.error('Error generating NFT metadata:', error);
     throw error;
   }
 };
