@@ -119,13 +119,16 @@ Service Line Expertise: Weighted based on role, tenure, and domain expertise.
 Experience Level: Defined based on highest role achieved.
 Client Base: Extracted from career focus areas.
 
-Return ONLY a valid JSON object with no additional text or formatting. Process this LinkedIn profile data:
+IMPORTANT: Return ONLY a raw JSON object with no markdown formatting, no \`\`\`json tags, and no additional text. Process this LinkedIn profile data:
 ${JSON.stringify(linkedInData)}`;
 
     console.log('Generating content with Gemini...');
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text();
+    let text = response.text();
+    
+    // Clean up any markdown formatting that might be present
+    text = text.replace(/```json\n/g, '').replace(/```/g, '').trim();
     
     console.log('Raw Gemini response:', text);
     
