@@ -20,7 +20,7 @@ interface NFTMetadata {
   }>;
 }
 
-const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { [key: string]: number }, connections: number = 0, followers: number = 0) => {
+const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { [key: string]: number }) => {
   // Calculate years of experience
   const totalYears = experiences.reduce((acc, exp) => {
     const duration = exp.duration;
@@ -35,35 +35,17 @@ const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { 
   const expertiseScores = Object.values(serviceExpertise);
   const averageExpertise = expertiseScores.reduce((a, b) => a + b, 0) / expertiseScores.length;
 
-  // Leadership score based on titles
-  const leadershipScore = experiences.some(exp => 
-    exp.title.toLowerCase().includes('ceo') || 
-    exp.title.toLowerCase().includes('founder') ||
-    exp.title.toLowerCase().includes('chief') ||
-    exp.title.toLowerCase().includes('president')
-  ) ? 0.3 : experiences.some(exp =>
-    exp.title.toLowerCase().includes('director') ||
-    exp.title.toLowerCase().includes('principal') ||
-    (exp.title.toLowerCase().includes('consultant') && totalYears >= 5)
-  ) ? 0.2 : 0.1;
+  // Normalize years (max 20 years = 1.0)
+  const normalizedYears = Math.min(totalYears / 20, 1);
+  
+  // Normalize expertise (already on 0-10 scale, convert to 0-1)
+  const normalizedExpertise = averageExpertise / 10;
 
-  // Network influence score (normalized to 0-0.2)
-  const networkScore = Math.min(
-    ((connections / 10000) + (followers / 15000)) / 2,
-    0.2
-  );
+  // Calculate voting power (50% experience weight, 50% expertise weight)
+  const votingPower = (normalizedYears * 0.5) + (normalizedExpertise * 0.5);
 
-  // Calculate voting power (30% expertise, 30% experience, 20% leadership, 20% network)
-  const votingPower = Math.min(
-    ((averageExpertise / 10) * 0.3) + 
-    ((totalYears / 20) * 0.3) + 
-    leadershipScore +
-    networkScore,
-    1
-  );
-
-  // Return the value between 0 and 1 with two decimal places
-  return Number(votingPower.toFixed(2));
+  // Round to 3 decimal places
+  return Math.round(votingPower * 1000) / 1000;
 };
 
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
@@ -72,70 +54,99 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     const model = genAI.getGenerativeModel({ 
       model: "gemini-pro",
       generationConfig: {
-        temperature: 0.7,
-        topP: 0.8,
+        temperature: 1,
+        topP: 0.95,
         maxOutputTokens: 8192,
       },
     });
 
-    const prompt = `You are an AI Agent designed to process LinkedIn profile data into standardized NFT metadata objects. Your goal is to analyze, categorize, and generate structured attributes based on the user's experience, expertise, and role in the professional services industry.
+    const prompt = `
+      You are an AI Agent designed to process LinkedIn profile data into standardized NFT metadata objects.
+      Your goal is to analyze, categorize, and generate structured attributes based on the user's experience, expertise, and role in the professional services industry.
 
-Standardized Field Rules
-Personal & Identification Fields:
-fullName: The full name of the individual.
-publicIdentifier: LinkedIn username or public profile identifier.
-profilePic: The profile image URL.
-Professional Influence:
-connections: Number of LinkedIn connections.
-followers: Number of LinkedIn followers.
-Professional Experience:
-experiences: List of key professional roles, including:
-title: Position title.
-company: Organization name.
-duration: Time spent in the role.
-location: City/remote work status.
-Trait Categories & Scoring:
-attributes: Standardized NFT trait assignments:
-Experience Level: (e.g., Founder & Advisor, CEO, Director, Consultant)
-Specialty: Determined by the primary industries they influence.
-Years in Practice: Extracted from the earliest experience date.
-Client Base: The primary market served (e.g., SMBs, Accounting Firms, Private Equity).
-Governance Voting Power: Scale 0.0 - 1.0 based on role, influence, and industry contributions.
-Fractional Ownership: Defaults to null unless ownership is assigned.
-Service Line Expertise: Scores (0.0 - 10.0) based on experience and industry focus across:
-Accounting Technology
-Media & Thought Leadership
-Advisory Services
-Automation & Workflow
-Small Business Accounting
-Tax Planning & Compliance
-M&A / Exit Planning
-Wealth Management
+      Required Output Format:
+      {
+        "fullName": "string",
+        "publicIdentifier": "string",
+        "profilePic": "string (URL)",
+        "attributes": [
+          {
+            "trait_type": "Experience Level",
+            "value": "string"
+          },
+          {
+            "trait_type": "Specialty",
+            "value": "string"
+          },
+          {
+            "trait_type": "Years in Practice",
+            "value": "string"
+          },
+          {
+            "trait_type": "Client Base",
+            "value": "string"
+          },
+          {
+            "trait_type": "Service Line Expertise",
+            "value": {
+              "Accounting Technology": number (0-10),
+              "Media & Thought Leadership": number (0-10),
+              "Advisory Services": number (0-10),
+              "Automation & Workflow": number (0-10),
+              "Small Business Accounting": number (0-10),
+              "Tax Planning & Compliance": number (0-10),
+              "M&A / Exit Planning": number (0-10),
+              "Wealth Management": number (0-10)
+            }
+          }
+        ],
+        "experiences": [
+          {
+            "title": "string",
+            "company": "string",
+            "duration": "string",
+            "location": "string"
+          }
+        ]
+      }
 
-Final Notes
-Governance Voting Power: Assigned based on influence, leadership, and role tenure.
-Fractional Ownership: Only included when explicitly provided.
-Service Line Expertise: Weighted based on role, tenure, and domain expertise.
-Experience Level: Defined based on highest role achieved.
-Client Base: Extracted from career focus areas.
-
-IMPORTANT: Return ONLY a raw JSON object with no markdown formatting, no \`\`\`json tags, and no additional text. Process this LinkedIn profile data:
-${JSON.stringify(linkedInData)}`;
+      Analyze this LinkedIn profile and generate the NFT metadata according to the specified format:
+      ${JSON.stringify(linkedInData)}
+    `;
 
     console.log('Generating content with Gemini...');
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    let text = response.text();
+    const text = response.text();
     
-    // Clean up any markdown formatting that might be present
-    text = text.replace(/```json\n/g, '').replace(/```/g, '').trim();
-    
-    console.log('Raw Gemini response:', text);
-    
-    const metadata = JSON.parse(text);
-    console.log('Generated NFT Metadata:', metadata);
-    
-    return metadata;
+    try {
+      console.log('Parsing Gemini response...');
+      const metadata = JSON.parse(text);
+      
+      // Calculate and add Governance Voting Power
+      const votingPower = calculateGovernanceVotingPower(
+        metadata.experiences,
+        metadata.attributes.find((a: any) => a.trait_type === "Service Line Expertise")?.value || {}
+      );
+
+      // Add Governance Voting Power to attributes
+      metadata.attributes.push({
+        trait_type: "Governance Voting Power",
+        value: votingPower
+      });
+
+      // Add Fractional Ownership placeholder
+      metadata.attributes.push({
+        trait_type: "Fractional Ownership",
+        value: null
+      });
+
+      console.log('Generated NFT Metadata:', metadata);
+      return metadata;
+    } catch (parseError) {
+      console.error('Error parsing Gemini response:', parseError);
+      throw new Error('Failed to parse Gemini response');
+    }
   } catch (error) {
     console.error('Error generating NFT metadata:', error);
     throw error;
