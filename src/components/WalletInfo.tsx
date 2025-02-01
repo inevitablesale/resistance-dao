@@ -3,9 +3,23 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 
 export const WalletInfo = () => {
-  const { primaryWallet, isConnected } = useDynamicContext();
+  const { primaryWallet } = useDynamicContext();
   const [balance, setBalance] = useState<string>("0");
   const [isLoading, setIsLoading] = useState(true);
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      if (primaryWallet) {
+        const connected = await primaryWallet.isConnected();
+        setIsWalletConnected(connected);
+      } else {
+        setIsWalletConnected(false);
+      }
+    };
+
+    checkConnection();
+  }, [primaryWallet]);
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -25,7 +39,7 @@ export const WalletInfo = () => {
     fetchBalance();
   }, [primaryWallet?.address]);
 
-  if (!isConnected) {
+  if (!isWalletConnected) {
     return null;
   }
 
