@@ -31,10 +31,13 @@ export const analyzeLinkedInProfile = async (profileUrl: string): Promise<Linked
     });
 
     if (!response.ok) {
+      console.error('API Response not OK:', await response.text());
       throw new Error('Failed to analyze LinkedIn profile');
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log('Raw API Response:', data);
+    return data;
   } catch (error) {
     console.error('Error analyzing LinkedIn profile:', error);
     throw error;
