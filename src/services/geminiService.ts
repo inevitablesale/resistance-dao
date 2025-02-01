@@ -36,59 +36,44 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       You are an AI Agent designed to process LinkedIn profile data into standardized NFT metadata objects.
       Your goal is to analyze, categorize, and generate structured attributes based on the user's experience, expertise, and role in the professional services industry.
 
-      Required Output Format:
-      {
-        "fullName": "string",
-        "publicIdentifier": "string",
-        "profilePic": "string (URL)",
-        "attributes": [
-          {
-            "trait_type": "Experience Level",
-            "value": "string"
-          },
-          {
-            "trait_type": "Specialty",
-            "value": "string"
-          },
-          {
-            "trait_type": "Years in Practice",
-            "value": "string"
-          },
-          {
-            "trait_type": "Client Base",
-            "value": "string"
-          },
-          {
-            "trait_type": "Governance Voting Power",
-            "value": number (0.0-1.0)
-          },
-          {
-            "trait_type": "Fractional Ownership",
-            "value": null
-          },
-          {
-            "trait_type": "Service Line Expertise",
-            "value": {
-              "Accounting Technology": number (0-10),
-              "Media & Thought Leadership": number (0-10),
-              "Advisory Services": number (0-10),
-              "Automation & Workflow": number (0-10),
-              "Small Business Accounting": number (0-10),
-              "Tax Planning & Compliance": number (0-10),
-              "M&A / Exit Planning": number (0-10),
-              "Wealth Management": number (0-10)
-            }
-          }
-        ],
-        "experiences": [
-          {
-            "title": "string",
-            "company": "string",
-            "duration": "string",
-            "location": "string"
-          }
-        ]
-      }
+      Standardized Field Rules:
+
+      Personal & Identification Fields:
+      - fullName: The full name of the individual
+      - publicIdentifier: LinkedIn username or public profile identifier
+      - profilePic: The profile image URL
+
+      Professional Experience:
+      - experiences: List of key professional roles, including:
+        - title: Position title
+        - company: Organization name
+        - duration: Time spent in the role
+        - location: City/remote work status
+
+      Trait Categories & Scoring:
+      - attributes: Standardized NFT trait assignments:
+        - Experience Level: (e.g., Founder & Advisor, CEO, Director, Consultant)
+        - Specialty: Determined by the primary industries they influence
+        - Years in Practice: Extracted from the earliest experience date
+        - Client Base: The primary market served (e.g., SMBs, Accounting Firms, Private Equity)
+        - Governance Voting Power: Scale 0.0 - 1.0 based on role, influence, and industry contributions
+        - Fractional Ownership: Defaults to null unless ownership is assigned
+        - Service Line Expertise: Scores (0.0 - 10.0) based on experience and industry focus across:
+          - Accounting Technology
+          - Media & Thought Leadership
+          - Advisory Services
+          - Automation & Workflow
+          - Small Business Accounting
+          - Tax Planning & Compliance
+          - M&A / Exit Planning
+          - Wealth Management
+
+      Rules for Scoring:
+      - Governance Voting Power: Assigned based on influence, leadership, and role tenure
+      - Fractional Ownership: Only included when explicitly provided
+      - Service Line Expertise: Weighted based on role, tenure, and domain expertise
+      - Experience Level: Defined based on highest role achieved
+      - Client Base: Extracted from career focus areas
 
       Analyze this LinkedIn profile and generate the NFT metadata according to the specified format:
       ${JSON.stringify(linkedInData)}
