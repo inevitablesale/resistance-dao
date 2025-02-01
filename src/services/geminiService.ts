@@ -67,11 +67,14 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       ${JSON.stringify(linkedInData)}
     `;
 
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    console.log('Using API key:', apiKey ? 'Key is present' : 'Key is missing');
+
     const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_GEMINI_API_KEY}`
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
         contents: [{
@@ -83,7 +86,8 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     });
 
     if (!response.ok) {
-      console.error('Gemini API Response not OK:', await response.text());
+      const errorText = await response.text();
+      console.error('Gemini API Response not OK:', errorText);
       throw new Error('Failed to generate NFT metadata');
     }
 
