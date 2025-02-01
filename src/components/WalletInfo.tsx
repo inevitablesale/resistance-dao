@@ -26,6 +26,11 @@ export const WalletInfo = () => {
   }, [primaryWallet]);
 
   const handleAnalyzeProfile = async () => {
+    console.log("User object:", user);
+    console.log("Verifications:", user?.verifications);
+    console.log("Custom fields:", user?.verifications?.customFields);
+    console.log("LinkedIn URL:", user?.verifications?.customFields?.["LinkedIn Profile URL"]);
+    
     const linkedInUrl = user?.verifications?.customFields?.["LinkedIn Profile URL"];
     
     if (!linkedInUrl) {
