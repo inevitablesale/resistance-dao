@@ -1,19 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Input } from './ui/input';
-import { Button } from './ui/button';
 
 const Map = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const [token, setToken] = useState('');
-  const [isMapInitialized, setIsMapInitialized] = useState(false);
 
-  const initializeMap = () => {
-    if (!mapContainer.current || !token) return;
+  useEffect(() => {
+    if (!mapContainer.current) return;
 
-    mapboxgl.accessToken = token;
+    // Initialize map with token
+    mapboxgl.accessToken = 'pk.eyJ1IjoiaW5ldml0YWJsZXNhbGUiLCJhIjoiY200dWtvaXZzMG10cTJzcTVjMGJ0bG14MSJ9.1bPoVxBRnR35MQGsGQgvQw';
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -100,34 +97,10 @@ const Map = () => {
     // Start the globe spinning
     spinGlobe();
 
-    setIsMapInitialized(true);
-  };
-
-  useEffect(() => {
     return () => {
       map.current?.remove();
     };
   }, []);
-
-  if (!isMapInitialized) {
-    return (
-      <div className="p-4 space-y-4">
-        <div className="max-w-md mx-auto">
-          <h2 className="text-lg font-semibold mb-2">Enter Mapbox Token</h2>
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              placeholder="Enter your Mapbox public token"
-              className="flex-1"
-            />
-            <Button onClick={initializeMap}>Initialize Map</Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="relative w-full h-[600px] bg-[#0b0b32]">
