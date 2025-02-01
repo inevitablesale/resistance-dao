@@ -1,13 +1,16 @@
 import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
-import { EthereumWalletConnectors, ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum";
+import * as DynamicEthereum from "@dynamic-labs/ethereum";
 import { WalletInfo } from "@/components/WalletInfo";
+
+// Log available exports
+console.log("Dynamic Ethereum exports:", DynamicEthereum);
 
 const Index = () => {
   return (
     <DynamicContextProvider
       settings={{
         environmentId: "2b74d425-6827-4ff1-af57-f9543d71cca0",
-        walletConnectors: [EthereumWalletConnectors, ZeroDevSmartWalletConnectors]
+        walletConnectors: [DynamicEthereum.EthereumWalletConnectors]
       }}
     >
       <div className="min-h-screen bg-gradient-to-b from-white to-purple-50">
