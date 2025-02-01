@@ -77,88 +77,65 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       },
     });
 
-    const prompt = `
-      You are an AI Agent designed to process LinkedIn profile data into standardized NFT metadata objects. Your goal is to analyze, categorize, and generate structured attributes based on the user's experience, expertise, and role in the professional services industry.
+    const prompt = `You are an AI Agent designed to process LinkedIn profile data into standardized NFT metadata objects. Your goal is to analyze, categorize, and generate structured attributes based on the user's experience, expertise, and role in the professional services industry.
 
-      Return ONLY a valid JSON object with no markdown formatting or additional text. The response should be a pure JSON object that can be parsed directly.
+Return ONLY a valid JSON object with the following structure, no markdown or additional text:
 
-      Standardized Field Rules:
-      Personal & Identification Fields:
-      - fullName: The full name of the individual.
-      - publicIdentifier: LinkedIn username or public profile identifier.
-      - profilePic: The profile image URL.
+{
+  "fullName": string,
+  "publicIdentifier": string,
+  "profilePic": string,
+  "attributes": [
+    {"trait_type": "Experience Level", "value": string},
+    {"trait_type": "Specialty", "value": string},
+    {"trait_type": "Years in Practice", "value": string},
+    {"trait_type": "Client Base", "value": string},
+    {"trait_type": "Governance Voting Power", "value": number},
+    {"trait_type": "Fractional Ownership", "value": null},
+    {"trait_type": "Service Line Expertise", "value": {
+      "Accounting Technology": number,
+      "Media & Thought Leadership": number,
+      "Advisory Services": number,
+      "Automation & Workflow": number,
+      "Small Business Accounting": number,
+      "Tax Planning & Compliance": number,
+      "M&A / Exit Planning": number,
+      "Wealth Management": number
+    }}
+  ],
+  "experiences": [
+    {
+      "title": string,
+      "company": string,
+      "duration": string,
+      "location": string
+    }
+  ]
+}
 
-      Professional Experience:
-      - experiences: List of key professional roles, including:
-        - title: Position title.
-        - company: Organization name.
-        - duration: Time spent in the role.
-        - location: City/remote work status.
+Rules:
+- Experience Level should be one of: "Founder & Advisor", "CEO", "Director", "Consultant"
+- Specialty should reflect primary industry focus
+- Years in Practice should be extracted from earliest experience
+- Client Base should reflect primary market served
+- Governance Voting Power should be 0.0-1.0 based on influence
+- Service Line Expertise scores should be 0.0-10.0
 
-      Trait Categories & Scoring:
-      attributes: Standardized NFT trait assignments:
-      - Experience Level: (e.g., Founder & Advisor, CEO, Director, Consultant)
-      - Specialty: Determined by the primary industries they influence.
-      - Years in Practice: Extracted from the earliest experience date.
-      - Client Base: The primary market served (e.g., SMBs, Accounting Firms, Private Equity).
-      - Service Line Expertise: Scores (0.0 - 10.0) based on experience and industry focus across:
-        - Accounting Technology
-        - Media & Thought Leadership
-        - Advisory Services
-        - Automation & Workflow
-        - Small Business Accounting
-        - Tax Planning & Compliance
-        - M&A / Exit Planning
-        - Wealth Management
-
-      Process this LinkedIn profile data and return ONLY the JSON object:
-      ${JSON.stringify(linkedInData)}
-    `;
+Process this LinkedIn profile data and return ONLY the JSON object with no additional text or formatting:
+${JSON.stringify(linkedInData)}`;
 
     console.log('Generating content with Gemini...');
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
     
-    try {
-      console.log('Raw Gemini response:', text);
-      
-      // Remove any markdown formatting or extra text
-      const jsonStr = text.replace(/```json\n|\n```|```/g, '').trim();
-      console.log('Cleaned JSON string:', jsonStr);
-      
-      const metadata = JSON.parse(jsonStr);
-      
-      // Calculate and add Governance Voting Power
-      const votingPower = calculateGovernanceVotingPower(
-        metadata.experiences,
-        metadata.attributes.find((a: any) => a.trait_type === "Service Line Expertise")?.value || {},
-        linkedInData.data?.connections,
-        linkedInData.data?.followers
-      );
-
-      // Add Governance Voting Power to attributes if not present
-      if (!metadata.attributes.find((a: any) => a.trait_type === "Governance Voting Power")) {
-        metadata.attributes.push({
-          trait_type: "Governance Voting Power",
-          value: votingPower
-        });
-      }
-
-      // Add Fractional Ownership if not present
-      if (!metadata.attributes.find((a: any) => a.trait_type === "Fractional Ownership")) {
-        metadata.attributes.push({
-          trait_type: "Fractional Ownership",
-          value: null
-        });
-      }
-
-      console.log('Generated NFT Metadata:', metadata);
-      return metadata;
-    } catch (parseError) {
-      console.error('Error parsing Gemini response:', parseError);
-      throw new Error('Failed to parse Gemini response');
-    }
+    console.log('Raw Gemini response:', text);
+    
+    // Parse the response as JSON
+    const metadata = JSON.parse(text);
+    console.log('Generated NFT Metadata:', metadata);
+    
+    return metadata;
   } catch (error) {
     console.error('Error generating NFT metadata:', error);
     throw error;
