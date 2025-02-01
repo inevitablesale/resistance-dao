@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WalletInfo } from "./WalletInfo";
 import { Building2, Wallet } from "lucide-react";
 import { useState, useEffect } from "react";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 export const PostOnboardingView = () => {
   const { user } = useDynamicContext();
@@ -97,5 +98,26 @@ export const PostOnboardingView = () => {
     );
   }
 
-  return null;
+  return (
+    <div className="max-w-md mx-auto mt-8">
+      <Card className="bg-white/5 border-white/10">
+        <CardHeader>
+          <CardTitle className="text-white">Enter Verification Code</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <InputOTP
+            maxLength={6}
+            onComplete={handleCodeComplete}
+            render={({ slots }) => (
+              <InputOTPGroup>
+                {slots.map((slot, index) => (
+                  <InputOTPSlot key={index} {...slot} />
+                ))}
+              </InputOTPGroup>
+            )}
+          />
+        </CardContent>
+      </Card>
+    </div>
+  );
 };
