@@ -62,8 +62,8 @@ const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { 
     1
   );
 
-  // Convert to a number between 0 and 100
-  return Math.round(votingPower * 100);
+  // Return the value between 0 and 1 with two decimal places
+  return Number(votingPower.toFixed(2));
 };
 
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
@@ -119,7 +119,7 @@ Rules:
 - Specialty should reflect primary industry focus
 - Years in Practice should be extracted from earliest experience
 - Client Base should reflect primary market served
-- Governance Voting Power should be a number between 0 and 100 based on influence
+- Governance Voting Power should be a decimal between 0.0 and 1.0 based on influence
 - Service Line Expertise scores should be 0.0-10.0
 
 Process this LinkedIn profile data and return ONLY the JSON object with no additional text or formatting:
