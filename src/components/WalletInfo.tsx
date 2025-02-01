@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight } from "lucide-react";
+import { analyzeLinkedInProfile } from "@/services/linkedinService";
+import { useToast } from "@/components/ui/use-toast";
 
 export const WalletInfo = () => {
   const { primaryWallet, user } = useDynamicContext();
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [progress, setProgress] = useState(25); // 25% for first step complete
+  const [progress, setProgress] = useState(25);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -20,6 +24,40 @@ export const WalletInfo = () => {
 
     checkConnection();
   }, [primaryWallet]);
+
+  const handleAnalyzeProfile = async () => {
+    if (!user?.verifications?.customFields?.["LinkedIn Profile URL"]) {
+      toast({
+        title: "LinkedIn Profile Not Found",
+        description: "Please make sure your LinkedIn profile is connected.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAnalyzing(true);
+    try {
+      const profileData = await analyzeLinkedInProfile(
+        user.verifications.customFields["LinkedIn Profile URL"]
+      );
+      
+      if (profileData.success) {
+        setProgress(50); // Move to next step
+        toast({
+          title: "Profile Analysis Complete",
+          description: "Your professional NFT attributes are being generated.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Analysis Failed",
+        description: "Failed to analyze LinkedIn profile. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   if (!isWalletConnected) {
     return null;
@@ -68,9 +106,19 @@ export const WalletInfo = () => {
           Your LinkedIn profile will be analyzed to generate unique NFT attributes that represent your professional experience and qualifications.
         </p>
         <div className="flex items-center justify-center">
-          <div className="animate-pulse-slow bg-polygon-primary/20 rounded-lg p-4 text-center">
-            <p className="text-polygon-primary">Analyzing LinkedIn Profile...</p>
-          </div>
+          <button
+            onClick={handleAnalyzeProfile}
+            disabled={isAnalyzing}
+            className={`${
+              isAnalyzing ? 'bg-polygon-primary/50' : 'bg-polygon-primary hover:bg-polygon-primary/90'
+            } text-white px-6 py-3 rounded-lg transition-colors`}
+          >
+            {isAnalyzing ? (
+              <div className="animate-pulse-slow">Analyzing Profile...</div>
+            ) : (
+              'Generate NFT'
+            )}
+          </button>
         </div>
       </div>
     </div>
