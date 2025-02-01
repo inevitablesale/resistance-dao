@@ -4,6 +4,7 @@ import { ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum-aa";
 import { WalletInfo } from "@/components/WalletInfo";
 import { PostOnboardingView } from "@/components/PostOnboardingView";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import Map from "@/components/Map";
 
 const IndexContent = () => {
   const { user } = useDynamicContext();
@@ -14,7 +15,7 @@ const IndexContent = () => {
 
   return (
     <>
-      <div className="text-center mb-16">
+      <div className="text-center mb-8">
         <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-purple-200 text-transparent bg-clip-text">
           The future of Web3
         </h1>
@@ -23,7 +24,9 @@ const IndexContent = () => {
         </p>
       </div>
 
-      <div className="max-w-md mx-auto">
+      <Map />
+
+      <div className="max-w-md mx-auto mt-8">
         <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
           <div className="flex justify-center mb-8">
             <DynamicWidget />
