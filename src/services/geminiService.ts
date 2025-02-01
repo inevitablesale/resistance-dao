@@ -20,7 +20,7 @@ interface NFTMetadata {
   }>;
 }
 
-const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { [key: string]: number }) => {
+const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { [key: string]: number }, connections: number = 0, followers: number = 0) => {
   // Calculate years of experience
   const totalYears = experiences.reduce((acc, exp) => {
     const duration = exp.duration;
@@ -35,18 +35,30 @@ const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { 
   const expertiseScores = Object.values(serviceExpertise);
   const averageExpertise = expertiseScores.reduce((a, b) => a + b, 0) / expertiseScores.length;
 
-  // For high-level executives and experienced consultants, boost the score
-  const seniorityBoost = experiences.some(exp => 
+  // Leadership score based on titles
+  const leadershipScore = experiences.some(exp => 
     exp.title.toLowerCase().includes('ceo') || 
+    exp.title.toLowerCase().includes('founder') ||
     exp.title.toLowerCase().includes('chief') ||
+    exp.title.toLowerCase().includes('president')
+  ) ? 0.3 : experiences.some(exp =>
+    exp.title.toLowerCase().includes('director') ||
+    exp.title.toLowerCase().includes('principal') ||
     (exp.title.toLowerCase().includes('consultant') && totalYears >= 5)
-  ) ? 0.2 : 0;
+  ) ? 0.2 : 0.1;
 
-  // Calculate voting power (40% experience, 40% expertise, 20% seniority)
+  // Network influence score (normalized to 0-0.2)
+  const networkScore = Math.min(
+    ((connections / 10000) + (followers / 15000)) / 2,
+    0.2
+  );
+
+  // Calculate voting power (30% expertise, 30% experience, 20% leadership, 20% network)
   const votingPower = Math.min(
-    ((totalYears / 20) * 0.4) + 
-    ((averageExpertise / 10) * 0.4) + 
-    seniorityBoost,
+    ((averageExpertise / 10) * 0.3) + 
+    ((totalYears / 20) * 0.3) + 
+    leadershipScore +
+    networkScore,
     1
   );
 
@@ -66,56 +78,38 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     });
 
     const prompt = `
-      Analyze this LinkedIn profile data and generate NFT metadata that accurately represents the professional's experience and expertise in the accounting and professional services industry. Pay special attention to their roles, responsibilities, and duration of experience.
+      You are an AI Agent designed to process LinkedIn profile data into standardized NFT metadata objects. Your goal is to analyze, categorize, and generate structured attributes based on the user's experience, expertise, and role in the professional services industry.
 
-      Required Output Format:
-      {
-        "fullName": "string",
-        "publicIdentifier": "string (LinkedIn handle)",
-        "profilePic": "string (URL from input)",
-        "attributes": [
-          {
-            "trait_type": "Experience Level",
-            "value": "string (e.g., CEO & Consultant, Senior Manager, etc.)"
-          },
-          {
-            "trait_type": "Specialty",
-            "value": "string (Main focus area)"
-          },
-          {
-            "trait_type": "Years in Practice",
-            "value": "string (e.g., 5+, 10+)"
-          },
-          {
-            "trait_type": "Client Base",
-            "value": "string (Types of clients served)"
-          },
-          {
-            "trait_type": "Service Line Expertise",
-            "value": {
-              "Accounting Technology": number (0-10),
-              "Media & Thought Leadership": number (0-10),
-              "Advisory Services": number (0-10),
-              "Automation & Workflow": number (0-10),
-              "Small Business Accounting": number (0-10),
-              "Tax Planning & Compliance": number (0-10),
-              "M&A / Exit Planning": number (0-10),
-              "Wealth Management": number (0-10)
-            }
-          }
-        ],
-        "experiences": [Array of most recent positions with exact details from input]
-      }
+      Standardized Field Rules:
+      Personal & Identification Fields:
+      - fullName: The full name of the individual.
+      - publicIdentifier: LinkedIn username or public profile identifier.
+      - profilePic: The profile image URL.
 
-      Guidelines:
-      1. Experience Level should reflect their most senior role and expertise level
-      2. Specialty should focus on their primary area of expertise
-      3. Years in Practice should be based on their total relevant experience
-      4. Client Base should reflect the types of organizations they serve
-      5. Service Line Expertise scores should be based on their experience and roles
-      6. Keep company names and durations exactly as provided in the input
+      Professional Experience:
+      - experiences: List of key professional roles, including:
+        - title: Position title.
+        - company: Organization name.
+        - duration: Time spent in the role.
+        - location: City/remote work status.
 
-      Input LinkedIn Data:
+      Trait Categories & Scoring:
+      attributes: Standardized NFT trait assignments:
+      - Experience Level: (e.g., Founder & Advisor, CEO, Director, Consultant)
+      - Specialty: Determined by the primary industries they influence.
+      - Years in Practice: Extracted from the earliest experience date.
+      - Client Base: The primary market served (e.g., SMBs, Accounting Firms, Private Equity).
+      - Service Line Expertise: Scores (0.0 - 10.0) based on experience and industry focus across:
+        - Accounting Technology
+        - Media & Thought Leadership
+        - Advisory Services
+        - Automation & Workflow
+        - Small Business Accounting
+        - Tax Planning & Compliance
+        - M&A / Exit Planning
+        - Wealth Management
+
+      Please analyze this LinkedIn profile and generate NFT metadata according to these rules:
       ${JSON.stringify(linkedInData)}
     `;
 
@@ -131,20 +125,26 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       // Calculate and add Governance Voting Power
       const votingPower = calculateGovernanceVotingPower(
         metadata.experiences,
-        metadata.attributes.find((a: any) => a.trait_type === "Service Line Expertise")?.value || {}
+        metadata.attributes.find((a: any) => a.trait_type === "Service Line Expertise")?.value || {},
+        linkedInData.data?.connections,
+        linkedInData.data?.followers
       );
 
-      // Add Governance Voting Power to attributes
-      metadata.attributes.push({
-        trait_type: "Governance Voting Power",
-        value: votingPower
-      });
+      // Add Governance Voting Power to attributes if not present
+      if (!metadata.attributes.find((a: any) => a.trait_type === "Governance Voting Power")) {
+        metadata.attributes.push({
+          trait_type: "Governance Voting Power",
+          value: votingPower
+        });
+      }
 
-      // Add Fractional Ownership placeholder
-      metadata.attributes.push({
-        trait_type: "Fractional Ownership",
-        value: null
-      });
+      // Add Fractional Ownership if not present
+      if (!metadata.attributes.find((a: any) => a.trait_type === "Fractional Ownership")) {
+        metadata.attributes.push({
+          trait_type: "Fractional Ownership",
+          value: null
+        });
+      }
 
       console.log('Generated NFT Metadata:', metadata);
       return metadata;
