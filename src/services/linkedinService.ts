@@ -1,3 +1,5 @@
+import { generateNFTMetadata } from "./geminiService";
+
 interface LinkedInProfile {
   success: boolean;
   status: number;
@@ -18,7 +20,7 @@ interface LinkedInProfile {
   };
 }
 
-export const analyzeLinkedInProfile = async (profileUrl: string): Promise<LinkedInProfile> => {
+export const analyzeLinkedInProfile = async (profileUrl: string) => {
   try {
     const response = await fetch('https://linkedin-bulk-data-scraper.p.rapidapi.com/person', {
       method: 'POST',
@@ -35,9 +37,17 @@ export const analyzeLinkedInProfile = async (profileUrl: string): Promise<Linked
       throw new Error('Failed to analyze LinkedIn profile');
     }
 
-    const data = await response.json();
-    console.log('Raw API Response:', data);
-    return data;
+    const linkedInData = await response.json();
+    console.log('LinkedIn API Response:', linkedInData);
+
+    // Generate NFT metadata using Gemini
+    const nftMetadata = await generateNFTMetadata(linkedInData);
+    console.log('Generated NFT Metadata:', nftMetadata);
+
+    return {
+      ...linkedInData,
+      nftMetadata
+    };
   } catch (error) {
     console.error('Error analyzing LinkedIn profile:', error);
     throw error;
