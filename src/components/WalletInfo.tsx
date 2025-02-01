@@ -27,11 +27,10 @@ export const WalletInfo = () => {
 
   const handleAnalyzeProfile = async () => {
     console.log("User object:", user);
-    console.log("Verifications:", user?.verifications);
-    console.log("Custom fields:", user?.verifications?.customFields);
-    console.log("LinkedIn URL:", user?.verifications?.customFields?.["LinkedIn Profile URL"]);
+    console.log("Metadata:", user?.metadata);
+    console.log("LinkedIn URL:", user?.metadata?.["LinkedIn Profile URL"]);
     
-    const linkedInUrl = user?.verifications?.customFields?.["LinkedIn Profile URL"];
+    const linkedInUrl = user?.metadata?.["LinkedIn Profile URL"];
     
     if (!linkedInUrl) {
       toast({
