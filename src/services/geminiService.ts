@@ -80,6 +80,8 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     const prompt = `
       You are an AI Agent designed to process LinkedIn profile data into standardized NFT metadata objects. Your goal is to analyze, categorize, and generate structured attributes based on the user's experience, expertise, and role in the professional services industry.
 
+      Return ONLY a valid JSON object with no markdown formatting or additional text. The response should be a pure JSON object that can be parsed directly.
+
       Standardized Field Rules:
       Personal & Identification Fields:
       - fullName: The full name of the individual.
@@ -109,7 +111,7 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
         - M&A / Exit Planning
         - Wealth Management
 
-      Please analyze this LinkedIn profile and generate NFT metadata according to these rules:
+      Process this LinkedIn profile data and return ONLY the JSON object:
       ${JSON.stringify(linkedInData)}
     `;
 
@@ -119,8 +121,13 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     const text = response.text();
     
     try {
-      console.log('Parsing Gemini response...');
-      const metadata = JSON.parse(text);
+      console.log('Raw Gemini response:', text);
+      
+      // Remove any markdown formatting or extra text
+      const jsonStr = text.replace(/```json\n|\n```|```/g, '').trim();
+      console.log('Cleaned JSON string:', jsonStr);
+      
+      const metadata = JSON.parse(jsonStr);
       
       // Calculate and add Governance Voting Power
       const votingPower = calculateGovernanceVotingPower(
