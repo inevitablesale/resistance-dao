@@ -3,7 +3,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 
 export const WalletInfo = () => {
-  const { primaryWallet, isAuthenticated } = useDynamicContext();
+  const { primaryWallet, isConnected } = useDynamicContext();
   const [balance, setBalance] = useState<string>("0");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -25,7 +25,7 @@ export const WalletInfo = () => {
     fetchBalance();
   }, [primaryWallet?.address]);
 
-  if (!isAuthenticated) {
+  if (!isConnected) {
     return null;
   }
 
