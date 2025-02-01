@@ -1,5 +1,6 @@
 import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+import { ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum-aa";
 import { WalletInfo } from "@/components/WalletInfo";
 
 const Index = () => {
@@ -7,7 +8,7 @@ const Index = () => {
     <DynamicContextProvider
       settings={{
         environmentId: "2b74d425-6827-4ff1-af57-f9543d71cca0",
-        walletConnectors: [EthereumWalletConnectors],
+        walletConnectors: [EthereumWalletConnectors, ZeroDevSmartWalletConnectors],
       }}
     >
       <div className="min-h-screen bg-gradient-to-b from-white to-purple-50">
