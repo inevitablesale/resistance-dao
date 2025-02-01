@@ -5,6 +5,10 @@ declare module "@dynamic-labs/sdk-react-core" {
   export interface UserProfile {
     alias?: string;
     email?: string;
+    metadata?: {
+      "LinkedIn Profile URL"?: string;
+      [key: string]: any;
+    };
     verifications?: {
       completedOnboarding?: boolean;
       customFields?: {

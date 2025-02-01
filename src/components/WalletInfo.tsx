@@ -44,8 +44,17 @@ export const WalletInfo = () => {
     setIsAnalyzing(true);
     try {
       const profileData = await analyzeLinkedInProfile(linkedInUrl);
+      console.log("LinkedIn API Response:", profileData);
       
       if (profileData.success) {
+        console.log("Profile Data:", {
+          name: `${profileData.data.firstName} ${profileData.data.lastName}`,
+          headline: profileData.data.headline,
+          skills: profileData.data.skills,
+          experiences: profileData.data.experiences,
+          education: profileData.data.educations
+        });
+        
         setProgress(50);
         toast({
           title: "Profile Analysis Complete",
@@ -53,6 +62,7 @@ export const WalletInfo = () => {
         });
       }
     } catch (error) {
+      console.error("API Error:", error);
       toast({
         title: "Analysis Failed",
         description: "Failed to analyze LinkedIn profile. Please try again later.",
