@@ -26,34 +26,33 @@ export const WalletInfo = () => {
   }, [primaryWallet]);
 
   const handleAnalyzeProfile = async () => {
-    console.group('LinkedIn Profile Analysis');
-    console.log('Starting profile analysis...');
+    console.log("User object:", user);
+    console.log("Metadata:", user?.metadata);
+    console.log("LinkedIn URL:", user?.metadata?.["LinkedIn Profile URL"]);
     
     const linkedInUrl = user?.metadata?.["LinkedIn Profile URL"];
-    console.log('LinkedIn URL:', linkedInUrl);
     
     if (!linkedInUrl) {
-      console.warn('LinkedIn Profile URL not found in metadata');
       toast({
         title: "LinkedIn Profile Not Found",
         description: "Please add your LinkedIn profile URL in your wallet settings.",
         variant: "destructive",
       });
-      console.groupEnd();
       return;
     }
 
     setIsAnalyzing(true);
     try {
-      console.log('Fetching LinkedIn profile data...');
       const profileData = await analyzeLinkedInProfile(linkedInUrl);
+      console.log("LinkedIn API Response:", profileData);
       
       if (profileData.success) {
-        console.log('Analysis completed successfully:', {
-          name: profileData.nftMetadata.fullName,
-          specialty: profileData.nftMetadata.attributes.find(a => a.trait_type === "Specialty")?.value,
-          experienceLevel: profileData.nftMetadata.attributes.find(a => a.trait_type === "Experience Level")?.value,
-          serviceExpertise: profileData.nftMetadata.attributes.find(a => a.trait_type === "Service Line Expertise")?.value
+        console.log("Profile Data:", {
+          name: `${profileData.data.firstName} ${profileData.data.lastName}`,
+          headline: profileData.data.headline,
+          skills: profileData.data.skills,
+          experiences: profileData.data.experiences,
+          education: profileData.data.educations
         });
         
         setProgress(50);
@@ -63,7 +62,7 @@ export const WalletInfo = () => {
         });
       }
     } catch (error) {
-      console.error('Profile analysis failed:', error);
+      console.error("API Error:", error);
       toast({
         title: "Analysis Failed",
         description: "Failed to analyze LinkedIn profile. Please try again later.",
@@ -71,7 +70,6 @@ export const WalletInfo = () => {
       });
     } finally {
       setIsAnalyzing(false);
-      console.groupEnd();
     }
   };
 
