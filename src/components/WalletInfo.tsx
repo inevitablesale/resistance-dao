@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { ethers } from "ethers";
+import { Progress } from "@/components/ui/progress";
+import { Check, ArrowRight } from "lucide-react";
 
 export const WalletInfo = () => {
-  const { primaryWallet } = useDynamicContext();
-  const [balance, setBalance] = useState<string>("0");
-  const [isLoading, setIsLoading] = useState(true);
+  const { primaryWallet, user } = useDynamicContext();
   const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [progress, setProgress] = useState(25); // 25% for first step complete
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -21,52 +21,55 @@ export const WalletInfo = () => {
     checkConnection();
   }, [primaryWallet]);
 
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (primaryWallet?.address) {
-        try {
-          const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
-          const balanceWei = await provider.getBalance(primaryWallet.address);
-          const balanceEth = ethers.utils.formatEther(balanceWei);
-          setBalance(parseFloat(balanceEth).toFixed(4));
-        } catch (error) {
-          console.error("Error fetching balance:", error);
-        }
-      }
-      setIsLoading(false);
-    };
-
-    fetchBalance();
-  }, [primaryWallet?.address]);
-
   if (!isWalletConnected) {
     return null;
   }
 
+  const steps = [
+    { name: "Wallet Created", status: "complete" },
+    { name: "Generate NFT", status: "current" },
+    { name: "KYC / AMLY", status: "upcoming" },
+    { name: "Complete", status: "upcoming" }
+  ];
+
   return (
-    <div className="mt-6 space-y-4">
-      <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-        <h2 className="text-xl font-semibold text-white mb-4">Wallet Details</h2>
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-400">Address</span>
-            <span className="text-white font-mono">
-              {primaryWallet?.address
-                ? `${primaryWallet.address.slice(0, 6)}...${primaryWallet.address.slice(-4)}`
-                : "Not connected"}
-            </span>
+    <div className="mt-6 space-y-6 animate-fade-in">
+      <Progress value={progress} className="h-2 bg-white/10" />
+      
+      <div className="grid grid-cols-4 gap-2">
+        {steps.map((step, index) => (
+          <div 
+            key={step.name}
+            className={`flex flex-col items-center text-center space-y-2 ${
+              index === 1 ? "text-polygon-primary" : 
+              index === 0 ? "text-white" : 
+              "text-gray-500"
+            }`}
+          >
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${
+              step.status === "complete" ? "bg-polygon-primary border-polygon-primary" :
+              step.status === "current" ? "border-polygon-primary" :
+              "border-gray-500"
+            }`}>
+              {step.status === "complete" ? (
+                <Check className="w-4 h-4 text-white" />
+              ) : step.status === "current" ? (
+                <ArrowRight className="w-4 h-4 text-polygon-primary" />
+              ) : null}
+            </div>
+            <span className="text-xs font-medium">{step.name}</span>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-400">Balance</span>
-            <span className="text-white">
-              {isLoading ? (
-                <span className="animate-pulse">Loading...</span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  {balance} <span className="text-polygon-primary">MATIC</span>
-                </span>
-              )}
-            </span>
+        ))}
+      </div>
+
+      <div className="p-6 rounded-xl bg-white/5 border border-white/10 space-y-4">
+        <h3 className="text-xl font-semibold text-white">Generate Your Professional NFT</h3>
+        <p className="text-gray-400">
+          Your LinkedIn profile will be analyzed to generate unique NFT attributes that represent your professional experience and qualifications.
+        </p>
+        <div className="flex items-center justify-center">
+          <div className="animate-pulse-slow bg-polygon-primary/20 rounded-lg p-4 text-center">
+            <p className="text-polygon-primary">Analyzing LinkedIn Profile...</p>
           </div>
         </div>
       </div>
