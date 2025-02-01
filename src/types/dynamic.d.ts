@@ -15,6 +15,11 @@ declare module "@dynamic-labs/sdk-react-core" {
 
   export interface DynamicContextType {
     user: UserProfile | null;
+    primaryWallet: {
+      address?: string;
+      isConnected: () => Promise<boolean>;
+      getWalletClient: () => Promise<any>;
+    } | null;
   }
 
   export function useDynamicContext(): DynamicContextType;
