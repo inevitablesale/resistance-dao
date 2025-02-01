@@ -98,13 +98,13 @@ export const WalletInfo = () => {
           </div>
         </div>
 
-        {/* NFTs Section */}
+        {/* Firm Ownership NFTs Section */}
         <div className="mt-8">
-          <h2 className="text-2xl font-bold text-white mb-6">NFTs</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">Firm Ownership NFTs</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {/* Placeholder for NFTs - We can implement NFT fetching in a future update */}
+            {/* Placeholder for NFTs - Will be populated with firm ownership NFTs */}
             <div className="aspect-square rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-              <span className="text-white/40">No NFTs found</span>
+              <span className="text-white/40">No ownership tokens found</span>
             </div>
           </div>
         </div>
