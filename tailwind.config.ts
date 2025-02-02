@@ -70,6 +70,12 @@ export default {
       animation: {
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
+      keyframes: {
+        twinkle: {
+          '0%, 100%': { opacity: '0.5' },
+          '50%': { opacity: '0.1' },
+        }
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],
