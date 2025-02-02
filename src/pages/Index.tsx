@@ -26,7 +26,7 @@ const IndexContent = () => {
       <div className="max-w-md mx-auto mt-8">
         <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
           <div className="flex justify-center mb-8">
-            <DynamicWidget buttonClassName="!bg-white !text-purple-900 hover:!bg-purple-100 transition-colors" />
+            <DynamicWidget variant="modal" buttonClassName="!bg-white !text-purple-900 hover:!bg-purple-100 transition-colors" />
           </div>
           <WalletInfo />
         </div>
@@ -57,9 +57,12 @@ const Index = () => {
         walletConnectors: [EthereumWalletConnectors, ZeroDevSmartWalletConnectors],
       }}
     >
-      <div className="min-h-screen bg-gradient-to-b from-[#2D1B69] to-black overflow-hidden relative">
+      <div className="min-h-screen bg-black overflow-hidden relative">
         {/* Animated stars background */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwMCIgaGVpZ2h0PSIyMDAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI25vaXNlKSIgb3BhY2l0eT0iLjA1Ii8+PC9zdmc+')] opacity-50 animate-[twinkle_20s_ease-in-out_infinite]"></div>
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwMCIgaGVpZ2h0PSIyMDAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI25vaXNlKSIgb3BhY2l0eT0iLjA1Ii8+PC9zdmc+')] opacity-50 animate-[twinkle_20s_ease-in-out_infinite]"></div>
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwMCIgaGVpZ2h0PSIyMDAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjI1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI25vaXNlKSIgb3BhY2l0eT0iLjA1Ii8+PC9zdmc+')] opacity-30 animate-[twinkle_15s_ease-in-out_infinite]"></div>
+        </div>
         
         <div className="container mx-auto px-4 py-16 relative z-10">
           <IndexContent />
