@@ -4,7 +4,6 @@ import { ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum-aa";
 import { WalletInfo } from "@/components/WalletInfo";
 import { PostOnboardingView } from "@/components/PostOnboardingView";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import Map from "@/components/Map";
 
 const IndexContent = () => {
   const { user } = useDynamicContext();
@@ -23,8 +22,6 @@ const IndexContent = () => {
           Connect your wallet to participate in the decentralized future of finance through our platform
         </p>
       </div>
-
-      <Map />
 
       <div className="max-w-md mx-auto mt-8">
         <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
