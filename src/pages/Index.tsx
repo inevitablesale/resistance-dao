@@ -26,7 +26,13 @@ const IndexContent = () => {
       <div className="max-w-md mx-auto mt-8">
         <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
           <div className="flex justify-center mb-8">
-            <DynamicWidget buttonClassName="!bg-white !text-purple-900 hover:!bg-purple-100 transition-colors" />
+            <DynamicWidget 
+              innerButtonComponent={
+                <button className="bg-white text-purple-900 hover:bg-purple-100 transition-colors px-6 py-2 rounded-lg font-medium">
+                  Mint Ledger NFT
+                </button>
+              }
+            />
           </div>
           <WalletInfo />
         </div>
