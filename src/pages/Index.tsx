@@ -26,7 +26,7 @@ const IndexContent = () => {
       <div className="max-w-md mx-auto mt-8">
         <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
           <div className="flex justify-center mb-8">
-            <DynamicWidget variant="modal" buttonClassName="!bg-white !text-purple-900 hover:!bg-purple-100 transition-colors" />
+            <DynamicWidget buttonClassName="!bg-white !text-purple-900 hover:!bg-purple-100 transition-colors" />
           </div>
           <WalletInfo />
         </div>
