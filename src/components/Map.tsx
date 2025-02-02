@@ -44,16 +44,14 @@ const Map = () => {
     return (
       <div className="p-4 space-y-4">
         <div className="max-w-md mx-auto">
-          <h2 className="text-lg font-semibold mb-2">Enter Mapbox Token</h2>
           <div className="flex gap-2">
             <Input
               type="text"
               value={token}
               onChange={(e) => setToken(e.target.value)}
-              placeholder="Enter your Mapbox public token"
               className="flex-1"
             />
-            <Button onClick={initializeMap}>Initialize Map</Button>
+            <Button onClick={initializeMap} />
           </div>
         </div>
       </div>
