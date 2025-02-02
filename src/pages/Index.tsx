@@ -25,7 +25,7 @@ const IndexContent = () => {
 
       <div className="max-w-md mx-auto mt-8">
         <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
-          <div className="flex justify-center mb-8">
+          <div className="flex gap-4 justify-center mb-8">
             <DynamicWidget 
               innerButtonComponent={
                 <button className="bg-white text-purple-900 hover:bg-purple-100 transition-colors px-6 py-2 rounded-lg font-medium">
@@ -33,6 +33,9 @@ const IndexContent = () => {
                 </button>
               }
             />
+            <button className="px-6 py-2 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors">
+              Earn Rewards with Quests
+            </button>
           </div>
           <WalletInfo />
         </div>
@@ -41,14 +44,6 @@ const IndexContent = () => {
           <p className="text-sm text-gray-400 mb-4">
             Check your eligibility to join the future of accounting
           </p>
-          <div className="flex gap-4 justify-center">
-            <button className="px-6 py-2 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors">
-              Earn Rewards with Quests
-            </button>
-            <button className="px-6 py-2 bg-white hover:bg-white/90 text-purple-900 rounded-lg transition-colors">
-              Mint Ledger NFT
-            </button>
-          </div>
         </div>
       </div>
     </>
