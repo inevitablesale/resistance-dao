@@ -59,19 +59,18 @@ export const WalletInfo = () => {
         throw new Error('Wallet address not found');
       }
 
-      const governancePowerLevel = 1; // This should be determined based on analysis
-      const { tokenId } = await mintNFT(
+      const result = await mintNFT(
         await primaryWallet.getWalletClient(),
         primaryWallet.address,
-        governancePowerLevel
+        nftMetadata
       );
 
-      console.log('NFT minted successfully:', tokenId);
+      console.log('NFT minted successfully:', result);
       setProgress(100);
       
       toast({
         title: "NFT Minted Successfully!",
-        description: "Your Professional NFT has been minted and should appear in your wallet shortly.",
+        description: `Your Professional NFT has been minted and stored on IPFS at ${result.tokenURI}`,
       });
     } catch (error) {
       console.error('Process failed:', error);
