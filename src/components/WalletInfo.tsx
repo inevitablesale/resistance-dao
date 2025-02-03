@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDynamicContext, NFTPreview } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, EmbeddedWalletPreview } from "@dynamic-labs/sdk-react-core";
 import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight, Eye } from "lucide-react";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
@@ -63,14 +63,17 @@ export const WalletInfo = () => {
     try {
       console.log('Fetching LinkedIn profile data...');
       const nftMetadata = await analyzeLinkedInProfile(linkedInUrl);
+      console.log('Received NFT metadata:', nftMetadata);
       setProgress(50);
       
       const governancePowerAttr = nftMetadata.attributes.find(
         attr => attr.trait_type === "Governance Power"
       );
+      console.log('Found Governance Power attribute:', governancePowerAttr);
       
       if (governancePowerAttr) {
         const imageCID = getGovernanceImageCID(String(governancePowerAttr.value));
+        console.log('Generated Image CID:', imageCID);
         setPreviewImageUrl(`https://ipfs.io/ipfs/${imageCID}`);
       }
       
@@ -83,6 +86,7 @@ export const WalletInfo = () => {
         }))
       };
       
+      console.log('Formatted metadata for preview:', formattedMetadata);
       setNFTPreview(formattedMetadata);
       toast({
         title: "Analysis Complete",
@@ -189,7 +193,7 @@ export const WalletInfo = () => {
           <Card className="p-6 bg-black/20 border border-white/10 rounded-lg">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex items-center justify-center">
-                <NFTPreview
+                <EmbeddedWalletPreview
                   metadata={{
                     name: `${nftPreview.fullName}'s Professional NFT`,
                     description: "Professional NFT representing verified credentials and experience",
