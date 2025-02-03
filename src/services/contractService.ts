@@ -4,11 +4,8 @@ import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 
 const CONTRACT_ADDRESS = "0x3dC25640b1B7528Dca23BeFcDAD835C5Bf4e5360";
 const CONTRACT_ABI = [
-  // Core minting and URI functions
   "function safeMint(address to, string memory governancePower) public returns (uint256)",
   "function tokenURI(uint256 tokenId) public view returns (string)",
-  
-  // Ownership and transfer functions
   "function approve(address to, uint256 tokenId)",
   "function renounceOwnership()",
   "function safeTransferFrom(address from, address to, uint256 tokenId)",
@@ -16,8 +13,6 @@ const CONTRACT_ABI = [
   "function transferFrom(address from, address to, uint256 tokenId)",
   "function transferOwnership(address newOwner)",
   "function updateGovernancePowerCID(uint256 tokenId, string memory newCID)",
-  
-  // Events
   "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 ];
 
@@ -35,7 +30,6 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
   try {
     console.log('Starting NFT minting process with metadata:', metadata);
     
-    // Extract governance power from attributes array
     const governancePowerAttr = metadata.attributes.find(
       (attr: { trait_type: string; value: string }) => 
       attr.trait_type === "Governance Power"
@@ -45,7 +39,6 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
       throw new Error('Governance Power not found in metadata attributes');
     }
 
-    // Create provider without ENS support
     const provider = new ethers.providers.Web3Provider(walletClient, {
       name: 'unknown',
       chainId: 137 // Polygon Mainnet
@@ -57,23 +50,20 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
     console.log('Minting NFT for address:', address);
     console.log('Using governance power:', governancePowerAttr.value);
 
-    // Call safeMint with the governance power value directly
     const tx = await contract.safeMint(address, governancePowerAttr.value);
     console.log('Minting transaction sent:', tx.hash);
     
     const receipt = await tx.wait();
     console.log('Minting confirmed:', receipt);
     
-    // Get the token ID from the event logs
     const mintEvent = receipt.events?.find(e => e.event === 'Transfer');
     const tokenId = mintEvent?.args?.tokenId;
 
-    // Still upload metadata to IPFS for reference
     const governanceImageCID = getGovernanceImageCID(governancePowerAttr.value);
     const governanceImageUrl = `ipfs://${governanceImageCID}`;
     
     const nftMetadata: NFTMetadata = {
-      name: `Professional Governance Power NFT`,
+      name: `${metadata.fullName}'s Professional NFT`,
       description: `This NFT represents the governance power level of ${metadata.fullName} based on their professional experience and qualifications.`,
       image: governanceImageUrl,
       attributes: metadata.attributes

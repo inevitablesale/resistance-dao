@@ -65,6 +65,15 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     
     console.log('Processing profile data:', profileData);
 
+    // Extract full name from LinkedIn data
+    const firstName = profileData.firstName || '';
+    const lastName = profileData.lastName || '';
+    const fullName = `${firstName} ${lastName}`.trim();
+
+    if (!fullName) {
+      throw new Error('Could not extract full name from LinkedIn profile');
+    }
+
     const model = genAI.getGenerativeModel({ 
       model: "gemini-pro",
       generationConfig: {
@@ -89,7 +98,7 @@ IMPORTANT: For the Governance Power attribute, you MUST ONLY use one of these ex
 
 Given a LinkedIn profile, generate NFT metadata with the following structure:
 {
-  "fullName": "string",
+  "fullName": "${fullName}",
   "publicIdentifier": "string",
   "profilePic": "string (optional)",
   "attributes": [
@@ -126,23 +135,20 @@ ${JSON.stringify(profileData, null, 2)}`;
     const response = await result.response;
     const text = response.text();
     
-    console.log('Raw Gemini response:', text);
-    
     try {
-      // Clean and extract JSON from the response
       const jsonString = extractJSONFromText(text);
       const parsedResponse = JSON.parse(jsonString);
       console.log('Parsed response:', parsedResponse);
       
-      // Extract just the data object from the response if needed
       const nftMetadata = parsedResponse.data || parsedResponse;
       
-      // Validate the required fields
-      if (!nftMetadata.fullName || !nftMetadata.publicIdentifier || !Array.isArray(nftMetadata.attributes)) {
+      // Ensure the full name is set
+      nftMetadata.fullName = fullName;
+
+      if (!nftMetadata.publicIdentifier || !Array.isArray(nftMetadata.attributes)) {
         throw new Error('Missing required fields in NFT metadata');
       }
 
-      // Ensure governance power is valid
       const governancePowerAttr = nftMetadata.attributes.find(attr => 
         attr.trait_type === "Governance Power"
       );
@@ -152,7 +158,6 @@ ${JSON.stringify(profileData, null, 2)}`;
         throw new Error('Invalid or missing Governance Power value');
       }
 
-      // Ensure all required attributes exist with non-null values
       const requiredAttributes = [
         "Governance Power",
         "Experience Level",
