@@ -1,4 +1,4 @@
-import { Contract } from '@dynamic-labs/ethers-v6';
+import { Contract, JsonRpcProvider } from 'ethers';
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,10 +25,11 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
     console.log('Wallet client:', walletClient);
     
     // Create contract instance using the wallet client from Dynamic
+    const provider = new JsonRpcProvider(walletClient.provider.transport.url);
     const contract = new Contract(
       NFT_CONTRACT_ADDRESS,
       NFT_CONTRACT_ABI,
-      walletClient
+      provider.getSigner(address)
     );
 
     console.log('Contract instance created:', contract);
