@@ -21,8 +21,8 @@ export const WalletInfo = () => {
         setIsWalletConnected(connected);
         
         // Log wallet type for debugging
-        console.log('Wallet type:', primaryWallet.connector?.name);
-        console.log('Is AA wallet:', primaryWallet.connector?.name.includes('ZeroDev'));
+        console.log('Wallet type:', primaryWallet.walletConnector?.name);
+        console.log('Is AA wallet:', primaryWallet.walletConnector?.name?.includes('ZeroDev'));
       } else {
         setIsWalletConnected(false);
       }
@@ -136,7 +136,7 @@ export const WalletInfo = () => {
         <h3 className="text-xl font-semibold text-white">Generate Your Professional NFT</h3>
         <p className="text-gray-400">
           Your LinkedIn profile will be analyzed to generate unique NFT attributes that represent your professional experience and qualifications.
-          {primaryWallet?.connector?.name.includes('ZeroDev') && (
+          {primaryWallet?.walletConnector?.name?.includes('ZeroDev') && (
             <span className="block mt-2 text-sm text-polygon-primary">
               Gas fees will be sponsored by ZeroDev
             </span>

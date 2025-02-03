@@ -12,10 +12,8 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const zeroDevConfig = {
-  projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
-  bundlerProvider: {
-    url: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
-  },
+  bundlerRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
+  paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
 };
 
 const App = () => (
