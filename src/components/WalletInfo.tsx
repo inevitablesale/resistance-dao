@@ -47,7 +47,6 @@ export const WalletInfo = () => {
 
     setIsAnalyzing(true);
     try {
-      // Analyze LinkedIn profile
       console.log('Fetching LinkedIn profile data...');
       const nftMetadata = await analyzeLinkedInProfile(linkedInUrl);
       setProgress(50);
@@ -60,13 +59,8 @@ export const WalletInfo = () => {
         throw new Error('Wallet address not found');
       }
 
-      // Get the wallet client from Dynamic
-      const walletClient = await primaryWallet.getWalletClient();
-      console.log('Got wallet client:', walletClient);
-
-      // Mint the NFT using the wallet client
       const result = await mintNFT(
-        walletClient,
+        await primaryWallet.getWalletClient(),
         primaryWallet.address,
         nftMetadata
       );
@@ -76,7 +70,7 @@ export const WalletInfo = () => {
       
       toast({
         title: "NFT Minted Successfully!",
-        description: `Your Professional NFT has been minted. Transaction hash: ${result.transactionHash}`,
+        description: `Your Professional NFT has been minted and stored on IPFS at ${result.tokenURI}`,
       });
     } catch (error) {
       console.error('Process failed:', error);
