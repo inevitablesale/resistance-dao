@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, DynamicNFTPreview } from "@dynamic-labs/sdk-react-core";
 import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight, Eye } from "lucide-react";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
@@ -63,7 +63,6 @@ export const WalletInfo = () => {
       const nftMetadata = await analyzeLinkedInProfile(linkedInUrl);
       setProgress(50);
       
-      // Get governance power and corresponding image
       const governancePowerAttr = nftMetadata.attributes.find(
         attr => attr.trait_type === "Governance Power"
       );
@@ -178,15 +177,18 @@ export const WalletInfo = () => {
         {nftPreview ? (
           <Card className="p-6 bg-black/20 border border-white/10 rounded-lg">
             <div className="grid md:grid-cols-2 gap-6">
-              {previewImageUrl && (
-                <div className="flex items-center justify-center">
-                  <img 
-                    src={previewImageUrl} 
-                    alt="NFT Preview" 
-                    className="rounded-lg max-w-[300px] w-full"
-                  />
-                </div>
-              )}
+              <div className="flex items-center justify-center">
+                <DynamicNFTPreview
+                  metadata={{
+                    name: `${nftPreview.fullName}'s Professional NFT`,
+                    description: "Professional NFT representing verified credentials and experience",
+                    image: previewImageUrl,
+                    attributes: nftPreview.attributes
+                  }}
+                  showFullMetadata={true}
+                  className="w-full max-w-[300px]"
+                />
+              </div>
               <div className="space-y-4">
                 <h4 className="text-lg font-semibold text-white">{nftPreview.fullName}'s Professional NFT</h4>
                 <div className="space-y-2">
