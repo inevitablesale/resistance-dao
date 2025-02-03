@@ -23,6 +23,9 @@ declare module "@dynamic-labs/sdk-react-core" {
       address?: string;
       isConnected: () => Promise<boolean>;
       getWalletClient: () => Promise<any>;
+      walletConnector?: {
+        name: string;
+      };
     } | null;
   }
 
