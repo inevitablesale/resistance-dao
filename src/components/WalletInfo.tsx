@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDynamicContext, DynamicNFTDisplayer } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight, Eye } from "lucide-react";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
@@ -8,14 +8,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 
-interface NFTAttribute {
-  trait_type: string;
-  value: string;
-}
-
-interface NFTPreviewData {
+interface NFTPreview {
   fullName: string;
-  attributes: NFTAttribute[];
+  attributes: Array<{
+    trait_type: string;
+    value: string;
+  }>;
 }
 
 export const WalletInfo = () => {
@@ -24,7 +22,7 @@ export const WalletInfo = () => {
   const [progress, setProgress] = useState(25);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
-  const [nftPreview, setNFTPreview] = useState<NFTPreviewData | null>(null);
+  const [nftPreview, setNFTPreview] = useState<NFTPreview | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState<string>("");
   const { toast } = useToast();
 
@@ -63,30 +61,19 @@ export const WalletInfo = () => {
     try {
       console.log('Fetching LinkedIn profile data...');
       const nftMetadata = await analyzeLinkedInProfile(linkedInUrl);
-      console.log('Received NFT metadata:', nftMetadata);
       setProgress(50);
       
+      // Get governance power and corresponding image
       const governancePowerAttr = nftMetadata.attributes.find(
         attr => attr.trait_type === "Governance Power"
       );
-      console.log('Found Governance Power attribute:', governancePowerAttr);
       
       if (governancePowerAttr) {
-        const imageCID = getGovernanceImageCID(String(governancePowerAttr.value));
-        console.log('Generated Image CID:', imageCID);
+        const imageCID = getGovernanceImageCID(governancePowerAttr.value);
         setPreviewImageUrl(`https://ipfs.io/ipfs/${imageCID}`);
       }
       
-      const formattedMetadata: NFTPreviewData = {
-        fullName: nftMetadata.fullName,
-        attributes: nftMetadata.attributes.map(attr => ({
-          trait_type: attr.trait_type,
-          value: String(attr.value)
-        }))
-      };
-      
-      console.log('Formatted metadata for preview:', formattedMetadata);
-      setNFTPreview(formattedMetadata);
+      setNFTPreview(nftMetadata);
       toast({
         title: "Analysis Complete",
         description: "Preview your NFT before minting.",
@@ -191,17 +178,15 @@ export const WalletInfo = () => {
         {nftPreview ? (
           <Card className="p-6 bg-black/20 border border-white/10 rounded-lg">
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="flex items-center justify-center">
-                <DynamicNFTDisplayer
-                  metadata={{
-                    name: `${nftPreview.fullName}'s Professional NFT`,
-                    description: "Professional NFT representing verified credentials and experience",
-                    image: previewImageUrl,
-                    attributes: nftPreview.attributes
-                  }}
-                  className="w-full max-w-[300px]"
-                />
-              </div>
+              {previewImageUrl && (
+                <div className="flex items-center justify-center">
+                  <img 
+                    src={previewImageUrl} 
+                    alt="NFT Preview" 
+                    className="rounded-lg max-w-[300px] w-full"
+                  />
+                </div>
+              )}
               <div className="space-y-4">
                 <h4 className="text-lg font-semibold text-white">{nftPreview.fullName}'s Professional NFT</h4>
                 <div className="space-y-2">
