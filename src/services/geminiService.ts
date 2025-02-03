@@ -60,62 +60,8 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       },
     });
 
-    const prompt = `
-      You are an AI Agent designed to process LinkedIn profile data into standardized NFT metadata objects.
-      Your goal is to analyze, categorize, and generate structured attributes based on the user's experience, expertise, and role in the professional services industry.
-
-      Required Output Format:
-      {
-        "fullName": "string",
-        "publicIdentifier": "string",
-        "profilePic": "string (URL)",
-        "attributes": [
-          {
-            "trait_type": "Experience Level",
-            "value": "string"
-          },
-          {
-            "trait_type": "Specialty",
-            "value": "string"
-          },
-          {
-            "trait_type": "Years in Practice",
-            "value": "string"
-          },
-          {
-            "trait_type": "Client Base",
-            "value": "string"
-          },
-          {
-            "trait_type": "Service Line Expertise",
-            "value": {
-              "Accounting Technology": number (0-10),
-              "Media & Thought Leadership": number (0-10),
-              "Advisory Services": number (0-10),
-              "Automation & Workflow": number (0-10),
-              "Small Business Accounting": number (0-10),
-              "Tax Planning & Compliance": number (0-10),
-              "M&A / Exit Planning": number (0-10),
-              "Wealth Management": number (0-10)
-            }
-          }
-        ],
-        "experiences": [
-          {
-            "title": "string",
-            "company": "string",
-            "duration": "string",
-            "location": "string"
-          }
-        ]
-      }
-
-      Analyze this LinkedIn profile and generate the NFT metadata according to the specified format:
-      ${JSON.stringify(linkedInData)}
-    `;
-
-    console.log('Generating content with Gemini...');
-    const result = await model.generateContent(prompt);
+    console.log('Processing LinkedIn data with Gemini...');
+    const result = await model.generateContent(JSON.stringify(linkedInData));
     const response = await result.response;
     const text = response.text();
     
@@ -129,17 +75,21 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
         metadata.attributes.find((a: any) => a.trait_type === "Service Line Expertise")?.value || {}
       );
 
-      // Add Governance Voting Power to attributes
-      metadata.attributes.push({
-        trait_type: "Governance Voting Power",
-        value: votingPower
-      });
+      // Add Governance Voting Power to attributes if not present
+      if (!metadata.attributes.find(a => a.trait_type === "Governance Voting Power")) {
+        metadata.attributes.push({
+          trait_type: "Governance Voting Power",
+          value: votingPower
+        });
+      }
 
-      // Add Fractional Ownership placeholder
-      metadata.attributes.push({
-        trait_type: "Fractional Ownership",
-        value: null
-      });
+      // Add Fractional Ownership if not present
+      if (!metadata.attributes.find(a => a.trait_type === "Fractional Ownership")) {
+        metadata.attributes.push({
+          trait_type: "Fractional Ownership",
+          value: null
+        });
+      }
 
       console.log('Generated NFT Metadata:', metadata);
       return metadata;
