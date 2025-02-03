@@ -50,7 +50,13 @@ const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { 
 
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
   try {
-    console.log('Initializing Gemini model...');
+    console.log('Raw LinkedIn data:', linkedInData);
+    
+    // Extract just the data object if it exists
+    const profileData = linkedInData.data || linkedInData;
+    
+    console.log('Processing profile data:', profileData);
+
     const model = genAI.getGenerativeModel({ 
       model: "gemini-pro",
       generationConfig: {
@@ -93,7 +99,7 @@ Required attributes must include:
 - Service Line Expertise (Accounting Technology, Media & Thought Leadership, etc.)
 
 Analyze this LinkedIn profile and generate the NFT metadata according to the specified format:
-${JSON.stringify(linkedInData, null, 2)}`;
+${JSON.stringify(profileData, null, 2)}`;
 
     console.log('Generating content with Gemini...');
     const result = await model.generateContent(prompt);
@@ -103,46 +109,40 @@ ${JSON.stringify(linkedInData, null, 2)}`;
     console.log('Raw Gemini response:', text);
     
     try {
-      const metadata = JSON.parse(text);
-      console.log('Parsed metadata:', metadata);
+      const parsedResponse = JSON.parse(text);
+      console.log('Parsed response:', parsedResponse);
       
-      // Validate required fields
-      if (!metadata.fullName || !metadata.publicIdentifier || !Array.isArray(metadata.attributes)) {
-        throw new Error('Missing required fields in metadata');
+      // Extract just the data object from the response if needed
+      const nftMetadata = parsedResponse.data || parsedResponse;
+      
+      // Validate the required fields
+      if (!nftMetadata.fullName || !nftMetadata.publicIdentifier || !Array.isArray(nftMetadata.attributes)) {
+        throw new Error('Missing required fields in NFT metadata');
       }
 
-      // Ensure attributes array exists
-      if (!metadata.attributes) {
-        metadata.attributes = [];
-      }
+      // Ensure all required attributes exist with non-null values
+      const requiredAttributes = [
+        "Governance Power",
+        "Experience Level",
+        "Specialty",
+        "Years in Practice",
+        "Client Base",
+        "Service Line Expertise"
+      ];
 
-      // Calculate and add Governance Voting Power
-      const votingPower = calculateGovernanceVotingPower(
-        metadata.experiences || [],
-        (metadata.attributes.find(a => a.trait_type === "Service Line Expertise")?.value as { [key: string]: number }) || {}
+      const missingAttributes = requiredAttributes.filter(attr => 
+        !nftMetadata.attributes.some(a => 
+          a.trait_type === attr && a.value !== null
+        )
       );
 
-      // Add Governance Voting Power to attributes if not exists
-      if (!metadata.attributes.find(a => a.trait_type === "Governance Voting Power")) {
-        metadata.attributes.push({
-          trait_type: "Governance Voting Power",
-          value: votingPower
-        });
+      if (missingAttributes.length > 0) {
+        throw new Error(`Missing or null values for attributes: ${missingAttributes.join(', ')}`);
       }
 
-      // Add Fractional Ownership placeholder if not exists
-      if (!metadata.attributes.find(a => a.trait_type === "Fractional Ownership")) {
-        metadata.attributes.push({
-          trait_type: "Fractional Ownership",
-          value: null
-        });
-      }
-
-      console.log('Final NFT Metadata:', metadata);
-      return metadata;
+      return nftMetadata;
     } catch (parseError) {
       console.error('Error parsing Gemini response:', parseError);
-      console.error('Raw response that failed to parse:', text);
       throw new Error('Failed to parse Gemini response');
     }
   } catch (error) {
