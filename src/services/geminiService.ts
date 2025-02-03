@@ -105,8 +105,7 @@ Each NFT has six defined attribute layers, and you must select exactly one value
 | M&A / Exit Planning | Firm sales, deal structuring |
 | Wealth Management | Financial planning, estate structuring |
 
-Example Outputs:
-
+Example Output:
 {
     "fullName": "David Leary",
     "publicIdentifier": "davidleary",
