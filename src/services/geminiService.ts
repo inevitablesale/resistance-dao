@@ -29,94 +29,102 @@ Personal Identification
 - publicIdentifier: Use LinkedIn username or profile URL
 - profilePic: Assign LinkedIn profile picture
 
+Professional Influence
+- connections: Total LinkedIn connections
+- followers: Total LinkedIn followers
+
+Professional Experience
+- experiences: List of key professional roles
+  - title: Role in organization
+  - company: Organization name
+  - duration: Length of tenure
+  - location: Work location
+
 🔹 NFT Trait Assignment Logic
 Each NFT has six defined attribute layers, and you must select exactly one value per layer based on the user's profile data.
 
 1️⃣ Governance Power (Influence & Leadership)
-Values:
-- Industry Icon (10,000+ followers, keynote speaker, national-level influence)
-- Veteran Firm Owner (5,000-9,999 followers, 20+ years leading a practice)
+Values & Criteria:
+- Industry Icon (10,000+ followers, keynote speaker, national influence)
+- Veteran Firm Owner (5,000-9,999 followers, 20+ years leading)
 - Established Leader (2,000-4,999 followers, regional influence)
-- Independent Operator (500-1,999 followers, stable firm ownership)
-- Innovator (Niche disruptor, AI-driven or automation-focused)
+- Independent Operator (500-1,999 followers, stable ownership)
+- Innovator (Niche disruptor, AI-driven focus)
 - Tax & Compliance Expert (Heavy tax planning focus)
-- M&A & Growth Specialist (Specializing in firm acquisitions)
+- M&A & Growth Specialist (Firm acquisitions focus)
 - Emerging Firm Owner (<500 followers, early-stage)
 
 2️⃣ Experience Level (Hierarchy)
 Values:
-- Founder & Advisor (Firm founders who also consult/educate)
-- Managing Partner (Owners of multi-partner firms)
-- Firm Owner (Solo or small firm owners)
-- Director (Senior leadership, not necessarily owner)
-- Consultant (Advisory-focused, no firm ownership)
+- Founder & Advisor (Firm founders who educate)
+- Managing Partner (Multi-partner firm owners)
+- Firm Owner (Solo/small firm owners)
+- Director (Senior leadership)
+- Consultant (Advisory-focused)
 
 3️⃣ Specialty (Primary Service Focus)
 Values:
-- Tax Advisory (IRS representation, compliance)
+- Tax Advisory (IRS representation)
 - Accounting & Compliance (Audit, bookkeeping)
-- M&A & Exit Planning (Firm sales, succession)
-- Wealth Management (Estate planning, high-net-worth)
-- Automation & Workflow (AI, digital transformation)
+- M&A & Exit Planning (Firm sales)
+- Wealth Management (Estate planning)
+- Automation & Workflow (AI, digital)
 - Niche Accounting (Specialized industries)
 
-4️⃣ Years in Practice (Longevity)
+4️⃣ Years in Practice
 Values:
-- 1-5 Years (New firm owners)
-- 6-10 Years (Mid-career professionals)
-- 11-15 Years (Established firm owners)
-- 16-20 Years (Veteran firm operators)
-- 20+ Years (Industry veterans)
+- 1-5 Years (New owners)
+- 6-10 Years (Mid-career)
+- 11-15 Years (Established)
+- 16-20 Years (Veteran)
+- 20+ Years (Industry veteran)
 
 5️⃣ Client Base (Market Focus)
 Values:
-- Small Businesses (General CPAs serving SMBs)
-- Accounting Firms (White-label or B2B advisory)
-- Private Equity & Investors (M&A-focused)
-- High-Net-Worth Individuals (Estate planning)
+- Small Businesses (General SMB focus)
+- Accounting Firms (B2B advisory)
+- Private Equity & Investors (M&A focus)
+- High-Net-Worth Individuals (Estate focus)
 
-6️⃣ Service Line Expertise (Top Ranked Skill)
+6️⃣ Service Line Expertise
 Values:
-- Accounting Technology (Cloud, AI-driven automation)
-- Media & Thought Leadership (Educators, speakers)
-- Advisory Services (CFO-level consulting)
-- Automation & Workflow (Operational efficiency)
-- Small Business Accounting (Generalist CPAs)
-- Tax Planning & Compliance (IRS representation)
-- M&A / Exit Planning (Firm sales)
-- Wealth Management (Financial planning)
+- Accounting Technology (Cloud, AI)
+- Media & Thought Leadership (Education)
+- Advisory Services (CFO-level)
+- Automation & Workflow (Efficiency)
+- Small Business Accounting (General)
+- Tax Planning & Compliance (IRS)
+- M&A / Exit Planning (Deals)
+- Wealth Management (Planning)
 
-Return a valid JSON object with this structure:
+Example Outputs:
+
 {
-  "fullName": "string",
-  "publicIdentifier": "string",
-  "profilePic": "string",
-  "attributes": [
-    {
-      "trait_type": "Governance Power",
-      "value": "string"
-    },
-    {
-      "trait_type": "Experience Level",
-      "value": "string"
-    },
-    {
-      "trait_type": "Specialty",
-      "value": "string"
-    },
-    {
-      "trait_type": "Years in Practice",
-      "value": "string"
-    },
-    {
-      "trait_type": "Client Base",
-      "value": "string"
-    },
-    {
-      "trait_type": "Service Line Expertise",
-      "value": "string"
-    }
-  ]
+    "fullName": "David Leary",
+    "publicIdentifier": "davidleary",
+    "profilePic": "https://media.licdn.com/dms/image/v2/D5603AQEpktC47EPHAQ/profile-displayphoto-shrink_100_100/0/1670085350994?e=1743638400&v=beta&t=niaQ-OJA84JHbZSEAS5zDRkxNPJXF70GGKMN6uL_1k0",
+    "attributes": [
+        {"trait_type": "Governance Power", "value": "Industry Icon"},
+        {"trait_type": "Experience Level", "value": "Founder & Advisor"},
+        {"trait_type": "Specialty", "value": "Accounting Technology"},
+        {"trait_type": "Years in Practice", "value": "20+"},
+        {"trait_type": "Client Base", "value": "Accounting Firms"},
+        {"trait_type": "Service Line Expertise", "value": "Media & Thought Leadership"}
+    ]
+}
+
+{
+    "fullName": "Tatiana Ritchie EA",
+    "publicIdentifier": "tatianaritchie",
+    "profilePic": "https://media.licdn.com/dms/image/v2/D5603AQGUZ5_th6vLCQ/profile-displayphoto-shrink_100_100/0/1736050905998?e=1744243200&v=beta&t=asVzqvPgnEsauKZTRLoG8Zr-LtfUl6nQffG-hgwzYMU",
+    "attributes": [
+        {"trait_type": "Governance Power", "value": "Established Leader"},
+        {"trait_type": "Experience Level", "value": "Firm Owner"},
+        {"trait_type": "Specialty", "value": "International Tax"},
+        {"trait_type": "Years in Practice", "value": "16-20 Years"},
+        {"trait_type": "Client Base", "value": "High-Net-Worth Individuals"},
+        {"trait_type": "Service Line Expertise", "value": "Tax Planning & Compliance"}
+    ]
 }`;
 
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
@@ -143,7 +151,6 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     try {
       console.log('Raw Gemini response:', text);
       
-      // Extract JSON from the response if it's wrapped in other text
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         throw new Error('No valid JSON found in response');
@@ -154,12 +161,10 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       
       const metadata = JSON.parse(jsonStr);
       
-      // Validate required fields
       if (!metadata.fullName || !metadata.publicIdentifier || !metadata.attributes) {
         throw new Error('Missing required fields in metadata');
       }
       
-      // Ensure attributes array has all required traits
       const requiredTraits = [
         "Governance Power",
         "Experience Level",
