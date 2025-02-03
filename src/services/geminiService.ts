@@ -20,20 +20,38 @@ interface NFTMetadata {
   }>;
 }
 
-const systemInstruction = `Role & Objective
-You are an AI Agent specializing in transforming LinkedIn profile data into structured NFT metadata objects. Your purpose is to analyze, categorize, and assign definitive trait values based on a professional's experience, influence, and expertise in the accounting, finance, and advisory industries.
-
-Each NFT consists of exactly one trait per layer, ensuring a precise but adaptable metadata structure.
-
-🔹 NFT Trait Assignment Logic
-Each NFT has six defined attribute layers, and you must select exactly one value per layer based on the user's profile data:
-
-1️⃣ Governance Power (Influence & Leadership)
-2️⃣ Experience Level (Hierarchy)
-3️⃣ Specialty (Primary Service Focus)
-4️⃣ Years in Practice (Longevity)
-5️⃣ Client Base (Market Focus)
-6️⃣ Service Line Expertise (Top Ranked Skill)`;
+const systemInstruction = `You are an AI Agent specializing in transforming LinkedIn profile data into structured NFT metadata objects. Analyze the provided LinkedIn profile and return a valid JSON object with the following structure:
+{
+  "fullName": "string",
+  "publicIdentifier": "string",
+  "profilePic": "string",
+  "attributes": [
+    {
+      "trait_type": "Governance Power",
+      "value": "string"
+    },
+    {
+      "trait_type": "Experience Level",
+      "value": "string"
+    },
+    {
+      "trait_type": "Specialty",
+      "value": "string"
+    },
+    {
+      "trait_type": "Years in Practice",
+      "value": "string"
+    },
+    {
+      "trait_type": "Client Base",
+      "value": "string"
+    },
+    {
+      "trait_type": "Service Line Expertise",
+      "value": "string"
+    }
+  ]
+}`;
 
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
   try {
@@ -41,9 +59,9 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     const model = genAI.getGenerativeModel({ 
       model: "gemini-pro",
       generationConfig: {
-        temperature: 1,
-        topP: 0.95,
-        maxOutputTokens: 8192,
+        temperature: 0.7,
+        topP: 0.8,
+        maxOutputTokens: 2048,
       },
       safetySettings: [
         {
@@ -65,10 +83,7 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       ],
     });
 
-    const prompt = `${systemInstruction}
-
-Analyze this LinkedIn profile and generate the NFT metadata according to the specified format:
-${JSON.stringify(linkedInData)}`;
+    const prompt = `${systemInstruction}\n\nAnalyze this LinkedIn profile and generate the NFT metadata according to the specified format:\n${JSON.stringify(linkedInData, null, 2)}`;
 
     console.log('Generating content with Gemini...');
     const result = await model.generateContent(prompt);
@@ -76,29 +91,40 @@ ${JSON.stringify(linkedInData)}`;
     const text = response.text();
     
     try {
-      console.log('Parsing Gemini response...');
-      const metadata = JSON.parse(text);
+      console.log('Raw Gemini response:', text);
       
-      // Calculate and add Governance Voting Power
-      const votingPower = calculateGovernanceVotingPower(
-        metadata.experiences || [],
-        metadata.attributes.find((a: any) => a.trait_type === "Service Line Expertise")?.value || {}
-      );
-
-      // Add Governance Voting Power to attributes if not present
-      if (!metadata.attributes.find((a: any) => a.trait_type === "Governance Voting Power")) {
-        metadata.attributes.push({
-          trait_type: "Governance Voting Power",
-          value: votingPower
-        });
+      // Extract JSON from the response if it's wrapped in other text
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('No valid JSON found in response');
       }
-
-      // Add Fractional Ownership if not present
-      if (!metadata.attributes.find((a: any) => a.trait_type === "Fractional Ownership")) {
-        metadata.attributes.push({
-          trait_type: "Fractional Ownership",
-          value: null
-        });
+      
+      const jsonStr = jsonMatch[0];
+      console.log('Extracted JSON:', jsonStr);
+      
+      const metadata = JSON.parse(jsonStr);
+      
+      // Validate required fields
+      if (!metadata.fullName || !metadata.publicIdentifier || !metadata.attributes) {
+        throw new Error('Missing required fields in metadata');
+      }
+      
+      // Ensure attributes array has all required traits
+      const requiredTraits = [
+        "Governance Power",
+        "Experience Level",
+        "Specialty",
+        "Years in Practice",
+        "Client Base",
+        "Service Line Expertise"
+      ];
+      
+      const hasAllTraits = requiredTraits.every(trait => 
+        metadata.attributes.some(attr => attr.trait_type === trait)
+      );
+      
+      if (!hasAllTraits) {
+        throw new Error('Missing required traits in attributes');
       }
 
       console.log('Generated NFT Metadata:', metadata);
