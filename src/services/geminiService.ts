@@ -20,33 +20,16 @@ interface NFTMetadata {
   }>;
 }
 
-const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { [key: string]: number }) => {
-  // Calculate years of experience
-  const totalYears = experiences.reduce((acc, exp) => {
-    const duration = exp.duration;
-    const years = duration.includes('yr') ? 
-      parseInt(duration.split(' ')[0]) :
-      duration.includes('mos') ? 
-        parseInt(duration.split(' ')[0]) / 12 : 0;
-    return acc + years;
-  }, 0);
-
-  // Calculate average expertise score
-  const expertiseScores = Object.values(serviceExpertise);
-  const averageExpertise = expertiseScores.reduce((a, b) => a + b, 0) / expertiseScores.length;
-
-  // Normalize years (max 20 years = 1.0)
-  const normalizedYears = Math.min(totalYears / 20, 1);
-  
-  // Normalize expertise (already on 0-10 scale, convert to 0-1)
-  const normalizedExpertise = averageExpertise / 10;
-
-  // Calculate voting power (50% experience weight, 50% expertise weight)
-  const votingPower = (normalizedYears * 0.5) + (normalizedExpertise * 0.5);
-
-  // Round to 3 decimal places
-  return Math.round(votingPower * 1000) / 1000;
-};
+const VALID_GOVERNANCE_POWERS = [
+  "Governance-Power-Emerging-Firm-Owner",
+  "Governance-Power-Established-Firm-Owner",
+  "Governance-Power-Industry-Leader",
+  "Governance-Power-Public-Figure",
+  "Governance-Power-Board-Advisor",
+  "Governance-Power-Market-Influencer",
+  "Governance-Power-Policy-Maker",
+  "Governance-Power-Veteran-Partner"
+];
 
 const extractJSONFromText = (text: string): string => {
   console.log('Raw text from Gemini:', text);
@@ -63,8 +46,11 @@ const extractJSONFromText = (text: string): string => {
     throw new Error('Invalid JSON structure in response');
   }
 
-  // Extract the JSON portion
-  const jsonString = text.substring(startIndex, endIndex + 1);
+  // Extract the JSON portion and remove trailing commas
+  let jsonString = text.substring(startIndex, endIndex + 1);
+  // Remove trailing commas in arrays and objects
+  jsonString = jsonString.replace(/,(\s*[}\]])/g, '$1');
+  
   console.log('Extracted JSON string:', jsonString);
   
   return jsonString;
@@ -91,6 +77,16 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     const prompt = `
 You are an AI assistant that analyzes LinkedIn profiles and generates NFT metadata. Your task is to extract relevant information and return it in a specific JSON format.
 
+IMPORTANT: For the Governance Power attribute, you MUST ONLY use one of these exact values:
+- Governance-Power-Emerging-Firm-Owner
+- Governance-Power-Established-Firm-Owner
+- Governance-Power-Industry-Leader
+- Governance-Power-Public-Figure
+- Governance-Power-Board-Advisor
+- Governance-Power-Market-Influencer
+- Governance-Power-Policy-Maker
+- Governance-Power-Veteran-Partner
+
 Given a LinkedIn profile, generate NFT metadata with the following structure:
 {
   "fullName": "string",
@@ -113,7 +109,7 @@ Given a LinkedIn profile, generate NFT metadata with the following structure:
 }
 
 Required attributes must include:
-- Governance Power (Industry Icon, Veteran Firm Owner, Established Leader, etc.)
+- Governance Power (MUST be one of the exact values listed above)
 - Experience Level (Founder & Advisor, Managing Partner, Firm Owner, etc.)
 - Specialty (Tax Advisory, Accounting & Compliance, M&A & Exit Planning, etc.)
 - Years in Practice (1-5 Years, 6-10 Years, 11-15 Years, etc.)
@@ -144,6 +140,16 @@ ${JSON.stringify(profileData, null, 2)}`;
       // Validate the required fields
       if (!nftMetadata.fullName || !nftMetadata.publicIdentifier || !Array.isArray(nftMetadata.attributes)) {
         throw new Error('Missing required fields in NFT metadata');
+      }
+
+      // Ensure governance power is valid
+      const governancePowerAttr = nftMetadata.attributes.find(attr => 
+        attr.trait_type === "Governance Power"
+      );
+
+      if (!governancePowerAttr || !governancePowerAttr.value || 
+          !VALID_GOVERNANCE_POWERS.includes(governancePowerAttr.value as string)) {
+        throw new Error('Invalid or missing Governance Power value');
       }
 
       // Ensure all required attributes exist with non-null values
