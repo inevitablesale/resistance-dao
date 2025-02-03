@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI("AIzaSyArsLfJI0fawJid7fD403HFjQEtqPe8iec");
 
@@ -60,19 +60,16 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       },
       safetySettings: [
         {
-          category: "HARM_CATEGORY_HARASSMENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          category: HarmCategory.HARASSMENT,
+          threshold: HarmBlockThreshold.MEDIUM_AND_ABOVE
         }
       ],
     });
 
-    console.log('Processing LinkedIn data with saved prompt...');
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: JSON.stringify(linkedInData) }] }],
-      generationConfig: {
-        promptId: "3016183046094192640" // Your saved Vertex AI prompt ID from the URL
-      }
-    });
+    console.log('Processing LinkedIn data...');
+    const result = await model.generateContent([
+      { role: "user", parts: [{ text: JSON.stringify(linkedInData) }] }
+    ]);
     
     const response = await result.response;
     const text = response.text();
