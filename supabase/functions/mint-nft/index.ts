@@ -1,5 +1,4 @@
-import { serve } from "https://deno.fresh.runtime.dev";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { ethers } from 'https://esm.sh/ethers@5.7.2';
 
 const corsHeaders = {
