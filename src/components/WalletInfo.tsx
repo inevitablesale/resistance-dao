@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDynamicContext, DynamicNFTPreview } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, NFTPreview } from "@dynamic-labs/sdk-react-core";
 import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight, Eye } from "lucide-react";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
@@ -8,12 +8,14 @@ import { useToast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 
-interface NFTPreview {
+interface NFTAttribute {
+  trait_type: string;
+  value: string;
+}
+
+interface NFTPreviewData {
   fullName: string;
-  attributes: Array<{
-    trait_type: string;
-    value: string;
-  }>;
+  attributes: NFTAttribute[];
 }
 
 export const WalletInfo = () => {
@@ -22,7 +24,7 @@ export const WalletInfo = () => {
   const [progress, setProgress] = useState(25);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
-  const [nftPreview, setNFTPreview] = useState<NFTPreview | null>(null);
+  const [nftPreview, setNFTPreview] = useState<NFTPreviewData | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState<string>("");
   const { toast } = useToast();
 
@@ -68,11 +70,20 @@ export const WalletInfo = () => {
       );
       
       if (governancePowerAttr) {
-        const imageCID = getGovernanceImageCID(governancePowerAttr.value);
+        const imageCID = getGovernanceImageCID(String(governancePowerAttr.value));
         setPreviewImageUrl(`https://ipfs.io/ipfs/${imageCID}`);
       }
       
-      setNFTPreview(nftMetadata);
+      // Convert all attribute values to strings
+      const formattedMetadata: NFTPreviewData = {
+        fullName: nftMetadata.fullName,
+        attributes: nftMetadata.attributes.map(attr => ({
+          trait_type: attr.trait_type,
+          value: String(attr.value)
+        }))
+      };
+      
+      setNFTPreview(formattedMetadata);
       toast({
         title: "Analysis Complete",
         description: "Preview your NFT before minting.",
@@ -178,7 +189,7 @@ export const WalletInfo = () => {
           <Card className="p-6 bg-black/20 border border-white/10 rounded-lg">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex items-center justify-center">
-                <DynamicNFTPreview
+                <NFTPreview
                   metadata={{
                     name: `${nftPreview.fullName}'s Professional NFT`,
                     description: "Professional NFT representing verified credentials and experience",
