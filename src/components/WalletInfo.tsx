@@ -46,22 +46,20 @@ export const WalletInfo = () => {
     setIsAnalyzing(true);
     try {
       console.log('Fetching LinkedIn profile data...');
-      const profileData = await analyzeLinkedInProfile(linkedInUrl);
+      const nftMetadata = await analyzeLinkedInProfile(linkedInUrl);
       
-      if (profileData.success) {
-        console.log('Analysis completed successfully:', {
-          name: profileData.nftMetadata.fullName,
-          specialty: profileData.nftMetadata.attributes.find(a => a.trait_type === "Specialty")?.value,
-          experienceLevel: profileData.nftMetadata.attributes.find(a => a.trait_type === "Experience Level")?.value,
-          serviceExpertise: profileData.nftMetadata.attributes.find(a => a.trait_type === "Service Line Expertise")?.value
-        });
-        
-        setProgress(50);
-        toast({
-          title: "Profile Analysis Complete",
-          description: "Your professional NFT attributes are being generated.",
-        });
-      }
+      console.log('Analysis completed successfully:', {
+        name: nftMetadata.fullName,
+        specialty: nftMetadata.attributes.find(a => a.trait_type === "Specialty")?.value,
+        experienceLevel: nftMetadata.attributes.find(a => a.trait_type === "Experience Level")?.value,
+        serviceExpertise: nftMetadata.attributes.find(a => a.trait_type === "Service Line Expertise")?.value
+      });
+      
+      setProgress(50);
+      toast({
+        title: "Profile Analysis Complete",
+        description: "Your professional NFT attributes are being generated.",
+      });
     } catch (error) {
       console.error('Profile analysis failed:', error);
       toast({

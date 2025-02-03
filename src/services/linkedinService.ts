@@ -40,14 +40,11 @@ export const analyzeLinkedInProfile = async (profileUrl: string) => {
     const linkedInData = await response.json();
     console.log('LinkedIn API Response:', linkedInData);
 
-    // Generate NFT metadata using Gemini
+    // Generate NFT metadata using Gemini and return only the metadata
     const nftMetadata = await generateNFTMetadata(linkedInData);
     console.log('Generated NFT Metadata:', nftMetadata);
 
-    return {
-      ...linkedInData,
-      nftMetadata
-    };
+    return nftMetadata;
   } catch (error) {
     console.error('Error analyzing LinkedIn profile:', error);
     throw error;
