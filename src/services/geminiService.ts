@@ -48,6 +48,28 @@ const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { 
   return Math.round(votingPower * 1000) / 1000;
 };
 
+const extractJSONFromText = (text: string): string => {
+  console.log('Raw text from Gemini:', text);
+  
+  // Find the first occurrence of '{'
+  const startIndex = text.indexOf('{');
+  if (startIndex === -1) {
+    throw new Error('No JSON object found in response');
+  }
+
+  // Find the last occurrence of '}'
+  const endIndex = text.lastIndexOf('}');
+  if (endIndex === -1) {
+    throw new Error('Invalid JSON structure in response');
+  }
+
+  // Extract the JSON portion
+  const jsonString = text.substring(startIndex, endIndex + 1);
+  console.log('Extracted JSON string:', jsonString);
+  
+  return jsonString;
+};
+
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
   try {
     console.log('Raw LinkedIn data:', linkedInData);
@@ -98,6 +120,8 @@ Required attributes must include:
 - Client Base (Small Businesses, Accounting Firms, etc.)
 - Service Line Expertise (Accounting Technology, Media & Thought Leadership, etc.)
 
+IMPORTANT: Return ONLY the JSON object, with no additional text before or after.
+
 Analyze this LinkedIn profile and generate the NFT metadata according to the specified format:
 ${JSON.stringify(profileData, null, 2)}`;
 
@@ -109,7 +133,9 @@ ${JSON.stringify(profileData, null, 2)}`;
     console.log('Raw Gemini response:', text);
     
     try {
-      const parsedResponse = JSON.parse(text);
+      // Clean and extract JSON from the response
+      const jsonString = extractJSONFromText(text);
+      const parsedResponse = JSON.parse(jsonString);
       console.log('Parsed response:', parsedResponse);
       
       // Extract just the data object from the response if needed
