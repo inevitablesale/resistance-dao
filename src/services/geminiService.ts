@@ -1,4 +1,4 @@
-import { VertexAI } from '@google-cloud/vertexai';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface NFTMetadata {
   fullName: string;
@@ -53,52 +53,27 @@ const systemInstruction = `You are an AI Agent specializing in transforming Link
 
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
   try {
-    console.log('Initializing Vertex AI...');
+    console.log('Initializing Gemini model...');
     
-    const vertexAI = new VertexAI({
-      project: 'gen-lang-client-0981544718',
-      location: 'us-central1',
-    });
-
-    const model = vertexAI.preview.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp',
-      generation_config: {
+    const genAI = new GoogleGenerativeAI("AIzaSyArsLfJI0fawJid7fD403HFjQEtqPe8iec");
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-pro",
+      generationConfig: {
         temperature: 1,
-        top_p: 0.95,
-        max_output_tokens: 8192,
-      },
-      safety_settings: [
-        {
-          category: 'HARM_CATEGORY_HATE_SPEECH',
-          threshold: 'OFF',
-        },
-        {
-          category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-          threshold: 'OFF',
-        },
-        {
-          category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-          threshold: 'OFF',
-        },
-        {
-          category: 'HARM_CATEGORY_HARASSMENT',
-          threshold: 'OFF',
-        },
-      ],
+        topP: 0.95,
+        maxOutputTokens: 8192,
+      }
     });
 
     const prompt = `${systemInstruction}\n\nAnalyze this LinkedIn profile and generate the NFT metadata according to the specified format:\n${JSON.stringify(linkedInData, null, 2)}`;
 
-    console.log('Generating content with Vertex AI...');
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    });
-    
+    console.log('Generating content with Gemini...');
+    const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
     
     try {
-      console.log('Raw Vertex AI response:', text);
+      console.log('Raw Gemini response:', text);
       
       // Extract JSON from the response if it's wrapped in other text
       const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -137,8 +112,8 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       console.log('Generated NFT Metadata:', metadata);
       return metadata;
     } catch (parseError) {
-      console.error('Error parsing Vertex AI response:', parseError);
-      throw new Error('Failed to parse Vertex AI response');
+      console.error('Error parsing Gemini response:', parseError);
+      throw new Error('Failed to parse Gemini response');
     }
   } catch (error) {
     console.error('Error generating NFT metadata:', error);
