@@ -57,24 +57,12 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
         temperature: 0.1, // Lower temperature for more consistent results
         topP: 0.8,
         maxOutputTokens: 8192,
-      },
-      safetySettings: [
-        {
-          category: "HARM_CATEGORY_HARASSMENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        }
-      ],
-    });
-
-    console.log('Processing LinkedIn data with saved prompt...');
-    // Use the saved prompt ID "linkedinToNFT" for processing
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: JSON.stringify(linkedInData) }] }],
-      generationConfig: {
-        promptId: "linkedinToNFT" // This should match your saved prompt ID in Vertex AI
       }
     });
-    
+
+    console.log('Processing LinkedIn data...');
+    const prompt = `Use this LinkedIn profile data to generate an NFT metadata: ${JSON.stringify(linkedInData)}`;
+    const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
     
