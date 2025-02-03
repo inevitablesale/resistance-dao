@@ -26,24 +26,13 @@ serve(async (req) => {
       throw new Error('Missing required parameters');
     }
 
-    // Get ZeroDev credentials from environment variables
-    const ZERODEV_PROJECT_ID = Deno.env.get('ZERODEV_PROJECT_ID');
-    const ZERODEV_AA_KEY = Deno.env.get('ZERODEV_AA_KEY');
-
-    if (!ZERODEV_PROJECT_ID || !ZERODEV_AA_KEY) {
-      throw new Error('ZeroDev credentials not configured');
-    }
-
     console.log('Initializing provider and contract...');
     
     // Initialize provider (Polygon Mainnet)
     const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
     
-    // Create wallet with ZeroDev AA key
-    const wallet = new ethers.Wallet(ZERODEV_AA_KEY, provider);
-    
-    // Initialize contract
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, wallet);
+    // Initialize contract with Dynamic's wallet
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
     console.log('Minting NFT...');
     const tx = await contract.safeMint(address, governancePower);

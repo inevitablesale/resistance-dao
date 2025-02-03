@@ -29,7 +29,7 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
       throw new Error('Governance Power not found in metadata attributes');
     }
 
-    // Call the Edge Function to mint the NFT
+    // Call the Edge Function to mint the NFT using Dynamic's wallet
     const { data: mintResult, error } = await supabase.functions.invoke('mint-nft', {
       body: {
         address,
