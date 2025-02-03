@@ -26,7 +26,7 @@ export const analyzeLinkedInProfile = async (profileUrl: string) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-RapidAPI-Key': 'b16ff54f96mshe700bf7347e9a71p141b59jsn89af9057b370',
+        'X-RapidAPI-Key': import.meta.env.VITE_RAPIDAPI_KEY,
         'X-RapidAPI-Host': 'linkedin-bulk-data-scraper.p.rapidapi.com'
       },
       body: JSON.stringify({ link: profileUrl })
@@ -40,7 +40,7 @@ export const analyzeLinkedInProfile = async (profileUrl: string) => {
     const linkedInData = await response.json();
     console.log('LinkedIn API Response:', linkedInData);
 
-    // Generate NFT metadata using Gemini
+    // Generate NFT metadata using Vertex AI directly
     const nftMetadata = await generateNFTMetadata(linkedInData);
     console.log('Generated NFT Metadata:', nftMetadata);
 

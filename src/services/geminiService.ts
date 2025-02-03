@@ -1,3 +1,5 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
 interface NFTMetadata {
   fullName: string;
   publicIdentifier: string;
@@ -14,24 +16,40 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
   try {
     console.log('LinkedIn Data:', linkedInData);
     
-    const response = await fetch('/api/generate-nft-metadata', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        linkedInData
-      })
-    });
+    const genAI = new GoogleGenerativeAI(import.meta.env.VITE_VERTEX_AI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    if (!response.ok) {
-      throw new Error('Failed to generate NFT metadata');
-    }
+    const prompt = `
+      Analyze this LinkedIn profile data and generate NFT metadata that represents the professional's experience and qualifications:
+      ${JSON.stringify(linkedInData)}
+      
+      Return a JSON object with the following structure:
+      {
+        "fullName": "Full name of the professional",
+        "publicIdentifier": "LinkedIn public identifier",
+        "attributes": [
+          {
+            "trait_type": "Experience Level",
+            "value": "Number of years of experience"
+          },
+          {
+            "trait_type": "Skills",
+            "value": {
+              "skill1": confidence_score,
+              "skill2": confidence_score
+            }
+          }
+        ]
+      }
+    `;
 
-    const data = await response.json();
-    console.log('Raw Vertex AI Response:', data);
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
     
-    return data;
+    console.log('Raw Vertex AI Response:', text);
+    
+    return JSON.parse(text);
   } catch (error) {
     console.error('Error generating NFT metadata:', error);
     throw error;
