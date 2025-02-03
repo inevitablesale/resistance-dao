@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDynamicContext, EmbeddedWalletPreview } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, DynamicEmbeddedWalletPreview } from "@dynamic-labs/sdk-react-core";
 import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight, Eye } from "lucide-react";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
@@ -193,7 +193,7 @@ export const WalletInfo = () => {
           <Card className="p-6 bg-black/20 border border-white/10 rounded-lg">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex items-center justify-center">
-                <EmbeddedWalletPreview
+                <DynamicEmbeddedWalletPreview
                   metadata={{
                     name: `${nftPreview.fullName}'s Professional NFT`,
                     description: "Professional NFT representing verified credentials and experience",
