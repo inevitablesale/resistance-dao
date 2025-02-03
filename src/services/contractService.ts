@@ -1,4 +1,4 @@
-import { Contract, BrowserProvider } from 'ethers';
+import { Contract } from 'ethers';
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,23 +21,19 @@ interface NFTMetadata {
 
 export const mintNFT = async (walletClient: any, address: string, metadata: any) => {
   try {
-    console.log('Starting NFT minting with Dynamic AA wallet...');
-    console.log('Wallet client:', walletClient);
+    console.log('Starting NFT minting with Dynamic wallet...');
     
     // Create contract instance using the wallet client from Dynamic
-    const provider = new BrowserProvider(walletClient.provider.transport);
-    const signer = await provider.getSigner(address);
     const contract = new Contract(
       NFT_CONTRACT_ADDRESS,
       NFT_CONTRACT_ABI,
-      signer
+      walletClient
     );
 
-    console.log('Contract instance created:', contract);
     console.log('Minting NFT for address:', address);
     console.log('With metadata:', metadata);
 
-    // Call the mint function using AA wallet
+    // Call the mint function
     const tx = await contract.mint(address, metadata.tokenURI);
     console.log('Minting transaction sent:', tx.hash);
 

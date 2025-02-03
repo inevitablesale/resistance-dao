@@ -49,14 +49,7 @@ const Index = () => {
     <DynamicContextProvider
       settings={{
         environmentId: "2b74d425-6827-4ff1-af57-f9543d71cca0",
-        walletConnectors: [
-          EthereumWalletConnectors,
-          (props) => ZeroDevSmartWalletConnectors({
-            ...props,
-            projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
-            bundlerProvider: "GELATO"
-          })
-        ],
+        walletConnectors: [EthereumWalletConnectors, ZeroDevSmartWalletConnectors],
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
