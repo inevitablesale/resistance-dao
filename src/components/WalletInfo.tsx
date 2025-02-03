@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDynamicContext, DynamicEmbeddedWalletPreview } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, DynamicNFTDisplayer } from "@dynamic-labs/sdk-react-core";
 import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight, Eye } from "lucide-react";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
@@ -77,7 +77,6 @@ export const WalletInfo = () => {
         setPreviewImageUrl(`https://ipfs.io/ipfs/${imageCID}`);
       }
       
-      // Convert all attribute values to strings
       const formattedMetadata: NFTPreviewData = {
         fullName: nftMetadata.fullName,
         attributes: nftMetadata.attributes.map(attr => ({
@@ -193,14 +192,13 @@ export const WalletInfo = () => {
           <Card className="p-6 bg-black/20 border border-white/10 rounded-lg">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex items-center justify-center">
-                <DynamicEmbeddedWalletPreview
+                <DynamicNFTDisplayer
                   metadata={{
                     name: `${nftPreview.fullName}'s Professional NFT`,
                     description: "Professional NFT representing verified credentials and experience",
                     image: previewImageUrl,
                     attributes: nftPreview.attributes
                   }}
-                  showFullMetadata={true}
                   className="w-full max-w-[300px]"
                 />
               </div>
