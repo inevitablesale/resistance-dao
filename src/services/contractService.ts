@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
+import { supabase } from "@/integrations/supabase/client";
 
 const CONTRACT_ADDRESS = "0x3dC25640b1B7528Dca23BeFcDAD835C5Bf4e5360";
 const CONTRACT_ABI = [
@@ -22,6 +23,16 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
   try {
     console.log('Starting NFT minting process with metadata:', metadata);
     
+    // Get ZeroDev credentials from Supabase
+    const { data: { ZERODEV_PROJECT_ID, ZERODEV_AA_KEY } } = await supabase
+      .from('secrets')
+      .select('ZERODEV_PROJECT_ID, ZERODEV_AA_KEY')
+      .single();
+
+    if (!ZERODEV_PROJECT_ID || !ZERODEV_AA_KEY) {
+      throw new Error('ZeroDev credentials not found');
+    }
+    
     // Extract governance power from attributes array
     const governancePowerAttr = metadata.attributes.find(
       (attr: { trait_type: string; value: string }) => 
@@ -39,12 +50,19 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
     });
     
     const signer = provider.getSigner();
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    
+    // Initialize ZeroDev SDK with credentials
+    const zeroDevSigner = await provider.getSigner().connectToZeroDev({
+      projectId: ZERODEV_PROJECT_ID,
+      owner: address,
+    });
+
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, zeroDevSigner);
     
     console.log('Minting NFT for address:', address);
     console.log('Using governance power:', governancePowerAttr.value);
 
-    // Call safeMint with the governance power value directly
+    // Call safeMint with the governance power value using ZeroDev signer
     const tx = await contract.safeMint(address, governancePowerAttr.value);
     console.log('Minting transaction sent:', tx.hash);
     
