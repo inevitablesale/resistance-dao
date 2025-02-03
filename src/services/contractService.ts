@@ -4,8 +4,21 @@ import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 
 const CONTRACT_ADDRESS = "0x3dC25640b1B7528Dca23BeFcDAD835C5Bf4e5360";
 const CONTRACT_ABI = [
+  // Core minting and URI functions
   "function safeMint(address to, string memory governancePower) public returns (uint256)",
-  "function tokenURI(uint256 tokenId) public view returns (string)"
+  "function tokenURI(uint256 tokenId) public view returns (string)",
+  
+  // Ownership and transfer functions
+  "function approve(address to, uint256 tokenId)",
+  "function renounceOwnership()",
+  "function safeTransferFrom(address from, address to, uint256 tokenId)",
+  "function setApprovalForAll(address operator, bool approved)",
+  "function transferFrom(address from, address to, uint256 tokenId)",
+  "function transferOwnership(address newOwner)",
+  "function updateGovernancePowerCID(uint256 tokenId, string memory newCID)",
+  
+  // Events
+  "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 ];
 
 interface NFTMetadata {
