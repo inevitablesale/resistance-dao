@@ -51,15 +51,15 @@ export const WalletInfo = () => {
       if (profileData.success) {
         console.log('Analysis completed successfully:', {
           name: profileData.nftMetadata.fullName,
-          specialty: profileData.nftMetadata.attributes.find(a => a.trait_type === "Specialty")?.value,
+          governancePower: profileData.nftMetadata.attributes.find(a => a.trait_type === "Governance Power")?.value,
           experienceLevel: profileData.nftMetadata.attributes.find(a => a.trait_type === "Experience Level")?.value,
-          serviceExpertise: profileData.nftMetadata.attributes.find(a => a.trait_type === "Service Line Expertise")?.value
+          specialty: profileData.nftMetadata.attributes.find(a => a.trait_type === "Specialty")?.value,
         });
         
         setProgress(50);
         toast({
           title: "Profile Analysis Complete",
-          description: "Your professional NFT attributes are being generated.",
+          description: `Generated NFT attributes for ${profileData.nftMetadata.fullName}`,
         });
       }
     } catch (error) {

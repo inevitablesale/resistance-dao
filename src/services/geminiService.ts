@@ -12,39 +12,21 @@ interface NFTMetadata {
       [key: string]: number;
     };
   }>;
-  experiences: Array<{
-    title: string;
-    company: string;
-    duration: string;
-    location: string;
-  }>;
 }
 
-const calculateGovernanceVotingPower = (experiences: any[], serviceExpertise: { [key: string]: number }) => {
-  // Calculate years of experience
-  const totalYears = experiences.reduce((acc, exp) => {
-    const duration = exp.duration;
-    const years = duration.includes('yr') ? 
-      parseInt(duration.split(' ')[0]) :
-      duration.includes('mos') ? 
-        parseInt(duration.split(' ')[0]) / 12 : 0;
-    return acc + years;
-  }, 0);
-
-  // Calculate average expertise score
-  const expertiseScores = Object.values(serviceExpertise);
-  const averageExpertise = expertiseScores.reduce((a, b) => a + b, 0) / expertiseScores.length;
-
-  // Normalize years (max 20 years = 1.0)
-  const normalizedYears = Math.min(totalYears / 20, 1);
+const calculateGovernanceVotingPower = (attributes: any[]) => {
+  // Find years in practice
+  const yearsAttribute = attributes.find(a => a.trait_type === "Years in Practice");
+  const years = yearsAttribute?.value;
+  let yearsValue = 0;
   
-  // Normalize expertise (already on 0-10 scale, convert to 0-1)
-  const normalizedExpertise = averageExpertise / 10;
+  if (typeof years === 'string') {
+    if (years === "20+") yearsValue = 20;
+    else yearsValue = parseInt(years);
+  }
 
-  // Calculate voting power (50% experience weight, 50% expertise weight)
-  const votingPower = (normalizedYears * 0.5) + (normalizedExpertise * 0.5);
-
-  // Round to 3 decimal places
+  // Calculate voting power (normalized to 0-1)
+  const votingPower = Math.min(yearsValue / 20, 1);
   return Math.round(votingPower * 1000) / 1000;
 };
 
@@ -67,8 +49,23 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     });
 
     console.log('Processing LinkedIn data...');
+    const prompt = `Analyze this LinkedIn profile data and generate NFT metadata that represents the professional's accounting expertise and experience. Focus on their specialization, years of experience, and service offerings. Return the response in this exact JSON format:
+    {
+      "fullName": "Full Name",
+      "publicIdentifier": "linkedin-identifier",
+      "profilePic": "profile-picture-url",
+      "attributes": [
+        {"trait_type": "Governance Power", "value": "Level"},
+        {"trait_type": "Experience Level", "value": "Senior/Junior/etc"},
+        {"trait_type": "Specialty", "value": "Main Focus Area"},
+        {"trait_type": "Years in Practice", "value": "Number or Range"},
+        {"trait_type": "Client Base", "value": "Type of Clients"},
+        {"trait_type": "Service Line Expertise", "value": "Main Service Area"}
+      ]
+    }`;
+
     const result = await model.generateContent([
-      { role: "user", parts: [{ text: JSON.stringify(linkedInData) }] }
+      { role: "user", parts: [{ text: prompt + "\n\nLinkedIn Data:\n" + JSON.stringify(linkedInData) }] }
     ]);
     
     const response = await result.response;
@@ -79,10 +76,7 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       const metadata = JSON.parse(text);
       
       // Calculate and add Governance Voting Power
-      const votingPower = calculateGovernanceVotingPower(
-        metadata.experiences,
-        metadata.attributes.find((a: any) => a.trait_type === "Service Line Expertise")?.value || {}
-      );
+      const votingPower = calculateGovernanceVotingPower(metadata.attributes);
 
       // Add Governance Voting Power to attributes if not present
       if (!metadata.attributes.find(a => a.trait_type === "Governance Voting Power")) {
