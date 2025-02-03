@@ -49,11 +49,17 @@ export const WalletInfo = () => {
       const profileData = await analyzeLinkedInProfile(linkedInUrl);
       
       if (profileData.success) {
-        console.log('Vertex AI Response:', profileData.nftMetadata);
+        console.log('Analysis completed successfully:', {
+          name: profileData.nftMetadata.fullName,
+          specialty: profileData.nftMetadata.attributes.find(a => a.trait_type === "Specialty")?.value,
+          experienceLevel: profileData.nftMetadata.attributes.find(a => a.trait_type === "Experience Level")?.value,
+          serviceExpertise: profileData.nftMetadata.attributes.find(a => a.trait_type === "Service Line Expertise")?.value
+        });
+        
         setProgress(50);
         toast({
           title: "Profile Analysis Complete",
-          description: "Check console for the complete Vertex AI response",
+          description: "Your professional NFT attributes are being generated.",
         });
       }
     } catch (error) {
