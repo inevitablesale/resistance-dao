@@ -54,14 +54,27 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     const model = genAI.getGenerativeModel({ 
       model: "gemini-pro",
       generationConfig: {
-        temperature: 1,
-        topP: 0.95,
+        temperature: 0.1, // Lower temperature for more consistent results
+        topP: 0.8,
         maxOutputTokens: 8192,
       },
+      safetySettings: [
+        {
+          category: "HARM_CATEGORY_HARASSMENT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        }
+      ],
     });
 
-    console.log('Processing LinkedIn data with Gemini...');
-    const result = await model.generateContent(JSON.stringify(linkedInData));
+    console.log('Processing LinkedIn data with saved prompt...');
+    // Use the saved prompt ID "linkedinToNFT" for processing
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: JSON.stringify(linkedInData) }] }],
+      generationConfig: {
+        promptId: "linkedinToNFT" // This should match your saved prompt ID in Vertex AI
+      }
+    });
+    
     const response = await result.response;
     const text = response.text();
     
