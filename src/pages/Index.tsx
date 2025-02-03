@@ -56,10 +56,7 @@ const Index = () => {
         environmentId: "2b74d425-6827-4ff1-af57-f9543d71cca0",
         walletConnectors: [
           EthereumWalletConnectors,
-          {
-            connector: ZeroDevSmartWalletConnectorsWithConfig,
-            configuration: zeroDevConfig
-          }
+          ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
         ],
       }}
     >
