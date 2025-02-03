@@ -19,10 +19,6 @@ export const WalletInfo = () => {
       if (primaryWallet) {
         const connected = await primaryWallet.isConnected();
         setIsWalletConnected(connected);
-        
-        // Log wallet type for debugging
-        console.log('Wallet type:', primaryWallet.walletConnector?.name);
-        console.log('Is AA wallet:', primaryWallet.walletConnector?.name?.includes('ZeroDev'));
       } else {
         setIsWalletConnected(false);
       }
@@ -74,7 +70,7 @@ export const WalletInfo = () => {
       
       toast({
         title: "NFT Minted Successfully!",
-        description: `Your Professional NFT has been minted with sponsored gas and stored on IPFS at ${result.tokenURI}`,
+        description: `Your Professional NFT has been minted and stored on IPFS at ${result.tokenURI}`,
       });
     } catch (error) {
       console.error('Process failed:', error);
@@ -136,11 +132,6 @@ export const WalletInfo = () => {
         <h3 className="text-xl font-semibold text-white">Generate Your Professional NFT</h3>
         <p className="text-gray-400">
           Your LinkedIn profile will be analyzed to generate unique NFT attributes that represent your professional experience and qualifications.
-          {primaryWallet?.walletConnector?.name?.includes('ZeroDev') && (
-            <span className="block mt-2 text-sm text-polygon-primary">
-              Gas fees will be sponsored by ZeroDev
-            </span>
-          )}
         </p>
         <div className="flex items-center justify-center">
           <button
