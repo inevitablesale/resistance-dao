@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 
-const CONTRACT_ADDRESS = "0x123..."; // Replace with your actual contract address
+const CONTRACT_ADDRESS = "0x3dC25640b1B7528Dca23BeFcDAD835C5Bf4e5360";
 const CONTRACT_ABI = [
   "function mint(address to, string memory tokenURI) public returns (uint256)",
   "function tokenURI(uint256 tokenId) public view returns (string)"
