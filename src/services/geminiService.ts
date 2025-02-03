@@ -1,5 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 interface NFTMetadata {
   fullName: string;
   publicIdentifier: string;
@@ -16,7 +14,7 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
   try {
     console.log('LinkedIn Data:', linkedInData);
     
-    const response = await fetch('https://us-central1-gen-lang-client-0981544718.cloudfunctions.net/generate', {
+    const response = await fetch('/api/generate-nft-metadata', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -27,7 +25,7 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch from Vertex AI endpoint');
+      throw new Error('Failed to generate NFT metadata');
     }
 
     const data = await response.json();
