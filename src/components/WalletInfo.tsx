@@ -3,6 +3,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight } from "lucide-react";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
+import { mintNFT } from "@/services/contractService";
 import { useToast } from "@/components/ui/use-toast";
 
 export const WalletInfo = () => {
@@ -10,6 +11,7 @@ export const WalletInfo = () => {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [progress, setProgress] = useState(25);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isMinting, setIsMinting] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export const WalletInfo = () => {
   }, [primaryWallet]);
 
   const handleAnalyzeProfile = async () => {
-    console.group('LinkedIn Profile Analysis');
+    console.group('LinkedIn Profile Analysis and NFT Minting');
     console.log('Starting profile analysis...');
     
     const linkedInUrl = user?.metadata?.["LinkedIn Profile URL"];
@@ -47,28 +49,41 @@ export const WalletInfo = () => {
     try {
       console.log('Fetching LinkedIn profile data...');
       const nftMetadata = await analyzeLinkedInProfile(linkedInUrl);
-      
-      console.log('Analysis completed successfully:', {
-        name: nftMetadata.fullName,
-        specialty: nftMetadata.attributes.find(a => a.trait_type === "Specialty")?.value,
-        experienceLevel: nftMetadata.attributes.find(a => a.trait_type === "Experience Level")?.value,
-        serviceExpertise: nftMetadata.attributes.find(a => a.trait_type === "Service Line Expertise")?.value
-      });
-      
       setProgress(50);
+      
+      // Start minting process
+      setIsMinting(true);
+      console.log('Starting NFT minting process...');
+      
+      if (!primaryWallet?.address) {
+        throw new Error('Wallet address not found');
+      }
+
+      const governancePowerLevel = 1; // This should be determined based on analysis
+      const { tokenId } = await mintNFT(
+        await primaryWallet.getWalletClient(),
+        primaryWallet.address,
+        governancePowerLevel
+      );
+
+      console.log('NFT minted successfully:', tokenId);
+      setProgress(100);
+      
       toast({
-        title: "Profile Analysis Complete",
-        description: "Your professional NFT attributes are being generated.",
+        title: "NFT Minted Successfully!",
+        description: "Your Professional NFT has been minted and should appear in your wallet shortly.",
       });
     } catch (error) {
-      console.error('Profile analysis failed:', error);
+      console.error('Process failed:', error);
       toast({
-        title: "Analysis Failed",
-        description: "Failed to analyze LinkedIn profile. Please try again later.",
+        title: "Process Failed",
+        description: error instanceof Error ? error.message : "Failed to complete the process. Please try again.",
         variant: "destructive",
       });
+      setProgress(25);
     } finally {
       setIsAnalyzing(false);
+      setIsMinting(false);
       console.groupEnd();
     }
   };
@@ -79,9 +94,9 @@ export const WalletInfo = () => {
 
   const steps = [
     { name: "Wallet Created", status: "complete" },
-    { name: "Generate NFT", status: "current" },
-    { name: "KYC / AMLY", status: "upcoming" },
-    { name: "Complete", status: "upcoming" }
+    { name: "Generate NFT", status: progress >= 50 ? "complete" : "current" },
+    { name: "KYC / AMLY", status: progress >= 75 ? "complete" : "upcoming" },
+    { name: "Complete", status: progress === 100 ? "complete" : "upcoming" }
   ];
 
   return (
@@ -93,8 +108,8 @@ export const WalletInfo = () => {
           <div 
             key={step.name}
             className={`flex flex-col items-center text-center space-y-2 ${
-              index === 1 ? "text-polygon-primary" : 
-              index === 0 ? "text-white" : 
+              step.status === "complete" ? "text-polygon-primary" : 
+              step.status === "current" ? "text-polygon-primary" : 
               "text-gray-500"
             }`}
           >
@@ -122,16 +137,14 @@ export const WalletInfo = () => {
         <div className="flex items-center justify-center">
           <button
             onClick={handleAnalyzeProfile}
-            disabled={isAnalyzing}
+            disabled={isAnalyzing || isMinting}
             className={`${
-              isAnalyzing ? 'bg-polygon-primary/50' : 'bg-polygon-primary hover:bg-polygon-primary/90'
+              isAnalyzing || isMinting ? 'bg-polygon-primary/50' : 'bg-polygon-primary hover:bg-polygon-primary/90'
             } text-white px-6 py-3 rounded-lg transition-colors`}
           >
-            {isAnalyzing ? (
-              <div className="animate-pulse-slow">Analyzing Profile...</div>
-            ) : (
-              'Generate NFT'
-            )}
+            {isAnalyzing ? 'Analyzing Profile...' :
+             isMinting ? 'Minting NFT...' :
+             'Generate NFT'}
           </button>
         </div>
       </div>
