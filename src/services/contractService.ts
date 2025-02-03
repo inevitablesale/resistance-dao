@@ -4,7 +4,7 @@ import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 
 const CONTRACT_ADDRESS = "0x3dC25640b1B7528Dca23BeFcDAD835C5Bf4e5360";
 const CONTRACT_ABI = [
-  "function mint(address to, string memory tokenURI) public returns (uint256)",
+  "function safeMint(address to, string memory governancePower) public returns (uint256)",
   "function tokenURI(uint256 tokenId) public view returns (string)"
 ];
 
@@ -31,23 +31,7 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
     if (!governancePowerAttr) {
       throw new Error('Governance Power not found in metadata attributes');
     }
-    
-    // Get the correct governance image CID based on power level
-    const governanceImageCID = getGovernanceImageCID(governancePowerAttr.value);
-    const governanceImageUrl = `ipfs://${governanceImageCID}`;
-    
-    // Structure the metadata in proper NFT format
-    const nftMetadata: NFTMetadata = {
-      name: `Professional Governance Power NFT`,
-      description: `This NFT represents the governance power level of ${metadata.fullName} based on their professional experience and qualifications.`,
-      image: governanceImageUrl,
-      attributes: metadata.attributes
-    };
-    
-    // Upload metadata to IPFS via Pinata
-    const tokenURI = await uploadMetadataToPinata(nftMetadata);
-    console.log('Metadata uploaded to IPFS:', tokenURI);
-    
+
     // Create provider without ENS support
     const provider = new ethers.providers.Web3Provider(walletClient, {
       name: 'unknown',
@@ -58,7 +42,10 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
     
     console.log('Minting NFT for address:', address);
-    const tx = await contract.mint(address, tokenURI);
+    console.log('Using governance power:', governancePowerAttr.value);
+
+    // Call safeMint with the governance power value directly
+    const tx = await contract.safeMint(address, governancePowerAttr.value);
     console.log('Minting transaction sent:', tx.hash);
     
     const receipt = await tx.wait();
@@ -67,6 +54,20 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
     // Get the token ID from the event logs
     const mintEvent = receipt.events?.find(e => e.event === 'Transfer');
     const tokenId = mintEvent?.args?.tokenId;
+
+    // Still upload metadata to IPFS for reference
+    const governanceImageCID = getGovernanceImageCID(governancePowerAttr.value);
+    const governanceImageUrl = `ipfs://${governanceImageCID}`;
+    
+    const nftMetadata: NFTMetadata = {
+      name: `Professional Governance Power NFT`,
+      description: `This NFT represents the governance power level of ${metadata.fullName} based on their professional experience and qualifications.`,
+      image: governanceImageUrl,
+      attributes: metadata.attributes
+    };
+    
+    const tokenURI = await uploadMetadataToPinata(nftMetadata);
+    console.log('Metadata uploaded to IPFS:', tokenURI);
     
     return { success: true, tokenId, tokenURI };
   } catch (error) {
