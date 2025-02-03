@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
+import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 
 const CONTRACT_ADDRESS = "0x3dC25640b1B7528Dca23BeFcDAD835C5Bf4e5360";
 const CONTRACT_ABI = [
@@ -21,11 +22,15 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
   try {
     console.log('Starting NFT minting process with metadata:', metadata);
     
+    // Get the correct governance image CID based on power level
+    const governanceImageCID = getGovernanceImageCID(metadata.governancePower);
+    const governanceImageUrl = `ipfs://${governanceImageCID}`;
+    
     // Structure the metadata in proper NFT format
     const nftMetadata: NFTMetadata = {
       name: `Professional Governance Power NFT`,
       description: `This NFT represents the governance power level of ${metadata.name} based on their professional experience and qualifications.`,
-      image: metadata.governanceImage, // This should be the IPFS URL of the governance power image
+      image: governanceImageUrl,
       attributes: [
         {
           trait_type: "Governance Power Level",
