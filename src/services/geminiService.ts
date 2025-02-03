@@ -16,7 +16,7 @@ interface NFTMetadata {
 
 export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadata> => {
   try {
-    console.log('Initializing Gemini model...');
+    console.log('Initializing Gemini model with saved prompt...');
     const model = genAI.getGenerativeModel({ 
       model: "gemini-pro",
       generationConfig: {
@@ -26,11 +26,46 @@ export const generateNFTMetadata = async (linkedInData: any): Promise<NFTMetadat
       }
     });
 
-    console.log('Processing LinkedIn data with saved prompt...');
     console.log('LinkedIn Data:', linkedInData);
     
+    const prompt = `You are a professional NFT metadata generator. Given a LinkedIn profile data, generate NFT metadata in the following JSON format:
+    {
+      "fullName": "string",
+      "publicIdentifier": "string",
+      "profilePic": "string (optional)",
+      "attributes": [
+        {
+          "trait_type": "Governance Power",
+          "value": "string"
+        },
+        {
+          "trait_type": "Experience Level",
+          "value": "string"
+        },
+        {
+          "trait_type": "Specialty",
+          "value": "string"
+        },
+        {
+          "trait_type": "Years in Practice",
+          "value": "string"
+        },
+        {
+          "trait_type": "Client Base",
+          "value": "string"
+        },
+        {
+          "trait_type": "Service Line Expertise",
+          "value": "string"
+        }
+      ]
+    }
+
+    IMPORTANT: Return ONLY valid JSON, no markdown or other text.
+    Here is the LinkedIn profile data to analyze: ${JSON.stringify(linkedInData)}`;
+
     const result = await model.generateContent([
-      { text: JSON.stringify(linkedInData) }
+      { text: prompt }
     ]);
     
     const response = await result.response;
