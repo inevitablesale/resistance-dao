@@ -1,9 +1,6 @@
-import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 import { supabase } from "@/integrations/supabase/client";
-
-const CONTRACT_ADDRESS = "0x3dC25640b1B7528Dca23BeFcDAD835C5Bf4e5360";
 
 interface NFTMetadata {
   name: string;
@@ -29,7 +26,7 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
       throw new Error('Governance Power not found in metadata attributes');
     }
 
-    // Call the Edge Function to mint the NFT using Dynamic's wallet
+    // Call the Edge Function to handle metadata storage and verification
     const { data: mintResult, error } = await supabase.functions.invoke('mint-nft', {
       body: {
         address,
@@ -39,10 +36,10 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
     });
 
     if (error) {
-      throw new Error(`Minting failed: ${error.message}`);
+      throw new Error(`Minting process failed: ${error.message}`);
     }
 
-    console.log('Minting successful:', mintResult);
+    console.log('Metadata processing successful:', mintResult);
 
     // Upload metadata to IPFS for reference
     const governanceImageCID = getGovernanceImageCID(governancePowerAttr.value);
@@ -65,7 +62,7 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
       transactionHash: mintResult.transactionHash 
     };
   } catch (error) {
-    console.error('Minting failed:', error);
+    console.error('Minting process failed:', error);
     throw error;
   }
 };
