@@ -1,5 +1,4 @@
-import { Contract } from 'ethers';
-import { BrowserProvider } from 'ethers/providers';
+import { Contract, BrowserProvider } from 'ethers';
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 import { supabase } from "@/integrations/supabase/client";
