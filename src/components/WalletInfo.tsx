@@ -147,11 +147,18 @@ export const WalletInfo = () => {
     return null;
   }
 
+  const getStepStatus = (stepIndex: number) => {
+    if (progress === 100) return "complete";
+    if (progress >= stepIndex * 25) return "complete";
+    if (progress >= (stepIndex - 1) * 25) return "current";
+    return "upcoming";
+  };
+
   const steps = [
-    { name: "Wallet Created", status: "complete" },
-    { name: "Generate NFT", status: progress >= 50 ? "complete" : "current" },
-    { name: "KYC / AMLY", status: progress >= 75 ? "complete" : "upcoming" },
-    { name: "Complete", status: progress === 100 ? "complete" : "upcoming" }
+    { name: "Connect Wallet", status: getStepStatus(1) },
+    { name: "Preview NFT", status: getStepStatus(2) },
+    { name: "Verify Profile", status: getStepStatus(3) },
+    { name: "Mint NFT", status: getStepStatus(4) }
   ];
 
   return (
@@ -162,21 +169,23 @@ export const WalletInfo = () => {
         {steps.map((step, index) => (
           <div 
             key={step.name}
-            className={`flex flex-col items-center text-center space-y-2 ${
+            className={cn(
+              "flex flex-col items-center text-center space-y-2",
               step.status === "complete" ? "text-polygon-primary" : 
               step.status === "current" ? "text-polygon-primary" : 
               "text-gray-500"
-            }`}
+            )}
           >
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${
+            <div className={cn(
+              "w-8 h-8 rounded-full flex items-center justify-center border transition-colors duration-300",
               step.status === "complete" ? "bg-polygon-primary border-polygon-primary" :
               step.status === "current" ? "border-polygon-primary" :
               "border-gray-500"
-            }`}>
+            )}>
               {step.status === "complete" ? (
-                <Check className="w-4 h-4 text-white" />
+                <Check className="w-4 h-4 text-white animate-scale-in" />
               ) : step.status === "current" ? (
-                <ArrowRight className="w-4 h-4 text-polygon-primary" />
+                <ArrowRight className="w-4 h-4 text-polygon-primary animate-pulse" />
               ) : null}
             </div>
             <span className="text-xs font-medium">{step.name}</span>
@@ -199,13 +208,12 @@ export const WalletInfo = () => {
               "hover:border-polygon-primary/40",
               "group"
             )}>
-              {/* Animated background effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-polygon-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
-              <div className="relative p-8 grid md:grid-cols-2 gap-8">
-                {/* Image Section with Animation */}
+              <div className="relative p-8 grid grid-cols-12 gap-8">
+                {/* Image Section with Animation - 4 columns */}
                 {previewImageUrl && (
-                  <div className="relative flex items-center justify-center animate-fade-in">
+                  <div className="col-span-4 relative flex items-center justify-center animate-fade-in">
                     <div className="absolute inset-0 bg-polygon-primary/20 rounded-full blur-2xl animate-pulse-slow" />
                     <div className="relative">
                       <div className="absolute -inset-1 bg-gradient-to-r from-polygon-primary to-polygon-secondary rounded-full blur animate-pulse-slow" />
@@ -218,25 +226,25 @@ export const WalletInfo = () => {
                   </div>
                 )}
 
-                {/* Content Section with Staggered Animation */}
-                <div className="space-y-6 animate-fade-in delay-150">
+                {/* Content Section with Staggered Animation - 8 columns */}
+                <div className="col-span-8 space-y-6 animate-fade-in">
                   <div className="space-y-2">
-                    <h4 className="text-2xl font-bold bg-gradient-to-r from-white to-polygon-primary bg-clip-text text-transparent">
+                    <h4 className="text-3xl font-bold bg-gradient-to-r from-white to-polygon-primary bg-clip-text text-transparent">
                       {nftPreview.fullName}'s Professional NFT
                     </h4>
-                    <p className="text-gray-400">Professional Identity Token</p>
+                    <p className="text-xl text-gray-400">Professional Identity Token</p>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
                     {nftPreview.attributes.map((attr, index) => (
                       <div 
                         key={index}
                         className="animate-fade-in"
                         style={{ animationDelay: `${150 + index * 100}ms` }}
                       >
-                        <div className="flex justify-between items-center p-3 rounded-lg bg-black/20 border border-white/5 hover:border-polygon-primary/20 transition-colors">
-                          <span className="text-gray-400 font-medium">{attr.trait_type}</span>
-                          <span className="text-white font-semibold">{attr.value}</span>
+                        <div className="flex flex-col p-4 rounded-lg bg-black/20 border border-white/5 hover:border-polygon-primary/20 transition-colors">
+                          <span className="text-sm text-gray-400 mb-1">{attr.trait_type}</span>
+                          <span className="text-lg font-semibold text-white">{attr.value}</span>
                         </div>
                       </div>
                     ))}
@@ -266,9 +274,10 @@ export const WalletInfo = () => {
             <button
               onClick={handleAnalyzeProfile}
               disabled={isAnalyzing}
-              className={`${
-                isAnalyzing ? 'bg-polygon-primary/50' : 'bg-polygon-primary hover:bg-polygon-primary/90'
-              } text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2`}
+              className={cn(
+                isAnalyzing ? 'bg-polygon-primary/50' : 'bg-polygon-primary hover:bg-polygon-primary/90',
+                'text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2'
+              )}
             >
               <Eye className="w-4 h-4" />
               {isAnalyzing ? 'Analyzing Profile...' : 'Preview NFT'}
