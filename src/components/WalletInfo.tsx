@@ -12,6 +12,15 @@ import { useNavigate } from "react-router-dom";
 import { LoadingSlides } from "./LoadingSlides";
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
+import { ethers } from "ethers";
+
+// Contract details
+const CONTRACT_ADDRESS = "0x3dC25640b1B7528Dca23BeFcDAD835C5Bf4e5360";
+const CONTRACT_ABI = [
+  "function balanceOf(address owner) view returns (uint256)",
+  "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)",
+  "function tokenURI(uint256 tokenId) view returns (string)"
+];
 
 interface NFTPreview {
   fullName: string;
@@ -31,26 +40,53 @@ export const WalletInfo = () => {
   const [nftPreview, setNFTPreview] = useState<NFTPreview | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState<string>("");
   const [isSavedToBlockchain, setIsSavedToBlockchain] = useState(false);
-  const [hasNFT, setHasNFT] = useState(false); // New state for NFT ownership
+  const [hasNFT, setHasNFT] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkConnection = async () => {
+    const checkWalletAndNFT = async () => {
       if (primaryWallet) {
-        const connected = await primaryWallet.isConnected();
-        setIsWalletConnected(connected);
-        // TODO: Add check for NFT ownership here
-        // For now, we'll use isSavedToBlockchain as a proxy
-        setHasNFT(isSavedToBlockchain);
+        try {
+          const connected = await primaryWallet.isConnected();
+          setIsWalletConnected(connected);
+          
+          if (connected && primaryWallet.address) {
+            // Check if user has NFT
+            const provider = new ethers.providers.Web3Provider(await primaryWallet.getWalletClient());
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+            const balance = await contract.balanceOf(primaryWallet.address);
+            
+            const hasNFT = balance.gt(0);
+            setHasNFT(hasNFT);
+            setIsSavedToBlockchain(hasNFT);
+
+            if (hasNFT) {
+              // Get the first token ID
+              const tokenId = await contract.tokenOfOwnerByIndex(primaryWallet.address, 0);
+              const tokenURI = await contract.tokenURI(tokenId);
+              
+              // Fetch metadata from IPFS
+              const response = await fetch(tokenURI.replace('ipfs://', 'https://ipfs.io/ipfs/'));
+              const metadata = await response.json();
+              
+              setPreviewImageUrl(metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/'));
+            }
+          }
+        } catch (error) {
+          console.error('Error checking NFT ownership:', error);
+          setHasNFT(false);
+          setIsSavedToBlockchain(false);
+        }
       } else {
         setIsWalletConnected(false);
         setHasNFT(false);
+        setIsSavedToBlockchain(false);
       }
     };
 
-    checkConnection();
-  }, [primaryWallet, isSavedToBlockchain]);
+    checkWalletAndNFT();
+  }, [primaryWallet]);
 
   const handleAnalyzeProfile = async () => {
     console.group('LinkedIn Profile Analysis');
@@ -124,14 +160,28 @@ export const WalletInfo = () => {
   const handleMintNFT = async () => {
     if (!nftPreview) return;
     
-    setIsMinting(true);
     try {
-      console.log('Starting NFT minting process...');
-      
       if (!primaryWallet?.address) {
         throw new Error('Wallet address not found');
       }
 
+      // Check if user already has an NFT
+      const provider = new ethers.providers.Web3Provider(await primaryWallet.getWalletClient());
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+      const balance = await contract.balanceOf(primaryWallet.address);
+      
+      if (balance.gt(0)) {
+        toast({
+          title: "NFT Already Owned",
+          description: "You already own a LedgerFren NFT. Only one NFT per wallet is allowed.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsMinting(true);
+      console.log('Starting NFT minting process...');
+      
       const result = await mintNFT(
         await primaryWallet.getWalletClient(),
         primaryWallet.address,
