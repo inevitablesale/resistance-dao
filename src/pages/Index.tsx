@@ -72,9 +72,9 @@ const Index = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* Enhanced Space Background with Realistic Ships */}
+        {/* Enhanced Space Background with Advanced Ships */}
         <div className="absolute inset-0">
-          {/* Deep space base with proper atmospheric glow */}
+          {/* Deep space base with quantum field effects */}
           <div 
             className="absolute inset-0"
             style={{
@@ -83,61 +83,123 @@ const Index = () => {
             }}
           />
           
-          {/* Planet atmosphere and surface details */}
+          {/* Quantum probability waves and temporal distortions */}
           <div 
             className="absolute inset-0"
             style={{
               background: `
-                radial-gradient(circle at 30% 70%, rgba(51, 153, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 70% 60%, rgba(51, 153, 255, 0.1) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(51, 153, 255, 0.05) 0%, transparent 55%)
+                radial-gradient(circle at 30% 70%, rgba(64, 156, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(147, 51, 255, 0.1) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.05) 0%, transparent 55%)
               `,
-              animation: 'atmosphereGlow 30s ease-in-out infinite'
+              animation: 'quantumField 30s ease-in-out infinite'
             }}
           />
           
-          {/* Realistic star field with depth */}
+          {/* Advanced star field with temporal wake effects */}
           <div 
             className="absolute inset-0 opacity-90"
             style={{
               backgroundImage: `
                 radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.8) 100%, transparent),
-                radial-gradient(1.5px 1.5px at 20% 20%, rgba(255, 255, 255, 0.7) 100%, transparent),
-                radial-gradient(1px 1px at 30% 30%, rgba(255, 255, 255, 0.8) 100%, transparent),
-                radial-gradient(2px 2px at 40% 40%, rgba(255, 255, 255, 0.6) 100%, transparent),
+                radial-gradient(2px 2px at 20% 20%, rgba(0, 255, 255, 0.7) 100%, transparent),
+                radial-gradient(1.5px 1.5px at 30% 30%, rgba(147, 51, 255, 0.8) 100%, transparent),
+                radial-gradient(2px 2px at 40% 40%, rgba(64, 156, 255, 0.6) 100%, transparent),
                 radial-gradient(1.5px 1.5px at 50% 50%, rgba(255, 255, 255, 0.7) 100%, transparent)
               `,
               backgroundSize: '400% 400%',
-              animation: 'starParallax 240s ease-in-out infinite'
+              animation: 'temporalWake 240s ease-in-out infinite'
             }}
           />
           
-          {/* Refugee ships with engine glow */}
+          {/* Advanced Spacecraft Fleet */}
           <div className="absolute inset-0">
-            {[...Array(5)].map((_, index) => (
+            {/* The Ark - Flagship */}
+            <div
+              className="absolute animate-quantum-ship"
+              style={{
+                left: '50%',
+                top: '40%',
+                width: '300px',
+                height: '100px',
+                background: `
+                  linear-gradient(45deg, 
+                    rgba(64, 156, 255, 0.9) 0%,
+                    rgba(147, 51, 255, 0.8) 50%,
+                    rgba(0, 255, 255, 0.7) 100%
+                  )
+                `,
+                boxShadow: `
+                  0 0 40px rgba(64, 156, 255, 0.3),
+                  0 0 80px rgba(147, 51, 255, 0.2),
+                  0 0 120px rgba(0, 255, 255, 0.1)
+                `,
+                clipPath: 'polygon(0 50%, 25% 0, 85% 0, 100% 50%, 85% 100%, 25% 100%)',
+                transform: 'rotate(-15deg)',
+                animation: `
+                  flagshipPulse 4s ease-in-out infinite,
+                  quantumShield 6s linear infinite
+                `
+              }}
+            />
+
+            {/* Guardian Escorts */}
+            {[...Array(3)].map((_, index) => (
               <div
-                key={index}
-                className="absolute animate-spacecraft"
+                key={`guardian-${index}`}
+                className="absolute animate-guardian-ship"
                 style={{
-                  left: `${20 + index * 15}%`,
-                  top: `${30 + index * 8}%`,
-                  width: '120px',
-                  height: '40px',
-                  background: `linear-gradient(45deg, 
-                    rgba(255,255,255,0.9) 0%,
-                    rgba(200,215,255,0.8) 50%,
-                    rgba(150,180,255,0.7) 100%
-                  )`,
-                  boxShadow: `
-                    0 0 20px rgba(51,153,255,0.3),
-                    0 0 40px rgba(51,153,255,0.2),
-                    0 0 60px rgba(51,153,255,0.1)
+                  left: `${30 + index * 20}%`,
+                  top: `${35 + index * 10}%`,
+                  width: '150px',
+                  height: '50px',
+                  background: `
+                    linear-gradient(45deg, 
+                      rgba(147, 51, 255, 0.9) 0%,
+                      rgba(0, 255, 255, 0.8) 50%,
+                      rgba(64, 156, 255, 0.7) 100%
+                    )
                   `,
-                  clipPath: 'polygon(0 50%, 20% 0, 90% 0, 100% 50%, 90% 100%, 20% 100%)',
+                  boxShadow: `
+                    0 0 30px rgba(147, 51, 255, 0.3),
+                    0 0 60px rgba(0, 255, 255, 0.2)
+                  `,
+                  clipPath: 'polygon(0 50%, 15% 0, 95% 0, 100% 50%, 95% 100%, 15% 100%)',
                   transform: 'rotate(-15deg)',
                   animation: `
-                    spacecraft${index + 1} ${20 + index * 2}s linear infinite,
-                    engineGlow ${1 + index * 0.2}s ease-in-out infinite alternate
+                    guardianPulse${index + 1} ${3 + index}s ease-in-out infinite,
+                    forceField ${2 + index}s linear infinite
+                  `
+                }}
+              />
+            ))}
+
+            {/* Pathfinder Scouts */}
+            {[...Array(5)].map((_, index) => (
+              <div
+                key={`scout-${index}`}
+                className="absolute animate-scout-ship"
+                style={{
+                  left: `${20 + index * 15}%`,
+                  top: `${45 + index * 8}%`,
+                  width: '80px',
+                  height: '30px',
+                  background: `
+                    linear-gradient(45deg, 
+                      rgba(0, 255, 255, 0.9) 0%,
+                      rgba(64, 156, 255, 0.8) 50%,
+                      rgba(147, 51, 255, 0.7) 100%
+                    )
+                  `,
+                  boxShadow: `
+                    0 0 20px rgba(0, 255, 255, 0.3),
+                    0 0 40px rgba(64, 156, 255, 0.2)
+                  `,
+                  clipPath: 'polygon(0 50%, 10% 0, 98% 0, 100% 50%, 98% 100%, 10% 100%)',
+                  transform: 'rotate(-15deg)',
+                  animation: `
+                    scoutPulse${index + 1} ${2 + index * 0.5}s ease-in-out infinite,
+                    biomimetic ${1.5 + index * 0.3}s linear infinite
                   `
                 }}
               />
@@ -146,62 +208,91 @@ const Index = () => {
           
           <style>
             {`
-              @keyframes atmosphereGlow {
+              @keyframes quantumField {
                 0%, 100% {
                   opacity: 0.7;
-                  transform: scale(1);
+                  transform: scale(1) rotate(0deg);
                 }
                 50% {
                   opacity: 0.9;
-                  transform: scale(1.02);
+                  transform: scale(1.05) rotate(1deg);
                 }
               }
 
-              @keyframes starParallax {
+              @keyframes temporalWake {
                 0%, 100% {
                   transform: scale(1) rotate(0deg);
                   opacity: 0.8;
                 }
                 50% {
-                  transform: scale(1.1) rotate(0.5deg);
+                  transform: scale(1.1) rotate(1deg);
                   opacity: 1;
                 }
               }
 
-              @keyframes engineGlow {
+              @keyframes flagshipPulse {
                 0%, 100% {
-                  box-shadow: 0 0 20px rgba(51,153,255,0.3),
-                             0 0 40px rgba(51,153,255,0.2);
+                  opacity: 0.9;
+                  transform: scale(1) rotate(-15deg);
                 }
                 50% {
-                  box-shadow: 0 0 30px rgba(51,153,255,0.4),
-                             0 0 60px rgba(51,153,255,0.3);
+                  opacity: 1;
+                  transform: scale(1.05) rotate(-15deg);
                 }
               }
 
-              @keyframes spacecraft1 {
-                0% { transform: translate(0, 0) rotate(-15deg); }
-                100% { transform: translate(-200px, 100px) rotate(-15deg); }
+              @keyframes quantumShield {
+                0% {
+                  filter: hue-rotate(0deg) brightness(1);
+                }
+                100% {
+                  filter: hue-rotate(360deg) brightness(1.2);
+                }
               }
 
-              @keyframes spacecraft2 {
-                0% { transform: translate(50px, -20px) rotate(-15deg); }
-                100% { transform: translate(-150px, 80px) rotate(-15deg); }
+              @keyframes forceField {
+                0% {
+                  filter: hue-rotate(0deg);
+                }
+                100% {
+                  filter: hue-rotate(180deg);
+                }
               }
 
-              @keyframes spacecraft3 {
-                0% { transform: translate(100px, -40px) rotate(-15deg); }
-                100% { transform: translate(-100px, 60px) rotate(-15deg); }
+              @keyframes biomimetic {
+                0%, 100% {
+                  transform: skewX(0deg) rotate(-15deg);
+                }
+                50% {
+                  transform: skewX(2deg) rotate(-15deg);
+                }
               }
 
-              @keyframes spacecraft4 {
-                0% { transform: translate(150px, -60px) rotate(-15deg); }
-                100% { transform: translate(-50px, 40px) rotate(-15deg); }
+              .animate-quantum-ship {
+                animation: flagshipMove 30s linear infinite;
               }
 
-              @keyframes spacecraft5 {
-                0% { transform: translate(200px, -80px) rotate(-15deg); }
-                100% { transform: translate(0px, 20px) rotate(-15deg); }
+              .animate-guardian-ship {
+                animation: guardianMove 25s linear infinite;
+              }
+
+              .animate-scout-ship {
+                animation: scoutMove 20s linear infinite;
+              }
+
+              @keyframes flagshipMove {
+                0% { transform: translate(0, 0); }
+                100% { transform: translate(-50px, 25px); }
+              }
+
+              @keyframes guardianMove {
+                0% { transform: translate(0, 0); }
+                100% { transform: translate(-40px, 20px); }
+              }
+
+              @keyframes scoutMove {
+                0% { transform: translate(0, 0); }
+                100% { transform: translate(-30px, 15px); }
               }
             `}
           </style>
@@ -218,3 +309,4 @@ const Index = () => {
 };
 
 export default Index;
+
