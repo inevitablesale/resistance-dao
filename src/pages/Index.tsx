@@ -1,4 +1,4 @@
-```typescript
+
 import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
@@ -72,266 +72,133 @@ const Index = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* Enhanced Space Background with Deep Atmospheric Effects */}
+        {/* James Webb-inspired Space Background */}
         <div className="absolute inset-0">
-          {/* Base Space Layer */}
+          {/* Deep space base layer */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%)',
+              background: 'radial-gradient(circle at center, #1e0f3c 0%, #000000 100%)',
               opacity: 0.95
             }}
           />
           
-          {/* Atmospheric Cloud Layer using reference image */}
+          {/* Nebula and cosmic dust */}
           <div 
             className="absolute inset-0"
             style={{
-              backgroundImage: `url('/lovable-uploads/a5e158c0-20cc-46ca-9c71-5dfa7741d854.png')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              opacity: 0.8,
-              mixBlendMode: 'screen'
-            }}
-          />
-
-          {/* Golden Atmospheric Glow */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(to top, rgba(255, 197, 66, 0.15) 0%, rgba(255, 197, 66, 0) 40%)',
-              mixBlendMode: 'overlay'
-            }}
-          />
-
-          {/* Detailed Planet with Enhanced Surface Features */}
-          <div className="absolute top-20 right-40">
-            <div 
-              className="w-64 h-64 relative"
-              style={{
-                background: `
-                  radial-gradient(circle at 40% 40%,
-                    #DAA520 0%,    /* Golden surface base */
-                    #B8860B 20%,   /* Darker golden regions */
-                    #CD853F 40%,   /* Copper-like areas */
-                    #8B4513 60%,   /* Deep surface features */
-                    #654321 85%,   /* Shadow regions */
-                    #3D2B1F 100%   /* Dark edge */
-                  )
-                `,
-                borderRadius: '50%',
-                transform: 'scale(1.5)',
-                opacity: 0.95,
-                boxShadow: `
-                  inset -15px -15px 40px rgba(0,0,0,0.8),
-                  inset 5px 5px 40px rgba(255,215,0,0.4),
-                  0 0 60px rgba(218,165,32,0.3)
-                `
-              }}
-            >
-              {/* Enhanced Atmospheric Layer */}
-              <div 
-                className="absolute inset-0"
-                style={{
-                  borderRadius: '50%',
-                  background: 'radial-gradient(circle at 30% 30%, rgba(255,215,0,0.2) 0%, transparent 60%)',
-                  filter: 'blur(8px)'
-                }}
-              />
-              
-              {/* Detailed Surface Features */}
-              <div 
-                className="absolute inset-0"
-                style={{
-                  borderRadius: '50%',
-                  background: `
-                    radial-gradient(circle at 60% 60%, rgba(205,133,63,0.3) 0%, transparent 30%),
-                    radial-gradient(circle at 30% 70%, rgba(218,165,32,0.2) 0%, transparent 40%),
-                    radial-gradient(circle at 70% 30%, rgba(139,69,19,0.4) 0%, transparent 35%)
-                  `,
-                  opacity: 0.9
-                }}
-              />
-
-              {/* Enhanced Landing Zone Indicators */}
-              <div 
-                className="absolute inset-0"
-                style={{
-                  borderRadius: '50%',
-                  background: `
-                    radial-gradient(circle at 45% 45%, rgba(255,223,0,0.3) 0%, transparent 5%),
-                    radial-gradient(circle at 55% 55%, rgba(255,223,0,0.3) 0%, transparent 5%)
-                  `,
-                  animation: 'pulse 2s infinite'
-                }}
-              />
-            </div>
-          </div>
-          
-          {/* Enhanced Refugee Fleet with Detailed Ships */}
-          <div className="absolute inset-0 overflow-hidden">
-            {/* Command Ship with Enhanced Details */}
-            <div className="absolute animate-landing-approach-1">
-              <div 
-                className="relative"
-                style={{
-                  width: '160px',
-                  height: '50px',
-                  background: '#CD853F',
-                  clipPath: 'polygon(0% 50%, 15% 20%, 85% 20%, 100% 50%, 85% 80%, 15% 80%)',
-                  boxShadow: '0 0 20px rgba(255,215,0,0.3)'
-                }}
-              >
-                {/* Enhanced Hull Details */}
-                <div 
-                  className="absolute inset-0"
-                  style={{
-                    background: `
-                      linear-gradient(90deg, 
-                        rgba(139,69,19,0.8) 0%,
-                        rgba(205,133,63,0.4) 50%,
-                        rgba(139,69,19,0.8) 100%
-                      )
-                    `
-                  }}
-                />
-
-                {/* Enhanced Heat Shield Effect */}
-                <div 
-                  className="absolute bottom-0 left-0 right-0 h-1/4"
-                  style={{
-                    background: 'linear-gradient(0deg, rgba(255,165,0,0.6) 0%, transparent 100%)',
-                    animation: 'pulse 1.5s infinite',
-                    filter: 'blur(2px)'
-                  }}
-                />
-
-                {/* Enhanced Engine Array */}
-                <div className="absolute -right-4 top-1/2 -translate-y-1/2 flex gap-1">
-                  {[...Array(4)].map((_, i) => (
-                    <div 
-                      key={i}
-                      className="relative"
-                      style={{
-                        width: '25px',
-                        height: '8px',
-                        background: 'radial-gradient(circle at right, rgba(255,215,0,0.9), transparent 70%)',
-                        filter: 'blur(1px)',
-                        animation: 'enginePulse 1.2s infinite'
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Transport Ships with Landing Configuration */}
-            {[2, 3].map((index) => (
-              <div key={index} className={`absolute animate-landing-approach-${index}`}>
-                <div 
-                  className="relative"
-                  style={{
-                    width: index === 2 ? '120px' : '80px',
-                    height: index === 2 ? '40px' : '30px',
-                    background: '#B8860B',
-                    clipPath: 'polygon(0% 50%, 20% 20%, 80% 20%, 100% 50%, 80% 80%, 20% 80%)',
-                    boxShadow: `0 0 ${15 - (index * 2)}px rgba(255,215,0,0.2)`
-                  }}
-                >
-                  {/* Ship-specific Heat Shield */}
-                  <div 
-                    className="absolute bottom-0 left-0 right-0 h-1/3"
-                    style={{
-                      background: 'linear-gradient(0deg, rgba(255,140,0,0.7) 0%, transparent 100%)',
-                      animation: 'pulse 1.8s infinite',
-                      filter: 'blur(1px)'
-                    }}
-                  />
-
-                  {/* Ship-specific Engines */}
-                  <div className="absolute -right-3 top-1/2 -translate-y-1/2 flex gap-1">
-                    {[...Array(index === 2 ? 3 : 2)].map((_, i) => (
-                      <div 
-                        key={i}
-                        className="relative"
-                        style={{
-                          width: `${20 - (index * 3)}px`,
-                          height: '6px',
-                          background: 'radial-gradient(circle at right, rgba(255,215,0,0.8), transparent 70%)',
-                          filter: 'blur(1px)',
-                          animation: `enginePulse ${1.5 + (index * 0.2)}s infinite`
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Enhanced Star Field with Depth */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              background: Array.from({length: 3}, (_, i) => 
-                Array.from({length: 150}, () => {
-                  const x = Math.random() * 100;
-                  const y = Math.random() * 100;
-                  const size = Math.random() * 1.5 + 0.5;
-                  return `radial-gradient(${size}px ${size}px at ${x}% ${y}%, rgba(255, 255, 255, ${0.8 - i * 0.2}) 0%, transparent 100%)`
-                }).join(',')
-              ).join(','),
-              opacity: 0.8
+              background: `
+                radial-gradient(circle at 30% 40%, rgba(255, 147, 92, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 70% 60%, rgba(130, 71, 229, 0.2) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(86, 42, 168, 0.15) 0%, transparent 55%),
+                radial-gradient(circle at 20% 30%, rgba(255, 124, 64, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(130, 71, 229, 0.15) 0%, transparent 45%)
+              `,
+              animation: 'nebulaPulse 20s ease-in-out infinite alternate'
             }}
           />
           
-          {/* Enhanced Atmospheric Glow */}
+          {/* Star clusters */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(circle at 70% 30%, rgba(255,215,0,0.15) 0%, transparent 60%)',
-              mixBlendMode: 'soft-light'
+              backgroundImage: `
+                radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.9) 100%, transparent),
+                radial-gradient(1.5px 1.5px at 20% 20%, rgba(255, 255, 255, 0.8) 100%, transparent),
+                radial-gradient(1px 1px at 30% 30%, rgba(255, 255, 255, 0.9) 100%, transparent),
+                radial-gradient(2px 2px at 40% 40%, rgba(255, 255, 255, 0.7) 100%, transparent),
+                radial-gradient(1.5px 1.5px at 50% 50%, rgba(255, 255, 255, 0.8) 100%, transparent),
+                radial-gradient(1px 1px at 60% 60%, rgba(255, 255, 255, 0.9) 100%, transparent),
+                radial-gradient(2px 2px at 70% 70%, rgba(255, 255, 255, 0.7) 100%, transparent),
+                radial-gradient(1.5px 1.5px at 80% 80%, rgba(255, 255, 255, 0.8) 100%, transparent),
+                radial-gradient(1px 1px at 90% 90%, rgba(255, 255, 255, 0.9) 100%, transparent)
+              `,
+              backgroundSize: '400% 400%',
+              animation: 'starFloat 45s ease-in-out infinite'
             }}
           />
           
-          {/* Animation Keyframes with Enhanced Landing Approaches */}
+          {/* Ethereal glow and cosmic rays */}
+          <div 
+            className="absolute inset-0 mix-blend-screen"
+            style={{
+              background: `
+                radial-gradient(circle at 40% 30%, rgba(255, 147, 92, 0.1) 0%, transparent 55%),
+                radial-gradient(circle at 60% 70%, rgba(130, 71, 229, 0.1) 0%, transparent 55%),
+                radial-gradient(circle at 50% 50%, rgba(86, 42, 168, 0.08) 0%, transparent 65%)
+              `,
+              animation: 'cosmicGlow 15s ease-in-out infinite alternate'
+            }}
+          />
+          
+          {/* Distant galaxies */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `
+                radial-gradient(2px 2px at 25% 35%, rgba(255, 187, 132, 0.6) 100%, transparent),
+                radial-gradient(2px 2px at 75% 65%, rgba(170, 111, 229, 0.6) 100%, transparent),
+                radial-gradient(2px 2px at 50% 50%, rgba(126, 82, 208, 0.6) 100%, transparent)
+              `,
+              backgroundSize: '300% 300%',
+              animation: 'galaxyPulse 30s ease-in-out infinite'
+            }}
+          />
+          
           <style>
             {`
-              @keyframes enginePulse {
-                0%, 100% { opacity: 0.7; transform: scaleX(1); }
-                50% { opacity: 1; transform: scaleX(1.3); }
+              @keyframes nebulaPulse {
+                0%, 100% {
+                  opacity: 0.4;
+                  transform: scale(1);
+                }
+                50% {
+                  opacity: 0.6;
+                  transform: scale(1.05);
+                }
               }
 
-              @keyframes landing-approach-1 {
-                0% { transform: translate(-160px, 40vh) rotate(-15deg); }
-                100% { transform: translate(calc(65vw), 35vh) rotate(25deg); }
+              @keyframes starFloat {
+                0%, 100% {
+                  opacity: 0.8;
+                  transform: scale(1) rotate(0deg);
+                  background-position: 0% 0%;
+                }
+                25% {
+                  opacity: 1;
+                  background-position: 50% 50%;
+                }
+                50% {
+                  opacity: 0.7;
+                  transform: scale(1.1) rotate(0.5deg);
+                  background-position: 100% 100%;
+                }
+                75% {
+                  opacity: 0.9;
+                  background-position: 25% 75%;
+                }
               }
 
-              @keyframes landing-approach-2 {
-                0% { transform: translate(-120px, 45vh) rotate(-18deg); }
-                100% { transform: translate(calc(60vw), 40vh) rotate(28deg); }
+              @keyframes cosmicGlow {
+                0%, 100% {
+                  opacity: 0.3;
+                  transform: scale(1);
+                }
+                50% {
+                  opacity: 0.5;
+                  transform: scale(1.1);
+                }
               }
 
-              @keyframes landing-approach-3 {
-                0% { transform: translate(-80px, 50vh) rotate(-20deg); }
-                100% { transform: translate(calc(55vw), 45vh) rotate(30deg); }
-              }
-
-              .animate-landing-approach-1 {
-                animation: landing-approach-1 20s linear infinite;
-                will-change: transform;
-              }
-
-              .animate-landing-approach-2 {
-                animation: landing-approach-2 25s linear infinite;
-                animation-delay: 5s;
-                will-change: transform;
-              }
-
-              .animate-landing-approach-3 {
-                animation: landing-approach-3 30s linear infinite;
-                animation-delay: 10s;
-                will-change: transform;
+              @keyframes galaxyPulse {
+                0%, 100% {
+                  opacity: 0.4;
+                  background-size: 300% 300%;
+                }
+                50% {
+                  opacity: 0.7;
+                  background-size: 320% 320%;
+                }
               }
             `}
           </style>
@@ -348,4 +215,3 @@ const Index = () => {
 };
 
 export default Index;
-```
