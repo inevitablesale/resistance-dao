@@ -5,7 +5,7 @@ import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-a
 import { WalletInfo } from "@/components/WalletInfo";
 import { PostOnboardingView } from "@/components/PostOnboardingView";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { Hero } from "@/components/Hero";
+import Hero from "@/components/Hero";
 
 const IndexContent = () => {
   const { user } = useDynamicContext();

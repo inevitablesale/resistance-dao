@@ -1,12 +1,11 @@
+
 import { Link } from "react-router-dom";
 import BlackHoleAnimation from "./BlackHoleAnimation";
-import { toast } from "sonner";
-import { supabase } from "../lib/supabase";
-import { useAuth } from "../contexts/AuthContext";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
-  const { session } = useAuth();
+  const { user } = useDynamicContext();
   const navigate = useNavigate();
 
   const handleClaimClick = () => {
@@ -36,10 +35,10 @@ const Hero = () => {
               Earn Rewards with Quests
             </Link>
             
-            {session ? (
+            {user ? (
               <button 
+                onClick={() => window.dynamic.handleLogOut()}
                 className="px-8 py-4 text-black bg-white hover:bg-gray-100 rounded-full font-medium transition-all duration-200 backdrop-blur-sm"
-                onClick={() => supabase.auth.signOut()}
               >
                 Sign Out
               </button>
