@@ -1,10 +1,7 @@
-
-import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
+```typescript
+import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
-import { WalletInfo } from "@/components/WalletInfo";
-import { PostOnboardingView } from "@/components/PostOnboardingView";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -15,13 +12,17 @@ import { AlternativeToEquity } from "@/components/AlternativeToEquity";
 import { SystemWeDeserve } from "@/components/SystemWeDeserve";
 import { CallToAction } from "@/components/CallToAction";
 import { Roadmap } from "@/components/Roadmap";
+import { useNavigate } from "react-router-dom";
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { WalletInfo } from "@/components/WalletInfo";
+
+const zeroDevConfig = {
+  bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
+  paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
+};
 
 const IndexContent = () => {
-  const { user, primaryWallet, setShowAuthFlow } = useDynamicContext();
-
-  if (user?.verifications?.completedOnboarding) {
-    return <PostOnboardingView />;
-  }
+  const navigate = useNavigate();
 
   return (
     <>
@@ -34,24 +35,15 @@ const IndexContent = () => {
         </p>
 
         <div className="flex flex-col md:flex-row gap-4 justify-center mb-16">
-          <button className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium">
-            Earn LGR with Quests
-          </button>
           <button 
-            onClick={() => setShowAuthFlow?.(true)}
-            className="px-8 py-3 bg-white hover:bg-white/90 text-[#8247E5] rounded-lg transition-colors text-lg font-medium"
+            onClick={() => navigate('/mint-nft')}
+            className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium"
           >
-            Mint LedgerFren Badge
+            Mint LedgerFren NFT
           </button>
-        </div>
-
-        <div className="max-w-md mx-auto">
-          <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
-            <div className="flex justify-center mb-8">
-              <DynamicWidget />
-            </div>
-            <WalletInfo />
-          </div>
+          <button className="px-8 py-3 bg-white hover:bg-white/90 text-[#8247E5] rounded-lg transition-colors text-lg font-medium">
+            Read Whitepaper
+          </button>
         </div>
       </div>
 
@@ -68,11 +60,6 @@ const IndexContent = () => {
   );
 };
 
-const zeroDevConfig = {
-  bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
-  paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
-};
-
 const Index = () => {
   return (
     <DynamicContextProvider
@@ -85,7 +72,7 @@ const Index = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* Enhanced Space Background with Advanced Ships */}
+        {/* Keep the space background code */}
         <div className="absolute inset-0">
           {/* Deep space base with quantum field effects */}
           <div 
@@ -322,3 +309,4 @@ const Index = () => {
 };
 
 export default Index;
+```

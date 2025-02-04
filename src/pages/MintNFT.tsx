@@ -1,0 +1,72 @@
+
+import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
+import { WalletInfo } from "@/components/WalletInfo";
+import { PostOnboardingView } from "@/components/PostOnboardingView";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import Nav from "@/components/Nav";
+
+const zeroDevConfig = {
+  bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
+  paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
+};
+
+const MintNFTContent = () => {
+  const { user } = useDynamicContext();
+
+  if (user?.verifications?.completedOnboarding) {
+    return <PostOnboardingView />;
+  }
+
+  return (
+    <div className="text-center mb-8 max-w-5xl mx-auto pt-32">
+      <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight">
+        Mint your LedgerFren NFT
+      </h1>
+      <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
+        Get your LedgerFren NFT to access the platform. Once verified, you'll be able to participate in investment opportunities.
+      </p>
+
+      <div className="max-w-md mx-auto">
+        <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
+          <div className="flex justify-center mb-8">
+            <DynamicWidget />
+          </div>
+          <WalletInfo />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const MintNFT = () => {
+  return (
+    <DynamicContextProvider
+      settings={{
+        environmentId: "2b74d425-6827-4ff1-af57-f9543d71cca0",
+        walletConnectors: [
+          EthereumWalletConnectors,
+          ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
+        ],
+      }}
+    >
+      <div className="min-h-screen bg-black overflow-hidden relative">
+        {/* Deep space background and effects from Index.tsx */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, #000B2E 0%, #000000 100%)', opacity: 0.98 }} />
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 30% 70%, rgba(64, 156, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(147, 51, 255, 0.1) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.05) 0%, transparent 55%)', animation: 'quantumField 30s ease-in-out infinite' }} />
+          <div className="absolute inset-0 opacity-90" style={{ backgroundImage: 'radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.8) 100%, transparent), radial-gradient(2px 2px at 20% 20%, rgba(0, 255, 255, 0.7) 100%, transparent), radial-gradient(1.5px 1.5px at 30% 30%, rgba(147, 51, 255, 0.8) 100%, transparent), radial-gradient(2px 2px at 40% 40%, rgba(64, 156, 255, 0.6) 100%, transparent), radial-gradient(1.5px 1.5px at 50% 50%, rgba(255, 255, 255, 0.7) 100%, transparent)', backgroundSize: '400% 400%', animation: 'temporalWake 240s ease-in-out infinite' }} />
+        </div>
+        
+        <Nav />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <MintNFTContent />
+        </div>
+      </div>
+    </DynamicContextProvider>
+  );
+};
+
+export default MintNFT;

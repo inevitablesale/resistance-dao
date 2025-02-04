@@ -1,11 +1,12 @@
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 
 const Nav = () => {
   const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleLaunchApp = async () => {
     if (!primaryWallet) {
@@ -27,10 +28,7 @@ const Nav = () => {
       return;
     }
 
-    toast({
-      title: "Coming Soon",
-      description: "NFT verification will be implemented soon.",
-    });
+    navigate('/mint-nft');
   };
 
   return (
@@ -39,10 +37,12 @@ const Nav = () => {
       <div className="container mx-auto px-4 relative">
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-[#8247E5] font-bold">
-              LF
-            </div>
-            <span className="text-white font-semibold text-xl">LedgerFund</span>
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-[#8247E5] font-bold">
+                LF
+              </div>
+              <span className="text-white font-semibold text-xl">LedgerFund</span>
+            </Link>
           </div>
           
           <div className="hidden md:flex items-center gap-8">
@@ -64,7 +64,7 @@ const Nav = () => {
             onClick={handleLaunchApp}
             className="hidden md:block px-6 py-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white rounded-lg font-medium transition-all hover:scale-105"
           >
-            Launch App
+            Get LedgerFren NFT
           </button>
         </div>
       </div>
@@ -73,4 +73,3 @@ const Nav = () => {
 };
 
 export default Nav;
-
