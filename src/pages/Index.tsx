@@ -12,14 +12,16 @@ import { CallToAction } from "@/components/CallToAction";
 import { Roadmap } from "@/components/Roadmap";
 import { useNavigate } from "react-router-dom";
 import { WalletInfo } from "@/components/WalletInfo";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
+import { checkNFTOwnership } from "@/services/contractService";
 
 const IndexContent = () => {
   const navigate = useNavigate();
   const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
+  const [isChecking, setIsChecking] = useState(false);
 
   useEffect(() => {
     const checkWalletStatus = async () => {
@@ -40,13 +42,31 @@ const IndexContent = () => {
         return;
       }
 
-      // Check NFT ownership
-      const hasNFT = false; // This will come from contract check
-      if (!hasNFT) {
+      // Check NFT ownership using contract
+      setIsChecking(true);
+      try {
+        console.log('Checking NFT ownership...');
+        const hasNFT = await checkNFTOwnership(
+          await primaryWallet.getWalletClient(),
+          primaryWallet.address
+        );
+        console.log('NFT ownership result:', hasNFT);
+        
+        if (!hasNFT) {
+          toast({
+            title: "NFT Required",
+            description: "Mint your LedgerFren NFT to participate in governance"
+          });
+        }
+      } catch (error) {
+        console.error('Error checking NFT:', error);
         toast({
-          title: "NFT Required",
-          description: "Mint your LedgerFren NFT to participate in governance"
+          title: "Error",
+          description: "Failed to check NFT ownership. Please try again.",
+          variant: "destructive"
         });
+      } finally {
+        setIsChecking(false);
       }
     };
 
