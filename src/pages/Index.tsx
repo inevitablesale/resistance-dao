@@ -5,10 +5,15 @@ import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-a
 import { WalletInfo } from "@/components/WalletInfo";
 import { PostOnboardingView } from "@/components/PostOnboardingView";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useInView } from "react-intersection-observer";
 import Nav from "@/components/Nav";
 
 const IndexContent = () => {
   const { user, primaryWallet, setShowAuthFlow } = useDynamicContext();
+  const { ref: sectionRef, inView } = useInView({
+    threshold: 0.2,
+    triggerOnce: true
+  });
 
   if (user?.verifications?.completedOnboarding) {
     return <PostOnboardingView />;
@@ -16,6 +21,7 @@ const IndexContent = () => {
 
   return (
     <>
+      {/* Hero Section */}
       <div className="text-center mb-8 max-w-5xl mx-auto pt-32">
         <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight">
           The future of accounting<br />belongs to you
@@ -23,32 +29,72 @@ const IndexContent = () => {
         <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
           Licensed accountants can participate in fractional ownership of accounting firms through our decentralized autonomous organization (DAO)
         </p>
+      </div>
 
-        <div className="flex flex-col md:flex-row gap-4 justify-center mb-16">
-          <button className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium">
-            Earn LGR with Quests
-          </button>
-          <button 
-            onClick={() => setShowAuthFlow?.(true)}
-            className="px-8 py-3 bg-white hover:bg-white/90 text-[#8247E5] rounded-lg transition-colors text-lg font-medium"
-          >
-            Mint LedgerFren Badge
-          </button>
-        </div>
+      {/* Story Sections */}
+      <div className="max-w-4xl mx-auto space-y-32 px-4 mb-32">
+        <section className="text-center animate-fade-in">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Revolutionizing Professional Services</h2>
+          <p className="text-lg text-gray-300">
+            Traditional accounting firms are being transformed through blockchain technology, 
+            creating new opportunities for licensed professionals to participate in ownership 
+            and governance.
+          </p>
+        </section>
 
-        <div className="max-w-md mx-auto">
-          <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
+        <section className="text-center animate-fade-in">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Earn Through Contribution</h2>
+          <p className="text-lg text-gray-300">
+            Complete quests, contribute your expertise, and earn LGR tokens. 
+            These tokens represent your stake in the future of decentralized accounting.
+          </p>
+        </section>
+
+        <section className="text-center animate-fade-in">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Join the Movement</h2>
+          <p className="text-lg text-gray-300">
+            Your LedgerFren Badge is more than just a token - it's your passport to 
+            participating in the governance of next-generation accounting firms.
+          </p>
+        </section>
+      </div>
+
+      {/* Final Landing Zone Section */}
+      <div 
+        ref={sectionRef}
+        className="max-w-5xl mx-auto px-4 py-24 text-center"
+      >
+        <div 
+          className={`transition-all duration-1000 transform ${
+            inView 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-10'
+          }`}
+        >
+          <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10 mb-12">
             <div className="flex justify-center mb-8">
               <DynamicWidget />
             </div>
             <WalletInfo />
           </div>
-        </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-400">
-            Check your eligibility to join the future of accounting
+          <p className="text-xl text-gray-300 mb-8">
+            Ready to shape the future of accounting? Your journey starts here.
           </p>
+
+          <div className="flex flex-col md:flex-row gap-6 justify-center items-center max-w-2xl mx-auto">
+            <button 
+              className="w-full md:w-auto px-8 py-4 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-all duration-300 text-lg font-medium transform hover:scale-105 hover:shadow-lg hover:shadow-[#8247E5]/20"
+            >
+              Earn LGR with Quests
+            </button>
+            <button 
+              onClick={() => setShowAuthFlow?.(true)}
+              className="w-full md:w-auto px-8 py-4 bg-white hover:bg-white/90 text-[#8247E5] rounded-lg transition-all duration-300 text-lg font-medium transform hover:scale-105 hover:shadow-lg"
+            >
+              Mint LedgerFren Badge
+            </button>
+          </div>
         </div>
       </div>
     </>
