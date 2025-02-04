@@ -72,133 +72,136 @@ const Index = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* James Webb-inspired Space Background */}
+        {/* Enhanced Space Background with Realistic Ships */}
         <div className="absolute inset-0">
-          {/* Deep space base layer */}
+          {/* Deep space base with proper atmospheric glow */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(circle at center, #1e0f3c 0%, #000000 100%)',
-              opacity: 0.95
+              background: 'radial-gradient(circle at center, #000B2E 0%, #000000 100%)',
+              opacity: 0.98
             }}
           />
           
-          {/* Nebula and cosmic dust */}
+          {/* Planet atmosphere and surface details */}
           <div 
             className="absolute inset-0"
             style={{
               background: `
-                radial-gradient(circle at 30% 40%, rgba(255, 147, 92, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 70% 60%, rgba(130, 71, 229, 0.2) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(86, 42, 168, 0.15) 0%, transparent 55%),
-                radial-gradient(circle at 20% 30%, rgba(255, 124, 64, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(130, 71, 229, 0.15) 0%, transparent 45%)
+                radial-gradient(circle at 30% 70%, rgba(51, 153, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(51, 153, 255, 0.1) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(51, 153, 255, 0.05) 0%, transparent 55%)
               `,
-              animation: 'nebulaPulse 20s ease-in-out infinite alternate'
+              animation: 'atmosphereGlow 30s ease-in-out infinite'
             }}
           />
           
-          {/* Star clusters */}
+          {/* Realistic star field with depth */}
           <div 
-            className="absolute inset-0"
+            className="absolute inset-0 opacity-90"
             style={{
               backgroundImage: `
-                radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.9) 100%, transparent),
-                radial-gradient(1.5px 1.5px at 20% 20%, rgba(255, 255, 255, 0.8) 100%, transparent),
-                radial-gradient(1px 1px at 30% 30%, rgba(255, 255, 255, 0.9) 100%, transparent),
-                radial-gradient(2px 2px at 40% 40%, rgba(255, 255, 255, 0.7) 100%, transparent),
-                radial-gradient(1.5px 1.5px at 50% 50%, rgba(255, 255, 255, 0.8) 100%, transparent),
-                radial-gradient(1px 1px at 60% 60%, rgba(255, 255, 255, 0.9) 100%, transparent),
-                radial-gradient(2px 2px at 70% 70%, rgba(255, 255, 255, 0.7) 100%, transparent),
-                radial-gradient(1.5px 1.5px at 80% 80%, rgba(255, 255, 255, 0.8) 100%, transparent),
-                radial-gradient(1px 1px at 90% 90%, rgba(255, 255, 255, 0.9) 100%, transparent)
+                radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.8) 100%, transparent),
+                radial-gradient(1.5px 1.5px at 20% 20%, rgba(255, 255, 255, 0.7) 100%, transparent),
+                radial-gradient(1px 1px at 30% 30%, rgba(255, 255, 255, 0.8) 100%, transparent),
+                radial-gradient(2px 2px at 40% 40%, rgba(255, 255, 255, 0.6) 100%, transparent),
+                radial-gradient(1.5px 1.5px at 50% 50%, rgba(255, 255, 255, 0.7) 100%, transparent)
               `,
               backgroundSize: '400% 400%',
-              animation: 'starFloat 45s ease-in-out infinite'
+              animation: 'starParallax 240s ease-in-out infinite'
             }}
           />
           
-          {/* Ethereal glow and cosmic rays */}
-          <div 
-            className="absolute inset-0 mix-blend-screen"
-            style={{
-              background: `
-                radial-gradient(circle at 40% 30%, rgba(255, 147, 92, 0.1) 0%, transparent 55%),
-                radial-gradient(circle at 60% 70%, rgba(130, 71, 229, 0.1) 0%, transparent 55%),
-                radial-gradient(circle at 50% 50%, rgba(86, 42, 168, 0.08) 0%, transparent 65%)
-              `,
-              animation: 'cosmicGlow 15s ease-in-out infinite alternate'
-            }}
-          />
-          
-          {/* Distant galaxies */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `
-                radial-gradient(2px 2px at 25% 35%, rgba(255, 187, 132, 0.6) 100%, transparent),
-                radial-gradient(2px 2px at 75% 65%, rgba(170, 111, 229, 0.6) 100%, transparent),
-                radial-gradient(2px 2px at 50% 50%, rgba(126, 82, 208, 0.6) 100%, transparent)
-              `,
-              backgroundSize: '300% 300%',
-              animation: 'galaxyPulse 30s ease-in-out infinite'
-            }}
-          />
+          {/* Refugee ships with engine glow */}
+          <div className="absolute inset-0">
+            {[...Array(5)].map((_, index) => (
+              <div
+                key={index}
+                className="absolute animate-spacecraft"
+                style={{
+                  left: `${20 + index * 15}%`,
+                  top: `${30 + index * 8}%`,
+                  width: '120px',
+                  height: '40px',
+                  background: `linear-gradient(45deg, 
+                    rgba(255,255,255,0.9) 0%,
+                    rgba(200,215,255,0.8) 50%,
+                    rgba(150,180,255,0.7) 100%
+                  )`,
+                  boxShadow: `
+                    0 0 20px rgba(51,153,255,0.3),
+                    0 0 40px rgba(51,153,255,0.2),
+                    0 0 60px rgba(51,153,255,0.1)
+                  `,
+                  clipPath: 'polygon(0 50%, 20% 0, 90% 0, 100% 50%, 90% 100%, 20% 100%)',
+                  transform: 'rotate(-15deg)',
+                  animation: `
+                    spacecraft${index + 1} ${20 + index * 2}s linear infinite,
+                    engineGlow ${1 + index * 0.2}s ease-in-out infinite alternate
+                  `
+                }}
+              />
+            ))}
+          </div>
           
           <style>
             {`
-              @keyframes nebulaPulse {
+              @keyframes atmosphereGlow {
                 0%, 100% {
-                  opacity: 0.4;
+                  opacity: 0.7;
                   transform: scale(1);
                 }
                 50% {
-                  opacity: 0.6;
-                  transform: scale(1.05);
-                }
-              }
-
-              @keyframes starFloat {
-                0%, 100% {
-                  opacity: 0.8;
-                  transform: scale(1) rotate(0deg);
-                  background-position: 0% 0%;
-                }
-                25% {
-                  opacity: 1;
-                  background-position: 50% 50%;
-                }
-                50% {
-                  opacity: 0.7;
-                  transform: scale(1.1) rotate(0.5deg);
-                  background-position: 100% 100%;
-                }
-                75% {
                   opacity: 0.9;
-                  background-position: 25% 75%;
+                  transform: scale(1.02);
                 }
               }
 
-              @keyframes cosmicGlow {
+              @keyframes starParallax {
                 0%, 100% {
-                  opacity: 0.3;
-                  transform: scale(1);
+                  transform: scale(1) rotate(0deg);
+                  opacity: 0.8;
                 }
                 50% {
-                  opacity: 0.5;
-                  transform: scale(1.1);
+                  transform: scale(1.1) rotate(0.5deg);
+                  opacity: 1;
                 }
               }
 
-              @keyframes galaxyPulse {
+              @keyframes engineGlow {
                 0%, 100% {
-                  opacity: 0.4;
-                  background-size: 300% 300%;
+                  box-shadow: 0 0 20px rgba(51,153,255,0.3),
+                             0 0 40px rgba(51,153,255,0.2);
                 }
                 50% {
-                  opacity: 0.7;
-                  background-size: 320% 320%;
+                  box-shadow: 0 0 30px rgba(51,153,255,0.4),
+                             0 0 60px rgba(51,153,255,0.3);
                 }
+              }
+
+              @keyframes spacecraft1 {
+                0% { transform: translate(0, 0) rotate(-15deg); }
+                100% { transform: translate(-200px, 100px) rotate(-15deg); }
+              }
+
+              @keyframes spacecraft2 {
+                0% { transform: translate(50px, -20px) rotate(-15deg); }
+                100% { transform: translate(-150px, 80px) rotate(-15deg); }
+              }
+
+              @keyframes spacecraft3 {
+                0% { transform: translate(100px, -40px) rotate(-15deg); }
+                100% { transform: translate(-100px, 60px) rotate(-15deg); }
+              }
+
+              @keyframes spacecraft4 {
+                0% { transform: translate(150px, -60px) rotate(-15deg); }
+                100% { transform: translate(-50px, 40px) rotate(-15deg); }
+              }
+
+              @keyframes spacecraft5 {
+                0% { transform: translate(200px, -80px) rotate(-15deg); }
+                100% { transform: translate(0px, 20px) rotate(-15deg); }
               }
             `}
           </style>
