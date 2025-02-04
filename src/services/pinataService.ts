@@ -36,3 +36,41 @@ export const uploadMetadataToPinata = async (metadata: any): Promise<string> => 
     throw error;
   }
 };
+
+export const uploadImageToPinata = async (imageUrl: string): Promise<string> => {
+  try {
+    const { data: { PINATA_API_KEY, PINATA_API_SECRET } } = await supabase
+      .functions.invoke('get-pinata-credentials');
+
+    if (!PINATA_API_KEY || !PINATA_API_SECRET) {
+      throw new Error('Pinata credentials not found');
+    }
+
+    // Fetch the image from LinkedIn
+    const imageResponse = await fetch(imageUrl);
+    const imageBlob = await imageResponse.blob();
+
+    // Create form data for the file upload
+    const formData = new FormData();
+    formData.append('file', imageBlob, 'profile.jpg');
+
+    const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+      method: 'POST',
+      headers: {
+        'pinata_api_key': PINATA_API_KEY,
+        'pinata_secret_api_key': PINATA_API_SECRET
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload image to Pinata');
+    }
+
+    const result: PinataResponse = await response.json();
+    return result.IpfsHash;
+  } catch (error) {
+    console.error('Error uploading image to Pinata:', error);
+    throw error;
+  }
+};

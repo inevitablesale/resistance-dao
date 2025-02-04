@@ -59,15 +59,16 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
     const mintEvent = receipt.events?.find(e => e.event === 'Transfer');
     const tokenId = mintEvent?.args?.tokenId;
 
-    // Get the correct image CID for the governance power
-    const governanceImageCID = getGovernanceImageCID(governancePowerAttr.value);
-    console.log('Retrieved governance image CID:', governanceImageCID);
+    // Use profile picture if available, otherwise fallback to governance power image
+    const imageUrl = metadata.profilePicCID 
+      ? `https://ipfs.io/ipfs/${metadata.profilePicCID}`
+      : `https://ipfs.io/ipfs/${getGovernanceImageCID(governancePowerAttr.value)}`;
 
     // Create the NFT metadata with the correct image URL
     const nftMetadata: NFTMetadata = {
       name: `${metadata.fullName}'s Professional NFT`,
       description: `This NFT represents the governance power level of ${metadata.fullName} based on their professional experience and qualifications.`,
-      image: `https://ipfs.io/ipfs/${governanceImageCID}`, // Using IPFS gateway URL for better compatibility
+      image: imageUrl,
       attributes: metadata.attributes
     };
     
