@@ -74,122 +74,194 @@ const Index = () => {
       <div className="min-h-screen bg-black overflow-hidden relative">
         {/* Enhanced Space Background */}
         <div className="absolute inset-0">
-          {/* Base gradient layer with enhanced colors */}
+          {/* Deep Space Base Layer */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(to bottom, #000000 0%, #1a1305 40%, #3d2f0c 100%)',
-              opacity: 0.95
+              background: 'linear-gradient(to bottom, #0B0B0F 0%, #1A1A2F 40%, #1F1F3F 100%)',
+              opacity: 0.98
             }}
           />
           
-          {/* Enhanced Nebula layer */}
+          {/* Enhanced Nebula Layer */}
           <div 
             className="absolute inset-0"
             style={{
               backgroundImage: `url('/lovable-uploads/4b887efe-6a76-44c3-870a-df8185740314.png')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              opacity: 0.4,
-              filter: 'sepia(100%) brightness(0.7) contrast(1.2)',
+              opacity: 0.3,
               mixBlendMode: 'screen'
             }}
           />
 
-          {/* Enhanced Planet with detailed features */}
+          {/* Detailed Planet */}
           <div className="absolute top-20 right-40">
             <div 
               className="w-64 h-64 relative"
               style={{
-                background: 'radial-gradient(circle at 40% 40%, #cfab67 0%, #7c571e 60%, #2b1d0a 100%)',
+                background: `
+                  radial-gradient(circle at 40% 40%, 
+                    #8B4513 0%,    /* Dark landmass base */
+                    #228B22 20%,   /* Forest regions */
+                    #1E90FF 40%,   /* Ocean areas */
+                    #4682B4 60%,   /* Deeper waters */
+                    #191970 85%,   /* Deep atmosphere */
+                    #000033 100%   /* Space edge */
+                  )
+                `,
                 borderRadius: '50%',
                 transform: 'scale(1.5)',
-                opacity: 0.9,
+                opacity: 0.95,
                 boxShadow: `
-                  inset -10px -10px 50px rgba(0,0,0,0.8),
-                  0 0 50px rgba(207, 171, 103, 0.3)
+                  inset -15px -15px 40px rgba(0,0,0,0.8),
+                  inset 5px 5px 40px rgba(255,255,255,0.4),
+                  0 0 60px rgba(135,206,250,0.2)
                 `
               }}
             >
-              {/* Atmospheric glow */}
+              {/* Atmosphere Glow */}
               <div 
                 className="absolute inset-0"
                 style={{
                   borderRadius: '50%',
-                  background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, transparent 60%)',
+                  background: 'radial-gradient(circle at 30% 30%, rgba(173,216,230,0.15) 0%, transparent 60%)',
                   filter: 'blur(8px)'
                 }}
               />
               
-              {/* Surface details */}
+              {/* Surface Features */}
               <div 
                 className="absolute inset-0"
                 style={{
                   borderRadius: '50%',
                   background: `
-                    radial-gradient(circle at 70% 70%, #8b5e1f 0%, transparent 20%),
-                    radial-gradient(circle at 30% 30%, #d4b36a 0%, transparent 30%),
-                    radial-gradient(circle at 50% 50%, #95642c 0%, transparent 40%)
+                    radial-gradient(circle at 60% 60%, rgba(34,139,34,0.3) 0%, transparent 30%),
+                    radial-gradient(circle at 30% 70%, rgba(0,191,255,0.2) 0%, transparent 40%),
+                    radial-gradient(circle at 70% 30%, rgba(139,69,19,0.4) 0%, transparent 35%)
                   `,
-                  opacity: 0.7
+                  opacity: 0.8
                 }}
               />
 
-              {/* City lights (dark side) */}
+              {/* City Lights (dark side) */}
               <div 
                 className="absolute inset-0"
                 style={{
                   borderRadius: '50%',
-                  background: 'radial-gradient(circle at 80% 80%, rgba(255, 240, 200, 0.15) 0%, transparent 30%)',
-                  filter: 'blur(3px)'
+                  background: 'radial-gradient(circle at 80% 80%, rgba(255,250,205,0.15) 0%, transparent 40%)',
+                  filter: 'blur(2px)'
+                }}
+              />
+
+              {/* Landing Zone Indicators */}
+              <div 
+                className="absolute inset-0"
+                style={{
+                  borderRadius: '50%',
+                  background: `
+                    radial-gradient(circle at 45% 45%, rgba(255,215,0,0.2) 0%, transparent 5%),
+                    radial-gradient(circle at 55% 55%, rgba(255,215,0,0.2) 0%, transparent 5%)
+                  `,
+                  animation: 'pulse 2s infinite'
                 }}
               />
             </div>
           </div>
           
-          {/* Enhanced Spacecraft Fleet */}
+          {/* Enhanced Refugee Fleet */}
           <div className="absolute inset-0 overflow-hidden">
-            {/* Large Refugee Ship */}
-            <div className="absolute animate-spaceship-1">
-              {/* Main Hull */}
+            {/* Large Command Ship */}
+            <div className="absolute animate-landing-approach-1">
+              <div 
+                className="relative"
+                style={{
+                  width: '160px',
+                  height: '50px',
+                  background: '#403E43',
+                  clipPath: 'polygon(0% 50%, 15% 20%, 85% 20%, 100% 50%, 85% 80%, 15% 80%)',
+                  boxShadow: '0 0 20px rgba(255,69,0,0.3)'
+                }}
+              >
+                {/* Hull Details */}
+                <div 
+                  className="absolute inset-0"
+                  style={{
+                    background: `
+                      linear-gradient(90deg, 
+                        rgba(62,58,63,0.8) 0%,
+                        rgba(142,145,150,0.4) 50%,
+                        rgba(62,58,63,0.8) 100%
+                      )
+                    `
+                  }}
+                />
+
+                {/* Cargo Modules */}
+                <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 flex gap-2">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex-1"
+                      style={{
+                        background: '#8E9196',
+                        boxShadow: 'inset 0 0 5px rgba(0,0,0,0.5)'
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Heat Shield Glow */}
+                <div 
+                  className="absolute bottom-0 left-0 right-0 h-1/4"
+                  style={{
+                    background: 'linear-gradient(0deg, rgba(255,69,0,0.3) 0%, transparent 100%)',
+                    animation: 'pulse 2s infinite'
+                  }}
+                />
+
+                {/* Engine Array */}
+                <div className="absolute -right-4 top-1/2 -translate-y-1/2 flex gap-1">
+                  {[...Array(4)].map((_, i) => (
+                    <div 
+                      key={i}
+                      className="relative"
+                      style={{
+                        width: '20px',
+                        height: '8px',
+                        background: 'radial-gradient(circle at right, rgba(255,140,0,0.8), transparent 70%)',
+                        filter: 'blur(2px)',
+                        animation: 'enginePulse 1.5s infinite'
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Medium Transport */}
+            <div className="absolute animate-landing-approach-2">
               <div 
                 className="relative"
                 style={{
                   width: '120px',
                   height: '40px',
-                  background: '#403E43',
+                  background: '#8E9196',
                   clipPath: 'polygon(0% 50%, 20% 20%, 80% 20%, 100% 50%, 80% 80%, 20% 80%)',
-                  boxShadow: '0 0 15px rgba(207, 171, 103, 0.3)'
+                  boxShadow: '0 0 15px rgba(255,69,0,0.2)'
                 }}
               >
-                {/* Cargo Modules */}
+                {/* Hull Damage */}
                 <div 
-                  className="absolute"
+                  className="absolute top-1/3 left-1/4 w-1/6 h-1/3"
                   style={{
-                    top: '25%',
-                    left: '30%',
-                    width: '40%',
-                    height: '50%',
-                    background: '#8E9196',
-                    clipPath: 'polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%)'
+                    background: '#403E43',
+                    clipPath: 'polygon(0% 0%, 100% 50%, 0% 100%)'
                   }}
                 />
-                
-                {/* Communication Array */}
-                <div 
-                  className="absolute"
-                  style={{
-                    top: '-30%',
-                    left: '60%',
-                    width: '4px',
-                    height: '20px',
-                    background: '#9F9EA1',
-                    transform: 'rotate(-15deg)'
-                  }}
-                />
-                
-                {/* Engine Exhausts */}
-                <div className="absolute right-0 flex space-x-1">
+
+                {/* Engine Array */}
+                <div className="absolute -right-3 top-1/2 -translate-y-1/2 flex gap-1">
                   {[...Array(3)].map((_, i) => (
                     <div 
                       key={i}
@@ -197,9 +269,9 @@ const Index = () => {
                       style={{
                         width: '15px',
                         height: '6px',
-                        background: 'radial-gradient(circle at right, rgba(207, 171, 103, 0.8), transparent 70%)',
-                        transform: 'translateX(100%)',
-                        filter: 'blur(2px)'
+                        background: 'radial-gradient(circle at right, rgba(255,140,0,0.7), transparent 70%)',
+                        filter: 'blur(1.5px)',
+                        animation: 'enginePulse 1.8s infinite'
                       }}
                     />
                   ))}
@@ -207,158 +279,92 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Medium Refugee Ship */}
-            <div className="absolute animate-spaceship-2">
-              {/* Main Hull */}
+            {/* Small Scout Ship */}
+            <div className="absolute animate-landing-approach-3">
               <div 
                 className="relative"
                 style={{
-                  width: '90px',
+                  width: '80px',
                   height: '30px',
-                  background: '#8E9196',
-                  clipPath: 'polygon(0% 50%, 30% 20%, 70% 20%, 100% 50%, 70% 80%, 30% 80%)',
-                  boxShadow: '0 0 10px rgba(207, 171, 103, 0.2)'
-                }}
-              >
-                {/* Emergency Repairs */}
-                <div 
-                  className="absolute"
-                  style={{
-                    top: '40%',
-                    left: '50%',
-                    width: '20px',
-                    height: '10px',
-                    background: '#C8C8C9',
-                    transform: 'rotate(-45deg)'
-                  }}
-                />
-                
-                {/* Engine Exhausts */}
-                <div className="absolute right-0 flex space-x-1">
-                  {[...Array(2)].map((_, i) => (
-                    <div 
-                      key={i}
-                      className="relative"
-                      style={{
-                        width: '12px',
-                        height: '5px',
-                        background: 'radial-gradient(circle at right, rgba(207, 171, 103, 0.6), transparent 70%)',
-                        transform: 'translateX(100%)',
-                        filter: 'blur(1px)'
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Small Refugee Ship */}
-            <div className="absolute animate-spaceship-3">
-              {/* Main Hull */}
-              <div 
-                className="relative"
-                style={{
-                  width: '60px',
-                  height: '24px',
                   background: '#9F9EA1',
                   clipPath: 'polygon(0% 50%, 25% 20%, 75% 20%, 100% 50%, 75% 80%, 25% 80%)',
-                  boxShadow: '0 0 8px rgba(207, 171, 103, 0.15)'
+                  boxShadow: '0 0 10px rgba(255,69,0,0.15)'
                 }}
               >
-                {/* Distress Beacon */}
+                {/* Emergency Thruster */}
                 <div 
-                  className="absolute"
+                  className="absolute -right-2 top-1/2 -translate-y-1/2"
                   style={{
-                    top: '-20%',
-                    left: '70%',
-                    width: '4px',
-                    height: '8px',
-                    background: '#ff4444',
-                    animation: 'pulse 2s infinite'
-                  }}
-                />
-                
-                {/* Engine Exhaust */}
-                <div 
-                  className="absolute right-0"
-                  style={{
-                    width: '10px',
-                    height: '4px',
-                    background: 'radial-gradient(circle at right, rgba(207, 171, 103, 0.5), transparent 70%)',
-                    transform: 'translateX(100%)',
-                    filter: 'blur(1px)'
+                    width: '12px',
+                    height: '5px',
+                    background: 'radial-gradient(circle at right, rgba(255,140,0,0.6), transparent 70%)',
+                    filter: 'blur(1px)',
+                    animation: 'enginePulse 2s infinite'
                   }}
                 />
               </div>
             </div>
           </div>
-          
-          {/* Enhanced Star Field */}
+
+          {/* Enhanced Star Field with Depth */}
           <div 
             className="absolute inset-0"
             style={{
-              backgroundImage: `
-                radial-gradient(1px 1px at ${Array.from({length: 200}, () => 
-                  `${Math.random() * 100}% ${Math.random() * 100}%`
-                ).join(', ')}, rgba(255, 255, 255, ${Array.from({length: 200}, () => 
-                  Math.random() * 0.4 + 0.1
-                ).join(')), rgba(255, 255, 255, ')})
-              `,
-              opacity: 0.6
+              background: Array.from({length: 3}, (_, i) => 
+                Array.from({length: 100}, () => 
+                  `radial-gradient(1px 1px at ${Math.random() * 100}% ${Math.random() * 100}%, rgba(255, 255, 255, ${0.3 - i * 0.1}) 0%, transparent 100%)`
+                ).join(',')
+              ).join(','),
+              opacity: 0.8
             }}
           />
           
-          {/* Enhanced Atmospheric Glow */}
+          {/* Landing Zone Atmospheric Glow */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(circle at 50% 80%, rgba(255, 200, 100, 0.15) 0%, transparent 60%)',
+              background: 'radial-gradient(circle at 70% 30%, rgba(173,216,230,0.1) 0%, transparent 60%)',
               mixBlendMode: 'screen'
             }}
           />
           
-          {/* Animation Styles */}
+          {/* Animation Keyframes */}
           <style>
             {`
-              @keyframes pulse {
-                0%, 100% { opacity: 0.6; transform: scale(1); }
-                50% { opacity: 1; transform: scale(1.2); }
+              @keyframes enginePulse {
+                0%, 100% { opacity: 0.6; transform: scaleX(1); }
+                50% { opacity: 1; transform: scaleX(1.2); }
               }
 
-              @keyframes spaceship1 {
-                0% { transform: translate(-120px, 100vh) rotate(-15deg); }
-                100% { transform: translate(calc(100vw + 120px), -100px) rotate(15deg); }
+              @keyframes landing-approach-1 {
+                0% { transform: translate(-160px, 20vh) rotate(-5deg); }
+                100% { transform: translate(calc(70vw), 30vh) rotate(15deg); }
               }
 
-              @keyframes spaceship2 {
-                0% { transform: translate(-90px, 70vh) rotate(-20deg); }
-                100% { transform: translate(calc(100vw + 90px), 100px) rotate(20deg); }
+              @keyframes landing-approach-2 {
+                0% { transform: translate(-120px, 30vh) rotate(-8deg); }
+                100% { transform: translate(calc(65vw), 35vh) rotate(18deg); }
               }
 
-              @keyframes spaceship3 {
-                0% { transform: translate(-60px, 40vh) rotate(-25deg); }
-                100% { transform: translate(calc(100vw + 60px), 300px) rotate(25deg); }
+              @keyframes landing-approach-3 {
+                0% { transform: translate(-80px, 40vh) rotate(-10deg); }
+                100% { transform: translate(calc(60vw), 40vh) rotate(20deg); }
               }
 
-              .animate-spaceship-1 {
-                top: 30%;
-                left: -120px;
-                animation: spaceship1 20s linear infinite;
+              .animate-landing-approach-1 {
+                animation: landing-approach-1 20s linear infinite;
+                animation-delay: 0s;
                 will-change: transform;
               }
 
-              .animate-spaceship-2 {
-                top: 45%;
-                left: -90px;
-                animation: spaceship2 25s linear infinite;
+              .animate-landing-approach-2 {
+                animation: landing-approach-2 25s linear infinite;
                 animation-delay: 5s;
                 will-change: transform;
               }
 
-              .animate-spaceship-3 {
-                top: 60%;
-                left: -60px;
-                animation: spaceship3 30s linear infinite;
+              .animate-landing-approach-3 {
+                animation: landing-approach-3 30s linear infinite;
                 animation-delay: 10s;
                 will-change: transform;
               }
