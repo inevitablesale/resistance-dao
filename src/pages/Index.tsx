@@ -3,16 +3,9 @@ import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
 import { WalletInfo } from "@/components/WalletInfo";
 import { PostOnboardingView } from "@/components/PostOnboardingView";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Link } from "react-router-dom";
 
 const IndexContent = () => {
-  const { user } = useDynamicContext();
-
-  if (user?.verifications?.completedOnboarding) {
-    return <PostOnboardingView />;
-  }
-
   return (
     <>
       {/* Navigation */}
