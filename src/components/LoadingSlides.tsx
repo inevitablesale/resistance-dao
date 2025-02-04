@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Coins, Vote, Shield, Award, Wallet } from "lucide-react";
+import { Coins, Vote, Shield, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LoadingSlide {
@@ -18,17 +18,12 @@ const slides: LoadingSlide[] = [
   {
     icon: <Award className="w-12 h-12 text-polygon-primary" />,
     title: "Calculating Governance Power",
-    description: "Your experience translates to voting weight in the DAO. Receive +1 PCRED"
+    description: "Your experience translates to voting weight in the DAO."
   },
   {
     icon: <Coins className="w-12 h-12 text-polygon-primary" />,
     title: "LGR Token Utility",
     description: "Access professional network features and participate in firm operations."
-  },
-  {
-    icon: <Wallet className="w-12 h-12 text-polygon-primary" />,
-    title: "Support the Project",
-    description: "Purchase LGR tokens (limited supply) to support the project's growth."
   },
   {
     icon: <Vote className="w-12 h-12 text-polygon-primary" />,
@@ -45,7 +40,7 @@ export const LoadingSlides = ({ isAnalyzing }: { isAnalyzing: boolean }) => {
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000); // Increased from 3000 to 5000ms
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [isAnalyzing]);
@@ -58,7 +53,7 @@ export const LoadingSlides = ({ isAnalyzing }: { isAnalyzing: boolean }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.8 }} // Increased from 0.5 to 0.8s
+          transition={{ duration: 0.5 }}
           className="flex flex-col items-center space-y-4"
         >
           <motion.div
@@ -67,7 +62,7 @@ export const LoadingSlides = ({ isAnalyzing }: { isAnalyzing: boolean }) => {
               rotate: [0, 5, -5, 0]
             }}
             transition={{ 
-              duration: 3, // Increased from 2 to 3s
+              duration: 2,
               repeat: Infinity,
               repeatType: "reverse"
             }}
@@ -91,11 +86,6 @@ export const LoadingSlides = ({ isAnalyzing }: { isAnalyzing: boolean }) => {
               />
             ))}
           </div>
-          {currentSlide === 3 && (
-            <p className="text-sm text-polygon-primary mt-2">
-              Transaction fees sponsored by Ledger Fund
-            </p>
-          )}
         </motion.div>
       </AnimatePresence>
     </div>

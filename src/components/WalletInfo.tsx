@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Progress } from "@/components/ui/progress";
-import { Check, ArrowRight, Eye, Save, RefreshCw, ExternalLink } from "lucide-react";
+import { Check, ArrowRight, Eye, Save, RefreshCw } from "lucide-react";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
 import { mintNFT } from "@/services/contractService";
 import { useToast } from "@/hooks/use-toast";
@@ -11,16 +11,6 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { LoadingSlides } from "./LoadingSlides";
 import { motion } from "framer-motion";
-import { Button } from "./ui/button";
-import { ethers } from "ethers";
-
-// Contract details
-const CONTRACT_ADDRESS = "0x3dC25640b1B7528Dca23BeFcDAD835C5Bf4e5360";
-const CONTRACT_ABI = [
-  "function balanceOf(address owner) view returns (uint256)",
-  "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)",
-  "function tokenURI(uint256 tokenId) view returns (string)"
-];
 
 interface NFTPreview {
   fullName: string;
@@ -40,52 +30,20 @@ export const WalletInfo = () => {
   const [nftPreview, setNFTPreview] = useState<NFTPreview | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState<string>("");
   const [isSavedToBlockchain, setIsSavedToBlockchain] = useState(false);
-  const [hasNFT, setHasNFT] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkWalletAndNFT = async () => {
+    const checkConnection = async () => {
       if (primaryWallet) {
-        try {
-          const connected = await primaryWallet.isConnected();
-          setIsWalletConnected(connected);
-          
-          if (connected && primaryWallet.address) {
-            // Check if user has NFT
-            const provider = new ethers.providers.Web3Provider(await primaryWallet.getWalletClient());
-            const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-            const balance = await contract.balanceOf(primaryWallet.address);
-            
-            const hasNFT = balance.gt(0);
-            setHasNFT(hasNFT);
-            setIsSavedToBlockchain(hasNFT);
-
-            if (hasNFT) {
-              // Get the first token ID
-              const tokenId = await contract.tokenOfOwnerByIndex(primaryWallet.address, 0);
-              const tokenURI = await contract.tokenURI(tokenId);
-              
-              // Fetch metadata from IPFS
-              const response = await fetch(tokenURI.replace('ipfs://', 'https://ipfs.io/ipfs/'));
-              const metadata = await response.json();
-              
-              setPreviewImageUrl(metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/'));
-            }
-          }
-        } catch (error) {
-          console.error('Error checking NFT ownership:', error);
-          setHasNFT(false);
-          setIsSavedToBlockchain(false);
-        }
+        const connected = await primaryWallet.isConnected();
+        setIsWalletConnected(connected);
       } else {
         setIsWalletConnected(false);
-        setHasNFT(false);
-        setIsSavedToBlockchain(false);
       }
     };
 
-    checkWalletAndNFT();
+    checkConnection();
   }, [primaryWallet]);
 
   const handleAnalyzeProfile = async () => {
@@ -107,11 +65,6 @@ export const WalletInfo = () => {
     }
 
     setIsAnalyzing(true);
-    setProgress(25);
-    setNFTPreview(null);
-    setPreviewImageUrl("");
-    setIsSavedToBlockchain(false);
-    
     try {
       console.log('Fetching LinkedIn profile data...');
       const nftMetadata = await analyzeLinkedInProfile(linkedInUrl);
@@ -139,6 +92,7 @@ export const WalletInfo = () => {
       }
       
       setNFTPreview(preview);
+      setIsSavedToBlockchain(false);
       toast({
         title: "Analysis Complete",
         description: "Preview your NFT before saving to blockchain.",
@@ -160,28 +114,14 @@ export const WalletInfo = () => {
   const handleMintNFT = async () => {
     if (!nftPreview) return;
     
+    setIsMinting(true);
     try {
+      console.log('Starting NFT minting process...');
+      
       if (!primaryWallet?.address) {
         throw new Error('Wallet address not found');
       }
 
-      // Check if user already has an NFT
-      const provider = new ethers.providers.Web3Provider(await primaryWallet.getWalletClient());
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-      const balance = await contract.balanceOf(primaryWallet.address);
-      
-      if (balance.gt(0)) {
-        toast({
-          title: "NFT Already Owned",
-          description: "You already own a LedgerFren NFT. Only one NFT per wallet is allowed.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setIsMinting(true);
-      console.log('Starting NFT minting process...');
-      
       const result = await mintNFT(
         await primaryWallet.getWalletClient(),
         primaryWallet.address,
@@ -228,39 +168,6 @@ export const WalletInfo = () => {
     { name: "Preview ID Badge", status: getStepStatus(2) },
     { name: "Mint ID Badge", status: getStepStatus(3) }
   ];
-
-  if (hasNFT) {
-    return (
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mt-6 space-y-6"
-      >
-        <Card className="p-6 bg-white/5 border border-white/10">
-          <div className="flex flex-col items-center space-y-6">
-            {previewImageUrl && (
-              <div className="w-32 h-32 relative">
-                <img 
-                  src={previewImageUrl} 
-                  alt="Your LedgerFren NFT" 
-                  className="rounded-full w-full h-full object-cover border-4 border-polygon-primary/20"
-                />
-              </div>
-            )}
-            <h3 className="text-2xl font-bold text-white">Welcome, LedgerFren!</h3>
-            <Button
-              onClick={() => navigate('/governance-voting')}
-              className="flex items-center gap-2 bg-polygon-primary hover:bg-polygon-primary/90"
-            >
-              <ExternalLink className="w-4 h-4" />
-              Go to Community Page
-            </Button>
-          </div>
-        </Card>
-      </motion.div>
-    );
-  }
 
   return (
     <motion.div 
@@ -315,6 +222,14 @@ export const WalletInfo = () => {
         >
           Become a LedgerFren
         </motion.h3>
+        <motion.p 
+          className="text-gray-400"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          Your LinkedIn profile will be analyzed to generate a unique ID Badge that represents your professional experience and qualifications.
+        </motion.p>
         
         {isAnalyzing && <LoadingSlides isAnalyzing={isAnalyzing} />}
         
@@ -354,7 +269,7 @@ export const WalletInfo = () => {
                 <div className="space-y-6 animate-fade-in w-full">
                   <div className="space-y-2 text-center">
                     <h4 className="text-3xl font-bold bg-gradient-to-r from-white to-polygon-primary bg-clip-text text-transparent">
-                      Become a LedgerFren
+                      LedgerFren NFT
                     </h4>
                     <p className="text-xl text-gray-400">Ledger Fund ID Badge</p>
                   </div>
