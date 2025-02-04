@@ -5,6 +5,7 @@ import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-a
 import { WalletInfo } from "@/components/WalletInfo";
 import { PostOnboardingView } from "@/components/PostOnboardingView";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useEffect } from "react";
 import Nav from "@/components/Nav";
 
 const zeroDevConfig = {
@@ -13,7 +14,14 @@ const zeroDevConfig = {
 };
 
 const MintNFTContent = () => {
-  const { user } = useDynamicContext();
+  const { user, setShowAuthFlow } = useDynamicContext();
+
+  useEffect(() => {
+    // Automatically open the auth flow when component mounts if user is not connected
+    if (!user) {
+      setShowAuthFlow?.(true);
+    }
+  }, [user, setShowAuthFlow]);
 
   if (user?.verifications?.completedOnboarding) {
     return <PostOnboardingView />;
