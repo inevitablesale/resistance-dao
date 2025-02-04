@@ -28,13 +28,20 @@ declare module "@dynamic-labs/sdk-react-core" {
     setShowAuthFlow?: (show: boolean) => void;
   }
 
+  export interface DynamicSettings {
+    environmentId: string;
+    walletConnectors: (typeof EthereumWalletConnectors | typeof ZeroDevSmartWalletConnectors)[];
+    eventsCallbacks?: {
+      onVerificationComplete?: () => void;
+      onAuthSuccess?: (args: any) => void;
+      onLogout?: () => void;
+    };
+  }
+
   export function useDynamicContext(): DynamicContextType;
 
   export const DynamicContextProvider: React.FC<{
-    settings: {
-      environmentId: string;
-      walletConnectors: (typeof EthereumWalletConnectors | typeof ZeroDevSmartWalletConnectors)[];
-    };
+    settings: DynamicSettings;
     children: React.ReactNode;
   }>;
 
