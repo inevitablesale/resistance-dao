@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
@@ -70,27 +69,12 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
       chainId: 137 // Polygon Mainnet
     });
     
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-    
-    console.log('Minting NFT for address:', address);
-    console.log('Using governance power:', governancePowerAttr.value);
-
-    const tx = await contract.safeMint(address, governancePowerAttr.value);
-    console.log('Minting transaction sent:', tx.hash);
-    
-    const receipt = await tx.wait();
-    console.log('Minting confirmed:', receipt);
-    
-    const mintEvent = receipt.events?.find(e => e.event === 'Transfer');
-    const tokenId = mintEvent?.args?.tokenId;
-
+    // First, upload the NFT metadata to IPFS/Pinata
     // Use profile picture if available, otherwise fallback to governance power image
     const imageUrl = metadata.profilePicCID 
       ? `https://ipfs.io/ipfs/${metadata.profilePicCID}`
       : `https://ipfs.io/ipfs/${getGovernanceImageCID(governancePowerAttr.value)}`;
 
-    // Create the NFT metadata with the correct image URL
     const nftMetadata: NFTMetadata = {
       name: `${metadata.fullName}'s Professional NFT`,
       description: `This NFT represents the governance power level of ${metadata.fullName} based on their professional experience and qualifications.`,
@@ -99,10 +83,29 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
     };
     
     console.log('Preparing to upload metadata with image:', nftMetadata.image);
-    const tokenURI = await uploadMetadataToPinata(nftMetadata);
-    console.log('Metadata uploaded to IPFS:', tokenURI);
+    const metadataUri = await uploadMetadataToPinata(nftMetadata);
+    console.log('Metadata uploaded to IPFS:', metadataUri);
+
+    // Extract CID from the IPFS URI (remove 'ipfs://' prefix)
+    const metadataCid = metadataUri.replace('ipfs://', '');
     
-    return { success: true, tokenId, tokenURI };
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    
+    console.log('Minting NFT for address:', address);
+    console.log('Using metadata CID:', metadataCid);
+
+    // Use the metadata CID as the governance power parameter
+    const tx = await contract.safeMint(address, metadataCid);
+    console.log('Minting transaction sent:', tx.hash);
+    
+    const receipt = await tx.wait();
+    console.log('Minting confirmed:', receipt);
+    
+    const mintEvent = receipt.events?.find(e => e.event === 'Transfer');
+    const tokenId = mintEvent?.args?.tokenId;
+    
+    return { success: true, tokenId, tokenURI: metadataUri };
   } catch (error) {
     console.error('Minting failed:', error);
     throw error;
