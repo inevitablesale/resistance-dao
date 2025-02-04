@@ -5,9 +5,11 @@ import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-a
 import { WalletInfo } from "@/components/WalletInfo";
 import { PostOnboardingView } from "@/components/PostOnboardingView";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import { useToast } from "@/hooks/use-toast";
+import { checkNFTOwnership } from "@/services/contractService";
+import { useNavigate } from "react-router-dom";
 
 const zeroDevConfig = {
   bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -15,8 +17,11 @@ const zeroDevConfig = {
 };
 
 const MintNFTContent = () => {
-  const { user, setShowAuthFlow } = useDynamicContext();
+  const { user, setShowAuthFlow, primaryWallet } = useDynamicContext();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [hasNFT, setHasNFT] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
 
   useEffect(() => {
     // Automatically open the auth flow when component mounts if user is not connected
@@ -24,6 +29,42 @@ const MintNFTContent = () => {
       setShowAuthFlow?.(true);
     }
   }, [user, setShowAuthFlow]);
+
+  useEffect(() => {
+    const checkNFT = async () => {
+      if (primaryWallet?.address) {
+        setIsChecking(true);
+        try {
+          console.log('Checking NFT ownership...');
+          const ownsNFT = await checkNFTOwnership(
+            await primaryWallet.getWalletClient(),
+            primaryWallet.address
+          );
+          console.log('NFT ownership result:', ownsNFT);
+          setHasNFT(ownsNFT);
+          
+          if (ownsNFT) {
+            toast({
+              title: "NFT Detected",
+              description: "You already own a LedgerFren NFT. Redirecting to governance...",
+            });
+            setTimeout(() => navigate('/governance-voting'), 2000);
+          }
+        } catch (error) {
+          console.error('Error checking NFT:', error);
+          toast({
+            title: "Error",
+            description: "Failed to check NFT ownership. Please try again.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsChecking(false);
+        }
+      }
+    };
+    
+    checkNFT();
+  }, [primaryWallet, toast, navigate]);
 
   if (user?.verifications?.completedOnboarding) {
     return <PostOnboardingView />;
@@ -38,13 +79,18 @@ const MintNFTContent = () => {
         Get your LedgerFren NFT to access the platform. Once verified, you'll be able to participate in investment opportunities.
       </p>
 
-      {/* Changed from max-w-md to max-w-2xl for wider container */}
       <div className="max-w-2xl mx-auto">
         <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
           <div className="flex justify-center mb-8">
             <DynamicWidget />
           </div>
-          <WalletInfo />
+          {isChecking ? (
+            <div className="text-white text-center">
+              Checking NFT ownership...
+            </div>
+          ) : (
+            <WalletInfo />
+          )}
         </div>
       </div>
     </div>
@@ -69,10 +115,10 @@ const MintNFT = () => {
               description: "Your account has been verified successfully.",
             });
           },
-          onAuthSuccess: () => {
+          onAuthSuccess: (args: any) => {
             toast({
               title: "Authentication Successful",
-              description: "You're now connected to LedgerFund.",
+              description: "You're now connected to LedgerFund. Checking NFT ownership...",
             });
           },
           onLogout: () => {
@@ -85,7 +131,6 @@ const MintNFT = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* Deep space background and effects from Index.tsx */}
         <div className="absolute inset-0">
           <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, #000B2E 0%, #000000 100%)', opacity: 0.98 }} />
           <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 30% 70%, rgba(64, 156, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(147, 51, 255, 0.1) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.05) 0%, transparent 55%)', animation: 'quantumField 30s ease-in-out infinite' }} />

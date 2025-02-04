@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
@@ -13,6 +14,8 @@ const CONTRACT_ABI = [
   "function transferFrom(address from, address to, uint256 tokenId)",
   "function transferOwnership(address newOwner)",
   "function updateGovernancePowerCID(uint256 tokenId, string memory newCID)",
+  "function balanceOf(address owner) view returns (uint256)",
+  "function ownerOf(uint256 tokenId) view returns (address)",
   "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 ];
 
@@ -25,6 +28,26 @@ interface NFTMetadata {
     value: string;
   }[];
 }
+
+export const checkNFTOwnership = async (walletClient: any, address: string) => {
+  try {
+    console.log('Checking NFT ownership for address:', address);
+    
+    const provider = new ethers.providers.Web3Provider(walletClient, {
+      name: 'unknown',
+      chainId: 137 // Polygon Mainnet
+    });
+    
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+    const balance = await contract.balanceOf(address);
+    console.log('NFT balance:', balance.toString());
+    
+    return balance.gt(0);
+  } catch (error) {
+    console.error('Error checking NFT ownership:', error);
+    return false;
+  }
+};
 
 export const mintNFT = async (walletClient: any, address: string, metadata: any) => {
   try {
