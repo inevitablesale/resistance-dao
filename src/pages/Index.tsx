@@ -79,74 +79,73 @@ const Index = () => {
             className="absolute inset-0"
             style={{
               background: 'radial-gradient(circle at center, #0a1929 0%, #000000 100%)',
-              opacity: 0.95
+              opacity: 0.98
             }}
           />
           
-          {/* Cosmic dust and nebula structures */}
+          {/* Distant nebulae and cosmic structures */}
           <div 
             className="absolute inset-0"
             style={{
               background: `
-                radial-gradient(ellipse at 20% 30%, rgba(205, 140, 70, 0.4) 0%, transparent 70%),
-                radial-gradient(ellipse at 60% 40%, rgba(168, 123, 92, 0.4) 0%, transparent 70%),
-                radial-gradient(ellipse at 80% 40%, rgba(155, 100, 60, 0.3) 0%, transparent 70%),
-                radial-gradient(circle at 50% 50%, rgba(41, 65, 133, 0.2) 0%, transparent 80%)
+                radial-gradient(ellipse at 20% 30%, rgba(133, 98, 63, 0.15) 0%, transparent 70%),
+                radial-gradient(ellipse at 60% 40%, rgba(92, 76, 61, 0.15) 0%, transparent 70%),
+                radial-gradient(ellipse at 80% 40%, rgba(82, 58, 36, 0.12) 0%, transparent 70%),
+                radial-gradient(circle at 50% 50%, rgba(28, 45, 90, 0.1) 0%, transparent 80%)
               `,
-              animation: 'nebulaPulse 30s ease-in-out infinite alternate',
+              animation: 'nebulaPulse 45s ease-in-out infinite alternate',
               mixBlendMode: 'screen'
             }}
           />
           
-          {/* Glowing nebula edges */}
+          {/* Mid-distance cosmic dust and gas */}
           <div 
             className="absolute inset-0"
             style={{
               background: `
-                radial-gradient(ellipse at 30% 40%, rgba(255, 196, 140, 0.3) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 50%, rgba(255, 180, 120, 0.3) 0%, transparent 60%),
-                radial-gradient(ellipse at 40% 60%, rgba(255, 160, 100, 0.3) 0%, transparent 60%)
+                radial-gradient(ellipse at 30% 40%, rgba(185, 145, 105, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(165, 120, 85, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 40% 60%, rgba(145, 95, 65, 0.12) 0%, transparent 60%)
               `,
-              animation: 'nebulaGlow 25s ease-in-out infinite alternate',
-              mixBlendMode: 'screen'
+              animation: 'nebulaGlow 40s ease-in-out infinite alternate',
+              mixBlendMode: 'soft-light'
             }}
           />
           
-          {/* High-definition star field */}
+          {/* Star field with varying sizes */}
           <div 
             className="absolute inset-0"
             style={{
               backgroundImage: `
-                radial-gradient(1.5px 1.5px at 10% 10%, rgba(255, 255, 255, 0.9) 100%, transparent),
-                radial-gradient(2px 2px at 20% 20%, rgba(255, 255, 255, 1) 100%, transparent),
-                radial-gradient(1.5px 1.5px at 30% 30%, rgba(255, 255, 255, 0.9) 100%, transparent),
-                radial-gradient(2.5px 2.5px at 40% 40%, rgba(255, 255, 255, 1) 100%, transparent),
-                radial-gradient(2px 2px at 50% 50%, rgba(255, 255, 255, 0.9) 100%, transparent),
-                radial-gradient(3px 3px at 60% 60%, rgba(255, 255, 255, 1) 100%, transparent),
-                radial-gradient(2.5px 2.5px at 70% 70%, rgba(255, 255, 255, 0.9) 100%, transparent),
-                radial-gradient(3.5px 3.5px at 80% 80%, rgba(255, 255, 255, 1) 100%, transparent),
-                radial-gradient(2px 2px at 90% 90%, rgba(255, 255, 255, 0.9) 100%, transparent)
+                radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.8) 100%, transparent),
+                radial-gradient(1.5px 1.5px at 20% 20%, rgba(255, 255, 255, 0.85) 100%, transparent),
+                radial-gradient(1px 1px at 30% 30%, rgba(255, 255, 255, 0.8) 100%, transparent),
+                radial-gradient(2px 2px at 40% 40%, rgba(255, 255, 255, 0.85) 100%, transparent),
+                radial-gradient(1.5px 1.5px at 50% 50%, rgba(255, 255, 255, 0.8) 100%, transparent),
+                radial-gradient(2.5px 2.5px at 60% 60%, rgba(255, 255, 255, 0.85) 100%, transparent),
+                radial-gradient(2px 2px at 70% 70%, rgba(255, 255, 255, 0.8) 100%, transparent),
+                radial-gradient(3px 3px at 80% 80%, rgba(255, 255, 255, 0.85) 100%, transparent)
               `,
               backgroundSize: '400% 400%',
-              animation: 'starTwinkle 40s ease-in-out infinite',
-              opacity: 0.9
+              animation: 'starTwinkle 60s ease-in-out infinite',
+              opacity: 0.7
             }}
           />
           
-          {/* Bright star highlights */}
+          {/* Bright star accents */}
           <div 
             className="absolute inset-0"
             style={{
               backgroundImage: `
-                radial-gradient(3px 3px at 25% 25%, rgba(255, 255, 255, 1) 100%, transparent),
-                radial-gradient(4px 4px at 45% 45%, rgba(255, 255, 255, 1) 100%, transparent),
-                radial-gradient(3px 3px at 65% 65%, rgba(255, 255, 255, 1) 100%, transparent),
-                radial-gradient(4px 4px at 85% 85%, rgba(255, 255, 255, 1) 100%, transparent)
+                radial-gradient(2px 2px at 25% 25%, rgba(255, 255, 255, 0.9) 100%, transparent),
+                radial-gradient(2.5px 2.5px at 45% 45%, rgba(255, 255, 255, 0.9) 100%, transparent),
+                radial-gradient(2px 2px at 65% 65%, rgba(255, 255, 255, 0.9) 100%, transparent),
+                radial-gradient(3px 3px at 85% 85%, rgba(255, 255, 255, 0.9) 100%, transparent)
               `,
               backgroundSize: '200% 200%',
-              animation: 'starGlow 30s ease-in-out infinite alternate',
-              opacity: 0.8,
-              filter: 'blur(0.5px)'
+              animation: 'starGlow 50s ease-in-out infinite alternate',
+              opacity: 0.6,
+              filter: 'blur(0.3px)'
             }}
           />
           
@@ -154,53 +153,53 @@ const Index = () => {
             {`
               @keyframes nebulaPulse {
                 0%, 100% {
-                  opacity: 0.7;
+                  opacity: 0.5;
                   transform: scale(1);
                 }
                 50% {
-                  opacity: 0.9;
-                  transform: scale(1.02);
+                  opacity: 0.6;
+                  transform: scale(1.01);
                 }
               }
 
               @keyframes nebulaGlow {
                 0%, 100% {
-                  opacity: 0.6;
+                  opacity: 0.4;
                   transform: scale(1);
                 }
                 50% {
-                  opacity: 0.8;
-                  transform: scale(1.03);
+                  opacity: 0.5;
+                  transform: scale(1.02);
                 }
               }
 
               @keyframes starTwinkle {
                 0%, 100% {
-                  opacity: 0.9;
+                  opacity: 0.7;
                   background-position: 0% 0%;
                 }
                 25% {
-                  opacity: 1;
+                  opacity: 0.8;
                   background-position: 25% 25%;
                 }
                 50% {
-                  opacity: 0.8;
+                  opacity: 0.6;
                   background-position: 50% 50%;
                 }
                 75% {
-                  opacity: 1;
+                  opacity: 0.8;
                   background-position: 75% 75%;
                 }
               }
 
               @keyframes starGlow {
                 0%, 100% {
-                  opacity: 0.7;
-                  filter: blur(0.5px);
+                  opacity: 0.5;
+                  filter: blur(0.3px);
                 }
                 50% {
-                  opacity: 1;
-                  filter: blur(1px);
+                  opacity: 0.7;
+                  filter: blur(0.5px);
                 }
               }
             `}
