@@ -10,6 +10,7 @@ import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 
 interface NFTPreview {
   fullName: string;
+  profilePicCID?: string;
   attributes: Array<{
     trait_type: string;
     value: string;
@@ -63,17 +64,30 @@ export const WalletInfo = () => {
       const nftMetadata = await analyzeLinkedInProfile(linkedInUrl);
       setProgress(50);
       
-      // Get governance power and corresponding image
-      const governancePowerAttr = nftMetadata.attributes.find(
-        attr => attr.trait_type === "Governance Power"
-      );
+      // Convert the metadata to NFTPreview format
+      const preview: NFTPreview = {
+        fullName: nftMetadata.fullName,
+        profilePicCID: nftMetadata.profilePicCID,
+        attributes: nftMetadata.attributes.map(attr => ({
+          trait_type: attr.trait_type,
+          value: String(attr.value) // Convert all values to strings
+        }))
+      };
       
-      if (governancePowerAttr) {
-        const imageCID = getGovernanceImageCID(governancePowerAttr.value);
-        setPreviewImageUrl(`https://ipfs.io/ipfs/${imageCID}`);
+      // Set preview image URL based on profile pic or governance power
+      if (nftMetadata.profilePicCID) {
+        setPreviewImageUrl(`https://ipfs.io/ipfs/${nftMetadata.profilePicCID}`);
+      } else {
+        const governancePowerAttr = preview.attributes.find(
+          attr => attr.trait_type === "Governance Power"
+        );
+        if (governancePowerAttr) {
+          const imageCID = getGovernanceImageCID(governancePowerAttr.value);
+          setPreviewImageUrl(`https://ipfs.io/ipfs/${imageCID}`);
+        }
       }
       
-      setNFTPreview(nftMetadata);
+      setNFTPreview(preview);
       toast({
         title: "Analysis Complete",
         description: "Preview your NFT before minting.",

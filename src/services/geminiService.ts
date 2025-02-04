@@ -6,6 +6,7 @@ interface NFTMetadata {
   fullName: string;
   publicIdentifier: string;
   profilePic?: string;
+  profilePicCID?: string;
   attributes: Array<{
     trait_type: string;
     value: string | number | null | {
