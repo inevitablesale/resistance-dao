@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface NFTPreview {
   fullName: string;
@@ -27,6 +28,7 @@ export const WalletInfo = () => {
   const [nftPreview, setNFTPreview] = useState<NFTPreview | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState<string>("");
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -65,17 +67,15 @@ export const WalletInfo = () => {
       const nftMetadata = await analyzeLinkedInProfile(linkedInUrl);
       setProgress(50);
       
-      // Convert the metadata to NFTPreview format
       const preview: NFTPreview = {
         fullName: nftMetadata.fullName,
         profilePicCID: nftMetadata.profilePicCID,
         attributes: nftMetadata.attributes.map(attr => ({
           trait_type: attr.trait_type,
-          value: String(attr.value) // Convert all values to strings
+          value: String(attr.value)
         }))
       };
       
-      // Set preview image URL based on profile pic or governance power
       if (nftMetadata.profilePicCID) {
         setPreviewImageUrl(`https://ipfs.io/ipfs/${nftMetadata.profilePicCID}`);
       } else {
@@ -129,8 +129,12 @@ export const WalletInfo = () => {
       
       toast({
         title: "NFT Minted Successfully!",
-        description: `Your Professional NFT has been minted and stored on IPFS at ${result.tokenURI}`,
+        description: "Your LedgerFren NFT has been minted. Redirecting to governance voting...",
       });
+
+      setTimeout(() => {
+        navigate('/governance-voting');
+      }, 2000);
     } catch (error) {
       console.error('Minting failed:', error);
       toast({
@@ -157,15 +161,14 @@ export const WalletInfo = () => {
   const steps = [
     { name: "Connect Wallet", status: getStepStatus(1) },
     { name: "Preview NFT", status: getStepStatus(2) },
-    { name: "Verify Profile", status: getStepStatus(3) },
-    { name: "Mint NFT", status: getStepStatus(4) }
+    { name: "Mint NFT", status: getStepStatus(3) }
   ];
 
   return (
     <div className="mt-6 space-y-6 animate-fade-in">
       <Progress value={progress} className="h-2 bg-white/10" />
       
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         {steps.map((step, index) => (
           <div 
             key={step.name}
@@ -194,7 +197,7 @@ export const WalletInfo = () => {
       </div>
 
       <div className="p-6 rounded-xl bg-white/5 border border-white/10 space-y-4">
-        <h3 className="text-xl font-semibold text-white">Generate Your Professional NFT</h3>
+        <h3 className="text-xl font-semibold text-white">Generate Your LedgerFren NFT</h3>
         <p className="text-gray-400">
           Your LinkedIn profile will be analyzed to generate unique NFT attributes that represent your professional experience and qualifications.
         </p>
@@ -211,10 +214,9 @@ export const WalletInfo = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-polygon-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
               <div className="relative flex flex-col p-8 gap-8">
-                {/* Image Section at the top */}
                 {previewImageUrl && (
                   <div className="w-full flex justify-center animate-fade-in">
-                    <div className="relative w-64 aspect-square">
+                    <div className="relative w-48 aspect-square">
                       <div className="absolute inset-0 bg-polygon-primary/20 rounded-full blur-2xl animate-pulse-slow" />
                       <div className="relative">
                         <div className="absolute -inset-1 bg-gradient-to-r from-polygon-primary to-polygon-secondary rounded-full blur animate-pulse-slow" />
@@ -228,28 +230,33 @@ export const WalletInfo = () => {
                   </div>
                 )}
 
-                {/* Content Section below image */}
                 <div className="space-y-6 animate-fade-in w-full">
                   <div className="space-y-2 text-center">
                     <h4 className="text-3xl font-bold bg-gradient-to-r from-white to-polygon-primary bg-clip-text text-transparent">
-                      {nftPreview.fullName}'s Professional NFT
+                      {nftPreview.fullName}'s LedgerFren NFT
                     </h4>
                     <p className="text-xl text-gray-400">Professional Identity Token</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    {nftPreview.attributes.map((attr, index) => (
-                      <div 
-                        key={index}
-                        className="animate-fade-in"
-                        style={{ animationDelay: `${150 + index * 100}ms` }}
-                      >
-                        <div className="flex flex-col p-4 rounded-lg bg-black/20 border border-white/5 hover:border-polygon-primary/20 transition-colors">
-                          <span className="text-sm text-gray-400 mb-1">{attr.trait_type}</span>
-                          <span className="text-lg font-semibold text-white">{attr.value}</span>
+                    {nftPreview.attributes.map((attr, index) => {
+                      const displayValue = attr.trait_type === "Governance Power" 
+                        ? String(attr.value).replace("Governance-Power-", "")
+                        : attr.value;
+
+                      return (
+                        <div 
+                          key={index}
+                          className="animate-fade-in"
+                          style={{ animationDelay: `${150 + index * 100}ms` }}
+                        >
+                          <div className="flex flex-col p-4 rounded-lg bg-black/20 border border-white/5 hover:border-polygon-primary/20 transition-colors">
+                            <span className="text-sm text-gray-400 mb-1">{attr.trait_type}</span>
+                            <span className="text-lg font-semibold text-white">{displayValue}</span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   <button
