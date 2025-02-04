@@ -72,79 +72,81 @@ const Index = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* Enhanced James Webb-inspired Space Background */}
+        {/* James Webb-inspired Space Background */}
         <div className="absolute inset-0">
-          {/* Deep space base layer - darker and more contrasted */}
+          {/* Deep space base layer */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(circle at center, #1a0f2e 0%, #000000 100%)',
-              opacity: 0.98
+              background: 'radial-gradient(circle at center, #0a1929 0%, #000000 100%)',
+              opacity: 0.95
             }}
           />
           
-          {/* Enhanced nebulae and cosmic dust with more vibrant colors */}
+          {/* Cosmic dust and nebula structures */}
           <div 
             className="absolute inset-0"
             style={{
               background: `
-                radial-gradient(circle at 30% 40%, rgba(255, 147, 92, 0.35) 0%, transparent 50%),
-                radial-gradient(circle at 70% 60%, rgba(130, 71, 229, 0.4) 0%, transparent 55%),
-                radial-gradient(circle at 50% 50%, rgba(86, 42, 168, 0.35) 0%, transparent 65%),
-                radial-gradient(circle at 20% 30%, rgba(255, 124, 64, 0.3) 0%, transparent 60%),
-                radial-gradient(circle at 80% 20%, rgba(130, 71, 229, 0.35) 0%, transparent 55%)
+                radial-gradient(ellipse at 20% 30%, rgba(205, 140, 70, 0.4) 0%, transparent 70%),
+                radial-gradient(ellipse at 60% 40%, rgba(168, 123, 92, 0.4) 0%, transparent 70%),
+                radial-gradient(ellipse at 80% 40%, rgba(155, 100, 60, 0.3) 0%, transparent 70%),
+                radial-gradient(circle at 50% 50%, rgba(41, 65, 133, 0.2) 0%, transparent 80%)
               `,
-              animation: 'nebulaPulse 25s ease-in-out infinite alternate',
+              animation: 'nebulaPulse 30s ease-in-out infinite alternate',
               mixBlendMode: 'screen'
             }}
           />
           
-          {/* High-definition star clusters with increased density */}
+          {/* Glowing nebula edges */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: `
+                radial-gradient(ellipse at 30% 40%, rgba(255, 196, 140, 0.3) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(255, 180, 120, 0.3) 0%, transparent 60%),
+                radial-gradient(ellipse at 40% 60%, rgba(255, 160, 100, 0.3) 0%, transparent 60%)
+              `,
+              animation: 'nebulaGlow 25s ease-in-out infinite alternate',
+              mixBlendMode: 'screen'
+            }}
+          />
+          
+          {/* High-definition star field */}
           <div 
             className="absolute inset-0"
             style={{
               backgroundImage: `
-                radial-gradient(2px 2px at 10% 10%, rgba(255, 255, 255, 1) 100%, transparent),
-                radial-gradient(2.5px 2.5px at 20% 20%, rgba(255, 255, 255, 0.9) 100%, transparent),
-                radial-gradient(2px 2px at 30% 30%, rgba(255, 255, 255, 1) 100%, transparent),
-                radial-gradient(3px 3px at 40% 40%, rgba(255, 255, 255, 0.9) 100%, transparent),
-                radial-gradient(2.5px 2.5px at 50% 50%, rgba(255, 255, 255, 1) 100%, transparent),
-                radial-gradient(2px 2px at 60% 60%, rgba(255, 255, 255, 0.9) 100%, transparent),
-                radial-gradient(3px 3px at 70% 70%, rgba(255, 255, 255, 1) 100%, transparent),
-                radial-gradient(2.5px 2.5px at 80% 80%, rgba(255, 255, 255, 0.9) 100%, transparent),
-                radial-gradient(2px 2px at 90% 90%, rgba(255, 255, 255, 1) 100%, transparent)
+                radial-gradient(1.5px 1.5px at 10% 10%, rgba(255, 255, 255, 0.9) 100%, transparent),
+                radial-gradient(2px 2px at 20% 20%, rgba(255, 255, 255, 1) 100%, transparent),
+                radial-gradient(1.5px 1.5px at 30% 30%, rgba(255, 255, 255, 0.9) 100%, transparent),
+                radial-gradient(2.5px 2.5px at 40% 40%, rgba(255, 255, 255, 1) 100%, transparent),
+                radial-gradient(2px 2px at 50% 50%, rgba(255, 255, 255, 0.9) 100%, transparent),
+                radial-gradient(3px 3px at 60% 60%, rgba(255, 255, 255, 1) 100%, transparent),
+                radial-gradient(2.5px 2.5px at 70% 70%, rgba(255, 255, 255, 0.9) 100%, transparent),
+                radial-gradient(3.5px 3.5px at 80% 80%, rgba(255, 255, 255, 1) 100%, transparent),
+                radial-gradient(2px 2px at 90% 90%, rgba(255, 255, 255, 0.9) 100%, transparent)
               `,
-              backgroundSize: '300% 300%',
-              animation: 'starFloat 60s ease-in-out infinite',
+              backgroundSize: '400% 400%',
+              animation: 'starTwinkle 40s ease-in-out infinite',
               opacity: 0.9
             }}
           />
           
-          {/* Enhanced ethereal glow and cosmic rays with increased intensity */}
-          <div 
-            className="absolute inset-0 mix-blend-screen"
-            style={{
-              background: `
-                radial-gradient(circle at 40% 30%, rgba(255, 147, 92, 0.25) 0%, transparent 65%),
-                radial-gradient(circle at 60% 70%, rgba(130, 71, 229, 0.25) 0%, transparent 65%),
-                radial-gradient(circle at 50% 50%, rgba(86, 42, 168, 0.2) 0%, transparent 75%)
-              `,
-              animation: 'cosmicGlow 20s ease-in-out infinite alternate'
-            }}
-          />
-          
-          {/* Distant galaxies with enhanced visibility */}
+          {/* Bright star highlights */}
           <div 
             className="absolute inset-0"
             style={{
               backgroundImage: `
-                radial-gradient(3px 3px at 25% 35%, rgba(255, 187, 132, 0.8) 100%, transparent),
-                radial-gradient(3px 3px at 75% 65%, rgba(170, 111, 229, 0.8) 100%, transparent),
-                radial-gradient(3px 3px at 50% 50%, rgba(126, 82, 208, 0.8) 100%, transparent)
+                radial-gradient(3px 3px at 25% 25%, rgba(255, 255, 255, 1) 100%, transparent),
+                radial-gradient(4px 4px at 45% 45%, rgba(255, 255, 255, 1) 100%, transparent),
+                radial-gradient(3px 3px at 65% 65%, rgba(255, 255, 255, 1) 100%, transparent),
+                radial-gradient(4px 4px at 85% 85%, rgba(255, 255, 255, 1) 100%, transparent)
               `,
               backgroundSize: '200% 200%',
-              animation: 'galaxyPulse 40s ease-in-out infinite',
-              opacity: 0.8
+              animation: 'starGlow 30s ease-in-out infinite alternate',
+              opacity: 0.8,
+              filter: 'blur(0.5px)'
             }}
           />
           
@@ -152,55 +154,53 @@ const Index = () => {
             {`
               @keyframes nebulaPulse {
                 0%, 100% {
+                  opacity: 0.7;
+                  transform: scale(1);
+                }
+                50% {
+                  opacity: 0.9;
+                  transform: scale(1.02);
+                }
+              }
+
+              @keyframes nebulaGlow {
+                0%, 100% {
                   opacity: 0.6;
                   transform: scale(1);
                 }
                 50% {
                   opacity: 0.8;
-                  transform: scale(1.05);
+                  transform: scale(1.03);
                 }
               }
 
-              @keyframes starFloat {
+              @keyframes starTwinkle {
                 0%, 100% {
                   opacity: 0.9;
-                  transform: scale(1) rotate(0deg);
                   background-position: 0% 0%;
                 }
                 25% {
                   opacity: 1;
-                  background-position: 50% 50%;
+                  background-position: 25% 25%;
                 }
                 50% {
                   opacity: 0.8;
-                  transform: scale(1.1) rotate(0.5deg);
-                  background-position: 100% 100%;
+                  background-position: 50% 50%;
                 }
                 75% {
                   opacity: 1;
-                  background-position: 25% 75%;
+                  background-position: 75% 75%;
                 }
               }
 
-              @keyframes cosmicGlow {
+              @keyframes starGlow {
                 0%, 100% {
-                  opacity: 0.5;
-                  transform: scale(1);
-                }
-                50% {
                   opacity: 0.7;
-                  transform: scale(1.1);
-                }
-              }
-
-              @keyframes galaxyPulse {
-                0%, 100% {
-                  opacity: 0.6;
-                  background-size: 200% 200%;
+                  filter: blur(0.5px);
                 }
                 50% {
-                  opacity: 0.8;
-                  background-size: 220% 220%;
+                  opacity: 1;
+                  filter: blur(1px);
                 }
               }
             `}
