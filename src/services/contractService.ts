@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
@@ -152,14 +151,49 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
         const metadataUrl = tokenUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
         
         console.log(`Fetching metadata for token ${tokenId} from ${metadataUrl}`);
-        const response = await fetch(metadataUrl);
-        const metadata = await response.json();
-        
-        return {
-          tokenId,
-          owner,
-          metadata
-        };
+        try {
+          const response = await fetch(metadataUrl);
+          const contentType = response.headers.get('content-type');
+          
+          let metadata;
+          if (contentType?.includes('image/')) {
+            // If the tokenURI points to an image, create synthetic metadata
+            metadata = {
+              name: `LedgerFren NFT #${tokenId}`,
+              description: "A Professional NFT in the LedgerFren Collection",
+              image: metadataUrl,
+              attributes: [{
+                trait_type: "Governance Power",
+                value: "Unknown" // We can't determine the power from just the image
+              }]
+            };
+          } else {
+            // Regular JSON metadata
+            metadata = await response.json();
+          }
+          
+          return {
+            tokenId,
+            owner,
+            metadata
+          };
+        } catch (error) {
+          console.error(`Error fetching metadata for token ${tokenId}:`, error);
+          // Return a placeholder metadata if fetching fails
+          return {
+            tokenId,
+            owner,
+            metadata: {
+              name: `LedgerFren NFT #${tokenId}`,
+              description: "Metadata temporarily unavailable",
+              image: "https://ipfs.io/ipfs/placeholder", // You might want to use a real placeholder image
+              attributes: [{
+                trait_type: "Governance Power",
+                value: "Unknown"
+              }]
+            }
+          };
+        }
       })
     );
     
