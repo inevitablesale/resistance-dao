@@ -72,50 +72,77 @@ const Index = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* James Webb inspired cosmic background */}
+        {/* Immersive James Webb-inspired cosmic background */}
         <div className="absolute inset-0">
-          {/* Deep space gradient background */}
+          {/* Deep space base layer with enhanced depth */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(circle at center, #1A1F2C 0%, #000000 100%)'
+              background: 'radial-gradient(circle at center, #1A1F2C 0%, #000000 100%)',
+              opacity: 0.95
             }}
           />
           
-          {/* Cosmic dust and nebula layer */}
+          {/* Intense nebula formations */}
+          <div 
+            className="absolute inset-0 opacity-60"
+            style={{
+              background: `
+                radial-gradient(circle at 20% 30%, rgba(155, 135, 245, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(14, 165, 233, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.2) 0%, transparent 60%)
+              `
+            }}
+          />
+          
+          {/* Distant star clusters */}
           <div 
             className="absolute inset-0"
             style={{
-              backgroundImage: 'radial-gradient(2px 2px at 40% 60%, rgba(155, 135, 245, 0.4) 100%, transparent)',
+              backgroundImage: 'radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.8) 100%, transparent)',
+              backgroundSize: '150% 150%',
+              animation: 'space 45s ease-in-out infinite'
+            }}
+          />
+          
+          {/* Brighter foreground stars */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              backgroundImage: 'radial-gradient(2px 2px at 70% 60%, rgba(255, 255, 255, 0.9) 100%, transparent)',
               backgroundSize: '200% 200%',
-              animation: 'space 25s ease-in-out infinite'
+              animation: 'space 35s ease-in-out infinite reverse'
             }}
           />
-          
-          {/* Distant galaxies layer */}
+
+          {/* Dynamic cosmic dust */}
           <div 
             className="absolute inset-0"
             style={{
-              backgroundImage: 'radial-gradient(3px 3px at 60% 40%, rgba(14, 165, 233, 0.6) 100%, transparent)',
+              backgroundImage: 'radial-gradient(1px 1px at 40% 40%, rgba(214, 188, 250, 0.7) 100%, transparent)',
               backgroundSize: '300% 300%',
-              animation: 'space 30s ease-in-out infinite alternate'
+              animation: 'space 55s ease-in-out infinite alternate'
             }}
           />
 
-          {/* Stellar formations layer */}
-          <div 
-            className="absolute inset-0 opacity-40"
-            style={{
-              background: 'radial-gradient(circle at 30% 50%, rgba(155, 135, 245, 0.3), transparent 60%), radial-gradient(circle at 70% 50%, rgba(14, 165, 233, 0.3), transparent 60%)'
-            }}
-          />
-
-          {/* Webb-like infrared glow effects */}
+          {/* Ethereal glow effects */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(circle at 50% 50%, rgba(214, 188, 250, 0.1), transparent 70%)',
-              animation: 'pulse 8s ease-in-out infinite'
+              background: `
+                radial-gradient(circle at 30% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 70% 60%, rgba(30, 174, 219, 0.15) 0%, transparent 45%)
+              `,
+              animation: 'pulse 12s ease-in-out infinite alternate'
+            }}
+          />
+
+          {/* Webb telescope infrared visualization effect */}
+          <div 
+            className="absolute inset-0 mix-blend-screen"
+            style={{
+              background: 'radial-gradient(circle at center, rgba(236, 72, 153, 0.03) 0%, transparent 70%)',
+              animation: 'pulse 8s ease-in-out infinite alternate-reverse'
             }}
           />
           
@@ -123,33 +150,33 @@ const Index = () => {
             {`
               @keyframes space {
                 0%, 100% {
-                  opacity: 0.7;
+                  opacity: 0.8;
                   transform: scale(1) rotate(0deg);
                   background-position: 0% 0%;
                 }
                 25% {
-                  opacity: 0.9;
+                  opacity: 1;
                   background-position: 50% 50%;
                 }
                 50% {
-                  opacity: 0.6;
-                  transform: scale(1.1) rotate(1deg);
+                  opacity: 0.7;
+                  transform: scale(1.2) rotate(1deg);
                   background-position: 100% 100%;
                 }
                 75% {
-                  opacity: 0.8;
+                  opacity: 0.9;
                   background-position: 25% 75%;
                 }
               }
 
               @keyframes pulse {
                 0%, 100% {
-                  opacity: 0.1;
+                  opacity: 0.2;
                   transform: scale(1);
                 }
                 50% {
-                  opacity: 0.2;
-                  transform: scale(1.05);
+                  opacity: 0.4;
+                  transform: scale(1.1);
                 }
               }
             `}
