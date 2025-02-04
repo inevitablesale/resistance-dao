@@ -1,4 +1,4 @@
-```typescript
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -273,4 +273,3 @@ const Index = () => {
 };
 
 export default Index;
-```
