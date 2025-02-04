@@ -6,6 +6,15 @@ import { WalletInfo } from "@/components/WalletInfo";
 import { PostOnboardingView } from "@/components/PostOnboardingView";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
+import { InvestmentReadiness } from "@/components/InvestmentReadiness";
+import { WhatWeBuilding } from "@/components/WhatWeBuilding";
+import { PrivateEquityImpact } from "@/components/PrivateEquityImpact";
+import { ReclaimControl } from "@/components/ReclaimControl";
+import { HowItWorks } from "@/components/HowItWorks";
+import { AlternativeToEquity } from "@/components/AlternativeToEquity";
+import { SystemWeDeserve } from "@/components/SystemWeDeserve";
+import { CallToAction } from "@/components/CallToAction";
+import { Roadmap } from "@/components/Roadmap";
 
 const IndexContent = () => {
   const { user, primaryWallet, setShowAuthFlow } = useDynamicContext();
@@ -44,13 +53,17 @@ const IndexContent = () => {
             <WalletInfo />
           </div>
         </div>
-
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-400">
-            Check your eligibility to join the future of accounting
-          </p>
-        </div>
       </div>
+
+      <InvestmentReadiness />
+      <WhatWeBuilding />
+      <PrivateEquityImpact />
+      <ReclaimControl />
+      <HowItWorks />
+      <AlternativeToEquity />
+      <SystemWeDeserve />
+      <CallToAction />
+      <Roadmap />
     </>
   );
 };
@@ -309,4 +322,3 @@ const Index = () => {
 };
 
 export default Index;
-

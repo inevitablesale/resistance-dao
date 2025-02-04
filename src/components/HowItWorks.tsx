@@ -1,0 +1,83 @@
+
+import { CircleDollarSign, FileCheck, Wallet } from "lucide-react";
+import { Card } from "./ui/card";
+
+export const HowItWorks = () => {
+  return (
+    <section className="py-16 bg-black/30">
+      <div className="container px-4">
+        <h2 className="text-4xl font-bold text-white mb-12 text-center">
+          How It Works: Invest, Own, and Share the Rewards
+        </h2>
+        
+        <div className="grid md:grid-cols-3 gap-8">
+          <Card className="p-6 bg-white/5 backdrop-blur border-white/10">
+            <CircleDollarSign className="w-8 h-8 text-[#8247E5] mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-4">1. Invest Your LGR Tokens</h3>
+            <p className="text-gray-300 mb-6">
+              When a new accounting practice is identified for acquisition, LedgerFund (LGR) token holders can invest their tokens into the deal.
+            </p>
+            <ul className="space-y-3 text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-[#8247E5]">•</span>
+                <span>Step into Ownership: By investing LGR, you're securing your stake in a real-world business.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#8247E5]">•</span>
+                <span>Shared Vision: Investments ensure each acquisition aligns with community goals.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#8247E5]">•</span>
+                <span>Regulatory Compliance: Investments conducted under Reg D 506(b) or 506(c) Safe Harbor Exceptions.</span>
+              </li>
+            </ul>
+          </Card>
+
+          <Card className="p-6 bg-white/5 backdrop-blur border-white/10">
+            <FileCheck className="w-8 h-8 text-[#8247E5] mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-4">2. Sign the SPV Paperwork</h3>
+            <p className="text-gray-300 mb-6">
+              Complete the necessary Special Purpose Vehicle (SPV) legal documentation that owns and operates the acquired practice.
+            </p>
+            <ul className="space-y-3 text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-[#8247E5]">•</span>
+                <span>Legal Security: The SPV separates firm operations and liabilities.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#8247E5]">•</span>
+                <span>Ownership Transparency: Your rights and ownership are clearly defined.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#8247E5]">•</span>
+                <span>Know Your Customer (KYC): Complete KYC process for compliance.</span>
+              </li>
+            </ul>
+          </Card>
+
+          <Card className="p-6 bg-white/5 backdrop-blur border-white/10">
+            <Wallet className="w-8 h-8 text-[#8247E5] mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-4">3. Receive Your RWA Tokens</h3>
+            <p className="text-gray-300 mb-6">
+              Receive Real World Asset (RWA) tokens representing your share in the SPV, unlocking direct benefits.
+            </p>
+            <ul className="space-y-3 text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-[#8247E5]">•</span>
+                <span>Profit Sharing: Receive dividends based on practice performance.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#8247E5]">•</span>
+                <span>Voting Rights: Participate in governance decisions.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#8247E5]">•</span>
+                <span>Tradable Assets: Hold long-term or trade where permitted.</span>
+              </li>
+            </ul>
+          </Card>
+        </div>
+      </div>
+    </section>
+  );
+};
