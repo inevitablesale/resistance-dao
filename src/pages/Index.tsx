@@ -108,6 +108,75 @@ const Index = () => {
             }}
           />
           
+          {/* Spaceships */}
+          <div className="absolute inset-0 overflow-hidden">
+            {/* Large Spaceship */}
+            <div
+              className="absolute animate-spaceship-1"
+              style={{
+                width: '60px',
+                height: '24px',
+                background: '#403E43',
+                clipPath: 'polygon(0% 50%, 20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%)',
+                boxShadow: '0 0 15px rgba(207, 171, 103, 0.3)',
+                animation: 'spaceship1 20s linear infinite'
+              }}
+            >
+              <div 
+                className="absolute right-0 w-3 h-2"
+                style={{
+                  background: 'radial-gradient(circle at right, rgba(207, 171, 103, 0.8), transparent 70%)',
+                  transform: 'translateX(100%)',
+                  filter: 'blur(2px)'
+                }}
+              />
+            </div>
+
+            {/* Medium Spaceship */}
+            <div
+              className="absolute animate-spaceship-2"
+              style={{
+                width: '40px',
+                height: '16px',
+                background: '#8E9196',
+                clipPath: 'polygon(0% 50%, 30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%)',
+                boxShadow: '0 0 10px rgba(207, 171, 103, 0.2)',
+                animation: 'spaceship2 25s linear infinite'
+              }}
+            >
+              <div 
+                className="absolute right-0 w-2 h-1.5"
+                style={{
+                  background: 'radial-gradient(circle at right, rgba(207, 171, 103, 0.6), transparent 70%)',
+                  transform: 'translateX(100%)',
+                  filter: 'blur(1px)'
+                }}
+              />
+            </div>
+
+            {/* Small Spaceship */}
+            <div
+              className="absolute animate-spaceship-3"
+              style={{
+                width: '30px',
+                height: '12px',
+                background: '#9F9EA1',
+                clipPath: 'polygon(0% 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%)',
+                boxShadow: '0 0 8px rgba(207, 171, 103, 0.15)',
+                animation: 'spaceship3 30s linear infinite'
+              }}
+            >
+              <div 
+                className="absolute right-0 w-1.5 h-1"
+                style={{
+                  background: 'radial-gradient(circle at right, rgba(207, 171, 103, 0.5), transparent 70%)',
+                  transform: 'translateX(100%)',
+                  filter: 'blur(1px)'
+                }}
+              />
+            </div>
+          </div>
+          
           {/* Stars layer */}
           <div 
             className="absolute inset-0"
@@ -143,6 +212,44 @@ const Index = () => {
                 0% { transform: translateX(0) scale(1); }
                 50% { transform: translateX(-1%) scale(1.01); }
                 100% { transform: translateX(0) scale(1); }
+              }
+
+              @keyframes spaceship1 {
+                0% { transform: translate(-100px, 100vh) rotate(-15deg); }
+                100% { transform: translate(calc(100vw + 100px), -100px) rotate(15deg); }
+              }
+
+              @keyframes spaceship2 {
+                0% { transform: translate(-80px, 70vh) rotate(-20deg); }
+                100% { transform: translate(calc(100vw + 80px), 100px) rotate(20deg); }
+              }
+
+              @keyframes spaceship3 {
+                0% { transform: translate(-60px, 40vh) rotate(-25deg); }
+                100% { transform: translate(calc(100vw + 60px), 300px) rotate(25deg); }
+              }
+
+              .animate-spaceship-1 {
+                top: 30%;
+                left: -60px;
+                animation: spaceship1 20s linear infinite;
+                will-change: transform;
+              }
+
+              .animate-spaceship-2 {
+                top: 45%;
+                left: -40px;
+                animation: spaceship2 25s linear infinite;
+                animation-delay: 5s;
+                will-change: transform;
+              }
+
+              .animate-spaceship-3 {
+                top: 60%;
+                left: -30px;
+                animation: spaceship3 30s linear infinite;
+                animation-delay: 10s;
+                will-change: transform;
               }
             `}
           </style>
