@@ -6,30 +6,30 @@ export const InvestmentReadiness = () => {
   return (
     <section className="py-16 bg-black/30 backdrop-blur-sm">
       <div className="container px-4">
-        <h2 className="text-3xl font-bold text-white mb-4">Join Our Vision</h2>
+        <h2 className="text-3xl font-bold text-white mb-4">Support Our Vision</h2>
         <p className="text-xl text-gray-300 mb-8 max-w-3xl">
-          We're raising funds to revolutionize the accounting industry. Mint your LedgerFren NFT to become part 
-          of our governance board and shape the future of decentralized accounting.
+          Join us in revolutionizing the accounting industry. Start by minting your LedgerFren NFT to participate 
+          in governance, then support the platform's development by acquiring LGR tokens.
         </p>
         
         <div className="grid md:grid-cols-3 gap-6">
           <Card className="p-6 bg-white/5 backdrop-blur border-white/10">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
               <Shield className="w-5 h-5" />
-              Initial Offering
+              Step 1: Mint NFT
             </h3>
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Limited NFT mint available
+                Get your LedgerFren NFT
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-[#8247E5]">•</span>
+                Become a governance member
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
                 Early supporter benefits
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-[#8247E5]">•</span>
-                Secure your governance rights
               </li>
             </ul>
           </Card>
@@ -37,20 +37,20 @@ export const InvestmentReadiness = () => {
           <Card className="p-6 bg-white/5 backdrop-blur border-white/10">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
               <Vote className="w-5 h-5" />
-              Governance Rights
+              Step 2: Governance
             </h3>
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Vote on key decisions
+                Vote on platform decisions
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Shape platform development
+                Shape development priorities
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Participate in governance meetings
+                Join governance meetings
               </li>
             </ul>
           </Card>
@@ -58,20 +58,20 @@ export const InvestmentReadiness = () => {
           <Card className="p-6 bg-white/5 backdrop-blur border-white/10">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
               <DollarSign className="w-5 h-5" />
-              Investment Process
+              Step 3: Support Platform
             </h3>
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Connect your wallet
+                Purchase LGR tokens
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Mint your LedgerFren NFT
+                Support platform development
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Participate in platform governance
+                Future platform utility
               </li>
             </ul>
           </Card>
