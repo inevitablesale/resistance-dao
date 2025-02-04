@@ -1,4 +1,3 @@
-```typescript
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
@@ -71,17 +70,10 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
     });
     
     // First, upload the NFT metadata to IPFS/Pinata
-    // Enhanced image URL handling
-    let imageUrl;
-    if (metadata.profilePicCID) {
-      console.log('Using LinkedIn profile picture with CID:', metadata.profilePicCID);
-      imageUrl = `${PINATA_GATEWAY}${metadata.profilePicCID}?pinataGatewayToken=${PINATA_GATEWAY_TOKEN}`;
-    } else {
-      console.log('No profile picture found, using governance power image');
-      const governanceImageCID = getGovernanceImageCID(governancePowerAttr.value);
-      imageUrl = `${PINATA_GATEWAY}${governanceImageCID}?pinataGatewayToken=${PINATA_GATEWAY_TOKEN}`;
-    }
-    console.log('Final image URL:', imageUrl);
+    // Use profile picture if available, otherwise fallback to governance power image
+    const imageUrl = metadata.profilePicCID 
+      ? `https://ipfs.io/ipfs/${metadata.profilePicCID}`
+      : `https://ipfs.io/ipfs/${getGovernanceImageCID(governancePowerAttr.value)}`;
 
     const nftMetadata: NFTMetadata = {
       name: `${metadata.fullName}'s Professional NFT`,
@@ -303,4 +295,3 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
     throw error;
   }
 };
-```
