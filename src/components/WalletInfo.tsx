@@ -11,13 +11,6 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { LoadingSlides } from "./LoadingSlides";
 import { motion } from "framer-motion";
-import { ethers } from "ethers";
-
-const CONTRACT_ADDRESS = "0x3dC25640b1B7528Dca23BeFcDAD835C5Bf4e5360";
-const CONTRACT_ABI = [
-  "function balanceOf(address owner) view returns (uint256)",
-  "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)"
-];
 
 interface NFTPreview {
   fullName: string;
@@ -44,9 +37,6 @@ export const WalletInfo = () => {
       if (primaryWallet) {
         const connected = await primaryWallet.isConnected();
         setIsWalletConnected(connected);
-        if (connected) {
-          checkNFTOwnership();
-        }
       } else {
         setIsWalletConnected(false);
       }
@@ -54,26 +44,6 @@ export const WalletInfo = () => {
 
     checkConnection();
   }, [primaryWallet]);
-
-  const checkNFTOwnership = async () => {
-    if (!primaryWallet?.address) return;
-
-    try {
-      const provider = new ethers.providers.Web3Provider(await primaryWallet.getWalletClient());
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-      const balance = await contract.balanceOf(primaryWallet.address);
-
-      if (balance.gt(0)) {
-        console.log('User already owns an NFT, redirecting to governance voting...');
-        navigate('/governance-voting');
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error checking NFT ownership:', error);
-      return false;
-    }
-  };
 
   const handleAnalyzeProfile = async () => {
     console.group('LinkedIn Profile Analysis');
@@ -148,15 +118,6 @@ export const WalletInfo = () => {
       
       if (!primaryWallet?.address) {
         throw new Error('Wallet address not found');
-      }
-
-      const hasNFT = await checkNFTOwnership();
-      if (hasNFT) {
-        toast({
-          title: "NFT Already Owned",
-          description: "You already own a LedgerFren NFT. Redirecting to governance voting...",
-        });
-        return;
       }
 
       const result = await mintNFT(
