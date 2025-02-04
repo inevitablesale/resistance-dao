@@ -27,8 +27,6 @@ const Nav = () => {
       return;
     }
 
-    // Here you would check for NFT ownership
-    // For now, we'll just show a toast
     toast({
       title: "Coming Soon",
       description: "NFT verification will be implemented soon.",
@@ -36,8 +34,9 @@ const Nav = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-[#8247E5] z-50">
-      <div className="container mx-auto px-4">
+    <nav className="fixed top-0 left-0 right-0 z-50">
+      <div className="absolute inset-0 bg-black/10 backdrop-blur-lg border-b border-white/10" />
+      <div className="container mx-auto px-4 relative">
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-[#8247E5] font-bold">
@@ -63,7 +62,7 @@ const Nav = () => {
 
           <button 
             onClick={handleLaunchApp}
-            className="hidden md:block px-6 py-2 bg-white text-[#8247E5] rounded-lg font-medium hover:bg-white/90 transition-colors"
+            className="hidden md:block px-6 py-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white rounded-lg font-medium transition-all hover:scale-105"
           >
             Launch App
           </button>
@@ -74,3 +73,4 @@ const Nav = () => {
 };
 
 export default Nav;
+
