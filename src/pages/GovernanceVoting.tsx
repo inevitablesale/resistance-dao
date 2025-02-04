@@ -1,4 +1,4 @@
-
+```typescript
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -6,8 +6,6 @@ import { getAllMintedNFTs } from "@/services/contractService";
 import NFTCollectionCard from "@/components/NFTCollectionCard";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-
-const PINATA_GATEWAY_TOKEN = "LxW7Vt1WCzQk4x7VPUWYizgTK5BXllL4JMUQVXMeZEPqSokovWPXI-jmwcFsZ3hs";
 
 const GovernanceVoting = () => {
   const { primaryWallet } = useDynamicContext();
@@ -33,19 +31,7 @@ const GovernanceVoting = () => {
         setIsLoading(true);
         const walletClient = await primaryWallet.getWalletClient();
         const mintedNFTs = await getAllMintedNFTs(walletClient);
-        
-        // Transform NFTs to append Pinata gateway token to image URLs
-        const transformedNFTs = mintedNFTs.map(nft => ({
-          ...nft,
-          metadata: {
-            ...nft.metadata,
-            image: nft.metadata.image.includes('mypinata.cloud') 
-              ? `${nft.metadata.image}${nft.metadata.image.includes('?') ? '&' : '?'}pinataGatewayToken=${PINATA_GATEWAY_TOKEN}`
-              : nft.metadata.image
-          }
-        }));
-        
-        setNfts(transformedNFTs);
+        setNfts(mintedNFTs);
       } catch (error) {
         console.error('Error fetching NFTs:', error);
         toast({
@@ -116,3 +102,4 @@ const GovernanceVoting = () => {
 };
 
 export default GovernanceVoting;
+```

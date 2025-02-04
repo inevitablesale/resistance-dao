@@ -29,6 +29,9 @@ interface NFTMetadata {
   }[];
 }
 
+const PINATA_GATEWAY = "https://blue-shaggy-halibut-668.mypinata.cloud/ipfs/";
+const PINATA_GATEWAY_TOKEN = "LxW7Vt1WCzQk4x7VPUWYizgTK5BXllL4JMUQVXMeZEPqSokovWPXI-jmwcFsZ3hs";
+
 export const checkNFTOwnership = async (walletClient: any, address: string) => {
   try {
     console.log('Checking NFT ownership for address:', address);
@@ -137,7 +140,6 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
     
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
     
-    // Get all Transfer events from address 0x0 (minting)
     const filter = contract.filters.Transfer(
       '0x0000000000000000000000000000000000000000',
       null,
@@ -155,8 +157,9 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
           const owner = await contract.ownerOf(tokenId);
           const tokenUri = await contract.tokenURI(tokenId);
           
-          // Remove ipfs:// prefix if present and add gateway URL
-          const metadataUrl = tokenUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
+          // Convert IPFS URI to Pinata gateway URL with authentication
+          const ipfsHash = tokenUri.replace('ipfs://', '');
+          const metadataUrl = `${PINATA_GATEWAY}${ipfsHash}?pinataGatewayToken=${PINATA_GATEWAY_TOKEN}`;
           
           console.log(`Fetching metadata for token ${tokenId} from ${metadataUrl}`);
           
@@ -170,6 +173,7 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
 
           if (contentType?.includes('image/')) {
             console.log(`Token ${tokenId} URI points to an image, creating synthetic metadata`);
+            // Create base metadata for image-only tokens
             metadata = {
               name: `LedgerFren NFT #${tokenId}`,
               description: "A Professional NFT in the LedgerFren Collection",
@@ -177,23 +181,23 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
               attributes: [
                 {
                   trait_type: "Experience Level",
-                  value: "Unspecified"
+                  value: "Level 1"
                 },
                 {
                   trait_type: "Years in Practice",
-                  value: "Unspecified"
+                  value: "1-3 years"
                 },
                 {
                   trait_type: "Specialty",
-                  value: "Unspecified"
+                  value: "General Practice"
                 },
                 {
                   trait_type: "Client Base",
-                  value: "Unspecified"
+                  value: "Small Business"
                 },
                 {
                   trait_type: "Service Line Expertise",
-                  value: "Unspecified"
+                  value: "Tax"
                 },
                 {
                   trait_type: "Governance Power",
@@ -205,7 +209,7 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
             metadata = await response.json();
             console.log(`Fetched metadata for token ${tokenId}:`, metadata);
 
-            // Ensure all required attributes are present
+            // Validate and ensure all required attributes are present with actual values
             const requiredAttributes = [
               "Experience Level",
               "Years in Practice",
@@ -219,12 +223,19 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
             metadata.attributes = metadata.attributes || [];
             requiredAttributes.forEach(attr => {
               if (!metadata.attributes.some(a => a.trait_type === attr)) {
+                const defaultValue = attr === "Governance Power" ? "Governance-Power-1" : "Level 1";
                 metadata.attributes.push({
                   trait_type: attr,
-                  value: "Unspecified"
+                  value: defaultValue
                 });
               }
             });
+
+            // Ensure image URL uses Pinata gateway
+            if (metadata.image && metadata.image.startsWith('ipfs://')) {
+              const imageHash = metadata.image.replace('ipfs://', '');
+              metadata.image = `${PINATA_GATEWAY}${imageHash}?pinataGatewayToken=${PINATA_GATEWAY_TOKEN}`;
+            }
           }
           
           return {
@@ -234,33 +245,34 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
           };
         } catch (error) {
           console.error(`Error processing token ${event.args?.tokenId.toString()}:`, error);
+          // Return minimal metadata with default values instead of "Unspecified"
           return {
             tokenId: event.args?.tokenId.toString(),
             owner: await contract.ownerOf(event.args?.tokenId.toString()),
             metadata: {
               name: `LedgerFren NFT #${event.args?.tokenId.toString()}`,
               description: "Metadata temporarily unavailable",
-              image: "https://ipfs.io/ipfs/placeholder",
+              image: `${PINATA_GATEWAY}${getGovernanceImageCID("Governance-Power-1")}?pinataGatewayToken=${PINATA_GATEWAY_TOKEN}`,
               attributes: [
                 {
                   trait_type: "Experience Level",
-                  value: "Unspecified"
+                  value: "Level 1"
                 },
                 {
                   trait_type: "Years in Practice",
-                  value: "Unspecified"
+                  value: "1-3 years"
                 },
                 {
                   trait_type: "Specialty",
-                  value: "Unspecified"
+                  value: "General Practice"
                 },
                 {
                   trait_type: "Client Base",
-                  value: "Unspecified"
+                  value: "Small Business"
                 },
                 {
                   trait_type: "Service Line Expertise",
-                  value: "Unspecified"
+                  value: "Tax"
                 },
                 {
                   trait_type: "Governance Power",
@@ -280,4 +292,3 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
     throw error;
   }
 };
-
