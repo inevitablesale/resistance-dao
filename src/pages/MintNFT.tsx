@@ -1,7 +1,5 @@
 
-import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
-import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
-import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { WalletInfo } from "@/components/WalletInfo";
 import { PostOnboardingView } from "@/components/PostOnboardingView";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -10,11 +8,6 @@ import Nav from "@/components/Nav";
 import { useToast } from "@/hooks/use-toast";
 import { checkNFTOwnership } from "@/services/contractService";
 import { useNavigate } from "react-router-dom";
-
-const zeroDevConfig = {
-  bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
-  paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
-};
 
 const MintNFTContent = () => {
   const { user, setShowAuthFlow, primaryWallet } = useDynamicContext();
@@ -98,52 +91,20 @@ const MintNFTContent = () => {
 };
 
 const MintNFT = () => {
-  const { toast } = useToast();
-
   return (
-    <DynamicContextProvider
-      settings={{
-        environmentId: "2b74d425-6827-4ff1-af57-f9543d71cca0",
-        walletConnectors: [
-          EthereumWalletConnectors,
-          ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
-        ],
-        eventsCallbacks: {
-          onVerificationComplete: () => {
-            toast({
-              title: "Verification Complete",
-              description: "Your account has been verified successfully.",
-            });
-          },
-          onAuthSuccess: (args: any) => {
-            toast({
-              title: "Authentication Successful",
-              description: "You're now connected to LedgerFund. Checking NFT ownership...",
-            });
-          },
-          onLogout: () => {
-            toast({
-              title: "Logged Out",
-              description: "You've been successfully logged out.",
-            });
-          },
-        }
-      }}
-    >
-      <div className="min-h-screen bg-black overflow-hidden relative">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, #000B2E 0%, #000000 100%)', opacity: 0.98 }} />
-          <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 30% 70%, rgba(64, 156, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(147, 51, 255, 0.1) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.05) 0%, transparent 55%)', animation: 'quantumField 30s ease-in-out infinite' }} />
-          <div className="absolute inset-0 opacity-90" style={{ backgroundImage: 'radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.8) 100%, transparent), radial-gradient(2px 2px at 20% 20%, rgba(0, 255, 255, 0.7) 100%, transparent), radial-gradient(1.5px 1.5px at 30% 30%, rgba(147, 51, 255, 0.8) 100%, transparent), radial-gradient(2px 2px at 40% 40%, rgba(64, 156, 255, 0.6) 100%, transparent), radial-gradient(1.5px 1.5px at 50% 50%, rgba(255, 255, 255, 0.7) 100%, transparent)', backgroundSize: '400% 400%', animation: 'temporalWake 240s ease-in-out infinite' }} />
-        </div>
-        
-        <Nav />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <MintNFTContent />
-        </div>
+    <div className="min-h-screen bg-black overflow-hidden relative">
+      <div className="absolute inset-0">
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, #000B2E 0%, #000000 100%)', opacity: 0.98 }} />
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 30% 70%, rgba(64, 156, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(147, 51, 255, 0.1) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.05) 0%, transparent 55%)', animation: 'quantumField 30s ease-in-out infinite' }} />
+        <div className="absolute inset-0 opacity-90" style={{ backgroundImage: 'radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.8) 100%, transparent), radial-gradient(2px 2px at 20% 20%, rgba(0, 255, 255, 0.7) 100%, transparent), radial-gradient(1.5px 1.5px at 30% 30%, rgba(147, 51, 255, 0.8) 100%, transparent), radial-gradient(2px 2px at 40% 40%, rgba(64, 156, 255, 0.6) 100%, transparent), radial-gradient(1.5px 1.5px at 50% 50%, rgba(255, 255, 255, 0.7) 100%, transparent)', backgroundSize: '400% 400%', animation: 'temporalWake 240s ease-in-out infinite' }} />
       </div>
-    </DynamicContextProvider>
+      
+      <Nav />
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <MintNFTContent />
+      </div>
+    </div>
   );
 };
 
