@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
@@ -9,9 +10,13 @@ const BlackHoleAnimation = () => {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true, 
+      alpha: true,
+    });
     
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 1); // Set clear color to black
     containerRef.current.appendChild(renderer.domElement);
 
     // Enhanced stars with better depth distribution
@@ -20,7 +25,8 @@ const BlackHoleAnimation = () => {
       color: 0xffffff,
       size: 0.1,
       transparent: true,
-      opacity: 0.8
+      opacity: 0.8,
+      sizeAttenuation: true,
     });
 
     const starsVertices = [];
@@ -62,7 +68,6 @@ const BlackHoleAnimation = () => {
           float angle = atan(vPosition.y, vPosition.x);
           float dist = length(vPosition.xy);
           
-          // Using the provided color palette
           vec3 purple1 = vec3(0.608, 0.529, 0.961);    // #9b87f5
           vec3 purple2 = vec3(0.494, 0.412, 0.671);    // #7E69AB
           vec3 purple3 = vec3(0.431, 0.349, 0.647);    // #6E59A5
@@ -70,23 +75,18 @@ const BlackHoleAnimation = () => {
           vec3 magentaPink = vec3(0.851, 0.275, 0.937); // #D946EF
           vec3 brightOrange = vec3(0.976, 0.451, 0.086); // #F97316
           
-          // Enhanced singularity effect
           float singularityPulse = sin(dist * 2.0 - time * 3.0) * 0.5 + 0.5;
           float horizonGlow = exp(-dist * 0.15) * 2.5;
           
-          // Dynamic color mixing based on distance and angle
           float colorMix = sin(dist * 1.5 + angle * 6.0 + t) * 0.5 + 0.5;
           float secondMix = cos(dist * 2.0 - angle * 4.0 - t * 1.5) * 0.5 + 0.5;
           
-          // Dramatic color transitions
           vec3 baseColor = mix(purple1, vividPurple, colorMix);
           baseColor = mix(baseColor, magentaPink, secondMix * singularityPulse);
           
-          // Add horizon glow
           vec3 horizonColor = mix(brightOrange, magentaPink, sin(time + angle) * 0.5 + 0.5);
           baseColor += horizonColor * horizonGlow * singularityPulse;
           
-          // Enhanced opacity for better visibility
           float opacity = smoothstep(8.0, 0.0, dist) * 0.95;
           opacity *= 1.0 - pow(sin(angle * 12.0 + t * 2.0) * 0.5 + 0.5, 3.0);
           
@@ -132,12 +132,14 @@ const BlackHoleAnimation = () => {
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      containerRef.current?.removeChild(renderer.domElement);
+      if (containerRef.current?.contains(renderer.domElement)) {
+        containerRef.current.removeChild(renderer.domElement);
+      }
       renderer.dispose();
     };
   }, []);
 
-  return <div ref={containerRef} className="fixed inset-0 -z-10" />;
+  return <div ref={containerRef} className="fixed inset-0 -z-10 bg-black" />;
 };
 
 export default BlackHoleAnimation;

@@ -13,11 +13,11 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-black">
       <BlackHoleAnimation />
       
       {/* Content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center z-10 mt-24">
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center z-10">
         <div className="max-w-[1200px] space-y-8">
           <h1 className="max-w-[1000px] mx-auto mb-8 text-5xl font-bold tracking-tight md:text-7xl text-white font-heading leading-tight flex items-center justify-center gap-2">
             The future of accounting belongs to you
@@ -37,7 +37,11 @@ const Hero = () => {
             
             {user ? (
               <button 
-                onClick={() => window.dynamic.handleLogOut()}
+                onClick={() => {
+                  if (window?.dynamic) {
+                    window.dynamic.handleLogOut();
+                  }
+                }}
                 className="px-8 py-4 text-black bg-white hover:bg-gray-100 rounded-full font-medium transition-all duration-200 backdrop-blur-sm"
               >
                 Sign Out
