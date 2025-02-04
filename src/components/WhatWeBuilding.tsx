@@ -1,5 +1,5 @@
 
-import { Tokens, Settings, Users } from "lucide-react";
+import { Coins, Settings, Users } from "lucide-react";
 
 export const WhatWeBuilding = () => {
   return (
@@ -10,7 +10,7 @@ export const WhatWeBuilding = () => {
         <div className="grid md:grid-cols-3 gap-8">
           <div className="p-6 rounded-lg bg-white/5 backdrop-blur border border-white/10">
             <div className="mb-4">
-              <Tokens className="w-8 h-8 text-[#8247E5]" />
+              <Coins className="w-8 h-8 text-[#8247E5]" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Tokenized Ownership</h3>
             <p className="text-gray-300">
@@ -42,3 +42,4 @@ export const WhatWeBuilding = () => {
     </section>
   );
 };
+
