@@ -4,11 +4,13 @@ import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight, Eye } from "lucide-react";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
 import { mintNFT } from "@/services/contractService";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { LoadingSlides } from "./LoadingSlides";
+import { motion } from "framer-motion";
 
 interface NFTPreview {
   fullName: string;
@@ -165,13 +167,21 @@ export const WalletInfo = () => {
   ];
 
   return (
-    <div className="mt-6 space-y-6 animate-fade-in">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="mt-6 space-y-6"
+    >
       <Progress value={progress} className="h-2 bg-white/10" />
       
       <div className="grid grid-cols-3 gap-2">
         {steps.map((step, index) => (
-          <div 
+          <motion.div 
             key={step.name}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.2 }}
             className={cn(
               "flex flex-col items-center text-center space-y-2",
               step.status === "complete" ? "text-polygon-primary" : 
@@ -179,31 +189,54 @@ export const WalletInfo = () => {
               "text-gray-500"
             )}
           >
-            <div className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center border transition-colors duration-300",
-              step.status === "complete" ? "bg-polygon-primary border-polygon-primary" :
-              step.status === "current" ? "border-polygon-primary" :
-              "border-gray-500"
-            )}>
+            <motion.div 
+              className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center border transition-colors duration-300",
+                step.status === "complete" ? "bg-polygon-primary border-polygon-primary" :
+                step.status === "current" ? "border-polygon-primary" :
+                "border-gray-500"
+              )}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
               {step.status === "complete" ? (
                 <Check className="w-4 h-4 text-white animate-scale-in" />
               ) : step.status === "current" ? (
                 <ArrowRight className="w-4 h-4 text-polygon-primary animate-pulse" />
               ) : null}
-            </div>
+            </motion.div>
             <span className="text-xs font-medium">{step.name}</span>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       <div className="p-6 rounded-xl bg-white/5 border border-white/10 space-y-4">
-        <h3 className="text-xl font-semibold text-white">Become a LedgerFren</h3>
-        <p className="text-gray-400">
-          Your LinkedIn profile will be analyzed to generate unique ID Badge that represent your professional experience and qualifications.
-        </p>
+        <motion.h3 
+          className="text-xl font-semibold text-white"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          Become a LedgerFren
+        </motion.h3>
+        <motion.p 
+          className="text-gray-400"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          Your LinkedIn profile will be analyzed to generate a unique ID Badge that represents your professional experience and qualifications.
+        </motion.p>
+        
+        {isAnalyzing && <LoadingSlides isAnalyzing={isAnalyzing} />}
         
         {nftPreview ? (
-          <div className="animate-fade-in">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="animate-fade-in"
+          >
             <Card className={cn(
               "relative overflow-hidden transition-all duration-500",
               "bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a]",
@@ -277,9 +310,13 @@ export const WalletInfo = () => {
                 </div>
               </div>
             </Card>
-          </div>
+          </motion.div>
         ) : (
-          <div className="flex items-center justify-center">
+          <motion.div 
+            className="flex items-center justify-center"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <button
               onClick={handleAnalyzeProfile}
               disabled={isAnalyzing}
@@ -291,10 +328,10 @@ export const WalletInfo = () => {
               <Eye className="w-4 h-4" />
               {isAnalyzing ? 'Analyzing Profile...' : 'Preview ID Badge'}
             </button>
-          </div>
+          </motion.div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
