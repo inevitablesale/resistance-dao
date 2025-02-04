@@ -159,9 +159,9 @@ export const WalletInfo = () => {
   };
 
   const steps = [
-    { name: "Connect Wallet", status: getStepStatus(1) },
-    { name: "Preview NFT", status: getStepStatus(2) },
-    { name: "Mint NFT", status: getStepStatus(3) }
+    { name: "Create Wallet", status: getStepStatus(1) },
+    { name: "Preview ID Badge", status: getStepStatus(2) },
+    { name: "Mint ID Badge", status: getStepStatus(3) }
   ];
 
   return (
@@ -197,9 +197,9 @@ export const WalletInfo = () => {
       </div>
 
       <div className="p-6 rounded-xl bg-white/5 border border-white/10 space-y-4">
-        <h3 className="text-xl font-semibold text-white">Generate Your LedgerFren NFT</h3>
+        <h3 className="text-xl font-semibold text-white">Become a LedgerFren</h3>
         <p className="text-gray-400">
-          Your LinkedIn profile will be analyzed to generate unique NFT attributes that represent your professional experience and qualifications.
+          Your LinkedIn profile will be analyzed to generate unique ID Badge that represent your professional experience and qualifications.
         </p>
         
         {nftPreview ? (
@@ -216,7 +216,7 @@ export const WalletInfo = () => {
               <div className="relative flex flex-col p-8 gap-8">
                 {previewImageUrl && (
                   <div className="w-full flex justify-center animate-fade-in">
-                    <div className="relative w-48 aspect-square">
+                    <div className="relative w-32 aspect-square">
                       <div className="absolute inset-0 bg-polygon-primary/20 rounded-full blur-2xl animate-pulse-slow" />
                       <div className="relative">
                         <div className="absolute -inset-1 bg-gradient-to-r from-polygon-primary to-polygon-secondary rounded-full blur animate-pulse-slow" />
@@ -233,9 +233,9 @@ export const WalletInfo = () => {
                 <div className="space-y-6 animate-fade-in w-full">
                   <div className="space-y-2 text-center">
                     <h4 className="text-3xl font-bold bg-gradient-to-r from-white to-polygon-primary bg-clip-text text-transparent">
-                      {nftPreview.fullName}'s LedgerFren NFT
+                      LedgerFren NFT
                     </h4>
-                    <p className="text-xl text-gray-400">Professional Identity Token</p>
+                    <p className="text-xl text-gray-400">Ledger Fund ID Badge</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -272,7 +272,7 @@ export const WalletInfo = () => {
                       "animate-fade-in delay-300"
                     )}
                   >
-                    {isMinting ? 'Minting NFT...' : 'Mint NFT'}
+                    {isMinting ? 'Minting ID Badge...' : 'Mint ID Badge'}
                   </button>
                 </div>
               </div>
@@ -289,7 +289,7 @@ export const WalletInfo = () => {
               )}
             >
               <Eye className="w-4 h-4" />
-              {isAnalyzing ? 'Analyzing Profile...' : 'Preview NFT'}
+              {isAnalyzing ? 'Analyzing Profile...' : 'Preview ID Badge'}
             </button>
           </div>
         )}
