@@ -1,5 +1,5 @@
 
-import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
+import { DynamicContextProvider, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
 import Nav from "@/components/Nav";
@@ -15,6 +15,8 @@ import { Roadmap } from "@/components/Roadmap";
 import { useNavigate } from "react-router-dom";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { WalletInfo } from "@/components/WalletInfo";
+import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const zeroDevConfig = {
   bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -23,6 +25,34 @@ const zeroDevConfig = {
 
 const IndexContent = () => {
   const navigate = useNavigate();
+  const { primaryWallet, isAuthenticated } = useDynamicContext();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const checkWalletAndNFT = async () => {
+      if (!isAuthenticated || !primaryWallet) {
+        toast({
+          title: "Wallet Not Connected",
+          description: "Connect or create your wallet to access the platform.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Here you would check if they have the NFT
+      // For now, we'll just mock this check
+      const hasNFT = false; // This should be replaced with actual NFT check
+      
+      if (!hasNFT) {
+        toast({
+          title: "NFT Required",
+          description: "Mint your LedgerFren NFT to access governance features.",
+        });
+      }
+    };
+
+    checkWalletAndNFT();
+  }, [isAuthenticated, primaryWallet, toast]);
 
   return (
     <>
@@ -39,7 +69,7 @@ const IndexContent = () => {
             onClick={() => navigate('/mint-nft')}
             className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium"
           >
-            Mint LedgerFren NFT
+            Access App
           </button>
           <button className="px-8 py-3 bg-white hover:bg-white/90 text-[#8247E5] rounded-lg transition-colors text-lg font-medium">
             Read Whitepaper
