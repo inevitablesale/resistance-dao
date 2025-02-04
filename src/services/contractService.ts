@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
@@ -116,6 +117,12 @@ interface MintedNFT {
       trait_type: string;
       value: string;
     }[];
+    experiences?: {
+      title: string;
+      company: string;
+      duration: string;
+      location: string;
+    }[];
   };
 }
 
@@ -143,33 +150,81 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
     
     const nfts: MintedNFT[] = await Promise.all(
       events.map(async (event) => {
-        const tokenId = event.args?.tokenId.toString();
-        const owner = await contract.ownerOf(tokenId);
-        const tokenUri = await contract.tokenURI(tokenId);
-        
-        // Remove ipfs:// prefix if present and add gateway URL
-        const metadataUrl = tokenUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
-        
-        console.log(`Fetching metadata for token ${tokenId} from ${metadataUrl}`);
         try {
-          const response = await fetch(metadataUrl);
-          const contentType = response.headers.get('content-type');
+          const tokenId = event.args?.tokenId.toString();
+          const owner = await contract.ownerOf(tokenId);
+          const tokenUri = await contract.tokenURI(tokenId);
           
+          // Remove ipfs:// prefix if present and add gateway URL
+          const metadataUrl = tokenUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
+          
+          console.log(`Fetching metadata for token ${tokenId} from ${metadataUrl}`);
+          
+          const response = await fetch(metadataUrl);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch metadata: ${response.statusText}`);
+          }
+
+          const contentType = response.headers.get('content-type');
           let metadata;
+
           if (contentType?.includes('image/')) {
-            // If the tokenURI points to an image, create synthetic metadata
+            console.log(`Token ${tokenId} URI points to an image, creating synthetic metadata`);
             metadata = {
               name: `LedgerFren NFT #${tokenId}`,
               description: "A Professional NFT in the LedgerFren Collection",
               image: metadataUrl,
-              attributes: [{
-                trait_type: "Governance Power",
-                value: "Unknown" // We can't determine the power from just the image
-              }]
+              attributes: [
+                {
+                  trait_type: "Experience Level",
+                  value: "Unspecified"
+                },
+                {
+                  trait_type: "Years in Practice",
+                  value: "Unspecified"
+                },
+                {
+                  trait_type: "Specialty",
+                  value: "Unspecified"
+                },
+                {
+                  trait_type: "Client Base",
+                  value: "Unspecified"
+                },
+                {
+                  trait_type: "Service Line Expertise",
+                  value: "Unspecified"
+                },
+                {
+                  trait_type: "Governance Power",
+                  value: "Governance-Power-1"
+                }
+              ]
             };
           } else {
-            // Regular JSON metadata
             metadata = await response.json();
+            console.log(`Fetched metadata for token ${tokenId}:`, metadata);
+
+            // Ensure all required attributes are present
+            const requiredAttributes = [
+              "Experience Level",
+              "Years in Practice",
+              "Specialty",
+              "Client Base",
+              "Service Line Expertise",
+              "Governance Power"
+            ];
+
+            // Add any missing attributes with "Unspecified" value
+            metadata.attributes = metadata.attributes || [];
+            requiredAttributes.forEach(attr => {
+              if (!metadata.attributes.some(a => a.trait_type === attr)) {
+                metadata.attributes.push({
+                  trait_type: attr,
+                  value: "Unspecified"
+                });
+              }
+            });
           }
           
           return {
@@ -178,29 +233,51 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
             metadata
           };
         } catch (error) {
-          console.error(`Error fetching metadata for token ${tokenId}:`, error);
-          // Return a placeholder metadata if fetching fails
+          console.error(`Error processing token ${event.args?.tokenId.toString()}:`, error);
           return {
-            tokenId,
-            owner,
+            tokenId: event.args?.tokenId.toString(),
+            owner: await contract.ownerOf(event.args?.tokenId.toString()),
             metadata: {
-              name: `LedgerFren NFT #${tokenId}`,
+              name: `LedgerFren NFT #${event.args?.tokenId.toString()}`,
               description: "Metadata temporarily unavailable",
-              image: "https://ipfs.io/ipfs/placeholder", // You might want to use a real placeholder image
-              attributes: [{
-                trait_type: "Governance Power",
-                value: "Unknown"
-              }]
+              image: "https://ipfs.io/ipfs/placeholder",
+              attributes: [
+                {
+                  trait_type: "Experience Level",
+                  value: "Unspecified"
+                },
+                {
+                  trait_type: "Years in Practice",
+                  value: "Unspecified"
+                },
+                {
+                  trait_type: "Specialty",
+                  value: "Unspecified"
+                },
+                {
+                  trait_type: "Client Base",
+                  value: "Unspecified"
+                },
+                {
+                  trait_type: "Service Line Expertise",
+                  value: "Unspecified"
+                },
+                {
+                  trait_type: "Governance Power",
+                  value: "Governance-Power-1"
+                }
+              ]
             }
           };
         }
       })
     );
     
-    console.log('Successfully fetched all NFT data');
+    console.log('Successfully fetched all NFT data:', nfts);
     return nfts;
   } catch (error) {
     console.error('Error fetching NFTs:', error);
     throw error;
   }
 };
+
