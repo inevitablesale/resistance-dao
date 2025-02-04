@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Progress } from "@/components/ui/progress";
-import { Check, ArrowRight, Eye, Save, RefreshCw } from "lucide-react";
+import { Check, ArrowRight, Eye, Save, RefreshCw, ExternalLink } from "lucide-react";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
 import { mintNFT } from "@/services/contractService";
 import { useToast } from "@/hooks/use-toast";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { LoadingSlides } from "./LoadingSlides";
 import { motion } from "framer-motion";
+import { Button } from "./ui/button";
 
 interface NFTPreview {
   fullName: string;
@@ -30,6 +31,7 @@ export const WalletInfo = () => {
   const [nftPreview, setNFTPreview] = useState<NFTPreview | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState<string>("");
   const [isSavedToBlockchain, setIsSavedToBlockchain] = useState(false);
+  const [hasNFT, setHasNFT] = useState(false); // New state for NFT ownership
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -38,13 +40,17 @@ export const WalletInfo = () => {
       if (primaryWallet) {
         const connected = await primaryWallet.isConnected();
         setIsWalletConnected(connected);
+        // TODO: Add check for NFT ownership here
+        // For now, we'll use isSavedToBlockchain as a proxy
+        setHasNFT(isSavedToBlockchain);
       } else {
         setIsWalletConnected(false);
+        setHasNFT(false);
       }
     };
 
     checkConnection();
-  }, [primaryWallet]);
+  }, [primaryWallet, isSavedToBlockchain]);
 
   const handleAnalyzeProfile = async () => {
     console.group('LinkedIn Profile Analysis');
@@ -173,6 +179,39 @@ export const WalletInfo = () => {
     { name: "Mint ID Badge", status: getStepStatus(3) }
   ];
 
+  if (hasNFT) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mt-6 space-y-6"
+      >
+        <Card className="p-6 bg-white/5 border border-white/10">
+          <div className="flex flex-col items-center space-y-6">
+            {previewImageUrl && (
+              <div className="w-32 h-32 relative">
+                <img 
+                  src={previewImageUrl} 
+                  alt="Your LedgerFren NFT" 
+                  className="rounded-full w-full h-full object-cover border-4 border-polygon-primary/20"
+                />
+              </div>
+            )}
+            <h3 className="text-2xl font-bold text-white">Welcome, LedgerFren!</h3>
+            <Button
+              onClick={() => navigate('/governance-voting')}
+              className="flex items-center gap-2 bg-polygon-primary hover:bg-polygon-primary/90"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Go to Community Page
+            </Button>
+          </div>
+        </Card>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -226,14 +265,6 @@ export const WalletInfo = () => {
         >
           Become a LedgerFren
         </motion.h3>
-        <motion.p 
-          className="text-gray-400"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
-          Your LinkedIn profile will be analyzed to generate a unique ID Badge that represents your professional experience and qualifications.
-        </motion.p>
         
         {isAnalyzing && <LoadingSlides isAnalyzing={isAnalyzing} />}
         
@@ -273,7 +304,7 @@ export const WalletInfo = () => {
                 <div className="space-y-6 animate-fade-in w-full">
                   <div className="space-y-2 text-center">
                     <h4 className="text-3xl font-bold bg-gradient-to-r from-white to-polygon-primary bg-clip-text text-transparent">
-                      LedgerFren NFT
+                      Become a LedgerFren
                     </h4>
                     <p className="text-xl text-gray-400">Ledger Fund ID Badge</p>
                   </div>
