@@ -72,9 +72,9 @@ const Index = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* Sepia Space Background */}
+        {/* Enhanced Space Background */}
         <div className="absolute inset-0">
-          {/* Base gradient layer */}
+          {/* Base gradient layer with enhanced colors */}
           <div 
             className="absolute inset-0"
             style={{
@@ -83,7 +83,7 @@ const Index = () => {
             }}
           />
           
-          {/* Cloud layer */}
+          {/* Enhanced Nebula layer */}
           <div 
             className="absolute inset-0"
             style={{
@@ -96,95 +96,211 @@ const Index = () => {
             }}
           />
 
-          {/* Planet */}
-          <div 
-            className="absolute top-20 right-40 w-64 h-64"
-            style={{
-              background: 'radial-gradient(circle at 40% 40%, #cfab67 0%, #7c571e 60%, #2b1d0a 100%)',
-              borderRadius: '50%',
-              boxShadow: 'inset -10px -10px 50px rgba(0,0,0,0.8)',
-              transform: 'scale(1.5)',
-              opacity: 0.9
-            }}
-          />
-          
-          {/* Spaceships */}
-          <div className="absolute inset-0 overflow-hidden">
-            {/* Large Spaceship */}
-            <div
-              className="absolute animate-spaceship-1"
+          {/* Enhanced Planet with detailed features */}
+          <div className="absolute top-20 right-40">
+            <div 
+              className="w-64 h-64 relative"
               style={{
-                width: '60px',
-                height: '24px',
-                background: '#403E43',
-                clipPath: 'polygon(0% 50%, 20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%)',
-                boxShadow: '0 0 15px rgba(207, 171, 103, 0.3)',
-                animation: 'spaceship1 20s linear infinite'
+                background: 'radial-gradient(circle at 40% 40%, #cfab67 0%, #7c571e 60%, #2b1d0a 100%)',
+                borderRadius: '50%',
+                transform: 'scale(1.5)',
+                opacity: 0.9,
+                boxShadow: `
+                  inset -10px -10px 50px rgba(0,0,0,0.8),
+                  0 0 50px rgba(207, 171, 103, 0.3)
+                `
               }}
             >
+              {/* Atmospheric glow */}
               <div 
-                className="absolute right-0 w-3 h-2"
+                className="absolute inset-0"
                 style={{
-                  background: 'radial-gradient(circle at right, rgba(207, 171, 103, 0.8), transparent 70%)',
-                  transform: 'translateX(100%)',
-                  filter: 'blur(2px)'
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, transparent 60%)',
+                  filter: 'blur(8px)'
                 }}
               />
-            </div>
-
-            {/* Medium Spaceship */}
-            <div
-              className="absolute animate-spaceship-2"
-              style={{
-                width: '40px',
-                height: '16px',
-                background: '#8E9196',
-                clipPath: 'polygon(0% 50%, 30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%)',
-                boxShadow: '0 0 10px rgba(207, 171, 103, 0.2)',
-                animation: 'spaceship2 25s linear infinite'
-              }}
-            >
+              
+              {/* Surface details */}
               <div 
-                className="absolute right-0 w-2 h-1.5"
+                className="absolute inset-0"
                 style={{
-                  background: 'radial-gradient(circle at right, rgba(207, 171, 103, 0.6), transparent 70%)',
-                  transform: 'translateX(100%)',
-                  filter: 'blur(1px)'
+                  borderRadius: '50%',
+                  background: `
+                    radial-gradient(circle at 70% 70%, #8b5e1f 0%, transparent 20%),
+                    radial-gradient(circle at 30% 30%, #d4b36a 0%, transparent 30%),
+                    radial-gradient(circle at 50% 50%, #95642c 0%, transparent 40%)
+                  `,
+                  opacity: 0.7
                 }}
               />
-            </div>
 
-            {/* Small Spaceship */}
-            <div
-              className="absolute animate-spaceship-3"
-              style={{
-                width: '30px',
-                height: '12px',
-                background: '#9F9EA1',
-                clipPath: 'polygon(0% 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%)',
-                boxShadow: '0 0 8px rgba(207, 171, 103, 0.15)',
-                animation: 'spaceship3 30s linear infinite'
-              }}
-            >
+              {/* City lights (dark side) */}
               <div 
-                className="absolute right-0 w-1.5 h-1"
+                className="absolute inset-0"
                 style={{
-                  background: 'radial-gradient(circle at right, rgba(207, 171, 103, 0.5), transparent 70%)',
-                  transform: 'translateX(100%)',
-                  filter: 'blur(1px)'
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle at 80% 80%, rgba(255, 240, 200, 0.15) 0%, transparent 30%)',
+                  filter: 'blur(3px)'
                 }}
               />
             </div>
           </div>
           
-          {/* Stars layer */}
+          {/* Enhanced Spacecraft Fleet */}
+          <div className="absolute inset-0 overflow-hidden">
+            {/* Large Refugee Ship */}
+            <div className="absolute animate-spaceship-1">
+              {/* Main Hull */}
+              <div 
+                className="relative"
+                style={{
+                  width: '120px',
+                  height: '40px',
+                  background: '#403E43',
+                  clipPath: 'polygon(0% 50%, 20% 20%, 80% 20%, 100% 50%, 80% 80%, 20% 80%)',
+                  boxShadow: '0 0 15px rgba(207, 171, 103, 0.3)'
+                }}
+              >
+                {/* Cargo Modules */}
+                <div 
+                  className="absolute"
+                  style={{
+                    top: '25%',
+                    left: '30%',
+                    width: '40%',
+                    height: '50%',
+                    background: '#8E9196',
+                    clipPath: 'polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%)'
+                  }}
+                />
+                
+                {/* Communication Array */}
+                <div 
+                  className="absolute"
+                  style={{
+                    top: '-30%',
+                    left: '60%',
+                    width: '4px',
+                    height: '20px',
+                    background: '#9F9EA1',
+                    transform: 'rotate(-15deg)'
+                  }}
+                />
+                
+                {/* Engine Exhausts */}
+                <div className="absolute right-0 flex space-x-1">
+                  {[...Array(3)].map((_, i) => (
+                    <div 
+                      key={i}
+                      className="relative"
+                      style={{
+                        width: '15px',
+                        height: '6px',
+                        background: 'radial-gradient(circle at right, rgba(207, 171, 103, 0.8), transparent 70%)',
+                        transform: 'translateX(100%)',
+                        filter: 'blur(2px)'
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Medium Refugee Ship */}
+            <div className="absolute animate-spaceship-2">
+              {/* Main Hull */}
+              <div 
+                className="relative"
+                style={{
+                  width: '90px',
+                  height: '30px',
+                  background: '#8E9196',
+                  clipPath: 'polygon(0% 50%, 30% 20%, 70% 20%, 100% 50%, 70% 80%, 30% 80%)',
+                  boxShadow: '0 0 10px rgba(207, 171, 103, 0.2)'
+                }}
+              >
+                {/* Emergency Repairs */}
+                <div 
+                  className="absolute"
+                  style={{
+                    top: '40%',
+                    left: '50%',
+                    width: '20px',
+                    height: '10px',
+                    background: '#C8C8C9',
+                    transform: 'rotate(-45deg)'
+                  }}
+                />
+                
+                {/* Engine Exhausts */}
+                <div className="absolute right-0 flex space-x-1">
+                  {[...Array(2)].map((_, i) => (
+                    <div 
+                      key={i}
+                      className="relative"
+                      style={{
+                        width: '12px',
+                        height: '5px',
+                        background: 'radial-gradient(circle at right, rgba(207, 171, 103, 0.6), transparent 70%)',
+                        transform: 'translateX(100%)',
+                        filter: 'blur(1px)'
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Small Refugee Ship */}
+            <div className="absolute animate-spaceship-3">
+              {/* Main Hull */}
+              <div 
+                className="relative"
+                style={{
+                  width: '60px',
+                  height: '24px',
+                  background: '#9F9EA1',
+                  clipPath: 'polygon(0% 50%, 25% 20%, 75% 20%, 100% 50%, 75% 80%, 25% 80%)',
+                  boxShadow: '0 0 8px rgba(207, 171, 103, 0.15)'
+                }}
+              >
+                {/* Distress Beacon */}
+                <div 
+                  className="absolute"
+                  style={{
+                    top: '-20%',
+                    left: '70%',
+                    width: '4px',
+                    height: '8px',
+                    background: '#ff4444',
+                    animation: 'pulse 2s infinite'
+                  }}
+                />
+                
+                {/* Engine Exhaust */}
+                <div 
+                  className="absolute right-0"
+                  style={{
+                    width: '10px',
+                    height: '4px',
+                    background: 'radial-gradient(circle at right, rgba(207, 171, 103, 0.5), transparent 70%)',
+                    transform: 'translateX(100%)',
+                    filter: 'blur(1px)'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Enhanced Star Field */}
           <div 
             className="absolute inset-0"
             style={{
               backgroundImage: `
-                radial-gradient(1px 1px at ${Array.from({length: 150}, () => 
+                radial-gradient(1px 1px at ${Array.from({length: 200}, () => 
                   `${Math.random() * 100}% ${Math.random() * 100}%`
-                ).join(', ')}, rgba(255, 255, 255, ${Array.from({length: 150}, () => 
+                ).join(', ')}, rgba(255, 255, 255, ${Array.from({length: 200}, () => 
                   Math.random() * 0.4 + 0.1
                 ).join(')), rgba(255, 255, 255, ')})
               `,
@@ -192,7 +308,7 @@ const Index = () => {
             }}
           />
           
-          {/* Atmospheric glow */}
+          {/* Enhanced Atmospheric Glow */}
           <div 
             className="absolute inset-0"
             style={{
@@ -201,27 +317,22 @@ const Index = () => {
             }}
           />
           
+          {/* Animation Styles */}
           <style>
             {`
-              @keyframes twinkle {
-                0%, 100% { opacity: 0.6; }
-                50% { opacity: 0.8; }
-              }
-              
-              @keyframes cloudDrift {
-                0% { transform: translateX(0) scale(1); }
-                50% { transform: translateX(-1%) scale(1.01); }
-                100% { transform: translateX(0) scale(1); }
+              @keyframes pulse {
+                0%, 100% { opacity: 0.6; transform: scale(1); }
+                50% { opacity: 1; transform: scale(1.2); }
               }
 
               @keyframes spaceship1 {
-                0% { transform: translate(-100px, 100vh) rotate(-15deg); }
-                100% { transform: translate(calc(100vw + 100px), -100px) rotate(15deg); }
+                0% { transform: translate(-120px, 100vh) rotate(-15deg); }
+                100% { transform: translate(calc(100vw + 120px), -100px) rotate(15deg); }
               }
 
               @keyframes spaceship2 {
-                0% { transform: translate(-80px, 70vh) rotate(-20deg); }
-                100% { transform: translate(calc(100vw + 80px), 100px) rotate(20deg); }
+                0% { transform: translate(-90px, 70vh) rotate(-20deg); }
+                100% { transform: translate(calc(100vw + 90px), 100px) rotate(20deg); }
               }
 
               @keyframes spaceship3 {
@@ -231,14 +342,14 @@ const Index = () => {
 
               .animate-spaceship-1 {
                 top: 30%;
-                left: -60px;
+                left: -120px;
                 animation: spaceship1 20s linear infinite;
                 will-change: transform;
               }
 
               .animate-spaceship-2 {
                 top: 45%;
-                left: -40px;
+                left: -90px;
                 animation: spaceship2 25s linear infinite;
                 animation-delay: 5s;
                 will-change: transform;
@@ -246,7 +357,7 @@ const Index = () => {
 
               .animate-spaceship-3 {
                 top: 60%;
-                left: -30px;
+                left: -60px;
                 animation: spaceship3 30s linear infinite;
                 animation-delay: 10s;
                 will-change: transform;
