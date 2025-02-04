@@ -5,6 +5,7 @@ import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-a
 import { WalletInfo } from "@/components/WalletInfo";
 import { PostOnboardingView } from "@/components/PostOnboardingView";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { motion } from "framer-motion";
 import Nav from "@/components/Nav";
 
 const IndexContent = () => {
@@ -13,6 +14,10 @@ const IndexContent = () => {
   if (user?.verifications?.completedOnboarding) {
     return <PostOnboardingView />;
   }
+
+  const handleBoardShip = () => {
+    setShowAuthFlow?.(true);
+  };
 
   return (
     <>
@@ -24,19 +29,49 @@ const IndexContent = () => {
           Licensed accountants can participate in fractional ownership of accounting firms through our decentralized autonomous organization (DAO)
         </p>
 
-        <div className="flex flex-col md:flex-row gap-4 justify-center mb-16">
-          <button className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium">
-            Earn LGR with Quests
-          </button>
-          <button 
-            onClick={() => setShowAuthFlow?.(true)}
-            className="px-8 py-3 bg-white hover:bg-white/90 text-[#8247E5] rounded-lg transition-colors text-lg font-medium"
+        <div className="max-w-md mx-auto relative">
+          {/* Interactive Scout Ship */}
+          <motion.div
+            className="absolute left-1/2 -translate-x-1/2 -top-24 w-[200px] h-[60px] cursor-pointer group"
+            whileHover={{ scale: 1.05 }}
+            onClick={handleBoardShip}
+            style={{
+              background: `
+                linear-gradient(45deg, 
+                  rgba(0, 255, 255, 0.9) 0%,
+                  rgba(64, 156, 255, 0.8) 50%,
+                  rgba(147, 51, 255, 0.7) 100%
+                )
+              `,
+              boxShadow: `
+                0 0 20px rgba(0, 255, 255, 0.3),
+                0 0 40px rgba(64, 156, 255, 0.2)
+              `,
+              clipPath: 'polygon(0 50%, 10% 0, 98% 0, 100% 50%, 98% 100%, 10% 100%)',
+              transform: 'rotate(-15deg)',
+            }}
           >
-            Mint LedgerFren Badge
-          </button>
-        </div>
+            {/* Quantum Pulse Effect */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background: `
+                  radial-gradient(circle at center,
+                    rgba(0, 255, 255, 0.4) 0%,
+                    transparent 70%
+                  )
+                `,
+                animation: 'pulse 2s infinite'
+              }}
+            />
+            
+            {/* Hover Text */}
+            <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <span className="text-cyan-300 text-lg font-semibold">
+                Board Scout Ship Delta-7
+              </span>
+            </div>
+          </motion.div>
 
-        <div className="max-w-md mx-auto">
           <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
             <div className="flex justify-center mb-8">
               <DynamicWidget />
