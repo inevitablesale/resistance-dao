@@ -1,4 +1,4 @@
-```typescript
+
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
@@ -34,7 +34,7 @@ const IndexContent = () => {
       if (!primaryWallet) {
         toast({
           title: "Welcome to LedgerFund",
-          description: "Connect or create your wallet to get started",
+          description: "Connect or create your wallet to get started"
         });
         return;
       }
@@ -43,7 +43,7 @@ const IndexContent = () => {
       if (!isConnected) {
         toast({
           title: "Wallet Connection Required",
-          description: "Please connect your wallet to access the platform",
+          description: "Please connect your wallet to access the platform"
         });
         return;
       }
@@ -53,7 +53,7 @@ const IndexContent = () => {
       if (!hasNFT) {
         toast({
           title: "NFT Required",
-          description: "Mint your LedgerFren NFT to participate in governance",
+          description: "Mint your LedgerFren NFT to participate in governance"
         });
       }
     };
@@ -105,12 +105,11 @@ const Index = () => {
         walletConnectors: [
           EthereumWalletConnectors,
           ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
-        ],
+        ]
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
         <div className="absolute inset-0">
-          {/* Deep space base */}
           <div 
             className="absolute inset-0"
             style={{
@@ -119,7 +118,6 @@ const Index = () => {
             }}
           />
           
-          {/* Quantum waves */}
           <div 
             className="absolute inset-0"
             style={{
@@ -128,7 +126,6 @@ const Index = () => {
             }}
           />
           
-          {/* Star field */}
           <div 
             className="absolute inset-0 opacity-90"
             style={{
@@ -138,9 +135,7 @@ const Index = () => {
             }}
           />
           
-          {/* Spacecraft Fleet */}
           <div className="absolute inset-0">
-            {/* Flagship */}
             <div
               className="absolute animate-quantum-ship"
               style={{
@@ -156,7 +151,6 @@ const Index = () => {
               }}
             />
 
-            {/* Escorts */}
             {[...Array(3)].map((_, index) => (
               <div
                 key={`guardian-${index}`}
@@ -175,7 +169,6 @@ const Index = () => {
               />
             ))}
 
-            {/* Scouts */}
             {[...Array(5)].map((_, index) => (
               <div
                 key={`scout-${index}`}
@@ -298,4 +291,3 @@ const Index = () => {
 };
 
 export default Index;
-```
