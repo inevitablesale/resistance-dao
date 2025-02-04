@@ -72,26 +72,42 @@ const Index = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* Immersive James Webb-inspired cosmic background */}
+        {/* Blockchain Universe Background */}
         <div className="absolute inset-0">
-          {/* Deep space base layer with enhanced depth */}
+          {/* Deep space base layer */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(circle at center, #1A1F2C 0%, #000000 100%)',
+              background: 'radial-gradient(circle at center, #1a1f3c 0%, #000000 100%)',
               opacity: 0.95
             }}
           />
           
-          {/* Intense nebula formations */}
+          {/* Blockchain nodes visualization */}
           <div 
-            className="absolute inset-0 opacity-60"
+            className="absolute inset-0"
             style={{
               background: `
-                radial-gradient(circle at 20% 30%, rgba(155, 135, 245, 0.4) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(14, 165, 233, 0.4) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.2) 0%, transparent 60%)
-              `
+                radial-gradient(circle at 20% 30%, rgba(130, 71, 229, 0.4) 0%, transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(130, 71, 229, 0.3) 0%, transparent 25%),
+                radial-gradient(circle at 50% 50%, rgba(130, 71, 229, 0.2) 0%, transparent 35%),
+                radial-gradient(circle at 30% 80%, rgba(130, 71, 229, 0.3) 0%, transparent 25%),
+                radial-gradient(circle at 70% 20%, rgba(130, 71, 229, 0.35) 0%, transparent 30%)
+              `,
+              animation: 'pulse 15s ease-in-out infinite alternate'
+            }}
+          />
+          
+          {/* Connecting lines between nodes */}
+          <div 
+            className="absolute inset-0 opacity-40"
+            style={{
+              backgroundImage: `
+                linear-gradient(45deg, transparent 48%, rgba(130, 71, 229, 0.3) 49%, rgba(130, 71, 229, 0.3) 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(130, 71, 229, 0.3) 49%, rgba(130, 71, 229, 0.3) 51%, transparent 52%)
+              `,
+              backgroundSize: '100px 100px',
+              animation: 'moveLines 20s linear infinite'
             }}
           />
           
@@ -100,55 +116,57 @@ const Index = () => {
             className="absolute inset-0"
             style={{
               backgroundImage: 'radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.8) 100%, transparent)',
-              backgroundSize: '150% 150%',
-              animation: 'space 45s ease-in-out infinite'
+              backgroundSize: '200% 200%',
+              animation: 'floatStars 45s ease-in-out infinite'
             }}
           />
           
-          {/* Brighter foreground stars */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              backgroundImage: 'radial-gradient(2px 2px at 70% 60%, rgba(255, 255, 255, 0.9) 100%, transparent)',
-              backgroundSize: '200% 200%',
-              animation: 'space 35s ease-in-out infinite reverse'
-            }}
-          />
-
-          {/* Dynamic cosmic dust */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              backgroundImage: 'radial-gradient(1px 1px at 40% 40%, rgba(214, 188, 250, 0.7) 100%, transparent)',
-              backgroundSize: '300% 300%',
-              animation: 'space 55s ease-in-out infinite alternate'
-            }}
-          />
-
-          {/* Ethereal glow effects */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              background: `
-                radial-gradient(circle at 30% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 45%),
-                radial-gradient(circle at 70% 60%, rgba(30, 174, 219, 0.15) 0%, transparent 45%)
-              `,
-              animation: 'pulse 12s ease-in-out infinite alternate'
-            }}
-          />
-
-          {/* Webb telescope infrared visualization effect */}
+          {/* Ethereal blockchain connections */}
           <div 
             className="absolute inset-0 mix-blend-screen"
             style={{
-              background: 'radial-gradient(circle at center, rgba(236, 72, 153, 0.03) 0%, transparent 70%)',
-              animation: 'pulse 8s ease-in-out infinite alternate-reverse'
+              background: `
+                radial-gradient(circle at 30% 20%, rgba(130, 71, 229, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 70% 60%, rgba(130, 71, 229, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 50% 40%, rgba(130, 71, 229, 0.1) 0%, transparent 55%)
+              `,
+              animation: 'etherealPulse 12s ease-in-out infinite alternate'
+            }}
+          />
+          
+          {/* Dynamic node pulses */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              backgroundImage: 'radial-gradient(2px 2px at 70% 60%, rgba(130, 71, 229, 0.9) 100%, transparent)',
+              backgroundSize: '300% 300%',
+              animation: 'nodePulse 25s ease-in-out infinite'
             }}
           />
           
           <style>
             {`
-              @keyframes space {
+              @keyframes pulse {
+                0%, 100% {
+                  opacity: 0.3;
+                  transform: scale(1);
+                }
+                50% {
+                  opacity: 0.5;
+                  transform: scale(1.1);
+                }
+              }
+
+              @keyframes moveLines {
+                0% {
+                  background-position: 0 0;
+                }
+                100% {
+                  background-position: 100px 100px;
+                }
+              }
+
+              @keyframes floatStars {
                 0%, 100% {
                   opacity: 0.8;
                   transform: scale(1) rotate(0deg);
@@ -169,14 +187,25 @@ const Index = () => {
                 }
               }
 
-              @keyframes pulse {
+              @keyframes etherealPulse {
                 0%, 100% {
                   opacity: 0.2;
                   transform: scale(1);
                 }
                 50% {
                   opacity: 0.4;
-                  transform: scale(1.1);
+                  transform: scale(1.15);
+                }
+              }
+
+              @keyframes nodePulse {
+                0%, 100% {
+                  opacity: 0.4;
+                  background-size: 300% 300%;
+                }
+                50% {
+                  opacity: 0.7;
+                  background-size: 350% 350%;
                 }
               }
             `}
