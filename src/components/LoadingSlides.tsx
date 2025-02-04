@@ -45,7 +45,7 @@ export const LoadingSlides = ({ isAnalyzing }: { isAnalyzing: boolean }) => {
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 3000);
+    }, 5000); // Increased from 3000 to 5000ms
 
     return () => clearInterval(interval);
   }, [isAnalyzing]);
@@ -58,7 +58,7 @@ export const LoadingSlides = ({ isAnalyzing }: { isAnalyzing: boolean }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.8 }} // Increased from 0.5 to 0.8s
           className="flex flex-col items-center space-y-4"
         >
           <motion.div
@@ -67,7 +67,7 @@ export const LoadingSlides = ({ isAnalyzing }: { isAnalyzing: boolean }) => {
               rotate: [0, 5, -5, 0]
             }}
             transition={{ 
-              duration: 2,
+              duration: 3, // Increased from 2 to 3s
               repeat: Infinity,
               repeatType: "reverse"
             }}

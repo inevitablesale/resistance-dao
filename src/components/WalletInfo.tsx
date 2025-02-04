@@ -65,6 +65,11 @@ export const WalletInfo = () => {
     }
 
     setIsAnalyzing(true);
+    setProgress(25);
+    setNFTPreview(null);
+    setPreviewImageUrl("");
+    setIsSavedToBlockchain(false);
+    
     try {
       console.log('Fetching LinkedIn profile data...');
       const nftMetadata = await analyzeLinkedInProfile(linkedInUrl);
@@ -92,7 +97,6 @@ export const WalletInfo = () => {
       }
       
       setNFTPreview(preview);
-      setIsSavedToBlockchain(false);
       toast({
         title: "Analysis Complete",
         description: "Preview your NFT before saving to blockchain.",
