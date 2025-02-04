@@ -1,4 +1,4 @@
-
+```typescript
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
@@ -105,3 +105,69 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
     throw error;
   }
 };
+
+interface MintedNFT {
+  tokenId: string;
+  owner: string;
+  metadata: {
+    name: string;
+    description: string;
+    image: string;
+    attributes: {
+      trait_type: string;
+      value: string;
+    }[];
+  };
+}
+
+export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> => {
+  try {
+    console.log('Fetching all minted NFTs...');
+    
+    const provider = new ethers.providers.Web3Provider(walletClient, {
+      name: 'unknown',
+      chainId: 137 // Polygon Mainnet
+    });
+    
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+    
+    // Get all Transfer events from address 0x0 (minting)
+    const filter = contract.filters.Transfer(
+      '0x0000000000000000000000000000000000000000',
+      null,
+      null
+    );
+    
+    console.log('Fetching Transfer events...');
+    const events = await contract.queryFilter(filter);
+    console.log(`Found ${events.length} minted NFTs`);
+    
+    const nfts: MintedNFT[] = await Promise.all(
+      events.map(async (event) => {
+        const tokenId = event.args?.tokenId.toString();
+        const owner = await contract.ownerOf(tokenId);
+        const tokenUri = await contract.tokenURI(tokenId);
+        
+        // Remove ipfs:// prefix if present and add gateway URL
+        const metadataUrl = tokenUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
+        
+        console.log(`Fetching metadata for token ${tokenId} from ${metadataUrl}`);
+        const response = await fetch(metadataUrl);
+        const metadata = await response.json();
+        
+        return {
+          tokenId,
+          owner,
+          metadata
+        };
+      })
+    );
+    
+    console.log('Successfully fetched all NFT data');
+    return nfts;
+  } catch (error) {
+    console.error('Error fetching NFTs:', error);
+    throw error;
+  }
+};
+```
