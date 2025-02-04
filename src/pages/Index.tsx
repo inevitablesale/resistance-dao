@@ -58,6 +58,15 @@ const Index = () => {
           EthereumWalletConnectors,
           ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
         ],
+        transactionModalSettings: {
+          modalTitle: "Mint Your LedgerFren ID Badge",
+          modalDescription: "You're almost there! Confirm the transaction to receive your ID Badge.",
+          receiveText: "You will receive",
+          networkText: "Network",
+          interactingText: "Contract",
+          confirmButtonText: "Mint ID Badge",
+          cancelButtonText: "Cancel"
+        }
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
