@@ -1,4 +1,4 @@
-```typescript
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -102,4 +102,3 @@ const GovernanceVoting = () => {
 };
 
 export default GovernanceVoting;
-```
