@@ -8,7 +8,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 
 const IndexContent = () => {
-  const { user, setShowAuthFlow } = useDynamicContext();
+  const { user, primaryWallet, setShowAuthFlow } = useDynamicContext();
 
   if (user?.verifications?.completedOnboarding) {
     return <PostOnboardingView />;
@@ -26,10 +26,10 @@ const IndexContent = () => {
 
         <div className="flex flex-col md:flex-row gap-4 justify-center mb-16">
           <button className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium">
-            Earn Rewards with Quests
+            Earn LGR with Quests
           </button>
           <button 
-            onClick={() => setShowAuthFlow(true)}
+            onClick={() => setShowAuthFlow?.(true)}
             className="px-8 py-3 bg-white hover:bg-white/90 text-[#8247E5] rounded-lg transition-colors text-lg font-medium"
           >
             Mint LedgerFren Badge

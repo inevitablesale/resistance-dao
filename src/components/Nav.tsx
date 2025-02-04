@@ -1,7 +1,40 @@
 
 import { Link } from "react-router-dom";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useToast } from "@/hooks/use-toast";
 
 const Nav = () => {
+  const { primaryWallet } = useDynamicContext();
+  const { toast } = useToast();
+
+  const handleLaunchApp = async () => {
+    if (!primaryWallet) {
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet first to launch the app.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const isConnected = await primaryWallet.isConnected();
+    if (!isConnected) {
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet to launch the app.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Here you would check for NFT ownership
+    // For now, we'll just show a toast
+    toast({
+      title: "Coming Soon",
+      description: "NFT verification will be implemented soon.",
+    });
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 bg-[#8247E5] z-50">
       <div className="container mx-auto px-4">
@@ -28,7 +61,10 @@ const Nav = () => {
             </Link>
           </div>
 
-          <button className="hidden md:block px-6 py-2 bg-white text-[#8247E5] rounded-lg font-medium hover:bg-white/90 transition-colors">
+          <button 
+            onClick={handleLaunchApp}
+            className="hidden md:block px-6 py-2 bg-white text-[#8247E5] rounded-lg font-medium hover:bg-white/90 transition-colors"
+          >
             Launch App
           </button>
         </div>
