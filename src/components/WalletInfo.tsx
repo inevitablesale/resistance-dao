@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Progress } from "@/components/ui/progress";
-import { Check, ArrowRight, Eye } from "lucide-react";
+import { Check, ArrowRight, Eye, Save, RefreshCw } from "lucide-react";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
 import { mintNFT } from "@/services/contractService";
 import { useToast } from "@/hooks/use-toast";
@@ -29,6 +29,7 @@ export const WalletInfo = () => {
   const [isMinting, setIsMinting] = useState(false);
   const [nftPreview, setNFTPreview] = useState<NFTPreview | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState<string>("");
+  const [isSavedToBlockchain, setIsSavedToBlockchain] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -91,9 +92,10 @@ export const WalletInfo = () => {
       }
       
       setNFTPreview(preview);
+      setIsSavedToBlockchain(false);
       toast({
         title: "Analysis Complete",
-        description: "Preview your NFT before minting.",
+        description: "Preview your NFT before saving to blockchain.",
       });
     } catch (error) {
       console.error('Analysis failed:', error);
@@ -128,6 +130,7 @@ export const WalletInfo = () => {
 
       console.log('NFT minted successfully:', result);
       setProgress(100);
+      setIsSavedToBlockchain(true);
       
       toast({
         title: "NFT Minted Successfully!",
@@ -292,21 +295,45 @@ export const WalletInfo = () => {
                     })}
                   </div>
 
-                  <button
-                    onClick={handleMintNFT}
-                    disabled={isMinting}
-                    className={cn(
-                      "w-full py-4 px-6 rounded-lg font-semibold",
-                      "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
-                      "text-white shadow-lg",
-                      "transition-all duration-300",
-                      "hover:shadow-polygon-primary/20 hover:scale-[1.02]",
-                      "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
-                      "animate-fade-in delay-300"
+                  <div className="flex gap-4">
+                    {!isSavedToBlockchain && (
+                      <>
+                        <button
+                          onClick={handleMintNFT}
+                          disabled={isMinting}
+                          className={cn(
+                            "flex-1 py-4 px-6 rounded-lg font-semibold",
+                            "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+                            "text-white shadow-lg",
+                            "transition-all duration-300",
+                            "hover:shadow-polygon-primary/20 hover:scale-[1.02]",
+                            "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+                            "animate-fade-in delay-300",
+                            "flex items-center justify-center gap-2"
+                          )}
+                        >
+                          <Save className="w-4 h-4" />
+                          {isMinting ? 'Saving to Blockchain...' : 'Save to Blockchain'}
+                        </button>
+                        <button
+                          onClick={handleAnalyzeProfile}
+                          disabled={isAnalyzing}
+                          className={cn(
+                            "flex-1 py-4 px-6 rounded-lg font-semibold",
+                            "bg-white/10 text-white",
+                            "transition-all duration-300",
+                            "hover:bg-white/20",
+                            "disabled:opacity-50 disabled:cursor-not-allowed",
+                            "animate-fade-in delay-300",
+                            "flex items-center justify-center gap-2"
+                          )}
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                          Re-analyze
+                        </button>
+                      </>
                     )}
-                  >
-                    {isMinting ? 'Minting ID Badge...' : 'Mint ID Badge'}
-                  </button>
+                  </div>
                 </div>
               </div>
             </Card>
