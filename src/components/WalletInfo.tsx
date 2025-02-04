@@ -210,25 +210,27 @@ export const WalletInfo = () => {
             )}>
               <div className="absolute inset-0 bg-gradient-to-r from-polygon-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
-              <div className="relative p-8 grid grid-cols-12 gap-8">
-                {/* Image Section with Animation - 4 columns */}
+              <div className="relative flex flex-col p-8 gap-8">
+                {/* Image Section at the top */}
                 {previewImageUrl && (
-                  <div className="col-span-4 relative flex items-center justify-center animate-fade-in">
-                    <div className="absolute inset-0 bg-polygon-primary/20 rounded-full blur-2xl animate-pulse-slow" />
-                    <div className="relative">
-                      <div className="absolute -inset-1 bg-gradient-to-r from-polygon-primary to-polygon-secondary rounded-full blur animate-pulse-slow" />
-                      <img 
-                        src={previewImageUrl} 
-                        alt="NFT Preview" 
-                        className="relative rounded-full aspect-square object-cover w-full max-w-[300px] border-4 border-white/10"
-                      />
+                  <div className="w-full flex justify-center animate-fade-in">
+                    <div className="relative w-64 aspect-square">
+                      <div className="absolute inset-0 bg-polygon-primary/20 rounded-full blur-2xl animate-pulse-slow" />
+                      <div className="relative">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-polygon-primary to-polygon-secondary rounded-full blur animate-pulse-slow" />
+                        <img 
+                          src={previewImageUrl} 
+                          alt="NFT Preview" 
+                          className="relative rounded-full aspect-square object-cover w-full border-4 border-white/10"
+                        />
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* Content Section with Staggered Animation - 8 columns */}
-                <div className="col-span-8 space-y-6 animate-fade-in">
-                  <div className="space-y-2">
+                {/* Content Section below image */}
+                <div className="space-y-6 animate-fade-in w-full">
+                  <div className="space-y-2 text-center">
                     <h4 className="text-3xl font-bold bg-gradient-to-r from-white to-polygon-primary bg-clip-text text-transparent">
                       {nftPreview.fullName}'s Professional NFT
                     </h4>
@@ -288,3 +290,5 @@ export const WalletInfo = () => {
     </div>
   );
 };
+
+export default WalletInfo;
