@@ -64,7 +64,7 @@ const Nav = () => {
             onClick={handleLaunchApp}
             className="hidden md:block px-6 py-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white rounded-lg font-medium transition-all hover:scale-105"
           >
-            Get LedgerFren NFT
+            Access App
           </button>
         </div>
       </div>
