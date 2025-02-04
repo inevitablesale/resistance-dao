@@ -7,6 +7,7 @@ import { mintNFT } from "@/services/contractService";
 import { useToast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
+import { cn } from "@/lib/utils";
 
 interface NFTPreview {
   fullName: string;
@@ -190,39 +191,76 @@ export const WalletInfo = () => {
         </p>
         
         {nftPreview ? (
-          <Card className="p-6 bg-black/20 border border-white/10 rounded-lg">
-            <div className="grid md:grid-cols-2 gap-6">
-              {previewImageUrl && (
-                <div className="flex items-center justify-center">
-                  <img 
-                    src={previewImageUrl} 
-                    alt="NFT Preview" 
-                    className="rounded-lg max-w-[300px] w-full"
-                  />
-                </div>
-              )}
-              <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-white">{nftPreview.fullName}'s Professional NFT</h4>
-                <div className="space-y-2">
-                  {nftPreview.attributes.map((attr, index) => (
-                    <div key={index} className="flex justify-between text-sm">
-                      <span className="text-gray-400">{attr.trait_type}:</span>
-                      <span className="text-white">{attr.value}</span>
+          <div className="animate-fade-in">
+            <Card className={cn(
+              "relative overflow-hidden transition-all duration-500",
+              "bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a]",
+              "border border-polygon-primary/20",
+              "hover:border-polygon-primary/40",
+              "group"
+            )}>
+              {/* Animated background effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-polygon-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <div className="relative p-8 grid md:grid-cols-2 gap-8">
+                {/* Image Section with Animation */}
+                {previewImageUrl && (
+                  <div className="relative flex items-center justify-center animate-fade-in">
+                    <div className="absolute inset-0 bg-polygon-primary/20 rounded-full blur-2xl animate-pulse-slow" />
+                    <div className="relative">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-polygon-primary to-polygon-secondary rounded-full blur animate-pulse-slow" />
+                      <img 
+                        src={previewImageUrl} 
+                        alt="NFT Preview" 
+                        className="relative rounded-full aspect-square object-cover w-full max-w-[300px] border-4 border-white/10"
+                      />
                     </div>
-                  ))}
+                  </div>
+                )}
+
+                {/* Content Section with Staggered Animation */}
+                <div className="space-y-6 animate-fade-in delay-150">
+                  <div className="space-y-2">
+                    <h4 className="text-2xl font-bold bg-gradient-to-r from-white to-polygon-primary bg-clip-text text-transparent">
+                      {nftPreview.fullName}'s Professional NFT
+                    </h4>
+                    <p className="text-gray-400">Professional Identity Token</p>
+                  </div>
+
+                  <div className="space-y-4">
+                    {nftPreview.attributes.map((attr, index) => (
+                      <div 
+                        key={index}
+                        className="animate-fade-in"
+                        style={{ animationDelay: `${150 + index * 100}ms` }}
+                      >
+                        <div className="flex justify-between items-center p-3 rounded-lg bg-black/20 border border-white/5 hover:border-polygon-primary/20 transition-colors">
+                          <span className="text-gray-400 font-medium">{attr.trait_type}</span>
+                          <span className="text-white font-semibold">{attr.value}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={handleMintNFT}
+                    disabled={isMinting}
+                    className={cn(
+                      "w-full py-4 px-6 rounded-lg font-semibold",
+                      "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+                      "text-white shadow-lg",
+                      "transition-all duration-300",
+                      "hover:shadow-polygon-primary/20 hover:scale-[1.02]",
+                      "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+                      "animate-fade-in delay-300"
+                    )}
+                  >
+                    {isMinting ? 'Minting NFT...' : 'Mint NFT'}
+                  </button>
                 </div>
-                <button
-                  onClick={handleMintNFT}
-                  disabled={isMinting}
-                  className={`${
-                    isMinting ? 'bg-polygon-primary/50' : 'bg-polygon-primary hover:bg-polygon-primary/90'
-                  } w-full text-white px-6 py-3 rounded-lg transition-colors mt-4`}
-                >
-                  {isMinting ? 'Minting NFT...' : 'Mint NFT'}
-                </button>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
         ) : (
           <div className="flex items-center justify-center">
             <button
