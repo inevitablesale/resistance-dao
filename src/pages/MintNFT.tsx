@@ -38,7 +38,8 @@ const MintNFTContent = () => {
         Get your LedgerFren NFT to access the platform. Once verified, you'll be able to participate in investment opportunities.
       </p>
 
-      <div className="max-w-md mx-auto">
+      {/* Changed from max-w-md to max-w-2xl for wider container */}
+      <div className="max-w-2xl mx-auto">
         <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
           <div className="flex justify-center mb-8">
             <DynamicWidget />
@@ -61,15 +62,6 @@ const MintNFT = () => {
           EthereumWalletConnectors,
           ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
         ],
-        flows: {
-          verification: {
-            autoVerifyingEmail: true,
-            autoRedirect: true,
-            skipCustomEmailVerificationUI: true,
-            skipEmailVerificationModal: true,
-            skipRedirectOnVerification: true,
-          }
-        },
         eventsCallbacks: {
           onVerificationComplete: () => {
             toast({
