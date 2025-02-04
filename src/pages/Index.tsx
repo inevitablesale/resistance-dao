@@ -72,29 +72,76 @@ const Index = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* Animated stars background */}
+        {/* Animated universe background */}
         <div className="absolute inset-0">
+          {/* Background gradient */}
           <div 
-            className="absolute inset-0 bg-[radial-gradient(white,_rgba(255,255,255,0.2)_2px,_transparent_4px)] bg-[length:50px_50px]"
+            className="absolute inset-0"
             style={{
-              backgroundSize: "50px 50px",
-              animation: "twinkle 10s ease-in-out infinite",
-              opacity: 0.3
+              background: 'radial-gradient(circle at center, rgba(31,41,55,1) 0%, rgba(0,0,0,1) 100%)'
             }}
           />
+          
+          {/* Stars layer 1 - Small fast-moving stars */}
           <div 
-            className="absolute inset-0 bg-[radial-gradient(white,_rgba(255,255,255,0.15)_1px,_transparent_3px)] bg-[length:100px_100px]"
+            className="absolute inset-0"
             style={{
-              backgroundSize: "100px 100px",
-              animation: "twinkle 15s ease-in-out infinite",
-              opacity: 0.2
+              backgroundImage: 'radial-gradient(1px 1px at 50% 50%, white 100%, transparent)',
+              backgroundSize: '100% 100%',
+              transform: 'translateZ(0)',
+              animation: 'space 8s ease-in-out infinite alternate'
             }}
           />
+          
+          {/* Stars layer 2 - Medium stars */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              backgroundImage: 'radial-gradient(2px 2px at 40% 60%, rgba(255,255,255,0.7) 100%, transparent)',
+              backgroundSize: '200% 200%',
+              animation: 'space 12s ease-in-out infinite alternate-reverse'
+            }}
+          />
+          
+          {/* Stars layer 3 - Large slow-moving stars */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              backgroundImage: 'radial-gradient(3px 3px at 60% 40%, rgba(255,255,255,0.9) 100%, transparent)',
+              backgroundSize: '300% 300%',
+              animation: 'space 20s ease-in-out infinite'
+            }}
+          />
+
+          {/* Nebula effects */}
+          <div 
+            className="absolute inset-0 opacity-30"
+            style={{
+              background: 'radial-gradient(circle at 50% 50%, rgba(130,71,229,0.2), transparent 60%)'
+            }}
+          />
+          
           <style>
             {`
-              @keyframes twinkle {
-                0%, 100% { opacity: 0.2; }
-                50% { opacity: 0.4; }
+              @keyframes space {
+                0%, 100% {
+                  opacity: 0.5;
+                  transform: scale(1) rotate(0deg);
+                  background-position: 0% 0%;
+                }
+                25% {
+                  opacity: 0.7;
+                  background-position: 50% 50%;
+                }
+                50% {
+                  opacity: 0.3;
+                  transform: scale(1.2) rotate(1deg);
+                  background-position: 100% 100%;
+                }
+                75% {
+                  opacity: 0.6;
+                  background-position: 50% 50%;
+                }
               }
             `}
           </style>
