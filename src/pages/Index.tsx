@@ -76,7 +76,7 @@ const IndexContent = () => {
             onClick={() => navigate('/mint-nft')}
             className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium"
           >
-            Access App
+            Mint LedgerFren NFT
           </button>
           <button className="px-8 py-3 bg-white hover:bg-white/90 text-[#8247E5] rounded-lg transition-colors text-lg font-medium">
             Read Whitepaper
