@@ -1,3 +1,4 @@
+```typescript
 import type { Config } from "tailwindcss";
 
 export default {
@@ -68,6 +69,10 @@ export default {
         }
       },
       animation: {
+        "quantum-float": "quantumFloat 3s ease-in-out infinite",
+        "quantum-glow": "quantumGlow 2s ease-in-out infinite",
+        "quantum-particle": "particleFlow 3s linear infinite",
+        "pulse-ring": "pulseRing 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "fade-in": "fade-in 0.5s ease-out forwards",
         "scale-in": "scale-in 0.5s ease-out forwards",
@@ -86,3 +91,4 @@ export default {
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+```
