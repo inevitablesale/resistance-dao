@@ -72,89 +72,77 @@ const Index = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* Deep Space Background with Nebula */}
+        {/* Sepia Space Background */}
         <div className="absolute inset-0">
-          {/* Base deep space layer */}
+          {/* Base gradient layer */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(to bottom, #0B0B0F 0%, #141420 100%)',
-              opacity: 0.92
+              background: 'linear-gradient(to bottom, #000000 0%, #1a1305 40%, #3d2f0c 100%)',
+              opacity: 0.95
             }}
           />
           
-          {/* Realistic nebula structure inspired by James Webb imagery */}
+          {/* Cloud layer */}
           <div 
             className="absolute inset-0"
             style={{
               backgroundImage: `url('/lovable-uploads/4b887efe-6a76-44c3-870a-df8185740314.png')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              opacity: 0.5,
+              opacity: 0.4,
+              filter: 'sepia(100%) brightness(0.7) contrast(1.2)',
               mixBlendMode: 'screen'
             }}
           />
 
-          {/* Overlay layer for depth and atmosphere */}
+          {/* Planet */}
           <div 
-            className="absolute inset-0"
+            className="absolute top-20 right-40 w-64 h-64"
             style={{
-              background: `
-                radial-gradient(circle at 30% 50%, rgba(43, 53, 89, 0.15) 0%, transparent 60%),
-                radial-gradient(circle at 70% 50%, rgba(89, 43, 69, 0.15) 0%, transparent 60%)
-              `,
-              mixBlendMode: 'overlay'
+              background: 'radial-gradient(circle at 40% 40%, #cfab67 0%, #7c571e 60%, #2b1d0a 100%)',
+              borderRadius: '50%',
+              boxShadow: 'inset -10px -10px 50px rgba(0,0,0,0.8)',
+              transform: 'scale(1.5)',
+              opacity: 0.9
             }}
           />
           
-          {/* Realistic star field with depth variation */}
+          {/* Stars layer */}
           <div 
             className="absolute inset-0"
             style={{
               backgroundImage: `
-                radial-gradient(1px 1px at ${Array.from({length: 100}, () => 
+                radial-gradient(1px 1px at ${Array.from({length: 150}, () => 
                   `${Math.random() * 100}% ${Math.random() * 100}%`
-                ).join(', ')}, rgba(255, 255, 255, ${Array.from({length: 100}, () => 
-                  Math.random() * 0.3 + 0.1
+                ).join(', ')}, rgba(255, 255, 255, ${Array.from({length: 150}, () => 
+                  Math.random() * 0.4 + 0.1
                 ).join(')), rgba(255, 255, 255, ')})
               `,
-              opacity: 0.8
+              opacity: 0.6
             }}
           />
           
-          {/* Larger focal stars */}
+          {/* Atmospheric glow */}
           <div 
             className="absolute inset-0"
             style={{
-              backgroundImage: Array.from({length: 12}, () => 
-                `radial-gradient(${Math.random() * 2 + 1}px ${Math.random() * 2 + 1}px at ${
-                  Math.random() * 100}% ${Math.random() * 100}%, rgba(255, 255, 255, ${
-                  Math.random() * 0.4 + 0.3}) 0%, transparent 100%)`
-              ).join(','),
-              filter: 'blur(0.2px)'
+              background: 'radial-gradient(circle at 50% 80%, rgba(255, 200, 100, 0.15) 0%, transparent 60%)',
+              mixBlendMode: 'screen'
             }}
           />
           
           <style>
             {`
-              @keyframes subtleNebula {
-                0%, 100% {
-                  opacity: 0.5;
-                  transform: scale(1);
-                }
-                50% {
-                  opacity: 0.55;
-                  transform: scale(1.001);
-                }
+              @keyframes twinkle {
+                0%, 100% { opacity: 0.6; }
+                50% { opacity: 0.8; }
               }
-
-              @keyframes subtleStars {
-                0%, 100% {
-                  opacity: 0.8;
-                }
-                50% {
-                  opacity: 0.7;
-                }
+              
+              @keyframes cloudDrift {
+                0% { transform: translateX(0) scale(1); }
+                50% { transform: translateX(-1%) scale(1.01); }
+                100% { transform: translateX(0) scale(1); }
               }
             `}
           </style>
