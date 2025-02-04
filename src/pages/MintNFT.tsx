@@ -7,6 +7,7 @@ import { PostOnboardingView } from "@/components/PostOnboardingView";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useEffect } from "react";
 import Nav from "@/components/Nav";
+import { useToast } from "@/hooks/use-toast";
 
 const zeroDevConfig = {
   bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -15,6 +16,7 @@ const zeroDevConfig = {
 
 const MintNFTContent = () => {
   const { user, setShowAuthFlow } = useDynamicContext();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Automatically open the auth flow when component mounts if user is not connected
@@ -49,6 +51,8 @@ const MintNFTContent = () => {
 };
 
 const MintNFT = () => {
+  const { toast } = useToast();
+
   return (
     <DynamicContextProvider
       settings={{
@@ -57,6 +61,35 @@ const MintNFT = () => {
           EthereumWalletConnectors,
           ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
         ],
+        flows: {
+          verification: {
+            autoVerifyingEmail: true,
+            autoRedirect: true,
+            skipCustomEmailVerificationUI: true,
+            skipEmailVerificationModal: true,
+            skipRedirectOnVerification: true,
+          }
+        },
+        eventsCallbacks: {
+          onVerificationComplete: () => {
+            toast({
+              title: "Verification Complete",
+              description: "Your account has been verified successfully.",
+            });
+          },
+          onAuthSuccess: () => {
+            toast({
+              title: "Authentication Successful",
+              description: "You're now connected to LedgerFund.",
+            });
+          },
+          onLogout: () => {
+            toast({
+              title: "Logged Out",
+              description: "You've been successfully logged out.",
+            });
+          },
+        }
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
