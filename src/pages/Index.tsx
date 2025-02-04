@@ -1,4 +1,4 @@
-
+```typescript
 import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
@@ -72,42 +72,51 @@ const Index = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* Enhanced Space Background */}
+        {/* Enhanced Space Background with Deep Atmospheric Effects */}
         <div className="absolute inset-0">
-          {/* Deep Space Base Layer */}
+          {/* Base Space Layer */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(to bottom, #0B0B0F 0%, #1A1A2F 40%, #1F1F3F 100%)',
-              opacity: 0.98
+              background: 'radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%)',
+              opacity: 0.95
             }}
           />
           
-          {/* Enhanced Nebula Layer */}
+          {/* Atmospheric Cloud Layer using reference image */}
           <div 
             className="absolute inset-0"
             style={{
-              backgroundImage: `url('/lovable-uploads/4b887efe-6a76-44c3-870a-df8185740314.png')`,
+              backgroundImage: `url('/lovable-uploads/a5e158c0-20cc-46ca-9c71-5dfa7741d854.png')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              opacity: 0.3,
+              opacity: 0.8,
               mixBlendMode: 'screen'
             }}
           />
 
-          {/* Detailed Planet */}
+          {/* Golden Atmospheric Glow */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(to top, rgba(255, 197, 66, 0.15) 0%, rgba(255, 197, 66, 0) 40%)',
+              mixBlendMode: 'overlay'
+            }}
+          />
+
+          {/* Detailed Planet with Enhanced Surface Features */}
           <div className="absolute top-20 right-40">
             <div 
               className="w-64 h-64 relative"
               style={{
                 background: `
-                  radial-gradient(circle at 40% 40%, 
-                    #8B4513 0%,    /* Dark landmass base */
-                    #228B22 20%,   /* Forest regions */
-                    #1E90FF 40%,   /* Ocean areas */
-                    #4682B4 60%,   /* Deeper waters */
-                    #191970 85%,   /* Deep atmosphere */
-                    #000033 100%   /* Space edge */
+                  radial-gradient(circle at 40% 40%,
+                    #DAA520 0%,    /* Golden surface base */
+                    #B8860B 20%,   /* Darker golden regions */
+                    #CD853F 40%,   /* Copper-like areas */
+                    #8B4513 60%,   /* Deep surface features */
+                    #654321 85%,   /* Shadow regions */
+                    #3D2B1F 100%   /* Dark edge */
                   )
                 `,
                 borderRadius: '50%',
@@ -115,53 +124,43 @@ const Index = () => {
                 opacity: 0.95,
                 boxShadow: `
                   inset -15px -15px 40px rgba(0,0,0,0.8),
-                  inset 5px 5px 40px rgba(255,255,255,0.4),
-                  0 0 60px rgba(135,206,250,0.2)
+                  inset 5px 5px 40px rgba(255,215,0,0.4),
+                  0 0 60px rgba(218,165,32,0.3)
                 `
               }}
             >
-              {/* Atmosphere Glow */}
+              {/* Enhanced Atmospheric Layer */}
               <div 
                 className="absolute inset-0"
                 style={{
                   borderRadius: '50%',
-                  background: 'radial-gradient(circle at 30% 30%, rgba(173,216,230,0.15) 0%, transparent 60%)',
+                  background: 'radial-gradient(circle at 30% 30%, rgba(255,215,0,0.2) 0%, transparent 60%)',
                   filter: 'blur(8px)'
                 }}
               />
               
-              {/* Surface Features */}
+              {/* Detailed Surface Features */}
               <div 
                 className="absolute inset-0"
                 style={{
                   borderRadius: '50%',
                   background: `
-                    radial-gradient(circle at 60% 60%, rgba(34,139,34,0.3) 0%, transparent 30%),
-                    radial-gradient(circle at 30% 70%, rgba(0,191,255,0.2) 0%, transparent 40%),
+                    radial-gradient(circle at 60% 60%, rgba(205,133,63,0.3) 0%, transparent 30%),
+                    radial-gradient(circle at 30% 70%, rgba(218,165,32,0.2) 0%, transparent 40%),
                     radial-gradient(circle at 70% 30%, rgba(139,69,19,0.4) 0%, transparent 35%)
                   `,
-                  opacity: 0.8
+                  opacity: 0.9
                 }}
               />
 
-              {/* City Lights (dark side) */}
-              <div 
-                className="absolute inset-0"
-                style={{
-                  borderRadius: '50%',
-                  background: 'radial-gradient(circle at 80% 80%, rgba(255,250,205,0.15) 0%, transparent 40%)',
-                  filter: 'blur(2px)'
-                }}
-              />
-
-              {/* Landing Zone Indicators */}
+              {/* Enhanced Landing Zone Indicators */}
               <div 
                 className="absolute inset-0"
                 style={{
                   borderRadius: '50%',
                   background: `
-                    radial-gradient(circle at 45% 45%, rgba(255,215,0,0.2) 0%, transparent 5%),
-                    radial-gradient(circle at 55% 55%, rgba(255,215,0,0.2) 0%, transparent 5%)
+                    radial-gradient(circle at 45% 45%, rgba(255,223,0,0.3) 0%, transparent 5%),
+                    radial-gradient(circle at 55% 55%, rgba(255,223,0,0.3) 0%, transparent 5%)
                   `,
                   animation: 'pulse 2s infinite'
                 }}
@@ -169,69 +168,56 @@ const Index = () => {
             </div>
           </div>
           
-          {/* Enhanced Refugee Fleet */}
+          {/* Enhanced Refugee Fleet with Detailed Ships */}
           <div className="absolute inset-0 overflow-hidden">
-            {/* Large Command Ship */}
+            {/* Command Ship with Enhanced Details */}
             <div className="absolute animate-landing-approach-1">
               <div 
                 className="relative"
                 style={{
                   width: '160px',
                   height: '50px',
-                  background: '#403E43',
+                  background: '#CD853F',
                   clipPath: 'polygon(0% 50%, 15% 20%, 85% 20%, 100% 50%, 85% 80%, 15% 80%)',
-                  boxShadow: '0 0 20px rgba(255,69,0,0.3)'
+                  boxShadow: '0 0 20px rgba(255,215,0,0.3)'
                 }}
               >
-                {/* Hull Details */}
+                {/* Enhanced Hull Details */}
                 <div 
                   className="absolute inset-0"
                   style={{
                     background: `
                       linear-gradient(90deg, 
-                        rgba(62,58,63,0.8) 0%,
-                        rgba(142,145,150,0.4) 50%,
-                        rgba(62,58,63,0.8) 100%
+                        rgba(139,69,19,0.8) 0%,
+                        rgba(205,133,63,0.4) 50%,
+                        rgba(139,69,19,0.8) 100%
                       )
                     `
                   }}
                 />
 
-                {/* Cargo Modules */}
-                <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 flex gap-2">
-                  {[...Array(3)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="flex-1"
-                      style={{
-                        background: '#8E9196',
-                        boxShadow: 'inset 0 0 5px rgba(0,0,0,0.5)'
-                      }}
-                    />
-                  ))}
-                </div>
-
-                {/* Heat Shield Glow */}
+                {/* Enhanced Heat Shield Effect */}
                 <div 
                   className="absolute bottom-0 left-0 right-0 h-1/4"
                   style={{
-                    background: 'linear-gradient(0deg, rgba(255,69,0,0.3) 0%, transparent 100%)',
-                    animation: 'pulse 2s infinite'
+                    background: 'linear-gradient(0deg, rgba(255,165,0,0.6) 0%, transparent 100%)',
+                    animation: 'pulse 1.5s infinite',
+                    filter: 'blur(2px)'
                   }}
                 />
 
-                {/* Engine Array */}
+                {/* Enhanced Engine Array */}
                 <div className="absolute -right-4 top-1/2 -translate-y-1/2 flex gap-1">
                   {[...Array(4)].map((_, i) => (
                     <div 
                       key={i}
                       className="relative"
                       style={{
-                        width: '20px',
+                        width: '25px',
                         height: '8px',
-                        background: 'radial-gradient(circle at right, rgba(255,140,0,0.8), transparent 70%)',
-                        filter: 'blur(2px)',
-                        animation: 'enginePulse 1.5s infinite'
+                        background: 'radial-gradient(circle at right, rgba(255,215,0,0.9), transparent 70%)',
+                        filter: 'blur(1px)',
+                        animation: 'enginePulse 1.2s infinite'
                       }}
                     />
                   ))}
@@ -239,71 +225,48 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Medium Transport */}
-            <div className="absolute animate-landing-approach-2">
-              <div 
-                className="relative"
-                style={{
-                  width: '120px',
-                  height: '40px',
-                  background: '#8E9196',
-                  clipPath: 'polygon(0% 50%, 20% 20%, 80% 20%, 100% 50%, 80% 80%, 20% 80%)',
-                  boxShadow: '0 0 15px rgba(255,69,0,0.2)'
-                }}
-              >
-                {/* Hull Damage */}
+            {/* Transport Ships with Landing Configuration */}
+            {[2, 3].map((index) => (
+              <div key={index} className={`absolute animate-landing-approach-${index}`}>
                 <div 
-                  className="absolute top-1/3 left-1/4 w-1/6 h-1/3"
+                  className="relative"
                   style={{
-                    background: '#403E43',
-                    clipPath: 'polygon(0% 0%, 100% 50%, 0% 100%)'
+                    width: index === 2 ? '120px' : '80px',
+                    height: index === 2 ? '40px' : '30px',
+                    background: '#B8860B',
+                    clipPath: 'polygon(0% 50%, 20% 20%, 80% 20%, 100% 50%, 80% 80%, 20% 80%)',
+                    boxShadow: `0 0 ${15 - (index * 2)}px rgba(255,215,0,0.2)`
                   }}
-                />
+                >
+                  {/* Ship-specific Heat Shield */}
+                  <div 
+                    className="absolute bottom-0 left-0 right-0 h-1/3"
+                    style={{
+                      background: 'linear-gradient(0deg, rgba(255,140,0,0.7) 0%, transparent 100%)',
+                      animation: 'pulse 1.8s infinite',
+                      filter: 'blur(1px)'
+                    }}
+                  />
 
-                {/* Engine Array */}
-                <div className="absolute -right-3 top-1/2 -translate-y-1/2 flex gap-1">
-                  {[...Array(3)].map((_, i) => (
-                    <div 
-                      key={i}
-                      className="relative"
-                      style={{
-                        width: '15px',
-                        height: '6px',
-                        background: 'radial-gradient(circle at right, rgba(255,140,0,0.7), transparent 70%)',
-                        filter: 'blur(1.5px)',
-                        animation: 'enginePulse 1.8s infinite'
-                      }}
-                    />
-                  ))}
+                  {/* Ship-specific Engines */}
+                  <div className="absolute -right-3 top-1/2 -translate-y-1/2 flex gap-1">
+                    {[...Array(index === 2 ? 3 : 2)].map((_, i) => (
+                      <div 
+                        key={i}
+                        className="relative"
+                        style={{
+                          width: `${20 - (index * 3)}px`,
+                          height: '6px',
+                          background: 'radial-gradient(circle at right, rgba(255,215,0,0.8), transparent 70%)',
+                          filter: 'blur(1px)',
+                          animation: `enginePulse ${1.5 + (index * 0.2)}s infinite`
+                        }}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* Small Scout Ship */}
-            <div className="absolute animate-landing-approach-3">
-              <div 
-                className="relative"
-                style={{
-                  width: '80px',
-                  height: '30px',
-                  background: '#9F9EA1',
-                  clipPath: 'polygon(0% 50%, 25% 20%, 75% 20%, 100% 50%, 75% 80%, 25% 80%)',
-                  boxShadow: '0 0 10px rgba(255,69,0,0.15)'
-                }}
-              >
-                {/* Emergency Thruster */}
-                <div 
-                  className="absolute -right-2 top-1/2 -translate-y-1/2"
-                  style={{
-                    width: '12px',
-                    height: '5px',
-                    background: 'radial-gradient(circle at right, rgba(255,140,0,0.6), transparent 70%)',
-                    filter: 'blur(1px)',
-                    animation: 'enginePulse 2s infinite'
-                  }}
-                />
-              </div>
-            </div>
+            ))}
           </div>
 
           {/* Enhanced Star Field with Depth */}
@@ -311,49 +274,51 @@ const Index = () => {
             className="absolute inset-0"
             style={{
               background: Array.from({length: 3}, (_, i) => 
-                Array.from({length: 100}, () => 
-                  `radial-gradient(1px 1px at ${Math.random() * 100}% ${Math.random() * 100}%, rgba(255, 255, 255, ${0.3 - i * 0.1}) 0%, transparent 100%)`
-                ).join(',')
+                Array.from({length: 150}, () => {
+                  const x = Math.random() * 100;
+                  const y = Math.random() * 100;
+                  const size = Math.random() * 1.5 + 0.5;
+                  return `radial-gradient(${size}px ${size}px at ${x}% ${y}%, rgba(255, 255, 255, ${0.8 - i * 0.2}) 0%, transparent 100%)`
+                }).join(',')
               ).join(','),
               opacity: 0.8
             }}
           />
           
-          {/* Landing Zone Atmospheric Glow */}
+          {/* Enhanced Atmospheric Glow */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(circle at 70% 30%, rgba(173,216,230,0.1) 0%, transparent 60%)',
-              mixBlendMode: 'screen'
+              background: 'radial-gradient(circle at 70% 30%, rgba(255,215,0,0.15) 0%, transparent 60%)',
+              mixBlendMode: 'soft-light'
             }}
           />
           
-          {/* Animation Keyframes */}
+          {/* Animation Keyframes with Enhanced Landing Approaches */}
           <style>
             {`
               @keyframes enginePulse {
-                0%, 100% { opacity: 0.6; transform: scaleX(1); }
-                50% { opacity: 1; transform: scaleX(1.2); }
+                0%, 100% { opacity: 0.7; transform: scaleX(1); }
+                50% { opacity: 1; transform: scaleX(1.3); }
               }
 
               @keyframes landing-approach-1 {
-                0% { transform: translate(-160px, 20vh) rotate(-5deg); }
-                100% { transform: translate(calc(70vw), 30vh) rotate(15deg); }
+                0% { transform: translate(-160px, 40vh) rotate(-15deg); }
+                100% { transform: translate(calc(65vw), 35vh) rotate(25deg); }
               }
 
               @keyframes landing-approach-2 {
-                0% { transform: translate(-120px, 30vh) rotate(-8deg); }
-                100% { transform: translate(calc(65vw), 35vh) rotate(18deg); }
+                0% { transform: translate(-120px, 45vh) rotate(-18deg); }
+                100% { transform: translate(calc(60vw), 40vh) rotate(28deg); }
               }
 
               @keyframes landing-approach-3 {
-                0% { transform: translate(-80px, 40vh) rotate(-10deg); }
-                100% { transform: translate(calc(60vw), 40vh) rotate(20deg); }
+                0% { transform: translate(-80px, 50vh) rotate(-20deg); }
+                100% { transform: translate(calc(55vw), 45vh) rotate(30deg); }
               }
 
               .animate-landing-approach-1 {
                 animation: landing-approach-1 20s linear infinite;
-                animation-delay: 0s;
                 will-change: transform;
               }
 
@@ -383,3 +348,4 @@ const Index = () => {
 };
 
 export default Index;
+```
