@@ -4,6 +4,7 @@ import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-a
 import { WalletInfo } from "@/components/WalletInfo";
 import { PostOnboardingView } from "@/components/PostOnboardingView";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { Link } from "react-router-dom";
 
 const IndexContent = () => {
   const { user } = useDynamicContext();
@@ -14,7 +15,28 @@ const IndexContent = () => {
 
   return (
     <>
-      <div className="text-center mb-8">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#2D0A42]/80 backdrop-blur-lg">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <span className="text-white font-bold text-xl">LedgerFund</span>
+            </div>
+            <div className="hidden md:flex items-center space-x-8">
+              <Link to="/" className="text-white hover:text-purple-200">Overview</Link>
+              <Link to="/governance-voting" className="text-white hover:text-purple-200">Get Investment Ready</Link>
+              <Link to="/" className="text-white hover:text-purple-200">Why Now</Link>
+              <Link to="/" className="text-white hover:text-purple-200">Roadmap</Link>
+              <button className="px-6 py-2 bg-white text-purple-900 rounded-lg hover:bg-purple-50 transition-colors">
+                Launch App
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <div className="text-center mb-8 pt-24">
         <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-purple-200 text-transparent bg-clip-text">
           The future of accounting<br />belongs to you
         </h1>
@@ -25,7 +47,7 @@ const IndexContent = () => {
 
       <div className="max-w-md mx-auto mt-8">
         <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
-          <div className="flex gap-4 justify-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <DynamicWidget />
             <button className="px-6 py-2 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors">
               Earn Rewards with Quests
@@ -58,7 +80,7 @@ const Index = () => {
           EthereumWalletConnectors,
           ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
         ],
-        transactionModalSettings: {
+        transactionModalConfiguration: {
           modalTitle: "Mint Your LedgerFren ID Badge",
           modalDescription: "You're almost there! Confirm the transaction to receive your ID Badge.",
           receiveText: "You will receive",
