@@ -69,11 +69,17 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
       chainId: 137 // Polygon Mainnet
     });
     
-    // First, upload the NFT metadata to IPFS/Pinata
-    // Use profile picture if available, otherwise fallback to governance power image
-    const imageUrl = metadata.profilePicCID 
-      ? `https://ipfs.io/ipfs/${metadata.profilePicCID}`
-      : `https://ipfs.io/ipfs/${getGovernanceImageCID(governancePowerAttr.value)}`;
+    // Enhanced image URL handling
+    let imageUrl;
+    if (metadata.profilePicCID) {
+      console.log('Using LinkedIn profile picture with CID:', metadata.profilePicCID);
+      imageUrl = `${PINATA_GATEWAY}${metadata.profilePicCID}?pinataGatewayToken=${PINATA_GATEWAY_TOKEN}`;
+    } else {
+      console.log('No profile picture found, using governance power image');
+      const governanceImageCID = getGovernanceImageCID(governancePowerAttr.value);
+      imageUrl = `${PINATA_GATEWAY}${governanceImageCID}?pinataGatewayToken=${PINATA_GATEWAY_TOKEN}`;
+    }
+    console.log('Final image URL:', imageUrl);
 
     const nftMetadata: NFTMetadata = {
       name: `${metadata.fullName}'s Professional NFT`,
@@ -85,25 +91,34 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
     console.log('Preparing to upload metadata with image:', nftMetadata.image);
     const metadataUri = await uploadMetadataToPinata(nftMetadata);
     console.log('Metadata uploaded to IPFS:', metadataUri);
-
-    // Extract CID from the IPFS URI (remove 'ipfs://' prefix)
-    const metadataCid = metadataUri.replace('ipfs://', '');
     
     const signer = provider.getSigner();
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
     
     console.log('Minting NFT for address:', address);
-    console.log('Using metadata CID:', metadataCid);
+    console.log('Using governance power:', governancePowerAttr.value);
 
-    // Use the metadata CID as the governance power parameter
-    const tx = await contract.safeMint(address, metadataCid);
+    // Use the governance power value directly for minting
+    const tx = await contract.safeMint(address, governancePowerAttr.value);
     console.log('Minting transaction sent:', tx.hash);
     
     const receipt = await tx.wait();
     console.log('Minting confirmed:', receipt);
     
+    // After successful minting, update the token's metadata CID
     const mintEvent = receipt.events?.find(e => e.event === 'Transfer');
     const tokenId = mintEvent?.args?.tokenId;
+    
+    if (tokenId) {
+      // Extract CID from the IPFS URI (remove 'ipfs://' prefix)
+      const metadataCid = metadataUri.replace('ipfs://', '');
+      console.log('Updating token metadata CID for token:', tokenId.toString());
+      
+      // Update the token's metadata CID
+      const updateTx = await contract.updateGovernancePowerCID(tokenId, metadataCid);
+      await updateTx.wait();
+      console.log('Token metadata CID updated successfully');
+    }
     
     return { success: true, tokenId, tokenURI: metadataUri };
   } catch (error) {
