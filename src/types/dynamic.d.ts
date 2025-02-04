@@ -1,3 +1,4 @@
+
 import { type EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { type ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum-aa";
 
@@ -24,6 +25,7 @@ declare module "@dynamic-labs/sdk-react-core" {
       isConnected: () => Promise<boolean>;
       getWalletClient: () => Promise<any>;
     } | null;
+    setShowAuthFlow?: (show: boolean) => void;
   }
 
   export function useDynamicContext(): DynamicContextType;

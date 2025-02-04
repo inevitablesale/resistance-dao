@@ -74,8 +74,30 @@ const Index = () => {
       <div className="min-h-screen bg-black overflow-hidden relative">
         {/* Animated stars background */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwMCIgaGVpZ2h0PSIyMDAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI25vaXNlKSIgb3BhY2l0eT0iLjA1Ii8+PC9zdmc+')] opacity-50 animate-[twinkle_20s_ease-in-out_infinite]"></div>
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwMCIgaGVpZ2h0PSIyMDAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjI1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI25vaXNlKSIgb3BhY2l0eT0iLjA1Ii8+PC9zdmc+')] opacity-30 animate-[twinkle_15s_ease-in-out_infinite]"></div>
+          <div 
+            className="absolute inset-0 bg-[radial-gradient(white,_rgba(255,255,255,0.2)_2px,_transparent_4px)] bg-[length:50px_50px]"
+            style={{
+              backgroundSize: "50px 50px",
+              animation: "twinkle 10s ease-in-out infinite",
+              opacity: 0.3
+            }}
+          />
+          <div 
+            className="absolute inset-0 bg-[radial-gradient(white,_rgba(255,255,255,0.15)_1px,_transparent_3px)] bg-[length:100px_100px]"
+            style={{
+              backgroundSize: "100px 100px",
+              animation: "twinkle 15s ease-in-out infinite",
+              opacity: 0.2
+            }}
+          />
+          <style>
+            {`
+              @keyframes twinkle {
+                0%, 100% { opacity: 0.2; }
+                50% { opacity: 0.4; }
+              }
+            `}
+          </style>
         </div>
         
         <Nav />
