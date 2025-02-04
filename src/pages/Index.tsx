@@ -72,52 +72,50 @@ const Index = () => {
       }}
     >
       <div className="min-h-screen bg-black overflow-hidden relative">
-        {/* Animated universe background */}
+        {/* James Webb inspired cosmic background */}
         <div className="absolute inset-0">
-          {/* Background gradient */}
+          {/* Deep space gradient background */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(circle at center, rgba(31,41,55,1) 0%, rgba(0,0,0,1) 100%)'
+              background: 'radial-gradient(circle at center, #1A1F2C 0%, #000000 100%)'
             }}
           />
           
-          {/* Stars layer 1 - Small fast-moving stars */}
+          {/* Cosmic dust and nebula layer */}
           <div 
             className="absolute inset-0"
             style={{
-              backgroundImage: 'radial-gradient(1px 1px at 50% 50%, white 100%, transparent)',
-              backgroundSize: '100% 100%',
-              transform: 'translateZ(0)',
-              animation: 'space 8s ease-in-out infinite alternate'
-            }}
-          />
-          
-          {/* Stars layer 2 - Medium stars */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              backgroundImage: 'radial-gradient(2px 2px at 40% 60%, rgba(255,255,255,0.7) 100%, transparent)',
+              backgroundImage: 'radial-gradient(2px 2px at 40% 60%, rgba(155, 135, 245, 0.4) 100%, transparent)',
               backgroundSize: '200% 200%',
-              animation: 'space 12s ease-in-out infinite alternate-reverse'
+              animation: 'space 25s ease-in-out infinite'
             }}
           />
           
-          {/* Stars layer 3 - Large slow-moving stars */}
+          {/* Distant galaxies layer */}
           <div 
             className="absolute inset-0"
             style={{
-              backgroundImage: 'radial-gradient(3px 3px at 60% 40%, rgba(255,255,255,0.9) 100%, transparent)',
+              backgroundImage: 'radial-gradient(3px 3px at 60% 40%, rgba(14, 165, 233, 0.6) 100%, transparent)',
               backgroundSize: '300% 300%',
-              animation: 'space 20s ease-in-out infinite'
+              animation: 'space 30s ease-in-out infinite alternate'
             }}
           />
 
-          {/* Nebula effects */}
+          {/* Stellar formations layer */}
           <div 
-            className="absolute inset-0 opacity-30"
+            className="absolute inset-0 opacity-40"
             style={{
-              background: 'radial-gradient(circle at 50% 50%, rgba(130,71,229,0.2), transparent 60%)'
+              background: 'radial-gradient(circle at 30% 50%, rgba(155, 135, 245, 0.3), transparent 60%), radial-gradient(circle at 70% 50%, rgba(14, 165, 233, 0.3), transparent 60%)'
+            }}
+          />
+
+          {/* Webb-like infrared glow effects */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: 'radial-gradient(circle at 50% 50%, rgba(214, 188, 250, 0.1), transparent 70%)',
+              animation: 'pulse 8s ease-in-out infinite'
             }}
           />
           
@@ -125,22 +123,33 @@ const Index = () => {
             {`
               @keyframes space {
                 0%, 100% {
-                  opacity: 0.5;
+                  opacity: 0.7;
                   transform: scale(1) rotate(0deg);
                   background-position: 0% 0%;
                 }
                 25% {
-                  opacity: 0.7;
+                  opacity: 0.9;
                   background-position: 50% 50%;
                 }
                 50% {
-                  opacity: 0.3;
-                  transform: scale(1.2) rotate(1deg);
+                  opacity: 0.6;
+                  transform: scale(1.1) rotate(1deg);
                   background-position: 100% 100%;
                 }
                 75% {
-                  opacity: 0.6;
-                  background-position: 50% 50%;
+                  opacity: 0.8;
+                  background-position: 25% 75%;
+                }
+              }
+
+              @keyframes pulse {
+                0%, 100% {
+                  opacity: 0.1;
+                  transform: scale(1);
+                }
+                50% {
+                  opacity: 0.2;
+                  transform: scale(1.05);
                 }
               }
             `}
