@@ -32,12 +32,16 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
   const { toast } = useToast();
   const [isExperienceOpen, setIsExperienceOpen] = useState(false);
 
-  const governancePower = metadata.attributes.find(
+  // Add console logs to debug metadata
+  console.log('NFT Metadata:', metadata);
+  console.log('NFT Attributes:', metadata.attributes);
+
+  const governancePower = metadata.attributes?.find(
     attr => attr.trait_type === "Governance Power"
-  )?.value.replace("Governance-Power-", "") || "Unknown";
+  )?.value?.replace("Governance-Power-", "") || "Unknown";
 
   const getAttribute = (traitType: string) => 
-    metadata.attributes.find(attr => attr.trait_type === traitType)?.value || "N/A";
+    metadata.attributes?.find(attr => attr.trait_type === traitType)?.value || "N/A";
 
   const handleVote = async (voteType: 'up' | 'down') => {
     try {
@@ -54,6 +58,12 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
       });
     }
   };
+
+  // Add null check for metadata
+  if (!metadata) {
+    console.error('No metadata provided for NFT:', tokenId);
+    return null;
+  }
 
   return (
     <motion.div
