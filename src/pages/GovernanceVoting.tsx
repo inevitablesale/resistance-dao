@@ -1,8 +1,11 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+import { ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum-aa";
 
-const GovernanceVoting = () => {
+const GovernanceVotingContent = () => {
   const { primaryWallet } = useDynamicContext();
   const navigate = useNavigate();
 
@@ -25,7 +28,6 @@ const GovernanceVoting = () => {
           As a LedgerFren NFT holder, you can now vote for members to join the governance board.
         </p>
         
-        {/* Placeholder for voting interface - to be implemented */}
         <div className="p-8 rounded-xl bg-white/5 border border-white/10">
           <p className="text-center text-gray-400">
             Voting functionality coming soon. Stay tuned!
@@ -33,6 +35,19 @@ const GovernanceVoting = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const GovernanceVoting = () => {
+  return (
+    <DynamicContextProvider
+      settings={{
+        environmentId: import.meta.env.VITE_DYNAMIC_ENVIRONMENT_ID,
+        walletConnectors: [EthereumWalletConnectors, ZeroDevSmartWalletConnectors],
+      }}
+    >
+      <GovernanceVotingContent />
+    </DynamicContextProvider>
   );
 };
 
