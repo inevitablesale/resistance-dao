@@ -32,6 +32,15 @@ declare module "@dynamic-labs/sdk-react-core" {
     settings: {
       environmentId: string;
       walletConnectors: (typeof EthereumWalletConnectors | typeof ZeroDevSmartWalletConnectors)[];
+      transactionModalConfiguration?: {
+        modalTitle?: string;
+        modalDescription?: string;
+        receiveText?: string;
+        networkText?: string;
+        interactingText?: string;
+        confirmButtonText?: string;
+        cancelButtonText?: string;
+      };
     };
     children: React.ReactNode;
   }>;

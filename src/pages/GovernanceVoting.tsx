@@ -25,7 +25,7 @@ interface NFTMetadata {
 }
 
 const GovernanceVoting = () => {
-  const { primaryWallet, isAuthenticated } = useDynamicContext();
+  const { primaryWallet, user } = useDynamicContext();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [nfts, setNfts] = useState<(NFTMetadata & { tokenId: string })[]>([]);
@@ -33,7 +33,8 @@ const GovernanceVoting = () => {
 
   useEffect(() => {
     const checkWallet = async () => {
-      if (!isAuthenticated || !primaryWallet) {
+      const isConnected = primaryWallet ? await primaryWallet.isConnected() : false;
+      if (!isConnected || !user) {
         toast({
           title: "Wallet Connection Required",
           description: "Please connect your wallet to access governance voting.",
@@ -44,14 +45,15 @@ const GovernanceVoting = () => {
       }
     };
     checkWallet();
-  }, [primaryWallet, isAuthenticated, navigate, toast]);
+  }, [primaryWallet, user, navigate, toast]);
 
   useEffect(() => {
     const fetchNFTs = async () => {
-      if (!primaryWallet?.provider) return;
+      if (!primaryWallet) return;
 
       try {
-        const provider = new ethers.providers.Web3Provider(primaryWallet.provider);
+        const walletClient = await primaryWallet.getWalletClient();
+        const provider = new ethers.providers.Web3Provider(walletClient);
         const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
         const totalSupply = await contract.totalSupply();
