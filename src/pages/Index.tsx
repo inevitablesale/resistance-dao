@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -86,10 +85,10 @@ const IndexContent = () => {
 
         <div className="flex flex-col md:flex-row gap-4 justify-center mb-16">
           <button 
-            onClick={() => navigate('/token-presale')}
+            onClick={() => navigate('/mint-nft')}
             className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium"
           >
-            Join Token Presale
+            Mint LedgerFren NFT
           </button>
           <button className="px-8 py-3 bg-white hover:bg-white/90 text-[#8247E5] rounded-lg transition-colors text-lg font-medium">
             Read Whitepaper
@@ -152,6 +151,22 @@ const Index = () => {
               clipPath: "polygon(0 50%, 25% 0, 85% 0, 100% 50%, 85% 100%, 25% 100%)",
               transform: "rotate(-15deg)",
               animation: "flagshipPulse 4s ease-in-out infinite, quantumShield 6s linear infinite"
+            }}
+          />
+
+          {/* Guide Ship */}
+          <div
+            className="absolute"
+            style={{
+              left: "70%",
+              top: "30%",
+              width: "80px",
+              height: "30px",
+              background: "linear-gradient(45deg, rgba(0, 255, 255, 0.9) 0%, rgba(64, 156, 255, 0.8) 50%, rgba(147, 51, 255, 0.7) 100%)",
+              boxShadow: "0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(64, 156, 255, 0.2)",
+              clipPath: "polygon(0 50%, 10% 0, 98% 0, 100% 50%, 98% 100%, 10% 100%)",
+              transform: "rotate(-15deg)",
+              animation: "guideShipMove 8s ease-in-out infinite"
             }}
           />
 
@@ -279,6 +294,21 @@ const Index = () => {
             @keyframes scoutMove {
               0% { transform: translate(0, 0); }
               100% { transform: translate(-30px, 15px); }
+            }
+
+            @keyframes guideShipMove {
+              0% { 
+                transform: translate(0, 0) rotate(-15deg);
+                opacity: 0.7;
+              }
+              50% {
+                transform: translate(0, 400px) rotate(-15deg);
+                opacity: 1;
+              }
+              100% { 
+                transform: translate(0, 0) rotate(-15deg);
+                opacity: 0.7;
+              }
             }
           `}
         </style>
