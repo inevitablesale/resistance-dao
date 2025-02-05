@@ -60,6 +60,8 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
     return null;
   }
 
+  const attributeBoxStyle = "bg-black/40 backdrop-blur-xl rounded-xl p-4 h-32 flex flex-col justify-between transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -108,7 +110,7 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
             </p>
           </div>
 
-          {/* Enhanced Professional Background with Fixed Heights */}
+          {/* Enhanced Professional Background with Template Box Height */}
           <div className="grid grid-cols-2 gap-3">
             {[
               { icon: GraduationCap, label: "Experience Level", value: getAttribute("Experience Level") },
@@ -118,7 +120,7 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
             ].map((item, index) => (
               <div 
                 key={index}
-                className="bg-black/40 backdrop-blur-xl rounded-xl p-4 h-[120px] flex flex-col justify-between transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20"
+                className={attributeBoxStyle}
               >
                 <div className="flex items-center gap-2 text-sm text-gray-400">
                   <item.icon className="w-4 h-4 text-polygon-primary flex-shrink-0" />
@@ -131,8 +133,8 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
             ))}
           </div>
 
-          {/* Enhanced Service Line Expertise with Fixed Height */}
-          <div className="bg-black/40 backdrop-blur-xl rounded-xl p-4 h-[120px] flex flex-col justify-between transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20">
+          {/* Enhanced Service Line Expertise with Template Box Height */}
+          <div className={attributeBoxStyle}>
             <div className="flex items-center gap-2 text-sm text-gray-400">
               <Award className="w-4 h-4 text-polygon-primary flex-shrink-0" />
               Service Line Expertise
