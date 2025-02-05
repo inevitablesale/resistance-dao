@@ -9,10 +9,10 @@ export const InvestmentReadiness = () => {
         <h2 className="text-3xl font-bold text-white mb-4">Support Our Vision</h2>
         <p className="text-xl text-gray-300 mb-8 max-w-3xl">
           Join us in revolutionizing the accounting industry. Start by minting your LedgerFren NFT to participate 
-          in governance, then support the platform's development by acquiring LGR tokens.
+          in governance, then support the platform's development through our limited LGR token pre-sale.
         </p>
         
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
           <Card className="p-6 bg-white/5 backdrop-blur border-white/10">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
               <Shield className="w-5 h-5" />
@@ -71,10 +71,37 @@ export const InvestmentReadiness = () => {
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Future platform utility
+                Early adopter benefits
               </li>
             </ul>
           </Card>
+        </div>
+
+        <div className="bg-[#8247E5]/10 border border-[#8247E5]/20 rounded-lg p-8 backdrop-blur">
+          <div className="max-w-3xl mx-auto text-center">
+            <h3 className="text-2xl font-bold text-white mb-4">Limited LGR Token Pre-sale</h3>
+            <p className="text-lg text-gray-300 mb-6">
+              Secure your position in the future of accounting with LGR tokens. Only 10 million tokens 
+              will ever be minted, with just 2 million available during our pre-sale phase.
+            </p>
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="p-4 bg-white/5 rounded-lg backdrop-blur">
+                <p className="text-3xl font-bold text-[#8247E5] mb-2">10M</p>
+                <p className="text-sm text-gray-300">Total Supply</p>
+              </div>
+              <div className="p-4 bg-white/5 rounded-lg backdrop-blur">
+                <p className="text-3xl font-bold text-[#8247E5] mb-2">2M</p>
+                <p className="text-sm text-gray-300">Pre-sale Tokens</p>
+              </div>
+              <div className="p-4 bg-white/5 rounded-lg backdrop-blur">
+                <p className="text-3xl font-bold text-[#8247E5] mb-2">20%</p>
+                <p className="text-sm text-gray-300">Early Bird Bonus</p>
+              </div>
+            </div>
+            <button className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium">
+              Join Pre-sale Waitlist
+            </button>
+          </div>
         </div>
       </div>
     </section>
