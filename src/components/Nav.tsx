@@ -2,6 +2,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 
 const Nav = () => {
   const { primaryWallet } = useDynamicContext();
@@ -50,7 +51,7 @@ const Nav = () => {
               Overview
             </Link>
             <Link to="/" className="text-white/80 hover:text-white transition-colors">
-              Get Investment Ready
+              Presale
             </Link>
             <Link to="/" className="text-white/80 hover:text-white transition-colors">
               Why Now
@@ -60,12 +61,9 @@ const Nav = () => {
             </Link>
           </div>
 
-          <button 
-            onClick={handleLaunchApp}
-            className="hidden md:block px-6 py-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white rounded-lg font-medium transition-all hover:scale-105"
-          >
-            Access App
-          </button>
+          <div className="hidden md:block">
+            <DynamicWidget />
+          </div>
         </div>
       </div>
     </nav>
