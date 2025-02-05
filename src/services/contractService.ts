@@ -1,22 +1,22 @@
+
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 
-const CONTRACT_ADDRESS = "0x3dC25640b1B7528Dca23BeFcDAD835C5Bf4e5360";
+const CONTRACT_ADDRESS = "0x6527b171AF1c61AE43bf405ABe53861b0487A369";
 const CONTRACT_ABI = [
-  "function safeMint(address to, string memory governancePower) public returns (uint256)",
+  "function safeMint(address to, string memory metadataCID) public payable returns (uint256)",
+  "function updateMetadataCID(uint256 tokenId, string memory newCID)",
+  "function mintPrice() public view returns (uint256)",
   "function tokenURI(uint256 tokenId) public view returns (string)",
-  "function approve(address to, uint256 tokenId)",
-  "function renounceOwnership()",
-  "function safeTransferFrom(address from, address to, uint256 tokenId)",
-  "function setApprovalForAll(address operator, bool approved)",
-  "function transferFrom(address from, address to, uint256 tokenId)",
-  "function transferOwnership(address newOwner)",
-  "function updateGovernancePowerCID(uint256 tokenId, string memory newCID)",
   "function balanceOf(address owner) view returns (uint256)",
   "function ownerOf(uint256 tokenId) view returns (address)",
+  "event MetadataURIUpdated(uint256 indexed tokenId, string newURI)",
   "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 ];
+
+const PINATA_GATEWAY = "https://blue-shaggy-halibut-668.mypinata.cloud/ipfs/";
+const PINATA_GATEWAY_TOKEN = "LxW7Vt1WCzQk4x7VPUWYizgTK5BXllL4JMUQVXMeZEPqSokovWPXI-jmwcFsZ3hs";
 
 interface NFTMetadata {
   name: string;
@@ -27,9 +27,6 @@ interface NFTMetadata {
     value: string;
   }[];
 }
-
-const PINATA_GATEWAY = "https://blue-shaggy-halibut-668.mypinata.cloud/ipfs/";
-const PINATA_GATEWAY_TOKEN = "LxW7Vt1WCzQk4x7VPUWYizgTK5BXllL4JMUQVXMeZEPqSokovWPXI-jmwcFsZ3hs";
 
 export const checkNFTOwnership = async (walletClient: any, address: string) => {
   try {
@@ -51,6 +48,22 @@ export const checkNFTOwnership = async (walletClient: any, address: string) => {
   }
 };
 
+export const getMintPrice = async (walletClient: any) => {
+  try {
+    const provider = new ethers.providers.Web3Provider(walletClient, {
+      name: 'unknown',
+      chainId: 137
+    });
+    
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+    const price = await contract.mintPrice();
+    return price;
+  } catch (error) {
+    console.error('Error getting mint price:', error);
+    throw error;
+  }
+};
+
 export const mintNFT = async (walletClient: any, address: string, metadata: any) => {
   try {
     console.log('Starting NFT minting process with metadata:', metadata);
@@ -66,7 +79,7 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
 
     const provider = new ethers.providers.Web3Provider(walletClient, {
       name: 'unknown',
-      chainId: 137 // Polygon Mainnet
+      chainId: 137
     });
     
     // Enhanced image URL handling
@@ -88,36 +101,38 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
       attributes: metadata.attributes
     };
     
-    console.log('Preparing to upload metadata with image:', nftMetadata.image);
+    console.log('Preparing to upload metadata:', nftMetadata);
     const metadataUri = await uploadMetadataToPinata(nftMetadata);
     console.log('Metadata uploaded to IPFS:', metadataUri);
     
     const signer = provider.getSigner();
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
     
-    console.log('Minting NFT for address:', address);
-    console.log('Using governance power:', governancePowerAttr.value);
+    // Get mint price
+    const mintPrice = await contract.mintPrice();
+    console.log('Current mint price:', mintPrice.toString());
 
-    // Use the governance power value directly for minting
-    const tx = await contract.safeMint(address, governancePowerAttr.value);
+    // Extract CID from the IPFS URI (remove 'ipfs://' prefix)
+    const metadataCid = metadataUri.replace('ipfs://', '');
+    
+    console.log('Minting NFT for address:', address);
+    console.log('Using metadata CID:', metadataCid);
+
+    // Mint with metadata CID and handle potential mint price
+    const tx = await contract.safeMint(address, metadataCid, {
+      value: mintPrice
+    });
     console.log('Minting transaction sent:', tx.hash);
     
     const receipt = await tx.wait();
     console.log('Minting confirmed:', receipt);
     
-    // After successful minting, update the token's metadata CID
+    // Get tokenId from the Transfer event
     const mintEvent = receipt.events?.find(e => e.event === 'Transfer');
     const tokenId = mintEvent?.args?.tokenId;
     
-    if (tokenId) {
-      // Extract CID from the IPFS URI (remove 'ipfs://' prefix)
-      const metadataCid = metadataUri.replace('ipfs://', '');
-      console.log('Updating token metadata CID for token:', tokenId.toString());
-      
-      // Update the token's metadata CID
-      const updateTx = await contract.updateGovernancePowerCID(tokenId, metadataCid);
-      await updateTx.wait();
-      console.log('Token metadata CID updated successfully');
+    if (!tokenId) {
+      throw new Error('Failed to get tokenId from minting event');
     }
     
     return { success: true, tokenId, tokenURI: metadataUri };
@@ -153,7 +168,7 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
     
     const provider = new ethers.providers.Web3Provider(walletClient, {
       name: 'unknown',
-      chainId: 137 // Polygon Mainnet
+      chainId: 137
     });
     
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
@@ -263,7 +278,7 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
           };
         } catch (error) {
           console.error(`Error processing token ${event.args?.tokenId.toString()}:`, error);
-          // Return minimal metadata with default values instead of "Unspecified"
+          // Return minimal metadata with default values
           return {
             tokenId: event.args?.tokenId.toString(),
             owner: await contract.ownerOf(event.args?.tokenId.toString()),
