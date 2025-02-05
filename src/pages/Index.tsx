@@ -158,16 +158,16 @@ const Index = () => {
           <div
             className="absolute animate-pulse"
             style={{
-              left: "70%",
-              top: "20%", // Start higher
-              width: "120px",
-              height: "40px",
+              left: "50%", // Center horizontally
+              top: "15%", // Position above the hero text
+              width: "160px", // Larger size
+              height: "50px", // Taller
               background: "linear-gradient(45deg, rgba(0, 255, 255, 0.9) 0%, rgba(64, 156, 255, 0.8) 50%, rgba(147, 51, 255, 0.7) 100%)",
-              boxShadow: "0 0 40px rgba(0, 255, 255, 0.5), 0 0 80px rgba(64, 156, 255, 0.4)",
+              boxShadow: "0 0 60px rgba(0, 255, 255, 0.7), 0 0 120px rgba(64, 156, 255, 0.6)", // Stronger glow
               clipPath: "polygon(0 50%, 10% 0, 98% 0, 100% 50%, 98% 100%, 10% 100%)",
-              transform: "rotate(-15deg)",
-              animation: "guideShipMove 4s ease-in-out infinite", // Faster animation
-              zIndex: 20
+              transform: "translateX(-50%) rotate(-15deg)", // Center the ship
+              animation: "guideShipMove 3s ease-in-out infinite", // Faster animation
+              zIndex: 30 // Ensure it's above other elements
             }}
           />
 
@@ -299,16 +299,16 @@ const Index = () => {
 
             @keyframes guideShipMove {
               0% { 
-                transform: translate(0, 0) rotate(-15deg);
-                opacity: 0.8;
+                transform: translate(-50%, 0) rotate(-15deg);
+                opacity: 0.9;
               }
               50% {
-                transform: translate(0, 800px) rotate(-15deg); // Longer travel distance
+                transform: translate(-50%, 400px) rotate(-15deg); // Move down to the content
                 opacity: 1;
               }
               100% { 
-                transform: translate(0, 0) rotate(-15deg);
-                opacity: 0.8;
+                transform: translate(-50%, 0) rotate(-15deg);
+                opacity: 0.9;
               }
             }
           `}
