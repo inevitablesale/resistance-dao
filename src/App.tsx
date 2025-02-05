@@ -31,17 +31,42 @@ function App() {
         });
       },
       onAuthSuccess: (args: any) => {
+        console.log("Auth Success:", args);
         toast({
           title: "Authentication Successful",
           description: "You're now connected to LedgerFund. Checking NFT ownership...",
         });
       },
       onLogout: () => {
+        console.log("Logged out");
         toast({
           title: "Logged Out",
           description: "You've been successfully logged out.",
         });
       },
+      onDisconnect: () => {
+        console.log("Wallet disconnected");
+        toast({
+          title: "Wallet Disconnected",
+          description: "Your wallet has been disconnected.",
+        });
+      }
+    },
+    settings: {
+      network: {
+        chainId: 1, // Ethereum Mainnet
+      },
+      environmentId: "2b74d425-6827-4ff1-af57-f9543d71cca0",
+      appName: "LedgerFund",
+      appLogoUrl: "/favicon.ico",
+      /**
+       * Enhanced settings for better auth handling
+       */
+      enableVisitTrackingOnConnectOnly: false,
+      enableWalletConnectV1: false, // Disable deprecated WalletConnect v1
+      enableWalletConnectV2: true, // Enable WalletConnect v2
+      persistWalletSession: true, // Enable session persistence
+      enableAuthProviders: true, // Enable authentication providers
     }
   };
 
