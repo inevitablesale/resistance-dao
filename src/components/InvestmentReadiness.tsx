@@ -42,15 +42,15 @@ export const InvestmentReadiness = () => {
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Create proposals (200 LGR)
+                Propose firm acquisitions
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Vote on platform decisions
+                Select managing partners
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Shape development priorities
+                Choose service providers
               </li>
             </ul>
           </Card>
@@ -63,7 +63,7 @@ export const InvestmentReadiness = () => {
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Transak KYC/AML trading
+                KYC/AML for firm investment
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
@@ -82,8 +82,8 @@ export const InvestmentReadiness = () => {
             <h3 className="text-2xl font-bold text-white mb-4">LGR Token Presale</h3>
             <p className="text-lg text-gray-300 mb-6">
               Join the future of accounting with LGR tokens. Purchase during presale with MATIC 
-              and gain early access to governance rights. After launch, trade through our Transak 
-              integration with full KYC/AML compliance.
+              and gain early access to governance rights. After launch, complete KYC/AML to invest 
+              in accounting firm acquisitions and operations.
             </p>
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="p-4 bg-white/5 rounded-lg backdrop-blur">
