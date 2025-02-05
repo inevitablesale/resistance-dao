@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import GovernanceVoting from "./pages/GovernanceVoting";
 import MintNFT from "./pages/MintNFT";
+import TokenPresale from "./pages/TokenPresale";
 import { useToast } from "./hooks/use-toast";
 
 function App() {
@@ -77,6 +78,7 @@ function App() {
           <Route path="/" element={<Index />} />
           <Route path="/governance-voting" element={<GovernanceVoting />} />
           <Route path="/mint-nft" element={<MintNFT />} />
+          <Route path="/token-presale" element={<TokenPresale />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

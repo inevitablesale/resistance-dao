@@ -4,17 +4,13 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 
 const Nav = () => {
-  const { primaryWallet } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleLaunchApp = async () => {
     if (!primaryWallet) {
-      toast({
-        title: "Wallet Not Connected",
-        description: "Please connect your wallet first to launch the app.",
-        variant: "destructive",
-      });
+      setShowAuthFlow?.(true);
       return;
     }
 
