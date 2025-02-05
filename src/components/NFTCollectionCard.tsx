@@ -108,45 +108,38 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
             </p>
           </div>
 
-          {/* Enhanced Professional Background */}
+          {/* Enhanced Professional Background with Fixed Heights */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-black/40 backdrop-blur-xl rounded-xl p-4 transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20">
-              <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                <GraduationCap className="w-4 h-4 text-polygon-primary" />
-                Experience Level
+            {[
+              { icon: GraduationCap, label: "Experience Level", value: getAttribute("Experience Level") },
+              { icon: Calendar, label: "Years in Practice", value: getAttribute("Years in Practice") },
+              { icon: Book, label: "Specialty", value: getAttribute("Specialty") },
+              { icon: Users, label: "Client Base", value: getAttribute("Client Base") }
+            ].map((item, index) => (
+              <div 
+                key={index}
+                className="bg-black/40 backdrop-blur-xl rounded-xl p-4 h-[120px] flex flex-col justify-between transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20"
+              >
+                <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <item.icon className="w-4 h-4 text-polygon-primary flex-shrink-0" />
+                  {item.label}
+                </div>
+                <p className="text-base font-medium text-white break-words line-clamp-2 hover:line-clamp-none transition-all">
+                  {item.value}
+                </p>
               </div>
-              <p className="text-base font-medium text-white">{getAttribute("Experience Level")}</p>
-            </div>
-            <div className="bg-black/40 backdrop-blur-xl rounded-xl p-4 transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20">
-              <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                <Calendar className="w-4 h-4 text-polygon-primary" />
-                Years in Practice
-              </div>
-              <p className="text-base font-medium text-white">{getAttribute("Years in Practice")}</p>
-            </div>
-            <div className="bg-black/40 backdrop-blur-xl rounded-xl p-4 transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20">
-              <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                <Book className="w-4 h-4 text-polygon-primary" />
-                Specialty
-              </div>
-              <p className="text-base font-medium text-white">{getAttribute("Specialty")}</p>
-            </div>
-            <div className="bg-black/40 backdrop-blur-xl rounded-xl p-4 transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20">
-              <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                <Users className="w-4 h-4 text-polygon-primary" />
-                Client Base
-              </div>
-              <p className="text-base font-medium text-white">{getAttribute("Client Base")}</p>
-            </div>
+            ))}
           </div>
 
-          {/* Enhanced Service Line Expertise */}
-          <div className="bg-black/40 backdrop-blur-xl rounded-xl p-4 transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20">
-            <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-              <Award className="w-4 h-4 text-polygon-primary" />
+          {/* Enhanced Service Line Expertise with Fixed Height */}
+          <div className="bg-black/40 backdrop-blur-xl rounded-xl p-4 h-[120px] flex flex-col justify-between transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20">
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <Award className="w-4 h-4 text-polygon-primary flex-shrink-0" />
               Service Line Expertise
             </div>
-            <p className="text-base font-medium text-white">{getAttribute("Service Line Expertise")}</p>
+            <p className="text-base font-medium text-white break-words line-clamp-2 hover:line-clamp-none transition-all">
+              {getAttribute("Service Line Expertise")}
+            </p>
           </div>
 
           {/* Professional Experience Section */}
