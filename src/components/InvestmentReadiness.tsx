@@ -9,27 +9,27 @@ export const InvestmentReadiness = () => {
         <h2 className="text-3xl font-bold text-white mb-4">Join Our Vision</h2>
         <p className="text-xl text-gray-300 mb-8 max-w-3xl">
           Participate in revolutionizing the accounting industry through our token presale. 
-          Get your LGR tokens for governance rights and shape the future of decentralized accounting.
+          Send MATIC to purchase LGR tokens and shape the future of decentralized accounting.
         </p>
         
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <Card className="p-6 bg-white/5 backdrop-blur border-white/10">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
               <Shield className="w-5 h-5" />
-              Professional Trading
+              Simple Purchase Process
             </h3>
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Licensed exchange partner
+                Direct MATIC transfer
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                KYC/AML compliant
+                Instant token delivery
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Multiple payment methods
+                1-year lockup period
               </li>
             </ul>
           </Card>
@@ -58,16 +58,16 @@ export const InvestmentReadiness = () => {
           <Card className="p-6 bg-white/5 backdrop-blur border-white/10">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
               <BarChart3 className="w-5 h-5" />
-              Token Details
+              Post-Launch Features
             </h3>
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                $0.10 per token
+                Transak KYC/AML trading
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Min purchase: 100 LGR
+                Fiat on/off ramps
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
@@ -81,9 +81,9 @@ export const InvestmentReadiness = () => {
           <div className="max-w-3xl mx-auto text-center">
             <h3 className="text-2xl font-bold text-white mb-4">LGR Token Presale</h3>
             <p className="text-lg text-gray-300 mb-6">
-              Join the future of accounting with LGR tokens. A total supply of 10 million tokens, 
-              with 5 million available during our presale phase. Trade confidently through our 
-              licensed exchange partner.
+              Join the future of accounting with LGR tokens. Purchase during presale with MATIC 
+              and gain early access to governance rights. After launch, trade through our Transak 
+              integration with full KYC/AML compliance.
             </p>
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="p-4 bg-white/5 rounded-lg backdrop-blur">
