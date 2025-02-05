@@ -1,11 +1,10 @@
-```typescript
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 
 const CONTRACT_ADDRESS = "0x3dC25640b1B7528Dca23BeFcDAD835C5Bf4e5360";
 const CONTRACT_ABI = [
-  "function safeMint(address to, string memory uri) public returns (uint256)",
+  "function safeMint(address to, string memory governancePower) public returns (uint256)",
   "function tokenURI(uint256 tokenId) public view returns (string)",
   "function approve(address to, uint256 tokenId)",
   "function renounceOwnership()",
@@ -13,6 +12,7 @@ const CONTRACT_ABI = [
   "function setApprovalForAll(address operator, bool approved)",
   "function transferFrom(address from, address to, uint256 tokenId)",
   "function transferOwnership(address newOwner)",
+  "function updateGovernancePowerCID(uint256 tokenId, string memory newCID)",
   "function balanceOf(address owner) view returns (uint256)",
   "function ownerOf(uint256 tokenId) view returns (address)",
   "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
@@ -88,22 +88,37 @@ export const mintNFT = async (walletClient: any, address: string, metadata: any)
       attributes: metadata.attributes
     };
     
-    console.log('Uploading metadata to IPFS:', nftMetadata);
+    console.log('Preparing to upload metadata with image:', nftMetadata.image);
     const metadataUri = await uploadMetadataToPinata(nftMetadata);
-    console.log('Metadata uploaded successfully:', metadataUri);
+    console.log('Metadata uploaded to IPFS:', metadataUri);
     
     const signer = provider.getSigner();
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
     
-    console.log('Minting NFT with metadata URI:', metadataUri);
-    const tx = await contract.safeMint(address, metadataUri);
+    console.log('Minting NFT for address:', address);
+    console.log('Using governance power:', governancePowerAttr.value);
+
+    // Use the governance power value directly for minting
+    const tx = await contract.safeMint(address, governancePowerAttr.value);
     console.log('Minting transaction sent:', tx.hash);
     
     const receipt = await tx.wait();
     console.log('Minting confirmed:', receipt);
     
+    // After successful minting, update the token's metadata CID
     const mintEvent = receipt.events?.find(e => e.event === 'Transfer');
     const tokenId = mintEvent?.args?.tokenId;
+    
+    if (tokenId) {
+      // Extract CID from the IPFS URI (remove 'ipfs://' prefix)
+      const metadataCid = metadataUri.replace('ipfs://', '');
+      console.log('Updating token metadata CID for token:', tokenId.toString());
+      
+      // Update the token's metadata CID
+      const updateTx = await contract.updateGovernancePowerCID(tokenId, metadataCid);
+      await updateTx.wait();
+      console.log('Token metadata CID updated successfully');
+    }
     
     return { success: true, tokenId, tokenURI: metadataUri };
   } catch (error) {
@@ -295,4 +310,3 @@ export const getAllMintedNFTs = async (walletClient: any): Promise<MintedNFT[]> 
     throw error;
   }
 };
-```
