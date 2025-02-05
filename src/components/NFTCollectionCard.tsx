@@ -62,7 +62,7 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
 
   const attributeBoxStyle = cn(
     "bg-black/40 backdrop-blur-xl rounded-xl p-4",
-    "h-full flex flex-col",
+    "flex flex-col h-full",
     "transform hover:scale-105 transition-all duration-300",
     "border border-white/5 hover:border-polygon-primary/20"
   );
@@ -115,43 +115,41 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
           </div>
 
           {/* Professional Background Grid */}
-          <div className="grid grid-cols-2 gap-3 auto-rows-fr">
+          <div className="grid grid-cols-2 gap-3">
             {[
               { icon: GraduationCap, label: "Experience Level", value: getAttribute("Experience Level") },
               { icon: Calendar, label: "Years in Practice", value: getAttribute("Years in Practice") },
-              { icon: Book, label: "Specialty", value: getAttribute("Specialty"), colSpan: getAttribute("Specialty").length > 30 ? true : false },
+              { icon: Book, label: "Specialty", value: getAttribute("Specialty") },
               { icon: Users, label: "Client Base", value: getAttribute("Client Base") }
             ].map((item, index) => (
-              <div 
-                key={index}
-                className={cn(
-                  attributeBoxStyle,
-                  item.colSpan && "col-span-2"
-                )}
-              >
-                <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                  <item.icon className="w-4 h-4 text-polygon-primary flex-shrink-0" />
-                  {item.label}
-                </div>
-                <div className="flex-grow">
-                  <p className="text-base font-medium text-white break-words">
-                    {item.value}
-                  </p>
+              <div key={index} className="h-full">
+                <div className={attributeBoxStyle}>
+                  <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                    <item.icon className="w-4 h-4 text-polygon-primary flex-shrink-0" />
+                    {item.label}
+                  </div>
+                  <div className="flex-grow">
+                    <p className="text-base font-medium text-white break-words">
+                      {item.value}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Service Line Expertise - Full Width */}
-          <div className={cn(attributeBoxStyle)}>
-            <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-              <Award className="w-4 h-4 text-polygon-primary flex-shrink-0" />
-              Service Line Expertise
-            </div>
-            <div className="flex-grow">
-              <p className="text-base font-medium text-white break-words">
-                {getAttribute("Service Line Expertise")}
-              </p>
+          <div className="h-full">
+            <div className={attributeBoxStyle}>
+              <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                <Award className="w-4 h-4 text-polygon-primary flex-shrink-0" />
+                Service Line Expertise
+              </div>
+              <div className="flex-grow">
+                <p className="text-base font-medium text-white break-words">
+                  {getAttribute("Service Line Expertise")}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -171,21 +169,20 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-3 space-y-3">
                 {metadata.experiences.map((exp, index) => (
-                  <div 
-                    key={index} 
-                    className={attributeBoxStyle}
-                  >
-                    <p className="text-base font-semibold text-white mb-1">{exp.title}</p>
-                    <p className="text-sm text-polygon-primary">{exp.company}</p>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {exp.duration}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {exp.location}
-                      </span>
+                  <div key={index} className="h-full">
+                    <div className={attributeBoxStyle}>
+                      <p className="text-base font-semibold text-white mb-1">{exp.title}</p>
+                      <p className="text-sm text-polygon-primary">{exp.company}</p>
+                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          {exp.duration}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          {exp.location}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}
