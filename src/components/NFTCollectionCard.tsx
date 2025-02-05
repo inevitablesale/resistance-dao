@@ -1,8 +1,7 @@
 
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-import { GraduationCap, Calendar, MapPin, Users, Book, Award, CircuitBoard } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Hexagon, Cpu, Circuit, Blocks, Binary, Network, Shield, Database } from "lucide-react";
 import { useState } from "react";
 import { ProfileSection } from "./nft-card/ProfileSection";
 import { AttributeBox } from "./nft-card/AttributeBox";
@@ -30,11 +29,12 @@ interface NFTCollectionCardProps {
 }
 
 export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCardProps) => {
+  const [isHovered, setIsHovered] = useState(false);
   const [isExperienceOpen, setIsExperienceOpen] = useState(false);
 
   const governancePower = metadata.attributes?.find(
     attr => attr.trait_type === "Governance Power"
-  )?.value?.replace("Governance-Power-", "") || "Unknown";
+  )?.value || "Unknown";
 
   const getAttribute = (traitType: string) => 
     metadata.attributes?.find(attr => attr.trait_type === traitType)?.value || "N/A";
@@ -46,115 +46,131 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      className="max-w-md mx-auto perspective-1000"
+      className="max-w-4xl mx-auto perspective-3000"
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
     >
-      <Card className={cn(
-        "relative overflow-hidden transition-all duration-700",
-        "bg-[#0a0a0a]",
-        "border-0",
-        "hover:transform hover:rotate-y-5 hover:scale-105",
-        "group"
-      )}>
-        {/* Animated Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] via-[#000000] to-[#1a1a1a]">
-          <div className="absolute inset-0 opacity-30 mix-blend-overlay">
-            <div className="absolute inset-0" style={{
-              backgroundImage: `radial-gradient(circle at 50% 50%, rgba(130, 71, 229, 0.1) 0%, transparent 50%),
-                               radial-gradient(circle at 100% 100%, rgba(163, 121, 255, 0.1) 0%, transparent 50%)`
-            }} />
-          </div>
-        </div>
-        
-        {/* Glowing Edge Effect */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-          <div className="absolute inset-0 bg-gradient-to-r from-polygon-primary/20 via-transparent to-polygon-secondary/20 blur-xl" />
-        </div>
-        
-        <div className="relative">
-          {/* Circuit Board Pattern Overlay */}
-          <div className="absolute inset-0 opacity-5">
-            <CircuitBoard className="w-full h-full text-polygon-primary" />
-          </div>
-          
-          {/* Main Content */}
-          <div className="relative flex flex-col p-8 gap-8">
-            <ProfileSection
-              image={metadata.image}
-              name={metadata.name}
-              governancePower={governancePower}
-              Award={Award}
+      <Card className="relative overflow-hidden bg-transparent border-0">
+        {/* Animated Background Layer */}
+        <div className="absolute inset-0 bg-black">
+          <motion.div 
+            className="absolute inset-0 opacity-30"
+            animate={{
+              background: [
+                "radial-gradient(circle at 0% 0%, #00ff87 0%, transparent 50%)",
+                "radial-gradient(circle at 100% 100%, #00ff87 0%, transparent 50%)",
+                "radial-gradient(circle at 0% 100%, #00ff87 0%, transparent 50%)",
+                "radial-gradient(circle at 100% 0%, #00ff87 0%, transparent 50%)",
+              ],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          />
+          {/* Tech Grid Pattern */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="w-full h-full" 
+              style={{
+                backgroundImage: `
+                  linear-gradient(to right, #00ff87 1px, transparent 1px),
+                  linear-gradient(to bottom, #00ff87 1px, transparent 1px)
+                `,
+                backgroundSize: '20px 20px'
+              }}
             />
+          </div>
+        </div>
 
-            {/* Attributes Grid */}
+        <div className="relative z-10">
+          {/* Main Content Container */}
+          <div className="p-8 space-y-8">
+            {/* Header Section with Holographic Effect */}
             <motion.div 
-              className="grid grid-cols-2 gap-4"
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
+              className="text-center space-y-4 relative"
+              animate={{ y: isHovered ? -10 : 0 }}
+              transition={{ type: "spring", stiffness: 300 }}
             >
+              <h2 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#00ff87] via-[#60efff] to-[#00ff87] pb-2">
+                {metadata.name}
+              </h2>
+              <div className="flex justify-center gap-2">
+                <Hexagon className="w-6 h-6 text-[#00ff87] animate-pulse" />
+                <span className="text-[#00ff87] font-mono">ID: {tokenId}</span>
+                <Hexagon className="w-6 h-6 text-[#00ff87] animate-pulse" />
+              </div>
+            </motion.div>
+
+            {/* Attributes Grid with Cyber Effect */}
+            <div className="grid grid-cols-2 gap-6">
               <AttributeBox
-                icon={GraduationCap}
+                icon={Shield}
+                label="Governance Power"
+                value={governancePower}
+                className="cyber-box"
+              />
+              <AttributeBox
+                icon={Cpu}
                 label="Experience Level"
                 value={getAttribute("Experience Level")}
+                className="cyber-box"
               />
               <AttributeBox
-                icon={Calendar}
+                icon={Circuit}
                 label="Years in Practice"
                 value={getAttribute("Years in Practice")}
+                className="cyber-box"
               />
               <AttributeBox
-                icon={Book}
+                icon={Binary}
                 label="Specialty"
                 value={getAttribute("Specialty")}
+                className="cyber-box"
               />
               <AttributeBox
-                icon={Users}
+                icon={Network}
                 label="Client Base"
                 value={getAttribute("Client Base")}
+                className="cyber-box"
               />
-            </motion.div>
-
-            {/* Service Line Expertise */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
               <AttributeBox
-                icon={Award}
-                label="Service Line Expertise"
+                icon={Database}
+                label="Service Line"
                 value={getAttribute("Service Line Expertise")}
+                className="cyber-box"
               />
-            </motion.div>
+            </div>
 
             {/* Experience Section */}
-            {metadata.experiences && metadata.experiences.length > 0 && (
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-              >
-                <ExperienceSection
-                  experiences={metadata.experiences}
-                  isOpen={isExperienceOpen}
-                  onOpenChange={setIsExperienceOpen}
-                />
-              </motion.div>
+            {metadata.experiences && (
+              <ExperienceSection
+                experiences={metadata.experiences}
+                isOpen={isExperienceOpen}
+                onOpenChange={setIsExperienceOpen}
+              />
             )}
 
             {/* Voting Section */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              <VotingSection tokenId={tokenId} owner={owner} />
-            </motion.div>
+            <VotingSection tokenId={tokenId} owner={owner} />
           </div>
         </div>
+
+        {/* Decorative Elements */}
+        <motion.div 
+          className="absolute top-0 left-0 w-full h-full pointer-events-none"
+          animate={{
+            background: [
+              "radial-gradient(circle at 50% 50%, rgba(0,255,135,0.1) 0%, transparent 50%)",
+              "radial-gradient(circle at 50% 50%, rgba(0,255,135,0.2) 20%, transparent 70%)",
+              "radial-gradient(circle at 50% 50%, rgba(0,255,135,0.1) 0%, transparent 50%)",
+            ],
+          }}
+          transition={{ duration: 3, repeat: Infinity }}
+        />
       </Card>
     </motion.div>
   );

@@ -12,39 +12,45 @@ interface AttributeBoxProps {
 
 export const AttributeBox = ({ icon: Icon, label, value, className }: AttributeBoxProps) => {
   const attributeBoxStyle = cn(
-    "relative overflow-hidden",
-    "backdrop-blur-xl rounded-2xl p-4",
-    "bg-gradient-to-br from-black/60 to-black/40",
-    "transform hover:scale-105 transition-all duration-500",
-    "border border-white/5 hover:border-polygon-primary/30",
-    "group",
+    "relative group",
+    "bg-black/40 backdrop-blur-xl rounded-lg p-6",
+    "border border-[#00ff87]/20",
+    "before:absolute before:inset-0",
+    "before:border before:border-[#00ff87]/20 before:rounded-lg",
+    "before:transition-all before:duration-300",
+    "hover:before:scale-105 hover:before:border-[#00ff87]/40",
+    "after:absolute after:inset-0",
+    "after:bg-gradient-to-br after:from-[#00ff87]/10 after:to-transparent",
+    "after:opacity-0 hover:after:opacity-100",
+    "after:transition-opacity after:duration-300",
     className
   );
 
   return (
-    <motion.div 
-      className="h-full"
+    <motion.div
+      className={attributeBoxStyle}
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2 }}
     >
-      <div className={attributeBoxStyle}>
-        {/* Glowing background effect */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-          <div className="absolute inset-0 bg-gradient-to-br from-polygon-primary/5 to-polygon-secondary/5 blur-xl" />
+      <div className="relative z-10">
+        {/* Label Section */}
+        <div className="flex items-center gap-2 mb-3">
+          <Icon className="w-5 h-5 text-[#00ff87]" />
+          <span className="text-[#00ff87] font-mono uppercase tracking-wider text-sm">
+            {label}
+          </span>
         </div>
         
-        {/* Content */}
-        <div className="relative">
-          <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-            <Icon className="w-4 h-4 text-polygon-primary" />
-            <span className="font-medium">{label}</span>
-          </div>
-          <div className="mt-1">
-            <p className="text-base font-semibold text-white break-words">
-              {value}
-            </p>
-          </div>
+        {/* Value Section */}
+        <div className="font-semibold text-white/90 break-words">
+          {value}
         </div>
+
+        {/* Decorative Corner Elements */}
+        <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#00ff87]/40" />
+        <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#00ff87]/40" />
+        <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#00ff87]/40" />
+        <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-[#00ff87]/40" />
       </div>
     </motion.div>
   );
