@@ -25,13 +25,6 @@ function App() {
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
     eventsCallbacks: {
-      onVerifySuccess: ({ setShowAuthFlow }) => {
-        setShowAuthFlow?.(false);
-        toast({
-          title: "Verification Complete",
-          description: "Your account has been verified successfully.",
-        });
-      },
       onAuthSuccess: (args: any) => {
         console.log("Auth Success:", args);
         toast({
@@ -53,12 +46,6 @@ function App() {
           description: "Your wallet has been disconnected.",
         });
       },
-      onEmailVerificationSuccess: () => {
-        toast({
-          title: "Email Verified",
-          description: "Your email has been successfully verified.",
-        });
-      },
       onError: (error: any) => {
         console.error("Dynamic SDK Error:", error);
         toast({
@@ -70,19 +57,18 @@ function App() {
     },
     settings: {
       network: {
-        chainId: 1, // Ethereum Mainnet
+        chainId: 137, // Polygon Mainnet
       },
       environmentId: "2b74d425-6827-4ff1-af57-f9543d71cca0",
       appName: "LedgerFund",
       appLogoUrl: "/favicon.ico",
-      /**
-       * Enhanced settings for better auth handling
-       */
+      enableEmbeddedWallets: true, // Enable embedded wallets
       enableVisitTrackingOnConnectOnly: false,
-      enableWalletConnectV1: false, // Disable deprecated WalletConnect v1
-      enableWalletConnectV2: true, // Enable WalletConnect v2
-      persistWalletSession: true, // Enable session persistence
-      enableAuthProviders: true, // Enable authentication providers
+      enableWalletConnectV1: false,
+      enableWalletConnectV2: true,
+      persistWalletSession: true,
+      enableAuthProviders: true,
+      shadowDOMEnabled: false // Disable shadow DOM to prevent wallet UI issues
     }
   };
 
