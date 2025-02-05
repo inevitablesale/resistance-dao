@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -59,7 +60,12 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
     return null;
   }
 
-  const attributeBoxStyle = "bg-black/40 backdrop-blur-xl rounded-xl p-4 flex flex-col h-full transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20";
+  const attributeBoxStyle = cn(
+    "bg-black/40 backdrop-blur-xl rounded-xl p-4",
+    "h-full flex flex-col",
+    "transform hover:scale-105 transition-all duration-300",
+    "border border-white/5 hover:border-polygon-primary/20"
+  );
 
   return (
     <motion.div
@@ -79,10 +85,9 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
         <div className="absolute inset-0 bg-gradient-to-br from-polygon-primary/5 via-transparent to-polygon-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         
         <div className="relative flex flex-col p-8 gap-6">
-          {/* Enhanced Profile Section */}
+          {/* Profile Section */}
           <div className="w-full flex justify-center mb-4">
             <div className="relative w-32 aspect-square">
-              {/* Multiple Glow Layers */}
               <div className="absolute -inset-4 bg-polygon-primary/10 rounded-full blur-3xl animate-pulse-slow" />
               <div className="absolute -inset-2 bg-polygon-secondary/15 rounded-full blur-2xl animate-pulse-slow delay-75" />
               <div className="relative">
@@ -96,7 +101,7 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
             </div>
           </div>
 
-          {/* Enhanced Title Section */}
+          {/* Title Section */}
           <div className="space-y-4 text-center">
             <h3 className="text-2xl font-bold bg-gradient-to-r from-white via-polygon-primary to-polygon-secondary bg-clip-text text-transparent">
               {metadata.name}
@@ -110,16 +115,19 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
           </div>
 
           {/* Professional Background Grid */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 auto-rows-fr">
             {[
               { icon: GraduationCap, label: "Experience Level", value: getAttribute("Experience Level") },
               { icon: Calendar, label: "Years in Practice", value: getAttribute("Years in Practice") },
-              { icon: Book, label: "Specialty", value: getAttribute("Specialty") },
+              { icon: Book, label: "Specialty", value: getAttribute("Specialty"), colSpan: getAttribute("Specialty").length > 30 ? true : false },
               { icon: Users, label: "Client Base", value: getAttribute("Client Base") }
             ].map((item, index) => (
               <div 
                 key={index}
-                className={attributeBoxStyle}
+                className={cn(
+                  attributeBoxStyle,
+                  item.colSpan && "col-span-2"
+                )}
               >
                 <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
                   <item.icon className="w-4 h-4 text-polygon-primary flex-shrink-0" />
@@ -134,8 +142,8 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
             ))}
           </div>
 
-          {/* Service Line Expertise */}
-          <div className={attributeBoxStyle}>
+          {/* Service Line Expertise - Full Width */}
+          <div className={cn(attributeBoxStyle)}>
             <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
               <Award className="w-4 h-4 text-polygon-primary flex-shrink-0" />
               Service Line Expertise
@@ -165,7 +173,7 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
                 {metadata.experiences.map((exp, index) => (
                   <div 
                     key={index} 
-                    className="bg-black/40 backdrop-blur-xl rounded-xl p-4 transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20"
+                    className={attributeBoxStyle}
                   >
                     <p className="text-base font-semibold text-white mb-1">{exp.title}</p>
                     <p className="text-sm text-polygon-primary">{exp.company}</p>
@@ -193,7 +201,7 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
             </div>
           </div>
 
-          {/* Enhanced Voting Buttons */}
+          {/* Voting Buttons */}
           <div className="flex justify-center gap-4 mt-2">
             <Button
               variant="outline"
@@ -221,3 +229,4 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
 };
 
 export default NFTCollectionCard;
+
