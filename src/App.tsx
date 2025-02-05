@@ -25,7 +25,8 @@ function App() {
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
     eventsCallbacks: {
-      onVerificationComplete: () => {
+      onVerifySuccess: ({ setShowAuthFlow }) => {
+        setShowAuthFlow?.(false);
         toast({
           title: "Verification Complete",
           description: "Your account has been verified successfully.",
@@ -67,7 +68,7 @@ function App() {
       enableWalletConnectV1: false, // Disable deprecated WalletConnect v1
       enableWalletConnectV2: true, // Enable WalletConnect v2
       persistWalletSession: true, // Enable session persistence
-      enableAuthProviders: true, // Enable authentication providers
+      enableAuthProviders: true, // Enable authentication providers,
     }
   };
 
