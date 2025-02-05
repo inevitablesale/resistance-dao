@@ -1,7 +1,7 @@
 
 import { Card } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
-import { Hexagon, Cpu, Circuit, Blocks, Binary, Network, Shield, Database } from "lucide-react";
+import { Hexagon, Cpu, Box, Blocks, Binary, Network, Shield, Database } from "lucide-react";
 import { useState } from "react";
 import { ProfileSection } from "./nft-card/ProfileSection";
 import { AttributeBox } from "./nft-card/AttributeBox";
@@ -120,7 +120,7 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
                 className="cyber-box"
               />
               <AttributeBox
-                icon={Circuit}
+                icon={Box}
                 label="Years in Practice"
                 value={getAttribute("Years in Practice")}
                 className="cyber-box"
