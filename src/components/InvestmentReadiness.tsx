@@ -1,35 +1,35 @@
 
-import { Shield, Vote, DollarSign } from "lucide-react";
+import { Shield, Vote, DollarSign, BarChart3 } from "lucide-react";
 import { Card } from "./ui/card";
 
 export const InvestmentReadiness = () => {
   return (
     <section className="py-16 bg-black/30 backdrop-blur-sm">
       <div className="container px-4">
-        <h2 className="text-3xl font-bold text-white mb-4">Support Our Vision</h2>
+        <h2 className="text-3xl font-bold text-white mb-4">Join Our Vision</h2>
         <p className="text-xl text-gray-300 mb-8 max-w-3xl">
-          Join us in revolutionizing the accounting industry. Start by minting your LedgerFren NFT to participate 
-          in governance, then support the platform's development through our limited LGR token pre-sale.
+          Participate in revolutionizing the accounting industry through our token presale. 
+          Get your LGR tokens for governance rights and shape the future of decentralized accounting.
         </p>
         
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <Card className="p-6 bg-white/5 backdrop-blur border-white/10">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
               <Shield className="w-5 h-5" />
-              Step 1: Mint NFT
+              Professional Trading
             </h3>
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Get your LedgerFren NFT
+                Licensed exchange partner
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Become a governance member
+                KYC/AML compliant
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Early supporter benefits
+                Multiple payment methods
               </li>
             </ul>
           </Card>
@@ -37,9 +37,13 @@ export const InvestmentReadiness = () => {
           <Card className="p-6 bg-white/5 backdrop-blur border-white/10">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
               <Vote className="w-5 h-5" />
-              Step 2: Governance
+              Governance Rights
             </h3>
             <ul className="space-y-3 text-gray-300">
+              <li className="flex items-center gap-2">
+                <span className="text-[#8247E5]">•</span>
+                Create proposals (200 LGR)
+              </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
                 Vote on platform decisions
@@ -48,30 +52,26 @@ export const InvestmentReadiness = () => {
                 <span className="text-[#8247E5]">•</span>
                 Shape development priorities
               </li>
-              <li className="flex items-center gap-2">
-                <span className="text-[#8247E5]">•</span>
-                Join governance meetings
-              </li>
             </ul>
           </Card>
 
           <Card className="p-6 bg-white/5 backdrop-blur border-white/10">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-              <DollarSign className="w-5 h-5" />
-              Step 3: Support Platform
+              <BarChart3 className="w-5 h-5" />
+              Token Details
             </h3>
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Purchase LGR tokens
+                $0.10 per token
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Support platform development
+                Min purchase: 100 LGR
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#8247E5]">•</span>
-                Early adopter benefits
+                Professional liquidity
               </li>
             </ul>
           </Card>
@@ -79,10 +79,11 @@ export const InvestmentReadiness = () => {
 
         <div className="bg-[#8247E5]/10 border border-[#8247E5]/20 rounded-lg p-8 backdrop-blur">
           <div className="max-w-3xl mx-auto text-center">
-            <h3 className="text-2xl font-bold text-white mb-4">Limited LGR Token Pre-sale</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">LGR Token Presale</h3>
             <p className="text-lg text-gray-300 mb-6">
-              Secure your position in the future of accounting with LGR tokens. Only 10 million tokens 
-              will ever be minted, with just 2 million available during our pre-sale phase.
+              Join the future of accounting with LGR tokens. A total supply of 10 million tokens, 
+              with 5 million available during our presale phase. Trade confidently through our 
+              licensed exchange partner.
             </p>
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="p-4 bg-white/5 rounded-lg backdrop-blur">
@@ -90,16 +91,16 @@ export const InvestmentReadiness = () => {
                 <p className="text-sm text-gray-300">Total Supply</p>
               </div>
               <div className="p-4 bg-white/5 rounded-lg backdrop-blur">
-                <p className="text-3xl font-bold text-[#8247E5] mb-2">2M</p>
-                <p className="text-sm text-gray-300">Pre-sale Tokens</p>
+                <p className="text-3xl font-bold text-[#8247E5] mb-2">5M</p>
+                <p className="text-sm text-gray-300">Presale Tokens</p>
               </div>
               <div className="p-4 bg-white/5 rounded-lg backdrop-blur">
-                <p className="text-3xl font-bold text-[#8247E5] mb-2">20%</p>
-                <p className="text-sm text-gray-300">Early Bird Bonus</p>
+                <p className="text-3xl font-bold text-[#8247E5] mb-2">$0.10</p>
+                <p className="text-sm text-gray-300">Price Per Token</p>
               </div>
             </div>
             <button className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium">
-              Join Pre-sale Waitlist
+              Join Token Presale
             </button>
           </div>
         </div>

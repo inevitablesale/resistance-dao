@@ -28,7 +28,7 @@ const IndexContent = () => {
       if (!primaryWallet) {
         toast({
           title: "Welcome to LedgerFund",
-          description: "Connect or create your wallet to get started"
+          description: "Connect your wallet to participate in the token presale"
         });
         return;
       }
@@ -77,18 +77,18 @@ const IndexContent = () => {
     <>
       <div className="text-center mb-8 max-w-5xl mx-auto pt-32">
         <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight">
-          The future of accounting<br />belongs to you
+          Own the future of<br />accounting
         </h1>
         <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
-          Licensed accountants can participate in fractional ownership of accounting firms through our decentralized autonomous organization (DAO)
+          Join our token presale to participate in the first decentralized accounting platform. Trade with confidence through our licensed exchange partner.
         </p>
 
         <div className="flex flex-col md:flex-row gap-4 justify-center mb-16">
           <button 
-            onClick={() => navigate('/mint-nft')}
+            onClick={() => navigate('/token-presale')}
             className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium"
           >
-            Mint LedgerFren NFT
+            Join Token Presale
           </button>
           <button className="px-8 py-3 bg-white hover:bg-white/90 text-[#8247E5] rounded-lg transition-colors text-lg font-medium">
             Read Whitepaper
