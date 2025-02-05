@@ -4,6 +4,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useEffect } from "react";
 import Nav from "@/components/Nav";
 import { useToast } from "@/hooks/use-toast";
+import { Wallet2 } from "lucide-react";
 
 const TokenPresaleContent = () => {
   const { user, setShowAuthFlow } = useDynamicContext();
@@ -21,7 +22,7 @@ const TokenPresaleContent = () => {
         Join LedgerFund Presale
       </h1>
       <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
-        You're about to participate in shaping the future of decentralized accounting. Follow the steps below to acquire LedgerFund tokens.
+        You're about to participate in shaping the future of decentralized accounting. Follow the path below that matches your situation.
       </p>
 
       <div className="max-w-2xl mx-auto">
@@ -31,6 +32,7 @@ const TokenPresaleContent = () => {
           </div>
           
           <div className="space-y-8 text-white">
+            {/* Token Stats */}
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div className="p-4 rounded-lg bg-white/5">
                 <p className="text-2xl font-bold text-[#8247E5]">10M</p>
@@ -42,33 +44,76 @@ const TokenPresaleContent = () => {
               </div>
             </div>
 
+            {/* Participation Paths */}
             <div className="text-left space-y-6">
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-white">How to Participate:</h3>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">1</div>
-                    <p className="text-gray-300">If you need to purchase MATIC (Polygon), you can do so directly through our integrated Banxa payment system - just click "Buy Crypto" in your wallet options above.</p>
+                <h3 className="text-xl font-semibold text-white">Choose Your Path to Participate:</h3>
+                
+                {/* Path A: New to Crypto */}
+                <div className="p-6 rounded-lg bg-white/5 space-y-4">
+                  <h4 className="text-lg font-medium text-[#8247E5]">Path A: New to Crypto</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">1</div>
+                      <p className="text-gray-300">Connect your wallet using the widget above</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">2</div>
+                      <p className="text-gray-300">Click "Buy Crypto" in your wallet options</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">3</div>
+                      <p className="text-gray-300">Complete one-time identity verification through Banxa (government ID required)</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">4</div>
+                      <p className="text-gray-300">Purchase MATIC using your preferred payment method</p>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">2</div>
-                    <p className="text-gray-300">If you already have MATIC in your wallet, ensure it's on the Polygon network.</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">3</div>
-                    <p className="text-gray-300">Enter the amount of tokens you wish to purchase and confirm the transaction in your wallet.</p>
+                </div>
+
+                {/* Path B: MetaMask Users */}
+                <div className="p-6 rounded-lg bg-white/5 space-y-4">
+                  <h4 className="text-lg font-medium text-[#8247E5]">Path B: MetaMask Users with MATIC</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">1</div>
+                      <p className="text-gray-300">Connect your MetaMask wallet using the widget above</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">2</div>
+                      <p className="text-gray-300">Switch to Polygon network if prompted</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">3</div>
+                      <p className="text-gray-300">Enter the amount of tokens you wish to purchase</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">4</div>
+                      <p className="text-gray-300">Confirm the transaction in your MetaMask popup</p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 rounded-lg bg-white/5">
-                <h3 className="text-lg font-semibold mb-2">Benefits:</h3>
+              {/* Benefits Section */}
+              <div className="p-6 rounded-lg bg-white/5">
+                <h3 className="text-lg font-semibold mb-4">Token Holder Benefits:</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-300">
                   <li>Early access to governance rights</li>
                   <li>Participation in platform decision-making</li>
                   <li>Revenue sharing opportunities</li>
                   <li>Priority access to new features</li>
                 </ul>
+              </div>
+
+              {/* Additional Details */}
+              <div className="p-4 rounded-lg bg-white/5 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Wallet2 className="w-5 h-5 text-[#8247E5]" />
+                  <span className="text-sm text-gray-300">Network: Polygon (MATIC)</span>
+                </div>
+                <p className="text-xs text-gray-400">Make sure you have enough MATIC for gas fees</p>
               </div>
             </div>
           </div>
