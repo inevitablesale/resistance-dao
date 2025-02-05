@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -60,7 +59,7 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
     return null;
   }
 
-  const attributeBoxStyle = "bg-black/40 backdrop-blur-xl rounded-xl p-4 flex flex-col justify-between transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20";
+  const attributeBoxStyle = "bg-black/40 backdrop-blur-xl rounded-xl p-4 flex flex-col h-full transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20";
 
   return (
     <motion.div
@@ -110,8 +109,8 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
             </p>
           </div>
 
-          {/* Enhanced Professional Background with Template Box Height */}
-          <div className="grid grid-cols-2 gap-3 auto-rows-fr">
+          {/* Professional Background Grid */}
+          <div className="grid grid-cols-2 gap-3">
             {[
               { icon: GraduationCap, label: "Experience Level", value: getAttribute("Experience Level") },
               { icon: Calendar, label: "Years in Practice", value: getAttribute("Years in Practice") },
@@ -122,26 +121,30 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
                 key={index}
                 className={attributeBoxStyle}
               >
-                <div className="flex items-center gap-2 text-sm text-gray-400">
+                <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
                   <item.icon className="w-4 h-4 text-polygon-primary flex-shrink-0" />
                   {item.label}
                 </div>
-                <p className="text-base font-medium text-white break-words line-clamp-2 hover:line-clamp-none transition-all">
-                  {item.value}
-                </p>
+                <div className="flex-grow">
+                  <p className="text-base font-medium text-white break-words">
+                    {item.value}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
 
-          {/* Enhanced Service Line Expertise with Template Box Height */}
+          {/* Service Line Expertise */}
           <div className={attributeBoxStyle}>
-            <div className="flex items-center gap-2 text-sm text-gray-400">
+            <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
               <Award className="w-4 h-4 text-polygon-primary flex-shrink-0" />
               Service Line Expertise
             </div>
-            <p className="text-base font-medium text-white break-words line-clamp-2 hover:line-clamp-none transition-all">
-              {getAttribute("Service Line Expertise")}
-            </p>
+            <div className="flex-grow">
+              <p className="text-base font-medium text-white break-words">
+                {getAttribute("Service Line Expertise")}
+              </p>
+            </div>
           </div>
 
           {/* Professional Experience Section */}
@@ -218,4 +221,3 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
 };
 
 export default NFTCollectionCard;
-
