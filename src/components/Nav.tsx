@@ -45,12 +45,15 @@ const Nav = () => {
             <a href="#join-our-vision" className="text-white/80 hover:text-white transition-colors">
               Presale
             </a>
-            <Link to="/" className="text-white/80 hover:text-white transition-colors">
+            <a href="#private-equity-impact" className="text-white/80 hover:text-white transition-colors">
               Why Now
-            </Link>
-            <Link to="/" className="text-white/80 hover:text-white transition-colors">
+            </a>
+            <a href="#how-it-works" className="text-white/80 hover:text-white transition-colors">
+              How It Works
+            </a>
+            <a href="#roadmap" className="text-white/80 hover:text-white transition-colors">
               Roadmap
-            </Link>
+            </a>
           </div>
 
           <button 

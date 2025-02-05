@@ -1,9 +1,8 @@
-
 import { AlertTriangle, TrendingDown, UserMinus, XCircle } from "lucide-react";
 
 export const PrivateEquityImpact = () => {
   return (
-    <section className="py-16 bg-black/30">
+    <section id="private-equity-impact" className="py-16 bg-black/30">
       <div className="container px-4">
         <h2 className="text-4xl font-bold text-white mb-12 text-center">
           What Happens When Private Equity Takes Over?

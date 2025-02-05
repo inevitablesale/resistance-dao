@@ -1,9 +1,8 @@
-
 import { Card } from "./ui/card";
 
 export const Roadmap = () => {
   return (
-    <section className="py-16 bg-black/30">
+    <section id="roadmap" className="py-16 bg-black/30">
       <div className="container px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-bold text-white mb-4 text-center">LedgerFund Roadmap</h2>

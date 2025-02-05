@@ -1,10 +1,9 @@
-
 import { CircleDollarSign, FileCheck, Wallet } from "lucide-react";
 import { Card } from "./ui/card";
 
 export const HowItWorks = () => {
   return (
-    <section className="py-16 bg-black/30">
+    <section id="how-it-works" className="py-16 bg-black/30">
       <div className="container px-4">
         <h2 className="text-4xl font-bold text-white mb-12 text-center">
           How It Works: Invest, Own, and Share the Rewards
