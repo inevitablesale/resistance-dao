@@ -60,7 +60,7 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
     return null;
   }
 
-  const attributeBoxStyle = "bg-black/40 backdrop-blur-xl rounded-xl p-4 h-32 flex flex-col justify-between transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20";
+  const attributeBoxStyle = "bg-black/40 backdrop-blur-xl rounded-xl p-4 flex flex-col justify-between transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20";
 
   return (
     <motion.div
@@ -111,7 +111,7 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
           </div>
 
           {/* Enhanced Professional Background with Template Box Height */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 auto-rows-fr">
             {[
               { icon: GraduationCap, label: "Experience Level", value: getAttribute("Experience Level") },
               { icon: Calendar, label: "Years in Practice", value: getAttribute("Years in Practice") },
@@ -218,3 +218,4 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
 };
 
 export default NFTCollectionCard;
+
