@@ -32,10 +32,6 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
   const { toast } = useToast();
   const [isExperienceOpen, setIsExperienceOpen] = useState(false);
 
-  // Add console logs to debug metadata
-  console.log('NFT Metadata:', metadata);
-  console.log('NFT Attributes:', metadata.attributes);
-
   const governancePower = metadata.attributes?.find(
     attr => attr.trait_type === "Governance Power"
   )?.value?.replace("Governance-Power-", "") || "Unknown";
@@ -59,7 +55,6 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
     }
   };
 
-  // Add null check for metadata
   if (!metadata) {
     console.error('No metadata provided for NFT:', tokenId);
     return null;
@@ -70,149 +65,156 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
+      className="max-w-md mx-auto"
     >
       <Card className={cn(
         "relative overflow-hidden transition-all duration-500",
-        "bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a]",
-        "border border-polygon-primary/20",
+        "bg-gradient-to-br from-[#1a1a1a] via-[#2a2a2a] to-[#1a1a1a]",
+        "border border-polygon-primary/20 shadow-xl",
         "hover:border-polygon-primary/40",
         "group"
       )}>
-        <div className="absolute inset-0 bg-gradient-to-r from-polygon-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Premium Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-polygon-primary/5 via-transparent to-polygon-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         
-        <div className="relative flex flex-col p-6 gap-4">
-          {/* Profile Section */}
-          <div className="w-full flex justify-center">
-            <div className="relative w-24 aspect-square">
-              <div className="absolute inset-0 bg-polygon-primary/20 rounded-full blur-2xl animate-pulse-slow" />
+        <div className="relative flex flex-col p-8 gap-6">
+          {/* Enhanced Profile Section */}
+          <div className="w-full flex justify-center mb-4">
+            <div className="relative w-32 aspect-square">
+              {/* Multiple Glow Layers */}
+              <div className="absolute -inset-4 bg-polygon-primary/10 rounded-full blur-3xl animate-pulse-slow" />
+              <div className="absolute -inset-2 bg-polygon-secondary/15 rounded-full blur-2xl animate-pulse-slow delay-75" />
               <div className="relative">
-                <div className="absolute -inset-1 bg-gradient-to-r from-polygon-primary to-polygon-secondary rounded-full blur animate-pulse-slow" />
+                <div className="absolute -inset-1 bg-gradient-to-r from-polygon-primary via-polygon-secondary to-polygon-primary rounded-full blur-xl animate-pulse-slow" />
                 <img 
                   src={metadata.image} 
                   alt={metadata.name}
-                  className="relative rounded-full aspect-square object-cover w-full border-4 border-white/10"
+                  className="relative rounded-full aspect-square object-cover w-full border-4 border-white/10 shadow-2xl transform group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
             </div>
           </div>
 
-          {/* Basic Information */}
-          <div className="space-y-4">
-            <div className="text-center">
-              <h3 className="text-xl font-bold bg-gradient-to-r from-white to-polygon-primary bg-clip-text text-transparent">
-                {metadata.name}
-              </h3>
-              <p className="text-sm text-gray-400 mt-1">
-                <Award className="inline-block w-4 h-4 mr-1" />
+          {/* Enhanced Title Section */}
+          <div className="space-y-4 text-center">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-white via-polygon-primary to-polygon-secondary bg-clip-text text-transparent">
+              {metadata.name}
+            </h3>
+            <p className="text-lg text-gray-300 flex items-center justify-center gap-2">
+              <Award className="w-5 h-5 text-polygon-primary" />
+              <span className="bg-gradient-to-r from-polygon-primary to-polygon-secondary bg-clip-text text-transparent">
                 Governance Power: {governancePower}
-              </p>
-            </div>
+              </span>
+            </p>
+          </div>
 
-            {/* Professional Background */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-white/5 rounded-lg p-2">
-                <div className="flex items-center gap-1 text-xs text-gray-400">
-                  <GraduationCap className="w-3 h-3" />
-                  Experience Level
-                </div>
-                <p className="text-sm text-white">{getAttribute("Experience Level")}</p>
+          {/* Enhanced Professional Background */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-black/40 backdrop-blur-xl rounded-xl p-4 transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20">
+              <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                <GraduationCap className="w-4 h-4 text-polygon-primary" />
+                Experience Level
               </div>
-              <div className="bg-white/5 rounded-lg p-2">
-                <div className="flex items-center gap-1 text-xs text-gray-400">
-                  <Calendar className="w-3 h-3" />
-                  Years in Practice
-                </div>
-                <p className="text-sm text-white">{getAttribute("Years in Practice")}</p>
-              </div>
-              <div className="bg-white/5 rounded-lg p-2">
-                <div className="flex items-center gap-1 text-xs text-gray-400">
-                  <Book className="w-3 h-3" />
-                  Specialty
-                </div>
-                <p className="text-sm text-white">{getAttribute("Specialty")}</p>
-              </div>
-              <div className="bg-white/5 rounded-lg p-2">
-                <div className="flex items-center gap-1 text-xs text-gray-400">
-                  <Users className="w-3 h-3" />
-                  Client Base
-                </div>
-                <p className="text-sm text-white">{getAttribute("Client Base")}</p>
-              </div>
+              <p className="text-base font-medium text-white">{getAttribute("Experience Level")}</p>
             </div>
-
-            {/* Service Line Expertise */}
-            <div className="bg-white/5 rounded-lg p-2">
-              <div className="flex items-center gap-1 text-xs text-gray-400">
-                <Award className="w-3 h-3" />
-                Service Line Expertise
+            <div className="bg-black/40 backdrop-blur-xl rounded-xl p-4 transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20">
+              <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                <Calendar className="w-4 h-4 text-polygon-primary" />
+                Years in Practice
               </div>
-              <p className="text-sm text-white">{getAttribute("Service Line Expertise")}</p>
+              <p className="text-base font-medium text-white">{getAttribute("Years in Practice")}</p>
             </div>
+            <div className="bg-black/40 backdrop-blur-xl rounded-xl p-4 transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20">
+              <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                <Book className="w-4 h-4 text-polygon-primary" />
+                Specialty
+              </div>
+              <p className="text-base font-medium text-white">{getAttribute("Specialty")}</p>
+            </div>
+            <div className="bg-black/40 backdrop-blur-xl rounded-xl p-4 transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20">
+              <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                <Users className="w-4 h-4 text-polygon-primary" />
+                Client Base
+              </div>
+              <p className="text-base font-medium text-white">{getAttribute("Client Base")}</p>
+            </div>
+          </div>
 
-            {/* Professional Experience */}
-            {metadata.experiences && metadata.experiences.length > 0 && (
-              <Collapsible open={isExperienceOpen} onOpenChange={setIsExperienceOpen}>
-                <CollapsibleTrigger className="w-full">
-                  <div className="flex items-center justify-between bg-white/5 rounded-lg p-2 hover:bg-white/10 transition-colors">
-                    <div className="flex items-center gap-1 text-sm text-gray-400">
-                      <Briefcase className="w-4 h-4" />
-                      Professional Experience
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {isExperienceOpen ? "Hide" : "Show"}
+          {/* Enhanced Service Line Expertise */}
+          <div className="bg-black/40 backdrop-blur-xl rounded-xl p-4 transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20">
+            <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+              <Award className="w-4 h-4 text-polygon-primary" />
+              Service Line Expertise
+            </div>
+            <p className="text-base font-medium text-white">{getAttribute("Service Line Expertise")}</p>
+          </div>
+
+          {/* Professional Experience Section */}
+          {metadata.experiences && metadata.experiences.length > 0 && (
+            <Collapsible open={isExperienceOpen} onOpenChange={setIsExperienceOpen}>
+              <CollapsibleTrigger className="w-full">
+                <div className="flex items-center justify-between bg-black/40 backdrop-blur-xl rounded-xl p-4 hover:bg-black/60 transition-colors border border-white/5 hover:border-polygon-primary/20">
+                  <div className="flex items-center gap-2 text-base text-gray-300">
+                    <Briefcase className="w-5 h-5 text-polygon-primary" />
+                    Professional Experience
+                  </div>
+                  <div className="text-sm text-polygon-primary">
+                    {isExperienceOpen ? "Hide" : "Show"}
+                  </div>
+                </div>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-3 space-y-3">
+                {metadata.experiences.map((exp, index) => (
+                  <div 
+                    key={index} 
+                    className="bg-black/40 backdrop-blur-xl rounded-xl p-4 transform hover:scale-105 transition-all duration-300 border border-white/5 hover:border-polygon-primary/20"
+                  >
+                    <p className="text-base font-semibold text-white mb-1">{exp.title}</p>
+                    <p className="text-sm text-polygon-primary">{exp.company}</p>
+                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {exp.duration}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        {exp.location}
+                      </span>
                     </div>
                   </div>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2 space-y-2">
-                  {metadata.experiences.map((exp, index) => (
-                    <div key={index} className="bg-white/5 rounded-lg p-2">
-                      <p className="text-sm font-semibold text-white">{exp.title}</p>
-                      <p className="text-xs text-gray-400">{exp.company}</p>
-                      <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {exp.duration}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          {exp.location}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </CollapsibleContent>
-              </Collapsible>
-            )}
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
+          )}
 
-            {/* Network Information */}
-            <div className="text-xs text-gray-500 space-y-1">
-              <div>Token ID: {tokenId}</div>
-              <div className="truncate">
-                Owner: {owner.slice(0, 6)}...{owner.slice(-4)}
-              </div>
+          {/* Network Information */}
+          <div className="text-sm text-gray-400 space-y-1 bg-black/20 rounded-lg p-3 border border-white/5">
+            <div>Token ID: {tokenId}</div>
+            <div className="truncate">
+              Owner: {owner.slice(0, 6)}...{owner.slice(-4)}
             </div>
+          </div>
 
-            {/* Voting buttons */}
-            <div className="flex justify-center gap-4 mt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2 hover:bg-green-500/20"
-                onClick={() => handleVote('up')}
-              >
-                <ThumbsUp className="w-4 h-4" />
-                Vote Up
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2 hover:bg-red-500/20"
-                onClick={() => handleVote('down')}
-              >
-                <ThumbsDown className="w-4 h-4" />
-                Vote Down
-              </Button>
-            </div>
+          {/* Enhanced Voting Buttons */}
+          <div className="flex justify-center gap-4 mt-2">
+            <Button
+              variant="outline"
+              size="lg"
+              className="flex items-center gap-2 bg-black/40 border-white/10 hover:bg-green-500/20 hover:border-green-500/40 transition-all duration-300"
+              onClick={() => handleVote('up')}
+            >
+              <ThumbsUp className="w-5 h-5" />
+              Vote Up
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="flex items-center gap-2 bg-black/40 border-white/10 hover:bg-red-500/20 hover:border-red-500/40 transition-all duration-300"
+              onClick={() => handleVote('down')}
+            >
+              <ThumbsDown className="w-5 h-5" />
+              Vote Down
+            </Button>
           </div>
         </div>
       </Card>
