@@ -80,7 +80,8 @@ const IndexContent = () => {
           Own the future of<br />accounting
         </h1>
         <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
-          Join our token presale by sending MATIC directly to our smart contract. After launch, trade with confidence through our Transak integration with full KYC/AML compliance.
+          LedgerFund is building a decentralized network of accounting firms owned and governed by accountants. 
+          We're putting the future of the profession back in the hands of professionals.
         </p>
 
         <div className="flex flex-col md:flex-row gap-4 justify-center mb-16">
