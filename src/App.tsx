@@ -36,7 +36,7 @@ function App() {
         console.log("Auth Success:", args);
         toast({
           title: "Authentication Successful",
-          description: "You're now connected to LedgerFund. Checking NFT ownership...",
+          description: "You're now connected to LedgerFund.",
         });
       },
       onLogout: () => {
@@ -51,6 +51,20 @@ function App() {
         toast({
           title: "Wallet Disconnected",
           description: "Your wallet has been disconnected.",
+        });
+      },
+      onEmailVerificationSuccess: () => {
+        toast({
+          title: "Email Verified",
+          description: "Your email has been successfully verified.",
+        });
+      },
+      onError: (error: any) => {
+        console.error("Dynamic SDK Error:", error);
+        toast({
+          title: "Error",
+          description: error?.message || "An error occurred",
+          variant: "destructive",
         });
       }
     },
@@ -68,7 +82,7 @@ function App() {
       enableWalletConnectV1: false, // Disable deprecated WalletConnect v1
       enableWalletConnectV2: true, // Enable WalletConnect v2
       persistWalletSession: true, // Enable session persistence
-      enableAuthProviders: true, // Enable authentication providers,
+      enableAuthProviders: true, // Enable authentication providers
     }
   };
 
