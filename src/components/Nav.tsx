@@ -46,12 +46,9 @@ const Nav = () => {
           </div>
           
           <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-white/80 hover:text-white transition-colors">
-              Overview
-            </Link>
-            <Link to="/" className="text-white/80 hover:text-white transition-colors">
-              Get Investment Ready
-            </Link>
+            <a href="#join-our-vision" className="text-white/80 hover:text-white transition-colors">
+              Presale
+            </a>
             <Link to="/" className="text-white/80 hover:text-white transition-colors">
               Why Now
             </Link>
@@ -64,7 +61,7 @@ const Nav = () => {
             onClick={handleLaunchApp}
             className="hidden md:block px-6 py-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white rounded-lg font-medium transition-all hover:scale-105"
           >
-            Access App
+            Connect Wallet
           </button>
         </div>
       </div>

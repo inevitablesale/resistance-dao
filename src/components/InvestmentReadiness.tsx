@@ -1,10 +1,13 @@
 
 import { Shield, Vote, DollarSign, BarChart3 } from "lucide-react";
 import { Card } from "./ui/card";
+import { useNavigate } from "react-router-dom";
 
 export const InvestmentReadiness = () => {
+  const navigate = useNavigate();
+
   return (
-    <section className="py-16 bg-black/30 backdrop-blur-sm">
+    <section id="join-our-vision" className="py-16 bg-black/30 backdrop-blur-sm">
       <div className="container px-4">
         <h2 className="text-3xl font-bold text-white mb-4">Join Our Vision</h2>
         <p className="text-xl text-gray-300 mb-8 max-w-3xl">
@@ -99,7 +102,10 @@ export const InvestmentReadiness = () => {
                 <p className="text-sm text-gray-300">Price Per Token</p>
               </div>
             </div>
-            <button className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium">
+            <button 
+              onClick={() => navigate('/token-presale')}
+              className="px-8 py-3 bg-[#8247E5] hover:bg-[#8247E5]/80 text-white rounded-lg transition-colors text-lg font-medium"
+            >
               Join Token Presale
             </button>
           </div>
