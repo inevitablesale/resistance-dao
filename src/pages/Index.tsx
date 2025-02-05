@@ -156,17 +156,18 @@ const Index = () => {
 
           {/* Guide Ship */}
           <div
-            className="absolute"
+            className="absolute animate-pulse"
             style={{
               left: "70%",
               top: "30%",
-              width: "80px",
-              height: "30px",
+              width: "120px", // Increased size
+              height: "40px", // Increased size
               background: "linear-gradient(45deg, rgba(0, 255, 255, 0.9) 0%, rgba(64, 156, 255, 0.8) 50%, rgba(147, 51, 255, 0.7) 100%)",
-              boxShadow: "0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(64, 156, 255, 0.2)",
+              boxShadow: "0 0 40px rgba(0, 255, 255, 0.5), 0 0 80px rgba(64, 156, 255, 0.4)", // Enhanced glow
               clipPath: "polygon(0 50%, 10% 0, 98% 0, 100% 50%, 98% 100%, 10% 100%)",
               transform: "rotate(-15deg)",
-              animation: "guideShipMove 8s ease-in-out infinite"
+              animation: "guideShipMove 8s ease-in-out infinite",
+              zIndex: 20 // Ensure it's above other elements
             }}
           />
 
@@ -299,15 +300,15 @@ const Index = () => {
             @keyframes guideShipMove {
               0% { 
                 transform: translate(0, 0) rotate(-15deg);
-                opacity: 0.7;
+                opacity: 0.8;
               }
               50% {
-                transform: translate(0, 400px) rotate(-15deg);
+                transform: translate(0, 600px) rotate(-15deg); // Increased travel distance
                 opacity: 1;
               }
               100% { 
                 transform: translate(0, 0) rotate(-15deg);
-                opacity: 0.7;
+                opacity: 0.8;
               }
             }
           `}
