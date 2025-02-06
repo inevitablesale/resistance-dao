@@ -19,15 +19,15 @@ const Nav = () => {
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 via-teal-400 to-yellow-400 rounded-xl flex items-center justify-center text-black font-bold text-xl shadow-lg transform transition-all duration-300 group-hover:scale-105 group-hover:rotate-3">
-                LF
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 via-[#9b87f5] to-[#8B5CF6] rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg transform transition-all duration-300 group-hover:scale-105 group-hover:rotate-3">
+                LGR
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-300 to-yellow-400">
+                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-[#9b87f5] to-[#8B5CF6]">
                   LedgerFund
                 </span>
-                <span className="text-xs text-yellow-500/80 font-medium tracking-wider">
-                  PROTOCOL
+                <span className="text-xs text-purple-500/80 font-medium tracking-wider">
+                  DAO
                 </span>
               </div>
             </Link>
