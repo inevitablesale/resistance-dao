@@ -76,6 +76,44 @@ const IndexContent = () => {
   return (
     <>
       <div className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10">
+        {/* Black Hole Scene Container */}
+        <div className="absolute inset-0 -z-10 overflow-hidden perspective-3000">
+          {/* Black Hole Core */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-black shadow-[0_0_100px_rgba(0,0,0,0.8)] animate-pulse-slow">
+            <div className="absolute inset-0 bg-black rounded-full shadow-[inset_0_0_50px_rgba(255,255,255,0.1)]"></div>
+          </div>
+
+          {/* Accretion Disk */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] animate-spin-slow">
+            <div className="absolute inset-0 rounded-full 
+                          bg-gradient-to-r from-[#ea384c]/40 via-[#F97316]/60 to-[#D946EF]/40
+                          blur-md transform rotate-45 scale-y-[0.15] animate-pulse-slow"></div>
+            <div className="absolute inset-0 rounded-full 
+                          bg-gradient-to-r from-[#F97316]/60 via-[#ea384c]/80 to-[#8B5CF6]/60
+                          blur-lg transform -rotate-45 scale-y-[0.15] animate-pulse-slow"></div>
+          </div>
+
+          {/* Energy Jet */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div className="h-[600px] w-12 bg-gradient-to-t from-[#0EA5E9] via-[#1EAEDB]/50 to-transparent
+                          transform -rotate-45 blur-xl animate-pulse-slow"></div>
+          </div>
+
+          {/* Gravitational Lensing Effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/5 to-transparent
+                         transform rotate-45 animate-wave"></div>
+
+          {/* Star Field */}
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-[radial-gradient(white_1px,transparent_1px)] bg-[length:50px_50px] opacity-50"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(white_2px,transparent_2px)] bg-[length:100px_100px] opacity-30 animate-twinkle"></div>
+          </div>
+
+          {/* Galactic Dust */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-orange-500/10"></div>
+        </div>
+
+        {/* Hero Content */}
         <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 animate-gradient">
           Own the future of<br />accounting
         </h1>
