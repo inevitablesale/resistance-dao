@@ -31,7 +31,7 @@ const IndexContent = () => {
 
   // Add states for presale data
   const [presaleSupply] = useState<string>(TOTAL_PRESALE_SUPPLY.toString());
-  const [totalRaised, setTotalRaised] = useState<string>('0');
+  const [totalSold, setTotalSold] = useState<string>('0');
   const [presaleEndTime] = useState<number>(PRESALE_END_TIME * 1000); // Convert to milliseconds
   const [timeLeft, setTimeLeft] = useState({
     days: '00',
@@ -39,6 +39,8 @@ const IndexContent = () => {
     minutes: '00',
     seconds: '00'
   });
+  const [myPurchased, setMyPurchased] = useState<string>('0');
+  const [myStakeable, setMyStakeable] = useState<string>('0');
 
   useEffect(() => {
     // Set loaded state after a small delay to trigger initial animations
@@ -121,7 +123,15 @@ const IndexContent = () => {
       
       // Get total LGR tokens sold
       const lgrSold = await presaleContract.totalLGRSold();
-      setTotalRaised(ethers.utils.formatEther(lgrSold));
+      setTotalSold(ethers.utils.formatEther(lgrSold));
+
+      // If wallet is connected, get user's purchased and stakeable tokens
+      if (primaryWallet?.address) {
+        const purchased = await presaleContract.purchasedTokens(primaryWallet.address);
+        const stakeable = await presaleContract.stakeableTokens(primaryWallet.address);
+        setMyPurchased(ethers.utils.formatEther(purchased));
+        setMyStakeable(ethers.utils.formatEther(stakeable));
+      }
 
     } catch (error) {
       console.error('Error fetching presale data:', error);
@@ -345,18 +355,46 @@ const IndexContent = () => {
             {/* Progress and Stats */}
             <div className="mb-8">
               <div className="text-white text-lg mb-4">
-                MATIC RAISED: {Number(totalRaised).toLocaleString()} / {Number(presaleSupply).toLocaleString()}
+                LGR SOLD: {Number(totalSold).toLocaleString()} / {Number(presaleSupply).toLocaleString()}
               </div>
               <div className="w-full h-4 bg-gray-700 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-yellow-500 to-teal-500" 
                   style={{ 
-                    width: `${Math.min(100, (Number(totalRaised) / Number(presaleSupply)) * 100)}%` 
+                    width: `${Math.min(100, (Number(totalSold) / Number(presaleSupply)) * 100)}%` 
                   }}
                 />
               </div>
               <div className="text-center text-white/80 mt-2">
                 UNTIL PRICE RISE
+              </div>
+            </div>
+
+            {/* User's Token Info */}
+            <div className="flex justify-between mb-8 text-white">
+              <div className="flex items-center gap-2">
+                MY PURCHASED = {Number(myPurchased).toLocaleString()}
+                <button 
+                  className="text-white/60 hover:text-white"
+                  onClick={() => toast({
+                    title: "Purchased Tokens",
+                    description: "These are the tokens you've bought during the presale"
+                  })}
+                >
+                  <Trophy className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                MY STAKEABLE = {Number(myStakeable).toLocaleString()}
+                <button 
+                  className="text-white/60 hover:text-white"
+                  onClick={() => toast({
+                    title: "Stakeable Tokens",
+                    description: "These are the tokens you can stake after the presale"
+                  })}
+                >
+                  <Trophy className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
