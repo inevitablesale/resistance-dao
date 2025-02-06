@@ -52,7 +52,8 @@ const IndexContent = () => {
       if (!heroRef.current) return;
       
       const rect = heroRef.current.getBoundingClientRect();
-      const scrollPercentage = Math.max(0, Math.min(1, 1 - (rect.bottom / window.innerHeight)));
+      // Increase the denominator to make it more sensitive to initial scroll
+      const scrollPercentage = Math.max(0, Math.min(1, 1 - (rect.bottom / (window.innerHeight * 0.8))));
       setScrollProgress(scrollPercentage);
     };
 
@@ -190,7 +191,7 @@ const IndexContent = () => {
     <>
       <div 
         ref={heroRef} 
-        className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 min-h-[120vh] flex flex-col items-center justify-start"
+        className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 min-h-[100vh] flex flex-col items-center justify-start"
       >
         {/* Background Layer */}
         <div className="fixed inset-0 z-0">
