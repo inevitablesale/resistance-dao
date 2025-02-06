@@ -94,7 +94,7 @@ export const WhatWeBuilding = () => {
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-2">Platform Access</h3>
                 <p className="text-gray-300">
-                  Access platform features and participate in the tokenized accounting firm ecosystem.
+                  View available deals and bid on service contracts within the ecosystem. Note: Platform access does not include participation in rewards or governance.
                 </p>
               </div>
 
@@ -102,9 +102,9 @@ export const WhatWeBuilding = () => {
                 <div className="mb-4">
                   <BadgeCheck className="w-8 h-8 text-yellow-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Reward Distribution</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">Service Bidding</h3>
                 <p className="text-gray-300">
-                  Earn rewards from platform activities and contribute to the ecosystem's growth.
+                  Submit competitive bids for service contracts and professional opportunities within the network.
                 </p>
               </div>
             </div>
