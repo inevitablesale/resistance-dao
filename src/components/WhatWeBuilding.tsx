@@ -5,14 +5,14 @@ export const WhatWeBuilding = () => {
   return (
     <section className="py-16 relative">
       <div className="container px-4">
-        <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 via-orange-200 to-blue-400 mb-12 text-center">
+        <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12 text-center">
           What We're Building
         </h2>
         
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-orange-500/20 hover:border-orange-500/40 transition-colors">
+          <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
             <div className="mb-4">
-              <Coins className="w-8 h-8 text-orange-400" />
+              <Coins className="w-8 h-8 text-yellow-400" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Tokenized Ownership</h3>
             <p className="text-gray-300">
@@ -20,9 +20,9 @@ export const WhatWeBuilding = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-blue-500/20 hover:border-blue-500/40 transition-colors">
+          <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
             <div className="mb-4">
-              <Settings className="w-8 h-8 text-blue-400" />
+              <Settings className="w-8 h-8 text-teal-400" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Efficient Operations</h3>
             <p className="text-gray-300">
@@ -30,9 +30,9 @@ export const WhatWeBuilding = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-orange-500/20 hover:border-orange-500/40 transition-colors">
+          <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
             <div className="mb-4">
-              <Users className="w-8 h-8 text-orange-400" />
+              <Users className="w-8 h-8 text-yellow-400" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Community Governance</h3>
             <p className="text-gray-300">
@@ -44,3 +44,4 @@ export const WhatWeBuilding = () => {
     </section>
   );
 };
+

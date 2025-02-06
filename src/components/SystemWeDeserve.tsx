@@ -1,10 +1,11 @@
+import { Eye, Users, HandshakeIcon } from "lucide-react";
 
 export const SystemWeDeserve = () => {
   return (
     <section className="py-16 bg-black/30">
       <div className="container px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 via-orange-200 to-blue-400 mb-8">
+          <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-8">
             The System We Deserve
           </h2>
           
@@ -24,9 +25,9 @@ export const SystemWeDeserve = () => {
             <p className="text-xl text-gray-300">
               LedgerFund is that system. A transparent, blockchain-powered platform that empowers professionals to own, operate, and grow their firms without outside interference.
             </p>
-            <p className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-orange-600">It's time to stop letting them decide our future.</p>
-            <p className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-blue-400">It's time to take ownership.</p>
-            <p className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">It's time to build something better.</p>
+            <p className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-yellow-600">It's time to stop letting them decide our future.</p>
+            <p className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-yellow-500 to-teal-400">It's time to take ownership.</p>
+            <p className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-teal-600">It's time to build something better.</p>
           </div>
         </div>
       </div>
