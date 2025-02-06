@@ -15,10 +15,10 @@ export const LedgerFrens = () => {
       <div className="container px-4 relative">
         <div className="max-w-4xl mx-auto text-center mb-12">
           <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
-            The Ultimate Launch Party
+            Join the Professional Elite
           </h2>
           <p className="text-xl text-white/80 mb-8">
-            Join an exclusive fellowship of early adopters and visionaries in the accounting revolution!
+            LedgerFrens represents a new era in professional accounting, where licensed accountants unite to govern the future of decentralized finance.
           </p>
         </div>
 
