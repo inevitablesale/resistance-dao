@@ -76,54 +76,58 @@ const IndexContent = () => {
 
   return (
     <>
-      <div className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10">
-        {/* Black Hole Scene Container */}
-        <div className="absolute inset-0 -z-10 overflow-hidden perspective-3000">
-          {/* Black Hole Core */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-black shadow-[0_0_100px_rgba(0,0,0,0.8)] animate-pulse-slow">
-            <div className="absolute inset-0 bg-black rounded-full shadow-[inset_0_0_50px_rgba(255,255,255,0.1)]"></div>
+      <div className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 overflow-hidden">
+        {/* Black Hole Effect Container */}
+        <div className="absolute inset-0 z-0 perspective-3000">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-[800px] h-[800px] relative">
+              {/* Singularity Core */}
+              <div className="absolute inset-0 rounded-full bg-black animate-singularity" 
+                   style={{
+                     boxShadow: `
+                       0 0 100px 20px rgba(138, 43, 226, 0.3),
+                       0 0 200px 40px rgba(138, 43, 226, 0.2),
+                       0 0 300px 60px rgba(138, 43, 226, 0.1)
+                     `
+                   }}
+              />
+              
+              {/* Accretion Disk */}
+              <div className="absolute inset-0 rounded-full animate-cosmic-pulse"
+                   style={{
+                     background: `radial-gradient(circle at center,
+                       rgba(147, 51, 234, 0.8) 0%,
+                       rgba(138, 43, 226, 0.5) 30%,
+                       rgba(123, 31, 162, 0.3) 60%,
+                       transparent 80%
+                     )`
+                   }}
+              />
+              
+              {/* Event Horizon */}
+              <div className="absolute inset-0 rounded-full animate-pulse-slow"
+                   style={{
+                     background: `radial-gradient(circle at center,
+                       rgba(255, 255, 255, 0.1) 0%,
+                       transparent 70%
+                     )`,
+                     border: '2px solid rgba(147, 51, 234, 0.3)'
+                   }}
+              />
+            </div>
           </div>
-
-          {/* Accretion Disk */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] animate-spin-slow">
-            <div className="absolute inset-0 rounded-full 
-                          bg-gradient-to-r from-[#ea384c]/40 via-[#F97316]/60 to-[#D946EF]/40
-                          blur-md transform rotate-45 scale-y-[0.15] animate-pulse-slow"></div>
-            <div className="absolute inset-0 rounded-full 
-                          bg-gradient-to-r from-[#F97316]/60 via-[#ea384c]/80 to-[#8B5CF6]/60
-                          blur-lg transform -rotate-45 scale-y-[0.15] animate-pulse-slow"></div>
-          </div>
-
-          {/* Energy Jet */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="h-[600px] w-12 bg-gradient-to-t from-[#0EA5E9] via-[#1EAEDB]/50 to-transparent
-                          transform -rotate-45 blur-xl animate-pulse-slow"></div>
-          </div>
-
-          {/* Gravitational Lensing Effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/5 to-transparent
-                         transform rotate-45 animate-wave"></div>
-
-          {/* Star Field */}
-          <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-[radial-gradient(white_1px,transparent_1px)] bg-[length:50px_50px] opacity-50"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(white_2px,transparent_2px)] bg-[length:100px_100px] opacity-30 animate-twinkle"></div>
-          </div>
-
-          {/* Galactic Dust */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-orange-500/10"></div>
         </div>
 
-        {/* Hero Content */}
-        <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 animate-gradient">
+        {/* Content */}
+        <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 animate-gradient relative z-10">
           Own the future of<br />accounting
         </h1>
-        <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
+        <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12 relative z-10">
           LedgerFund is building a decentralized network of accounting firms owned and governed by accountants. 
           We're putting the future of the profession back in the hands of professionals.
         </p>
 
-        <div className="mb-16">
+        <div className="mb-16 relative z-10">
           <p className="text-sm uppercase tracking-wider text-purple-300 mb-6">
             Explore applications powered by LedgerFund Protocol
           </p>
@@ -151,23 +155,6 @@ const IndexContent = () => {
               </div>
             </button>
           </div>
-        </div>
-
-        {/* Animated Wave Effect */}
-        <div className="absolute bottom-0 left-0 right-0 h-64 z-0">
-          <div className="absolute inset-0 bg-gradient-to-t from-purple-600/20 to-transparent animate-wave" 
-               style={{
-                 maskImage: "linear-gradient(to bottom, transparent, black)",
-                 WebkitMaskImage: "linear-gradient(to bottom, transparent, black)"
-               }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-purple-400/20 to-transparent animate-wave-slow" 
-               style={{
-                 maskImage: "linear-gradient(to bottom, transparent, black)",
-                 WebkitMaskImage: "linear-gradient(to bottom, transparent, black)",
-                 animationDelay: "-2s"
-               }}
-          />
         </div>
       </div>
 
@@ -197,22 +184,16 @@ const Index = () => {
           }}
         />
         
-        {/* Animated Glow Effects */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: "radial-gradient(circle at 30% 70%, rgba(147, 51, 234, 0.15) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(139, 92, 246, 0.1) 0%, transparent 45%)",
-            animation: "quantumField 30s ease-in-out infinite"
-          }}
-        />
-        
         {/* Star Field Effect */}
         <div 
           className="absolute inset-0 opacity-90"
           style={{
-            backgroundImage: "radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.8) 100%, transparent), radial-gradient(1.5px 1.5px at 20% 20%, rgba(139, 92, 246, 0.7) 100%, transparent)",
+            backgroundImage: `
+              radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.8) 100%, transparent),
+              radial-gradient(1.5px 1.5px at 20% 20%, rgba(139, 92, 246, 0.7) 100%, transparent)
+            `,
             backgroundSize: "400% 400%",
-            animation: "temporalWake 240s ease-in-out infinite"
+            animation: "star-field 240s ease-in-out infinite"
           }}
         />
       </div>
@@ -225,38 +206,23 @@ const Index = () => {
 
       <style>
         {`
-          @keyframes wave {
-            0%, 100% {
-              transform: translateY(0) scale(1.5);
-            }
-            50% {
-              transform: translateY(-20px) scale(1.3);
-            }
+          @keyframes singularity {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
           }
           
-          @keyframes gradient {
-            0% {
-              background-position: 0% 50%;
-            }
-            50% {
-              background-position: 100% 50%;
-            }
-            100% {
-              background-position: 0% 50%;
-            }
+          @keyframes cosmic-pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
           }
           
-          .animate-wave {
-            animation: wave 8s ease-in-out infinite;
+          @keyframes star-field {
+            0% { transform: translateZ(0) rotate(0deg); }
+            100% { transform: translateZ(400px) rotate(360deg); }
           }
           
-          .animate-wave-slow {
-            animation: wave 12s ease-in-out infinite;
-          }
-          
-          .animate-gradient {
-            animation: gradient 8s ease infinite;
-            background-size: 200% 200%;
+          .perspective-3000 {
+            perspective: 3000px;
           }
         `}
       </style>
