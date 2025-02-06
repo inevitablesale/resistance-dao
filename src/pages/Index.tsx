@@ -135,73 +135,56 @@ const IndexContent = () => {
               const createRandomEdgeGroup = (index: number) => {
                 // Determine which edge this group will be on (0: top, 1: right, 2: bottom, 3: left)
                 const edgeIndex = Math.floor(index / 2); // This creates roughly 2 firms per edge
+                const offset = 50; // Fixed offset from the edge
                 
                 // Add some randomness to group positioning
                 const groupPosition = Math.random(); // Random position along the edge
                 const offsetVariation = 0.2; // How spread out the group can be
                 const finalPosition = Math.max(0, Math.min(1, groupPosition + (Math.random() - 0.5) * offsetVariation));
                 
+                // Position firms based on viewport dimensions
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                
                 switch(edgeIndex % 4) {
                   case 0: // Top edge
                     return { 
-                      x: finalPosition * window.innerWidth, 
-                      y: Math.random() * 50 // Small random offset from edge
+                      x: finalPosition * viewportWidth, 
+                      y: offset // Fixed distance from edge
                     };
                   case 1: // Right edge
                     return { 
-                      x: window.innerWidth - Math.random() * 50,
-                      y: finalPosition * window.innerHeight
+                      x: viewportWidth - offset,
+                      y: finalPosition * viewportHeight
                     };
                   case 2: // Bottom edge
                     return { 
-                      x: finalPosition * window.innerWidth,
-                      y: window.innerHeight - Math.random() * 50
+                      x: finalPosition * viewportWidth,
+                      y: viewportHeight - offset
                     };
                   default: // Left edge
                     return { 
-                      x: Math.random() * 50,
-                      y: finalPosition * window.innerHeight
+                      x: offset,
+                      y: finalPosition * viewportHeight
                     };
                 }
               };
 
               const startPos = createRandomEdgeGroup(i);
               
-              // Unique orbit parameters for each firm
-              const orbitSpeed = 15000; // 15 second base orbit cycle
-              const orbitPhase = Math.random() * Math.PI * 2; // Random initial phase
-              const rotationSpeed = 0.3 + Math.random() * 0.4;
-              const orbitRadius = Math.max(
-                150,
-                Math.max(window.innerWidth, window.innerHeight) * 0.8 * 
-                Math.pow(0.95, ((Date.now() - loadTime) % orbitSpeed) / orbitSpeed * 15)
-              );
-              
-              const wobbleAmplitude = 10 + Math.random() * 15;
-              const wobbleFrequency = 0.8 + Math.random() * 0.4;
-
-              const timeProgress = ((Date.now() - loadTime) % orbitSpeed) / orbitSpeed;
-              const angle = (timeProgress * Math.PI * 2 + orbitPhase) % (Math.PI * 2);
-              const finalRadius = 150 - (scrollProgress * 150);
-              
               return (
                 <div
                   key={i}
-                  className="absolute"
+                  className="absolute transition-all duration-[15000ms] ease-in-out"
                   style={{
-                    top: '50%',
-                    left: '50%',
-                    transform: scrollProgress > 0 
-                      ? `translate(-50%, -50%) rotate(${angle * 180 / Math.PI + (scrollProgress * 720)}deg) translateX(${finalRadius}px)`
-                      : `translate(calc(-50% + ${startPos.x}px), calc(-50% + ${startPos.y}px)) 
-                         rotate(${angle * 180 / Math.PI * rotationSpeed}deg) 
-                         translateX(${orbitRadius + Math.sin(timeProgress * Math.PI * 2 * wobbleFrequency) * wobbleAmplitude}px)`,
+                    top: startPos.y,
+                    left: startPos.x,
+                    transform: `translate(-50%, -50%)`
                   }}
                 >
                   <Building2 
                     className="w-8 h-8 text-teal-300/90 transition-all duration-1000"
                     style={{ 
-                      transform: `rotate(${-angle * 180 / Math.PI}deg) scale(${1 - scrollProgress * 0.5})`,
                       opacity: Math.max(0, 1 - scrollProgress * 2)
                     }}
                   />
