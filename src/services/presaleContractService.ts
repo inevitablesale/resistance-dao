@@ -34,7 +34,7 @@ export const fetchTotalLGRSold = async () => {
     return ethers.utils.formatEther(totalSold);
   } catch (error) {
     console.error("Error fetching total LGR sold:", error);
-    throw error;
+    return "0";
   }
 };
 
@@ -44,12 +44,12 @@ export const fetchRemainingPresaleSupply = async () => {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
     const contract = getPresaleContract(provider);
     const totalSold = await contract.totalLGRSold();
-    const presaleSupply = await contract.PRESALE_SUPPLY();
+    const presaleSupply = ethers.utils.parseEther(TOTAL_PRESALE_SUPPLY.toString());
     const remaining = presaleSupply.sub(totalSold);
     return ethers.utils.formatEther(remaining);
   } catch (error) {
     console.error("Error fetching remaining presale supply:", error);
-    throw error;
+    return TOTAL_PRESALE_SUPPLY.toString();
   }
 };
 
@@ -59,10 +59,10 @@ export const fetchPresaleUSDPrice = async () => {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
     const contract = getPresaleContract(provider);
     const usdPrice = await contract.PRESALE_USD_PRICE();
-    return ethers.utils.formatEther(usdPrice);
+    return ethers.utils.formatUnits(usdPrice, 18);
   } catch (error) {
     console.error("Error fetching USD price:", error);
-    throw error;
+    return USD_PRICE.toString();
   }
 };
 
@@ -75,7 +75,6 @@ export const fetchPresaleMaticPrice = async () => {
     return ethers.utils.formatEther(maticPrice);
   } catch (error) {
     console.error("Error fetching MATIC price:", error);
-    throw error;
+    return "0";
   }
 };
-

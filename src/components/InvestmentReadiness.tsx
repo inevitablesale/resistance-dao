@@ -3,9 +3,7 @@ import { Shield, Vote, DollarSign, BarChart3, Loader2 } from "lucide-react";
 import { Card } from "./ui/card";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { ethers } from "ethers";
 import { 
-  getPresaleContract, 
   fetchTotalLGRSold,
   fetchRemainingPresaleSupply,
   fetchPresaleUSDPrice,
@@ -15,6 +13,7 @@ import {
 export const InvestmentReadiness = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [totalSold, setTotalSold] = useState<string>("0");
   const [remainingSupply, setRemainingSupply] = useState<string>("0");
   const [priceUSD, setPriceUSD] = useState<string>("0");
   const [priceMatic, setPriceMatic] = useState<string>("0");
@@ -22,12 +21,15 @@ export const InvestmentReadiness = () => {
   useEffect(() => {
     const fetchContractData = async () => {
       try {
+        setIsLoading(true);
         // Fetch all contract data
+        const sold = await fetchTotalLGRSold();
         const remaining = await fetchRemainingPresaleSupply();
         const usdPrice = await fetchPresaleUSDPrice();
         const maticPrice = await fetchPresaleMaticPrice();
         
         // Update state with fetched values
+        setTotalSold(sold);
         setRemainingSupply(remaining);
         setPriceUSD(usdPrice);
         setPriceMatic(maticPrice);
@@ -122,7 +124,7 @@ export const InvestmentReadiness = () => {
 
         <div className="bg-gradient-to-br from-yellow-500/5 via-teal-500/5 to-yellow-500/5 border border-yellow-500/20 rounded-lg p-8 backdrop-blur">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="grid md:grid-cols-4 gap-6 mb-8">
               <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
                 {isLoading ? (
                   <div className="flex items-center justify-center h-[76px]">
@@ -131,7 +133,21 @@ export const InvestmentReadiness = () => {
                 ) : (
                   <>
                     <p className="text-3xl font-bold text-yellow-400 mb-2">
-                      {parseFloat(remainingSupply).toLocaleString()}
+                      {Number(totalSold).toLocaleString()}
+                    </p>
+                    <p className="text-sm text-gray-300">Tokens Sold</p>
+                  </>
+                )}
+              </div>
+              <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
+                {isLoading ? (
+                  <div className="flex items-center justify-center h-[76px]">
+                    <Loader2 className="h-6 w-6 animate-spin text-yellow-400" />
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-3xl font-bold text-yellow-400 mb-2">
+                      {Number(remainingSupply).toLocaleString()}
                     </p>
                     <p className="text-sm text-gray-300">Remaining Supply</p>
                   </>
@@ -145,7 +161,7 @@ export const InvestmentReadiness = () => {
                 ) : (
                   <>
                     <p className="text-3xl font-bold text-teal-400 mb-2">
-                      {parseFloat(priceMatic).toLocaleString()} MATIC
+                      {Number(priceMatic).toLocaleString()} MATIC
                     </p>
                     <p className="text-sm text-gray-300">Price Per Token</p>
                   </>
@@ -159,7 +175,7 @@ export const InvestmentReadiness = () => {
                 ) : (
                   <>
                     <p className="text-3xl font-bold text-yellow-400 mb-2">
-                      ${parseFloat(priceUSD).toLocaleString()}
+                      ${Number(priceUSD).toLocaleString()}
                     </p>
                     <p className="text-sm text-gray-300">USD Price</p>
                   </>
@@ -179,4 +195,3 @@ export const InvestmentReadiness = () => {
     </section>
   );
 };
-
