@@ -131,31 +131,40 @@ const IndexContent = () => {
             }}
           >
             {[...Array(7)].map((_, i) => {
-              // Generate random starting position on viewport edge
-              const randomEdgePosition = () => {
-                const edge = Math.floor(Math.random() * 4); // 0: top, 1: right, 2: bottom, 3: left
-                const maxWidth = window.innerWidth;
-                const maxHeight = window.innerHeight;
+              // Distribute firms evenly around viewport edges
+              const distributeAroundEdges = (index: number) => {
+                const totalEdgeLength = 2 * (window.innerWidth + window.innerHeight);
+                const segmentLength = totalEdgeLength / 7;
+                const position = segmentLength * (index + Math.random() * 0.5); // Add some randomness within segment
                 
-                switch(edge) {
-                  case 0: return { x: Math.random() * maxWidth, y: 0 }; // Top
-                  case 1: return { x: maxWidth, y: Math.random() * maxHeight }; // Right
-                  case 2: return { x: Math.random() * maxWidth, y: maxHeight }; // Bottom
-                  default: return { x: 0, y: Math.random() * maxHeight }; // Left
+                if (position < window.innerWidth) {
+                  return { x: position, y: 0 }; // Top edge
+                } else if (position < window.innerWidth + window.innerHeight) {
+                  return { x: window.innerWidth, y: position - window.innerWidth }; // Right edge
+                } else if (position < 2 * window.innerWidth + window.innerHeight) {
+                  return { x: 2 * window.innerWidth + window.innerHeight - position, y: window.innerHeight }; // Bottom edge
+                } else {
+                  return { x: 0, y: totalEdgeLength - position }; // Left edge
                 }
               };
 
-              const startPos = randomEdgePosition();
+              const startPos = distributeAroundEdges(i);
               
               // Unique orbit parameters for each firm
-              const orbitSpeed = 0.5 + Math.random() * 1.5;
-              const orbitRadius = Math.max(150, Math.max(window.innerWidth, window.innerHeight) * 0.8 * Math.pow(0.95, (Date.now() - loadTime) / 1000));
-              const orbitPhase = Math.random() * Math.PI * 2;
-              const rotationSpeed = 0.3 + Math.random() * 0.7;
-              const wobbleAmplitude = 15 + Math.random() * 20;
-              const wobbleFrequency = 0.8 + Math.random() * 1.2;
+              const orbitSpeed = 15000; // 15 second base orbit cycle
+              const orbitPhase = (i / 7) * Math.PI * 2; // Evenly distribute initial phases
+              const rotationSpeed = 0.3 + Math.random() * 0.4; // Slightly randomized rotation
+              const orbitRadius = Math.max(
+                150,
+                Math.max(window.innerWidth, window.innerHeight) * 0.8 * 
+                Math.pow(0.95, ((Date.now() - loadTime) % orbitSpeed) / orbitSpeed * 15)
+              );
+              
+              const wobbleAmplitude = 10 + Math.random() * 15;
+              const wobbleFrequency = 0.8 + Math.random() * 0.4;
 
-              const angle = (Date.now() / (1000 / orbitSpeed) + orbitPhase) % (Math.PI * 2);
+              const timeProgress = ((Date.now() - loadTime) % orbitSpeed) / orbitSpeed;
+              const angle = (timeProgress * Math.PI * 2 + orbitPhase) % (Math.PI * 2);
               const finalRadius = 150 - (scrollProgress * 150);
               
               return (
@@ -169,7 +178,7 @@ const IndexContent = () => {
                       ? `translate(-50%, -50%) rotate(${angle * 180 / Math.PI + (scrollProgress * 720)}deg) translateX(${finalRadius}px)`
                       : `translate(calc(-50% + ${startPos.x}px), calc(-50% + ${startPos.y}px)) 
                          rotate(${angle * 180 / Math.PI * rotationSpeed}deg) 
-                         translateX(${orbitRadius + Math.sin(Date.now() / (1000 * wobbleFrequency)) * wobbleAmplitude}px)`,
+                         translateX(${orbitRadius + Math.sin(timeProgress * Math.PI * 2 * wobbleFrequency) * wobbleAmplitude}px)`,
                   }}
                 >
                   <Building2 
