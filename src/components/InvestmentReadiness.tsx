@@ -1,10 +1,43 @@
 
-import { Shield, Vote, DollarSign, BarChart3 } from "lucide-react";
+import { Shield, Vote, DollarSign, BarChart3, Loader2 } from "lucide-react";
 import { Card } from "./ui/card";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { ethers } from "ethers";
+import { getPresaleContract } from "@/services/presaleContractService";
 
 export const InvestmentReadiness = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [presaleSupply, setPresaleSupply] = useState<string>("0");
+  const [priceUSD, setPriceUSD] = useState<string>("0");
+  const [priceMatic, setPriceMatic] = useState<string>("0");
+
+  useEffect(() => {
+    const fetchContractData = async () => {
+      try {
+        // Connect to Mumbai network
+        const provider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.maticvigil.com");
+        const contract = getPresaleContract(provider);
+        
+        // Fetch contract data
+        const supply = await contract.PRESALE_SUPPLY();
+        const usdPrice = await contract.PRESALE_USD_PRICE();
+        const maticPrice = await contract.getLGRPrice();
+        
+        // Format values
+        setPresaleSupply(ethers.utils.formatEther(supply));
+        setPriceUSD(ethers.utils.formatEther(usdPrice));
+        setPriceMatic(ethers.utils.formatEther(maticPrice));
+      } catch (error) {
+        console.error("Error fetching contract data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchContractData();
+  }, []);
 
   return (
     <section id="join-our-vision" className="py-16 bg-black/30 backdrop-blur-sm">
@@ -90,16 +123,46 @@ export const InvestmentReadiness = () => {
             </p>
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
-                <p className="text-3xl font-bold text-yellow-400 mb-2">10M</p>
-                <p className="text-sm text-gray-300">Total Supply</p>
+                {isLoading ? (
+                  <div className="flex items-center justify-center h-[76px]">
+                    <Loader2 className="h-6 w-6 animate-spin text-yellow-400" />
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-3xl font-bold text-yellow-400 mb-2">
+                      {parseFloat(presaleSupply).toLocaleString()}
+                    </p>
+                    <p className="text-sm text-gray-300">Presale Supply</p>
+                  </>
+                )}
               </div>
               <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-teal-500/20">
-                <p className="text-3xl font-bold text-teal-400 mb-2">5M</p>
-                <p className="text-sm text-gray-300">Presale Tokens</p>
+                {isLoading ? (
+                  <div className="flex items-center justify-center h-[76px]">
+                    <Loader2 className="h-6 w-6 animate-spin text-teal-400" />
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-3xl font-bold text-teal-400 mb-2">
+                      {parseFloat(priceMatic).toLocaleString()} MATIC
+                    </p>
+                    <p className="text-sm text-gray-300">Price Per Token</p>
+                  </>
+                )}
               </div>
               <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
-                <p className="text-3xl font-bold text-yellow-400 mb-2">$0.10</p>
-                <p className="text-sm text-gray-300">Price Per Token</p>
+                {isLoading ? (
+                  <div className="flex items-center justify-center h-[76px]">
+                    <Loader2 className="h-6 w-6 animate-spin text-yellow-400" />
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-3xl font-bold text-yellow-400 mb-2">
+                      ${parseFloat(priceUSD).toLocaleString()}
+                    </p>
+                    <p className="text-sm text-gray-300">USD Price</p>
+                  </>
+                )}
               </div>
             </div>
             <button 
