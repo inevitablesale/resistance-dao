@@ -130,22 +130,30 @@ const IndexContent = () => {
               opacity: Math.max(0, 1 - scrollProgress * 1.5),
             }}
           >
-            {[...Array(12)].map((_, i) => {
-              // Calculate initial position on the edge of the viewport
-              const viewportAngle = (i * (360 / 12)) * (Math.PI / 180);
-              const viewportRadius = Math.max(window.innerWidth, window.innerHeight) * 0.8;
-              const startX = Math.cos(viewportAngle) * viewportRadius;
-              const startY = Math.sin(viewportAngle) * viewportRadius;
+            {[...Array(7)].map((_, i) => {
+              // Generate random starting position on viewport edge
+              const randomEdgePosition = () => {
+                const edge = Math.floor(Math.random() * 4); // 0: top, 1: right, 2: bottom, 3: left
+                const maxWidth = window.innerWidth;
+                const maxHeight = window.innerHeight;
+                
+                switch(edge) {
+                  case 0: return { x: Math.random() * maxWidth, y: 0 }; // Top
+                  case 1: return { x: maxWidth, y: Math.random() * maxHeight }; // Right
+                  case 2: return { x: Math.random() * maxWidth, y: maxHeight }; // Bottom
+                  default: return { x: 0, y: Math.random() * maxHeight }; // Left
+                }
+              };
 
+              const startPos = randomEdgePosition();
+              
               // Unique orbit parameters for each firm
-              const orbitSpeed = 1 + (i % 3) * 0.5;
-              const orbitRadius = isLoaded 
-                ? Math.max(150, viewportRadius * Math.pow(0.95, (Date.now() - loadTime) / 1000)) // Exponential decay
-                : viewportRadius;
-              const orbitPhase = i * (Math.PI / 6);
-              const rotationSpeed = 0.5 + (i % 4) * 0.3;
-              const wobbleAmplitude = 20 + (i % 3) * 10;
-              const wobbleFrequency = 1 + (i % 2) * 0.5;
+              const orbitSpeed = 0.5 + Math.random() * 1.5;
+              const orbitRadius = Math.max(150, Math.max(window.innerWidth, window.innerHeight) * 0.8 * Math.pow(0.95, (Date.now() - loadTime) / 1000));
+              const orbitPhase = Math.random() * Math.PI * 2;
+              const rotationSpeed = 0.3 + Math.random() * 0.7;
+              const wobbleAmplitude = 15 + Math.random() * 20;
+              const wobbleFrequency = 0.8 + Math.random() * 1.2;
 
               const angle = (Date.now() / (1000 / orbitSpeed) + orbitPhase) % (Math.PI * 2);
               const finalRadius = 150 - (scrollProgress * 150);
@@ -157,16 +165,15 @@ const IndexContent = () => {
                   style={{
                     top: '50%',
                     left: '50%',
-                    transition: isLoaded ? 'all 1s cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
                     transform: scrollProgress > 0 
                       ? `translate(-50%, -50%) rotate(${angle * 180 / Math.PI + (scrollProgress * 720)}deg) translateX(${finalRadius}px)`
-                      : `translate(calc(-50% + ${startX}px), calc(-50% + ${startY}px)) 
+                      : `translate(calc(-50% + ${startPos.x}px), calc(-50% + ${startPos.y}px)) 
                          rotate(${angle * 180 / Math.PI * rotationSpeed}deg) 
                          translateX(${orbitRadius + Math.sin(Date.now() / (1000 * wobbleFrequency)) * wobbleAmplitude}px)`,
                   }}
                 >
                   <Building2 
-                    className={`w-8 h-8 text-teal-300/90 transition-all duration-1000`}
+                    className="w-8 h-8 text-teal-300/90 transition-all duration-1000"
                     style={{ 
                       transform: `rotate(${-angle * 180 / Math.PI}deg) scale(${1 - scrollProgress * 0.5})`,
                       opacity: Math.max(0, 1 - scrollProgress * 2)
