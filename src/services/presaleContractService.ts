@@ -16,6 +16,9 @@ export const PRESALE_ABI = [
   "function totalLGRSold() public view returns (uint256)"
 ];
 
+export const PRESALE_END_TIME = 1746057600; // May 1, 2025
+export const TOTAL_PRESALE_SUPPLY = 5000000; // 5 million tokens
+
 export const getPresaleContract = (provider: ethers.providers.Provider | ethers.Signer) => {
   return new ethers.Contract(PRESALE_CONTRACT_ADDRESS, PRESALE_ABI, provider);
 };

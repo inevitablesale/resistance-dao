@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { checkNFTOwnership } from "@/services/contractService";
 import { Trophy, UserCircle, Building2, Wallet } from "lucide-react";
 import { ethers } from "ethers";
-import { getPresaleContract, PRESALE_CONTRACT_ADDRESS } from "@/services/presaleContractService";
+import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY } from "@/services/presaleContractService";
 
 const IndexContent = () => {
   const navigate = useNavigate();
@@ -30,9 +30,9 @@ const IndexContent = () => {
   const loadTime = Date.now();
 
   // Add states for presale data
-  const [presaleSupply, setPresaleSupply] = useState<string>('0');
+  const [presaleSupply] = useState<string>(TOTAL_PRESALE_SUPPLY.toString());
   const [totalRaised, setTotalRaised] = useState<string>('0');
-  const [presaleEndTime, setPresaleEndTime] = useState<number>(Date.now() + 86400000); // Default to 24h from now
+  const [presaleEndTime] = useState<number>(PRESALE_END_TIME * 1000); // Convert to milliseconds
   const [timeLeft, setTimeLeft] = useState({
     days: '00',
     hours: '00',
@@ -119,17 +119,9 @@ const IndexContent = () => {
       const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
       const presaleContract = getPresaleContract(provider);
       
-      // Get total presale supply
-      const supply = await presaleContract.PRESALE_SUPPLY();
-      setPresaleSupply(ethers.utils.formatEther(supply));
-
       // Get total LGR tokens sold
       const lgrSold = await presaleContract.totalLGRSold();
       setTotalRaised(ethers.utils.formatEther(lgrSold));
-
-      // Get presale end time
-      const endTime = await presaleContract.presaleEndTime();
-      setPresaleEndTime(endTime.toNumber() * 1000); // Convert from seconds to milliseconds
 
     } catch (error) {
       console.error('Error fetching presale data:', error);
@@ -141,13 +133,6 @@ const IndexContent = () => {
     }
   };
 
-  // Fetch presale data on component mount
-  useEffect(() => {
-    fetchPresaleData();
-    const interval = setInterval(fetchPresaleData, 30000); // Refresh every 30 seconds
-    return () => clearInterval(interval);
-  }, []);
-
   // Calculate time left
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -155,18 +140,31 @@ const IndexContent = () => {
       const difference = presaleEndTime - now;
 
       if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((difference / 1000 / 60) % 60);
+        const seconds = Math.floor((difference / 1000) % 60);
+
         setTimeLeft({
-          days: String(Math.floor(difference / (1000 * 60 * 60 * 24))).padStart(2, '0'),
-          hours: String(Math.floor((difference / (1000 * 60 * 60)) % 24)).padStart(2, '0'),
-          minutes: String(Math.floor((difference / 1000 / 60) % 60)).padStart(2, '0'),
-          seconds: String(Math.floor((difference / 1000) % 60)).padStart(2, '0')
+          days: String(days).padStart(2, '0'),
+          hours: String(hours).padStart(2, '0'),
+          minutes: String(minutes).padStart(2, '0'),
+          seconds: String(seconds).padStart(2, '0')
         });
       }
     };
 
+    calculateTimeLeft(); // Initial calculation
     const timer = setInterval(calculateTimeLeft, 1000);
     return () => clearInterval(timer);
   }, [presaleEndTime]);
+
+  // Fetch presale data on component mount and periodically
+  useEffect(() => {
+    fetchPresaleData();
+    const interval = setInterval(fetchPresaleData, 30000); // Refresh every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>
