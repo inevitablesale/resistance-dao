@@ -1,3 +1,4 @@
+
 import { PartyPopper, Trophy, Rocket, Gift, ShoppingBag, Medal, Star } from "lucide-react";
 
 export const LedgerFrens = () => {
@@ -58,11 +59,11 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <Gift className="w-8 h-8 text-yellow-400 flex-shrink-0" />
+                <ShoppingBag className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Launch Party Access</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Limited Edition Merch</h4>
                   <p className="text-gray-300">
-                    At $250K raised: Random selection of 50 holders will be invited to our exclusive launch party, with travel expenses covered up to $1,000.
+                    At $400K raised: Top 100 holders receive exclusive LedgerFund branded merchandise pack including premium apparel and accessories.
                   </p>
                 </div>
               </div>
@@ -71,11 +72,11 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <ShoppingBag className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <Gift className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Limited Edition Merch</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Launch Party Access</h4>
                   <p className="text-gray-300">
-                    At $500K raised: Top 100 holders receive exclusive LedgerFund branded merchandise pack including premium apparel and accessories.
+                    At $500K raised: Random selection of 50 holders will be invited to our exclusive launch party, with travel expenses covered up to $1,000.
                   </p>
                 </div>
               </div>
@@ -99,9 +100,9 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <Star className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Advisory Board Seats</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Legacy Circle Membership</h4>
                   <p className="text-gray-300">
-                    At $1M raised: Top 10 holders earn seats on our advisory board, with direct influence on strategic decisions and premium benefits.
+                    At $1M raised: Top 10 holders receive lifetime membership to our Legacy Circle, featuring exclusive benefits, mentorship opportunities, and priority access to future initiatives.
                   </p>
                 </div>
               </div>
@@ -112,3 +113,4 @@ export const LedgerFrens = () => {
     </section>
   );
 };
+
