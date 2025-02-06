@@ -111,7 +111,7 @@ const IndexContent = () => {
                 radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
               `,
               backgroundSize: "240px 240px",
-              opacity: 0.85 - scrollProgress * 0.3
+              opacity: Math.max(0.1, 0.85 - scrollProgress)
             }}
           />
         </div>
@@ -122,23 +122,29 @@ const IndexContent = () => {
             className="absolute inset-0 overflow-hidden"
             style={{
               opacity: Math.max(0, 1 - scrollProgress * 1.5),
-              transform: `scale(${1 + scrollProgress * 0.3})`
             }}
           >
             {[...Array(12)].map((_, i) => (
               <div
                 key={i}
-                className="absolute animate-orbit"
+                className="absolute"
                 style={{
                   top: `${Math.random() * 100}%`,
                   left: `${Math.random() * 100}%`,
-                  animationDelay: `${i * -2}s`,
-                  transform: `rotate(${i * 30}deg) translateX(${150 + scrollProgress * 100}px)`,
+                  transition: 'all 0.5s ease-out',
+                  transform: scrollProgress > 0 
+                    ? `translate(${(50 - (Math.random() * 100)) * scrollProgress}%, ${(50 - (Math.random() * 100)) * scrollProgress}%) scale(${1 - scrollProgress * 0.5})`
+                    : `rotate(${i * 30}deg) translateX(${150}px)`,
                 }}
               >
                 <Building2 
                   className="w-8 h-8 text-teal-300/90" 
-                  style={{ transform: `rotate(-${i * 30}deg)` }}
+                  style={{ 
+                    transform: scrollProgress > 0 
+                      ? `rotate(${360 * scrollProgress}deg)` 
+                      : `rotate(-${i * 30}deg)`,
+                    transition: 'transform 0.5s ease-out'
+                  }}
                 />
               </div>
             ))}
@@ -165,11 +171,12 @@ const IndexContent = () => {
                 className="absolute inset-0 rounded-full bg-black animate-singularity" 
                 style={{
                   boxShadow: `
-                    0 0 ${100 + scrollProgress * 100}px ${20 + scrollProgress * 30}px rgba(234, 179, 8, 0.4),
-                    0 0 ${200 + scrollProgress * 200}px ${40 + scrollProgress * 60}px rgba(20, 184, 166, 0.3),
-                    0 0 ${300 + scrollProgress * 300}px ${60 + scrollProgress * 90}px rgba(234, 179, 8, 0.2)
+                    0 0 ${100 + scrollProgress * 200}px ${20 + scrollProgress * 40}px rgba(234, 179, 8, 0.4),
+                    0 0 ${200 + scrollProgress * 400}px ${40 + scrollProgress * 80}px rgba(20, 184, 166, 0.3),
+                    0 0 ${300 + scrollProgress * 600}px ${60 + scrollProgress * 120}px rgba(234, 179, 8, 0.2)
                   `,
-                  transform: `scale(${1 + scrollProgress * 0.8})`
+                  transform: `scale(${0.2 + scrollProgress * 1.8})`,
+                  transition: 'transform 0.3s ease-out'
                 }}
               />
               
@@ -180,13 +187,14 @@ const IndexContent = () => {
                   background: `
                     radial-gradient(circle at center,
                       rgba(0, 0, 0, 1) 0%,
-                      rgba(234, 179, 8, ${0.7 + scrollProgress * 0.3}) 30%,
-                      rgba(20, 184, 166, ${0.5 + scrollProgress * 0.3}) 50%,
-                      rgba(234, 179, 8, ${0.4 + scrollProgress * 0.2}) 70%,
+                      rgba(234, 179, 8, ${0.3 + scrollProgress * 0.7}) 30%,
+                      rgba(20, 184, 166, ${0.2 + scrollProgress * 0.6}) 50%,
+                      rgba(234, 179, 8, ${0.1 + scrollProgress * 0.5}) 70%,
                       transparent 90%
                     )
                   `,
-                  transform: `scale(${1 + scrollProgress * 1.2}) rotate(${scrollProgress * 180}deg)`
+                  transform: `scale(${0.5 + scrollProgress * 1.5}) rotate(${scrollProgress * 360}deg)`,
+                  transition: 'transform 0.3s ease-out'
                 }}
               />
               
@@ -197,15 +205,15 @@ const IndexContent = () => {
                   background: `
                     radial-gradient(circle at center,
                       rgba(0, 0, 0, 0.9) 0%,
-                      rgba(234, 179, 8, ${0.3 + scrollProgress * 0.2}) 40%,
-                      rgba(20, 184, 166, ${0.2 + scrollProgress * 0.2}) 60%,
-                      rgba(234, 179, 8, ${0.15 + scrollProgress * 0.15}) 80%,
+                      rgba(234, 179, 8, ${0.1 + scrollProgress * 0.4}) 40%,
+                      rgba(20, 184, 166, ${0.1 + scrollProgress * 0.3}) 60%,
+                      rgba(234, 179, 8, ${0.05 + scrollProgress * 0.25}) 80%,
                       transparent 90%
                     )
                   `,
                   border: '2px solid rgba(234, 179, 8, 0.5)',
-                  transform: `scale(${1 + scrollProgress * 1.5})`,
-                  animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                  transform: `scale(${0.8 + scrollProgress * 1.7})`,
+                  transition: 'transform 0.3s ease-out'
                 }}
               />
             </div>
