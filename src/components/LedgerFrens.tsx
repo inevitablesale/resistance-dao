@@ -35,9 +35,9 @@ export const LedgerFrens = () => {
           <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
             <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <Trophy className="w-10 h-10 text-teal-400 mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-3">Exclusive Access</h3>
+            <h3 className="text-xl font-semibold text-white mb-3">Governance Power</h3>
             <p className="text-gray-300">
-              Top 500 holders in our presale get exclusive invites to our launch party, featuring epic surprises and exclusive perks.
+              First 500 holders will have exclusive voting rights on the DAO governance board, shaping the future of decentralized accounting.
             </p>
           </div>
 
@@ -54,3 +54,4 @@ export const LedgerFrens = () => {
     </section>
   );
 };
+
