@@ -1,4 +1,3 @@
-
 import { DynamicWidget, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
@@ -32,23 +31,18 @@ const TokenPresaleContent = () => {
       if (!primaryWallet?.address) return;
 
       try {
-        // Get ethers provider from Dynamic wallet
         const ethersProvider = new ethers.providers.Web3Provider(await primaryWallet.getWalletClient());
         const contract = getPresaleContract(ethersProvider);
         
-        // Get token price in MATIC
         const price = await contract.getLGRPrice();
         setTokenPrice(ethers.utils.formatEther(price));
 
-        // Get max tokens per wallet
         const maxTokens = await contract.MAX_PER_WALLET();
         setMaxPerWallet(ethers.utils.formatEther(maxTokens));
 
-        // Get already purchased amount
         const purchased = await contract.purchasedTokens(primaryWallet.address);
         setAlreadyPurchased(ethers.utils.formatEther(purchased));
 
-        // Calculate remaining allowance
         const remaining = maxTokens.sub(purchased);
         setRemainingAllowance(ethers.utils.formatEther(remaining));
       } catch (error) {
@@ -71,7 +65,6 @@ const TokenPresaleContent = () => {
   const handleBuyTokens = async () => {
     if (!primaryWallet?.address || !maticAmount) return;
 
-    // Check if purchase would exceed allowance
     if (parseFloat(expectedTokens) > parseFloat(remainingAllowance)) {
       toast({
         title: "Exceeds Limit",
@@ -87,20 +80,16 @@ const TokenPresaleContent = () => {
       const signer = ethersProvider.getSigner();
       const contract = getPresaleContract(signer);
 
-      // Calculate minimum expected tokens with 1% slippage tolerance
       const minExpectedTokens = ethers.utils.parseEther(
         (parseFloat(expectedTokens) * 0.99).toString()
       );
 
-      // Dynamic will automatically show the transaction confirmation UI
       const tx = await contract.buyTokens(minExpectedTokens, {
         value: ethers.utils.parseEther(maticAmount)
       });
 
-      // Let Dynamic handle the transaction UI, no need for our own toast here
       await tx.wait();
 
-      // Reset form and update purchased amount after confirmation
       setMaticAmount("");
       setExpectedTokens("0");
 
@@ -139,17 +128,10 @@ const TokenPresaleContent = () => {
       <div className="max-w-2xl mx-auto">
         <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
           <div className="flex justify-center mb-8">
-            <DynamicWidget
-              innerButtonComponent={
-                <button className="w-full py-3 px-4 rounded-lg bg-[#8247E5] hover:bg-[#6f3cc7] text-white font-medium transition-colors">
-                  Connect Wallet
-                </button>
-              }
-            />
+            <DynamicWidget />
           </div>
           
           <div className="space-y-8 text-white">
-            {/* Token Stats */}
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div className="p-4 rounded-lg bg-white/5">
                 <p className="text-2xl font-bold text-[#8247E5]">{parseFloat(maxPerWallet).toLocaleString()}</p>
@@ -202,7 +184,6 @@ const TokenPresaleContent = () => {
               </div>
             )}
 
-            {/* Network Info */}
             <div className="p-4 rounded-lg bg-white/5 space-y-2">
               <div className="flex items-center gap-2">
                 <Wallet2 className="w-5 h-5 text-[#8247E5]" />
