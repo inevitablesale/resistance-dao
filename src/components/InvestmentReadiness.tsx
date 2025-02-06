@@ -1,20 +1,52 @@
-
 import { Shield, Vote, DollarSign, BarChart3, Trophy, Wallet } from "lucide-react";
 import { Card } from "./ui/card";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { TOTAL_PRESALE_SUPPLY } from "@/services/presaleContractService";
+import { 
+  TOTAL_PRESALE_SUPPLY,
+  fetchTotalLGRSold,
+  fetchRemainingPresaleSupply,
+  fetchPresaleUSDPrice,
+  fetchPresaleMaticPrice 
+} from "@/services/presaleContractService";
 
 export const InvestmentReadiness = () => {
   const navigate = useNavigate();
-  const [isLoading] = useState(false);
-  const [totalSold] = useState<string>("4999990"); // Fixed value as requested
-  const [remainingSupply] = useState<string>("10"); // Fixed value as requested
-  const [priceUSD] = useState<string>("0.1"); // Fixed value as requested
-  const [priceMatic] = useState<string>("0.335275"); // Fixed value as requested
+  const [isLoading, setIsLoading] = useState(true);
+  const [totalSold, setTotalSold] = useState<string>("0");
+  const [remainingSupply, setRemainingSupply] = useState<string>("0");
+  const [priceUSD, setPriceUSD] = useState<string>("0.1");
+  const [priceMatic, setPriceMatic] = useState<string>("0");
 
-  // Calculate percentage sold using Number() to fix the TS error
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [sold, remaining, usdPrice, maticPrice] = await Promise.all([
+          fetchTotalLGRSold(),
+          fetchRemainingPresaleSupply(),
+          fetchPresaleUSDPrice(),
+          fetchPresaleMaticPrice()
+        ]);
+        
+        setTotalSold(sold);
+        setRemainingSupply(remaining);
+        setPriceUSD(usdPrice);
+        setPriceMatic(maticPrice);
+      } catch (error) {
+        console.error("Error fetching presale data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 30000); // Refresh every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  // Calculate percentage sold
   const percentageSold = isLoading ? 0 : Math.min(
     100,
     (Number(totalSold) / Number(ethers.utils.formatUnits(TOTAL_PRESALE_SUPPLY, 18))) * 100
@@ -150,14 +182,14 @@ export const InvestmentReadiness = () => {
               </div>
               <div className="flex justify-between items-center mt-2">
                 <p className="text-sm text-gray-400">
-                  {Number(totalSold).toLocaleString()} / {Number("5000000").toLocaleString()} LGR Tokens Sold
+                  {Number(totalSold).toLocaleString()} / {Number(ethers.utils.formatUnits(TOTAL_PRESALE_SUPPLY, 18)).toLocaleString()} LGR Tokens Sold
                 </p>
                 <p className="text-sm text-gray-400">
                   {percentageSold.toFixed(2)}%
                 </p>
               </div>
-              <p className="text-sm text-gray-400 mt-2">
-                UNTIL PRICE INCREASE
+              <p className="text-sm text-yellow-400 font-semibold mt-2">
+                90% DISCOUNT UNTIL PUBLIC SALE
               </p>
             </div>
             
@@ -197,4 +229,3 @@ export const InvestmentReadiness = () => {
     </section>
   );
 };
-
