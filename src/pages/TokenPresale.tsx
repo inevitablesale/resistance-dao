@@ -1,3 +1,4 @@
+
 import { DynamicWidget, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
@@ -117,8 +118,23 @@ const TokenPresaleContent = () => {
   };
 
   return (
-    <div className="text-center mb-8 max-w-5xl mx-auto pt-32">
-      <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight">
+    <div className="text-center mb-8 max-w-5xl mx-auto pt-32 relative z-10">
+      <div className="absolute inset-0">
+        <div 
+          className="absolute inset-0 animate-parallax-slow"
+          style={{
+            background: `
+              radial-gradient(2px 2px at 20% 20%, rgba(234, 179, 8, 0.95) 100%, transparent),
+              radial-gradient(2px 2px at 40% 40%, rgba(234, 179, 8, 0.92) 100%, transparent),
+              radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
+            `,
+            backgroundSize: "240px 240px",
+            opacity: 0.1
+          }}
+        />
+      </div>
+
+      <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 leading-tight">
         Join LedgerFund Presale
       </h1>
       <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
@@ -133,19 +149,19 @@ const TokenPresaleContent = () => {
           
           <div className="space-y-8 text-white">
             <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="p-4 rounded-lg bg-white/5">
-                <p className="text-2xl font-bold text-[#8247E5]">{parseFloat(maxPerWallet).toLocaleString()}</p>
+              <div className="p-4 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20">
+                <p className="text-2xl font-bold text-yellow-400">{parseFloat(maxPerWallet).toLocaleString()}</p>
                 <p className="text-sm text-gray-400">Max Tokens Per Wallet</p>
               </div>
-              <div className="p-4 rounded-lg bg-white/5">
-                <p className="text-2xl font-bold text-[#8247E5]">$0.10</p>
+              <div className="p-4 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20">
+                <p className="text-2xl font-bold text-teal-400">$0.10</p>
                 <p className="text-sm text-gray-400">Price Per Token</p>
               </div>
             </div>
 
             {user && (
               <div className="space-y-4">
-                <Alert>
+                <Alert className="bg-black/30 border-yellow-500/20">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Your Purchase Info</AlertTitle>
                   <AlertDescription className="space-y-2">
@@ -154,8 +170,8 @@ const TokenPresaleContent = () => {
                   </AlertDescription>
                 </Alert>
 
-                <div className="p-6 rounded-lg bg-white/5 space-y-4">
-                  <h4 className="text-lg font-medium text-[#8247E5]">Buy LGR Tokens</h4>
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 space-y-4">
+                  <h4 className="text-lg font-medium text-teal-400">Buy LGR Tokens</h4>
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-400 mb-2">
@@ -166,7 +182,7 @@ const TokenPresaleContent = () => {
                         value={maticAmount}
                         onChange={(e) => setMaticAmount(e.target.value)}
                         placeholder="Enter MATIC amount"
-                        className="w-full bg-white/10 border-white/20"
+                        className="w-full bg-black/30 border-white/20"
                       />
                       <p className="text-sm text-gray-400 mt-2">
                         Expected LGR: {expectedTokens}
@@ -175,7 +191,7 @@ const TokenPresaleContent = () => {
                     <Button
                       onClick={handleBuyTokens}
                       disabled={!maticAmount || isLoading || !user || parseFloat(expectedTokens) > parseFloat(remainingAllowance)}
-                      className="w-full bg-[#8247E5] hover:bg-[#6f3cc7]"
+                      className="w-full bg-gradient-to-r from-yellow-600 to-teal-500 hover:from-yellow-500 hover:to-teal-400"
                     >
                       {isLoading ? "Processing..." : "Buy Tokens"}
                     </Button>
@@ -184,9 +200,9 @@ const TokenPresaleContent = () => {
               </div>
             )}
 
-            <div className="p-4 rounded-lg bg-white/5 space-y-2">
+            <div className="p-4 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 space-y-2">
               <div className="flex items-center gap-2">
-                <Wallet2 className="w-5 h-5 text-[#8247E5]" />
+                <Wallet2 className="w-5 h-5 text-yellow-400" />
                 <span className="text-sm text-gray-300">Network: Polygon (MATIC)</span>
               </div>
               <p className="text-xs text-gray-400">Contract: {PRESALE_CONTRACT_ADDRESS}</p>
@@ -203,9 +219,13 @@ const TokenPresale = () => {
   return (
     <div className="min-h-screen bg-black overflow-hidden relative">
       <div className="absolute inset-0">
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, #000B2E 0%, #000000 100%)', opacity: 0.98 }} />
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 30% 70%, rgba(64, 156, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(147, 51, 255, 0.1) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.05) 0%, transparent 55%)', animation: 'quantumField 30s ease-in-out infinite' }} />
-        <div className="absolute inset-0 opacity-90" style={{ backgroundImage: 'radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.8) 100%, transparent), radial-gradient(2px 2px at 20% 20%, rgba(0, 255, 255, 0.7) 100%, transparent), radial-gradient(1.5px 1.5px at 30% 30%, rgba(147, 51, 255, 0.8) 100%, transparent), radial-gradient(2px 2px at 40% 40%, rgba(64, 156, 255, 0.6) 100%, transparent), radial-gradient(1.5px 1.5px at 50% 50%, rgba(255, 255, 255, 0.7) 100%, transparent)', backgroundSize: '400% 400%', animation: 'temporalWake 240s ease-in-out infinite' }} />
+        <div 
+          className="absolute inset-0" 
+          style={{ 
+            background: 'radial-gradient(circle at center, #eab308 0%, #000000 100%)',
+            opacity: 0.98 
+          }} 
+        />
       </div>
       
       <Nav />
@@ -218,3 +238,4 @@ const TokenPresale = () => {
 };
 
 export default TokenPresale;
+
