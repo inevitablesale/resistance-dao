@@ -7,8 +7,10 @@ import {
   fetchTotalLGRSold,
   fetchRemainingPresaleSupply,
   fetchPresaleUSDPrice,
-  fetchPresaleMaticPrice
+  fetchPresaleMaticPrice,
+  TOTAL_PRESALE_SUPPLY
 } from "@/services/presaleContractService";
+import { ethers } from "ethers";
 
 export const InvestmentReadiness = () => {
   const navigate = useNavigate();
@@ -22,11 +24,13 @@ export const InvestmentReadiness = () => {
     const fetchContractData = async () => {
       try {
         setIsLoading(true);
-        // Fetch all contract data
-        const sold = await fetchTotalLGRSold();
-        const remaining = await fetchRemainingPresaleSupply();
-        const usdPrice = await fetchPresaleUSDPrice();
-        const maticPrice = await fetchPresaleMaticPrice();
+        // Fetch all contract data in parallel
+        const [sold, remaining, usdPrice, maticPrice] = await Promise.all([
+          fetchTotalLGRSold(),
+          fetchRemainingPresaleSupply(),
+          fetchPresaleUSDPrice(),
+          fetchPresaleMaticPrice()
+        ]);
         
         // Update state with fetched values
         setTotalSold(sold);
@@ -47,6 +51,12 @@ export const InvestmentReadiness = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Calculate percentage sold
+  const percentageSold = isLoading ? 0 : Math.min(
+    100,
+    (Number(totalSold) / ethers.utils.formatUnits(TOTAL_PRESALE_SUPPLY, 18)) * 100
+  );
 
   return (
     <section id="join-our-vision" className="py-16 bg-black/30 backdrop-blur-sm">
@@ -133,7 +143,7 @@ export const InvestmentReadiness = () => {
                 ) : (
                   <>
                     <p className="text-3xl font-bold text-yellow-400 mb-2">
-                      {Number(totalSold).toLocaleString()}
+                      {Number(totalSold).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                     </p>
                     <p className="text-sm text-gray-300">Tokens Sold</p>
                   </>
@@ -147,7 +157,7 @@ export const InvestmentReadiness = () => {
                 ) : (
                   <>
                     <p className="text-3xl font-bold text-yellow-400 mb-2">
-                      {Number(remainingSupply).toLocaleString()}
+                      {Number(remainingSupply).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                     </p>
                     <p className="text-sm text-gray-300">Remaining Supply</p>
                   </>
@@ -161,7 +171,7 @@ export const InvestmentReadiness = () => {
                 ) : (
                   <>
                     <p className="text-3xl font-bold text-teal-400 mb-2">
-                      {Number(priceMatic).toLocaleString()} MATIC
+                      {Number(priceMatic).toLocaleString(undefined, { maximumFractionDigits: 6 })} MATIC
                     </p>
                     <p className="text-sm text-gray-300">Price Per Token</p>
                   </>
@@ -175,13 +185,27 @@ export const InvestmentReadiness = () => {
                 ) : (
                   <>
                     <p className="text-3xl font-bold text-yellow-400 mb-2">
-                      ${Number(priceUSD).toLocaleString()}
+                      ${Number(priceUSD).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                     </p>
                     <p className="text-sm text-gray-300">USD Price</p>
                   </>
                 )}
               </div>
             </div>
+
+            {/* Progress bar */}
+            <div className="mb-8">
+              <div className="h-2 bg-black/30 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-yellow-500 to-teal-500 transition-all duration-1000"
+                  style={{ width: `${percentageSold}%` }}
+                />
+              </div>
+              <p className="text-sm text-gray-400 mt-2">
+                {percentageSold.toFixed(2)}% Sold
+              </p>
+            </div>
+            
             <button 
               onClick={() => navigate('/token-presale')}
               className="group relative px-8 py-3 bg-gradient-to-r from-yellow-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"

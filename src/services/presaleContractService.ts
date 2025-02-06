@@ -12,26 +12,38 @@ export const PRESALE_ABI = [
   "function PRESALE_SUPPLY() public view returns (uint256)",
   "function MAX_PER_WALLET() public view returns (uint256)",
   "function PRESALE_USD_PRICE() public view returns (uint256)",
-  "function presaleEndTime() public view returns (uint256)",
-  "function totalLGRSold() public view returns (uint256)",
-  "function stakeableTokens(address) public view returns (uint256)"
+  "function presaleEnd() public view returns (uint256)",
+  "function lgrToken() public view returns (address)"
+];
+
+// ERC20 Interface for token balance checks
+const ERC20_ABI = [
+  "function balanceOf(address account) public view returns (uint256)"
 ];
 
 export const PRESALE_END_TIME = 1746057600; // May 1, 2025
-export const TOTAL_PRESALE_SUPPLY = 5000000; // 5 million tokens
-export const USD_PRICE = 0.1; // $0.10 per token
+export const TOTAL_PRESALE_SUPPLY = ethers.utils.parseUnits("5000000", 18); // 5 million tokens with 18 decimals
+export const USD_PRICE = ethers.utils.parseUnits("0.1", 18); // $0.10 per token
 
 export const getPresaleContract = (provider: ethers.providers.Provider | ethers.Signer) => {
   return new ethers.Contract(PRESALE_CONTRACT_ADDRESS, PRESALE_ABI, provider);
 };
 
-// Function to fetch total LGR sold
+// Function to get LGR token contract
+const getLGRTokenContract = async (provider: ethers.providers.Provider) => {
+  const presaleContract = getPresaleContract(provider);
+  const lgrTokenAddress = await presaleContract.lgrToken();
+  return new ethers.Contract(lgrTokenAddress, ERC20_ABI, provider);
+};
+
+// Function to fetch total LGR sold by checking contract's token balance
 export const fetchTotalLGRSold = async () => {
   try {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
-    const contract = getPresaleContract(provider);
-    const totalSold = await contract.totalLGRSold();
-    return ethers.utils.formatEther(totalSold);
+    const lgrTokenContract = await getLGRTokenContract(provider);
+    const remainingBalance = await lgrTokenContract.balanceOf(PRESALE_CONTRACT_ADDRESS);
+    const totalSold = TOTAL_PRESALE_SUPPLY.sub(remainingBalance);
+    return ethers.utils.formatUnits(totalSold, 18);
   } catch (error) {
     console.error("Error fetching total LGR sold:", error);
     return "0";
@@ -42,18 +54,16 @@ export const fetchTotalLGRSold = async () => {
 export const fetchRemainingPresaleSupply = async () => {
   try {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
-    const contract = getPresaleContract(provider);
-    const totalSold = await contract.totalLGRSold();
-    const presaleSupply = ethers.utils.parseEther(TOTAL_PRESALE_SUPPLY.toString());
-    const remaining = presaleSupply.sub(totalSold);
-    return ethers.utils.formatEther(remaining);
+    const lgrTokenContract = await getLGRTokenContract(provider);
+    const remainingBalance = await lgrTokenContract.balanceOf(PRESALE_CONTRACT_ADDRESS);
+    return ethers.utils.formatUnits(remainingBalance, 18);
   } catch (error) {
     console.error("Error fetching remaining presale supply:", error);
-    return TOTAL_PRESALE_SUPPLY.toString();
+    return ethers.utils.formatUnits(TOTAL_PRESALE_SUPPLY, 18);
   }
 };
 
-// Function to fetch presale price in USD
+// Function to fetch presale price in USD (fixed at $0.10)
 export const fetchPresaleUSDPrice = async () => {
   try {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
@@ -62,7 +72,7 @@ export const fetchPresaleUSDPrice = async () => {
     return ethers.utils.formatUnits(usdPrice, 18);
   } catch (error) {
     console.error("Error fetching USD price:", error);
-    return USD_PRICE.toString();
+    return ethers.utils.formatUnits(USD_PRICE, 18);
   }
 };
 
