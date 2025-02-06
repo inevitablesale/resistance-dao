@@ -282,7 +282,7 @@ const Index = () => {
         <div 
           className="absolute inset-0"
           style={{
-            background: "radial-gradient(circle at center, #eab308 0%, #0F0628 100%)",
+            background: "radial-gradient(circle at center, #eab308 0%, #000000 100%)",
             opacity: 0.98
           }}
         />
