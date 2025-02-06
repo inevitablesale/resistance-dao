@@ -73,16 +73,13 @@ export default {
         "fade-in": "fade-in 0.5s ease-out forwards",
         "scale-in": "scale-in 0.5s ease-out forwards",
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "spin-slow": "spin 20s linear infinite",
         "wave": "wave 8s ease-in-out infinite",
         "wave-slow": "wave 12s ease-in-out infinite",
         "gradient": "gradient 8s ease infinite",
-        "singularity": "singularity 20s ease-in-out infinite",
-        "cosmic-pulse": "cosmic-pulse 4s ease-in-out infinite",
-        "star-field": "star-field 30s linear infinite",
+        "spiral-in": "spiral-in 10s ease-in-out infinite",
         "particle-drift": "particle-drift 15s linear infinite",
         "space-warp": "space-warp 10s ease-in-out infinite",
-        "energy-swirl": "energy-swirl 12s linear infinite",
-        "gravitational-pull": "gravitational-pull 8s ease-in-out infinite"
       },
       keyframes: {
         "accordion-down": {
@@ -110,35 +107,20 @@ export default {
           "50%": { backgroundPosition: "100% 50%" },
           "100%": { backgroundPosition: "0% 50%" }
         },
-        "singularity": {
-          "0%, 100%": { transform: "scale(1) rotate(0deg)" },
-          "50%": { transform: "scale(1.1) rotate(180deg)" }
-        },
-        "cosmic-pulse": {
-          "0%, 100%": { opacity: "0.5", transform: "scale(1)" },
-          "50%": { opacity: "1", transform: "scale(1.05)" }
-        },
-        "star-field": {
-          "0%": { transform: "translateZ(0) rotate(0deg)" },
-          "100%": { transform: "translateZ(400px) rotate(360deg)" }
+        "spiral-in": {
+          "0%": { transform: "rotate(0deg) translateX(0)", opacity: "0" },
+          "50%": { opacity: "1" },
+          "100%": { transform: "rotate(360deg) translateX(200px)", opacity: "0" }
         },
         "particle-drift": {
-          "0%, 100%": { transform: "translateY(0) translateX(0)" },
-          "50%": { transform: "translateY(-20px) translateX(10px)" }
+          "0%": { transform: "translateY(0) translateX(0) rotate(0deg)" },
+          "50%": { transform: "translateY(-100px) translateX(50px) rotate(180deg)" },
+          "100%": { transform: "translateY(0) translateX(0) rotate(360deg)" }
         },
         "space-warp": {
           "0%": { transform: "scale(1) rotate(0deg)", opacity: "0.5" },
-          "50%": { transform: "scale(1.2) rotate(180deg)", opacity: "0.8" },
+          "50%": { transform: "scale(1.5) rotate(180deg)", opacity: "0.8" },
           "100%": { transform: "scale(1) rotate(360deg)", opacity: "0.5" }
-        },
-        "energy-swirl": {
-          "0%": { transform: "rotate(0deg) scale(1)", opacity: "0.8" },
-          "50%": { transform: "rotate(180deg) scale(1.1)", opacity: "1" },
-          "100%": { transform: "rotate(360deg) scale(1)", opacity: "0.8" }
-        },
-        "gravitational-pull": {
-          "0%": { transform: "translateY(100px) scale(0.8)", opacity: "0.5" },
-          "100%": { transform: "translateY(0) scale(1)", opacity: "1" }
         }
       }
     },

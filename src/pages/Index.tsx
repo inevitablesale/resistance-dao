@@ -23,11 +23,22 @@ const IndexContent = () => {
   const { toast } = useToast();
   const [isChecking, setIsChecking] = useState(false);
   const [scrollPos, setScrollPos] = useState(0);
+  const [blackHoleState, setBlackHoleState] = useState('pe-dominance'); // 'pe-dominance' | 'transformation' | 'ledgerfund-future'
 
   useEffect(() => {
     const handleScroll = () => {
       const position = window.scrollY;
       setScrollPos(position);
+      
+      // Update black hole state based on scroll position
+      const windowHeight = window.innerHeight;
+      if (position < windowHeight * 0.3) {
+        setBlackHoleState('pe-dominance');
+      } else if (position < windowHeight * 0.6) {
+        setBlackHoleState('transformation');
+      } else {
+        setBlackHoleState('ledgerfund-future');
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -86,70 +97,128 @@ const IndexContent = () => {
 
   return (
     <>
-      <div className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 overflow-hidden">
-        {/* Enhanced Black Hole Effect Container */}
+      <div className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 overflow-hidden min-h-[100vh]">
+        {/* Enhanced Black Hole Container */}
         <div className="absolute inset-0 z-0 perspective-3000">
           <div className="absolute inset-0 flex items-center justify-center">
             <div 
-              className="w-[800px] h-[800px] relative"
+              className={`w-[1200px] h-[1200px] relative transition-all duration-1000 ease-out ${
+                blackHoleState === 'pe-dominance' ? 'scale-75' : 
+                blackHoleState === 'transformation' ? 'scale-90' : 
+                'scale-100'
+              }`}
               style={{
-                transform: `translateY(${Math.min(scrollPos * 0.2, 100)}px) scale(${1 + scrollPos * 0.001})`
+                transform: `
+                  translateY(${Math.min(scrollPos * 0.15, 150)}px) 
+                  scale(${1 + scrollPos * 0.0005})
+                `
               }}
             >
-              {/* Enhanced Singularity Core */}
+              {/* Black Hole Core */}
               <div 
-                className="absolute inset-0 rounded-full bg-black animate-singularity" 
+                className={`absolute inset-0 rounded-full transition-all duration-1000 ${
+                  blackHoleState === 'pe-dominance' ? 'bg-black scale-100' :
+                  blackHoleState === 'transformation' ? 'bg-purple-900/90 scale-90' :
+                  'bg-purple-800/80 scale-75'
+                }`}
                 style={{
                   boxShadow: `
-                    0 0 100px 20px rgba(138, 43, 226, 0.3),
-                    0 0 200px 40px rgba(138, 43, 226, 0.2),
-                    0 0 300px 60px rgba(138, 43, 226, 0.1)
+                    0 0 150px 30px rgba(138, 43, 226, 0.3),
+                    0 0 300px 60px rgba(138, 43, 226, 0.2),
+                    0 0 450px 90px rgba(138, 43, 226, 0.1)
                   `
                 }}
               />
               
-              {/* Enhanced Accretion Disk */}
+              {/* Event Horizon */}
               <div 
-                className="absolute inset-0 rounded-full animate-energy-swirl"
+                className="absolute inset-0 rounded-full animate-pulse-slow"
+                style={{
+                  background: `
+                    radial-gradient(
+                      circle at 50% 50%,
+                      rgba(139, 92, 246, 0.5) 0%,
+                      rgba(139, 92, 246, 0.2) 30%,
+                      transparent 70%
+                    )
+                  `
+                }}
+              />
+              
+              {/* Accretion Disk with Dynamic Colors */}
+              <div 
+                className={`absolute inset-0 rounded-full animate-spin-slow transition-opacity duration-1000 ${
+                  blackHoleState === 'pe-dominance' ? 'opacity-100' :
+                  blackHoleState === 'transformation' ? 'opacity-70' :
+                  'opacity-40'
+                }`}
                 style={{
                   background: `
                     conic-gradient(
-                      from 0deg,
+                      from ${scrollPos}deg,
                       rgba(147, 51, 234, 0.8) 0%,
                       rgba(138, 43, 226, 0.5) 25%,
                       rgba(123, 31, 162, 0.3) 50%,
                       rgba(147, 51, 234, 0.8) 75%,
                       rgba(138, 43, 226, 0.5) 100%
                     )
-                  `
+                  `,
+                  animation: 'spin 20s linear infinite'
                 }}
               />
               
-              {/* Space Dust Particles */}
+              {/* PE Takeover Text Fragments */}
+              {blackHoleState === 'pe-dominance' && (
+                <>
+                  {['Layoffs', 'Short-Term Profits', 'Lost Trust'].map((text, index) => (
+                    <div
+                      key={text}
+                      className="absolute text-red-400/80 font-medium animate-spiral-in"
+                      style={{
+                        left: '50%',
+                        top: '50%',
+                        transform: `rotate(${index * 120}deg) translateX(${200 + scrollPos * 0.1}px)`,
+                        animation: `spiral-in 10s infinite ${index * 2}s`
+                      }}
+                    >
+                      {text}
+                    </div>
+                  ))}
+                </>
+              )}
+              
+              {/* Decentralized Network Lines - Appears during transformation */}
+              {blackHoleState !== 'pe-dominance' && (
+                <div className="absolute inset-0">
+                  {[...Array(8)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute w-full h-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/50 to-purple-500/0 origin-center"
+                      style={{
+                        transform: `rotate(${i * 45}deg)`,
+                        opacity: blackHoleState === 'ledgerfund-future' ? 0.8 : 0.4
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+              
+              {/* Glowing Particles */}
               <div className="absolute inset-0">
-                {[...Array(20)].map((_, i) => (
+                {[...Array(30)].map((_, i) => (
                   <div
                     key={i}
-                    className="absolute w-1 h-1 bg-white rounded-full animate-particle-drift"
+                    className="absolute w-1 h-1 bg-purple-300 rounded-full animate-particle-drift"
                     style={{
                       top: `${Math.random() * 100}%`,
                       left: `${Math.random() * 100}%`,
-                      opacity: Math.random() * 0.5 + 0.3,
-                      animationDelay: `${Math.random() * 5}s`
+                      opacity: Math.random() * 0.7 + 0.3,
+                      animationDelay: `${Math.random() * 5}s`,
+                      animationDuration: `${15 + Math.random() * 10}s`
                     }}
                   />
                 ))}
               </div>
-              
-              {/* Gravitational Distortion Ring */}
-              <div 
-                className="absolute inset-0 rounded-full animate-space-warp"
-                style={{
-                  border: '2px solid rgba(147, 51, 234, 0.3)',
-                  transform: `scale(${1 + scrollPos * 0.002})`,
-                  opacity: Math.max(0, 1 - scrollPos * 0.002)
-                }}
-              />
             </div>
           </div>
         </div>
@@ -159,12 +228,12 @@ const IndexContent = () => {
           className="absolute inset-0 opacity-90"
           style={{
             background: `
-              radial-gradient(1px 1px at ${10 + scrollPos * 0.1}% ${10 + scrollPos * 0.05}%, rgba(255, 255, 255, 0.8) 100%, transparent),
-              radial-gradient(1.5px 1.5px at ${20 + scrollPos * 0.15}% ${20 + scrollPos * 0.1}%, rgba(139, 92, 246, 0.7) 100%, transparent),
-              radial-gradient(2px 2px at ${30 + scrollPos * 0.2}% ${30 + scrollPos * 0.15}%, rgba(255, 255, 255, 0.6) 100%, transparent)
+              radial-gradient(1px 1px at ${20 + scrollPos * 0.05}% ${20 + scrollPos * 0.02}%, rgba(255, 255, 255, 0.3) 100%, transparent),
+              radial-gradient(2px 2px at ${40 + scrollPos * 0.08}% ${40 + scrollPos * 0.04}%, rgba(139, 92, 246, 0.4) 100%, transparent),
+              radial-gradient(2.5px 2.5px at ${60 + scrollPos * 0.12}% ${60 + scrollPos * 0.06}%, rgba(255, 255, 255, 0.2) 100%, transparent)
             `,
-            backgroundSize: '400% 400%',
-            transform: `translateZ(${scrollPos * 0.5}px)`
+            backgroundSize: '200% 200%',
+            transform: `translateZ(${scrollPos * 0.2}px)`
           }}
         />
 
@@ -208,6 +277,7 @@ const IndexContent = () => {
         </div>
       </div>
 
+      {/* Other sections */}
       <InvestmentReadiness />
       <WhatWeBuilding />
       <PrivateEquityImpact />
