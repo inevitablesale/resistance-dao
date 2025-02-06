@@ -9,8 +9,8 @@ const presaleData = [
 
 const publicSaleData = [
   { name: 'Staked from Presale', value: 50, color: '#14b8a6', description: 'Tokens staked from presale phase.' },
-  { name: 'Public Sale', value: 25, color: '#0d9488', description: 'For protocol growth and sustainability. Collects voting fees, proposal fees, advertising revenue, and 5% from acquisitions and annual returns.' },
-  { name: 'Community Rewards', value: 10, color: '#0f766e', description: 'Allocated for community incentives, governance participation, and ecosystem development initiatives.' },
+  { name: 'Public Sale', value: 30, color: '#0d9488', description: 'For protocol growth and sustainability. Collects voting fees, proposal fees, advertising revenue, and 5% from acquisitions and annual returns.' },
+  { name: 'Community Rewards', value: 5, color: '#0f766e', description: 'Allocated for community incentives, governance participation, and ecosystem development initiatives.' },
   { name: 'Team', value: 10, color: '#0f766e', description: 'Supporting the core team building and maintaining the protocol.' },
   { name: 'Partners', value: 5, color: '#115e59', description: 'Reserved for strategic partnerships and ecosystem development.' }
 ];
@@ -24,11 +24,17 @@ export const WhatWeBuilding = () => {
         </h2>
 
         <Tabs defaultValue="presale" className="w-full">
-          <TabsList className="grid w-full max-w-[400px] grid-cols-2 mx-auto mb-8 bg-black/40">
-            <TabsTrigger value="presale" className="data-[state=active]:bg-yellow-500/20">
+          <TabsList className="grid w-full max-w-[400px] grid-cols-2 mx-auto mb-8 bg-black/40 relative z-10">
+            <TabsTrigger 
+              value="presale" 
+              className="data-[state=active]:bg-yellow-500/20 text-white relative z-10 hover:text-white/90"
+            >
               Presale (5M Supply)
             </TabsTrigger>
-            <TabsTrigger value="public" className="data-[state=active]:bg-teal-500/20">
+            <TabsTrigger 
+              value="public" 
+              className="data-[state=active]:bg-teal-500/20 text-white relative z-10 hover:text-white/90"
+            >
               Public Sale (10M Supply)
             </TabsTrigger>
           </TabsList>
@@ -220,4 +226,3 @@ export const WhatWeBuilding = () => {
     </section>
   );
 };
-
