@@ -32,7 +32,7 @@ const IndexContent = () => {
   // Add states for presale data
   const [presaleSupply, setPresaleSupply] = useState<string>('0');
   const [totalRaised, setTotalRaised] = useState<string>('0');
-  const [presaleEndTime] = useState<number>(new Date('2024-04-01').getTime()); // Hardcoded for now
+  const [presaleEndTime, setPresaleEndTime] = useState<number>(Date.now() + 86400000); // Default to 24h from now
   const [timeLeft, setTimeLeft] = useState({
     days: '00',
     hours: '00',
@@ -123,14 +123,13 @@ const IndexContent = () => {
       const supply = await presaleContract.PRESALE_SUPPLY();
       setPresaleSupply(ethers.utils.formatEther(supply));
 
-      // Calculate total MATIC raised based on purchased tokens
-      const maticPrice = await presaleContract.getLatestMaticPrice();
-      const lgrPrice = await presaleContract.getLGRPrice();
-      const purchasedTokens = await presaleContract.purchasedTokens(PRESALE_CONTRACT_ADDRESS);
-      
-      // Convert to MATIC equivalent
-      const maticRaised = purchasedTokens.mul(lgrPrice).div(maticPrice);
-      setTotalRaised(ethers.utils.formatEther(maticRaised));
+      // Get total LGR tokens sold
+      const lgrSold = await presaleContract.totalLGRSold();
+      setTotalRaised(ethers.utils.formatEther(lgrSold));
+
+      // Get presale end time
+      const endTime = await presaleContract.presaleEndTime();
+      setPresaleEndTime(endTime.toNumber() * 1000); // Convert from seconds to milliseconds
 
     } catch (error) {
       console.error('Error fetching presale data:', error);
@@ -152,7 +151,7 @@ const IndexContent = () => {
   // Calculate time left
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const now = new Date().getTime();
+      const now = Date.now();
       const difference = presaleEndTime - now;
 
       if (difference > 0) {

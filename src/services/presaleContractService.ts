@@ -11,9 +11,12 @@ export const PRESALE_ABI = [
   "function purchasedTokens(address) public view returns (uint256)",
   "function PRESALE_SUPPLY() public view returns (uint256)",
   "function MAX_PER_WALLET() public view returns (uint256)",
-  "function PRESALE_USD_PRICE() public view returns (uint256)"
+  "function PRESALE_USD_PRICE() public view returns (uint256)",
+  "function presaleEndTime() public view returns (uint256)",
+  "function totalLGRSold() public view returns (uint256)"
 ];
 
 export const getPresaleContract = (provider: ethers.providers.Provider | ethers.Signer) => {
   return new ethers.Contract(PRESALE_CONTRACT_ADDRESS, PRESALE_ABI, provider);
 };
+
