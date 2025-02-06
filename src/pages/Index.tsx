@@ -16,6 +16,8 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { checkNFTOwnership } from "@/services/contractService";
 import { Trophy, UserCircle, Building2, Wallet } from "lucide-react";
+import { ethers } from "ethers";
+import { getPresaleContract, PRESALE_CONTRACT_ADDRESS } from "@/services/presaleContractService";
 
 const IndexContent = () => {
   const navigate = useNavigate();
@@ -26,6 +28,17 @@ const IndexContent = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const loadTime = Date.now();
+
+  // Add states for presale data
+  const [presaleSupply, setPresaleSupply] = useState<string>('0');
+  const [totalRaised, setTotalRaised] = useState<string>('0');
+  const [presaleEndTime] = useState<number>(new Date('2024-04-01').getTime()); // Hardcoded for now
+  const [timeLeft, setTimeLeft] = useState({
+    days: '00',
+    hours: '00',
+    minutes: '00',
+    seconds: '00'
+  });
 
   useEffect(() => {
     // Set loaded state after a small delay to trigger initial animations
@@ -100,18 +113,47 @@ const IndexContent = () => {
     opacity: 1 - scrollProgress * 0.6
   } as React.CSSProperties;
 
-  const [timeLeft, setTimeLeft] = useState({
-    days: '00',
-    hours: '00',
-    minutes: '00',
-    seconds: '00'
-  });
+  // Function to fetch presale data
+  const fetchPresaleData = async () => {
+    try {
+      const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
+      const presaleContract = getPresaleContract(provider);
+      
+      // Get total presale supply
+      const supply = await presaleContract.PRESALE_SUPPLY();
+      setPresaleSupply(ethers.utils.formatEther(supply));
 
+      // Calculate total MATIC raised based on purchased tokens
+      const maticPrice = await presaleContract.getLatestMaticPrice();
+      const lgrPrice = await presaleContract.getLGRPrice();
+      const purchasedTokens = await presaleContract.purchasedTokens(PRESALE_CONTRACT_ADDRESS);
+      
+      // Convert to MATIC equivalent
+      const maticRaised = purchasedTokens.mul(lgrPrice).div(maticPrice);
+      setTotalRaised(ethers.utils.formatEther(maticRaised));
+
+    } catch (error) {
+      console.error('Error fetching presale data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch presale data",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Fetch presale data on component mount
+  useEffect(() => {
+    fetchPresaleData();
+    const interval = setInterval(fetchPresaleData, 30000); // Refresh every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  // Calculate time left
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const presaleEnd = new Date('2024-04-01').getTime(); // Set your actual presale end date
       const now = new Date().getTime();
-      const difference = presaleEnd - now;
+      const difference = presaleEndTime - now;
 
       if (difference > 0) {
         setTimeLeft({
@@ -125,7 +167,7 @@ const IndexContent = () => {
 
     const timer = setInterval(calculateTimeLeft, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [presaleEndTime]);
 
   return (
     <>
@@ -306,12 +348,14 @@ const IndexContent = () => {
             {/* Progress and Stats */}
             <div className="mb-8">
               <div className="text-white text-lg mb-4">
-                MATIC RAISED: 15,268 / 20,000
+                MATIC RAISED: {Number(totalRaised).toLocaleString()} / {Number(presaleSupply).toLocaleString()}
               </div>
               <div className="w-full h-4 bg-gray-700 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-yellow-500 to-teal-500" 
-                  style={{ width: '76%' }}
+                  style={{ 
+                    width: `${Math.min(100, (Number(totalRaised) / Number(presaleSupply)) * 100)}%` 
+                  }}
                 />
               </div>
               <div className="text-center text-white/80 mt-2">
