@@ -1,3 +1,4 @@
+
 import { CircleDollarSign, FileCheck, Wallet } from "lucide-react";
 import { Card } from "./ui/card";
 
@@ -23,7 +24,7 @@ export const HowItWorks = () => {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-yellow-400">•</span>
-                <span>Shared Vision: Investments ensure each acquisition aligns with community goals.</span>
+                <span>KYC Requirement: You'll need to mint a LedgerFren NFT and complete KYC/AML verification to participate.</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-yellow-400">•</span>
