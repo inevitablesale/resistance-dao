@@ -34,7 +34,7 @@ export const WhatWeBuilding = () => {
               value="public" 
               className="data-[state=active]:bg-teal-500/20 text-white relative z-10 hover:text-white/90"
             >
-              Public Sale (10M Supply)
+              Public Sale (4M Supply)
             </TabsTrigger>
           </TabsList>
 
@@ -90,7 +90,7 @@ export const WhatWeBuilding = () => {
 
           <TabsContent value="public">
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
-              Public Sale Total Supply: 10,000,000 LGR
+              Public Sale Available Supply: 4,000,000 LGR
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
               <div className="h-[400px] relative">
