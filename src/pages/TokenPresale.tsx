@@ -1,6 +1,5 @@
 
-import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { DynamicWidget, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import { useToast } from "@/hooks/use-toast";
@@ -93,34 +92,29 @@ const TokenPresaleContent = () => {
         (parseFloat(expectedTokens) * 0.99).toString()
       );
 
+      // Dynamic will automatically show the transaction confirmation UI
       const tx = await contract.buyTokens(minExpectedTokens, {
         value: ethers.utils.parseEther(maticAmount)
       });
 
-      toast({
-        title: "Transaction Submitted",
-        description: "Please wait for the transaction to be confirmed.",
-      });
-
+      // Let Dynamic handle the transaction UI, no need for our own toast here
       await tx.wait();
+
+      // Reset form and update purchased amount after confirmation
+      setMaticAmount("");
+      setExpectedTokens("0");
+
+      const purchased = await contract.purchasedTokens(primaryWallet.address);
+      setAlreadyPurchased(ethers.utils.formatEther(purchased));
+      
+      const maxTokens = await contract.MAX_PER_WALLET();
+      const remaining = maxTokens.sub(purchased);
+      setRemainingAllowance(ethers.utils.formatEther(remaining));
 
       toast({
         title: "Purchase Successful!",
         description: `You've successfully purchased ${expectedTokens} LGR tokens.`,
       });
-
-      // Reset form
-      setMaticAmount("");
-      setExpectedTokens("0");
-
-      // Refresh purchased amount
-      const purchased = await contract.purchasedTokens(primaryWallet.address);
-      setAlreadyPurchased(ethers.utils.formatEther(purchased));
-      
-      // Update remaining allowance
-      const maxTokens = await contract.MAX_PER_WALLET();
-      const remaining = maxTokens.sub(purchased);
-      setRemainingAllowance(ethers.utils.formatEther(remaining));
     } catch (error: any) {
       console.error("Purchase error:", error);
       toast({
@@ -139,13 +133,19 @@ const TokenPresaleContent = () => {
         Join LedgerFund Presale
       </h1>
       <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
-        You're about to participate in shaping the future of decentralized accounting. Follow the path below that matches your situation.
+        You're about to participate in shaping the future of decentralized accounting. Follow the steps below to purchase LGR tokens.
       </p>
 
       <div className="max-w-2xl mx-auto">
         <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
           <div className="flex justify-center mb-8">
-            <DynamicWidget />
+            <DynamicWidget
+              innerButtonComponent={
+                <button className="w-full py-3 px-4 rounded-lg bg-[#8247E5] hover:bg-[#6f3cc7] text-white font-medium transition-colors">
+                  Connect Wallet
+                </button>
+              }
+            />
           </div>
           
           <div className="space-y-8 text-white">
