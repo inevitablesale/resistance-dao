@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { checkNFTOwnership } from "@/services/contractService";
-import { Trophy, UserCircle, Building2 } from "lucide-react";
+import { Trophy, UserCircle, Building2, Wallet } from "lucide-react";
 
 const IndexContent = () => {
   const navigate = useNavigate();
@@ -99,6 +99,33 @@ const IndexContent = () => {
     transform: `scale(${1 + scrollProgress * 0.5})`,
     opacity: 1 - scrollProgress * 0.6
   } as React.CSSProperties;
+
+  const [timeLeft, setTimeLeft] = useState({
+    days: '00',
+    hours: '00',
+    minutes: '00',
+    seconds: '00'
+  });
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const presaleEnd = new Date('2024-04-01').getTime(); // Set your actual presale end date
+      const now = new Date().getTime();
+      const difference = presaleEnd - now;
+
+      if (difference > 0) {
+        setTimeLeft({
+          days: String(Math.floor(difference / (1000 * 60 * 60 * 24))).padStart(2, '0'),
+          hours: String(Math.floor((difference / (1000 * 60 * 60)) % 24)).padStart(2, '0'),
+          minutes: String(Math.floor((difference / 1000 / 60) % 60)).padStart(2, '0'),
+          seconds: String(Math.floor((difference / 1000) % 60)).padStart(2, '0')
+        });
+      }
+    };
+
+    const timer = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <>
@@ -256,34 +283,73 @@ const IndexContent = () => {
             We're putting the future of the profession back in the hands of professionals.
           </p>
 
-          <div className="mb-16">
-            <p className="text-sm uppercase tracking-wider text-teal-300 mb-6 font-semibold drop-shadow-[0_1px_1px_rgba(0,0,0,0.7)]">
-              Explore applications powered by LedgerFund Protocol
-            </p>
-            
-            <div className="flex flex-col md:flex-row gap-4 justify-center">
-              <a 
-                href="#join-our-vision"
-                className="group relative px-8 py-3 bg-gradient-to-r from-yellow-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
-                <div className="relative flex items-center justify-center gap-2 text-white font-medium">
-                  <Trophy className="w-5 h-5" />
-                  <span>Purchase LGR Tokens</span>
+          <div className="max-w-3xl mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-6 border border-yellow-500/20">
+            <h2 className="text-3xl font-bold text-yellow-500 mb-6">
+              BUY LGR PRESALE NOW!
+            </h2>
+
+            {/* Countdown Timer */}
+            <div className="grid grid-cols-4 gap-4 mb-8">
+              {[
+                { label: 'DAYS', value: timeLeft.days },
+                { label: 'HOURS', value: timeLeft.hours },
+                { label: 'MINUTES', value: timeLeft.minutes },
+                { label: 'SECONDS', value: timeLeft.seconds }
+              ].map(({ label, value }) => (
+                <div key={label} className="bg-black/60 p-4 rounded-lg">
+                  <div className="text-4xl font-bold text-white mb-2">{value}</div>
+                  <div className="text-sm text-gray-400">{label}</div>
                 </div>
-              </a>
+              ))}
+            </div>
+
+            {/* Progress and Stats */}
+            <div className="mb-8">
+              <div className="text-white text-lg mb-4">
+                MATIC RAISED: 15,268 / 20,000
+              </div>
+              <div className="w-full h-4 bg-gray-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-yellow-500 to-teal-500" 
+                  style={{ width: '76%' }}
+                />
+              </div>
+              <div className="text-center text-white/80 mt-2">
+                UNTIL PRICE RISE
+              </div>
+            </div>
+
+            {/* Purchase Options */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <button 
+                onClick={() => navigate('/token-presale')}
+                className="group relative px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-yellow-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                <div className="relative flex items-center justify-center gap-2 text-white font-medium text-lg">
+                  <Trophy className="w-5 h-5" />
+                  <span>Buy with Card</span>
+                </div>
+              </button>
               
               <button 
-                onClick={() => navigate('/mint-nft')}
-                className="group relative px-8 py-3 bg-black/50 hover:bg-black/60 border border-yellow-500/40 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                onClick={() => navigate('/token-presale')}
+                className="group relative px-8 py-4 bg-black/50 hover:bg-black/60 border border-teal-500/40 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-400/20 blur-sm group-hover:blur-lg transition-all duration-300" />
-                <div className="relative flex items-center justify-center gap-2 text-white font-medium">
-                  <UserCircle className="w-5 h-5" />
-                  <span>Mint Your LedgerFren NFT</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-teal-400/20 blur-sm group-hover:blur-lg transition-all duration-300" />
+                <div className="relative flex items-center justify-center gap-2 text-white font-medium text-lg">
+                  <Wallet className="w-5 h-5" />
+                  <span>Buy with Crypto</span>
                 </div>
               </button>
             </div>
+
+            <button 
+              onClick={() => navigate('/mint-nft')}
+              className="mt-4 text-white/80 hover:text-white underline text-sm transition-colors"
+            >
+              Don't have a wallet?
+            </button>
           </div>
         </div>
       </div>
