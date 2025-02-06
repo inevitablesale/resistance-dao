@@ -1,19 +1,74 @@
 
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2 } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+
+const data = [
+  { name: 'Presale', value: 30, color: '#14b8a6', description: 'Reserved for early supporters who believe in the future of decentralized accounting.' },
+  { name: 'Treasury', value: 30, color: '#0d9488', description: 'For protocol growth, development, and sustainability of the ecosystem.' },
+  { name: 'Marketing', value: 20, color: '#0f766e', description: 'Allocated for community growth and awareness initiatives to expand the LedgerFund ecosystem.' },
+  { name: 'Team', value: 10, color: '#0f766e', description: 'Supporting the core team building and maintaining the protocol.' },
+  { name: 'Partners', value: 10, color: '#115e59', description: 'Reserved for strategic partnerships and ecosystem development.' }
+];
 
 export const WhatWeBuilding = () => {
   return (
     <section className="py-16 relative">
       <div className="container px-4">
         <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 text-center">
-          LedgerFund Tokenomics
+          LGR Token Distribution
         </h2>
         
         <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
-          Our dual-token system combines liquidity provision with NFT-based governance, ensuring transparency, 
-          stability, and alignment with long-term goals.
+          Total Supply: 1,510,000,000 LGR
         </p>
-        
+
+        {/* Token Distribution Chart */}
+        <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
+          <div className="h-[400px] relative">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={160}
+                  innerRadius={100}
+                  dataKey="value"
+                  labelLine={false}
+                  label={({ name, value }) => `${name} ${value}%`}
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/10 to-transparent animate-pulse blur-2xl" />
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {data.map((segment, index) => (
+              <div 
+                key={segment.name}
+                className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-4 h-4 rounded-full" style={{ backgroundColor: segment.color }} />
+                  <h3 className="text-xl font-semibold text-white">
+                    {segment.name} ({segment.value}%)
+                  </h3>
+                </div>
+                <p className="text-gray-300">
+                  {segment.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Token Utility Section */}
         <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
           {/* LGR Token Section */}
           <div className="space-y-8">
