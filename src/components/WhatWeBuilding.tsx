@@ -1,21 +1,19 @@
-
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const presaleData = [
   { name: 'Presale Stake', value: 50, color: '#14b8a6', description: 'Reserved for early supporters who believe in the future of decentralized accounting acquisitions. 5M tokens available. 1 yr hold term.' },
+  { name: 'Community Rewards', value: 25, color: '#0f766e', description: 'Allocated for community incentives and ecosystem development.' },
+  { name: 'Team', value: 20, color: '#0f766e', description: 'Supporting the core team and ongoing development.' },
+  { name: 'Partners', value: 5, color: '#115e59', description: 'Strategic partnerships and ecosystem growth.' }
+];
+
+const publicSaleData = [
   { name: 'Public Sale', value: 25, color: '#0d9488', description: 'For protocol growth and sustainability. Collects voting fees, proposal fees, advertising revenue, and 5% from acquisitions and annual returns.' },
   { name: 'Community Rewards', value: 10, color: '#0f766e', description: 'Allocated for community incentives, governance participation, and ecosystem development initiatives.' },
   { name: 'Team', value: 10, color: '#0f766e', description: 'Supporting the core team building and maintaining the protocol.' },
   { name: 'Partners', value: 5, color: '#115e59', description: 'Reserved for strategic partnerships and ecosystem development.' }
-];
-
-const publicSaleData = [
-  { name: 'Public Sale', value: 40, color: '#0d9488', description: 'Available for public participation. 10M tokens total supply.' },
-  { name: 'Community Rewards', value: 25, color: '#0f766e', description: 'Allocated for community incentives and ecosystem development.' },
-  { name: 'Team', value: 20, color: '#0f766e', description: 'Supporting the core team and ongoing development.' },
-  { name: 'Partners', value: 15, color: '#115e59', description: 'Strategic partnerships and ecosystem growth.' }
 ];
 
 export const WhatWeBuilding = () => {
