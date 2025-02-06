@@ -23,7 +23,24 @@ const IndexContent = () => {
   const { toast } = useToast();
   const [isChecking, setIsChecking] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isReclaimVisible, setIsReclaimVisible] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+  const reclaimRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsReclaimVisible(entry.isIntersecting);
+      },
+      { threshold: 0.5 }
+    );
+
+    if (reclaimRef.current) {
+      observer.observe(reclaimRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -88,6 +105,16 @@ const IndexContent = () => {
     checkWalletStatus();
   }, [primaryWallet, toast]);
 
+  const generateFirmIcons = (count: number) => {
+    return Array.from({ length: count }).map((_, i) => ({
+      id: i,
+      delay: `${Math.random() * 2}s`,
+      position: Math.random() * 100
+    }));
+  };
+
+  const firms = generateFirmIcons(12);
+
   const parallaxStyle = {
     '--scroll-progress': scrollProgress,
     transform: `scale(${1 + scrollProgress * 0.2})`,
@@ -97,97 +124,61 @@ const IndexContent = () => {
   return (
     <>
       <div ref={heroRef} className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 overflow-hidden min-h-screen">
-        {/* Background Layer (Slowest) */}
-        <div className="fixed inset-0 z-0">
+        {/* Fixed Black Hole at Bottom */}
+        <div className="fixed bottom-0 left-0 right-0 h-[40vh] z-20 pointer-events-none">
           <div 
-            className="absolute inset-0 animate-parallax-slow"
-            style={{
-              background: `
-                radial-gradient(2px 2px at 20% 20%, rgba(255, 255, 255, 0.8) 100%, transparent),
-                radial-gradient(2px 2px at 40% 40%, rgba(255, 255, 255, 0.6) 100%, transparent),
-                radial-gradient(3px 3px at 60% 60%, rgba(255, 255, 255, 0.4) 100%, transparent)
-              `,
-              backgroundSize: "240px 240px",
-              opacity: 0.5
-            }}
+            className={`absolute inset-0 transition-colors duration-1000 ${
+              isReclaimVisible 
+                ? 'bg-gradient-to-t from-orange-500/30 via-blue-400/20 to-transparent'
+                : 'bg-gradient-to-t from-purple-900/30 via-purple-800/20 to-transparent'
+            }`}
           />
-        </div>
-
-        {/* Middle Layer */}
-        <div className="fixed inset-0 z-1">
-          {/* Floating Firm Icons */}
-          <div className="absolute inset-0 overflow-hidden">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute animate-orbit"
-                style={{
-                  top: `${20 + i * 10}%`,
-                  left: `${20 + i * 10}%`,
-                  animationDelay: `${i * -3}s`,
-                  transform: `rotate(${i * 60}deg) translateX(100px)`,
-                }}
-              >
-                <Building2 
-                  className="w-8 h-8 text-purple-400/30" 
-                  style={{ transform: `rotate(-${i * 60}deg)` }}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px]">
+            {/* Event Horizon */}
+            <div 
+              className={`absolute bottom-0 left-0 right-0 h-32 rounded-t-full animate-black-hole-pulse transition-colors duration-1000 ${
+                isReclaimVisible
+                  ? 'bg-gradient-to-t from-orange-500 via-blue-400 to-transparent'
+                  : 'bg-gradient-to-t from-purple-900 via-purple-800 to-transparent'
+              }`}
+            />
+            {/* Gravitational Waves */}
+            <div className="absolute bottom-0 left-0 right-0 h-64 flex flex-col justify-end gap-4">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className={`h-[2px] w-full animate-gravity-wave opacity-30 transition-colors duration-1000 ${
+                    isReclaimVisible ? 'bg-orange-400' : 'bg-purple-600'
+                  }`}
+                  style={{ animationDelay: `${i * 0.2}s` }}
                 />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Black Hole Effect Container */}
-        <div className="absolute inset-0 z-2 perspective-3000" style={parallaxStyle}>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-[800px] h-[800px] relative">
-              {/* Singularity Core */}
-              <div 
-                className="absolute inset-0 rounded-full bg-black animate-singularity" 
-                style={{
-                  boxShadow: `
-                    0 0 100px 20px rgba(255, 69, 0, 0.3),
-                    0 0 200px 40px rgba(255, 140, 0, 0.2),
-                    0 0 300px 60px rgba(0, 0, 139, 0.1)
-                  `
-                }}
-              />
-              
-              {/* Accretion Disk */}
-              <div 
-                className="absolute inset-0 rounded-full animate-cosmic-pulse"
-                style={{
-                  background: `
-                    radial-gradient(circle at center,
-                      rgba(255, 69, 0, 0.8) 0%,
-                      rgba(255, 140, 0, 0.6) 30%,
-                      rgba(0, 0, 139, 0.4) 60%,
-                      transparent 80%
-                    )
-                  `
-                }}
-              />
-              
-              {/* Event Horizon */}
-              <div 
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: `
-                    radial-gradient(circle at center,
-                      rgba(255, 255, 255, 0.1) 0%,
-                      transparent 70%
-                    )
-                  `,
-                  border: '2px solid rgba(255, 140, 0, 0.3)',
-                  animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                }}
-              />
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Content Layer */}
-        <div className="relative z-3" style={parallaxStyle}>
+        {/* Falling/Rising Firms */}
+        {firms.map(firm => (
+          <div
+            key={firm.id}
+            className={`fixed top-0 left-[${firm.position}%] z-10 ${
+              isReclaimVisible ? 'animate-eject-and-rise' : 'animate-fall-and-spiral'
+            }`}
+            style={{ 
+              animationDelay: firm.delay,
+              animationPlayState: scrollProgress > 0 ? 'running' : 'paused'
+            }}
+          >
+            <Building2 
+              className={`w-8 h-8 transition-colors duration-1000 ${
+                isReclaimVisible ? 'text-orange-400' : 'text-purple-400'
+              }`}
+            />
+          </div>
+        ))}
+
+        {/* Hero Content */}
+        <div className="relative z-30">
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-orange-200 to-blue-400 animate-gradient">
             Own the future of<br />accounting
           </h1>
@@ -231,7 +222,9 @@ const IndexContent = () => {
       <InvestmentReadiness />
       <WhatWeBuilding />
       <PrivateEquityImpact />
-      <ReclaimControl />
+      <div ref={reclaimRef}>
+        <ReclaimControl />
+      </div>
       <HowItWorks />
       <AlternativeToEquity />
       <SystemWeDeserve />

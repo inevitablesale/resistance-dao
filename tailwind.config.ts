@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -83,6 +82,10 @@ export default {
         "parallax-medium": "parallax-scroll 10s linear infinite",
         "parallax-fast": "parallax-scroll 5s linear infinite",
         "orbit": "orbit 20s linear infinite",
+        "fall-and-spiral": "fall-and-spiral 4s ease-in-out infinite",
+        "eject-and-rise": "eject-and-rise 4s ease-out forwards",
+        "black-hole-pulse": "black-hole-pulse 3s ease-in-out infinite",
+        "gravity-wave": "gravity-wave 8s ease-in-out infinite",
       },
       keyframes: {
         "accordion-down": {
@@ -129,6 +132,55 @@ export default {
         "orbit": {
           "0%": { transform: "rotate(0deg) translateX(100px) rotate(0deg)" },
           "100%": { transform: "rotate(360deg) translateX(100px) rotate(-360deg)" }
+        },
+        "fall-and-spiral": {
+          "0%": { 
+            transform: "translateY(-100vh) rotate(0deg) scale(1)",
+            opacity: "1"
+          },
+          "90%": {
+            transform: "translateY(80vh) rotate(720deg) scale(0.2)",
+            opacity: "0.6"
+          },
+          "100%": {
+            transform: "translateY(100vh) rotate(1080deg) scale(0)",
+            opacity: "0"
+          }
+        },
+        "eject-and-rise": {
+          "0%": {
+            transform: "translateY(100vh) rotate(0deg) scale(0)",
+            opacity: "0"
+          },
+          "20%": {
+            transform: "translateY(80vh) rotate(-180deg) scale(0.2)",
+            opacity: "0.6"
+          },
+          "100%": {
+            transform: "translateY(0) rotate(-360deg) scale(1)",
+            opacity: "1"
+          }
+        },
+        "black-hole-pulse": {
+          "0%, 100%": {
+            transform: "scale(1)",
+            filter: "brightness(1)"
+          },
+          "50%": {
+            transform: "scale(1.05)",
+            filter: "brightness(1.2)"
+          }
+        },
+        "gravity-wave": {
+          "0%": {
+            transform: "scaleX(1) scaleY(1)"
+          },
+          "50%": {
+            transform: "scaleX(1.1) scaleY(0.9)"
+          },
+          "100%": {
+            transform: "scaleX(1) scaleY(1)"
+          }
         }
       }
     },
