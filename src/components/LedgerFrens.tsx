@@ -1,5 +1,5 @@
 
-import { PartyPopper, Trophy, Rocket, Gift, ShoppingBag, Medal, Star } from "lucide-react";
+import { PartyPopper, Trophy, Gift, ShoppingBag, Medal, Star } from "lucide-react";
 
 export const LedgerFrens = () => {
   return (
@@ -23,43 +23,53 @@ export const LedgerFrens = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
-          <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <PartyPopper className="w-10 h-10 text-yellow-400 mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-3">Early Minting Bonus</h3>
-            <p className="text-gray-300">
-              LedgerFrens NFTs will be minted after reaching the first $50,000 milestone (10% of raise), rewarding early supporters.
-            </p>
-          </div>
-
-          <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <Trophy className="w-10 h-10 text-teal-400 mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-3">Governance Power</h3>
-            <p className="text-gray-300">
-              First 500 holders will have exclusive voting rights on the DAO governance board, shaping the future of decentralized accounting.
-            </p>
-          </div>
-
-          <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <Rocket className="w-10 h-10 text-yellow-400 mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-3">Guaranteed Membership</h3>
-            <p className="text-gray-300">
-              First 1,000 holders investing $250+ during presale secure guaranteed membership to an ultra-exclusive fellowship.
-            </p>
-          </div>
-        </div>
-
-        {/* Additional Rewards Section */}
+        {/* Milestone Rewards Section */}
         <div className="max-w-5xl mx-auto">
           <h3 className="text-2xl font-bold text-white text-center mb-8">Milestone Rewards</h3>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
+                <PartyPopper className="w-8 h-8 text-yellow-400 flex-shrink-0" />
+                <div>
+                  <h4 className="text-lg font-semibold text-white mb-2">Early Minting Access</h4>
+                  <p className="text-gray-300">
+                    At $50K raised: LedgerFrens NFTs are minted, giving early supporters exclusive access to our decentralized accounting ecosystem.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="flex items-start gap-4">
+                <Trophy className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <div>
+                  <h4 className="text-lg font-semibold text-white mb-2">Governance Board Election</h4>
+                  <p className="text-gray-300">
+                    At $100K raised: Voting begins for governance board seats, empowering our community to shape the future of decentralized accounting.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="flex items-start gap-4">
                 <ShoppingBag className="w-8 h-8 text-yellow-400 flex-shrink-0" />
+                <div>
+                  <h4 className="text-lg font-semibold text-white mb-2">Exclusive DAO Merch</h4>
+                  <p className="text-gray-300">
+                    At $250K raised: Top 250 holders receive exclusive LedgerFund DAO merchandise pack including premium apparel and accessories.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="flex items-start gap-4">
+                <ShoppingBag className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">Limited Edition Merch</h4>
                   <p className="text-gray-300">
@@ -69,10 +79,10 @@ export const LedgerFrens = () => {
               </div>
             </div>
 
-            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <Gift className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <Gift className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">Launch Party Access</h4>
                   <p className="text-gray-300">
@@ -82,10 +92,10 @@ export const LedgerFrens = () => {
               </div>
             </div>
 
-            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <Medal className="w-8 h-8 text-yellow-400 flex-shrink-0" />
+                <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">VIP Networking Events</h4>
                   <p className="text-gray-300">
@@ -95,10 +105,10 @@ export const LedgerFrens = () => {
               </div>
             </div>
 
-            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <Star className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <Star className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">Legacy Circle Membership</h4>
                   <p className="text-gray-300">
@@ -113,4 +123,3 @@ export const LedgerFrens = () => {
     </section>
   );
 };
-
