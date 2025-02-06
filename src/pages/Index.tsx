@@ -131,60 +131,39 @@ const IndexContent = () => {
             }}
           >
             {[...Array(7)].map((_, i) => {
-              // Create random groups around edges
-              const createRandomEdgeGroup = (index: number) => {
-                // Determine which edge this group will be on (0: top, 1: right, 2: bottom, 3: left)
-                const edgeIndex = Math.floor(index / 2); // This creates roughly 2 firms per edge
-                const offset = 50; // Fixed offset from the edge
-                
-                // Add some randomness to group positioning
-                const groupPosition = Math.random(); // Random position along the edge
-                const offsetVariation = 0.2; // How spread out the group can be
-                const finalPosition = Math.max(0, Math.min(1, groupPosition + (Math.random() - 0.5) * offsetVariation));
-                
-                // Position firms based on viewport dimensions
-                const viewportWidth = window.innerWidth;
-                const viewportHeight = window.innerHeight;
-                
-                switch(edgeIndex % 4) {
-                  case 0: // Top edge
-                    return { 
-                      x: finalPosition * viewportWidth, 
-                      y: offset // Fixed distance from edge
-                    };
-                  case 1: // Right edge
-                    return { 
-                      x: viewportWidth - offset,
-                      y: finalPosition * viewportHeight
-                    };
-                  case 2: // Bottom edge
-                    return { 
-                      x: finalPosition * viewportWidth,
-                      y: viewportHeight - offset
-                    };
-                  default: // Left edge
-                    return { 
-                      x: offset,
-                      y: finalPosition * viewportHeight
-                    };
-                }
-              };
+              const orbitSpeed = 15000; // 15 second orbit cycle
+              const orbitPhase = (i / 7) * Math.PI * 2; // Evenly space firms around the orbit
+              const timeProgress = ((Date.now() - loadTime) % orbitSpeed) / orbitSpeed;
+              const angle = (timeProgress * Math.PI * 2 + orbitPhase) % (Math.PI * 2);
+              
+              // Calculate orbit radius based on scroll position
+              const maxRadius = Math.min(window.innerWidth, window.innerHeight) * 0.3;
+              const minRadius = 150;
+              const currentRadius = scrollProgress > 0 
+                ? minRadius - (scrollProgress * 100)
+                : maxRadius;
 
-              const startPos = createRandomEdgeGroup(i);
+              // Calculate position based on orbit
+              const orbitX = Math.cos(angle) * currentRadius;
+              const orbitY = Math.sin(angle) * currentRadius;
               
               return (
                 <div
                   key={i}
-                  className="absolute transition-all duration-[15000ms] ease-in-out"
+                  className="absolute transition-transform duration-300"
                   style={{
-                    top: startPos.y,
-                    left: startPos.x,
-                    transform: `translate(-50%, -50%)`
+                    top: '50%',
+                    left: '50%',
+                    transform: scrollProgress > 0 
+                      ? `translate(-50%, -50%) translate(${orbitX}px, ${orbitY}px) rotate(${angle * 180 / Math.PI}deg)`
+                      : `translate(calc(-50% + ${0}px), calc(-50% + ${0}px))`,
+                    transition: scrollProgress > 0 ? 'none' : 'transform 15s linear infinite'
                   }}
                 >
                   <Building2 
                     className="w-8 h-8 text-teal-300/90 transition-all duration-1000"
                     style={{ 
+                      transform: `rotate(${-angle * 180 / Math.PI}deg)`,
                       opacity: Math.max(0, 1 - scrollProgress * 2)
                     }}
                   />
