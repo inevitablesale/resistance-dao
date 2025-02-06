@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -15,7 +16,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { checkNFTOwnership } from "@/services/contractService";
-import { Trophy, UserCircle, Building2, Wallet } from "lucide-react";
+import { Trophy, UserCircle, Building2, Wallet, ClipboardCopy } from "lucide-react";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 
