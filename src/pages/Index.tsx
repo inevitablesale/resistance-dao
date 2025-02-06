@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -507,8 +506,8 @@ const IndexContent = () => {
       </div>
 
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
-        <LedgerFrens />
         <WhatWeBuilding />
+        <LedgerFrens />
         <HowItWorks />
         <AlternativeToEquity />
         <PrivateEquityImpact />
