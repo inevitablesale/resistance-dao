@@ -3,11 +3,11 @@ import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2 } fr
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const data = [
-  { name: 'Presale', value: 50, color: '#14b8a6', description: 'Reserved for early supporters who believe in the future of decentralized accounting. 5M tokens available.' },
-  { name: 'Treasury', value: 20, color: '#0d9488', description: 'For protocol growth and sustainability. Collects voting fees, proposal fees, advertising revenue, and 5% from acquisitions and annual returns.' },
+  { name: 'Presale Stake', value: 50, color: '#14b8a6', description: 'Reserved for early supporters who believe in the future of decentralized accounting acquisitions. 5M tokens available. 1 yr hold term.' },
+  { name: 'Public Sale', value: 25, color: '#0d9488', description: 'For protocol growth and sustainability. Collects voting fees, proposal fees, advertising revenue, and 5% from acquisitions and annual returns.' },
   { name: 'Community Rewards', value: 10, color: '#0f766e', description: 'Allocated for community incentives, governance participation, and ecosystem development initiatives.' },
   { name: 'Team', value: 10, color: '#0f766e', description: 'Supporting the core team building and maintaining the protocol.' },
-  { name: 'Partners', value: 10, color: '#115e59', description: 'Reserved for strategic partnerships and ecosystem development.' }
+  { name: 'Partners', value: 5, color: '#115e59', description: 'Reserved for strategic partnerships and ecosystem development.' }
 ];
 
 export const WhatWeBuilding = () => {
@@ -154,3 +154,4 @@ export const WhatWeBuilding = () => {
     </section>
   );
 };
+
