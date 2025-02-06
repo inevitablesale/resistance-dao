@@ -8,8 +8,8 @@ const presaleData = [
 ];
 
 const publicSaleData = [
-  { name: 'Staked from Presale', value: 50, color: '#14b8a6', description: 'Tokens staked from presale phase.' },
-  { name: 'Public Sale', value: 30, color: '#0d9488', description: 'For protocol growth and sustainability. Collects voting fees, proposal fees, advertising revenue, and 5% from acquisitions and annual returns.' },
+  { name: 'Treasury', value: 40, color: '#14b8a6', description: 'Reserved tokens from presale phase, managed by protocol Treasury.' },
+  { name: 'Public Sale', value: 40, color: '#0d9488', description: 'For protocol growth and sustainability. Collects voting fees, proposal fees, advertising revenue, and 5% from acquisitions and annual returns.' },
   { name: 'Community Rewards', value: 5, color: '#0f766e', description: 'Allocated for community incentives, governance participation, and ecosystem development initiatives.' },
   { name: 'Team', value: 10, color: '#0f766e', description: 'Supporting the core team building and maintaining the protocol.' },
   { name: 'Partners', value: 5, color: '#115e59', description: 'Reserved for strategic partnerships and ecosystem development.' }
