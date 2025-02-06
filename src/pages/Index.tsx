@@ -357,6 +357,10 @@ const IndexContent = () => {
               </div>
             </div>
 
+            <div className="text-center text-white/80 font-medium mb-4">
+              UNTIL PRICE INCREASE
+            </div>
+
             {/* Countdown Timer with Enhanced Design */}
             <div className="grid grid-cols-4 gap-4 mb-8">
               {[
@@ -417,7 +421,7 @@ const IndexContent = () => {
                     90% DISCOUNT ACTIVE
                   </div>
                   <div className="text-center text-teal-400 font-medium">
-                    Current Price: {maticPrice} MATIC / $0.10
+                    Current Price: {maticPrice} / $0.10 USD
                   </div>
                 </div>
               </div>
@@ -454,6 +458,47 @@ const IndexContent = () => {
             >
               New to crypto? Get started here
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* How to Buy Section */}
+      <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12">
+            How to Buy $LGR
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="relative p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20">
+              <div className="absolute -top-4 -left-4 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold">
+                1
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-4">Create Your Wallet</h3>
+              <p className="text-gray-300">
+                Enter and confirm your email address to create a wallet. You can also sign in using your MetaMask wallet.
+              </p>
+            </div>
+
+            <div className="relative p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20">
+              <div className="absolute -top-4 -left-4 w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-black font-bold">
+                2
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-4">Load Wallet With Crypto</h3>
+              <p className="text-gray-300">
+                Add MATIC to your wallet to participate in the presale. You can buy MATIC directly or transfer from another wallet.
+              </p>
+            </div>
+
+            <div className="relative p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20">
+              <div className="absolute -top-4 -left-4 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold">
+                3
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-4">Buy and Stake $LGR</h3>
+              <p className="text-gray-300">
+                Purchase $LGR tokens at the presale price and stake them to earn rewards and participate in governance.
+              </p>
+            </div>
           </div>
         </div>
       </div>
