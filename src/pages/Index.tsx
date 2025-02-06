@@ -22,7 +22,7 @@ import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_P
 
 const IndexContent = () => {
   const navigate = useNavigate();
-  const { primaryWallet } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   const [isChecking, setIsChecking] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -191,6 +191,22 @@ const IndexContent = () => {
   // Function to format large numbers with commas
   const formatLargeNumber = (num: string) => {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const handleBuyClick = () => {
+    if (!primaryWallet || !primaryWallet.isConnected()) {
+      setShowAuthFlow?.(true);
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your wallet to purchase tokens.",
+      });
+    } else {
+      // Once connected, we can handle the purchase directly here
+      toast({
+        title: "Ready to Purchase",
+        description: "Your wallet is connected. You can now purchase tokens.",
+      });
+    }
   };
 
   return (
@@ -432,7 +448,7 @@ const IndexContent = () => {
             {/* Enhanced Purchase Options */}
             <div className="grid md:grid-cols-2 gap-4">
               <button 
-                onClick={() => navigate('/token-presale')}
+                onClick={handleBuyClick}
                 className="group relative px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-yellow-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
@@ -443,7 +459,7 @@ const IndexContent = () => {
               </button>
               
               <button 
-                onClick={() => navigate('/token-presale')}
+                onClick={handleBuyClick}
                 className="group relative px-8 py-4 bg-gradient-to-br from-teal-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-teal-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />

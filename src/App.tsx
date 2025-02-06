@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -7,7 +6,6 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import GovernanceVoting from "./pages/GovernanceVoting";
 import MintNFT from "./pages/MintNFT";
-import TokenPresale from "./pages/TokenPresale";
 import { useToast } from "./hooks/use-toast";
 
 function App() {
@@ -62,13 +60,13 @@ function App() {
       environmentId: "2b74d425-6827-4ff1-af57-f9543d71cca0",
       appName: "LedgerFund",
       appLogoUrl: "/favicon.ico",
-      enableEmbeddedWallets: true, // Enable embedded wallets
+      enableEmbeddedWallets: true,
       enableVisitTrackingOnConnectOnly: false,
       enableWalletConnectV1: false,
       enableWalletConnectV2: true,
       persistWalletSession: true,
       enableAuthProviders: true,
-      shadowDOMEnabled: false // Disable shadow DOM to prevent wallet UI issues
+      shadowDOMEnabled: false
     }
   };
 
@@ -79,7 +77,6 @@ function App() {
           <Route path="/" element={<Index />} />
           <Route path="/governance-voting" element={<GovernanceVoting />} />
           <Route path="/mint-nft" element={<MintNFT />} />
-          <Route path="/token-presale" element={<TokenPresale />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
