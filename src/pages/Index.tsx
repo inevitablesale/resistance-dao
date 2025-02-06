@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -111,34 +112,34 @@ const IndexContent = () => {
                 radial-gradient(3px 3px at 60% 60%, rgba(255, 255, 255, 0.90) 100%, transparent)
               `,
               backgroundSize: "240px 240px",
-              opacity: 0.85 - scrollProgress * 0.5
+              opacity: 0.85 - scrollProgress * 0.3
             }}
           />
         </div>
 
-        {/* Middle Layer */}
+        {/* Middle Layer with Floating Firms */}
         <div className="fixed inset-0 z-1">
           <div 
             className="absolute inset-0 overflow-hidden"
             style={{
-              opacity: Math.max(0, 1 - scrollProgress * 2),
+              opacity: Math.max(0, 1 - scrollProgress * 1.5),
               transform: `scale(${1 + scrollProgress * 0.3})`
             }}
           >
-            {[...Array(6)].map((_, i) => (
+            {[...Array(12)].map((_, i) => (
               <div
                 key={i}
                 className="absolute animate-orbit"
                 style={{
-                  top: `${20 + i * 10}%`,
-                  left: `${20 + i * 10}%`,
-                  animationDelay: `${i * -3}s`,
-                  transform: `rotate(${i * 60}deg) translateX(${100 + scrollProgress * 50}px)`,
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  animationDelay: `${i * -2}s`,
+                  transform: `rotate(${i * 30}deg) translateX(${150 + scrollProgress * 100}px)`,
                 }}
               >
                 <Building2 
-                  className="w-8 h-8 text-indigo-400/70" 
-                  style={{ transform: `rotate(-${i * 60}deg)` }}
+                  className="w-8 h-8 text-purple-400/90" 
+                  style={{ transform: `rotate(-${i * 30}deg)` }}
                 />
               </div>
             ))}
@@ -256,15 +257,17 @@ const IndexContent = () => {
         </div>
       </div>
 
-      <InvestmentReadiness />
-      <WhatWeBuilding />
-      <PrivateEquityImpact />
-      <ReclaimControl />
-      <HowItWorks />
-      <AlternativeToEquity />
-      <SystemWeDeserve />
-      <CallToAction />
-      <Roadmap />
+      <div className="relative z-10 bg-black/80 backdrop-blur-sm">
+        <InvestmentReadiness />
+        <WhatWeBuilding />
+        <PrivateEquityImpact />
+        <ReclaimControl />
+        <HowItWorks />
+        <AlternativeToEquity />
+        <SystemWeDeserve />
+        <CallToAction />
+        <Roadmap />
+      </div>
     </>
   );
 };
