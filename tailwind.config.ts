@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -80,6 +79,10 @@ export default {
         "singularity": "singularity 20s ease-in-out infinite",
         "cosmic-pulse": "cosmic-pulse 4s ease-in-out infinite",
         "star-field": "star-field 30s linear infinite",
+        "particle-drift": "particle-drift 15s linear infinite",
+        "space-warp": "space-warp 10s ease-in-out infinite",
+        "energy-swirl": "energy-swirl 12s linear infinite",
+        "gravitational-pull": "gravitational-pull 8s ease-in-out infinite"
       },
       keyframes: {
         "accordion-down": {
@@ -118,6 +121,24 @@ export default {
         "star-field": {
           "0%": { transform: "translateZ(0) rotate(0deg)" },
           "100%": { transform: "translateZ(400px) rotate(360deg)" }
+        },
+        "particle-drift": {
+          "0%, 100%": { transform: "translateY(0) translateX(0)" },
+          "50%": { transform: "translateY(-20px) translateX(10px)" }
+        },
+        "space-warp": {
+          "0%": { transform: "scale(1) rotate(0deg)", opacity: "0.5" },
+          "50%": { transform: "scale(1.2) rotate(180deg)", opacity: "0.8" },
+          "100%": { transform: "scale(1) rotate(360deg)", opacity: "0.5" }
+        },
+        "energy-swirl": {
+          "0%": { transform: "rotate(0deg) scale(1)", opacity: "0.8" },
+          "50%": { transform: "rotate(180deg) scale(1.1)", opacity: "1" },
+          "100%": { transform: "rotate(360deg) scale(1)", opacity: "0.8" }
+        },
+        "gravitational-pull": {
+          "0%": { transform: "translateY(100px) scale(0.8)", opacity: "0.5" },
+          "100%": { transform: "translateY(0) scale(1)", opacity: "1" }
         }
       }
     },

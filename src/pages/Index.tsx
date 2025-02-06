@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -23,6 +22,17 @@ const IndexContent = () => {
   const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
   const [isChecking, setIsChecking] = useState(false);
+  const [scrollPos, setScrollPos] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const position = window.scrollY;
+      setScrollPos(position);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const checkWalletStatus = async () => {
@@ -77,46 +87,86 @@ const IndexContent = () => {
   return (
     <>
       <div className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 overflow-hidden">
-        {/* Black Hole Effect Container */}
+        {/* Enhanced Black Hole Effect Container */}
         <div className="absolute inset-0 z-0 perspective-3000">
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-[800px] h-[800px] relative">
-              {/* Singularity Core */}
-              <div className="absolute inset-0 rounded-full bg-black animate-singularity" 
-                   style={{
-                     boxShadow: `
-                       0 0 100px 20px rgba(138, 43, 226, 0.3),
-                       0 0 200px 40px rgba(138, 43, 226, 0.2),
-                       0 0 300px 60px rgba(138, 43, 226, 0.1)
-                     `
-                   }}
+            <div 
+              className="w-[800px] h-[800px] relative"
+              style={{
+                transform: `translateY(${Math.min(scrollPos * 0.2, 100)}px) scale(${1 + scrollPos * 0.001})`
+              }}
+            >
+              {/* Enhanced Singularity Core */}
+              <div 
+                className="absolute inset-0 rounded-full bg-black animate-singularity" 
+                style={{
+                  boxShadow: `
+                    0 0 100px 20px rgba(138, 43, 226, 0.3),
+                    0 0 200px 40px rgba(138, 43, 226, 0.2),
+                    0 0 300px 60px rgba(138, 43, 226, 0.1)
+                  `
+                }}
               />
               
-              {/* Accretion Disk */}
-              <div className="absolute inset-0 rounded-full animate-cosmic-pulse"
-                   style={{
-                     background: `radial-gradient(circle at center,
-                       rgba(147, 51, 234, 0.8) 0%,
-                       rgba(138, 43, 226, 0.5) 30%,
-                       rgba(123, 31, 162, 0.3) 60%,
-                       transparent 80%
-                     )`
-                   }}
+              {/* Enhanced Accretion Disk */}
+              <div 
+                className="absolute inset-0 rounded-full animate-energy-swirl"
+                style={{
+                  background: `
+                    conic-gradient(
+                      from 0deg,
+                      rgba(147, 51, 234, 0.8) 0%,
+                      rgba(138, 43, 226, 0.5) 25%,
+                      rgba(123, 31, 162, 0.3) 50%,
+                      rgba(147, 51, 234, 0.8) 75%,
+                      rgba(138, 43, 226, 0.5) 100%
+                    )
+                  `
+                }}
               />
               
-              {/* Event Horizon */}
-              <div className="absolute inset-0 rounded-full animate-pulse-slow"
-                   style={{
-                     background: `radial-gradient(circle at center,
-                       rgba(255, 255, 255, 0.1) 0%,
-                       transparent 70%
-                     )`,
-                     border: '2px solid rgba(147, 51, 234, 0.3)'
-                   }}
+              {/* Space Dust Particles */}
+              <div className="absolute inset-0">
+                {[...Array(20)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-1 h-1 bg-white rounded-full animate-particle-drift"
+                    style={{
+                      top: `${Math.random() * 100}%`,
+                      left: `${Math.random() * 100}%`,
+                      opacity: Math.random() * 0.5 + 0.3,
+                      animationDelay: `${Math.random() * 5}s`
+                    }}
+                  />
+                ))}
+              </div>
+              
+              {/* Gravitational Distortion Ring */}
+              <div 
+                className="absolute inset-0 rounded-full animate-space-warp"
+                style={{
+                  border: '2px solid rgba(147, 51, 234, 0.3)',
+                  transform: `scale(${1 + scrollPos * 0.002})`,
+                  opacity: Math.max(0, 1 - scrollPos * 0.002)
+                }}
               />
             </div>
           </div>
         </div>
+
+        {/* Star Field Background with Parallax */}
+        <div 
+          className="absolute inset-0 opacity-90"
+          style={{
+            background: `
+              radial-gradient(1px 1px at ${10 + scrollPos * 0.1}% ${10 + scrollPos * 0.05}%, rgba(255, 255, 255, 0.8) 100%, transparent),
+              radial-gradient(1.5px 1.5px at ${20 + scrollPos * 0.15}% ${20 + scrollPos * 0.1}%, rgba(139, 92, 246, 0.7) 100%, transparent),
+              radial-gradient(2px 2px at ${30 + scrollPos * 0.2}% ${30 + scrollPos * 0.15}%, rgba(255, 255, 255, 0.6) 100%, transparent)
+            `,
+            backgroundSize: '400% 400%',
+            transform: `translateZ(${scrollPos * 0.5}px)`
+          }}
+        />
 
         {/* Content */}
         <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 animate-gradient relative z-10">
