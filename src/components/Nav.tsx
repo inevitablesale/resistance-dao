@@ -9,22 +9,7 @@ const Nav = () => {
   const navigate = useNavigate();
 
   const handleLaunchApp = async () => {
-    if (!primaryWallet) {
-      setShowAuthFlow?.(true);
-      return;
-    }
-
-    const isConnected = await primaryWallet.isConnected();
-    if (!isConnected) {
-      toast({
-        title: "Wallet Not Connected",
-        description: "Please connect your wallet to launch the app.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    navigate('/mint-nft');
+    window.open('https://docs.ledgerfund.finance', '_blank');
   };
 
   return (
@@ -54,21 +39,13 @@ const Nav = () => {
             <a href="#roadmap" className="text-white/80 hover:text-white transition-colors">
               Roadmap
             </a>
-            <a 
-              href="https://docs.ledgerfund.finance" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-white/80 hover:text-white transition-colors"
-            >
-              Whitepaper
-            </a>
           </div>
 
           <button 
             onClick={handleLaunchApp}
             className="hidden md:block px-6 py-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white rounded-lg font-medium transition-all hover:scale-105"
           >
-            Connect Wallet
+            Download Whitepaper
           </button>
         </div>
       </div>

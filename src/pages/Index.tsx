@@ -8,6 +8,7 @@ import { AlternativeToEquity } from "@/components/AlternativeToEquity";
 import { SystemWeDeserve } from "@/components/SystemWeDeserve";
 import { CallToAction } from "@/components/CallToAction";
 import { Roadmap } from "@/components/Roadmap";
+import { LedgerFrens } from "@/components/LedgerFrens";
 import { useNavigate } from "react-router-dom";
 import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
@@ -504,6 +505,7 @@ const IndexContent = () => {
       </div>
 
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
+        <LedgerFrens />
         <WhatWeBuilding />
         <PrivateEquityImpact />
         <ReclaimControl />
