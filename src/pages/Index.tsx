@@ -40,6 +40,7 @@ const IndexContent = () => {
   });
   const [myPurchased, setMyPurchased] = useState<string>('0');
   const [myStakeable, setMyStakeable] = useState<string>('0');
+  const [maticPrice, setMaticPrice] = useState<string>('Loading...');
 
   useEffect(() => {
     // Set loaded state after a small delay to trigger initial animations
@@ -123,7 +124,7 @@ const IndexContent = () => {
 
       // Get current price in MATIC
       const price = await fetchPresaleMaticPrice();
-      const maticPrice = price === "0" ? "Loading..." : `${price} MATIC`;
+      setMaticPrice(price === "0" ? "Loading..." : `${price} MATIC`);
       
       // If wallet is connected, get user's purchased tokens
       if (primaryWallet?.address) {
@@ -416,7 +417,7 @@ const IndexContent = () => {
                     UNTIL PRICE INCREASE
                   </div>
                   <div className="text-center text-teal-400 font-medium">
-                    Current Price: { await fetchPresaleMaticPrice()} MATIC
+                    Current Price: {maticPrice}
                   </div>
                 </div>
               </div>
