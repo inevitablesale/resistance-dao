@@ -1,13 +1,21 @@
 
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-const data = [
+const presaleData = [
   { name: 'Presale Stake', value: 50, color: '#14b8a6', description: 'Reserved for early supporters who believe in the future of decentralized accounting acquisitions. 5M tokens available. 1 yr hold term.' },
   { name: 'Public Sale', value: 25, color: '#0d9488', description: 'For protocol growth and sustainability. Collects voting fees, proposal fees, advertising revenue, and 5% from acquisitions and annual returns.' },
   { name: 'Community Rewards', value: 10, color: '#0f766e', description: 'Allocated for community incentives, governance participation, and ecosystem development initiatives.' },
   { name: 'Team', value: 10, color: '#0f766e', description: 'Supporting the core team building and maintaining the protocol.' },
   { name: 'Partners', value: 5, color: '#115e59', description: 'Reserved for strategic partnerships and ecosystem development.' }
+];
+
+const publicSaleData = [
+  { name: 'Public Sale', value: 40, color: '#0d9488', description: 'Available for public participation. 10M tokens total supply.' },
+  { name: 'Community Rewards', value: 25, color: '#0f766e', description: 'Allocated for community incentives and ecosystem development.' },
+  { name: 'Team', value: 20, color: '#0f766e', description: 'Supporting the core team and ongoing development.' },
+  { name: 'Partners', value: 15, color: '#115e59', description: 'Strategic partnerships and ecosystem growth.' }
 ];
 
 export const WhatWeBuilding = () => {
@@ -17,56 +25,117 @@ export const WhatWeBuilding = () => {
         <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 text-center">
           LGR Token Distribution
         </h2>
-        
-        <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
-          Total Supply: 10,000,000 LGR
-        </p>
 
-        {/* Token Distribution Chart */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-          <div className="h-[400px] relative">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={data}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={160}
-                  innerRadius={100}
-                  dataKey="value"
-                  labelLine={false}
-                  label={({ name, value }) => `${name} ${value}%`}
-                >
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/10 to-transparent animate-pulse blur-2xl" />
-            </div>
-          </div>
+        <Tabs defaultValue="presale" className="w-full">
+          <TabsList className="grid w-full max-w-[400px] grid-cols-2 mx-auto mb-8 bg-black/40">
+            <TabsTrigger value="presale" className="data-[state=active]:bg-yellow-500/20">
+              Presale (5M Supply)
+            </TabsTrigger>
+            <TabsTrigger value="public" className="data-[state=active]:bg-teal-500/20">
+              Public Sale (10M Supply)
+            </TabsTrigger>
+          </TabsList>
 
-          <div className="space-y-6">
-            {data.map((segment, index) => (
-              <div 
-                key={segment.name}
-                className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-4 h-4 rounded-full" style={{ backgroundColor: segment.color }} />
-                  <h3 className="text-xl font-semibold text-white">
-                    {segment.name} ({segment.value}%)
-                  </h3>
+          <TabsContent value="presale">
+            <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
+              Presale Total Supply: 5,000,000 LGR
+            </p>
+            <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
+              <div className="h-[400px] relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={presaleData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={160}
+                      innerRadius={100}
+                      dataKey="value"
+                      labelLine={false}
+                      label={({ name, value }) => `${name} ${value}%`}
+                    >
+                      {presaleData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent animate-pulse blur-2xl" />
                 </div>
-                <p className="text-gray-300">
-                  {segment.description}
-                </p>
               </div>
-            ))}
-          </div>
-        </div>
+
+              <div className="space-y-6">
+                {presaleData.map((segment, index) => (
+                  <div 
+                    key={segment.name}
+                    className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: segment.color }} />
+                      <h3 className="text-xl font-semibold text-white">
+                        {segment.name} ({segment.value}%)
+                      </h3>
+                    </div>
+                    <p className="text-gray-300">
+                      {segment.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="public">
+            <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
+              Public Sale Total Supply: 10,000,000 LGR
+            </p>
+            <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
+              <div className="h-[400px] relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={publicSaleData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={160}
+                      innerRadius={100}
+                      dataKey="value"
+                      labelLine={false}
+                      label={({ name, value }) => `${name} ${value}%`}
+                    >
+                      {publicSaleData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/10 to-transparent animate-pulse blur-2xl" />
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {publicSaleData.map((segment, index) => (
+                  <div 
+                    key={segment.name}
+                    className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: segment.color }} />
+                      <h3 className="text-xl font-semibold text-white">
+                        {segment.name} ({segment.value}%)
+                      </h3>
+                    </div>
+                    <p className="text-gray-300">
+                      {segment.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
 
         {/* Token Utility Section */}
         <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
@@ -154,4 +223,3 @@ export const WhatWeBuilding = () => {
     </section>
   );
 };
-
