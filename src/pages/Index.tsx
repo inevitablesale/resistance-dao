@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -137,7 +138,7 @@ const IndexContent = () => {
                 }}
               >
                 <Building2 
-                  className="w-8 h-8 text-purple-400/90" 
+                  className="w-8 h-8 text-orange-400/90" 
                   style={{ transform: `rotate(-${i * 30}deg)` }}
                 />
               </div>
@@ -220,7 +221,7 @@ const IndexContent = () => {
             transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * -50}px)`
           }}
         >
-          <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-indigo-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-orange-200 to-blue-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
             Own the future of<br />accounting
           </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
@@ -229,16 +230,16 @@ const IndexContent = () => {
           </p>
 
           <div className="mb-16">
-            <p className="text-sm uppercase tracking-wider text-purple-300 mb-6 font-semibold drop-shadow-[0_1px_1px_rgba(0,0,0,0.7)]">
+            <p className="text-sm uppercase tracking-wider text-orange-300 mb-6 font-semibold drop-shadow-[0_1px_1px_rgba(0,0,0,0.7)]">
               Explore applications powered by LedgerFund Protocol
             </p>
             
             <div className="flex flex-col md:flex-row gap-4 justify-center">
               <button 
                 onClick={() => navigate('/mint-nft')}
-                className="group relative px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                className="group relative px-8 py-3 bg-gradient-to-r from-orange-600 to-blue-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/70 to-indigo-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-600/70 to-blue-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
                 <div className="relative flex items-center justify-center gap-2 text-white font-medium">
                   <Trophy className="w-5 h-5" />
                   <span>Earn Rewards with Quests</span>
@@ -247,9 +248,9 @@ const IndexContent = () => {
               
               <button 
                 onClick={() => navigate('/token-presale')}
-                className="group relative px-8 py-3 bg-black/50 hover:bg-black/60 border border-purple-500/40 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                className="group relative px-8 py-3 bg-black/50 hover:bg-black/60 border border-orange-500/40 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-indigo-400/20 blur-sm group-hover:blur-lg transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-blue-400/20 blur-sm group-hover:blur-lg transition-all duration-300" />
                 <div className="relative flex items-center justify-center gap-2 text-white font-medium">
                   <UserCircle className="w-5 h-5" />
                   <span>Mint Your LedgerFren NFT</span>
@@ -282,7 +283,7 @@ const Index = () => {
         <div 
           className="absolute inset-0"
           style={{
-            background: "radial-gradient(circle at center, #2D1B69 0%, #0F0628 100%)",
+            background: "radial-gradient(circle at center, #1e3a8a 0%, #0F0628 100%)",
             opacity: 0.98
           }}
         />
