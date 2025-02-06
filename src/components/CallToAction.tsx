@@ -7,13 +7,13 @@ export const CallToAction = () => {
       <div className="container px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
-            Join Our Investment Round
+            Join the Protocol
           </h2>
           <p className="text-xl text-gray-300 mb-4">
-            We're raising funds to invest in accounting firms, democratizing access to firm ownership through blockchain technology.
+            We're building a decentralized protocol to power the next generation of professional service firms through blockchain technology.
           </p>
           <p className="text-lg text-gray-400 mb-12">
-            To participate in firm investments later, you'll need to mint a LedgerFren NFT and complete our KYC/AML verification process.
+            Participate in our token distribution to help build the infrastructure for decentralized professional services.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
