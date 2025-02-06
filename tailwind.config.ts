@@ -77,6 +77,9 @@ export default {
         "wave": "wave 8s ease-in-out infinite",
         "wave-slow": "wave 12s ease-in-out infinite",
         "gradient": "gradient 8s ease infinite",
+        "singularity": "singularity 20s ease-in-out infinite",
+        "cosmic-pulse": "cosmic-pulse 4s ease-in-out infinite",
+        "star-field": "star-field 30s linear infinite",
       },
       keyframes: {
         "accordion-down": {
@@ -103,6 +106,18 @@ export default {
           "0%": { backgroundPosition: "0% 50%" },
           "50%": { backgroundPosition: "100% 50%" },
           "100%": { backgroundPosition: "0% 50%" }
+        },
+        "singularity": {
+          "0%, 100%": { transform: "scale(1) rotate(0deg)" },
+          "50%": { transform: "scale(1.1) rotate(180deg)" }
+        },
+        "cosmic-pulse": {
+          "0%, 100%": { opacity: "0.5", transform: "scale(1)" },
+          "50%": { opacity: "1", transform: "scale(1.05)" }
+        },
+        "star-field": {
+          "0%": { transform: "translateZ(0) rotate(0deg)" },
+          "100%": { transform: "translateZ(400px) rotate(360deg)" }
         }
       }
     },
