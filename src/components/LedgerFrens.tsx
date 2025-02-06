@@ -1,4 +1,3 @@
-
 import { PartyPopper, Trophy, Rocket, Gift, ShoppingBag, Medal, Star } from "lucide-react";
 
 export const LedgerFrens = () => {
