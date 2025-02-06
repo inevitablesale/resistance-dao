@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -57,16 +56,19 @@ const IndexContent = () => {
       
       const presaleRect = presaleRef.current.getBoundingClientRect();
       
-      // Calculate visibility percentage of presale section
-      // This will be 0 when presale is below viewport
-      // Will increase as presale enters viewport
-      // And will decrease as presale moves above viewport
+      // Calculate when Presale Stage 1 enters viewport (top of section reaches bottom of viewport)
+      // Scale from 0 to 1 as section enters
       const presaleVisibility = Math.max(0, Math.min(1, 
-        1 - (presaleRect.top / window.innerHeight),
+        1 - (presaleRect.top / window.innerHeight)
+      ));
+      
+      // When scrolling up past the section, scale back down
+      const scrollingUpAdjustment = Math.max(0, Math.min(1,
         1 - (Math.abs(presaleRect.bottom) / window.innerHeight)
       ));
       
-      setScrollProgress(presaleVisibility);
+      // Use the minimum of both values to ensure proper scaling in both directions
+      setScrollProgress(Math.min(presaleVisibility, scrollingUpAdjustment));
     };
 
     window.addEventListener('scroll', handleScroll);
