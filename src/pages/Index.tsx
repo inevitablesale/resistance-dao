@@ -96,7 +96,10 @@ const IndexContent = () => {
 
   return (
     <>
-      <div ref={heroRef} className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 overflow-hidden min-h-screen">
+      <div 
+        ref={heroRef} 
+        className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 min-h-[120vh] flex flex-col items-center justify-start"
+      >
         {/* Background Layer (Slowest) */}
         <div className="fixed inset-0 z-0">
           <div 
@@ -138,7 +141,7 @@ const IndexContent = () => {
         </div>
 
         {/* Black Hole Effect Container */}
-        <div className="absolute inset-0 z-2 perspective-3000" style={parallaxStyle}>
+        <div className="fixed inset-0 z-2 perspective-3000" style={parallaxStyle}>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-[800px] h-[800px] relative">
               {/* Singularity Core */}
@@ -187,7 +190,7 @@ const IndexContent = () => {
         </div>
 
         {/* Content Layer */}
-        <div className="relative z-3" style={parallaxStyle}>
+        <div className="relative z-3 mt-[30vh]" style={parallaxStyle}>
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-orange-200 to-blue-400 animate-gradient">
             Own the future of<br />accounting
           </h1>
