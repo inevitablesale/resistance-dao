@@ -372,18 +372,41 @@ export const WhatWeBuilding = () => {
         </Tabs>
       </div>
 
-      <style jsx>{`
-        @keyframes particle-flow {
-          0% {
-            transform: translateY(0) translateX(0) scale(1);
-            opacity: 1;
+      <style>
+        {`
+          @keyframes particle-flow {
+            0% {
+              transform: translateY(0) translateX(0) scale(1);
+              opacity: 1;
+            }
+            100% {
+              transform: translateY(-50px) translateX(-50px) scale(0);
+              opacity: 0;
+            }
           }
-          100% {
-            transform: translateY(-50px) translateX(-50px) scale(0);
-            opacity: 0;
+
+          @keyframes black-hole-rotate {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(360deg);
+            }
           }
-        }
-      `}</style>
+
+          @keyframes gravitational-pull {
+            0% {
+              transform: scale(1) rotate(0deg);
+            }
+            50% {
+              transform: scale(0.95) rotate(180deg);
+            }
+            100% {
+              transform: scale(1) rotate(360deg);
+            }
+          }
+        `}
+      </style>
     </section>
   );
 };
