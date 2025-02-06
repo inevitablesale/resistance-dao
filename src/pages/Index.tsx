@@ -500,6 +500,7 @@ const IndexContent = () => {
           />
         </div>
         <div className="relative z-10">
+          <AlternativeToEquity />
           <PrivateEquityImpact />
           <ReclaimControl />
         </div>
@@ -509,7 +510,6 @@ const IndexContent = () => {
         <WhatWeBuilding />
         <LedgerFrens />
         <HowItWorks />
-        <AlternativeToEquity />
         <CallToAction />
         <Roadmap />
         <Partners />
