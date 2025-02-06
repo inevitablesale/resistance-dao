@@ -101,15 +101,15 @@ const IndexContent = () => {
         ref={heroRef} 
         className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 min-h-[120vh] flex flex-col items-center justify-start"
       >
-        {/* Background Layer (Slowest) */}
+        {/* Background Layer */}
         <div className="fixed inset-0 z-0">
           <div 
             className="absolute inset-0 animate-parallax-slow"
             style={{
               background: `
-                radial-gradient(2px 2px at 20% 20%, rgba(147, 197, 253, 0.95) 100%, transparent),
-                radial-gradient(2px 2px at 40% 40%, rgba(147, 197, 253, 0.92) 100%, transparent),
-                radial-gradient(3px 3px at 60% 60%, rgba(147, 197, 253, 0.90) 100%, transparent)
+                radial-gradient(2px 2px at 20% 20%, rgba(234, 179, 8, 0.95) 100%, transparent),
+                radial-gradient(2px 2px at 40% 40%, rgba(234, 179, 8, 0.92) 100%, transparent),
+                radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
               `,
               backgroundSize: "240px 240px",
               opacity: 0.85 - scrollProgress * 0.3
@@ -138,7 +138,7 @@ const IndexContent = () => {
                 }}
               >
                 <Building2 
-                  className="w-8 h-8 text-blue-300/90" 
+                  className="w-8 h-8 text-teal-300/90" 
                   style={{ transform: `rotate(-${i * 30}deg)` }}
                 />
               </div>
@@ -146,7 +146,7 @@ const IndexContent = () => {
           </div>
         </div>
 
-        {/* Black Hole Effect Container */}
+        {/* Energy Vortex Effect */}
         <div 
           className="fixed inset-0 z-2 perspective-3000" 
           style={{
@@ -161,29 +161,29 @@ const IndexContent = () => {
                 transform: `translateZ(${scrollProgress * 200}px)`
               }}
             >
-              {/* Singularity Core */}
+              {/* Core */}
               <div 
                 className="absolute inset-0 rounded-full bg-black animate-singularity" 
                 style={{
                   boxShadow: `
-                    0 0 ${100 + scrollProgress * 100}px ${20 + scrollProgress * 30}px rgba(59, 130, 246, 0.4),
-                    0 0 ${200 + scrollProgress * 200}px ${40 + scrollProgress * 60}px rgba(96, 165, 250, 0.3),
-                    0 0 ${300 + scrollProgress * 300}px ${60 + scrollProgress * 90}px rgba(147, 197, 253, 0.2)
+                    0 0 ${100 + scrollProgress * 100}px ${20 + scrollProgress * 30}px rgba(234, 179, 8, 0.4),
+                    0 0 ${200 + scrollProgress * 200}px ${40 + scrollProgress * 60}px rgba(20, 184, 166, 0.3),
+                    0 0 ${300 + scrollProgress * 300}px ${60 + scrollProgress * 90}px rgba(234, 179, 8, 0.2)
                   `,
                   transform: `scale(${1 + scrollProgress * 0.8})`
                 }}
               />
               
-              {/* Accretion Disk - Shimmering Effect */}
+              {/* Energy Field */}
               <div 
                 className="absolute inset-0 rounded-full animate-cosmic-pulse"
                 style={{
                   background: `
                     radial-gradient(circle at center,
                       rgba(0, 0, 0, 1) 0%,
-                      rgba(59, 130, 246, ${0.7 + scrollProgress * 0.3}) 30%,
-                      rgba(96, 165, 250, ${0.5 + scrollProgress * 0.3}) 50%,
-                      rgba(147, 197, 253, ${0.4 + scrollProgress * 0.2}) 70%,
+                      rgba(234, 179, 8, ${0.7 + scrollProgress * 0.3}) 30%,
+                      rgba(20, 184, 166, ${0.5 + scrollProgress * 0.3}) 50%,
+                      rgba(234, 179, 8, ${0.4 + scrollProgress * 0.2}) 70%,
                       transparent 90%
                     )
                   `,
@@ -191,20 +191,20 @@ const IndexContent = () => {
                 }}
               />
               
-              {/* Event Horizon - Enhanced Shimmer */}
+              {/* Outer Ring */}
               <div 
                 className="absolute inset-0 rounded-full"
                 style={{
                   background: `
                     radial-gradient(circle at center,
                       rgba(0, 0, 0, 0.9) 0%,
-                      rgba(59, 130, 246, ${0.3 + scrollProgress * 0.2}) 40%,
-                      rgba(96, 165, 250, ${0.2 + scrollProgress * 0.2}) 60%,
-                      rgba(147, 197, 253, ${0.15 + scrollProgress * 0.15}) 80%,
+                      rgba(234, 179, 8, ${0.3 + scrollProgress * 0.2}) 40%,
+                      rgba(20, 184, 166, ${0.2 + scrollProgress * 0.2}) 60%,
+                      rgba(234, 179, 8, ${0.15 + scrollProgress * 0.15}) 80%,
                       transparent 90%
                     )
                   `,
-                  border: '2px solid rgba(147, 197, 253, 0.5)',
+                  border: '2px solid rgba(234, 179, 8, 0.5)',
                   transform: `scale(${1 + scrollProgress * 1.5})`,
                   animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                 }}
@@ -221,7 +221,7 @@ const IndexContent = () => {
             transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * -50}px)`
           }}
         >
-          <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-200 to-cyan-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
             Own the future of<br />accounting
           </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
@@ -230,16 +230,16 @@ const IndexContent = () => {
           </p>
 
           <div className="mb-16">
-            <p className="text-sm uppercase tracking-wider text-blue-300 mb-6 font-semibold drop-shadow-[0_1px_1px_rgba(0,0,0,0.7)]">
+            <p className="text-sm uppercase tracking-wider text-teal-300 mb-6 font-semibold drop-shadow-[0_1px_1px_rgba(0,0,0,0.7)]">
               Explore applications powered by LedgerFund Protocol
             </p>
             
             <div className="flex flex-col md:flex-row gap-4 justify-center">
               <button 
                 onClick={() => navigate('/mint-nft')}
-                className="group relative px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                className="group relative px-8 py-3 bg-gradient-to-r from-yellow-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/70 to-cyan-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
                 <div className="relative flex items-center justify-center gap-2 text-white font-medium">
                   <Trophy className="w-5 h-5" />
                   <span>Earn Rewards with Quests</span>
@@ -248,9 +248,9 @@ const IndexContent = () => {
               
               <button 
                 onClick={() => navigate('/token-presale')}
-                className="group relative px-8 py-3 bg-black/50 hover:bg-black/60 border border-blue-500/40 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                className="group relative px-8 py-3 bg-black/50 hover:bg-black/60 border border-yellow-500/40 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-400/20 blur-sm group-hover:blur-lg transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-400/20 blur-sm group-hover:blur-lg transition-all duration-300" />
                 <div className="relative flex items-center justify-center gap-2 text-white font-medium">
                   <UserCircle className="w-5 h-5" />
                   <span>Mint Your LedgerFren NFT</span>
@@ -261,7 +261,7 @@ const IndexContent = () => {
         </div>
       </div>
 
-      <div className="relative z-10 bg-black/80 backdrop-blur-sm">
+      <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
         <InvestmentReadiness />
         <WhatWeBuilding />
         <PrivateEquityImpact />
@@ -283,7 +283,7 @@ const Index = () => {
         <div 
           className="absolute inset-0"
           style={{
-            background: "radial-gradient(circle at center, #3b82f6 0%, #0F0628 100%)",
+            background: "radial-gradient(circle at center, #eab308 0%, #0F0628 100%)",
             opacity: 0.98
           }}
         />
@@ -299,3 +299,4 @@ const Index = () => {
 };
 
 export default Index;
+
