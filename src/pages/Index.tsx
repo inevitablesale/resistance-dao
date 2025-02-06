@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -26,6 +25,7 @@ const IndexContent = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+  const loadTime = Date.now();
 
   useEffect(() => {
     // Set loaded state after a small delay to trigger initial animations
@@ -132,7 +132,11 @@ const IndexContent = () => {
           >
             {[...Array(12)].map((_, i) => {
               const angle = (i * 30) + (isLoaded ? 360 : 0);
-              const radius = 150 - (scrollProgress * 150);
+              const baseRadius = window.innerWidth * 0.7; // Start from 70% of viewport width
+              const radius = isLoaded 
+                ? baseRadius * Math.max(0.2, 1 - (Date.now() - loadTime) / 10000) // Spiral inward over 10 seconds
+                : baseRadius;
+              const finalRadius = 150 - (scrollProgress * 150);
               const speed = 1 + (i % 3) * 0.5;
               const direction = i % 2 === 0 ? 1 : -1;
               
@@ -143,14 +147,14 @@ const IndexContent = () => {
                   style={{
                     top: '50%',
                     left: '50%',
-                    transition: 'all 0.5s ease-out',
+                    transition: 'all 1s cubic-bezier(0.4, 0, 0.2, 1)',
                     transform: scrollProgress > 0 
-                      ? `translate(-50%, -50%) rotate(${angle * direction + (scrollProgress * 720)}deg) translateX(${radius}px)`
-                      : `translate(-50%, -50%) rotate(${angle * direction}deg) translateX(${150 + Math.sin(Date.now() / (1000 * speed)) * 20}px)`,
+                      ? `translate(-50%, -50%) rotate(${angle * direction + (scrollProgress * 720)}deg) translateX(${finalRadius}px)`
+                      : `translate(-50%, -50%) rotate(${angle * direction}deg) translateX(${radius + Math.sin(Date.now() / (1000 * speed)) * 20}px)`,
                   }}
                 >
                   <Building2 
-                    className={`w-8 h-8 text-teal-300/90 transition-all duration-500`}
+                    className={`w-8 h-8 text-teal-300/90 transition-all duration-1000`}
                     style={{ 
                       transform: `rotate(${-angle * direction}deg) scale(${1 - scrollProgress * 0.5})`,
                       opacity: Math.max(0, 1 - scrollProgress * 2)
@@ -315,4 +319,3 @@ const Index = () => {
 };
 
 export default Index;
-
