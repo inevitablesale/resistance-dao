@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -83,6 +82,8 @@ export default {
         "parallax-medium": "parallax-scroll 10s linear infinite",
         "parallax-fast": "parallax-scroll 5s linear infinite",
         "orbit": "orbit 20s linear infinite",
+        "pulse": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "bounce": "bounce 1s infinite",
       },
       keyframes: {
         "accordion-down": {
@@ -129,7 +130,25 @@ export default {
         "orbit": {
           "0%": { transform: "rotate(0deg) translateX(100px) rotate(0deg)" },
           "100%": { transform: "rotate(360deg) translateX(100px) rotate(-360deg)" }
-        }
+        },
+        "pulse": {
+          '0%, 100%': {
+            opacity: '1',
+          },
+          '50%': {
+            opacity: '0.5',
+          },
+        },
+        "bounce": {
+          '0%, 100%': {
+            transform: 'translateY(-25%)',
+            animationTimingFunction: 'cubic-bezier(0.8,0,1,1)',
+          },
+          '50%': {
+            transform: 'none',
+            animationTimingFunction: 'cubic-bezier(0,0,0.2,1)',
+          },
+        },
       }
     },
   },
