@@ -355,7 +355,7 @@ const IndexContent = () => {
             {/* Progress and Stats */}
             <div className="mb-8">
               <div className="text-white text-lg mb-4">
-                LGR SOLD: {Number(totalSold).toLocaleString()} / {Number(presaleSupply).toLocaleString()}
+                <span className="font-bold">Total LGR Sold:</span> {Number(totalSold).toLocaleString()} / {Number(presaleSupply).toLocaleString()}
               </div>
               <div className="w-full h-4 bg-gray-700 rounded-full overflow-hidden">
                 <div 
@@ -367,34 +367,6 @@ const IndexContent = () => {
               </div>
               <div className="text-center text-white/80 mt-2">
                 UNTIL PRICE RISE
-              </div>
-            </div>
-
-            {/* User's Token Info */}
-            <div className="flex justify-between mb-8 text-white">
-              <div className="flex items-center gap-2">
-                MY PURCHASED = {Number(myPurchased).toLocaleString()}
-                <button 
-                  className="text-white/60 hover:text-white"
-                  onClick={() => toast({
-                    title: "Purchased Tokens",
-                    description: "These are the tokens you've bought during the presale"
-                  })}
-                >
-                  <Trophy className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="flex items-center gap-2">
-                MY STAKEABLE = {Number(myStakeable).toLocaleString()}
-                <button 
-                  className="text-white/60 hover:text-white"
-                  onClick={() => toast({
-                    title: "Stakeable Tokens",
-                    description: "These are the tokens you can stake after the presale"
-                  })}
-                >
-                  <Trophy className="w-4 h-4" />
-                </button>
               </div>
             </div>
 
