@@ -242,7 +242,7 @@ const IndexContent = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
                 <div className="relative flex items-center justify-center gap-2 text-white font-medium">
                   <Trophy className="w-5 h-5" />
-                  <span>Earn Rewards with Quests</span>
+                  <span>Purchase LGR Tokens</span>
                 </div>
               </button>
               
