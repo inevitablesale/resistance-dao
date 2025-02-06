@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -16,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { checkNFTOwnership } from "@/services/contractService";
-import { Trophy, UserCircle, Building2, Wallet, Loader2 } from "lucide-react";
+import { Trophy, UserCircle, Building2, Wallet } from "lucide-react";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY } from "@/services/presaleContractService";
 
@@ -42,10 +41,6 @@ const IndexContent = () => {
   });
   const [myPurchased, setMyPurchased] = useState<string>('0');
   const [myStakeable, setMyStakeable] = useState<string>('0');
-  const [isLoading, setIsLoading] = useState(true);
-  const [remainingSupply, setRemainingSupply] = useState<string>("0");
-  const [priceUSD, setPriceUSD] = useState<string>("0");
-  const [priceMatic, setPriceMatic] = useState<string>("0");
 
   useEffect(() => {
     // Set loaded state after a small delay to trigger initial animations
@@ -113,6 +108,12 @@ const IndexContent = () => {
 
     checkWalletStatus();
   }, [primaryWallet, toast]);
+
+  const parallaxStyle = {
+    '--scroll-progress': scrollProgress,
+    transform: `scale(${1 + scrollProgress * 0.5})`,
+    opacity: 1 - scrollProgress * 0.6
+  } as React.CSSProperties;
 
   // Function to fetch presale data
   const fetchPresaleData = async () => {
@@ -184,46 +185,6 @@ const IndexContent = () => {
   const calculatePercentage = () => {
     return ((Number(totalSold) / Number(presaleSupply)) * 100).toFixed(2);
   };
-
-  useEffect(() => {
-    const fetchContractData = async () => {
-      try {
-        setIsLoading(true);
-        // Fetch all contract data here
-        const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
-        const presaleContract = getPresaleContract(provider);
-        
-        // Get remaining supply
-        const presaleSupply = await presaleContract.PRESALE_SUPPLY();
-        const totalSold = await presaleContract.totalLGRSold();
-        const remaining = presaleSupply.sub(totalSold);
-        setRemainingSupply(ethers.utils.formatUnits(remaining, 18));
-
-        // Get USD price
-        const usdPrice = await presaleContract.PRESALE_USD_PRICE();
-        setPriceUSD(ethers.utils.formatUnits(usdPrice, 18));
-
-        // Get MATIC price
-        const maticPrice = await presaleContract.getLGRPrice();
-        setPriceMatic(ethers.utils.formatUnits(maticPrice, 18));
-
-      } catch (error) {
-        console.error("Error fetching contract data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchContractData();
-    const interval = setInterval(fetchContractData, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const parallaxStyle = {
-    '--scroll-progress': scrollProgress,
-    transform: `scale(${1 + scrollProgress * 0.5})`,
-    opacity: 1 - scrollProgress * 0.6
-  } as React.CSSProperties;
 
   return (
     <>
@@ -298,6 +259,73 @@ const IndexContent = () => {
           </div>
         </div>
 
+        {/* Energy Vortex Effect */}
+        <div 
+          className="fixed inset-0 z-2 perspective-3000" 
+          style={{
+            ...parallaxStyle,
+            transform: `scale(${1 + scrollProgress * 1.5})`,
+          }}
+        >
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div 
+              className="w-[800px] h-[800px] relative"
+              style={{
+                transform: `translateZ(${scrollProgress * 200}px)`,
+                transition: 'transform 0.5s ease-out'
+              }}
+            >
+              {/* Core */}
+              <div 
+                className={`absolute inset-0 rounded-full bg-black transition-all duration-1000 ${isLoaded ? 'scale-100' : 'scale-0'}`}
+                style={{
+                  boxShadow: `
+                    0 0 ${100 + scrollProgress * 200}px ${20 + scrollProgress * 40}px rgba(234, 179, 8, 0.4),
+                    0 0 ${200 + scrollProgress * 400}px ${40 + scrollProgress * 80}px rgba(20, 184, 166, 0.3),
+                    0 0 ${300 + scrollProgress * 600}px ${60 + scrollProgress * 120}px rgba(234, 179, 8, 0.2)
+                  `,
+                  transform: `scale(${0.2 + scrollProgress * 1.8})`,
+                }}
+              />
+              
+              {/* Energy Field */}
+              <div 
+                className={`absolute inset-0 rounded-full animate-cosmic-pulse transition-all duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+                style={{
+                  background: `
+                    radial-gradient(circle at center,
+                      rgba(0, 0, 0, 1) 0%,
+                      rgba(234, 179, 8, ${0.3 + scrollProgress * 0.7}) 30%,
+                      rgba(20, 184, 166, ${0.2 + scrollProgress * 0.6}) 50%,
+                      rgba(234, 179, 8, ${0.1 + scrollProgress * 0.5}) 70%,
+                      transparent 90%
+                    )
+                  `,
+                  transform: `scale(${0.5 + scrollProgress * 1.5}) rotate(${scrollProgress * 360}deg)`,
+                }}
+              />
+              
+              {/* Outer Ring */}
+              <div 
+                className={`absolute inset-0 rounded-full transition-all duration-1000 ${isLoaded ? 'scale-100' : 'scale-0'}`}
+                style={{
+                  background: `
+                    radial-gradient(circle at center,
+                      rgba(0, 0, 0, 0.9) 0%,
+                      rgba(234, 179, 8, ${0.1 + scrollProgress * 0.4}) 40%,
+                      rgba(20, 184, 166, ${0.1 + scrollProgress * 0.3}) 60%,
+                      rgba(234, 179, 8, ${0.05 + scrollProgress * 0.25}) 80%,
+                      transparent 90%
+                    )
+                  `,
+                  border: '2px solid rgba(234, 179, 8, 0.5)',
+                  transform: `scale(${0.8 + scrollProgress * 1.7})`,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Content Layer */}
         <div 
           className="relative z-3 mt-[30vh]" 
@@ -315,86 +343,107 @@ const IndexContent = () => {
           </p>
 
           <div className="max-w-3xl mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
-            <div className="max-w-3xl mx-auto text-center">
-              <div className="mb-8">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 blur-xl animate-pulse" />
-                  <h2 className="relative text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-2 text-center">
-                    LGR Presale Phase 1
-                  </h2>
-                  <p className="text-2xl font-semibold text-teal-400">90% Discount</p>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-4 gap-6 mb-8">
-                <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
-                  {isLoading ? (
-                    <div className="flex items-center justify-center h-[76px]">
-                      <Loader2 className="h-6 w-6 animate-spin text-yellow-400" />
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-3xl font-bold text-yellow-400 mb-2">
-                        {Number(remainingSupply).toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-300">Remaining Supply</p>
-                    </>
-                  )}
-                </div>
-                <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-teal-500/20">
-                  {isLoading ? (
-                    <div className="flex items-center justify-center h-[76px]">
-                      <Loader2 className="h-6 w-6 animate-spin text-teal-400" />
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-3xl font-bold text-teal-400 mb-2">
-                        {Number(priceMatic).toLocaleString()} MATIC
-                      </p>
-                      <p className="text-sm text-gray-300">Price Per Token</p>
-                    </>
-                  )}
-                </div>
-                <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
-                  {isLoading ? (
-                    <div className="flex items-center justify-center h-[76px]">
-                      <Loader2 className="h-6 w-6 animate-spin text-yellow-400" />
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-3xl font-bold text-yellow-400 mb-2">
-                        ${Number(priceUSD).toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-300">USD Price</p>
-                    </>
-                  )}
-                </div>
-                <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-teal-500/20">
-                  {isLoading ? (
-                    <div className="flex items-center justify-center h-[76px]">
-                      <Loader2 className="h-6 w-6 animate-spin text-teal-400" />
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-3xl font-bold text-teal-400 mb-2">
-                        {Number(totalSold).toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-300">Tokens Sold</p>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex justify-center">
-                <button 
-                  onClick={() => navigate('/token-presale')}
-                  className="group relative px-8 py-3 bg-gradient-to-r from-yellow-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
-                  <span className="relative text-white font-medium">Join Token Presale</span>
-                </button>
+            <div className="mb-8">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 blur-xl animate-pulse" />
+                <h2 className="relative text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-2 text-center">
+                  Token Presale Progress
+                </h2>
               </div>
             </div>
+
+            {/* Countdown Timer with Enhanced Design */}
+            <div className="grid grid-cols-4 gap-4 mb-8">
+              {[
+                { label: 'DAYS', value: timeLeft.days },
+                { label: 'HOURS', value: timeLeft.hours },
+                { label: 'MINUTES', value: timeLeft.minutes },
+                { label: 'SECONDS', value: timeLeft.seconds }
+              ].map(({ label, value }) => (
+                <div 
+                  key={label} 
+                  className="relative group perspective-3000"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
+                  <div className="relative bg-black/80 p-4 rounded-lg border border-yellow-500/30 transform transition-all duration-300 group-hover:translate-y-[-2px]">
+                    <div className="text-4xl font-bold text-white mb-2 text-center animate-[pulse_2s_ease-in-out_infinite]">
+                      {value}
+                    </div>
+                    <div className="text-sm text-gray-400 text-center">{label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Progress and Stats with Enhanced Visual Design */}
+            <div className="mb-8 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-teal-500/10 blur-lg" />
+              <div className="relative">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="text-white text-lg">
+                    <span className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-300">
+                      {formatNumber(Number(totalSold))}
+                    </span>
+                    <span className="text-gray-400"> / </span> 
+                    <span className="text-gray-300">{formatNumber(Number(presaleSupply))}</span>
+                    <span className="text-gray-400 ml-2">LGR Tokens Sold</span>
+                  </div>
+                  <div className="text-teal-400 font-bold">
+                    {calculatePercentage()}%
+                  </div>
+                </div>
+                
+                <div className="relative h-4 bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 animate-pulse blur-sm"
+                  />
+                  <div 
+                    className="h-full bg-gradient-to-r from-yellow-500 to-teal-500 transition-all duration-1000 relative"
+                    style={{ 
+                      width: `${Math.min(100, (Number(totalSold) / Number(presaleSupply)) * 100)}%` 
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/50 to-teal-500/50 animate-pulse" />
+                  </div>
+                </div>
+                
+                <div className="text-center text-white/80 mt-2 font-medium">
+                  UNTIL PRICE INCREASE
+                </div>
+              </div>
+            </div>
+
+            {/* Enhanced Purchase Options */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <button 
+                onClick={() => navigate('/token-presale')}
+                className="group relative px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-yellow-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                <div className="relative flex items-center justify-center gap-3 text-white font-medium text-lg">
+                  <Trophy className="w-5 h-5 animate-bounce" />
+                  <span>Buy with Card</span>
+                </div>
+              </button>
+              
+              <button 
+                onClick={() => navigate('/token-presale')}
+                className="group relative px-8 py-4 bg-gradient-to-br from-teal-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-teal-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                <div className="relative flex items-center justify-center gap-3 text-white font-medium text-lg">
+                  <Wallet className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
+                  <span>Buy with Crypto</span>
+                </div>
+              </button>
+            </div>
+
+            <button 
+              onClick={() => navigate('/mint-nft')}
+              className="mt-4 text-white/80 hover:text-white underline text-sm transition-colors w-full text-center"
+            >
+              New to crypto? Get started here
+            </button>
           </div>
         </div>
       </div>
