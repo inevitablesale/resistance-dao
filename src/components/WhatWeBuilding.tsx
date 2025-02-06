@@ -1,5 +1,5 @@
 
-import { Coins, Lock, BadgeCheck, UsersRound, GanttChartSquare, Building2 } from "lucide-react";
+import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2 } from "lucide-react";
 
 export const WhatWeBuilding = () => {
   return (
@@ -10,7 +10,7 @@ export const WhatWeBuilding = () => {
         </h2>
         
         <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
-          Our dual-token system separates governance from ownership, ensuring transparency, 
+          Our dual-token system combines liquidity provision with NFT-based governance, ensuring transparency, 
           stability, and alignment with long-term goals.
         </p>
         
@@ -19,27 +19,27 @@ export const WhatWeBuilding = () => {
           <div className="space-y-8">
             <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
               <Coins className="w-8 h-8 text-yellow-400" />
-              <span>LGR Token (Governance)</span>
+              <span>LGR Token (Liquidity)</span>
             </div>
             
             <div className="space-y-6">
               <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
                 <div className="mb-4">
-                  <UsersRound className="w-8 h-8 text-yellow-400" />
+                  <Wallet className="w-8 h-8 text-yellow-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Voting Rights</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">Liquidity Provision</h3>
                 <p className="text-gray-300">
-                  Participate in key decisions including firm acquisitions, resource allocation, and operational strategies.
+                  Provide liquidity to the protocol and earn rewards from platform fees and transactions.
                 </p>
               </div>
 
               <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
                 <div className="mb-4">
-                  <Lock className="w-8 h-8 text-yellow-400" />
+                  <UsersRound className="w-8 h-8 text-yellow-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Fixed Value</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">Platform Access</h3>
                 <p className="text-gray-300">
-                  Non-speculative token maintaining stable value to prevent price volatility and ensure governance stability.
+                  Access platform features and participate in the tokenized accounting firm ecosystem.
                 </p>
               </div>
 
@@ -47,9 +47,9 @@ export const WhatWeBuilding = () => {
                 <div className="mb-4">
                   <BadgeCheck className="w-8 h-8 text-yellow-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Professional Requirement</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">Reward Distribution</h3>
                 <p className="text-gray-300">
-                  Reserved for licensed accountants, ensuring industry expertise guides decision-making.
+                  Earn rewards from platform activities and contribute to the ecosystem's growth.
                 </p>
               </div>
             </div>
