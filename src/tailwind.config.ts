@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -77,8 +78,7 @@ export default {
         "wave-slow": "wave 12s ease-in-out infinite",
         "gradient": "gradient 8s ease infinite",
         "spin-slow": "spin 20s linear infinite",
-        "twinkle": "twinkle 4s ease-in-out infinite",
-        "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "twinkle": "twinkle 4s ease-in-out infinite"
       },
       keyframes: {
         "accordion-down": {
@@ -109,7 +109,7 @@ export default {
         "twinkle": {
           "0%, 100%": { opacity: "0.5" },
           "50%": { opacity: "1" }
-        },
+        }
       }
     },
   },

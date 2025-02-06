@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -222,41 +223,43 @@ const Index = () => {
         <IndexContent />
       </div>
 
-      <style jsx>{`
-        @keyframes wave {
-          0%, 100% {
-            transform: translateY(0) scale(1.5);
+      <style>
+        {`
+          @keyframes wave {
+            0%, 100% {
+              transform: translateY(0) scale(1.5);
+            }
+            50% {
+              transform: translateY(-20px) scale(1.3);
+            }
           }
-          50% {
-            transform: translateY(-20px) scale(1.3);
+          
+          @keyframes gradient {
+            0% {
+              background-position: 0% 50%;
+            }
+            50% {
+              background-position: 100% 50%;
+            }
+            100% {
+              background-position: 0% 50%;
+            }
           }
-        }
-        
-        @keyframes gradient {
-          0% {
-            background-position: 0% 50%;
+          
+          .animate-wave {
+            animation: wave 8s ease-in-out infinite;
           }
-          50% {
-            background-position: 100% 50%;
+          
+          .animate-wave-slow {
+            animation: wave 12s ease-in-out infinite;
           }
-          100% {
-            background-position: 0% 50%;
+          
+          .animate-gradient {
+            animation: gradient 8s ease infinite;
+            background-size: 200% 200%;
           }
-        }
-        
-        .animate-wave {
-          animation: wave 8s ease-in-out infinite;
-        }
-        
-        .animate-wave-slow {
-          animation: wave 12s ease-in-out infinite;
-        }
-        
-        .animate-gradient {
-          animation: gradient 8s ease infinite;
-          background-size: 200% 200%;
-        }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
