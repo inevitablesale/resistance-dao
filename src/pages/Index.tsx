@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -163,7 +162,7 @@ const IndexContent = () => {
             >
               {/* Singularity Core */}
               <div 
-                className="absolute inset-0 rounded-full bg-[#120338] animate-singularity" 
+                className="absolute inset-0 rounded-full bg-black animate-singularity" 
                 style={{
                   boxShadow: `
                     0 0 ${100 + scrollProgress * 100}px ${20 + scrollProgress * 30}px rgba(147, 51, 234, 0.5),
@@ -174,30 +173,33 @@ const IndexContent = () => {
                 }}
               />
               
-              {/* Accretion Disk */}
+              {/* Accretion Disk - Shimmering Effect */}
               <div 
                 className="absolute inset-0 rounded-full animate-cosmic-pulse"
                 style={{
                   background: `
                     radial-gradient(circle at center,
-                      rgba(147, 51, 234, ${0.7 + scrollProgress * 0.3}) 0%,
-                      rgba(168, 85, 247, ${0.5 + scrollProgress * 0.3}) 30%,
-                      rgba(192, 132, 252, ${0.4 + scrollProgress * 0.2}) 60%,
-                      transparent 80%
+                      rgba(0, 0, 0, 1) 0%,
+                      rgba(147, 51, 234, ${0.7 + scrollProgress * 0.3}) 30%,
+                      rgba(168, 85, 247, ${0.5 + scrollProgress * 0.3}) 50%,
+                      rgba(192, 132, 252, ${0.4 + scrollProgress * 0.2}) 70%,
+                      transparent 90%
                     )
                   `,
                   transform: `scale(${1 + scrollProgress * 1.2}) rotate(${scrollProgress * 180}deg)`
                 }}
               />
               
-              {/* Event Horizon */}
+              {/* Event Horizon - Enhanced Shimmer */}
               <div 
                 className="absolute inset-0 rounded-full"
                 style={{
                   background: `
                     radial-gradient(circle at center,
-                      rgba(255, 255, 255, ${0.2 + scrollProgress * 0.2}) 0%,
-                      transparent 70%
+                      rgba(0, 0, 0, 0.9) 0%,
+                      rgba(147, 51, 234, ${0.3 + scrollProgress * 0.2}) 40%,
+                      rgba(168, 85, 247, ${0.2 + scrollProgress * 0.2}) 60%,
+                      transparent 80%
                     )
                   `,
                   border: '2px solid rgba(168, 85, 247, 0.5)',
