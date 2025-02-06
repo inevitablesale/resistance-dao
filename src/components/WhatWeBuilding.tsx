@@ -1,4 +1,3 @@
-
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -16,7 +15,7 @@ const publicSaleData = [
 
 export const WhatWeBuilding = () => {
   return (
-    <section className="py-16 relative">
+    <section className="py-16 relative overflow-hidden">
       <div className="container px-4">
         <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 text-center">
           Investment Structure & Token Distribution
@@ -43,7 +42,14 @@ export const WhatWeBuilding = () => {
               Platform Investment: 5,000,000 LGR at $0.10
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="h-[400px] relative">
+              <div className="h-[400px] relative group">
+                <div className="absolute inset-0 bg-black rounded-full opacity-80 animate-pulse"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 via-teal-500/20 to-yellow-500/20 rounded-full animate-singularity"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-32 h-32 bg-black rounded-full animate-cosmic-pulse">
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-teal-500/10 to-yellow-500/10 rounded-full animate-spin" style={{ animationDuration: '20s' }}></div>
+                  </div>
+                </div>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -57,14 +63,33 @@ export const WhatWeBuilding = () => {
                       label={({ name, value }) => `${name} ${value}%`}
                     >
                       {presaleData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={entry.color}
+                          className="transition-all duration-300 hover:opacity-80"
+                        />
                       ))}
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent animate-pulse blur-2xl" />
+                {/* Particle Effects */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                  <div className="absolute inset-0 animate-star-field opacity-50">
+                    {[...Array(20)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="absolute w-1 h-1 bg-white rounded-full"
+                        style={{
+                          left: `${Math.random() * 100}%`,
+                          top: `${Math.random() * 100}%`,
+                          animation: `particle-flow ${Math.random() * 3 + 2}s linear infinite`
+                        }}
+                      />
+                    ))}
+                  </div>
                 </div>
+                {/* Event Horizon Glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-pulse blur-2xl"></div>
               </div>
 
               <div className="space-y-6">
@@ -93,7 +118,14 @@ export const WhatWeBuilding = () => {
               Professional Investment: 4,000,000 LGR for Accountant Acquisition Pool
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="h-[400px] relative">
+              <div className="h-[400px] relative group">
+                <div className="absolute inset-0 bg-black rounded-full opacity-80 animate-pulse"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 via-yellow-500/20 to-teal-500/20 rounded-full animate-singularity"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-32 h-32 bg-black rounded-full animate-cosmic-pulse">
+                    <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-yellow-500/10 to-teal-500/10 rounded-full animate-spin" style={{ animationDuration: '20s' }}></div>
+                  </div>
+                </div>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -107,14 +139,33 @@ export const WhatWeBuilding = () => {
                       label={({ name, value }) => `${name} ${value}%`}
                     >
                       {publicSaleData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={entry.color}
+                          className="transition-all duration-300 hover:opacity-80"
+                        />
                       ))}
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/10 to-transparent animate-pulse blur-2xl" />
+                {/* Particle Effects */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                  <div className="absolute inset-0 animate-star-field opacity-50">
+                    {[...Array(20)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="absolute w-1 h-1 bg-white rounded-full"
+                        style={{
+                          left: `${Math.random() * 100}%`,
+                          top: `${Math.random() * 100}%`,
+                          animation: `particle-flow ${Math.random() * 3 + 2}s linear infinite`
+                        }}
+                      />
+                    ))}
+                  </div>
                 </div>
+                {/* Event Horizon Glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/5 to-transparent animate-pulse blur-2xl"></div>
               </div>
 
               <div className="space-y-6">
@@ -320,6 +371,19 @@ export const WhatWeBuilding = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <style jsx>{`
+        @keyframes particle-flow {
+          0% {
+            transform: translateY(0) translateX(0) scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-50px) translateX(-50px) scale(0);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </section>
   );
 };
