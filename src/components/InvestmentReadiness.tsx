@@ -1,4 +1,3 @@
-
 import { Shield, Vote, DollarSign, BarChart3, Loader2 } from "lucide-react";
 import { Card } from "./ui/card";
 import { useNavigate } from "react-router-dom";
@@ -15,47 +14,15 @@ import { ethers } from "ethers";
 export const InvestmentReadiness = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [totalSold, setTotalSold] = useState<string>("0");
-  const [remainingSupply, setRemainingSupply] = useState<string>("0");
-  const [priceUSD, setPriceUSD] = useState<string>("0");
-  const [priceMatic, setPriceMatic] = useState<string>("0");
+  const [totalSold] = useState<string>("4999990"); // Fixed value as requested
+  const [remainingSupply] = useState<string>("10"); // Fixed value as requested
+  const [priceUSD] = useState<string>("0.1"); // Fixed value as requested
+  const [priceMatic] = useState<string>("0.335275"); // Fixed value as requested
 
-  useEffect(() => {
-    const fetchContractData = async () => {
-      try {
-        setIsLoading(true);
-        // Fetch all contract data in parallel
-        const [sold, remaining, usdPrice, maticPrice] = await Promise.all([
-          fetchTotalLGRSold(),
-          fetchRemainingPresaleSupply(),
-          fetchPresaleUSDPrice(),
-          fetchPresaleMaticPrice()
-        ]);
-        
-        // Update state with fetched values
-        setTotalSold(sold);
-        setRemainingSupply(remaining);
-        setPriceUSD(usdPrice);
-        setPriceMatic(maticPrice);
-      } catch (error) {
-        console.error("Error fetching contract data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchContractData();
-
-    // Refresh data every 30 seconds
-    const interval = setInterval(fetchContractData, 30000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Calculate percentage sold
+  // Calculate percentage sold using Number() to fix the TS error
   const percentageSold = isLoading ? 0 : Math.min(
     100,
-    (Number(totalSold) / ethers.utils.formatUnits(TOTAL_PRESALE_SUPPLY, 18)) * 100
+    (Number(totalSold) / Number(ethers.utils.formatUnits(TOTAL_PRESALE_SUPPLY, 18))) * 100
   );
 
   return (
@@ -136,60 +103,28 @@ export const InvestmentReadiness = () => {
           <div className="max-w-3xl mx-auto text-center">
             <div className="grid md:grid-cols-4 gap-6 mb-8">
               <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
-                {isLoading ? (
-                  <div className="flex items-center justify-center h-[76px]">
-                    <Loader2 className="h-6 w-6 animate-spin text-yellow-400" />
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-3xl font-bold text-yellow-400 mb-2">
-                      {Number(totalSold).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                    </p>
-                    <p className="text-sm text-gray-300">Tokens Sold</p>
-                  </>
-                )}
+                <p className="text-3xl font-bold text-yellow-400 mb-2">
+                  {Number(totalSold).toLocaleString()}
+                </p>
+                <p className="text-sm text-gray-300">Tokens Sold</p>
               </div>
               <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
-                {isLoading ? (
-                  <div className="flex items-center justify-center h-[76px]">
-                    <Loader2 className="h-6 w-6 animate-spin text-yellow-400" />
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-3xl font-bold text-yellow-400 mb-2">
-                      {Number(remainingSupply).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                    </p>
-                    <p className="text-sm text-gray-300">Remaining Supply</p>
-                  </>
-                )}
+                <p className="text-3xl font-bold text-yellow-400 mb-2">
+                  {Number(remainingSupply).toLocaleString()}
+                </p>
+                <p className="text-sm text-gray-300">Remaining Supply</p>
               </div>
               <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-teal-500/20">
-                {isLoading ? (
-                  <div className="flex items-center justify-center h-[76px]">
-                    <Loader2 className="h-6 w-6 animate-spin text-teal-400" />
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-3xl font-bold text-teal-400 mb-2">
-                      {Number(priceMatic).toLocaleString(undefined, { maximumFractionDigits: 6 })} MATIC
-                    </p>
-                    <p className="text-sm text-gray-300">Price Per Token</p>
-                  </>
-                )}
+                <p className="text-3xl font-bold text-teal-400 mb-2">
+                  {Number(priceMatic).toLocaleString(undefined, { maximumFractionDigits: 6 })} MATIC
+                </p>
+                <p className="text-sm text-gray-300">Price Per Token</p>
               </div>
               <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
-                {isLoading ? (
-                  <div className="flex items-center justify-center h-[76px]">
-                    <Loader2 className="h-6 w-6 animate-spin text-yellow-400" />
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-3xl font-bold text-yellow-400 mb-2">
-                      ${Number(priceUSD).toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                    </p>
-                    <p className="text-sm text-gray-300">USD Price</p>
-                  </>
-                )}
+                <p className="text-3xl font-bold text-yellow-400 mb-2">
+                  ${Number(priceUSD).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                </p>
+                <p className="text-sm text-gray-300">USD Price</p>
               </div>
             </div>
 
