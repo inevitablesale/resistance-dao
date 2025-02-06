@@ -185,6 +185,11 @@ const IndexContent = () => {
     return ((Number(totalSold) / Number(presaleSupply)) * 100).toFixed(2);
   };
 
+  // Function to format large numbers with commas
+  const formatLargeNumber = (num: string) => {
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
   return (
     <>
       <div 
