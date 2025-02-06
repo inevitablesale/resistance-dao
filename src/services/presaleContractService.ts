@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
@@ -28,8 +29,8 @@ export const getPresaleContract = (provider: ethers.providers.Provider | ethers.
   return new ethers.Contract(PRESALE_CONTRACT_ADDRESS, PRESALE_ABI, provider);
 };
 
-// Function to get LGR token contract
-const getLGRTokenContract = async (provider: ethers.providers.Provider) => {
+// Function to get LGR token contract - now exported
+export const getLgrTokenContract = async (provider: ethers.providers.Provider) => {
   const presaleContract = getPresaleContract(provider);
   const lgrTokenAddress = await presaleContract.lgrToken();
   return new ethers.Contract(lgrTokenAddress, ERC20_ABI, provider);
@@ -90,7 +91,7 @@ export const fetchPresaleMaticPrice = async () => {
   }
 };
 
-// New function to purchase tokens
+// Function to purchase tokens
 export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string) => {
   try {
     console.log('Starting token purchase with MATIC amount:', maticAmount);
