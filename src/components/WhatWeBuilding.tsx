@@ -8,8 +8,8 @@ const presaleData = [
 
 const publicSaleData = [
   { name: 'Treasury', value: 30, color: '#14b8a6', description: 'Management company operations, collecting 2% management fee on acquisitions and 20% performance fee on distributions.' },
-  { name: 'Public Sale', value: 40, color: '#0d9488', description: 'Trading liquidity pool ensuring market stability and token accessibility.' },
-  { name: 'Team', value: 20, color: '#0f766e', description: 'Core team compensation for ongoing platform development and operations.' },
+  { name: 'Public Sale', value: 50, color: '#0d9488', description: 'Trading liquidity pool ensuring market stability and token accessibility.' },
+  { name: 'Community Rewards', value: 10, color: '#0f766e', description: 'Core team compensation for ongoing platform development and operations.' },
   { name: 'Partners', value: 10, color: '#115e59', description: 'Strategic partnerships and ecosystem growth initiatives.' }
 ];
 
