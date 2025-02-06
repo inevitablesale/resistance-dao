@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -91,8 +90,8 @@ const IndexContent = () => {
 
   const parallaxStyle = {
     '--scroll-progress': scrollProgress,
-    transform: `scale(${1 + scrollProgress * 0.5})`, // Increased scale effect
-    opacity: 1 - scrollProgress * 0.6  // Increased fade out rate
+    transform: `scale(${1 + scrollProgress * 0.5})`,
+    opacity: 1 - scrollProgress * 0.6
   } as React.CSSProperties;
 
   return (
@@ -107,24 +106,23 @@ const IndexContent = () => {
             className="absolute inset-0 animate-parallax-slow"
             style={{
               background: `
-                radial-gradient(2px 2px at 20% 20%, rgba(255, 255, 255, 0.9) 100%, transparent),
-                radial-gradient(2px 2px at 40% 40%, rgba(255, 255, 255, 0.8) 100%, transparent),
-                radial-gradient(3px 3px at 60% 60%, rgba(255, 255, 255, 0.7) 100%, transparent)
+                radial-gradient(2px 2px at 20% 20%, rgba(255, 255, 255, 0.95) 100%, transparent),
+                radial-gradient(2px 2px at 40% 40%, rgba(255, 255, 255, 0.92) 100%, transparent),
+                radial-gradient(3px 3px at 60% 60%, rgba(255, 255, 255, 0.90) 100%, transparent)
               `,
               backgroundSize: "240px 240px",
-              opacity: 0.7 - scrollProgress * 0.5 // Fade out stars with scroll
+              opacity: 0.85 - scrollProgress * 0.5
             }}
           />
         </div>
 
         {/* Middle Layer */}
         <div className="fixed inset-0 z-1">
-          {/* Floating Firm Icons */}
           <div 
             className="absolute inset-0 overflow-hidden"
             style={{
-              opacity: Math.max(0, 1 - scrollProgress * 2), // Fade out icons faster
-              transform: `scale(${1 + scrollProgress * 0.3})` // Scale icons slightly
+              opacity: Math.max(0, 1 - scrollProgress * 2),
+              transform: `scale(${1 + scrollProgress * 0.3})`
             }}
           >
             {[...Array(6)].map((_, i) => (
@@ -135,11 +133,11 @@ const IndexContent = () => {
                   top: `${20 + i * 10}%`,
                   left: `${20 + i * 10}%`,
                   animationDelay: `${i * -3}s`,
-                  transform: `rotate(${i * 60}deg) translateX(${100 + scrollProgress * 50}px)`, // Icons move outward
+                  transform: `rotate(${i * 60}deg) translateX(${100 + scrollProgress * 50}px)`,
                 }}
               >
                 <Building2 
-                  className="w-8 h-8 text-purple-400/50" 
+                  className="w-8 h-8 text-indigo-400/70" 
                   style={{ transform: `rotate(-${i * 60}deg)` }}
                 />
               </div>
@@ -152,26 +150,26 @@ const IndexContent = () => {
           className="fixed inset-0 z-2 perspective-3000" 
           style={{
             ...parallaxStyle,
-            transform: `scale(${1 + scrollProgress * 1.5})`, // Increased scaling effect
+            transform: `scale(${1 + scrollProgress * 1.5})`,
           }}
         >
           <div className="absolute inset-0 flex items-center justify-center">
             <div 
               className="w-[800px] h-[800px] relative"
               style={{
-                transform: `translateZ(${scrollProgress * 200}px)` // Move closer to viewer
+                transform: `translateZ(${scrollProgress * 200}px)`
               }}
             >
               {/* Singularity Core */}
               <div 
-                className="absolute inset-0 rounded-full bg-black animate-singularity" 
+                className="absolute inset-0 rounded-full bg-[#120338] animate-singularity" 
                 style={{
                   boxShadow: `
-                    0 0 ${100 + scrollProgress * 100}px ${20 + scrollProgress * 30}px rgba(255, 69, 0, 0.4),
-                    0 0 ${200 + scrollProgress * 200}px ${40 + scrollProgress * 60}px rgba(255, 140, 0, 0.3),
-                    0 0 ${300 + scrollProgress * 300}px ${60 + scrollProgress * 90}px rgba(0, 0, 139, 0.2)
+                    0 0 ${100 + scrollProgress * 100}px ${20 + scrollProgress * 30}px rgba(147, 51, 234, 0.5),
+                    0 0 ${200 + scrollProgress * 200}px ${40 + scrollProgress * 60}px rgba(168, 85, 247, 0.4),
+                    0 0 ${300 + scrollProgress * 300}px ${60 + scrollProgress * 90}px rgba(192, 132, 252, 0.3)
                   `,
-                  transform: `scale(${1 + scrollProgress * 0.8})` // Core grows with scroll
+                  transform: `scale(${1 + scrollProgress * 0.8})`
                 }}
               />
               
@@ -181,13 +179,13 @@ const IndexContent = () => {
                 style={{
                   background: `
                     radial-gradient(circle at center,
-                      rgba(255, 69, 0, ${0.6 + scrollProgress * 0.4}) 0%,
-                      rgba(255, 140, 0, ${0.4 + scrollProgress * 0.3}) 30%,
-                      rgba(0, 0, 139, ${0.3 + scrollProgress * 0.2}) 60%,
+                      rgba(147, 51, 234, ${0.7 + scrollProgress * 0.3}) 0%,
+                      rgba(168, 85, 247, ${0.5 + scrollProgress * 0.3}) 30%,
+                      rgba(192, 132, 252, ${0.4 + scrollProgress * 0.2}) 60%,
                       transparent 80%
                     )
                   `,
-                  transform: `scale(${1 + scrollProgress * 1.2}) rotate(${scrollProgress * 180}deg)` // Disk grows and rotates
+                  transform: `scale(${1 + scrollProgress * 1.2}) rotate(${scrollProgress * 180}deg)`
                 }}
               />
               
@@ -197,12 +195,12 @@ const IndexContent = () => {
                 style={{
                   background: `
                     radial-gradient(circle at center,
-                      rgba(255, 255, 255, ${0.15 + scrollProgress * 0.15}) 0%,
+                      rgba(255, 255, 255, ${0.2 + scrollProgress * 0.2}) 0%,
                       transparent 70%
                     )
                   `,
-                  border: '2px solid rgba(255, 140, 0, 0.4)',
-                  transform: `scale(${1 + scrollProgress * 1.5})`, // Event horizon expands faster
+                  border: '2px solid rgba(168, 85, 247, 0.5)',
+                  transform: `scale(${1 + scrollProgress * 1.5})`,
                   animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                 }}
               />
@@ -215,28 +213,28 @@ const IndexContent = () => {
           className="relative z-3 mt-[30vh]" 
           style={{
             ...parallaxStyle,
-            transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * -50}px)` // Content scales down and moves up
+            transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * -50}px)`
           }}
         >
-          <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-orange-200 to-blue-400 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-indigo-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
             Own the future of<br />accounting
           </h1>
-          <p className="text-lg md:text-xl text-white max-w-3xl mx-auto mb-12 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
+          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
             LedgerFund is building a decentralized network of accounting firms owned and governed by accountants. 
             We're putting the future of the profession back in the hands of professionals.
           </p>
 
           <div className="mb-16">
-            <p className="text-sm uppercase tracking-wider text-orange-300 mb-6 font-semibold drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
+            <p className="text-sm uppercase tracking-wider text-purple-300 mb-6 font-semibold drop-shadow-[0_1px_1px_rgba(0,0,0,0.7)]">
               Explore applications powered by LedgerFund Protocol
             </p>
             
             <div className="flex flex-col md:flex-row gap-4 justify-center">
               <button 
                 onClick={() => navigate('/mint-nft')}
-                className="group relative px-8 py-3 bg-gradient-to-r from-orange-600 to-blue-400 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                className="group relative px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-600/70 to-blue-400/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/70 to-indigo-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
                 <div className="relative flex items-center justify-center gap-2 text-white font-medium">
                   <Trophy className="w-5 h-5" />
                   <span>Earn Rewards with Quests</span>
@@ -245,9 +243,9 @@ const IndexContent = () => {
               
               <button 
                 onClick={() => navigate('/token-presale')}
-                className="group relative px-8 py-3 bg-black/50 hover:bg-black/60 border border-orange-500/40 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                className="group relative px-8 py-3 bg-black/50 hover:bg-black/60 border border-purple-500/40 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-blue-300/20 blur-sm group-hover:blur-lg transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-indigo-400/20 blur-sm group-hover:blur-lg transition-all duration-300" />
                 <div className="relative flex items-center justify-center gap-2 text-white font-medium">
                   <UserCircle className="w-5 h-5" />
                   <span>Mint Your LedgerFren NFT</span>
@@ -278,7 +276,7 @@ const Index = () => {
         <div 
           className="absolute inset-0"
           style={{
-            background: "radial-gradient(circle at center, #1a0b2e 0%, #000000 100%)",
+            background: "radial-gradient(circle at center, #2D1B69 0%, #0F0628 100%)",
             opacity: 0.98
           }}
         />
