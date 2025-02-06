@@ -16,8 +16,8 @@ export const InvestmentReadiness = () => {
   useEffect(() => {
     const fetchContractData = async () => {
       try {
-        // Connect to Mumbai network
-        const provider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.maticvigil.com");
+        // Connect to Polygon Mainnet
+        const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
         const contract = getPresaleContract(provider);
         
         // Fetch contract data
