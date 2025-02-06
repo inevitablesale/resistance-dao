@@ -91,8 +91,8 @@ const IndexContent = () => {
 
   const parallaxStyle = {
     '--scroll-progress': scrollProgress,
-    transform: `scale(${1 + scrollProgress * 0.2})`,
-    opacity: 1 - scrollProgress * 0.3 // Reduced fade out rate
+    transform: `scale(${1 + scrollProgress * 0.5})`, // Increased scale effect
+    opacity: 1 - scrollProgress * 0.6  // Increased fade out rate
   } as React.CSSProperties;
 
   return (
@@ -112,7 +112,7 @@ const IndexContent = () => {
                 radial-gradient(3px 3px at 60% 60%, rgba(255, 255, 255, 0.7) 100%, transparent)
               `,
               backgroundSize: "240px 240px",
-              opacity: 0.7
+              opacity: 0.7 - scrollProgress * 0.5 // Fade out stars with scroll
             }}
           />
         </div>
@@ -120,7 +120,13 @@ const IndexContent = () => {
         {/* Middle Layer */}
         <div className="fixed inset-0 z-1">
           {/* Floating Firm Icons */}
-          <div className="absolute inset-0 overflow-hidden">
+          <div 
+            className="absolute inset-0 overflow-hidden"
+            style={{
+              opacity: Math.max(0, 1 - scrollProgress * 2), // Fade out icons faster
+              transform: `scale(${1 + scrollProgress * 0.3})` // Scale icons slightly
+            }}
+          >
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
@@ -129,7 +135,7 @@ const IndexContent = () => {
                   top: `${20 + i * 10}%`,
                   left: `${20 + i * 10}%`,
                   animationDelay: `${i * -3}s`,
-                  transform: `rotate(${i * 60}deg) translateX(100px)`,
+                  transform: `rotate(${i * 60}deg) translateX(${100 + scrollProgress * 50}px)`, // Icons move outward
                 }}
               >
                 <Building2 
@@ -142,18 +148,30 @@ const IndexContent = () => {
         </div>
 
         {/* Black Hole Effect Container */}
-        <div className="fixed inset-0 z-2 perspective-3000" style={parallaxStyle}>
+        <div 
+          className="fixed inset-0 z-2 perspective-3000" 
+          style={{
+            ...parallaxStyle,
+            transform: `scale(${1 + scrollProgress * 1.5})`, // Increased scaling effect
+          }}
+        >
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-[800px] h-[800px] relative">
+            <div 
+              className="w-[800px] h-[800px] relative"
+              style={{
+                transform: `translateZ(${scrollProgress * 200}px)` // Move closer to viewer
+              }}
+            >
               {/* Singularity Core */}
               <div 
                 className="absolute inset-0 rounded-full bg-black animate-singularity" 
                 style={{
                   boxShadow: `
-                    0 0 100px 20px rgba(255, 69, 0, 0.4),
-                    0 0 200px 40px rgba(255, 140, 0, 0.3),
-                    0 0 300px 60px rgba(0, 0, 139, 0.2)
-                  `
+                    0 0 ${100 + scrollProgress * 100}px ${20 + scrollProgress * 30}px rgba(255, 69, 0, 0.4),
+                    0 0 ${200 + scrollProgress * 200}px ${40 + scrollProgress * 60}px rgba(255, 140, 0, 0.3),
+                    0 0 ${300 + scrollProgress * 300}px ${60 + scrollProgress * 90}px rgba(0, 0, 139, 0.2)
+                  `,
+                  transform: `scale(${1 + scrollProgress * 0.8})` // Core grows with scroll
                 }}
               />
               
@@ -163,12 +181,13 @@ const IndexContent = () => {
                 style={{
                   background: `
                     radial-gradient(circle at center,
-                      rgba(255, 69, 0, 0.6) 0%,
-                      rgba(255, 140, 0, 0.4) 30%,
-                      rgba(0, 0, 139, 0.3) 60%,
+                      rgba(255, 69, 0, ${0.6 + scrollProgress * 0.4}) 0%,
+                      rgba(255, 140, 0, ${0.4 + scrollProgress * 0.3}) 30%,
+                      rgba(0, 0, 139, ${0.3 + scrollProgress * 0.2}) 60%,
                       transparent 80%
                     )
-                  `
+                  `,
+                  transform: `scale(${1 + scrollProgress * 1.2}) rotate(${scrollProgress * 180}deg)` // Disk grows and rotates
                 }}
               />
               
@@ -178,11 +197,12 @@ const IndexContent = () => {
                 style={{
                   background: `
                     radial-gradient(circle at center,
-                      rgba(255, 255, 255, 0.15) 0%,
+                      rgba(255, 255, 255, ${0.15 + scrollProgress * 0.15}) 0%,
                       transparent 70%
                     )
                   `,
                   border: '2px solid rgba(255, 140, 0, 0.4)',
+                  transform: `scale(${1 + scrollProgress * 1.5})`, // Event horizon expands faster
                   animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                 }}
               />
@@ -191,7 +211,13 @@ const IndexContent = () => {
         </div>
 
         {/* Content Layer */}
-        <div className="relative z-3 mt-[30vh]" style={parallaxStyle}>
+        <div 
+          className="relative z-3 mt-[30vh]" 
+          style={{
+            ...parallaxStyle,
+            transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * -50}px)` // Content scales down and moves up
+          }}
+        >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-orange-200 to-blue-400 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
             Own the future of<br />accounting
           </h1>
@@ -268,4 +294,3 @@ const Index = () => {
 };
 
 export default Index;
-
