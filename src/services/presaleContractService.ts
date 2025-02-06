@@ -31,7 +31,8 @@ export const fetchTotalLGRSold = async () => {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
     const contract = getPresaleContract(provider);
     const totalSold = await contract.totalLGRSold();
-    return ethers.utils.formatEther(totalSold);
+    const formattedTotal = ethers.utils.formatUnits(totalSold, 18);
+    return parseFloat(formattedTotal).toLocaleString();
   } catch (error) {
     console.error("Error fetching total LGR sold:", error);
     return "0";
@@ -43,10 +44,11 @@ export const fetchRemainingPresaleSupply = async () => {
   try {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
     const contract = getPresaleContract(provider);
+    const presaleSupply = await contract.PRESALE_SUPPLY();
     const totalSold = await contract.totalLGRSold();
-    const presaleSupply = ethers.utils.parseEther(TOTAL_PRESALE_SUPPLY.toString());
     const remaining = presaleSupply.sub(totalSold);
-    return ethers.utils.formatEther(remaining);
+    const formattedRemaining = ethers.utils.formatUnits(remaining, 18);
+    return parseFloat(formattedRemaining).toLocaleString();
   } catch (error) {
     console.error("Error fetching remaining presale supply:", error);
     return TOTAL_PRESALE_SUPPLY.toString();
@@ -59,7 +61,8 @@ export const fetchPresaleUSDPrice = async () => {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
     const contract = getPresaleContract(provider);
     const usdPrice = await contract.PRESALE_USD_PRICE();
-    return ethers.utils.formatUnits(usdPrice, 18);
+    const formattedPrice = ethers.utils.formatUnits(usdPrice, 18);
+    return parseFloat(formattedPrice).toFixed(2);
   } catch (error) {
     console.error("Error fetching USD price:", error);
     return USD_PRICE.toString();
@@ -72,7 +75,8 @@ export const fetchPresaleMaticPrice = async () => {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
     const contract = getPresaleContract(provider);
     const maticPrice = await contract.getLGRPrice();
-    return ethers.utils.formatEther(maticPrice);
+    const formattedPrice = ethers.utils.formatUnits(maticPrice, 18);
+    return parseFloat(formattedPrice).toFixed(4);
   } catch (error) {
     console.error("Error fetching MATIC price:", error);
     return "0";
