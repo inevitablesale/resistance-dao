@@ -69,11 +69,37 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <ShoppingBag className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Limited Edition Merch</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">MSP Proposals Open</h4>
                   <p className="text-gray-300">
-                    At $400K raised: Top 100 holders receive exclusive LedgerFund branded merchandise pack including premium apparel and accessories.
+                    At $250K raised: Proposals open for managed service providers, expanding our network's capabilities and reach.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="flex items-start gap-4">
+                <Trophy className="w-8 h-8 text-yellow-400 flex-shrink-0" />
+                <div>
+                  <h4 className="text-lg font-semibold text-white mb-2">First Acquisition Vote</h4>
+                  <p className="text-gray-300">
+                    At $300K raised: LedgerFren NFT holders invited to vote on first acquisition proposals, marking a key milestone in our growth strategy.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="flex items-start gap-4">
+                <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <div>
+                  <h4 className="text-lg font-semibold text-white mb-2">Target Search Begins</h4>
+                  <p className="text-gray-300">
+                    At $400K raised: Network begins active search for matching acquisition targets, expanding our decentralized accounting ecosystem.
                   </p>
                 </div>
               </div>
@@ -86,7 +112,7 @@ export const LedgerFrens = () => {
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">Launch Party Access</h4>
                   <p className="text-gray-300">
-                    At $500K raised: Random selection of 50 holders will be invited to our exclusive launch party, with travel expenses covered up to $1,000.
+                    At $500K raised: 5 random holders will be invited to our exclusive launch party, with travel expenses covered up to $1,000.
                   </p>
                 </div>
               </div>
@@ -95,20 +121,7 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">VIP Networking Events</h4>
-                  <p className="text-gray-300">
-                    At $750K raised: Top 25 holders gain access to quarterly VIP networking events with industry leaders and potential partners.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="flex items-start gap-4">
-                <Star className="w-8 h-8 text-yellow-400 flex-shrink-0" />
+                <Star className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">Legacy Circle Membership</h4>
                   <p className="text-gray-300">
@@ -123,3 +136,4 @@ export const LedgerFrens = () => {
     </section>
   );
 };
+
