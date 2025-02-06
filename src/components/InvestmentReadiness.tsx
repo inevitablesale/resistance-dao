@@ -1,19 +1,14 @@
-import { Shield, Vote, DollarSign, BarChart3, Loader2 } from "lucide-react";
+
+import { Shield, Vote, DollarSign, BarChart3, Trophy, Wallet } from "lucide-react";
 import { Card } from "./ui/card";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { 
-  fetchTotalLGRSold,
-  fetchRemainingPresaleSupply,
-  fetchPresaleUSDPrice,
-  fetchPresaleMaticPrice,
-  TOTAL_PRESALE_SUPPLY
-} from "@/services/presaleContractService";
+import { useState } from "react";
 import { ethers } from "ethers";
+import { TOTAL_PRESALE_SUPPLY } from "@/services/presaleContractService";
 
 export const InvestmentReadiness = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading] = useState(false);
   const [totalSold] = useState<string>("4999990"); // Fixed value as requested
   const [remainingSupply] = useState<string>("10"); // Fixed value as requested
   const [priceUSD] = useState<string>("0.1"); // Fixed value as requested
@@ -101,34 +96,29 @@ export const InvestmentReadiness = () => {
 
         <div className="bg-gradient-to-br from-yellow-500/5 via-teal-500/5 to-yellow-500/5 border border-yellow-500/20 rounded-lg p-8 backdrop-blur">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="grid md:grid-cols-4 gap-6 mb-8">
-              <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
-                <p className="text-3xl font-bold text-yellow-400 mb-2">
-                  {Number(totalSold).toLocaleString()}
-                </p>
-                <p className="text-sm text-gray-300">Tokens Sold</p>
+            <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-8">
+              Token Presale Progress
+            </h3>
+
+            <div className="grid grid-cols-4 gap-4 mb-8">
+              <div className="p-4 bg-black/30 rounded-lg backdrop-blur">
+                <p className="text-4xl font-bold text-white mb-1">83</p>
+                <p className="text-sm text-gray-400">DAYS</p>
               </div>
-              <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
-                <p className="text-3xl font-bold text-yellow-400 mb-2">
-                  {Number(remainingSupply).toLocaleString()}
-                </p>
-                <p className="text-sm text-gray-300">Remaining Supply</p>
+              <div className="p-4 bg-black/30 rounded-lg backdrop-blur">
+                <p className="text-4xl font-bold text-white mb-1">04</p>
+                <p className="text-sm text-gray-400">HOURS</p>
               </div>
-              <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-teal-500/20">
-                <p className="text-3xl font-bold text-teal-400 mb-2">
-                  {Number(priceMatic).toLocaleString(undefined, { maximumFractionDigits: 6 })} MATIC
-                </p>
-                <p className="text-sm text-gray-300">Price Per Token</p>
+              <div className="p-4 bg-black/30 rounded-lg backdrop-blur">
+                <p className="text-4xl font-bold text-white mb-1">47</p>
+                <p className="text-sm text-gray-400">MINUTES</p>
               </div>
-              <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
-                <p className="text-3xl font-bold text-yellow-400 mb-2">
-                  ${Number(priceUSD).toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                </p>
-                <p className="text-sm text-gray-300">USD Price</p>
+              <div className="p-4 bg-black/30 rounded-lg backdrop-blur">
+                <p className="text-4xl font-bold text-white mb-1">05</p>
+                <p className="text-sm text-gray-400">SECONDS</p>
               </div>
             </div>
 
-            {/* Progress bar */}
             <div className="mb-8">
               <div className="h-2 bg-black/30 rounded-full overflow-hidden">
                 <div 
@@ -136,17 +126,48 @@ export const InvestmentReadiness = () => {
                   style={{ width: `${percentageSold}%` }}
                 />
               </div>
+              <div className="flex justify-between items-center mt-2">
+                <p className="text-sm text-gray-400">
+                  {Number(totalSold).toLocaleString()} / {Number("5000000").toLocaleString()} LGR Tokens Sold
+                </p>
+                <p className="text-sm text-gray-400">
+                  {percentageSold.toFixed(2)}%
+                </p>
+              </div>
               <p className="text-sm text-gray-400 mt-2">
-                {percentageSold.toFixed(2)}% Sold
+                UNTIL PRICE INCREASE
               </p>
             </div>
             
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <button 
+                onClick={() => navigate('/token-presale')}
+                className="group relative px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-yellow-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                <div className="relative flex items-center justify-center gap-3 text-white font-medium">
+                  <Trophy className="w-5 h-5" />
+                  <span>Buy with Card</span>
+                </div>
+              </button>
+              
+              <button 
+                onClick={() => navigate('/token-presale')}
+                className="group relative px-8 py-4 bg-gradient-to-br from-teal-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-teal-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                <div className="relative flex items-center justify-center gap-3 text-white font-medium">
+                  <Wallet className="w-5 h-5" />
+                  <span>Buy with Crypto</span>
+                </div>
+              </button>
+            </div>
+
             <button 
-              onClick={() => navigate('/token-presale')}
-              className="group relative px-8 py-3 bg-gradient-to-r from-yellow-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+              onClick={() => navigate('/mint-nft')}
+              className="text-white/80 hover:text-white underline text-sm transition-colors"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
-              <span className="relative text-white font-medium">Join Token Presale</span>
+              New to crypto? Get started here
             </button>
           </div>
         </div>
