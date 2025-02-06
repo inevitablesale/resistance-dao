@@ -14,6 +14,6 @@ export const PRESALE_ABI = [
   "function PRESALE_USD_PRICE() public view returns (uint256)"
 ];
 
-export const getPresaleContract = (provider: ethers.providers.Web3Provider | ethers.Signer) => {
+export const getPresaleContract = (provider: ethers.providers.Provider | ethers.Signer) => {
   return new ethers.Contract(PRESALE_CONTRACT_ADDRESS, PRESALE_ABI, provider);
 };
