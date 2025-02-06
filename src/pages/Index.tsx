@@ -123,57 +123,75 @@ const IndexContent = () => {
                 }`}
                 style={{
                   boxShadow: `
-                    0 0 150px 30px rgba(138, 43, 226, 0.3),
-                    0 0 300px 60px rgba(138, 43, 226, 0.2),
-                    0 0 450px 90px rgba(138, 43, 226, 0.1)
+                    0 0 150px 30px rgba(255, 140, 0, 0.3),
+                    0 0 300px 60px rgba(255, 69, 0, 0.2),
+                    0 0 450px 90px rgba(255, 165, 0, 0.1)
                   `
                 }}
               />
               
-              {/* Event Horizon */}
-              <div 
-                className="absolute inset-0 rounded-full animate-pulse-slow"
+              {/* Light Beam */}
+              <div
+                className="absolute top-1/2 left-1/2 w-[400px] h-[800px] -translate-x-1/2 -translate-y-1/2 animate-light-beam"
                 style={{
                   background: `
-                    radial-gradient(
-                      circle at 50% 50%,
-                      rgba(139, 92, 246, 0.5) 0%,
-                      rgba(139, 92, 246, 0.2) 30%,
-                      transparent 70%
+                    linear-gradient(
+                      180deg,
+                      rgba(255, 255, 255, 0.8) 0%,
+                      rgba(255, 165, 0, 0.4) 50%,
+                      transparent 100%
                     )
-                  `
+                  `,
+                  transform: 'rotate(-45deg)'
                 }}
               />
               
-              {/* Accretion Disk with Dynamic Colors */}
+              {/* Accretion Disk */}
               <div 
-                className={`absolute inset-0 rounded-full animate-spin-slow transition-opacity duration-1000 ${
-                  blackHoleState === 'pe-dominance' ? 'opacity-100' :
-                  blackHoleState === 'transformation' ? 'opacity-70' :
-                  'opacity-40'
-                }`}
+                className="absolute inset-0 rounded-full animate-accretion-spin"
                 style={{
                   background: `
                     conic-gradient(
-                      from ${scrollPos}deg,
-                      rgba(147, 51, 234, 0.8) 0%,
-                      rgba(138, 43, 226, 0.5) 25%,
-                      rgba(123, 31, 162, 0.3) 50%,
-                      rgba(147, 51, 234, 0.8) 75%,
-                      rgba(138, 43, 226, 0.5) 100%
+                      from 0deg,
+                      rgba(255, 69, 0, 0.8) 0%,
+                      rgba(255, 140, 0, 0.6) 25%,
+                      rgba(255, 165, 0, 0.4) 50%,
+                      rgba(255, 69, 0, 0.8) 75%,
+                      rgba(255, 140, 0, 0.6) 100%
                     )
                   `,
-                  animation: 'spin 20s linear infinite'
+                  clipPath: 'ellipse(40% 15% at 50% 50%)',
+                  transform: 'rotate(-15deg)'
                 }}
               />
               
+              {/* Matter Streams */}
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute inset-0 animate-matter-stream"
+                  style={{
+                    background: `
+                      radial-gradient(
+                        ellipse at center,
+                        rgba(255, 140, 0, 0.6) 0%,
+                        rgba(255, 69, 0, 0.4) 50%,
+                        transparent 100%
+                      )
+                    `,
+                    transform: `rotate(${i * 45}deg)`,
+                    animationDelay: `${i * 0.5}s`
+                  }}
+                />
+              ))}
+
               {/* PE Takeover Text Fragments */}
               {blackHoleState === 'pe-dominance' && (
                 <>
                   {['Layoffs', 'Short-Term Profits', 'Lost Trust'].map((text, index) => (
                     <div
                       key={text}
-                      className="absolute text-red-400/80 font-medium animate-spiral-in"
+                      className="absolute text-orange-400/80 font-medium animate-spiral-in"
                       style={{
                         left: '50%',
                         top: '50%',
@@ -187,38 +205,25 @@ const IndexContent = () => {
                 </>
               )}
               
-              {/* Decentralized Network Lines - Appears during transformation */}
-              {blackHoleState !== 'pe-dominance' && (
-                <div className="absolute inset-0">
-                  {[...Array(8)].map((_, i) => (
+              {/* Firm Icons being pulled in */}
+              {blackHoleState === 'pe-dominance' && (
+                <>
+                  {['🏢', '🏦', '📊'].map((icon, index) => (
                     <div
-                      key={i}
-                      className="absolute w-full h-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/50 to-purple-500/0 origin-center"
+                      key={icon}
+                      className="absolute text-2xl animate-matter-stream"
                       style={{
-                        transform: `rotate(${i * 45}deg)`,
-                        opacity: blackHoleState === 'ledgerfund-future' ? 0.8 : 0.4
+                        left: '50%',
+                        top: '50%',
+                        transform: `rotate(${index * 120}deg) translateX(${300 + scrollPos * 0.2}px)`,
+                        animationDelay: `${index * 1.5}s`
                       }}
-                    />
+                    >
+                      {icon}
+                    </div>
                   ))}
-                </div>
+                </>
               )}
-              
-              {/* Glowing Particles */}
-              <div className="absolute inset-0">
-                {[...Array(30)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute w-1 h-1 bg-purple-300 rounded-full animate-particle-drift"
-                    style={{
-                      top: `${Math.random() * 100}%`,
-                      left: `${Math.random() * 100}%`,
-                      opacity: Math.random() * 0.7 + 0.3,
-                      animationDelay: `${Math.random() * 5}s`,
-                      animationDuration: `${15 + Math.random() * 10}s`
-                    }}
-                  />
-                ))}
-              </div>
             </div>
           </div>
         </div>
@@ -229,7 +234,7 @@ const IndexContent = () => {
           style={{
             background: `
               radial-gradient(1px 1px at ${20 + scrollPos * 0.05}% ${20 + scrollPos * 0.02}%, rgba(255, 255, 255, 0.3) 100%, transparent),
-              radial-gradient(2px 2px at ${40 + scrollPos * 0.08}% ${40 + scrollPos * 0.04}%, rgba(139, 92, 246, 0.4) 100%, transparent),
+              radial-gradient(2px 2px at ${40 + scrollPos * 0.08}% ${40 + scrollPos * 0.04}%, rgba(255, 165, 0, 0.2) 100%, transparent),
               radial-gradient(2.5px 2.5px at ${60 + scrollPos * 0.12}% ${60 + scrollPos * 0.06}%, rgba(255, 255, 255, 0.2) 100%, transparent)
             `,
             backgroundSize: '200% 200%',
