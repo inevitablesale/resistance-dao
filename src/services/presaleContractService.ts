@@ -24,3 +24,16 @@ export const USD_PRICE = 0.1; // $0.10 per token
 export const getPresaleContract = (provider: ethers.providers.Provider | ethers.Signer) => {
   return new ethers.Contract(PRESALE_CONTRACT_ADDRESS, PRESALE_ABI, provider);
 };
+
+// New function to fetch total LGR sold
+export const fetchTotalLGRSold = async () => {
+  try {
+    const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+    const contract = getPresaleContract(provider);
+    const totalSold = await contract.totalLGRSold();
+    return ethers.utils.formatEther(totalSold);
+  } catch (error) {
+    console.error("Error fetching total LGR sold:", error);
+    throw error;
+  }
+};

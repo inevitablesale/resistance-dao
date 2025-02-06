@@ -54,6 +54,14 @@ const Nav = () => {
             <a href="#roadmap" className="text-white/80 hover:text-white transition-colors">
               Roadmap
             </a>
+            <a 
+              href="https://docs.ledgerfund.finance" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-white/80 hover:text-white transition-colors"
+            >
+              Whitepaper
+            </a>
           </div>
 
           <button 
@@ -69,4 +77,3 @@ const Nav = () => {
 };
 
 export default Nav;
-
