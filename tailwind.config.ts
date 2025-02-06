@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -82,8 +83,6 @@ export default {
         "parallax-medium": "parallax-scroll 10s linear infinite",
         "parallax-fast": "parallax-scroll 5s linear infinite",
         "orbit": "orbit 20s linear infinite",
-        "float": "float 10s ease-in-out infinite",
-        "twinkle": "twinkle 3s ease-in-out infinite",
       },
       keyframes: {
         "accordion-down": {
@@ -130,25 +129,7 @@ export default {
         "orbit": {
           "0%": { transform: "rotate(0deg) translateX(100px) rotate(0deg)" },
           "100%": { transform: "rotate(360deg) translateX(100px) rotate(-360deg)" }
-        },
-        float: {
-          "0%, 100%": { 
-            transform: "translateY(0) rotate(0deg)",
-          },
-          "50%": { 
-            transform: "translateY(20px) rotate(5deg)",
-          }
-        },
-        twinkle: {
-          "0%, 100%": { 
-            opacity: "0.3",
-            transform: "scale(0.8)",
-          },
-          "50%": { 
-            opacity: "0.8",
-            transform: "scale(1)",
-          }
-        },
+        }
       }
     },
   },

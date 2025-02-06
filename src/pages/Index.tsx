@@ -16,7 +16,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { checkNFTOwnership } from "@/services/contractService";
-import { Trophy, UserCircle, Building2, Star } from "lucide-react";
+import { Trophy, UserCircle, Building2, FileText } from "lucide-react";
 
 const IndexContent = () => {
   const navigate = useNavigate();
@@ -101,23 +101,18 @@ const IndexContent = () => {
         ref={heroRef} 
         className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 min-h-[120vh] flex flex-col items-center justify-start"
       >
-        {/* Background Layer with Stars */}
+        {/* Background Layer (Slowest) */}
         <div className="fixed inset-0 z-0">
           <div 
-            className="absolute inset-0"
+            className="absolute inset-0 animate-parallax-slow"
             style={{
               background: `
-                radial-gradient(1px 1px at 40px 60px, #D6BCFA 100%, transparent),
-                radial-gradient(1px 1px at 20% 50%, #9b87f5 100%, transparent),
-                radial-gradient(1.5px 1.5px at 30% 40%, #7E69AB 100%, transparent),
-                radial-gradient(1.2px 1.2px at 50% 60%, #8B5CF6 100%, transparent),
-                radial-gradient(1px 1px at 60% 50%, #D6BCFA 100%, transparent),
-                radial-gradient(1.5px 1.5px at 70% 30%, #9b87f5 100%, transparent),
-                radial-gradient(2px 2px at 80% 40%, #7E69AB 100%, transparent),
-                radial-gradient(1.2px 1.2px at 90% 60%, #8B5CF6 100%, transparent)
+                radial-gradient(2px 2px at 20% 20%, rgba(255, 255, 255, 0.95) 100%, transparent),
+                radial-gradient(2px 2px at 40% 40%, rgba(255, 255, 255, 0.92) 100%, transparent),
+                radial-gradient(3px 3px at 60% 60%, rgba(255, 255, 255, 0.90) 100%, transparent)
               `,
-              backgroundSize: "550px 550px",
-              opacity: 0.6
+              backgroundSize: "240px 240px",
+              opacity: 0.85 - scrollProgress * 0.3
             }}
           />
         </div>
@@ -127,33 +122,31 @@ const IndexContent = () => {
           <div 
             className="absolute inset-0 overflow-hidden"
             style={{
-              opacity: Math.max(0, 1 - scrollProgress * 1.5)
+              opacity: Math.max(0, 1 - scrollProgress * 1.5),
+              transform: `scale(${1 + scrollProgress * 0.3})`
             }}
           >
-            {[...Array(15)].map((_, i) => (
+            {[...Array(12)].map((_, i) => (
               <div
                 key={i}
-                className="absolute animate-float"
+                className="absolute animate-orbit"
                 style={{
-                  left: "50%",
-                  top: `${-20 + (i * 10)}%`,
-                  transform: `translateX(-50%) translateY(${scrollProgress * 100}vh) rotate(${i * 15}deg)`,
-                  transition: "transform 0.3s ease-out",
-                  animation: `float-${i} ${10 + i}s infinite`
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  animationDelay: `${i * -2}s`,
+                  transform: `rotate(${i * 30}deg) translateX(${150 + scrollProgress * 100}px)`,
                 }}
               >
                 <Building2 
-                  className="w-8 h-8 text-purple-400/90 drop-shadow-[0_0_8px_rgba(139,92,246,0.5)]" 
-                  style={{
-                    transform: `rotate(${-i * 15}deg)`,
-                  }}
+                  className="w-8 h-8 text-purple-400/90" 
+                  style={{ transform: `rotate(-${i * 30}deg)` }}
                 />
               </div>
             ))}
           </div>
         </div>
 
-        {/* Black Hole Effect */}
+        {/* Black Hole Effect Container */}
         <div 
           className="fixed inset-0 z-2 perspective-3000" 
           style={{
@@ -264,23 +257,7 @@ const IndexContent = () => {
         </div>
       </div>
 
-      <div className="relative z-10 bg-black/95 backdrop-blur-sm">
-        {/* Section Background with Stars */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(50)].map((_, i) => (
-            <Star
-              key={i}
-              className="absolute text-purple-200/30"
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                transform: `scale(${0.5 + Math.random() * 0.5})`,
-                animation: `twinkle ${2 + Math.random() * 4}s ease-in-out infinite ${Math.random() * 2}s`
-              }}
-            />
-          ))}
-        </div>
-        
+      <div className="relative z-10 bg-black/80 backdrop-blur-sm">
         <InvestmentReadiness />
         <WhatWeBuilding />
         <PrivateEquityImpact />
