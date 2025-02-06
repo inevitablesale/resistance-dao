@@ -1,3 +1,4 @@
+
 import { DynamicWidget, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
@@ -138,9 +139,13 @@ const TokenPresaleContent = () => {
       <div className="max-w-2xl mx-auto">
         <div className="glass-card p-8 rounded-2xl backdrop-blur-lg bg-white/5 border border-white/10">
           <div className="flex justify-center mb-8">
-            <button className="w-full py-3 px-4 rounded-lg bg-[#8247E5] hover:bg-[#6f3cc7] text-white font-medium transition-colors">
-              <DynamicWidget />
-            </button>
+            <DynamicWidget
+              innerButtonComponent={
+                <button className="w-full py-3 px-4 rounded-lg bg-[#8247E5] hover:bg-[#6f3cc7] text-white font-medium transition-colors">
+                  Connect Wallet
+                </button>
+              }
+            />
           </div>
           
           <div className="space-y-8 text-white">

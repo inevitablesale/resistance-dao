@@ -22,28 +22,6 @@ const IndexContent = () => {
   const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
   const [isChecking, setIsChecking] = useState(false);
-  const [scrollPos, setScrollPos] = useState(0);
-  const [blackHoleState, setBlackHoleState] = useState('pe-dominance'); // 'pe-dominance' | 'transformation' | 'ledgerfund-future'
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const position = window.scrollY;
-      setScrollPos(position);
-      
-      // Update black hole state based on scroll position
-      const windowHeight = window.innerHeight;
-      if (position < windowHeight * 0.3) {
-        setBlackHoleState('pe-dominance');
-      } else if (position < windowHeight * 0.6) {
-        setBlackHoleState('transformation');
-      } else {
-        setBlackHoleState('ledgerfund-future');
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     const checkWalletStatus = async () => {
@@ -97,161 +75,16 @@ const IndexContent = () => {
 
   return (
     <>
-      <div className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 overflow-hidden min-h-[100vh]">
-        {/* Enhanced Black Hole Container */}
-        <div className="absolute inset-0 z-0 perspective-3000">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div 
-              className={`w-[1200px] h-[1200px] relative transition-all duration-1000 ease-out ${
-                blackHoleState === 'pe-dominance' ? 'scale-75' : 
-                blackHoleState === 'transformation' ? 'scale-90' : 
-                'scale-100'
-              }`}
-              style={{
-                transform: `
-                  translateY(${Math.min(scrollPos * 0.15, 150)}px) 
-                  scale(${1 + scrollPos * 0.0005})
-                `
-              }}
-            >
-              {/* Black Hole Core */}
-              <div 
-                className={`absolute inset-0 rounded-full transition-all duration-1000 ${
-                  blackHoleState === 'pe-dominance' ? 'bg-black scale-100' :
-                  blackHoleState === 'transformation' ? 'bg-purple-900/90 scale-90' :
-                  'bg-purple-800/80 scale-75'
-                }`}
-                style={{
-                  boxShadow: `
-                    0 0 150px 30px rgba(255, 140, 0, 0.3),
-                    0 0 300px 60px rgba(255, 69, 0, 0.2),
-                    0 0 450px 90px rgba(255, 165, 0, 0.1)
-                  `
-                }}
-              />
-              
-              {/* Light Beam */}
-              <div
-                className="absolute top-1/2 left-1/2 w-[400px] h-[800px] -translate-x-1/2 -translate-y-1/2 animate-light-beam"
-                style={{
-                  background: `
-                    linear-gradient(
-                      180deg,
-                      rgba(255, 255, 255, 0.8) 0%,
-                      rgba(255, 165, 0, 0.4) 50%,
-                      transparent 100%
-                    )
-                  `,
-                  transform: 'rotate(-45deg)'
-                }}
-              />
-              
-              {/* Accretion Disk */}
-              <div 
-                className="absolute inset-0 rounded-full animate-accretion-spin"
-                style={{
-                  background: `
-                    conic-gradient(
-                      from 0deg,
-                      rgba(255, 69, 0, 0.8) 0%,
-                      rgba(255, 140, 0, 0.6) 25%,
-                      rgba(255, 165, 0, 0.4) 50%,
-                      rgba(255, 69, 0, 0.8) 75%,
-                      rgba(255, 140, 0, 0.6) 100%
-                    )
-                  `,
-                  clipPath: 'ellipse(40% 15% at 50% 50%)',
-                  transform: 'rotate(-15deg)'
-                }}
-              />
-              
-              {/* Matter Streams */}
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute inset-0 animate-matter-stream"
-                  style={{
-                    background: `
-                      radial-gradient(
-                        ellipse at center,
-                        rgba(255, 140, 0, 0.6) 0%,
-                        rgba(255, 69, 0, 0.4) 50%,
-                        transparent 100%
-                      )
-                    `,
-                    transform: `rotate(${i * 45}deg)`,
-                    animationDelay: `${i * 0.5}s`
-                  }}
-                />
-              ))}
-
-              {/* PE Takeover Text Fragments */}
-              {blackHoleState === 'pe-dominance' && (
-                <>
-                  {['Layoffs', 'Short-Term Profits', 'Lost Trust'].map((text, index) => (
-                    <div
-                      key={text}
-                      className="absolute text-orange-400/80 font-medium animate-spiral-in"
-                      style={{
-                        left: '50%',
-                        top: '50%',
-                        transform: `rotate(${index * 120}deg) translateX(${200 + scrollPos * 0.1}px)`,
-                        animation: `spiral-in 10s infinite ${index * 2}s`
-                      }}
-                    >
-                      {text}
-                    </div>
-                  ))}
-                </>
-              )}
-              
-              {/* Firm Icons being pulled in */}
-              {blackHoleState === 'pe-dominance' && (
-                <>
-                  {['🏢', '🏦', '📊'].map((icon, index) => (
-                    <div
-                      key={icon}
-                      className="absolute text-2xl animate-matter-stream"
-                      style={{
-                        left: '50%',
-                        top: '50%',
-                        transform: `rotate(${index * 120}deg) translateX(${300 + scrollPos * 0.2}px)`,
-                        animationDelay: `${index * 1.5}s`
-                      }}
-                    >
-                      {icon}
-                    </div>
-                  ))}
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Star Field Background with Parallax */}
-        <div 
-          className="absolute inset-0 opacity-90"
-          style={{
-            background: `
-              radial-gradient(1px 1px at ${20 + scrollPos * 0.05}% ${20 + scrollPos * 0.02}%, rgba(255, 255, 255, 0.3) 100%, transparent),
-              radial-gradient(2px 2px at ${40 + scrollPos * 0.08}% ${40 + scrollPos * 0.04}%, rgba(255, 165, 0, 0.2) 100%, transparent),
-              radial-gradient(2.5px 2.5px at ${60 + scrollPos * 0.12}% ${60 + scrollPos * 0.06}%, rgba(255, 255, 255, 0.2) 100%, transparent)
-            `,
-            backgroundSize: '200% 200%',
-            transform: `translateZ(${scrollPos * 0.2}px)`
-          }}
-        />
-
-        {/* Content */}
-        <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 animate-gradient relative z-10">
+      <div className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10">
+        <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 animate-gradient">
           Own the future of<br />accounting
         </h1>
-        <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12 relative z-10">
+        <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
           LedgerFund is building a decentralized network of accounting firms owned and governed by accountants. 
           We're putting the future of the profession back in the hands of professionals.
         </p>
 
-        <div className="mb-16 relative z-10">
+        <div className="mb-16">
           <p className="text-sm uppercase tracking-wider text-purple-300 mb-6">
             Explore applications powered by LedgerFund Protocol
           </p>
@@ -280,9 +113,25 @@ const IndexContent = () => {
             </button>
           </div>
         </div>
+
+        {/* Animated Wave Effect */}
+        <div className="absolute bottom-0 left-0 right-0 h-64 z-0">
+          <div className="absolute inset-0 bg-gradient-to-t from-purple-600/20 to-transparent animate-wave" 
+               style={{
+                 maskImage: "linear-gradient(to bottom, transparent, black)",
+                 WebkitMaskImage: "linear-gradient(to bottom, transparent, black)"
+               }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-purple-400/20 to-transparent animate-wave-slow" 
+               style={{
+                 maskImage: "linear-gradient(to bottom, transparent, black)",
+                 WebkitMaskImage: "linear-gradient(to bottom, transparent, black)",
+                 animationDelay: "-2s"
+               }}
+          />
+        </div>
       </div>
 
-      {/* Other sections */}
       <InvestmentReadiness />
       <WhatWeBuilding />
       <PrivateEquityImpact />
@@ -309,16 +158,22 @@ const Index = () => {
           }}
         />
         
+        {/* Animated Glow Effects */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(circle at 30% 70%, rgba(147, 51, 234, 0.15) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(139, 92, 246, 0.1) 0%, transparent 45%)",
+            animation: "quantumField 30s ease-in-out infinite"
+          }}
+        />
+        
         {/* Star Field Effect */}
         <div 
           className="absolute inset-0 opacity-90"
           style={{
-            backgroundImage: `
-              radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.8) 100%, transparent),
-              radial-gradient(1.5px 1.5px at 20% 20%, rgba(139, 92, 246, 0.7) 100%, transparent)
-            `,
+            backgroundImage: "radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.8) 100%, transparent), radial-gradient(1.5px 1.5px at 20% 20%, rgba(139, 92, 246, 0.7) 100%, transparent)",
             backgroundSize: "400% 400%",
-            animation: "star-field 240s ease-in-out infinite"
+            animation: "temporalWake 240s ease-in-out infinite"
           }}
         />
       </div>
@@ -329,28 +184,41 @@ const Index = () => {
         <IndexContent />
       </div>
 
-      <style>
-        {`
-          @keyframes singularity {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.1) rotate(180deg); }
+      <style jsx>{`
+        @keyframes wave {
+          0%, 100% {
+            transform: translateY(0) scale(1.5);
           }
-          
-          @keyframes cosmic-pulse {
-            0%, 100% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
+          50% {
+            transform: translateY(-20px) scale(1.3);
           }
-          
-          @keyframes star-field {
-            0% { transform: translateZ(0) rotate(0deg); }
-            100% { transform: translateZ(400px) rotate(360deg); }
+        }
+        
+        @keyframes gradient {
+          0% {
+            background-position: 0% 50%;
           }
-          
-          .perspective-3000 {
-            perspective: 3000px;
+          50% {
+            background-position: 100% 50%;
           }
-        `}
-      </style>
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+        
+        .animate-wave {
+          animation: wave 8s ease-in-out infinite;
+        }
+        
+        .animate-wave-slow {
+          animation: wave 12s ease-in-out infinite;
+        }
+        
+        .animate-gradient {
+          animation: gradient 8s ease infinite;
+          background-size: 200% 200%;
+        }
+      `}</style>
     </div>
   );
 };
