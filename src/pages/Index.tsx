@@ -28,6 +28,7 @@ const IndexContent = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+  const presaleRef = useRef<HTMLDivElement>(null);
   const loadTime = Date.now();
 
   // Add states for presale data
@@ -51,11 +52,14 @@ const IndexContent = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!heroRef.current) return;
+      if (!heroRef.current || !presaleRef.current) return;
       
-      const rect = heroRef.current.getBoundingClientRect();
-      // Changed from 1 to 0.7 to start expansion earlier
-      const scrollPercentage = Math.max(0, Math.min(1, 0.7 - (rect.bottom / window.innerHeight)));
+      const presaleRect = presaleRef.current.getBoundingClientRect();
+      const heroRect = heroRef.current.getBoundingClientRect();
+      
+      // Start expanding when presale section enters viewport
+      const presaleVisibility = 1 - (presaleRect.top / window.innerHeight);
+      const scrollPercentage = Math.max(0, Math.min(1, presaleVisibility));
       setScrollProgress(scrollPercentage);
     };
 
@@ -352,6 +356,7 @@ const IndexContent = () => {
 
         {/* Content Layer with presale information moved from InvestmentReadiness */}
         <div 
+          ref={presaleRef}
           className="relative z-3 mt-[30vh]" 
           style={{
             ...parallaxStyle,
