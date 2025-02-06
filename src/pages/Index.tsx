@@ -24,7 +24,13 @@ const IndexContent = () => {
   const { toast } = useToast();
   const [isChecking, setIsChecking] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Set loaded state after a small delay to trigger initial animations
+    setTimeout(() => setIsLoaded(true), 100);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -124,30 +130,35 @@ const IndexContent = () => {
               opacity: Math.max(0, 1 - scrollProgress * 1.5),
             }}
           >
-            {[...Array(12)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute"
-                style={{
-                  top: `${Math.random() * 100}%`,
-                  left: `${Math.random() * 100}%`,
-                  transition: 'all 0.5s ease-out',
-                  transform: scrollProgress > 0 
-                    ? `translate(${(50 - (Math.random() * 100)) * scrollProgress}%, ${(50 - (Math.random() * 100)) * scrollProgress}%) scale(${1 - scrollProgress * 0.5})`
-                    : `rotate(${i * 30}deg) translateX(${150}px)`,
-                }}
-              >
-                <Building2 
-                  className="w-8 h-8 text-teal-300/90" 
-                  style={{ 
+            {[...Array(12)].map((_, i) => {
+              const angle = (i * 30) + (isLoaded ? 360 : 0);
+              const radius = 150 - (scrollProgress * 150);
+              const speed = 1 + (i % 3) * 0.5;
+              const direction = i % 2 === 0 ? 1 : -1;
+              
+              return (
+                <div
+                  key={i}
+                  className="absolute"
+                  style={{
+                    top: '50%',
+                    left: '50%',
+                    transition: 'all 0.5s ease-out',
                     transform: scrollProgress > 0 
-                      ? `rotate(${360 * scrollProgress}deg)` 
-                      : `rotate(-${i * 30}deg)`,
-                    transition: 'transform 0.5s ease-out'
+                      ? `translate(-50%, -50%) rotate(${angle * direction + (scrollProgress * 720)}deg) translateX(${radius}px)`
+                      : `translate(-50%, -50%) rotate(${angle * direction}deg) translateX(${150 + Math.sin(Date.now() / (1000 * speed)) * 20}px)`,
                   }}
-                />
-              </div>
-            ))}
+                >
+                  <Building2 
+                    className={`w-8 h-8 text-teal-300/90 transition-all duration-500`}
+                    style={{ 
+                      transform: `rotate(${-angle * direction}deg) scale(${1 - scrollProgress * 0.5})`,
+                      opacity: Math.max(0, 1 - scrollProgress * 2)
+                    }}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -163,12 +174,13 @@ const IndexContent = () => {
             <div 
               className="w-[800px] h-[800px] relative"
               style={{
-                transform: `translateZ(${scrollProgress * 200}px)`
+                transform: `translateZ(${scrollProgress * 200}px)`,
+                transition: 'transform 0.5s ease-out'
               }}
             >
               {/* Core */}
               <div 
-                className="absolute inset-0 rounded-full bg-black animate-singularity" 
+                className={`absolute inset-0 rounded-full bg-black transition-all duration-1000 ${isLoaded ? 'scale-100' : 'scale-0'}`}
                 style={{
                   boxShadow: `
                     0 0 ${100 + scrollProgress * 200}px ${20 + scrollProgress * 40}px rgba(234, 179, 8, 0.4),
@@ -176,13 +188,12 @@ const IndexContent = () => {
                     0 0 ${300 + scrollProgress * 600}px ${60 + scrollProgress * 120}px rgba(234, 179, 8, 0.2)
                   `,
                   transform: `scale(${0.2 + scrollProgress * 1.8})`,
-                  transition: 'transform 0.3s ease-out'
                 }}
               />
               
               {/* Energy Field */}
               <div 
-                className="absolute inset-0 rounded-full animate-cosmic-pulse"
+                className={`absolute inset-0 rounded-full animate-cosmic-pulse transition-all duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
                 style={{
                   background: `
                     radial-gradient(circle at center,
@@ -194,13 +205,12 @@ const IndexContent = () => {
                     )
                   `,
                   transform: `scale(${0.5 + scrollProgress * 1.5}) rotate(${scrollProgress * 360}deg)`,
-                  transition: 'transform 0.3s ease-out'
                 }}
               />
               
               {/* Outer Ring */}
               <div 
-                className="absolute inset-0 rounded-full"
+                className={`absolute inset-0 rounded-full transition-all duration-1000 ${isLoaded ? 'scale-100' : 'scale-0'}`}
                 style={{
                   background: `
                     radial-gradient(circle at center,
@@ -213,7 +223,6 @@ const IndexContent = () => {
                   `,
                   border: '2px solid rgba(234, 179, 8, 0.5)',
                   transform: `scale(${0.8 + scrollProgress * 1.7})`,
-                  transition: 'transform 0.3s ease-out'
                 }}
               />
             </div>
@@ -306,3 +315,4 @@ const Index = () => {
 };
 
 export default Index;
+
