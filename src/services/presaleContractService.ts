@@ -25,7 +25,7 @@ export const getPresaleContract = (provider: ethers.providers.Provider | ethers.
   return new ethers.Contract(PRESALE_CONTRACT_ADDRESS, PRESALE_ABI, provider);
 };
 
-// New function to fetch total LGR sold
+// Function to fetch total LGR sold
 export const fetchTotalLGRSold = async () => {
   try {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
@@ -37,3 +37,45 @@ export const fetchTotalLGRSold = async () => {
     throw error;
   }
 };
+
+// Function to fetch remaining presale supply
+export const fetchRemainingPresaleSupply = async () => {
+  try {
+    const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+    const contract = getPresaleContract(provider);
+    const totalSold = await contract.totalLGRSold();
+    const presaleSupply = await contract.PRESALE_SUPPLY();
+    const remaining = presaleSupply.sub(totalSold);
+    return ethers.utils.formatEther(remaining);
+  } catch (error) {
+    console.error("Error fetching remaining presale supply:", error);
+    throw error;
+  }
+};
+
+// Function to fetch presale price in USD
+export const fetchPresaleUSDPrice = async () => {
+  try {
+    const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+    const contract = getPresaleContract(provider);
+    const usdPrice = await contract.PRESALE_USD_PRICE();
+    return ethers.utils.formatEther(usdPrice);
+  } catch (error) {
+    console.error("Error fetching USD price:", error);
+    throw error;
+  }
+};
+
+// Function to fetch latest MATIC price and convert presale price to MATIC
+export const fetchPresaleMaticPrice = async () => {
+  try {
+    const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+    const contract = getPresaleContract(provider);
+    const maticPrice = await contract.getLGRPrice();
+    return ethers.utils.formatEther(maticPrice);
+  } catch (error) {
+    console.error("Error fetching MATIC price:", error);
+    throw error;
+  }
+};
+

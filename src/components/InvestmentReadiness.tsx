@@ -4,31 +4,33 @@ import { Card } from "./ui/card";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import { getPresaleContract } from "@/services/presaleContractService";
+import { 
+  getPresaleContract, 
+  fetchTotalLGRSold,
+  fetchRemainingPresaleSupply,
+  fetchPresaleUSDPrice,
+  fetchPresaleMaticPrice
+} from "@/services/presaleContractService";
 
 export const InvestmentReadiness = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [presaleSupply, setPresaleSupply] = useState<string>("0");
+  const [remainingSupply, setRemainingSupply] = useState<string>("0");
   const [priceUSD, setPriceUSD] = useState<string>("0");
   const [priceMatic, setPriceMatic] = useState<string>("0");
 
   useEffect(() => {
     const fetchContractData = async () => {
       try {
-        // Connect to Polygon Mainnet
-        const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
-        const contract = getPresaleContract(provider);
+        // Fetch all contract data
+        const remaining = await fetchRemainingPresaleSupply();
+        const usdPrice = await fetchPresaleUSDPrice();
+        const maticPrice = await fetchPresaleMaticPrice();
         
-        // Fetch contract data
-        const supply = await contract.PRESALE_SUPPLY();
-        const usdPrice = await contract.PRESALE_USD_PRICE();
-        const maticPrice = await contract.getLGRPrice();
-        
-        // Format values
-        setPresaleSupply(ethers.utils.formatEther(supply));
-        setPriceUSD(ethers.utils.formatEther(usdPrice));
-        setPriceMatic(ethers.utils.formatEther(maticPrice));
+        // Update state with fetched values
+        setRemainingSupply(remaining);
+        setPriceUSD(usdPrice);
+        setPriceMatic(maticPrice);
       } catch (error) {
         console.error("Error fetching contract data:", error);
       } finally {
@@ -37,6 +39,11 @@ export const InvestmentReadiness = () => {
     };
 
     fetchContractData();
+
+    // Refresh data every 30 seconds
+    const interval = setInterval(fetchContractData, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -115,12 +122,6 @@ export const InvestmentReadiness = () => {
 
         <div className="bg-gradient-to-br from-yellow-500/5 via-teal-500/5 to-yellow-500/5 border border-yellow-500/20 rounded-lg p-8 backdrop-blur">
           <div className="max-w-3xl mx-auto text-center">
-            <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-4">LGR Token Presale</h3>
-            <p className="text-lg text-gray-300 mb-6">
-              Join the future of accounting with LGR tokens. Purchase during presale with MATIC 
-              and gain early access to governance rights. After launch, complete KYC/AML to invest 
-              in accounting firm acquisitions and operations.
-            </p>
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="p-4 bg-black/30 rounded-lg backdrop-blur border border-yellow-500/20">
                 {isLoading ? (
@@ -130,9 +131,9 @@ export const InvestmentReadiness = () => {
                 ) : (
                   <>
                     <p className="text-3xl font-bold text-yellow-400 mb-2">
-                      {parseFloat(presaleSupply).toLocaleString()}
+                      {parseFloat(remainingSupply).toLocaleString()}
                     </p>
-                    <p className="text-sm text-gray-300">Presale Supply</p>
+                    <p className="text-sm text-gray-300">Remaining Supply</p>
                   </>
                 )}
               </div>
