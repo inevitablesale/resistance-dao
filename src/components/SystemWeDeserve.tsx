@@ -4,7 +4,9 @@ export const SystemWeDeserve = () => {
     <section className="py-16 bg-black/30">
       <div className="container px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-8">The System We Deserve</h2>
+          <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 via-orange-200 to-blue-400 mb-8">
+            The System We Deserve
+          </h2>
           
           <div className="space-y-4 mb-12 text-xl text-gray-300">
             <p>We don't need private equity.</p>
@@ -22,9 +24,9 @@ export const SystemWeDeserve = () => {
             <p className="text-xl text-gray-300">
               LedgerFund is that system. A transparent, blockchain-powered platform that empowers professionals to own, operate, and grow their firms without outside interference.
             </p>
-            <p className="text-xl text-[#8247E5]">It's time to stop letting them decide our future.</p>
-            <p className="text-xl text-[#8247E5]">It's time to take ownership.</p>
-            <p className="text-xl text-[#8247E5]">It's time to build something better.</p>
+            <p className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-orange-600">It's time to stop letting them decide our future.</p>
+            <p className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-blue-400">It's time to take ownership.</p>
+            <p className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">It's time to build something better.</p>
           </div>
         </div>
       </div>
