@@ -97,7 +97,7 @@ export const InvestmentReadiness = () => {
         <div className="bg-gradient-to-br from-yellow-500/5 via-teal-500/5 to-yellow-500/5 border border-yellow-500/20 rounded-lg p-8 backdrop-blur">
           <div className="max-w-3xl mx-auto text-center">
             <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-8">
-              Token Presale Progress
+              Presale Stage 1
             </h3>
 
             <div className="grid grid-cols-4 gap-4 mb-8">
@@ -116,6 +116,28 @@ export const InvestmentReadiness = () => {
               <div className="p-4 bg-black/30 rounded-lg backdrop-blur">
                 <p className="text-4xl font-bold text-white mb-1">05</p>
                 <p className="text-sm text-gray-400">SECONDS</p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="p-4 bg-black/30 rounded-lg backdrop-blur">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <DollarSign className="w-5 h-5 text-yellow-400" />
+                  <span className="text-lg text-gray-400">Token Price</span>
+                </div>
+                <p className="text-2xl font-bold text-white">
+                  ${priceUSD} USD
+                  <span className="text-sm text-yellow-400 ml-2">(90% Discount)</span>
+                </p>
+                <p className="text-lg text-gray-400">{priceMatic} MATIC</p>
+              </div>
+              <div className="p-4 bg-black/30 rounded-lg backdrop-blur">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <BarChart3 className="w-5 h-5 text-teal-400" />
+                  <span className="text-lg text-gray-400">Supply</span>
+                </div>
+                <p className="text-2xl font-bold text-white">5M</p>
+                <p className="text-lg text-gray-400">Total Supply</p>
               </div>
             </div>
 
@@ -175,3 +197,4 @@ export const InvestmentReadiness = () => {
     </section>
   );
 };
+
