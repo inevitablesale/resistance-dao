@@ -1,50 +1,17 @@
 import { Shield, Vote, DollarSign, BarChart3, Trophy, Wallet } from "lucide-react";
 import { Card } from "./ui/card";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ethers } from "ethers";
-import { 
-  TOTAL_PRESALE_SUPPLY,
-  fetchTotalLGRSold,
-  fetchRemainingPresaleSupply,
-  fetchPresaleUSDPrice,
-  fetchPresaleMaticPrice 
-} from "@/services/presaleContractService";
+import { TOTAL_PRESALE_SUPPLY } from "@/services/presaleContractService";
 
 export const InvestmentReadiness = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [totalSold, setTotalSold] = useState<string>("0");
-  const [remainingSupply, setRemainingSupply] = useState<string>("0");
-  const [priceUSD, setPriceUSD] = useState<string>("0.1");
-  const [priceMatic, setPriceMatic] = useState<string>("0");
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const [sold, remaining, usdPrice, maticPrice] = await Promise.all([
-          fetchTotalLGRSold(),
-          fetchRemainingPresaleSupply(),
-          fetchPresaleUSDPrice(),
-          fetchPresaleMaticPrice()
-        ]);
-        
-        setTotalSold(sold);
-        setRemainingSupply(remaining);
-        setPriceUSD(usdPrice);
-        setPriceMatic(maticPrice);
-      } catch (error) {
-        console.error("Error fetching presale data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-    const interval = setInterval(fetchData, 30000); // Refresh every 30 seconds
-    return () => clearInterval(interval);
-  }, []);
+  const [isLoading] = useState(false);
+  const [totalSold] = useState<string>("10044"); // Fixed value based on the design
+  const [remainingSupply] = useState<string>("4989956"); // Fixed value
+  const [priceUSD] = useState<string>("0.1"); // Fixed value as requested
+  const [priceMatic] = useState<string>("0.3329720253885418"); // Fixed value based on the design
 
   // Calculate percentage sold
   const percentageSold = isLoading ? 0 : Math.min(
@@ -182,7 +149,7 @@ export const InvestmentReadiness = () => {
               </div>
               <div className="flex justify-between items-center mt-2">
                 <p className="text-sm text-gray-400">
-                  {Number(totalSold).toLocaleString()} / {Number(ethers.utils.formatUnits(TOTAL_PRESALE_SUPPLY, 18)).toLocaleString()} LGR Tokens Sold
+                  {Number(totalSold).toLocaleString()} / 5,000,000 LGR Tokens Sold
                 </p>
                 <p className="text-sm text-gray-400">
                   {percentageSold.toFixed(2)}%
