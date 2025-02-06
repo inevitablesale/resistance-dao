@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -233,8 +234,8 @@ const IndexContent = () => {
             </p>
             
             <div className="flex flex-col md:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => navigate('/token-presale')}
+              <a 
+                href="#join-our-vision"
                 className="group relative px-8 py-3 bg-gradient-to-r from-yellow-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
@@ -242,7 +243,7 @@ const IndexContent = () => {
                   <Trophy className="w-5 h-5" />
                   <span>Purchase LGR Tokens</span>
                 </div>
-              </button>
+              </a>
               
               <button 
                 onClick={() => navigate('/mint-nft')}
