@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -10,6 +9,7 @@ import { SystemWeDeserve } from "@/components/SystemWeDeserve";
 import { CallToAction } from "@/components/CallToAction";
 import { Roadmap } from "@/components/Roadmap";
 import { LedgerFrens } from "@/components/LedgerFrens";
+import { Partners } from "@/components/Partners";
 import { useNavigate } from "react-router-dom";
 import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
@@ -510,6 +510,7 @@ const IndexContent = () => {
         <WhatWeBuilding />
         <HowItWorks />
         <AlternativeToEquity />
+        <Partners />
         <PrivateEquityImpact />
         <ReclaimControl />
         <SystemWeDeserve />
@@ -543,4 +544,3 @@ const Index = () => {
 };
 
 export default Index;
-
