@@ -16,7 +16,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { checkNFTOwnership } from "@/services/contractService";
-import { Trophy, UserCircle, Building2, Wallet, ClipboardCopy } from "lucide-react";
+import { Trophy, UserCircle, Wallet, ClipboardCopy } from "lucide-react";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 
@@ -242,57 +242,6 @@ const IndexContent = () => {
               opacity: Math.max(0.1, 0.85 - scrollProgress)
             }}
           />
-        </div>
-
-        {/* Middle Layer with Floating Firms */}
-        <div className="fixed inset-0 z-1">
-          <div 
-            className="absolute inset-0 overflow-hidden"
-            style={{
-              opacity: Math.max(0, 1 - scrollProgress * 1.5),
-            }}
-          >
-            {[...Array(7)].map((_, i) => {
-              const orbitSpeed = 15000; // 15 second orbit cycle
-              const orbitPhase = (i / 7) * Math.PI * 2; // Evenly space firms around the orbit
-              const timeProgress = ((Date.now() - loadTime) % orbitSpeed) / orbitSpeed;
-              const angle = (timeProgress * Math.PI * 2 + orbitPhase) % (Math.PI * 2);
-              
-              // Calculate orbit radius based on scroll position
-              const maxRadius = Math.min(window.innerWidth, window.innerHeight) * 0.3;
-              const minRadius = 150;
-              const currentRadius = scrollProgress > 0 
-                ? minRadius - (scrollProgress * 100)
-                : maxRadius;
-
-              // Calculate position based on orbit
-              const orbitX = Math.cos(angle) * currentRadius;
-              const orbitY = Math.sin(angle) * currentRadius;
-              
-              return (
-                <div
-                  key={i}
-                  className="absolute transition-transform duration-300"
-                  style={{
-                    top: '50%',
-                    left: '50%',
-                    transform: scrollProgress > 0 
-                      ? `translate(-50%, -50%) translate(${orbitX}px, ${orbitY}px) rotate(${angle * 180 / Math.PI}deg)`
-                      : `translate(calc(-50% + ${0}px), calc(-50% + ${0}px))`,
-                    transition: scrollProgress > 0 ? 'none' : 'transform 15s linear infinite'
-                  }}
-                >
-                  <Building2 
-                    className="w-8 h-8 text-teal-300/90 transition-all duration-1000"
-                    style={{ 
-                      transform: `rotate(${-angle * 180 / Math.PI}deg)`,
-                      opacity: Math.max(0, 1 - scrollProgress * 2)
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
         </div>
 
         {/* Energy Vortex Effect */}
