@@ -508,10 +508,10 @@ const IndexContent = () => {
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
         <LedgerFrens />
         <WhatWeBuilding />
-        <PrivateEquityImpact />
-        <ReclaimControl />
         <HowItWorks />
         <AlternativeToEquity />
+        <PrivateEquityImpact />
+        <ReclaimControl />
         <SystemWeDeserve />
         <CallToAction />
         <Roadmap />
@@ -543,3 +543,4 @@ const Index = () => {
 };
 
 export default Index;
+
