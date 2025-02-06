@@ -131,29 +131,46 @@ const IndexContent = () => {
             }}
           >
             {[...Array(7)].map((_, i) => {
-              // Distribute firms evenly around viewport edges
-              const distributeAroundEdges = (index: number) => {
-                const totalEdgeLength = 2 * (window.innerWidth + window.innerHeight);
-                const segmentLength = totalEdgeLength / 7;
-                const position = segmentLength * (index + Math.random() * 0.5); // Add some randomness within segment
+              // Create random groups around edges
+              const createRandomEdgeGroup = (index: number) => {
+                // Determine which edge this group will be on (0: top, 1: right, 2: bottom, 3: left)
+                const edgeIndex = Math.floor(index / 2); // This creates roughly 2 firms per edge
                 
-                if (position < window.innerWidth) {
-                  return { x: position, y: 0 }; // Top edge
-                } else if (position < window.innerWidth + window.innerHeight) {
-                  return { x: window.innerWidth, y: position - window.innerWidth }; // Right edge
-                } else if (position < 2 * window.innerWidth + window.innerHeight) {
-                  return { x: 2 * window.innerWidth + window.innerHeight - position, y: window.innerHeight }; // Bottom edge
-                } else {
-                  return { x: 0, y: totalEdgeLength - position }; // Left edge
+                // Add some randomness to group positioning
+                const groupPosition = Math.random(); // Random position along the edge
+                const offsetVariation = 0.2; // How spread out the group can be
+                const finalPosition = Math.max(0, Math.min(1, groupPosition + (Math.random() - 0.5) * offsetVariation));
+                
+                switch(edgeIndex % 4) {
+                  case 0: // Top edge
+                    return { 
+                      x: finalPosition * window.innerWidth, 
+                      y: Math.random() * 50 // Small random offset from edge
+                    };
+                  case 1: // Right edge
+                    return { 
+                      x: window.innerWidth - Math.random() * 50,
+                      y: finalPosition * window.innerHeight
+                    };
+                  case 2: // Bottom edge
+                    return { 
+                      x: finalPosition * window.innerWidth,
+                      y: window.innerHeight - Math.random() * 50
+                    };
+                  default: // Left edge
+                    return { 
+                      x: Math.random() * 50,
+                      y: finalPosition * window.innerHeight
+                    };
                 }
               };
 
-              const startPos = distributeAroundEdges(i);
+              const startPos = createRandomEdgeGroup(i);
               
               // Unique orbit parameters for each firm
               const orbitSpeed = 15000; // 15 second base orbit cycle
-              const orbitPhase = (i / 7) * Math.PI * 2; // Evenly distribute initial phases
-              const rotationSpeed = 0.3 + Math.random() * 0.4; // Slightly randomized rotation
+              const orbitPhase = Math.random() * Math.PI * 2; // Random initial phase
+              const rotationSpeed = 0.3 + Math.random() * 0.4;
               const orbitRadius = Math.max(
                 150,
                 Math.max(window.innerWidth, window.innerHeight) * 0.8 * 
