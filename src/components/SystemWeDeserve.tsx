@@ -15,21 +15,6 @@ export const SystemWeDeserve = () => {
             <p>A platform powered by smart contracts.</p>
             <p>A network owned by the community.</p>
           </div>
-
-          <div className="mb-12">
-            <p className="text-xl text-gray-300">
-              What we need is a protocol that works for everyone—a system that leverages blockchain technology to automate treasury management and reward distribution.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            <p className="text-xl text-gray-300">
-              LedgerFund is that protocol. A transparent, blockchain-powered platform that enables automated treasury management and professional service coordination.
-            </p>
-            <p className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-yellow-600">Building the infrastructure for professional services.</p>
-            <p className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-yellow-500 to-teal-400">Powering decentralized firm operations.</p>
-            <p className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-teal-600">Creating a community-owned platform.</p>
-          </div>
         </div>
       </div>
     </section>
