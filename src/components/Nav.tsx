@@ -34,10 +34,10 @@ const Nav = () => {
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center gap-2">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-[#8247E5] font-bold">
-                LF
+              <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-teal-500 rounded-lg flex items-center justify-center text-white font-bold shadow-lg">
+                LD
               </div>
-              <span className="text-white font-semibold text-xl">LedgerFund</span>
+              <span className="text-white font-semibold text-xl">LedgerDAO</span>
             </Link>
           </div>
           
@@ -69,3 +69,4 @@ const Nav = () => {
 };
 
 export default Nav;
+
