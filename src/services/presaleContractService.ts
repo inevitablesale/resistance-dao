@@ -43,7 +43,8 @@ export const fetchTotalLGRSold = async () => {
     const lgrTokenContract = await getLGRTokenContract(provider);
     const remainingBalance = await lgrTokenContract.balanceOf(PRESALE_CONTRACT_ADDRESS);
     const totalSold = TOTAL_PRESALE_SUPPLY.sub(remainingBalance);
-    return ethers.utils.formatUnits(totalSold, 18);
+    const formattedAmount = Number(ethers.utils.formatUnits(totalSold, 18)).toFixed(2);
+    return formattedAmount;
   } catch (error) {
     console.error("Error fetching total LGR sold:", error);
     return "0";
@@ -82,9 +83,11 @@ export const fetchPresaleMaticPrice = async () => {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
     const contract = getPresaleContract(provider);
     const maticPrice = await contract.getLGRPrice();
-    return ethers.utils.formatEther(maticPrice);
+    const formattedPrice = Number(ethers.utils.formatEther(maticPrice)).toFixed(4);
+    return formattedPrice;
   } catch (error) {
     console.error("Error fetching MATIC price:", error);
     return "0";
   }
 };
+

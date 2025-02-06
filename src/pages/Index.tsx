@@ -414,10 +414,10 @@ const IndexContent = () => {
                 
                 <div className="flex justify-between items-center mt-2">
                   <div className="text-center text-white/80 font-medium">
-                    UNTIL PRICE INCREASE
+                    90% DISCOUNT ACTIVE
                   </div>
                   <div className="text-center text-teal-400 font-medium">
-                    Current Price: {maticPrice}
+                    Current Price: {maticPrice} MATIC
                   </div>
                 </div>
               </div>
