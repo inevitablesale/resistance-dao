@@ -55,21 +55,74 @@ const IndexContent = () => {
       if (!heroRef.current || !presaleRef.current) return;
       
       const presaleRect = presaleRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
       
-      // Calculate progress as section enters viewport from bottom
-      // Start when the top of the section is at the bottom of viewport
-      // Complete when it's 1/3 into the viewport
-      const progress = Math.max(0, Math.min(1,
-        (viewportHeight - presaleRect.top) / (viewportHeight / 3)
+      // Calculate when Presale Stage 1 enters viewport (top of section reaches bottom of viewport)
+      // Scale from 0 to 1 as section enters
+      const presaleVisibility = Math.max(0, Math.min(1, 
+        1 - (presaleRect.top / window.innerHeight)
       ));
       
-      setScrollProgress(progress);
+      // When scrolling up past the section, scale back down
+      const scrollingUpAdjustment = Math.max(0, Math.min(1,
+        1 - (Math.abs(presaleRect.bottom) / window.innerHeight)
+      ));
+      
+      // Use the minimum of both values to ensure proper scaling in both directions
+      setScrollProgress(Math.min(presaleVisibility, scrollingUpAdjustment));
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const checkWalletStatus = async () => {
+      if (!primaryWallet) {
+        toast({
+          title: "Welcome to LedgerFund",
+          description: "Connect your wallet to participate in the token presale"
+        });
+        return;
+      }
+
+      const isConnected = await primaryWallet.isConnected();
+      if (!isConnected) {
+        toast({
+          title: "Wallet Connection Required",
+          description: "Please connect your wallet to access the platform"
+        });
+        return;
+      }
+
+      setIsChecking(true);
+      try {
+        console.log('Checking NFT ownership...');
+        const hasNFT = await checkNFTOwnership(
+          await primaryWallet.getWalletClient(),
+          primaryWallet.address
+        );
+        console.log('NFT ownership result:', hasNFT);
+        
+        if (!hasNFT) {
+          toast({
+            title: "NFT Required",
+            description: "Mint your LedgerFren NFT to participate in governance"
+          });
+        }
+      } catch (error) {
+        console.error('Error checking NFT:', error);
+        toast({
+          title: "Error",
+          description: "Failed to check NFT ownership. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    checkWalletStatus();
+  }, [primaryWallet, toast]);
 
   const parallaxStyle = {
     '--scroll-progress': scrollProgress,
@@ -246,8 +299,8 @@ const IndexContent = () => {
         <div 
           className="fixed inset-0 z-2 perspective-3000" 
           style={{
+            ...parallaxStyle,
             transform: `scale(${1 + scrollProgress * 1.5})`,
-            transition: 'transform 0.3s ease-out'
           }}
         >
           <div className="absolute inset-0 flex items-center justify-center">
@@ -314,8 +367,8 @@ const IndexContent = () => {
           ref={presaleRef}
           className="relative z-3 mt-[30vh]" 
           style={{
-            transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * -50}px)`,
-            opacity: 1 - scrollProgress * 0.8
+            ...parallaxStyle,
+            transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * -50}px)`
           }}
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
