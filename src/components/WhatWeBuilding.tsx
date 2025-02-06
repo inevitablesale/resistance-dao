@@ -1,15 +1,14 @@
+
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const presaleData = [
-  { name: 'Presale Stake', value: 50, color: '#14b8a6', description: 'Reserved for early supporters who believe in the future of decentralized accounting acquisitions. 5M tokens available. 1 yr hold term.' },
-  { name: 'Community Rewards', value: 25, color: '#0f766e', description: 'Allocated for community incentives and ecosystem development.' },
-  { name: 'Team', value: 20, color: '#0f766e', description: 'Supporting the core team and ongoing development.' },
-  { name: 'Partners', value: 5, color: '#115e59', description: 'Strategic partnerships and ecosystem growth.' }
+  { name: 'Presale Stake', value: 100, color: '#14b8a6', description: 'Reserved for early supporters who believe in the future of decentralized accounting acquisitions. 5M tokens available. 1 yr hold term.' }
 ];
 
 const publicSaleData = [
+  { name: 'Staked from Presale', value: 50, color: '#14b8a6', description: 'Tokens staked from presale phase.' },
   { name: 'Public Sale', value: 25, color: '#0d9488', description: 'For protocol growth and sustainability. Collects voting fees, proposal fees, advertising revenue, and 5% from acquisitions and annual returns.' },
   { name: 'Community Rewards', value: 10, color: '#0f766e', description: 'Allocated for community incentives, governance participation, and ecosystem development initiatives.' },
   { name: 'Team', value: 10, color: '#0f766e', description: 'Supporting the core team building and maintaining the protocol.' },
@@ -132,92 +131,93 @@ export const WhatWeBuilding = () => {
                 ))}
               </div>
             </div>
+
+            {/* Token Utility Section */}
+            <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+              {/* LGR Token Section */}
+              <div className="space-y-8">
+                <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
+                  <Coins className="w-8 h-8 text-yellow-400" />
+                  <span>LGR Token (Liquidity)</span>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <Wallet className="w-8 h-8 text-yellow-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Liquidity Provision</h3>
+                    <p className="text-gray-300">
+                      Provide liquidity to the protocol and earn rewards from platform fees and transactions.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <UsersRound className="w-8 h-8 text-yellow-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Platform Access</h3>
+                    <p className="text-gray-300">
+                      View available deals and bid on service contracts within the ecosystem. Note: Platform access does not include participation in rewards or governance.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <BadgeCheck className="w-8 h-8 text-yellow-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Service Bidding</h3>
+                    <p className="text-gray-300">
+                      Submit competitive bids for service contracts and professional opportunities within the network.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* LP Token Section */}
+              <div className="space-y-8">
+                <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
+                  <Building2 className="w-8 h-8 text-teal-400" />
+                  <span>LP Token (Ownership)</span>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <Coins className="w-8 h-8 text-teal-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Real Asset Backing</h3>
+                    <p className="text-gray-300">
+                      Represents direct fractional ownership in acquired firms, with value tied to firm performance.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <GanttChartSquare className="w-8 h-8 text-teal-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Structured Liquidity</h3>
+                    <p className="text-gray-300">
+                      Annual redemption windows after 3-year lock-up period, ensuring stability while providing exit options.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <Coins className="w-8 h-8 text-teal-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Profit Distribution</h3>
+                    <p className="text-gray-300">
+                      Receive proportional distributions from firm profits, creating passive income streams.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
-
-        {/* Token Utility Section */}
-        <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-          {/* LGR Token Section */}
-          <div className="space-y-8">
-            <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
-              <Coins className="w-8 h-8 text-yellow-400" />
-              <span>LGR Token (Liquidity)</span>
-            </div>
-            
-            <div className="space-y-6">
-              <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
-                <div className="mb-4">
-                  <Wallet className="w-8 h-8 text-yellow-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Liquidity Provision</h3>
-                <p className="text-gray-300">
-                  Provide liquidity to the protocol and earn rewards from platform fees and transactions.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
-                <div className="mb-4">
-                  <UsersRound className="w-8 h-8 text-yellow-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Platform Access</h3>
-                <p className="text-gray-300">
-                  View available deals and bid on service contracts within the ecosystem. Note: Platform access does not include participation in rewards or governance.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
-                <div className="mb-4">
-                  <BadgeCheck className="w-8 h-8 text-yellow-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Service Bidding</h3>
-                <p className="text-gray-300">
-                  Submit competitive bids for service contracts and professional opportunities within the network.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* LP Token Section */}
-          <div className="space-y-8">
-            <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
-              <Building2 className="w-8 h-8 text-teal-400" />
-              <span>LP Token (Ownership)</span>
-            </div>
-            
-            <div className="space-y-6">
-              <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
-                <div className="mb-4">
-                  <Coins className="w-8 h-8 text-teal-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Real Asset Backing</h3>
-                <p className="text-gray-300">
-                  Represents direct fractional ownership in acquired firms, with value tied to firm performance.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
-                <div className="mb-4">
-                  <GanttChartSquare className="w-8 h-8 text-teal-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Structured Liquidity</h3>
-                <p className="text-gray-300">
-                  Annual redemption windows after 3-year lock-up period, ensuring stability while providing exit options.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
-                <div className="mb-4">
-                  <Coins className="w-8 h-8 text-teal-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Profit Distribution</h3>
-                <p className="text-gray-300">
-                  Receive proportional distributions from firm profits, creating passive income streams.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
 };
+
