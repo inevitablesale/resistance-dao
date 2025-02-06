@@ -1,6 +1,5 @@
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
-import { InvestmentReadiness } from "@/components/InvestmentReadiness";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
 import { PrivateEquityImpact } from "@/components/PrivateEquityImpact";
 import { ReclaimControl } from "@/components/ReclaimControl";
@@ -326,7 +325,7 @@ const IndexContent = () => {
           </div>
         </div>
 
-        {/* Content Layer */}
+        {/* Content Layer with presale information moved from InvestmentReadiness */}
         <div 
           className="relative z-3 mt-[30vh]" 
           style={{
@@ -449,7 +448,6 @@ const IndexContent = () => {
       </div>
 
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
-        <InvestmentReadiness />
         <WhatWeBuilding />
         <PrivateEquityImpact />
         <ReclaimControl />
