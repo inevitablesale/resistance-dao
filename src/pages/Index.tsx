@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -16,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { checkNFTOwnership } from "@/services/contractService";
-import { Trophy, UserCircle, Building2, FileText } from "lucide-react";
+import { Trophy, UserCircle, Building2 } from "lucide-react";
 
 const IndexContent = () => {
   const navigate = useNavigate();
@@ -58,7 +57,6 @@ const IndexContent = () => {
         return;
       }
 
-      // Check NFT ownership using contract
       setIsChecking(true);
       try {
         console.log('Checking NFT ownership...');
@@ -236,7 +234,7 @@ const IndexContent = () => {
             
             <div className="flex flex-col md:flex-row gap-4 justify-center">
               <button 
-                onClick={() => navigate('/mint-nft')}
+                onClick={() => navigate('/token-presale')}
                 className="group relative px-8 py-3 bg-gradient-to-r from-yellow-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
@@ -247,7 +245,7 @@ const IndexContent = () => {
               </button>
               
               <button 
-                onClick={() => navigate('/token-presale')}
+                onClick={() => navigate('/mint-nft')}
                 className="group relative px-8 py-3 bg-black/50 hover:bg-black/60 border border-yellow-500/40 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-400/20 blur-sm group-hover:blur-lg transition-all duration-300" />
@@ -299,4 +297,3 @@ const Index = () => {
 };
 
 export default Index;
-
