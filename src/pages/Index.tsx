@@ -390,7 +390,7 @@ const IndexContent = () => {
                       {formatLargeNumber(totalSold)}
                     </span>
                     <span className="text-gray-400"> / </span> 
-                    <span className="text-gray-300">{formatLargeNumber(presaleSupply)}</span>
+                    <span className="text-gray-300">5M</span>
                     <span className="text-gray-400 ml-2">LGR Tokens Sold</span>
                   </div>
                   <div className="text-teal-400 font-bold">
@@ -417,7 +417,7 @@ const IndexContent = () => {
                     90% DISCOUNT ACTIVE
                   </div>
                   <div className="text-center text-teal-400 font-medium">
-                    Current Price: {maticPrice} MATIC
+                    Current Price: {maticPrice} MATIC / $0.10
                   </div>
                 </div>
               </div>

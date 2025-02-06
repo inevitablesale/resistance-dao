@@ -22,7 +22,7 @@ const ERC20_ABI = [
 ];
 
 export const PRESALE_END_TIME = 1746057600; // May 1, 2025
-export const TOTAL_PRESALE_SUPPLY = ethers.utils.parseUnits("5000000", 18); // 5 million tokens with 18 decimals
+export const TOTAL_PRESALE_SUPPLY = ethers.utils.parseUnits("5", 24); // 5 million tokens with 18 decimals
 export const USD_PRICE = ethers.utils.parseUnits("0.1", 18); // $0.10 per token
 
 export const getPresaleContract = (provider: ethers.providers.Provider | ethers.Signer) => {
