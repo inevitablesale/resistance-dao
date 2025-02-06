@@ -19,6 +19,8 @@ const TokenPresaleContent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [tokenPrice, setTokenPrice] = useState<string>("0");
   const [alreadyPurchased, setAlreadyPurchased] = useState<string>("0");
+  const [maxPerWallet, setMaxPerWallet] = useState<string>("0");
+  const [remainingAllowance, setRemainingAllowance] = useState<string>("0");
 
   useEffect(() => {
     if (!user) {
@@ -28,27 +30,35 @@ const TokenPresaleContent = () => {
 
   useEffect(() => {
     const fetchContractData = async () => {
-      if (!primaryWallet?.provider) return;
+      if (!primaryWallet?.address) return;
 
       try {
-        const provider = new ethers.providers.Web3Provider(primaryWallet.provider);
-        const contract = getPresaleContract(provider);
+        // Get ethers provider from Dynamic wallet
+        const ethersProvider = new ethers.providers.Web3Provider(await primaryWallet.getWalletClient());
+        const contract = getPresaleContract(ethersProvider);
         
         // Get token price in MATIC
         const price = await contract.getLGRPrice();
         setTokenPrice(ethers.utils.formatEther(price));
 
-        if (primaryWallet.address) {
-          const purchased = await contract.purchasedTokens(primaryWallet.address);
-          setAlreadyPurchased(ethers.utils.formatEther(purchased));
-        }
+        // Get max tokens per wallet
+        const maxTokens = await contract.MAX_PER_WALLET();
+        setMaxPerWallet(ethers.utils.formatEther(maxTokens));
+
+        // Get already purchased amount
+        const purchased = await contract.purchasedTokens(primaryWallet.address);
+        setAlreadyPurchased(ethers.utils.formatEther(purchased));
+
+        // Calculate remaining allowance
+        const remaining = maxTokens.sub(purchased);
+        setRemainingAllowance(ethers.utils.formatEther(remaining));
       } catch (error) {
         console.error("Error fetching contract data:", error);
       }
     };
 
     fetchContractData();
-  }, [primaryWallet]);
+  }, [primaryWallet?.address]);
 
   useEffect(() => {
     if (maticAmount && tokenPrice) {
@@ -60,12 +70,22 @@ const TokenPresaleContent = () => {
   }, [maticAmount, tokenPrice]);
 
   const handleBuyTokens = async () => {
-    if (!primaryWallet?.provider || !maticAmount) return;
+    if (!primaryWallet?.address || !maticAmount) return;
+
+    // Check if purchase would exceed allowance
+    if (parseFloat(expectedTokens) > parseFloat(remainingAllowance)) {
+      toast({
+        title: "Exceeds Limit",
+        description: `You can only purchase ${remainingAllowance} more tokens.`,
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsLoading(true);
     try {
-      const provider = new ethers.providers.Web3Provider(primaryWallet.provider);
-      const signer = provider.getSigner();
+      const ethersProvider = new ethers.providers.Web3Provider(await primaryWallet.getWalletClient());
+      const signer = ethersProvider.getSigner();
       const contract = getPresaleContract(signer);
 
       // Calculate minimum expected tokens with 1% slippage tolerance
@@ -96,6 +116,11 @@ const TokenPresaleContent = () => {
       // Refresh purchased amount
       const purchased = await contract.purchasedTokens(primaryWallet.address);
       setAlreadyPurchased(ethers.utils.formatEther(purchased));
+      
+      // Update remaining allowance
+      const maxTokens = await contract.MAX_PER_WALLET();
+      const remaining = maxTokens.sub(purchased);
+      setRemainingAllowance(ethers.utils.formatEther(remaining));
     } catch (error: any) {
       console.error("Purchase error:", error);
       toast({
@@ -127,8 +152,8 @@ const TokenPresaleContent = () => {
             {/* Token Stats */}
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div className="p-4 rounded-lg bg-white/5">
-                <p className="text-2xl font-bold text-[#8247E5]">10M</p>
-                <p className="text-sm text-gray-400">Total Supply</p>
+                <p className="text-2xl font-bold text-[#8247E5]">{parseFloat(maxPerWallet).toLocaleString()}</p>
+                <p className="text-sm text-gray-400">Max Tokens Per Wallet</p>
               </div>
               <div className="p-4 rounded-lg bg-white/5">
                 <p className="text-2xl font-bold text-[#8247E5]">$0.10</p>
@@ -141,8 +166,9 @@ const TokenPresaleContent = () => {
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Your Purchase Info</AlertTitle>
-                  <AlertDescription>
-                    You've already purchased {parseFloat(alreadyPurchased).toFixed(2)} LGR tokens
+                  <AlertDescription className="space-y-2">
+                    <p>Already purchased: {parseFloat(alreadyPurchased).toLocaleString()} LGR</p>
+                    <p>Remaining allowance: {parseFloat(remainingAllowance).toLocaleString()} LGR</p>
                   </AlertDescription>
                 </Alert>
 
@@ -166,7 +192,7 @@ const TokenPresaleContent = () => {
                     </div>
                     <Button
                       onClick={handleBuyTokens}
-                      disabled={!maticAmount || isLoading || !user}
+                      disabled={!maticAmount || isLoading || !user || parseFloat(expectedTokens) > parseFloat(remainingAllowance)}
                       className="w-full bg-[#8247E5] hover:bg-[#6f3cc7]"
                     >
                       {isLoading ? "Processing..." : "Buy Tokens"}
@@ -211,4 +237,3 @@ const TokenPresale = () => {
 };
 
 export default TokenPresale;
-
