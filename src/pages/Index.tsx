@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { checkNFTOwnership } from "@/services/contractService";
 import { Trophy, UserCircle, Building2, Wallet } from "lucide-react";
 import { ethers } from "ethers";
-import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY } from "@/services/presaleContractService";
+import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 
 const IndexContent = () => {
   const navigate = useNavigate();
@@ -117,21 +117,21 @@ const IndexContent = () => {
   // Function to fetch presale data
   const fetchPresaleData = async () => {
     try {
-      const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
-      const presaleContract = getPresaleContract(provider);
+      // Get total LGR tokens sold using the correct function
+      const sold = await fetchTotalLGRSold();
+      setTotalSold(sold);
+
+      // Get current price in MATIC
+      const price = await fetchPresaleMaticPrice();
+      const maticPrice = price === "0" ? "Loading..." : `${price} MATIC`;
       
-      // Get total LGR tokens sold
-      const lgrSold = await presaleContract.totalLGRSold();
-      setTotalSold(ethers.utils.formatEther(lgrSold));
-
-      // If wallet is connected, get user's purchased and stakeable tokens
+      // If wallet is connected, get user's purchased tokens
       if (primaryWallet?.address) {
+        const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
+        const presaleContract = getPresaleContract(provider);
         const purchased = await presaleContract.purchasedTokens(primaryWallet.address);
-        const stakeable = await presaleContract.stakeableTokens(primaryWallet.address);
         setMyPurchased(ethers.utils.formatEther(purchased));
-        setMyStakeable(ethers.utils.formatEther(stakeable));
       }
-
     } catch (error) {
       console.error('Error fetching presale data:', error);
       toast({
@@ -386,10 +386,10 @@ const IndexContent = () => {
                 <div className="flex justify-between items-center mb-2">
                   <div className="text-white text-lg">
                     <span className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-300">
-                      {formatNumber(Number(totalSold))}
+                      {formatLargeNumber(totalSold)}
                     </span>
                     <span className="text-gray-400"> / </span> 
-                    <span className="text-gray-300">{formatNumber(Number(presaleSupply))}</span>
+                    <span className="text-gray-300">{formatLargeNumber(presaleSupply)}</span>
                     <span className="text-gray-400 ml-2">LGR Tokens Sold</span>
                   </div>
                   <div className="text-teal-400 font-bold">
@@ -411,8 +411,13 @@ const IndexContent = () => {
                   </div>
                 </div>
                 
-                <div className="text-center text-white/80 mt-2 font-medium">
-                  UNTIL PRICE INCREASE
+                <div className="flex justify-between items-center mt-2">
+                  <div className="text-center text-white/80 font-medium">
+                    UNTIL PRICE INCREASE
+                  </div>
+                  <div className="text-center text-teal-400 font-medium">
+                    Current Price: { await fetchPresaleMaticPrice()} MATIC
+                  </div>
                 </div>
               </div>
             </div>
