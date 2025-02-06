@@ -3,9 +3,9 @@ import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2 } fr
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const data = [
-  { name: 'Presale', value: 30, color: '#14b8a6', description: 'Reserved for early supporters who believe in the future of decentralized accounting.' },
-  { name: 'Treasury', value: 30, color: '#0d9488', description: 'For protocol growth, development, and sustainability of the ecosystem.' },
-  { name: 'Marketing', value: 20, color: '#0f766e', description: 'Allocated for community growth and awareness initiatives to expand the LedgerFund ecosystem.' },
+  { name: 'Presale', value: 50, color: '#14b8a6', description: 'Reserved for early supporters who believe in the future of decentralized accounting. 5M tokens available.' },
+  { name: 'Treasury', value: 20, color: '#0d9488', description: 'For protocol growth and sustainability. Collects voting fees, proposal fees, advertising revenue, and 5% from acquisitions and annual returns.' },
+  { name: 'Community Rewards', value: 10, color: '#0f766e', description: 'Allocated for community incentives, governance participation, and ecosystem development initiatives.' },
   { name: 'Team', value: 10, color: '#0f766e', description: 'Supporting the core team building and maintaining the protocol.' },
   { name: 'Partners', value: 10, color: '#115e59', description: 'Reserved for strategic partnerships and ecosystem development.' }
 ];
@@ -19,7 +19,7 @@ export const WhatWeBuilding = () => {
         </h2>
         
         <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
-          Total Supply: 1,510,000,000 LGR
+          Total Supply: 10,000,000 LGR
         </p>
 
         {/* Token Distribution Chart */}
