@@ -54,7 +54,8 @@ const IndexContent = () => {
       if (!heroRef.current) return;
       
       const rect = heroRef.current.getBoundingClientRect();
-      const scrollPercentage = Math.max(0, Math.min(1, 1 - (rect.bottom / window.innerHeight)));
+      // Changed from 1 to 0.7 to start expansion earlier
+      const scrollPercentage = Math.max(0, Math.min(1, 0.7 - (rect.bottom / window.innerHeight)));
       setScrollProgress(scrollPercentage);
     };
 

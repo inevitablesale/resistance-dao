@@ -117,22 +117,10 @@ export const LedgerFrens = () => {
                 </div>
               </div>
             </div>
-
-            <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="flex items-start gap-4">
-                <Star className="w-8 h-8 text-teal-400 flex-shrink-0" />
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">First Investment</h4>
-                  <p className="text-gray-300">
-                    At $1M raised: First Investment utilizing a decentralized ownership model, pioneering a new era in collaborative business ventures.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     </section>
   );
 };
+
