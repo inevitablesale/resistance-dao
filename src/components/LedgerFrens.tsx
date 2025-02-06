@@ -18,7 +18,7 @@ export const LedgerFrens = () => {
             Grow and Celebrate With Us
           </h2>
           <p className="text-xl text-white/80 mb-8">
-            As LedgerFund grows, we reward our early supporters. From exclusive launch events to limited edition merchandise, 
+            As LedgerFund DAO grows, we reward our early supporters. From exclusive launch events to limited edition merchandise, 
             we're creating a community that shares in our success from day one.
           </p>
         </div>
@@ -60,7 +60,7 @@ export const LedgerFrens = () => {
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">Exclusive DAO Merch</h4>
                   <p className="text-gray-300">
-                    At $250K raised: Top 250 holders receive exclusive LedgerFund DAO merchandise pack including premium apparel and accessories.
+                    At $150K raised: 150 random stakers receive exclusive LedgerFund DAO merchandise pack including premium apparel and accessories.
                   </p>
                 </div>
               </div>
@@ -123,9 +123,9 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <Star className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Legacy Circle Membership</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">First Investment</h4>
                   <p className="text-gray-300">
-                    At $1M raised: Top 10 holders receive lifetime membership to our Legacy Circle, featuring exclusive benefits, mentorship opportunities, and priority access to future initiatives.
+                    At $1M raised: First Investment utilizing a decentralized ownership model, pioneering a new era in collaborative business ventures.
                   </p>
                 </div>
               </div>
@@ -136,4 +136,3 @@ export const LedgerFrens = () => {
     </section>
   );
 };
-
