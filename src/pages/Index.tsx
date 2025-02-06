@@ -5,7 +5,6 @@ import { PrivateEquityImpact } from "@/components/PrivateEquityImpact";
 import { ReclaimControl } from "@/components/ReclaimControl";
 import { HowItWorks } from "@/components/HowItWorks";
 import { AlternativeToEquity } from "@/components/AlternativeToEquity";
-import { SystemWeDeserve } from "@/components/SystemWeDeserve";
 import { CallToAction } from "@/components/CallToAction";
 import { Roadmap } from "@/components/Roadmap";
 import { LedgerFrens } from "@/components/LedgerFrens";
@@ -503,11 +502,14 @@ const IndexContent = () => {
         <div className="relative z-10">
           <PrivateEquityImpact />
           <ReclaimControl />
-          <SystemWeDeserve />
         </div>
       </div>
 
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
+        <WhatWeBuilding />
+        <LedgerFrens />
+        <HowItWorks />
+        <AlternativeToEquity />
         <CallToAction />
         <Roadmap />
         <Partners />
