@@ -1,20 +1,112 @@
 
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import { useToast } from "@/hooks/use-toast";
-import { Wallet2 } from "lucide-react";
+import { Wallet2, AlertCircle } from "lucide-react";
+import { ethers } from "ethers";
+import { getPresaleContract, PRESALE_CONTRACT_ADDRESS } from "@/services/presaleContractService";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
 
 const TokenPresaleContent = () => {
-  const { user, setShowAuthFlow } = useDynamicContext();
+  const { user, setShowAuthFlow, primaryWallet } = useDynamicContext();
   const { toast } = useToast();
+  const [maticAmount, setMaticAmount] = useState("");
+  const [expectedTokens, setExpectedTokens] = useState<string>("0");
+  const [isLoading, setIsLoading] = useState(false);
+  const [tokenPrice, setTokenPrice] = useState<string>("0");
+  const [alreadyPurchased, setAlreadyPurchased] = useState<string>("0");
 
   useEffect(() => {
     if (!user) {
       setShowAuthFlow?.(true);
     }
   }, [user, setShowAuthFlow]);
+
+  useEffect(() => {
+    const fetchContractData = async () => {
+      if (!primaryWallet?.provider) return;
+
+      try {
+        const provider = new ethers.providers.Web3Provider(primaryWallet.provider);
+        const contract = getPresaleContract(provider);
+        
+        // Get token price in MATIC
+        const price = await contract.getLGRPrice();
+        setTokenPrice(ethers.utils.formatEther(price));
+
+        if (primaryWallet.address) {
+          const purchased = await contract.purchasedTokens(primaryWallet.address);
+          setAlreadyPurchased(ethers.utils.formatEther(purchased));
+        }
+      } catch (error) {
+        console.error("Error fetching contract data:", error);
+      }
+    };
+
+    fetchContractData();
+  }, [primaryWallet]);
+
+  useEffect(() => {
+    if (maticAmount && tokenPrice) {
+      const tokens = parseFloat(maticAmount) / parseFloat(tokenPrice);
+      setExpectedTokens(tokens.toFixed(2));
+    } else {
+      setExpectedTokens("0");
+    }
+  }, [maticAmount, tokenPrice]);
+
+  const handleBuyTokens = async () => {
+    if (!primaryWallet?.provider || !maticAmount) return;
+
+    setIsLoading(true);
+    try {
+      const provider = new ethers.providers.Web3Provider(primaryWallet.provider);
+      const signer = provider.getSigner();
+      const contract = getPresaleContract(signer);
+
+      // Calculate minimum expected tokens with 1% slippage tolerance
+      const minExpectedTokens = ethers.utils.parseEther(
+        (parseFloat(expectedTokens) * 0.99).toString()
+      );
+
+      const tx = await contract.buyTokens(minExpectedTokens, {
+        value: ethers.utils.parseEther(maticAmount)
+      });
+
+      toast({
+        title: "Transaction Submitted",
+        description: "Please wait for the transaction to be confirmed.",
+      });
+
+      await tx.wait();
+
+      toast({
+        title: "Purchase Successful!",
+        description: `You've successfully purchased ${expectedTokens} LGR tokens.`,
+      });
+
+      // Reset form
+      setMaticAmount("");
+      setExpectedTokens("0");
+
+      // Refresh purchased amount
+      const purchased = await contract.purchasedTokens(primaryWallet.address);
+      setAlreadyPurchased(ethers.utils.formatEther(purchased));
+    } catch (error: any) {
+      console.error("Purchase error:", error);
+      toast({
+        title: "Purchase Failed",
+        description: error?.message || "Transaction failed. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="text-center mb-8 max-w-5xl mx-auto pt-32">
@@ -44,77 +136,54 @@ const TokenPresaleContent = () => {
               </div>
             </div>
 
-            {/* Participation Paths */}
-            <div className="text-left space-y-6">
+            {user && (
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-white">Choose Your Path to Participate:</h3>
-                
-                {/* Path A: New to Crypto */}
-                <div className="p-6 rounded-lg bg-white/5 space-y-4">
-                  <h4 className="text-lg font-medium text-[#8247E5]">Path A: New to Crypto</h4>
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">1</div>
-                      <p className="text-gray-300">Connect your wallet using the widget above</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">2</div>
-                      <p className="text-gray-300">Click "Buy Crypto" in your wallet options</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">3</div>
-                      <p className="text-gray-300">Complete one-time identity verification through Banxa (government ID required)</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">4</div>
-                      <p className="text-gray-300">Purchase MATIC using your preferred payment method</p>
-                    </div>
-                  </div>
-                </div>
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Your Purchase Info</AlertTitle>
+                  <AlertDescription>
+                    You've already purchased {parseFloat(alreadyPurchased).toFixed(2)} LGR tokens
+                  </AlertDescription>
+                </Alert>
 
-                {/* Path B: MetaMask Users */}
                 <div className="p-6 rounded-lg bg-white/5 space-y-4">
-                  <h4 className="text-lg font-medium text-[#8247E5]">Path B: MetaMask Users with MATIC</h4>
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">1</div>
-                      <p className="text-gray-300">Connect your MetaMask wallet using the widget above</p>
+                  <h4 className="text-lg font-medium text-[#8247E5]">Buy LGR Tokens</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-2">
+                        Amount in MATIC
+                      </label>
+                      <Input
+                        type="number"
+                        value={maticAmount}
+                        onChange={(e) => setMaticAmount(e.target.value)}
+                        placeholder="Enter MATIC amount"
+                        className="w-full bg-white/10 border-white/20"
+                      />
+                      <p className="text-sm text-gray-400 mt-2">
+                        Expected LGR: {expectedTokens}
+                      </p>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">2</div>
-                      <p className="text-gray-300">Switch to Polygon network if prompted</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">3</div>
-                      <p className="text-gray-300">Enter the amount of tokens you wish to purchase</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#8247E5] flex items-center justify-center flex-shrink-0">4</div>
-                      <p className="text-gray-300">Confirm the transaction in your MetaMask popup</p>
-                    </div>
+                    <Button
+                      onClick={handleBuyTokens}
+                      disabled={!maticAmount || isLoading || !user}
+                      className="w-full bg-[#8247E5] hover:bg-[#6f3cc7]"
+                    >
+                      {isLoading ? "Processing..." : "Buy Tokens"}
+                    </Button>
                   </div>
                 </div>
               </div>
+            )}
 
-              {/* Benefits Section */}
-              <div className="p-6 rounded-lg bg-white/5">
-                <h3 className="text-lg font-semibold mb-4">Token Holder Benefits:</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-300">
-                  <li>Early access to governance rights</li>
-                  <li>Participation in platform decision-making</li>
-                  <li>Revenue sharing opportunities</li>
-                  <li>Priority access to new features</li>
-                </ul>
+            {/* Network Info */}
+            <div className="p-4 rounded-lg bg-white/5 space-y-2">
+              <div className="flex items-center gap-2">
+                <Wallet2 className="w-5 h-5 text-[#8247E5]" />
+                <span className="text-sm text-gray-300">Network: Polygon (MATIC)</span>
               </div>
-
-              {/* Additional Details */}
-              <div className="p-4 rounded-lg bg-white/5 space-y-2">
-                <div className="flex items-center gap-2">
-                  <Wallet2 className="w-5 h-5 text-[#8247E5]" />
-                  <span className="text-sm text-gray-300">Network: Polygon (MATIC)</span>
-                </div>
-                <p className="text-xs text-gray-400">Make sure you have enough MATIC for gas fees</p>
-              </div>
+              <p className="text-xs text-gray-400">Contract: {PRESALE_CONTRACT_ADDRESS}</p>
+              <p className="text-xs text-gray-400">Make sure you have enough MATIC for gas fees</p>
             </div>
           </div>
         </div>
@@ -142,3 +211,4 @@ const TokenPresale = () => {
 };
 
 export default TokenPresale;
+
