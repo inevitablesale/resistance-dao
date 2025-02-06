@@ -484,14 +484,30 @@ const IndexContent = () => {
         </div>
       </div>
 
+      {/* Sections with black hole background effect */}
+      <div className="relative">
+        <div className="fixed inset-0 z-0">
+          <div 
+            className="absolute inset-0 animate-parallax-slow"
+            style={{
+              background: `
+                radial-gradient(2px 2px at 20% 20%, rgba(234, 179, 8, 0.95) 100%, transparent),
+                radial-gradient(2px 2px at 40% 40%, rgba(234, 179, 8, 0.92) 100%, transparent),
+                radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
+              `,
+              backgroundSize: "240px 240px",
+              opacity: 0.1
+            }}
+          />
+        </div>
+        <div className="relative z-10">
+          <PrivateEquityImpact />
+          <ReclaimControl />
+          <SystemWeDeserve />
+        </div>
+      </div>
+
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
-        <WhatWeBuilding />
-        <LedgerFrens />
-        <HowItWorks />
-        <AlternativeToEquity />
-        <PrivateEquityImpact />
-        <ReclaimControl />
-        <SystemWeDeserve />
         <CallToAction />
         <Roadmap />
         <Partners />
