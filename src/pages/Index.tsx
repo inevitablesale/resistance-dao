@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -55,12 +56,17 @@ const IndexContent = () => {
       if (!heroRef.current || !presaleRef.current) return;
       
       const presaleRect = presaleRef.current.getBoundingClientRect();
-      const heroRect = heroRef.current.getBoundingClientRect();
       
-      // Start expanding when presale section enters viewport
-      const presaleVisibility = 1 - (presaleRect.top / window.innerHeight);
-      const scrollPercentage = Math.max(0, Math.min(1, presaleVisibility));
-      setScrollProgress(scrollPercentage);
+      // Calculate visibility percentage of presale section
+      // This will be 0 when presale is below viewport
+      // Will increase as presale enters viewport
+      // And will decrease as presale moves above viewport
+      const presaleVisibility = Math.max(0, Math.min(1, 
+        1 - (presaleRect.top / window.innerHeight),
+        1 - (Math.abs(presaleRect.bottom) / window.innerHeight)
+      ));
+      
+      setScrollProgress(presaleVisibility);
     };
 
     window.addEventListener('scroll', handleScroll);
