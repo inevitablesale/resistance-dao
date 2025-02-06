@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { InvestmentReadiness } from "@/components/InvestmentReadiness";
@@ -12,17 +11,32 @@ import { CallToAction } from "@/components/CallToAction";
 import { Roadmap } from "@/components/Roadmap";
 import { useNavigate } from "react-router-dom";
 import { WalletInfo } from "@/components/WalletInfo";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { checkNFTOwnership } from "@/services/contractService";
-import { Trophy, UserCircle } from "lucide-react";
+import { Trophy, UserCircle, Building2, FileText } from "lucide-react";
 
 const IndexContent = () => {
   const navigate = useNavigate();
   const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
   const [isChecking, setIsChecking] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!heroRef.current) return;
+      
+      const rect = heroRef.current.getBoundingClientRect();
+      const scrollPercentage = Math.max(0, Math.min(1, 1 - (rect.bottom / window.innerHeight)));
+      setScrollProgress(scrollPercentage);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const checkWalletStatus = async () => {
@@ -74,86 +88,142 @@ const IndexContent = () => {
     checkWalletStatus();
   }, [primaryWallet, toast]);
 
+  const parallaxStyle = {
+    '--scroll-progress': scrollProgress,
+    transform: `scale(${1 + scrollProgress * 0.2})`,
+    opacity: 1 - scrollProgress * 0.5
+  } as React.CSSProperties;
+
   return (
     <>
-      <div className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 overflow-hidden">
+      <div ref={heroRef} className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 overflow-hidden min-h-screen">
+        {/* Background Layer (Slowest) */}
+        <div className="fixed inset-0 z-0">
+          <div 
+            className="absolute inset-0 animate-parallax-slow"
+            style={{
+              background: `
+                radial-gradient(2px 2px at 20% 20%, rgba(255, 255, 255, 0.8) 100%, transparent),
+                radial-gradient(2px 2px at 40% 40%, rgba(255, 255, 255, 0.6) 100%, transparent),
+                radial-gradient(3px 3px at 60% 60%, rgba(255, 255, 255, 0.4) 100%, transparent)
+              `,
+              backgroundSize: "240px 240px",
+              opacity: 0.5
+            }}
+          />
+        </div>
+
+        {/* Middle Layer */}
+        <div className="fixed inset-0 z-1">
+          {/* Floating Firm Icons */}
+          <div className="absolute inset-0 overflow-hidden">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute animate-orbit"
+                style={{
+                  top: `${20 + i * 10}%`,
+                  left: `${20 + i * 10}%`,
+                  animationDelay: `${i * -3}s`,
+                  transform: `rotate(${i * 60}deg) translateX(100px)`,
+                }}
+              >
+                <Building2 
+                  className="w-8 h-8 text-purple-400/30" 
+                  style={{ transform: `rotate(-${i * 60}deg)` }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Black Hole Effect Container */}
-        <div className="absolute inset-0 z-0 perspective-3000">
+        <div className="absolute inset-0 z-2 perspective-3000" style={parallaxStyle}>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-[800px] h-[800px] relative">
               {/* Singularity Core */}
-              <div className="absolute inset-0 rounded-full bg-black animate-singularity" 
-                   style={{
-                     boxShadow: `
-                       0 0 100px 20px rgba(138, 43, 226, 0.3),
-                       0 0 200px 40px rgba(138, 43, 226, 0.2),
-                       0 0 300px 60px rgba(138, 43, 226, 0.1)
-                     `
-                   }}
+              <div 
+                className="absolute inset-0 rounded-full bg-black animate-singularity" 
+                style={{
+                  boxShadow: `
+                    0 0 100px 20px rgba(255, 69, 0, 0.3),
+                    0 0 200px 40px rgba(255, 140, 0, 0.2),
+                    0 0 300px 60px rgba(0, 0, 139, 0.1)
+                  `
+                }}
               />
               
               {/* Accretion Disk */}
-              <div className="absolute inset-0 rounded-full animate-cosmic-pulse"
-                   style={{
-                     background: `radial-gradient(circle at center,
-                       rgba(147, 51, 234, 0.8) 0%,
-                       rgba(138, 43, 226, 0.5) 30%,
-                       rgba(123, 31, 162, 0.3) 60%,
-                       transparent 80%
-                     )`
-                   }}
+              <div 
+                className="absolute inset-0 rounded-full animate-cosmic-pulse"
+                style={{
+                  background: `
+                    radial-gradient(circle at center,
+                      rgba(255, 69, 0, 0.8) 0%,
+                      rgba(255, 140, 0, 0.6) 30%,
+                      rgba(0, 0, 139, 0.4) 60%,
+                      transparent 80%
+                    )
+                  `
+                }}
               />
               
               {/* Event Horizon */}
-              <div className="absolute inset-0 rounded-full animate-pulse-slow"
-                   style={{
-                     background: `radial-gradient(circle at center,
-                       rgba(255, 255, 255, 0.1) 0%,
-                       transparent 70%
-                     )`,
-                     border: '2px solid rgba(147, 51, 234, 0.3)'
-                   }}
+              <div 
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: `
+                    radial-gradient(circle at center,
+                      rgba(255, 255, 255, 0.1) 0%,
+                      transparent 70%
+                    )
+                  `,
+                  border: '2px solid rgba(255, 140, 0, 0.3)',
+                  animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                }}
               />
             </div>
           </div>
         </div>
 
-        {/* Content */}
-        <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 animate-gradient relative z-10">
-          Own the future of<br />accounting
-        </h1>
-        <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12 relative z-10">
-          LedgerFund is building a decentralized network of accounting firms owned and governed by accountants. 
-          We're putting the future of the profession back in the hands of professionals.
-        </p>
-
-        <div className="mb-16 relative z-10">
-          <p className="text-sm uppercase tracking-wider text-purple-300 mb-6">
-            Explore applications powered by LedgerFund Protocol
+        {/* Content Layer */}
+        <div className="relative z-3" style={parallaxStyle}>
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-orange-200 to-blue-400 animate-gradient">
+            Own the future of<br />accounting
+          </h1>
+          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
+            LedgerFund is building a decentralized network of accounting firms owned and governed by accountants. 
+            We're putting the future of the profession back in the hands of professionals.
           </p>
-          
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <button 
-              onClick={() => navigate('/mint-nft')}
-              className="group relative px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-400 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/50 to-purple-400/50 blur-lg group-hover:blur-xl transition-all duration-300" />
-              <div className="relative flex items-center justify-center gap-2 text-white font-medium">
-                <Trophy className="w-5 h-5" />
-                <span>Earn Rewards with Quests</span>
-              </div>
-            </button>
+
+          <div className="mb-16">
+            <p className="text-sm uppercase tracking-wider text-orange-300 mb-6">
+              Explore applications powered by LedgerFund Protocol
+            </p>
             
-            <button 
-              onClick={() => navigate('/token-presale')}
-              className="group relative px-8 py-3 bg-black/30 hover:bg-black/40 border border-purple-500/30 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-purple-300/10 blur-sm group-hover:blur-lg transition-all duration-300" />
-              <div className="relative flex items-center justify-center gap-2 text-white font-medium">
-                <UserCircle className="w-5 h-5" />
-                <span>Mint Your LedgerFren NFT</span>
-              </div>
-            </button>
+            <div className="flex flex-col md:flex-row gap-4 justify-center">
+              <button 
+                onClick={() => navigate('/mint-nft')}
+                className="group relative px-8 py-3 bg-gradient-to-r from-orange-600 to-blue-400 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-600/50 to-blue-400/50 blur-lg group-hover:blur-xl transition-all duration-300" />
+                <div className="relative flex items-center justify-center gap-2 text-white font-medium">
+                  <Trophy className="w-5 h-5" />
+                  <span>Earn Rewards with Quests</span>
+                </div>
+              </button>
+              
+              <button 
+                onClick={() => navigate('/token-presale')}
+                className="group relative px-8 py-3 bg-black/30 hover:bg-black/40 border border-orange-500/30 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-blue-300/10 blur-sm group-hover:blur-lg transition-all duration-300" />
+                <div className="relative flex items-center justify-center gap-2 text-white font-medium">
+                  <UserCircle className="w-5 h-5" />
+                  <span>Mint Your LedgerFren NFT</span>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -175,25 +245,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-black overflow-hidden relative">
       <div className="absolute inset-0">
-        {/* Dark Purple Background with Stars */}
         <div 
           className="absolute inset-0"
           style={{
             background: "radial-gradient(circle at center, #1a0b2e 0%, #000000 100%)",
             opacity: 0.98
-          }}
-        />
-        
-        {/* Star Field Effect */}
-        <div 
-          className="absolute inset-0 opacity-90"
-          style={{
-            backgroundImage: `
-              radial-gradient(1px 1px at 10% 10%, rgba(255, 255, 255, 0.8) 100%, transparent),
-              radial-gradient(1.5px 1.5px at 20% 20%, rgba(139, 92, 246, 0.7) 100%, transparent)
-            `,
-            backgroundSize: "400% 400%",
-            animation: "star-field 240s ease-in-out infinite"
           }}
         />
       </div>
@@ -203,29 +259,6 @@ const Index = () => {
       <div className="container mx-auto px-4 relative z-10">
         <IndexContent />
       </div>
-
-      <style>
-        {`
-          @keyframes singularity {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.1) rotate(180deg); }
-          }
-          
-          @keyframes cosmic-pulse {
-            0%, 100% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
-          }
-          
-          @keyframes star-field {
-            0% { transform: translateZ(0) rotate(0deg); }
-            100% { transform: translateZ(400px) rotate(360deg); }
-          }
-          
-          .perspective-3000 {
-            perspective: 3000px;
-          }
-        `}
-      </style>
     </div>
   );
 };
