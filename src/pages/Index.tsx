@@ -131,14 +131,24 @@ const IndexContent = () => {
             }}
           >
             {[...Array(12)].map((_, i) => {
-              const angle = (i * 30) + (isLoaded ? 360 : 0);
-              const baseRadius = window.innerWidth * 0.7; // Start from 70% of viewport width
-              const radius = isLoaded 
-                ? baseRadius * Math.max(0.2, 1 - (Date.now() - loadTime) / 10000) // Spiral inward over 10 seconds
-                : baseRadius;
+              // Calculate initial position on the edge of the viewport
+              const viewportAngle = (i * (360 / 12)) * (Math.PI / 180);
+              const viewportRadius = Math.max(window.innerWidth, window.innerHeight) * 0.8;
+              const startX = Math.cos(viewportAngle) * viewportRadius;
+              const startY = Math.sin(viewportAngle) * viewportRadius;
+
+              // Unique orbit parameters for each firm
+              const orbitSpeed = 1 + (i % 3) * 0.5;
+              const orbitRadius = isLoaded 
+                ? Math.max(150, viewportRadius * Math.pow(0.95, (Date.now() - loadTime) / 1000)) // Exponential decay
+                : viewportRadius;
+              const orbitPhase = i * (Math.PI / 6);
+              const rotationSpeed = 0.5 + (i % 4) * 0.3;
+              const wobbleAmplitude = 20 + (i % 3) * 10;
+              const wobbleFrequency = 1 + (i % 2) * 0.5;
+
+              const angle = (Date.now() / (1000 / orbitSpeed) + orbitPhase) % (Math.PI * 2);
               const finalRadius = 150 - (scrollProgress * 150);
-              const speed = 1 + (i % 3) * 0.5;
-              const direction = i % 2 === 0 ? 1 : -1;
               
               return (
                 <div
@@ -147,16 +157,18 @@ const IndexContent = () => {
                   style={{
                     top: '50%',
                     left: '50%',
-                    transition: 'all 1s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: isLoaded ? 'all 1s cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
                     transform: scrollProgress > 0 
-                      ? `translate(-50%, -50%) rotate(${angle * direction + (scrollProgress * 720)}deg) translateX(${finalRadius}px)`
-                      : `translate(-50%, -50%) rotate(${angle * direction}deg) translateX(${radius + Math.sin(Date.now() / (1000 * speed)) * 20}px)`,
+                      ? `translate(-50%, -50%) rotate(${angle * 180 / Math.PI + (scrollProgress * 720)}deg) translateX(${finalRadius}px)`
+                      : `translate(calc(-50% + ${startX}px), calc(-50% + ${startY}px)) 
+                         rotate(${angle * 180 / Math.PI * rotationSpeed}deg) 
+                         translateX(${orbitRadius + Math.sin(Date.now() / (1000 * wobbleFrequency)) * wobbleAmplitude}px)`,
                   }}
                 >
                   <Building2 
                     className={`w-8 h-8 text-teal-300/90 transition-all duration-1000`}
                     style={{ 
-                      transform: `rotate(${-angle * direction}deg) scale(${1 - scrollProgress * 0.5})`,
+                      transform: `rotate(${-angle * 180 / Math.PI}deg) scale(${1 - scrollProgress * 0.5})`,
                       opacity: Math.max(0, 1 - scrollProgress * 2)
                     }}
                   />
