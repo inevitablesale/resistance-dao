@@ -147,16 +147,16 @@ export const WhatWeBuilding = () => {
         </h2>
 
         <Tabs defaultValue="presale" className="w-full">
-          <TabsList className="grid w-full max-w-[400px] grid-cols-2 mx-auto mb-8 bg-black/40">
+          <TabsList className="grid w-full max-w-[400px] grid-cols-2 mx-auto mb-8 bg-gradient-to-r from-yellow-950/50 to-teal-950/50 backdrop-blur-sm">
             <TabsTrigger 
               value="presale" 
-              className="data-[state=active]:bg-yellow-500/20 text-white hover:text-white/90"
+              className="data-[state=active]:bg-gradient-to-r from-yellow-500/90 to-yellow-600/90 data-[state=active]:text-white data-[state=active]:shadow-lg text-white/80 hover:text-white transition-all duration-300"
             >
               Platform Investment
             </TabsTrigger>
             <TabsTrigger 
               value="public" 
-              className="data-[state=active]:bg-teal-500/20 text-white hover:text-white/90"
+              className="data-[state=active]:bg-gradient-to-r from-teal-500/90 to-teal-600/90 data-[state=active]:text-white data-[state=active]:shadow-lg text-white/80 hover:text-white transition-all duration-300"
             >
               Professional Investment
             </TabsTrigger>
