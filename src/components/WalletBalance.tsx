@@ -8,7 +8,7 @@ import { ethers } from "ethers";
 import { ChevronUp, Plus, Send, Coins } from "lucide-react";
 
 export const WalletBalance = () => {
-  const { primaryWallet } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const [maticBalance, setMaticBalance] = useState<string>("0");
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [isExpanded, setIsExpanded] = useState(true);
@@ -37,6 +37,28 @@ export const WalletBalance = () => {
     const interval = setInterval(fetchBalances, 30000);
     return () => clearInterval(interval);
   }, [primaryWallet?.address]);
+
+  const handleDeposit = () => {
+    if (!primaryWallet) {
+      setShowAuthFlow?.(true);
+      return;
+    }
+    // This will open Dynamic's deposit flow
+    primaryWallet?.connector?.showWallet?.({
+      view: 'deposit'
+    });
+  };
+
+  const handleSend = () => {
+    if (!primaryWallet) {
+      setShowAuthFlow?.(true);
+      return;
+    }
+    // This will open Dynamic's send flow
+    primaryWallet?.connector?.showWallet?.({
+      view: 'send'
+    });
+  };
 
   return (
     <Card className="bg-[#1A1F2C]/90 border-white/10 p-4 space-y-4">
@@ -91,7 +113,7 @@ export const WalletBalance = () => {
               <Button 
                 variant="outline" 
                 className="w-full bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                onClick={() => window.open('https://wallet.polygon.technology/polygon/bridge', '_blank')}
+                onClick={handleDeposit}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Deposit
@@ -99,7 +121,7 @@ export const WalletBalance = () => {
               <Button 
                 variant="outline" 
                 className="w-full bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                onClick={() => window.open('https://wallet.polygon.technology', '_blank')}
+                onClick={handleSend}
               >
                 <Send className="w-4 h-4 mr-2" />
                 Send
@@ -111,3 +133,4 @@ export const WalletBalance = () => {
     </Card>
   );
 };
+

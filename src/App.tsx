@@ -140,7 +140,6 @@ function App() {
         displaySiweStatement: false,
         buttonText: {
           connectWallet: "Connect Wallet",
-          connecting: "Connecting...",
           disconnect: "Disconnect",
           signIn: "Connect Wallet",
           signUp: "Connect Wallet",
