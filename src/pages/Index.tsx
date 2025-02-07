@@ -22,7 +22,7 @@ import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
 
 const presaleData = [
   { 
-    name: 'Protocol Investment', 
+    name: 'Platform Investment', 
     value: 100, 
     color: '#14b8a6', 
     description: 'Early supporters invest in the LedgerFund platform, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10.',
@@ -57,7 +57,7 @@ const publicSaleData = [
     className: 'col-span-1'
   },
   { 
-    name: 'Firm Investment', 
+    name: 'Professional Investment', 
     value: 50, 
     color: '#ea384c',
     description: 'Dedicated allocation for accountants to invest in practices identified and vetted by the DAO community.',
