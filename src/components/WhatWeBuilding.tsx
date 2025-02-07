@@ -228,7 +228,7 @@ export const WhatWeBuilding = () => {
 
           <TabsContent value="professional" className="relative">
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
-              Firm Investment: 4,000,000 LGR at $1.00
+              Public Sale Allocation: 5,000,000 LGR
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
               <div className="grid grid-cols-2 gap-6 relative col-span-2">
