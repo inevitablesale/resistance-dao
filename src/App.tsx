@@ -84,6 +84,19 @@ function App() {
       persistWalletSession: true,
       enableAuthProviders: true,
       shadowDOMEnabled: false,
+      displayBalances: true, // Enable balance display
+      evmNetworks: [{
+        chainId: 137,
+        name: 'Polygon',
+        chainName: 'Polygon Mainnet',
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC',
+          decimals: 18,
+        },
+        blockExplorerUrls: ['https://polygonscan.com/'],
+        rpcUrls: ['https://polygon-rpc.com']
+      }]
     },
     tokens: [{
       name: "LedgerFund Token",
@@ -97,7 +110,9 @@ function App() {
       isToken: true,
       balance: "fetchFromContract",
       contractAddress: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
-      network: "polygon"
+      network: "polygon",
+      displayBalance: true, // Explicitly enable balance display
+      standard: "ERC20" // Specify token standard
     }]
   };
 
@@ -116,4 +131,3 @@ function App() {
 }
 
 export default App;
-
