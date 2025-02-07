@@ -146,8 +146,8 @@ const IndexContent = () => {
       // If wallet is connected, get user's purchased tokens
       if (primaryWallet?.address) {
         const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
-        const presaleContract = getPresaleContract(provider);
-        const purchased = await presaleContract.purchasedTokens(primaryWallet.address);
+        const presaleContract = await getPresaleContract(provider);
+        const purchased = await (await presaleContract).purchasedTokens(primaryWallet.address);
         setMyPurchased(ethers.utils.formatEther(purchased));
       }
     } catch (error) {
