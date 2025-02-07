@@ -31,6 +31,7 @@ function App() {
     eventsCallbacks: {
       onInitLoggedOut: () => {
         console.log("[Dynamic SDK] Initial state: Logged out");
+        // Single welcome toast when initially logged out
         toast({
           title: "Welcome to LedgerFund",
           description: "Connect your wallet to get started.",
@@ -83,6 +84,7 @@ function App() {
       },
       onLogout: () => {
         console.log("[Dynamic SDK] User logged out");
+        // Single welcome toast when logging out
         toast({
           title: "Logged Out",
           description: "You've been successfully logged out.",
