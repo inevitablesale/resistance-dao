@@ -469,7 +469,7 @@ export const WhatWeBuilding = () => {
               </div>
             ))}
           </div>
-        </TabsContent>
+        </Tabs>
       </div>
     </section>
   );
