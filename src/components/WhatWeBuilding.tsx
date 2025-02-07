@@ -3,14 +3,44 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
 
 const presaleData = [
-  { name: 'Presale Stake', value: 100, color: '#14b8a6', description: 'Reserved for early platform supporters. 5M tokens available at $0.10, with 1-year lock period and projected growth to $1.00.' }
+  { 
+    name: 'Presale Stake', 
+    value: 100, 
+    color: '#14b8a6', 
+    description: 'Reserved for early platform supporters. 5M tokens available at $0.10, with 1-year lock period and projected growth to $1.00.',
+    className: 'col-span-2 text-center' // Added className for full width and centering
+  }
 ];
 
 const publicSaleData = [
-  { name: 'Treasury', value: 30, color: '#14b8a6', description: 'Management company operations, collecting 2% management fee on acquisitions and 20% performance fee on distributions.' },
-  { name: 'Public Sale', value: 50, color: '#0d9488', description: 'Trading liquidity pool ensuring market stability and token accessibility.' },
-  { name: 'Community Rewards', value: 10, color: '#0f766e', description: 'Core team compensation for ongoing platform development and operations.' },
-  { name: 'Partners', value: 10, color: '#115e59', description: 'Strategic partnerships and ecosystem growth initiatives.' }
+  { 
+    name: 'Treasury', 
+    value: 30, 
+    color: '#14b8a6', 
+    description: 'Management company operations, collecting 2% management fee on acquisitions and 20% performance fee on distributions.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Public Sale', 
+    value: 50, 
+    color: '#0d9488', 
+    description: 'Trading liquidity pool ensuring market stability and token accessibility.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Community Rewards', 
+    value: 10, 
+    color: '#0f766e', 
+    description: 'Core team compensation for ongoing platform development and operations.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Partners', 
+    value: 10, 
+    color: '#115e59', 
+    description: 'Strategic partnerships and ecosystem growth initiatives.',
+    className: 'col-span-1'
+  }
 ];
 
 export const WhatWeBuilding = () => {
@@ -137,7 +167,7 @@ export const WhatWeBuilding = () => {
               Platform Investment: 5,000,000 LGR at $0.10
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="space-y-6 relative">
+              <div className="space-y-6 relative lg:col-span-2"> {/* Added lg:col-span-2 for full width */}
                 {presaleData.map((segment, index) => {
                   const orbitRadius = 20 + index * 10;
                   const orbitDuration = 20 + index * 5;
@@ -147,7 +177,7 @@ export const WhatWeBuilding = () => {
                   return (
                     <div 
                       key={segment.name}
-                      className="relative group animate-cosmic-pulse astral-energy"
+                      className={`relative group animate-cosmic-pulse astral-energy ${segment.className}`}
                       style={{
                         ...calculateEnergyStyles(sectionRef.current as HTMLElement),
                         '--energy-color': segment.color,
@@ -165,13 +195,13 @@ export const WhatWeBuilding = () => {
                                  hover:translate-y-[-4px] hover:rotate-1
                                  group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]"
                       >
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="flex items-center gap-3 mb-2 justify-center"> {/* Added justify-center */}
                           <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
                           <h3 className="text-xl font-semibold text-white">
                             {segment.name} ({segment.value}%)
                           </h3>
                         </div>
-                        <p className="text-gray-300">
+                        <p className="text-gray-300 text-center"> {/* Added text-center */}
                           {segment.description}
                         </p>
                       </div>
@@ -187,7 +217,7 @@ export const WhatWeBuilding = () => {
               Professional Investment: 4,000,000 LGR for Accountant Acquisition Pool
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="space-y-6 relative">
+              <div className="grid grid-cols-2 gap-6 relative col-span-2"> {/* Changed to grid with 2 columns */}
                 {publicSaleData.map((segment, index) => {
                   const orbitRadius = 20 + index * 10;
                   const orbitDuration = 20 + index * 5;
@@ -197,7 +227,7 @@ export const WhatWeBuilding = () => {
                   return (
                     <div 
                       key={segment.name}
-                      className="relative group animate-cosmic-pulse"
+                      className={`relative group animate-cosmic-pulse ${segment.className}`}
                       style={{
                         animation: `orbit ${orbitDuration}s linear infinite`,
                         transform: `translate(${offsetX}px, ${offsetY}px)`,
