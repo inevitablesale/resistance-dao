@@ -176,8 +176,8 @@ export const WhatWeBuilding = () => {
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
               Protocol Investment: Total Supply 10,000,000 LGR
             </p>
-            <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="space-y-6 relative grid grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="flex justify-center mb-20">
+              <div className="grid grid-cols-2 gap-6 max-w-4xl">
                 {presaleData.map((segment, index) => {
                   const orbitRadius = 20 + index * 10;
                   const orbitDuration = 20 + index * 5;
@@ -462,3 +462,4 @@ export const WhatWeBuilding = () => {
     </section>
   );
 };
+
