@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -27,6 +28,10 @@ function App() {
     eventsCallbacks: {
       onAuthSuccess: (args: any) => {
         console.log("Auth Success:", args);
+        // Log wallet chain info for debugging
+        if (args.wallet?.chain) {
+          console.log("Connected Wallet Network:", args.wallet.chain);
+        }
         toast({
           title: "Authentication Successful",
           description: "You're now connected to LedgerFund.",
@@ -60,6 +65,9 @@ function App() {
           description: error?.message || "An error occurred",
           variant: "destructive",
         });
+      },
+      onTokenBalancesLoad: (balances: any) => {
+        console.log("Token Balances Loaded:", balances);
       }
     },
     settings: {
@@ -108,3 +116,4 @@ function App() {
 }
 
 export default App;
+
