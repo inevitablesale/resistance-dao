@@ -37,10 +37,6 @@ function App() {
           title: "Email Verified",
           description: "Your email has been successfully verified.",
         });
-        // Use the window.dynamic API to close the auth flow
-        if (window.dynamic) {
-          window.dynamic.closeAuthFlow();
-        }
       },
       onLogout: () => {
         console.log("Logged out");
