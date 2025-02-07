@@ -1,4 +1,3 @@
-
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
@@ -49,21 +48,58 @@ export const WhatWeBuilding = () => {
 
   return (
     <section ref={sectionRef} className="py-16 relative overflow-hidden min-h-screen perspective-3000">
-      {/* Cosmic Background */}
-      <div className="absolute inset-0 opacity-90">
+      {/* Enhanced Black Hole Effect */}
+      <div className="absolute inset-0 overflow-hidden">
         <div 
-          className="absolute inset-0 transition-transform duration-300"
+          className="absolute inset-0 transition-transform duration-1000"
           style={{
-            background: 'radial-gradient(circle at center, transparent 0%, #000000e6 70%)',
-            transform: `scale(${1 + scrollProgress * 0.5})`
+            background: `
+              radial-gradient(circle at 50% 50%, 
+                rgba(0, 0, 0, 1) 0%,
+                rgba(20, 184, 166, 0.1) 20%,
+                rgba(234, 179, 8, 0.05) 40%,
+                transparent 70%
+              )
+            `,
+            transform: `scale(${1 + scrollProgress * 0.5})`,
+            animation: 'cosmic-pulse 8s ease-in-out infinite'
           }}
         />
+        
+        {/* Light Distortion Effect */}
         <div 
-          className="absolute inset-0 transition-transform duration-300"
+          className="absolute inset-0 transition-all duration-1000"
           style={{
-            background: 'radial-gradient(circle at center, rgba(234,179,8,0.15) 0%, rgba(45,212,191,0.1) 30%, transparent 70%)',
+            background: `
+              conic-gradient(
+                from 0deg at 50% 50%,
+                rgba(20, 184, 166, 0.1),
+                rgba(234, 179, 8, 0.1),
+                rgba(20, 184, 166, 0.1),
+                rgba(234, 179, 8, 0.1)
+              )
+            `,
+            transform: `rotate(${scrollProgress * 360}deg) scale(${1 + scrollProgress * 0.3})`,
+            opacity: 0.6,
+            mixBlendMode: 'overlay'
+          }}
+        />
+        
+        {/* Event Horizon Glow */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(circle at 50% 50%,
+                rgba(20, 184, 166, 0.2) 0%,
+                rgba(234, 179, 8, 0.15) 30%,
+                transparent 70%
+              )
+            `,
             animation: 'cosmic-pulse 4s ease-in-out infinite',
-            transform: `scale(${1 + scrollProgress * 0.3})`
+            transform: `scale(${1 + scrollProgress * 0.3}) rotate(${scrollProgress * 180}deg)`,
+            opacity: 0.8,
+            mixBlendMode: 'screen'
           }}
         />
       </div>
@@ -95,37 +131,61 @@ export const WhatWeBuilding = () => {
             </p>
             <div className="grid md:grid-cols-1 gap-12 items-center mb-20 max-w-4xl mx-auto">
               {presaleData.map((segment, index) => {
-                const orbitRadius = 20 + index * 10;
-                const orbitDuration = 20 + index * 5;
-                const offsetX = mousePosition.x * (10 + index * 5);
-                const offsetY = mousePosition.y * (10 + index * 5);
+                const distanceFromCenter = Math.sqrt(
+                  Math.pow(mousePosition.x, 2) + Math.pow(mousePosition.y, 2)
+                );
+                const distortionFactor = Math.max(0, 1 - distanceFromCenter);
+                const offsetX = mousePosition.x * (10 + index * 5) * distortionFactor;
+                const offsetY = mousePosition.y * (10 + index * 5) * distortionFactor;
 
                 return (
                   <div 
                     key={segment.name}
-                    className="relative group animate-cosmic-pulse"
+                    className="relative group"
                     style={{
-                      animation: `orbit ${orbitDuration}s linear infinite`,
-                      transform: `translate(${offsetX}px, ${offsetY}px)`,
-                      transition: 'transform 0.3s ease-out'
+                      transform: `
+                        translate(${offsetX}px, ${offsetY}px)
+                        scale(${1 - scrollProgress * 0.1})
+                      `,
+                      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}
                   >
-                    {/* Gravitational Lens Effect */}
-                    <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                    {/* Space-Time Distortion Effect */}
+                    <div 
+                      className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-all duration-500"
+                      style={{
+                        transform: `scale(${1 + scrollProgress * 0.2}) rotate(${scrollProgress * 45}deg)`,
+                      }}
+                    />
                     
                     <div 
                       className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
                                bg-black/30 border-yellow-500/20 hover:border-yellow-500/40
-                               hover:translate-y-[-4px] hover:rotate-1
                                group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]"
+                      style={{
+                        transform: `
+                          perspective(1000px)
+                          rotateX(${mousePosition.y * 10}deg)
+                          rotateY(${mousePosition.x * 10}deg)
+                        `
+                      }}
                     >
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
+                        <div 
+                          className="w-4 h-4 rounded-full animate-pulse"
+                          style={{ 
+                            backgroundColor: segment.color,
+                            boxShadow: `0 0 ${10 + scrollProgress * 20}px ${segment.color}`
+                          }} 
+                        />
                         <h3 className="text-xl font-semibold text-white">
                           {segment.name} ({segment.value}%)
                         </h3>
                       </div>
-                      <p className="text-gray-300">
+                      <p className="text-gray-300 transform transition-all duration-300"
+                         style={{
+                           filter: `blur(${scrollProgress * 0.5}px)`,
+                         }}>
                         {segment.description}
                       </p>
                     </div>
@@ -142,9 +202,12 @@ export const WhatWeBuilding = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 items-start mb-20">
               {publicSaleData.map((segment, index) => {
                 const angle = (index / publicSaleData.length) * Math.PI * 2;
-                const radius = 20;
-                const offsetX = mousePosition.x * (10 + index * 5);
-                const offsetY = mousePosition.y * (10 + index * 5);
+                const distanceFromCenter = Math.sqrt(
+                  Math.pow(mousePosition.x, 2) + Math.pow(mousePosition.y, 2)
+                );
+                const distortionFactor = Math.max(0, 1 - distanceFromCenter);
+                const offsetX = Math.cos(angle) * 100 * (1 + scrollProgress) + mousePosition.x * 20 * distortionFactor;
+                const offsetY = Math.sin(angle) * 100 * (1 + scrollProgress) + mousePosition.y * 20 * distortionFactor;
 
                 return (
                   <div 
@@ -154,29 +217,48 @@ export const WhatWeBuilding = () => {
                       transform: `
                         translate(${offsetX}px, ${offsetY}px)
                         rotate(${angle}rad)
+                        scale(${1 - scrollProgress * 0.1})
                       `,
-                      transition: 'transform 0.3s ease-out'
+                      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}
                   >
-                    {/* Gravitational Lens Effect */}
-                    <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-yellow-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                    {/* Space-Time Distortion Effect */}
+                    <div 
+                      className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-yellow-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-all duration-500"
+                      style={{
+                        transform: `scale(${1 + scrollProgress * 0.2}) rotate(${scrollProgress * 45}deg)`,
+                      }}
+                    />
                     
                     <div 
                       className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
                                bg-black/30 border-teal-500/20 hover:border-teal-500/40
-                               hover:translate-y-[-4px] hover:rotate-1
                                group-hover:shadow-[0_0_25px_rgba(45,212,191,0.2)]"
                       style={{
-                        transform: `rotate(${-angle}rad)`, // Counter-rotate the content
+                        transform: `
+                          rotate(${-angle}rad)
+                          perspective(1000px)
+                          rotateX(${mousePosition.y * 10}deg)
+                          rotateY(${mousePosition.x * 10}deg)
+                        `
                       }}
                     >
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
+                        <div 
+                          className="w-4 h-4 rounded-full animate-pulse"
+                          style={{ 
+                            backgroundColor: segment.color,
+                            boxShadow: `0 0 ${10 + scrollProgress * 20}px ${segment.color}`
+                          }}
+                        />
                         <h3 className="text-xl font-semibold text-white">
                           {segment.name} ({segment.value}%)
                         </h3>
                       </div>
-                      <p className="text-gray-300">
+                      <p className="text-gray-300 transform transition-all duration-300"
+                         style={{
+                           filter: `blur(${scrollProgress * 0.5}px)`,
+                         }}>
                         {segment.description}
                       </p>
                     </div>

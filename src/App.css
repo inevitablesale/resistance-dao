@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -52,15 +53,40 @@
 
 @keyframes cosmic-pulse {
   0%, 100% {
-    transform: scale(1);
-    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    opacity: 0.8;
   }
   50% {
-    transform: scale(1.05);
-    opacity: 0.8;
+    transform: scale(1.1) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+@keyframes event-horizon {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+  }
+}
+
+@keyframes light-distortion {
+  0% {
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  50% {
+    filter: hue-rotate(180deg) brightness(1.2);
+  }
+  100% {
+    filter: hue-rotate(360deg) brightness(1);
   }
 }
 
 .perspective-3000 {
   perspective: 3000px;
 }
+
