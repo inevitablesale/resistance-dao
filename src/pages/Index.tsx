@@ -34,7 +34,7 @@ const IndexContent = () => {
   // Add states for presale data
   const [presaleSupply] = useState<string>(TOTAL_PRESALE_SUPPLY.toString());
   const [totalSold, setTotalSold] = useState<string>('0');
-  const [presaleEndTime] = useState<number>(PRESALE_END_TIME * 1000); // Convert to milliseconds
+  const [presaleEndTime] = useState<number>(PRESALE_END_TIME * 1000);
   const [timeLeft, setTimeLeft] = useState({
     days: '00',
     hours: '00',
@@ -45,7 +45,6 @@ const IndexContent = () => {
   const [myStakeable, setMyStakeable] = useState<string>('0');
   const [maticPrice, setMaticPrice] = useState<string>('Loading...');
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
-  const { tokenBalances, isLoading: isLoadingBalances } = useTokenBalances();
 
   useEffect(() => {
     // Set loaded state after a small delay to trigger initial animations
@@ -109,20 +108,16 @@ const IndexContent = () => {
   // Function to fetch presale data
   const fetchPresaleData = async () => {
     try {
-      // Get total LGR tokens sold using the correct function
       const sold = await fetchTotalLGRSold();
       setTotalSold(sold);
 
-      // Get current price in MATIC
       const price = await fetchPresaleMaticPrice();
       setMaticPrice(price === "0" ? "Loading..." : `${price} MATIC`);
       
-      // If wallet is connected, get user's purchased tokens
       if (primaryWallet?.address) {
-        const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
-        const presaleContract = await getPresaleContract(provider);
-        const purchased = await (await presaleContract).purchasedTokens(primaryWallet.address);
-        setMyPurchased(ethers.utils.formatEther(purchased));
+        const purchased = await fetchPurchasedTokens(primaryWallet.address);
+        console.log('Setting myPurchased to:', purchased);
+        setMyPurchased(purchased);
       }
     } catch (error) {
       console.error('Error fetching presale data:', error);
@@ -325,53 +320,29 @@ const IndexContent = () => {
               
               <div className="bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
                 {/* Token Balances Section */}
-                {primaryWallet && (
+                {primaryWallet && Number(myPurchased) > 0 && (
                   <div className="mb-8 p-4 rounded-lg bg-black/40 border border-yellow-500/10">
                     <div className="flex items-center gap-2 mb-4">
                       <Coins className="w-5 h-5 text-yellow-500" />
-                      <h3 className="text-lg font-semibold text-white">Your Balances</h3>
+                      <h3 className="text-lg font-semibold text-white">Your LGR Balance</h3>
                     </div>
-                    
-                    {isLoadingBalances ? (
-                      <div className="animate-pulse flex space-x-4">
-                        <div className="h-12 bg-yellow-500/10 rounded w-full"></div>
-                      </div>
-                    ) : tokenBalances && tokenBalances.length > 0 ? (
-                      <div className="space-y-3">
-                        {tokenBalances.map((token) => (
-                          <div 
-                            key={token.address} 
-                            className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-yellow-500/5 hover:border-yellow-500/20 transition-colors"
-                          >
-                            <div className="flex items-center gap-3">
-                              {token.logoURI && (
-                                <img 
-                                  src={token.logoURI} 
-                                  alt={token.symbol} 
-                                  className="w-8 h-8 rounded-full"
-                                />
-                              )}
-                              <div>
-                                <div className="text-white font-medium">{token.symbol}</div>
-                                <div className="text-sm text-gray-400">{token.name}</div>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-white font-medium">
-                                {Number(token.balance).toFixed(4)}
-                              </div>
-                              <div className="text-sm text-gray-400">
-                                {token.networkId === 137 ? 'Polygon' : 'Network ' + token.networkId}
-                              </div>
-                            </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-yellow-500/5 hover:border-yellow-500/20 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <img src="/favicon.ico" alt="LGR" className="w-8 h-8 rounded-full" />
+                          <div>
+                            <div className="text-white font-medium">LGR</div>
+                            <div className="text-sm text-gray-400">LedgerFund Token</div>
                           </div>
-                        ))}
+                        </div>
+                        <div className="text-right">
+                          <div className="text-white font-medium">
+                            {Number(myPurchased).toFixed(2)}
+                          </div>
+                          <div className="text-sm text-gray-400">Polygon</div>
+                        </div>
                       </div>
-                    ) : (
-                      <div className="text-center text-gray-400 py-4">
-                        No tokens found in your wallet
-                      </div>
-                    )}
+                    </div>
                   </div>
                 )}
 

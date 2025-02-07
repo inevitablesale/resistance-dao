@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
@@ -116,6 +115,23 @@ export const fetchPresaleMaticPrice = async () => {
   }
 };
 
+// Function to fetch user's purchased tokens
+export const fetchPurchasedTokens = async (address: string) => {
+  try {
+    console.log('Fetching purchased tokens for address:', address);
+    const provider = await getWorkingProvider();
+    const contract = await getPresaleContract(provider);
+    const purchased = await contract.purchasedTokens(address);
+    console.log('Purchased tokens (raw):', purchased.toString());
+    const formatted = ethers.utils.formatUnits(purchased, 18);
+    console.log('Purchased tokens (formatted):', formatted);
+    return formatted;
+  } catch (error) {
+    console.error("Error fetching purchased tokens:", error);
+    return "0";
+  }
+};
+
 // Function to purchase tokens
 export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string) => {
   try {
@@ -155,4 +171,3 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
     throw error;
   }
 };
-
