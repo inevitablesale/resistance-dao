@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -15,7 +16,7 @@ import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, UserCircle, Wallet, ClipboardCopy } from "lucide-react";
+import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBranch } from "lucide-react";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
@@ -470,6 +471,91 @@ const IndexContent = () => {
       </div>
 
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
+        {/* Project Overview Section */}
+        <div className="container mx-auto px-4 py-24">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
+              The $LGR Protocol Vision
+            </h2>
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+              Building Web3's first protocol that combines elite M&A expertise, battle-tested playbooks, and networked capital into an unstoppable acquisition engine.
+            </p>
+          </div>
+
+          {/* Protocol Power Grid */}
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            {/* Protocol Power */}
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-teal-500/20 rounded-lg blur-xl group-hover:scale-105 transition-transform duration-300" />
+              <div className="relative bg-black/40 backdrop-blur-sm p-8 rounded-lg border border-yellow-500/20">
+                <div className="flex items-center gap-3 mb-4">
+                  <Zap className="w-6 h-6 text-yellow-500" />
+                  <h3 className="text-2xl font-bold text-white">Protocol Power</h3>
+                </div>
+                <p className="text-white/80">
+                  Decades of M&A expertise and proven playbooks, codified into smart contracts for unstoppable execution.
+                </p>
+              </div>
+            </div>
+
+            {/* Network Effects */}
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/20 to-yellow-500/20 rounded-lg blur-xl group-hover:scale-105 transition-transform duration-300" />
+              <div className="relative bg-black/40 backdrop-blur-sm p-8 rounded-lg border border-teal-500/20">
+                <div className="flex items-center gap-3 mb-4">
+                  <Network className="w-6 h-6 text-teal-500" />
+                  <h3 className="text-2xl font-bold text-white">Network Effects</h3>
+                </div>
+                <p className="text-white/80">
+                  Each acquisition strengthens the network, creating a flywheel of increasing protocol value and market dominance.
+                </p>
+              </div>
+            </div>
+
+            {/* Value Capture */}
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-teal-500/20 rounded-lg blur-xl group-hover:scale-105 transition-transform duration-300" />
+              <div className="relative bg-black/40 backdrop-blur-sm p-8 rounded-lg border border-yellow-500/20">
+                <div className="flex items-center gap-3 mb-4">
+                  <Coins className="w-6 h-6 text-yellow-500" />
+                  <h3 className="text-2xl font-bold text-white">Value Capture</h3>
+                </div>
+                <p className="text-white/80">
+                  Token holders capture value through governance rights and protocol-owned revenue streams from acquisitions.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Singularity Effect Box */}
+          <div className="relative mb-16">
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl" />
+            <div className="relative bg-black/60 backdrop-blur-sm p-8 md:p-12 rounded-lg border border-yellow-500/20">
+              <div className="flex items-center gap-3 mb-6">
+                <GitBranch className="w-8 h-8 text-teal-500" />
+                <h3 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-300">
+                  The Singularity Effect
+                </h3>
+              </div>
+              <div className="grid md:grid-cols-3 gap-8">
+                <div className="space-y-2">
+                  <h4 className="text-xl font-semibold text-yellow-500">Elite M&A Expertise</h4>
+                  <p className="text-white/80">Decades of experience in accounting firm acquisitions, mergers, and optimizations.</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-xl font-semibold text-teal-500">Battle-tested Playbooks</h4>
+                  <p className="text-white/80">Proven strategies for firm valuation, integration, and value creation.</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-xl font-semibold text-yellow-500">Collective Capital</h4>
+                  <p className="text-white/80">Protocol-owned liquidity powering a continuous acquisition engine.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Continue with existing sections */}
         <WhatWeBuilding />
         <LedgerFrens />
         <HowItWorks />
