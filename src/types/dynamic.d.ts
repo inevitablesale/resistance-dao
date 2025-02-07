@@ -31,10 +31,52 @@ declare module "@dynamic-labs/sdk-react-core" {
   export interface DynamicSettings {
     environmentId: string;
     walletConnectors: (typeof EthereumWalletConnectors | typeof ZeroDevSmartWalletConnectors)[];
+    walletConnectorOptions?: {
+      zeroDevOptions: {
+        projectId: string;
+        bundlerRpc: string;
+        paymasterRpc: string;
+      };
+    };
     eventsCallbacks?: {
       onVerificationComplete?: () => void;
       onAuthSuccess?: (args: any) => void;
       onLogout?: () => void;
+    };
+    settings?: {
+      network?: {
+        chainId: number;
+      };
+      environmentId: string;
+      appName: string;
+      appLogoUrl: string;
+      enableEmbeddedWallets?: boolean;
+      enableVisitTrackingOnConnectOnly?: boolean;
+      enableWalletConnectV1?: boolean;
+      enableWalletConnectV2?: boolean;
+      persistWalletSession?: boolean;
+      enableSessionRestoration?: boolean;
+      enableAuthProviders?: boolean;
+      enablePasskeys?: boolean;
+      evmWallets?: {
+        options: {
+          emailAuth: {
+            signInWithEmail: boolean;
+            autoVerify: boolean;
+            autoClose: boolean;
+            onComplete: (args: any) => void;
+          };
+        };
+      };
+      shadowDOMEnabled?: boolean;
+      tokens?: Array<{
+        address: string;
+        symbol: string;
+        decimals: number;
+        name: string;
+        icon: string;
+        chainId: number;
+      }>;
     };
   }
 
