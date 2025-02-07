@@ -51,22 +51,18 @@ const IndexContent = () => {
     setTimeout(() => setIsLoaded(true), 100);
   }, []);
 
-  // Show welcome toast only once when component mounts and wallet is not connected
+  // Show welcome toast only once when component mounts
   useEffect(() => {
-    const showWelcomeToast = async () => {
-      if (welcomeToastShown.current) return;
-      
-      if (!primaryWallet || !(await primaryWallet?.isConnected())) {
-        welcomeToastShown.current = true;
-        toast({
-          title: "Welcome to LedgerFund",
-          description: "Connect your wallet to participate in the token presale"
-        });
-      }
-    };
-
-    showWelcomeToast();
-  }, [primaryWallet, toast]);
+    if (!welcomeToastShown.current && !primaryWallet) {
+      console.log("[Toast] Showing welcome toast - no wallet detected");
+      welcomeToastShown.current = true;
+      toast({
+        title: "Welcome to LedgerFund",
+        description: "Connect your wallet to participate in the token presale",
+        duration: 5000,
+      });
+    }
+  }, [primaryWallet]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -199,11 +195,12 @@ const IndexContent = () => {
   };
 
   const handleBuyClick = () => {
-    if (!primaryWallet || !primaryWallet.isConnected()) {
+    if (!primaryWallet) {
       setShowAuthFlow?.(true);
       toast({
         title: "Connect Wallet",
         description: "Please connect your wallet to purchase tokens.",
+        duration: 5000,
       });
     } else {
       setShowPurchaseForm(true);
