@@ -7,7 +7,7 @@ const presaleData = [
     name: 'Protocol Investment', 
     value: 100, 
     color: '#9b87f5',
-    description: 'Protocol supporters diversify into two investment tracks: passive token holders who earn reflections, and active participants who engage in firm acquisitions.',
+    description: 'Two distinct investment tracks within the protocol enable diverse participation in accounting firm acquisitions.',
     className: 'col-span-2 text-center'
   }
 ];
@@ -105,8 +105,8 @@ export const WhatWeBuilding = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const calculateEnergyStyles = (element: HTMLElement, energyColor: string) => {
-    if (!blackholeRef.current) return {};
+  const calculateEnergyStyles = (element: HTMLElement | null, energyColor: string) => {
+    if (!element || !blackholeRef.current) return {};
     
     const rect = element.getBoundingClientRect();
     const elementCenter = {
@@ -200,7 +200,7 @@ export const WhatWeBuilding = () => {
                       key={segment.name}
                       className={`relative group animate-cosmic-pulse astral-energy ${segment.className}`}
                       style={{
-                        ...calculateEnergyStyles(sectionRef.current as HTMLElement),
+                        ...calculateEnergyStyles(sectionRef.current, segment.color),
                         '--energy-color': segment.color,
                         animation: `orbit ${orbitDuration}s linear infinite`,
                         transform: `translate(${offsetX}px, ${offsetY}px)`,
@@ -238,7 +238,7 @@ export const WhatWeBuilding = () => {
                       key={option.name}
                       ref={el => optionRefs.current[index] = el}
                       className="relative group astral-energy"
-                      style={optionRefs.current[index] ? calculateEnergyStyles(optionRefs.current[index], option.energyColor) : {}}
+                      style={calculateEnergyStyles(optionRefs.current[index], option.energyColor)}
                     >
                       <div 
                         className="absolute inset-0 pointer-events-none"
