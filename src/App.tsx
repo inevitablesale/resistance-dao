@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -28,7 +29,6 @@ function App() {
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
     events: {
-      // Auth related events
       authFlowOpen: () => {
         console.log("[Dynamic SDK] Auth flow opened");
       },
@@ -113,6 +113,17 @@ function App() {
       // Authentication settings
       enableAuthProviders: true,
       enablePasskeys: false,
+      buttonTranslations: {
+        connect_wallet: "Connect Wallet",
+        sign_in: "Connect Wallet",
+        logged_out: "Connect Wallet",
+        sign_up: "Connect Wallet",
+        connecting: "Connecting...",
+        disconnect: "Disconnect",
+        view_account: "View Account"
+      },
+      buttonClassName: "dynamic-button",
+      displaySiweStatement: false,
       // Email authentication settings
       evmWallets: {
         options: {
@@ -133,13 +144,6 @@ function App() {
               });
             }
           }
-        }
-      },
-      walletsDisplayFormat: {
-        buttonSettings: {
-          connectWalletButtonText: "Connect Wallet",
-          disconnectButtonText: "Disconnect",
-          showLoginWithEmailButton: true
         }
       },
       shadowDOMEnabled: false,
