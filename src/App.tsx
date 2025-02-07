@@ -25,42 +25,45 @@ function App() {
     ],
     eventsCallbacks: {
       onAuthSuccess: (args: any) => {
-        console.log("Auth Success:", args);
+        console.log("Auth Success Event Triggered:", args);
         toast({
           title: "Authentication Successful",
           description: "You're now connected to LedgerFund.",
         });
       },
+      onEmailVerificationStart: () => {
+        console.log("Email verification process started");
+      },
       onEmailVerificationSuccess: (args: any) => {
-        console.log("Email Verification Success:", args);
+        console.log("Email Verification Success Event Triggered:", args);
         toast({
           title: "Email Verified",
           description: "Your email has been successfully verified.",
         });
       },
       onWalletConnectSuccess: (args: any) => {
-        console.log("Wallet Connect Success:", args);
+        console.log("Wallet Connect Success Event Triggered:", args);
         toast({
           title: "Wallet Connected",
           description: "Your wallet has been successfully connected.",
         });
       },
       onLogout: () => {
-        console.log("Logged out");
+        console.log("Logout Event Triggered");
         toast({
           title: "Logged Out",
           description: "You've been successfully logged out.",
         });
       },
       onDisconnect: () => {
-        console.log("Wallet disconnected");
+        console.log("Wallet Disconnect Event Triggered");
         toast({
           title: "Wallet Disconnected",
           description: "Your wallet has been disconnected.",
         });
       },
       onError: (error: any) => {
-        console.error("Dynamic SDK Error:", error);
+        console.error("Dynamic SDK Error Event Triggered:", error);
         toast({
           title: "Error",
           description: error?.message || "An error occurred",
@@ -68,7 +71,7 @@ function App() {
         });
       },
       onEmailVerificationFailure: (error: any) => {
-        console.error("Email Verification Error:", error);
+        console.error("Email Verification Error Event Triggered:", error);
         toast({
           title: "Verification Failed",
           description: "Failed to verify email. Please try again.",
@@ -133,3 +136,4 @@ function App() {
 }
 
 export default App;
+
