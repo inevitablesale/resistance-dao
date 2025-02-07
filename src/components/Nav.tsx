@@ -2,11 +2,15 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
+import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 
 const Nav = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Initialize balance monitoring
+  useBalanceMonitor();
 
   const handleLaunchApp = async () => {
     window.open('https://docs.ledgerfund.finance', '_blank');
@@ -64,4 +68,3 @@ const Nav = () => {
 };
 
 export default Nav;
-

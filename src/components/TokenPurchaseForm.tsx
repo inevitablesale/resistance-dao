@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Input } from "@/components/ui/input";
@@ -7,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { purchaseTokens, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { ethers } from "ethers";
 import { Loader2 } from "lucide-react";
+import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 
 export const TokenPurchaseForm = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
@@ -14,6 +14,9 @@ export const TokenPurchaseForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [expectedLGR, setExpectedLGR] = useState<string | null>(null);
+
+  // Initialize balance monitoring
+  useBalanceMonitor();
 
   const calculateExpectedLGR = async (amount: string) => {
     try {
