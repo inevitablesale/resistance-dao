@@ -48,9 +48,11 @@ function App() {
         console.log("[Dynamic SDK] Connected wallet:", args?.wallet);
         console.log("[Dynamic SDK] Connected user:", args?.user);
         console.log("[Dynamic SDK] Verification:", args?.user?.verifications);
+        
+        // Enhanced toast for wallet connection
         toast({
-          title: "Authentication Successful",
-          description: "You're now connected to LedgerFund.",
+          title: "Wallet Connected",
+          description: `Successfully connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
         });
       },
       onEmailVerificationStart: () => {
@@ -144,4 +146,3 @@ function App() {
 }
 
 export default App;
-
