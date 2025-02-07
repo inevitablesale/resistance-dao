@@ -1,3 +1,4 @@
+
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
@@ -92,47 +93,45 @@ export const WhatWeBuilding = () => {
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
               Platform Investment: 5,000,000 LGR at $0.10
             </p>
-            <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="space-y-6 relative">
-                {presaleData.map((segment, index) => {
-                  const orbitRadius = 20 + index * 10;
-                  const orbitDuration = 20 + index * 5;
-                  const offsetX = mousePosition.x * (10 + index * 5);
-                  const offsetY = mousePosition.y * (10 + index * 5);
+            <div className="grid md:grid-cols-1 gap-12 items-center mb-20 max-w-4xl mx-auto">
+              {presaleData.map((segment, index) => {
+                const orbitRadius = 20 + index * 10;
+                const orbitDuration = 20 + index * 5;
+                const offsetX = mousePosition.x * (10 + index * 5);
+                const offsetY = mousePosition.y * (10 + index * 5);
 
-                  return (
+                return (
+                  <div 
+                    key={segment.name}
+                    className="relative group animate-cosmic-pulse"
+                    style={{
+                      animation: `orbit ${orbitDuration}s linear infinite`,
+                      transform: `translate(${offsetX}px, ${offsetY}px)`,
+                      transition: 'transform 0.3s ease-out'
+                    }}
+                  >
+                    {/* Gravitational Lens Effect */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                    
                     <div 
-                      key={segment.name}
-                      className="relative group animate-cosmic-pulse"
-                      style={{
-                        animation: `orbit ${orbitDuration}s linear infinite`,
-                        transform: `translate(${offsetX}px, ${offsetY}px)`,
-                        transition: 'transform 0.3s ease-out'
-                      }}
+                      className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
+                               bg-black/30 border-yellow-500/20 hover:border-yellow-500/40
+                               hover:translate-y-[-4px] hover:rotate-1
+                               group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]"
                     >
-                      {/* Gravitational Lens Effect */}
-                      <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
-                      
-                      <div 
-                        className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
-                                 bg-black/30 border-yellow-500/20 hover:border-yellow-500/40
-                                 hover:translate-y-[-4px] hover:rotate-1
-                                 group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]"
-                      >
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
-                          <h3 className="text-xl font-semibold text-white">
-                            {segment.name} ({segment.value}%)
-                          </h3>
-                        </div>
-                        <p className="text-gray-300">
-                          {segment.description}
-                        </p>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
+                        <h3 className="text-xl font-semibold text-white">
+                          {segment.name} ({segment.value}%)
+                        </h3>
                       </div>
+                      <p className="text-gray-300">
+                        {segment.description}
+                      </p>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
           </TabsContent>
 
@@ -140,47 +139,50 @@ export const WhatWeBuilding = () => {
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
               Professional Investment: 4,000,000 LGR for Accountant Acquisition Pool
             </p>
-            <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="space-y-6 relative">
-                {publicSaleData.map((segment, index) => {
-                  const orbitRadius = 20 + index * 10;
-                  const orbitDuration = 20 + index * 5;
-                  const offsetX = mousePosition.x * (10 + index * 5);
-                  const offsetY = mousePosition.y * (10 + index * 5);
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 items-start mb-20">
+              {publicSaleData.map((segment, index) => {
+                const angle = (index / publicSaleData.length) * Math.PI * 2;
+                const radius = 20;
+                const offsetX = mousePosition.x * (10 + index * 5);
+                const offsetY = mousePosition.y * (10 + index * 5);
 
-                  return (
+                return (
+                  <div 
+                    key={segment.name}
+                    className="relative group"
+                    style={{
+                      transform: `
+                        translate(${offsetX}px, ${offsetY}px)
+                        rotate(${angle}rad)
+                      `,
+                      transition: 'transform 0.3s ease-out'
+                    }}
+                  >
+                    {/* Gravitational Lens Effect */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-yellow-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                    
                     <div 
-                      key={segment.name}
-                      className="relative group animate-cosmic-pulse"
+                      className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
+                               bg-black/30 border-teal-500/20 hover:border-teal-500/40
+                               hover:translate-y-[-4px] hover:rotate-1
+                               group-hover:shadow-[0_0_25px_rgba(45,212,191,0.2)]"
                       style={{
-                        animation: `orbit ${orbitDuration}s linear infinite`,
-                        transform: `translate(${offsetX}px, ${offsetY}px)`,
-                        transition: 'transform 0.3s ease-out'
+                        transform: `rotate(${-angle}rad)`, // Counter-rotate the content
                       }}
                     >
-                      {/* Gravitational Lens Effect */}
-                      <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-yellow-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
-                      
-                      <div 
-                        className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
-                                 bg-black/30 border-teal-500/20 hover:border-teal-500/40
-                                 hover:translate-y-[-4px] hover:rotate-1
-                                 group-hover:shadow-[0_0_25px_rgba(45,212,191,0.2)]"
-                      >
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
-                          <h3 className="text-xl font-semibold text-white">
-                            {segment.name} ({segment.value}%)
-                          </h3>
-                        </div>
-                        <p className="text-gray-300">
-                          {segment.description}
-                        </p>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
+                        <h3 className="text-xl font-semibold text-white">
+                          {segment.name} ({segment.value}%)
+                        </h3>
                       </div>
+                      <p className="text-gray-300">
+                        {segment.description}
+                      </p>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Management Fee Structure Section */}
