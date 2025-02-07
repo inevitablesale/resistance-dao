@@ -7,7 +7,7 @@ const presaleData = [
     name: 'Presale Stake', 
     value: 100, 
     color: '#14b8a6', 
-    description: 'Early supporters invest in the LedgerFund platform, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10, with 1-year lock period and projected growth to $1.00.',
+    description: 'Early supporters invest in the LedgerFund platform, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10, with 1-year lock up period.',
     className: 'col-span-2 text-center'
   }
 ];
