@@ -7,7 +7,7 @@ const presaleData = [
     name: 'Presale Stake', 
     value: 100, 
     color: '#14b8a6', 
-    description: 'Early supporters receive platform tokens and earn reflections from accounting firm investments made by LedgerFund DAO professionals. 5M tokens available at $0.10, with 1-year lock period and projected growth to $1.00.',
+    description: 'Early supporters invest in the LedgerFund platform, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10, with 1-year lock period and projected growth to $1.00.',
     className: 'col-span-2 text-center'
   }
 ];
@@ -17,28 +17,28 @@ const publicSaleData = [
     name: 'Treasury', 
     value: 30, 
     color: '#14b8a6', 
-    description: 'Strategic treasury management by third-party vault provider, ensuring secure and transparent fund management.',
+    description: 'Strategic treasury management by third-party vault provider ensures secure and transparent fund management for accounting firm acquisitions.',
     className: 'col-span-1'
   },
   { 
     name: 'Public Sale', 
     value: 50, 
     color: '#0d9488', 
-    description: 'Public token sale allocation: tokens available to the broader community after the presale period.',
+    description: 'Dedicated allocation for accountants to invest in practices identified and vetted by the DAO community.',
     className: 'col-span-1'
   },
   { 
     name: 'Community Rewards', 
     value: 10, 
     color: '#0f766e', 
-    description: 'Community engagement incentives including contests, milestone rewards, exclusive merchandise, launch events, and special access to platform features.',
+    description: 'Incentives for active DAO participation including practice identification, due diligence, and community growth initiatives.',
     className: 'col-span-1'
   },
   { 
     name: 'Partners', 
     value: 10, 
     color: '#115e59', 
-    description: 'Strategic partnerships with banks, staffing agencies, technology providers, and other ecosystem participants to enhance platform capabilities.',
+    description: 'Strategic partnerships with banks, staffing agencies, technology providers, and other ecosystem participants supporting practice acquisitions.',
     className: 'col-span-1'
   }
 ];
