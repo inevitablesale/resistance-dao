@@ -210,6 +210,20 @@ export const WhatWeBuilding = () => {
                 })}
               </div>
             </div>
+            <ul className="space-y-3 text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-yellow-400">•</span>
+                <span>Step into Ownership: By investing LGR, you're securing your stake in a real-world business.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-yellow-400">•</span>
+                <span>Log in or sign up to connect your wallet and participate.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-yellow-400">•</span>
+                <span>NFT Requirement: You'll need to mint a LedgerFren confirming your industry expertise to participate.</span>
+              </li>
+            </ul>
           </TabsContent>
 
           <TabsContent value="public" className="relative">
@@ -431,9 +445,9 @@ export const WhatWeBuilding = () => {
                     <div className="mb-4">
                       <Coins className="w-8 h-8 text-teal-400" />
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Network Access</h3>
+                    <h3 className="text-xl font-semibold text-white mb-2">Voting Rights</h3>
                     <p className="text-gray-300">
-                      Join a professional network of accountant-owners with shared interests.
+                      Participate in governance decisions for the firm (resourcing, budgeting, processes)
                     </p>
                   </div>
                 </div>
