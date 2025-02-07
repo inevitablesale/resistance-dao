@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -137,6 +138,8 @@ function App() {
       },
       buttonSettings: {
         loginButtonText: "Connect Wallet",
+        connectWalletButtonText: "Connect Wallet",
+        signUpButtonText: "Connect Wallet"
       },
       shadowDOMEnabled: false,
       tokens: [
