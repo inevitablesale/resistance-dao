@@ -126,8 +126,8 @@ function App() {
         options: {
           emailAuth: {
             signInWithEmail: true,
-            autoVerify: false,  // Show verification window
-            autoClose: true,   // Close window after successful verification
+            autoVerify: true,  // Changed to true to auto-verify
+            autoClose: true,   // Keep auto-close true
             onComplete: (args) => {
               console.log("[Dynamic SDK] Email Auth Complete:", args);
               console.log("[Dynamic SDK] Auth details:", {
