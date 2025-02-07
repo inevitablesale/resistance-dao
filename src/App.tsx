@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -74,7 +73,17 @@ function App() {
       enableWalletConnectV2: true,
       persistWalletSession: true,
       enableAuthProviders: true,
-      shadowDOMEnabled: false
+      shadowDOMEnabled: false,
+      tokens: [
+        {
+          address: "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c",
+          symbol: "LGR",
+          decimals: 18,
+          name: "LedgerFund Token",
+          icon: "/favicon.ico",
+          chainId: 137
+        }
+      ]
     }
   };
 
