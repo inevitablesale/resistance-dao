@@ -31,10 +31,16 @@ function App() {
           description: "You're now connected to LedgerFund.",
         });
       },
-      onEmailVerificationSuccess: () => {
-        console.log("Email verification successful");
-        // This will ensure the verification window closes
-        window.location.reload();
+      onEmailVerificationSuccess: (args: any) => {
+        console.log("Email verification successful", args);
+        toast({
+          title: "Email Verified",
+          description: "Your email has been successfully verified.",
+        });
+        // Force the auth flow to close
+        if (dynamicSettings.settings?.setShowAuthFlow) {
+          dynamicSettings.settings.setShowAuthFlow(false);
+        }
       },
       onLogout: () => {
         console.log("Logged out");
