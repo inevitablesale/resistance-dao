@@ -113,17 +113,6 @@ function App() {
       // Authentication settings
       enableAuthProviders: true,
       enablePasskeys: false,
-      buttonTranslations: {
-        connect_wallet: "Connect Wallet",
-        sign_in: "Connect Wallet",
-        logged_out: "Connect Wallet",
-        sign_up: "Connect Wallet",
-        connecting: "Connecting...",
-        disconnect: "Disconnect",
-        view_account: "View Account"
-      },
-      buttonClassName: "dynamic-button",
-      displaySiweStatement: false,
       // Email authentication settings
       evmWallets: {
         options: {
@@ -144,6 +133,22 @@ function App() {
               });
             }
           }
+        }
+      },
+      style: {
+        buttonClassName: "dynamic-button",
+        theme: "dark",
+        displaySiweStatement: false,
+        buttonText: {
+          connectWallet: "Connect Wallet",
+          connecting: "Connecting...",
+          disconnect: "Disconnect",
+          signIn: "Connect Wallet",
+          signUp: "Connect Wallet",
+          connected: "Connected",
+          connecting: "Connecting...",
+          viewAccount: "View Account",
+          loggedOut: "Connect Wallet"
         }
       },
       shadowDOMEnabled: false,
@@ -176,3 +181,4 @@ function App() {
 }
 
 export default App;
+
