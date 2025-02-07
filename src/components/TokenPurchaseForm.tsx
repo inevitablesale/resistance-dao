@@ -1,23 +1,44 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { purchaseTokens, fetchPresaleMaticPrice } from "@/services/presaleContractService";
+import { purchaseTokens, fetchPresaleMaticPrice, getWorkingProvider, getLgrTokenContract } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Loader2 } from "lucide-react";
+import { Loader2, Coins } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 
 export const TokenPurchaseForm = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const [maticAmount, setMaticAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [lgrBalance, setLgrBalance] = useState<string>("0");
   const { toast } = useToast();
   const [expectedLGR, setExpectedLGR] = useState<string | null>(null);
 
   // Initialize balance monitoring
   useBalanceMonitor();
+
+  useEffect(() => {
+    const fetchLGRBalance = async () => {
+      if (!primaryWallet?.address) return;
+
+      try {
+        const provider = await getWorkingProvider();
+        const lgrTokenContract = await getLgrTokenContract(provider);
+        const balance = await lgrTokenContract.balanceOf(primaryWallet.address);
+        setLgrBalance(ethers.utils.formatUnits(balance, 18));
+      } catch (error) {
+        console.error("Error fetching LGR balance:", error);
+      }
+    };
+
+    fetchLGRBalance();
+    // Set up an interval to refresh the balance every 30 seconds
+    const interval = setInterval(fetchLGRBalance, 30000);
+    return () => clearInterval(interval);
+  }, [primaryWallet?.address]);
 
   const calculateExpectedLGR = async (amount: string) => {
     try {
@@ -87,6 +108,19 @@ export const TokenPurchaseForm = () => {
 
   return (
     <div className="space-y-4 w-full max-w-md mx-auto">
+      <div className="p-4 rounded-lg bg-black/20 border border-white/10 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Coins className="w-5 h-5 text-yellow-500" />
+          <span className="text-gray-400">Your LGR Balance:</span>
+        </div>
+        <span className="text-lg font-medium text-white">
+          {Number(lgrBalance).toLocaleString(undefined, { 
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 
+          })} LGR
+        </span>
+      </div>
+
       <div className="space-y-2">
         <label htmlFor="maticAmount" className="block text-sm font-medium text-gray-200">
           Amount in MATIC
