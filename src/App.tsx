@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import GovernanceVoting from "./pages/GovernanceVoting";
 import MintNFT from "./pages/MintNFT";
 import { useToast } from "./hooks/use-toast";
+import { Toaster } from "./components/ui/toaster";
 
 function App() {
   const { toast } = useToast();
@@ -118,6 +119,10 @@ function App() {
             },
             onComplete: () => {
               console.log("[Dynamic SDK] Email auth completed");
+              toast({
+                title: "Email Authentication Complete",
+                description: "Email verification process completed.",
+              });
             }
           }
         }
@@ -146,6 +151,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
+      <Toaster />
     </DynamicContextProvider>
   );
 }
