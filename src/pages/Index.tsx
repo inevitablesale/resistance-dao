@@ -401,13 +401,13 @@ const IndexContent = () => {
                   </div>
                 </div>
 
-                {/* Enhanced Purchase Options - Now Disabled */}
+                {/* Enhanced Purchase Options */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <button 
-                    disabled
-                    className="group relative px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-500 rounded-lg overflow-hidden transition-all duration-300 opacity-50 cursor-not-allowed"
+                    onClick={handleBuyClick}
+                    className="group relative px-8 py-4 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-[1.02]"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-gray-600/70 to-gray-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
                     <div className="relative flex items-center justify-center gap-3 text-white font-medium text-lg">
                       <Trophy className="w-5 h-5" />
                       <span>Buy with Card</span>
@@ -415,10 +415,10 @@ const IndexContent = () => {
                   </button>
                   
                   <button 
-                    disabled
-                    className="group relative px-8 py-4 bg-gradient-to-br from-gray-600 to-gray-500 rounded-lg overflow-hidden transition-all duration-300 opacity-50 cursor-not-allowed"
+                    onClick={handleBuyClick}
+                    className="group relative px-8 py-4 bg-gradient-to-br from-yellow-500 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-[1.02]"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-gray-600/70 to-gray-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
                     <div className="relative flex items-center justify-center gap-3 text-white font-medium text-lg">
                       <Wallet className="w-5 h-5" />
                       <span>Buy with Crypto</span>
@@ -427,8 +427,8 @@ const IndexContent = () => {
                 </div>
 
                 <button 
-                  disabled
-                  className="mt-4 text-gray-500 cursor-not-allowed text-sm w-full text-center"
+                  onClick={() => window.open('https://docs.ledgerfund.finance/guides/buying-lgr', '_blank')}
+                  className="mt-4 text-gray-400 hover:text-white transition-colors text-sm w-full text-center"
                 >
                   New to crypto? Get started here
                 </button>
