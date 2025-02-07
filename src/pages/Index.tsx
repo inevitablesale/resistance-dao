@@ -19,6 +19,7 @@ import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBran
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
+import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 
 const IndexContent = () => {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ const IndexContent = () => {
   const [myStakeable, setMyStakeable] = useState<string>('0');
   const [maticPrice, setMaticPrice] = useState<string>('Loading...');
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
+  const { tokenBalances, isLoading: isLoadingBalances } = useTokenBalances();
 
   useEffect(() => {
     // Set loaded state after a small delay to trigger initial animations
@@ -322,6 +324,58 @@ const IndexContent = () => {
               </div>
               
               <div className="bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
+                {/* Token Balances Section */}
+                {primaryWallet && (
+                  <div className="mb-8 p-4 rounded-lg bg-black/40 border border-yellow-500/10">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Coins className="w-5 h-5 text-yellow-500" />
+                      <h3 className="text-lg font-semibold text-white">Your Balances</h3>
+                    </div>
+                    
+                    {isLoadingBalances ? (
+                      <div className="animate-pulse flex space-x-4">
+                        <div className="h-12 bg-yellow-500/10 rounded w-full"></div>
+                      </div>
+                    ) : tokenBalances && tokenBalances.length > 0 ? (
+                      <div className="space-y-3">
+                        {tokenBalances.map((token) => (
+                          <div 
+                            key={token.address} 
+                            className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-yellow-500/5 hover:border-yellow-500/20 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              {token.logoURI && (
+                                <img 
+                                  src={token.logoURI} 
+                                  alt={token.symbol} 
+                                  className="w-8 h-8 rounded-full"
+                                />
+                              )}
+                              <div>
+                                <div className="text-white font-medium">{token.symbol}</div>
+                                <div className="text-sm text-gray-400">{token.name}</div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-white font-medium">
+                                {Number(token.balance).toFixed(4)}
+                              </div>
+                              <div className="text-sm text-gray-400">
+                                {token.networkId === 137 ? 'Polygon' : 'Network ' + token.networkId}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center text-gray-400 py-4">
+                        No tokens found in your wallet
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Continue with existing presale content */}
                 <div className="mb-8">
                   <div className="relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 blur-xl animate-pulse" />
