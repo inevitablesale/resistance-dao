@@ -8,6 +8,7 @@ import { purchaseTokens, fetchPresaleMaticPrice, getWorkingProvider, getLgrToken
 import { ethers } from "ethers";
 import { Loader2, Coins } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
+import { WalletBalance } from "./WalletBalance";
 
 export const TokenPurchaseForm = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
@@ -108,6 +109,8 @@ export const TokenPurchaseForm = () => {
 
   return (
     <div className="space-y-4 w-full max-w-md mx-auto">
+      <WalletBalance />
+      
       <div className="p-4 rounded-lg bg-black/20 border border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Coins className="w-5 h-5 text-yellow-500" />
