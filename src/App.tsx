@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -17,7 +18,7 @@ function App() {
   };
 
   const dynamicSettings = {
-    environmentId: "2b74d425-6827-4ff1-af57-f9543d71cca0",
+    environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2", // Updated to Live environment ID
     walletConnectors: [
       EthereumWalletConnectors,
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
@@ -64,7 +65,7 @@ function App() {
       network: {
         chainId: 137, // Polygon Mainnet
       },
-      environmentId: "2b74d425-6827-4ff1-af57-f9543d71cca0",
+      environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2", // Updated to Live environment ID
       appName: "LedgerFund",
       appLogoUrl: "/favicon.ico",
       enableEmbeddedWallets: true,
@@ -76,7 +77,7 @@ function App() {
       shadowDOMEnabled: false,
       tokens: [
         {
-          address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00", // Updated to LGR token contract
+          address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
           symbol: "LGR",
           decimals: 18,
           name: "LedgerFund Token",
