@@ -1,6 +1,6 @@
-
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useEffect, useRef, useState } from "react";
 
 const presaleData = [
   { name: 'Presale Stake', value: 100, color: '#14b8a6', description: 'Reserved for early platform supporters. 5M tokens available at $0.10, with 1-year lock period and projected growth to $1.00.' }
@@ -14,9 +14,60 @@ const publicSaleData = [
 ];
 
 export const WhatWeBuilding = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const sectionRef = useRef<HTMLElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      
+      const rect = sectionRef.current.getBoundingClientRect();
+      const scrollPercentage = Math.max(0, Math.min(1, 
+        1 - (rect.top / window.innerHeight)
+      ));
+      
+      setScrollProgress(scrollPercentage);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 2 - 1,
+        y: (e.clientY / window.innerHeight) * 2 - 1
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
-    <section className="py-16 relative overflow-hidden">
-      <div className="container px-4">
+    <section ref={sectionRef} className="py-16 relative overflow-hidden min-h-screen perspective-3000">
+      {/* Cosmic Background */}
+      <div className="absolute inset-0 opacity-90">
+        <div 
+          className="absolute inset-0 transition-transform duration-300"
+          style={{
+            background: 'radial-gradient(circle at center, transparent 0%, #000000e6 70%)',
+            transform: `scale(${1 + scrollProgress * 0.5})`
+          }}
+        />
+        <div 
+          className="absolute inset-0 transition-transform duration-300"
+          style={{
+            background: 'radial-gradient(circle at center, rgba(234,179,8,0.15) 0%, rgba(45,212,191,0.1) 30%, transparent 70%)',
+            animation: 'cosmic-pulse 4s ease-in-out infinite',
+            transform: `scale(${1 + scrollProgress * 0.3})`
+          }}
+        />
+      </div>
+
+      <div className="container px-4 relative z-10">
         <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 text-center">
           Investment Structure & Token Distribution
         </h2>
@@ -37,54 +88,98 @@ export const WhatWeBuilding = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="presale">
+          <TabsContent value="presale" className="relative">
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
               Platform Investment: 5,000,000 LGR at $0.10
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="space-y-6">
-                {presaleData.map((segment, index) => (
-                  <div 
-                    key={segment.name}
-                    className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: segment.color }} />
-                      <h3 className="text-xl font-semibold text-white">
-                        {segment.name} ({segment.value}%)
-                      </h3>
+              <div className="space-y-6 relative">
+                {presaleData.map((segment, index) => {
+                  const orbitRadius = 20 + index * 10;
+                  const orbitDuration = 20 + index * 5;
+                  const offsetX = mousePosition.x * (10 + index * 5);
+                  const offsetY = mousePosition.y * (10 + index * 5);
+
+                  return (
+                    <div 
+                      key={segment.name}
+                      className="relative group animate-cosmic-pulse"
+                      style={{
+                        animation: `orbit ${orbitDuration}s linear infinite`,
+                        transform: `translate(${offsetX}px, ${offsetY}px)`,
+                        transition: 'transform 0.3s ease-out'
+                      }}
+                    >
+                      {/* Gravitational Lens Effect */}
+                      <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                      
+                      <div 
+                        className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
+                                 bg-black/30 border-yellow-500/20 hover:border-yellow-500/40
+                                 hover:translate-y-[-4px] hover:rotate-1
+                                 group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]"
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
+                          <h3 className="text-xl font-semibold text-white">
+                            {segment.name} ({segment.value}%)
+                          </h3>
+                        </div>
+                        <p className="text-gray-300">
+                          {segment.description}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-gray-300">
-                      {segment.description}
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="public">
+          <TabsContent value="public" className="relative">
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
               Professional Investment: 4,000,000 LGR for Accountant Acquisition Pool
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="space-y-6">
-                {publicSaleData.map((segment, index) => (
-                  <div 
-                    key={segment.name}
-                    className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: segment.color }} />
-                      <h3 className="text-xl font-semibold text-white">
-                        {segment.name} ({segment.value}%)
-                      </h3>
+              <div className="space-y-6 relative">
+                {publicSaleData.map((segment, index) => {
+                  const orbitRadius = 20 + index * 10;
+                  const orbitDuration = 20 + index * 5;
+                  const offsetX = mousePosition.x * (10 + index * 5);
+                  const offsetY = mousePosition.y * (10 + index * 5);
+
+                  return (
+                    <div 
+                      key={segment.name}
+                      className="relative group animate-cosmic-pulse"
+                      style={{
+                        animation: `orbit ${orbitDuration}s linear infinite`,
+                        transform: `translate(${offsetX}px, ${offsetY}px)`,
+                        transition: 'transform 0.3s ease-out'
+                      }}
+                    >
+                      {/* Gravitational Lens Effect */}
+                      <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-yellow-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                      
+                      <div 
+                        className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
+                                 bg-black/30 border-teal-500/20 hover:border-teal-500/40
+                                 hover:translate-y-[-4px] hover:rotate-1
+                                 group-hover:shadow-[0_0_25px_rgba(45,212,191,0.2)]"
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
+                          <h3 className="text-xl font-semibold text-white">
+                            {segment.name} ({segment.value}%)
+                          </h3>
+                        </div>
+                        <p className="text-gray-300">
+                          {segment.description}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-gray-300">
-                      {segment.description}
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -274,4 +369,3 @@ export const WhatWeBuilding = () => {
     </section>
   );
 };
-
