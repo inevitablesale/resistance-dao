@@ -39,9 +39,14 @@ declare module "@dynamic-labs/sdk-react-core" {
       };
     };
     eventsCallbacks?: {
+      onVerificationSuccess?: (args: any) => void;
       onVerificationComplete?: () => void;
       onAuthSuccess?: (args: any) => void;
       onLogout?: () => void;
+      onEmailVerificationStart?: () => void;
+      onEmailVerificationSuccess?: () => void;
+      onSessionConnect?: () => void;
+      onSessionRestore?: () => void;
     };
     settings?: {
       network?: {
@@ -89,3 +94,4 @@ declare module "@dynamic-labs/sdk-react-core" {
 
   export const DynamicWidget: React.FC;
 }
+

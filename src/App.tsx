@@ -29,6 +29,13 @@ function App() {
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
     eventsCallbacks: {
+      onVerificationSuccess: (args: any) => {
+        console.log("[Dynamic SDK] Verification success:", args);
+        toast({
+          title: "Verification Successful",
+          description: "Your email has been verified.",
+        });
+      },
       onVerificationComplete: () => {
         console.log("[Dynamic SDK] Verification completed");
         toast({
@@ -46,12 +53,24 @@ function App() {
           description: "You're now connected to LedgerFund.",
         });
       },
+      onEmailVerificationStart: () => {
+        console.log("[Dynamic SDK] Email verification started");
+      },
+      onEmailVerificationSuccess: () => {
+        console.log("[Dynamic SDK] Email verification succeeded");
+      },
       onLogout: () => {
         console.log("[Dynamic SDK] User logged out");
         toast({
           title: "Logged Out",
           description: "You've been successfully logged out.",
         });
+      },
+      onSessionConnect: () => {
+        console.log("[Dynamic SDK] Session connected");
+      },
+      onSessionRestore: () => {
+        console.log("[Dynamic SDK] Session restored");
       }
     },
     settings: {
@@ -125,3 +144,4 @@ function App() {
 }
 
 export default App;
+
