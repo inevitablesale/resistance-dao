@@ -1,5 +1,4 @@
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3 } from "lucide-react";
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const presaleData = [
@@ -31,43 +30,82 @@ const TokenDistribution = () => {
             }}
           />
           
-          {/* Orbiting Tokens */}
-          {Array.from({ length: 5 }).map((_, i) => (
+          {/* Distribution Orbits */}
+          {publicSaleData.map((segment, index) => (
             <div
-              key={i}
+              key={segment.name}
               className="absolute inset-0"
               style={{
-                animation: `orbit ${10 + i * 2}s linear infinite`,
-                transform: `rotate(${i * 72}deg)`
+                animation: `orbit ${15 + index * 2}s linear infinite`,
+                transform: `rotate(${index * (360 / publicSaleData.length)}deg)`
               }}
             >
+              {/* Token */}
               <div 
-                className="absolute -top-2 left-1/2 w-4 h-4 rounded-full bg-gradient-to-r from-yellow-500 to-teal-400"
+                className="absolute -top-2 left-1/2 group perspective-3000"
                 style={{
-                  animation: 'pulse 2s ease-in-out infinite',
-                  animationDelay: `${i * 0.5}s`
+                  transform: `translateX(-50%) scale(${1 + segment.value / 100})`,
                 }}
-              />
+              >
+                <div 
+                  className="w-8 h-8 rounded-full bg-gradient-to-r from-yellow-500 to-teal-400 relative"
+                  style={{
+                    animation: 'cosmic-pulse 2s ease-in-out infinite',
+                    animationDelay: `${index * 0.5}s`
+                  }}
+                >
+                  {/* Token Glow */}
+                  <div
+                    className="absolute inset-0 rounded-full blur-md bg-gradient-to-r from-yellow-500/50 to-teal-400/50"
+                    style={{
+                      animation: 'pulse 2s ease-in-out infinite',
+                      animationDelay: `${index * 0.5}s`
+                    }}
+                  />
+                  
+                  {/* Hover Card */}
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full bg-black/90 backdrop-blur-sm p-3 rounded-lg border border-yellow-500/20 w-48 z-10">
+                    <div className="text-sm font-semibold text-white mb-1">{segment.name}</div>
+                    <div className="text-xs text-yellow-500 mb-2">{segment.value}%</div>
+                    <div className="text-xs text-gray-300">{segment.description}</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Orbital Path */}
+              <div 
+                className="absolute inset-0 rounded-full border border-yellow-500/10"
+                style={{
+                  transform: `scale(${1 + index * 0.2})`,
+                }}
+              >
+                {/* Energy Trail */}
+                <div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: `
+                      linear-gradient(
+                        90deg,
+                        transparent 0%,
+                        ${segment.color}20 50%,
+                        transparent 100%
+                      )
+                    `,
+                    animation: `orbit ${15 + index * 2}s linear infinite reverse`
+                  }}
+                />
+              </div>
             </div>
           ))}
           
-          {/* Token Distribution Labels */}
-          <div className="absolute inset-0">
-            {presaleData.map((segment, index) => (
-              <div
-                key={segment.name}
-                className="absolute text-sm text-white/80"
-                style={{
-                  top: '50%',
-                  left: '50%',
-                  transform: `rotate(${index * 72}deg) translateX(140px) rotate(-${index * 72}deg)`,
-                  transformOrigin: 'center'
-                }}
-              >
-                {segment.name}
-              </div>
-            ))}
-          </div>
+          {/* Accretion Disk */}
+          <div 
+            className="absolute inset-0 opacity-20"
+            style={{
+              background: 'conic-gradient(from 0deg at 50% 50%, #eab308 0%, #2dd4bf 25%, #eab308 50%, #2dd4bf 75%, #eab308 100%)',
+              animation: 'orbit 20s linear infinite'
+            }}
+          />
         </div>
       </div>
       
@@ -150,7 +188,7 @@ export const WhatWeBuilding = () => {
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
               <div className="h-[400px] relative">
-                <ResponsiveContainer width="100%" height="100%">
+                {/*<ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={publicSaleData}
@@ -170,7 +208,8 @@ export const WhatWeBuilding = () => {
                       ))}
                     </Pie>
                   </PieChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer>*/}
+                <TokenDistribution />
               </div>
 
               <div className="space-y-6">
