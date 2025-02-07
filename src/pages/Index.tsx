@@ -453,7 +453,7 @@ const IndexContent = () => {
               The $LGR Protocol Vision
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
-              Support Web3's first protocol where token holders elect the board, vote on MSP partners, and power an unstoppable acquisition engine. LedgerFund DAO unites elite accountants, trusted managed service providers, and networked capital to revolutionize practice ownership.
+              Support Web3's first protocol that brings together elite accountants, trusted managed service providers, and networked capital into an unstoppable acquisition engine.
             </p>
           </div>
 
