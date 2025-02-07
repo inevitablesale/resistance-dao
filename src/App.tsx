@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -78,22 +77,20 @@ function App() {
       enableAuthProviders: true,
       shadowDOMEnabled: false,
     },
-    // Move tokens to root level of dynamicSettings
-    tokens: [
-      {
-        name: "LedgerFund Token",
-        symbol: "LGR",
-        icon: "/favicon.ico",
-        address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
-        decimals: 18,
-        chainId: 137,
-        // Add these properties for better token display
-        logoURI: "/favicon.ico",
-        isToken: true,
-        balance: "fetchFromContract", // Dynamic will fetch the balance
-        contractAddress: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00"
-      }
-    ]
+    tokens: [{
+      name: "LedgerFund Token",
+      symbol: "LGR",
+      icon: "/favicon.ico",
+      address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
+      decimals: 18,
+      chainId: 137,
+      logoURI: "/favicon.ico",
+      isNative: false,
+      isToken: true,
+      balance: "fetchFromContract",
+      contractAddress: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
+      network: "polygon"
+    }]
   };
 
   return (
@@ -111,4 +108,3 @@ function App() {
 }
 
 export default App;
-
