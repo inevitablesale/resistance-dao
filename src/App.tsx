@@ -1,6 +1,6 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
+import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
 import Index from "./pages/Index";
@@ -14,34 +14,69 @@ function App() {
   const { toast } = useToast();
   
   const zeroDevConfig = {
+    projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
     bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
     paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
   };
 
   const dynamicSettings = {
     environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
+    walletConnectorOptions: {
+      zeroDevOptions: zeroDevConfig
+    },
     walletConnectors: [
       EthereumWalletConnectors,
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
     eventsCallbacks: {
-      onAuthSuccess: (args) => {
-        console.log("[Dynamic SDK] Auth Success Event:", args);
-        console.log("[Dynamic SDK] User details:", args?.user);
-        console.log("[Dynamic SDK] Wallet details:", args?.wallet);
+      // User authentication events
+      onAuthSuccess: (args: any) => {
+        console.log("[Dynamic SDK] Auth Success:", args);
+        console.log("[Dynamic SDK] Connected wallet:", args?.wallet);
+        console.log("[Dynamic SDK] Connected user:", args?.user);
+        console.log("[Dynamic SDK] Verification:", args?.user?.verifications);
         toast({
           title: "Authentication Successful",
           description: "You're now connected to LedgerFund.",
         });
       },
-      onEmailVerificationStart: (args) => {
-        console.log("[Dynamic SDK] Email verification process started:", args);
+      onAuthFailure: (error: any) => {
+        console.error("[Dynamic SDK] Auth Failure:", error);
+        toast({
+          title: "Authentication Failed",
+          description: error?.message || "Failed to authenticate",
+          variant: "destructive",
+        });
+      },
+      // Wallet connection events
+      onWalletConnectStart: (args: any) => {
+        console.log("[Dynamic SDK] Wallet Connect Started:", args);
+      },
+      onWalletConnectSuccess: (args: any) => {
+        console.log("[Dynamic SDK] Wallet Connect Success:", args);
+        console.log("[Dynamic SDK] Connected wallet details:", args?.wallet);
+        toast({
+          title: "Wallet Connected",
+          description: "Your wallet has been successfully connected.",
+        });
+      },
+      onWalletConnectFailure: (error: any) => {
+        console.error("[Dynamic SDK] Wallet Connect Failed:", error);
+        toast({
+          title: "Connection Failed",
+          description: error?.message || "Failed to connect wallet",
+          variant: "destructive",
+        });
+      },
+      // Email verification events
+      onEmailVerificationStart: (args: any) => {
+        console.log("[Dynamic SDK] Email Verification Started:", args);
         toast({
           title: "Verification Started",
           description: "Please check your email for the verification code.",
         });
       },
-      onEmailVerificationSuccess: (args) => {
+      onEmailVerificationSuccess: (args: any) => {
         console.log("[Dynamic SDK] Email Verification Success:", args);
         console.log("[Dynamic SDK] Verification details:", args?.verificationDetails);
         toast({
@@ -49,51 +84,69 @@ function App() {
           description: "Your email has been successfully verified.",
         });
       },
-      onWalletConnectSuccess: (args) => {
-        console.log("[Dynamic SDK] Wallet Connect Success:", args);
-        console.log("[Dynamic SDK] Connected wallet:", args?.wallet);
+      onEmailVerificationFailure: (error: any) => {
+        console.error("[Dynamic SDK] Email Verification Failed:", error);
         toast({
-          title: "Wallet Connected",
-          description: "Your wallet has been successfully connected.",
+          title: "Verification Failed",
+          description: error?.message || "Failed to verify email",
+          variant: "destructive",
         });
       },
-      onLogout: () => {
-        console.log("[Dynamic SDK] Logout triggered");
+      // User management events
+      onUserProfileUpdate: (args: any) => {
+        console.log("[Dynamic SDK] User Profile Updated:", args);
+        console.log("[Dynamic SDK] Updated profile:", args?.user);
+      },
+      onUserProfileUpdateFailure: (error: any) => {
+        console.error("[Dynamic SDK] Profile Update Failed:", error);
+        toast({
+          title: "Update Failed",
+          description: error?.message || "Failed to update profile",
+          variant: "destructive",
+        });
+      },
+      // Session management events
+      onLogout: (args: any) => {
+        console.log("[Dynamic SDK] Logout:", args);
         toast({
           title: "Logged Out",
           description: "You've been successfully logged out.",
         });
       },
-      onDisconnect: () => {
-        console.log("[Dynamic SDK] Wallet disconnect triggered");
+      onDisconnect: (args: any) => {
+        console.log("[Dynamic SDK] Wallet Disconnected:", args);
         toast({
           title: "Wallet Disconnected",
           description: "Your wallet has been disconnected.",
         });
       },
-      onError: (error) => {
-        console.error("[Dynamic SDK] Error occurred:", error);
-        console.error("[Dynamic SDK] Error details:", {
-          message: error?.message,
-          code: error?.code,
-          stack: error?.stack
-        });
-        toast({
-          title: "Error",
-          description: error?.message || "An error occurred",
-          variant: "destructive",
+      onSessionConnect: (args: any) => {
+        console.log("[Dynamic SDK] Session Connected:", args);
+        console.log("[Dynamic SDK] Session details:", {
+          user: args?.user,
+          wallet: args?.wallet,
+          sessionId: args?.sessionId
         });
       },
-      onEmailVerificationFailure: (error) => {
-        console.error("[Dynamic SDK] Email verification failed:", error);
-        console.error("[Dynamic SDK] Verification error details:", {
+      onSessionRestore: (args: any) => {
+        console.log("[Dynamic SDK] Session Restored:", args);
+        console.log("[Dynamic SDK] Restored session:", {
+          user: args?.user,
+          wallet: args?.wallet,
+          sessionId: args?.sessionId
+        });
+      },
+      // General error handling
+      onError: (error: any) => {
+        console.error("[Dynamic SDK] Error:", error);
+        console.error("[Dynamic SDK] Error details:", {
           message: error?.message,
           code: error?.code,
           context: error?.context
         });
         toast({
-          title: "Verification Failed",
-          description: "Failed to verify email. Please try again.",
+          title: "Error",
+          description: error?.message || "An error occurred",
           variant: "destructive",
         });
       }
@@ -105,21 +158,31 @@ function App() {
       environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
       appName: "LedgerFund",
       appLogoUrl: "/favicon.ico",
+      // Wallet settings
       enableEmbeddedWallets: true,
-      enableVisitTrackingOnConnectOnly: false,
+      enableVisitTrackingOnConnectOnly: true,
       enableWalletConnectV1: false,
       enableWalletConnectV2: true,
+      // Session settings
       persistWalletSession: true,
+      enableSessionRestoration: true,
+      // Authentication settings
       enableAuthProviders: true,
       enablePasskeys: false,
+      // Email authentication settings
       evmWallets: {
         options: {
           emailAuth: {
             signInWithEmail: true,
             autoVerify: true,
             autoClose: true,
-            onComplete: (args) => {
-              console.log("[Dynamic SDK] Email auth completed:", args);
+            onComplete: (args: any) => {
+              console.log("[Dynamic SDK] Email Auth Complete:", args);
+              console.log("[Dynamic SDK] Auth details:", {
+                user: args?.user,
+                wallet: args?.wallet,
+                verificationDetails: args?.verificationDetails
+              });
               toast({
                 title: "Email Authentication Complete",
                 description: "You can now proceed with the token purchase.",
@@ -152,6 +215,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
+      <DynamicWidget />
       <Toaster />
     </DynamicContextProvider>
   );
