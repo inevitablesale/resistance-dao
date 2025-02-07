@@ -49,7 +49,6 @@ function App() {
         console.log("[Dynamic SDK] Connected user:", args?.user);
         console.log("[Dynamic SDK] Verification:", args?.user?.verifications);
         
-        // Enhanced toast for wallet connection
         toast({
           title: "Wallet Connected",
           description: `Successfully connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
@@ -98,8 +97,8 @@ function App() {
         options: {
           emailAuth: {
             signInWithEmail: true,
-            autoVerify: true,
-            autoClose: true,
+            autoVerify: false,  // Changed to false to show verification window
+            autoClose: false,   // Changed to false to prevent auto-closing
             onComplete: (args: any) => {
               console.log("[Dynamic SDK] Email Auth Complete:", args);
               console.log("[Dynamic SDK] Auth details:", {
