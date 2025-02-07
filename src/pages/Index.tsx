@@ -521,7 +521,7 @@ const IndexContent = () => {
 
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-24">
-          <div id="join-the-singularity" className="text-center mb-16">
+          <div id="join-the-singularity" className="text-center mb-16 pt-20">
             <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
               Join the Singularity
             </h2>
@@ -530,7 +530,7 @@ const IndexContent = () => {
             </p>
           </div>
 
-          <div id="presale" className="relative mb-16">
+          <div id="presale" className="relative mb-16 pt-20">
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl" />
             <div className="relative bg-black/60 backdrop-blur-sm p-8 md:p-12 rounded-lg border border-yellow-500/20">
               <div className="grid md:grid-cols-2 gap-8">
@@ -554,18 +554,18 @@ const IndexContent = () => {
             </div>
           </div>
         </div>
-
-        <WhatWeBuilding />
-        <LedgerFrens />
-        <HowItWorks />
-        <AlternativeToEquity />
-        <PrivateEquityImpact />
-        <ReclaimControl />
-        <SystemWeDeserve />
-        <CallToAction />
-        <Roadmap />
-        <Partners />
       </div>
+
+      <WhatWeBuilding />
+      <LedgerFrens />
+      <HowItWorks />
+      <AlternativeToEquity />
+      <PrivateEquityImpact />
+      <ReclaimControl />
+      <SystemWeDeserve />
+      <CallToAction />
+      <Roadmap />
+      <Partners />
     </>
   );
 };
