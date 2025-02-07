@@ -24,6 +24,11 @@ declare module "@dynamic-labs/sdk-react-core" {
       address?: string;
       isConnected: () => Promise<boolean>;
       getWalletClient: () => Promise<any>;
+      disconnect?: () => Promise<void>;
+      connector?: {
+        name?: string;
+        showWallet?: (options: { view: 'send' | 'deposit' }) => void;
+      };
     } | null;
     setShowAuthFlow?: (show: boolean) => void;
   }
@@ -94,4 +99,3 @@ declare module "@dynamic-labs/sdk-react-core" {
 
   export const DynamicWidget: React.FC;
 }
-

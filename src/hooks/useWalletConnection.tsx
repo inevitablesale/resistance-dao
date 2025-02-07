@@ -20,7 +20,9 @@ export const useWalletConnection = () => {
   const disconnect = async () => {
     try {
       setIsConnecting(true);
-      await primaryWallet?.disconnect?.();
+      if (primaryWallet?.disconnect) {
+        await primaryWallet.disconnect();
+      }
     } catch (error) {
       console.error("Disconnect error:", error);
     } finally {
