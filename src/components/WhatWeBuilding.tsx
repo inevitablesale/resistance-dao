@@ -1,3 +1,4 @@
+
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3, Building } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
@@ -16,28 +17,28 @@ const publicSaleData = [
   { 
     name: 'Treasury', 
     value: 30, 
-    color: '#ea384c', // Changed to red
+    color: '#ea384c',
     description: 'Strategic treasury management by third-party vault provider ensures secure and transparent fund management for accounting firm acquisitions.',
     className: 'col-span-1'
   },
   { 
     name: 'Public Sale', 
     value: 50, 
-    color: '#ea384c', // Changed to red
+    color: '#ea384c',
     description: 'Dedicated allocation for accountants to invest in practices identified and vetted by the DAO community.',
     className: 'col-span-1'
   },
   { 
     name: 'Community Rewards', 
     value: 10, 
-    color: '#ea384c', // Changed to red
+    color: '#ea384c',
     description: 'Incentives for active DAO participation including practice identification, due diligence, and community growth initiatives.',
     className: 'col-span-1'
   },
   { 
     name: 'Partners', 
     value: 10, 
-    color: '#ea384c', // Changed to red
+    color: '#ea384c',
     description: 'Strategic partnerships with banks, staffing agencies, technology providers supporting practice acquisitions.',
     className: 'col-span-1'
   }
@@ -61,7 +62,6 @@ export const WhatWeBuilding = () => {
       
       setScrollProgress(scrollPercentage);
 
-      // Update center point of black hole
       if (blackholeRef.current) {
         const bhRect = blackholeRef.current.getBoundingClientRect();
         setCenterPoint({
@@ -72,7 +72,7 @@ export const WhatWeBuilding = () => {
     };
 
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial calculation
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -85,7 +85,7 @@ export const WhatWeBuilding = () => {
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('scroll', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   const calculateEnergyStyles = (element: HTMLElement) => {
@@ -97,13 +97,11 @@ export const WhatWeBuilding = () => {
       y: rect.top + rect.height / 2
     };
 
-    // Calculate angle between element and black hole center
     const angle = Math.atan2(
       centerPoint.y - elementCenter.y,
       centerPoint.x - elementCenter.x
     );
 
-    // Calculate distance for intensity
     const distance = Math.sqrt(
       Math.pow(centerPoint.x - elementCenter.x, 2) +
       Math.pow(centerPoint.y - elementCenter.y, 2)
@@ -173,7 +171,7 @@ export const WhatWeBuilding = () => {
               Platform Investment: 5,000,000 LGR at $0.10
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="space-y-6 relative lg:col-span-2"> {/* Added lg:col-span-2 for full width */}
+              <div className="space-y-6 relative lg:col-span-2">
                 {presaleData.map((segment, index) => {
                   const orbitRadius = 20 + index * 10;
                   const orbitDuration = 20 + index * 5;
@@ -192,7 +190,6 @@ export const WhatWeBuilding = () => {
                         transition: 'transform 0.3s ease-out'
                       } as React.CSSProperties}
                     >
-                      {/* Gravitational Lens Effect */}
                       <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
                       
                       <div 
@@ -201,13 +198,13 @@ export const WhatWeBuilding = () => {
                                  hover:translate-y-[-4px] hover:rotate-1
                                  group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]"
                       >
-                        <div className="flex items-center gap-3 mb-2 justify-center"> {/* Added justify-center */}
+                        <div className="flex items-center gap-3 mb-2 justify-center">
                           <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
                           <h3 className="text-xl font-semibold text-white">
                             {segment.name} ({segment.value}%)
                           </h3>
                         </div>
-                        <p className="text-gray-300 text-center"> {/* Added text-center */}
+                        <p className="text-gray-300 text-center">
                           {segment.description}
                         </p>
                       </div>
@@ -223,7 +220,7 @@ export const WhatWeBuilding = () => {
               Professional Investment: 4,000,000 LGR at $1.00
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="grid grid-cols-2 gap-6 relative col-span-2"> {/* Changed to grid with 2 columns */}
+              <div className="grid grid-cols-2 gap-6 relative col-span-2">
                 {publicSaleData.map((segment, index) => {
                   const orbitRadius = 20 + index * 10;
                   const orbitDuration = 20 + index * 5;
@@ -240,7 +237,6 @@ export const WhatWeBuilding = () => {
                         transition: 'transform 0.3s ease-out'
                       }}
                     >
-                      {/* Gravitational Lens Effect */}
                       <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-yellow-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
                       
                       <div 
@@ -319,133 +315,6 @@ export const WhatWeBuilding = () => {
               </div>
             </div>
 
-            {/* Investment Flow Section */}
-            <div className="mb-20">
-              <h3 className="text-3xl font-bold text-white mb-8 text-center">Investment Flow</h3>
-              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <ChartPie className="w-8 h-8 text-yellow-400" />
-                    <h4 className="text-xl font-semibold text-white">Initial Investment</h4>
-                  </div>
-                  <ul className="space-y-2 text-gray-300">
-                    <li className="flex items-start gap-2">
-                      <span className="text-yellow-400">•</span>
-                      <span>98% goes to acquisition</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-yellow-400">•</span>
-                      <span>2% management fee to treasury</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Building2 className="w-8 h-8 text-teal-400" />
-                    <h4 className="text-xl font-semibold text-white">Profit Distribution</h4>
-                  </div>
-                  <ul className="space-y-2 text-gray-300">
-                    <li className="flex items-start gap-2">
-                      <span className="text-teal-400">•</span>
-                      <span>70% to RWA token holders</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-teal-400">•</span>
-                      <span>20% performance fee to management</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-teal-400">•</span>
-                      <span>10% reflections to LGR holders</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Token Benefits Section */}
-            <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-              {/* LGR Token Section */}
-              <div className="space-y-8">
-                <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
-                  <Coins className="w-8 h-8 text-yellow-400" />
-                  <span>LGR Token Benefits</span>
-                </div>
-                
-                <div className="space-y-6">
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
-                    <div className="mb-4">
-                      <Wallet className="w-8 h-8 text-yellow-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Platform Governance</h3>
-                    <p className="text-gray-300">
-                      LGR holders participate in platform governance decisions and contribute to the development of the ecosystem.
-                    </p>
-                  </div>
-
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
-                    <div className="mb-4">
-                      <UsersRound className="w-8 h-8 text-yellow-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Reflection Rewards</h3>
-                    <p className="text-gray-300">
-                      Earn 10% of all firm distributions, creating passive income from platform success.
-                    </p>
-                  </div>
-
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
-                    <div className="mb-4">
-                      <BadgeCheck className="w-8 h-8 text-yellow-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Platform Development</h3>
-                    <p className="text-gray-300">
-                      Support the growth of decentralized accounting firm ownership and professional control.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* RWA Token Section */}
-              <div className="space-y-8">
-                <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
-                  <Building2 className="w-8 h-8 text-teal-400" />
-                  <span>RWA Token Benefits</span>
-                </div>
-                
-                <div className="space-y-6">
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
-                    <div className="mb-4">
-                      <Coins className="w-8 h-8 text-teal-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Direct Ownership</h3>
-                    <p className="text-gray-300">
-                      Receive 70% of firm profits through direct fractional ownership.
-                    </p>
-                  </div>
-
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
-                    <div className="mb-4">
-                      <GanttChartSquare className="w-8 h-8 text-teal-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Professional Control</h3>
-                    <p className="text-gray-300">
-                      Maintain industry standards through accountant-led governance and operations.
-                    </p>
-                  </div>
-
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
-                    <div className="mb-4">
-                      <Coins className="w-8 h-8 text-teal-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Voting Rights</h3>
-                    <p className="text-gray-300">
-                      Participate in governance decisions for the firm (resourcing, budgeting, processes)
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Firm Management Section */}
             <div className="mb-20">
               <h3 className="text-3xl font-bold text-white mb-8 text-center">Firm Management Structure</h3>
@@ -498,50 +367,6 @@ export const WhatWeBuilding = () => {
                     <li className="flex items-start gap-2">
                       <span className="text-teal-400">•</span>
                       <span>Ability to propose and vote on management changes</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Investment Flow Section */}
-            <div className="mb-20">
-              <h3 className="text-3xl font-bold text-white mb-8 text-center">Investment Flow</h3>
-              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <ChartPie className="w-8 h-8 text-yellow-400" />
-                    <h4 className="text-xl font-semibold text-white">Initial Investment</h4>
-                  </div>
-                  <ul className="space-y-2 text-gray-300">
-                    <li className="flex items-start gap-2">
-                      <span className="text-yellow-400">•</span>
-                      <span>98% goes to acquisition</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-yellow-400">•</span>
-                      <span>2% management fee to treasury</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Building2 className="w-8 h-8 text-teal-400" />
-                    <h4 className="text-xl font-semibold text-white">Profit Distribution</h4>
-                  </div>
-                  <ul className="space-y-2 text-gray-300">
-                    <li className="flex items-start gap-2">
-                      <span className="text-teal-400">•</span>
-                      <span>70% to RWA token holders</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-teal-400">•</span>
-                      <span>20% performance fee to management</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-teal-400">•</span>
-                      <span>10% reflections to LGR holders</span>
                     </li>
                   </ul>
                 </div>
@@ -636,3 +461,4 @@ export const WhatWeBuilding = () => {
     </section>
   );
 };
+
