@@ -76,7 +76,7 @@ function App() {
       shadowDOMEnabled: false,
       tokens: [
         {
-          address: "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c",
+          address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00", // Updated to LGR token contract
           symbol: "LGR",
           decimals: 18,
           name: "LedgerFund Token",
