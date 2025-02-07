@@ -54,8 +54,8 @@ function App() {
           description: `Successfully connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
         });
       },
-      onEmailVerificationSuccess: (args: any) => {
-        console.log("[Dynamic SDK] Email verification succeeded:", args);
+      onEmailVerificationSuccess: () => {
+        console.log("[Dynamic SDK] Email verification succeeded");
         toast({
           title: "Email Verified",
           description: "Your email has been successfully verified.",
