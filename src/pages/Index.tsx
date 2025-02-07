@@ -281,7 +281,7 @@ const IndexContent = () => {
           </div>
         </div>
 
-        {/* Content Layer with presale information moved from InvestmentReadiness */}
+        {/* Content Layer with presale information */}
         <div 
           ref={presaleRef}
           className="relative z-3 mt-[30vh]" 
@@ -312,9 +312,13 @@ const IndexContent = () => {
             </div>
           ) : (
             <div className="relative max-w-3xl mx-auto">
-              {/* Sale Start Banner */}
-              <div className="absolute -top-12 left-0 right-0 bg-[#ea384c] text-white py-2 px-4 rounded-t-lg font-bold text-lg shadow-lg animate-pulse">
-                SALE STARTS 2/10/2025
+              {/* Sale Start Banner - Now diagonal across presale box */}
+              <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-10">
+                <div 
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#ea384c] text-white py-2 px-4 font-bold text-lg shadow-lg transform rotate-[-35deg] w-[150%] text-center"
+                >
+                  SALE STARTS 2/10/2025
+                </div>
               </div>
               
               <div className="bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
@@ -397,26 +401,26 @@ const IndexContent = () => {
                   </div>
                 </div>
 
-                {/* Enhanced Purchase Options */}
+                {/* Enhanced Purchase Options - Now Disabled */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <button 
-                    onClick={handleBuyClick}
-                    className="group relative px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                    disabled
+                    className="group relative px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-500 rounded-lg overflow-hidden transition-all duration-300 opacity-50 cursor-not-allowed"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-yellow-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-gray-600/70 to-gray-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
                     <div className="relative flex items-center justify-center gap-3 text-white font-medium text-lg">
-                      <Trophy className="w-5 h-5 animate-bounce" />
+                      <Trophy className="w-5 h-5" />
                       <span>Buy with Card</span>
                     </div>
                   </button>
                   
                   <button 
-                    onClick={handleBuyClick}
-                    className="group relative px-8 py-4 bg-gradient-to-br from-teal-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                    disabled
+                    className="group relative px-8 py-4 bg-gradient-to-br from-gray-600 to-gray-500 rounded-lg overflow-hidden transition-all duration-300 opacity-50 cursor-not-allowed"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-teal-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-gray-600/70 to-gray-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
                     <div className="relative flex items-center justify-center gap-3 text-white font-medium text-lg">
-                      <Wallet className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
+                      <Wallet className="w-5 h-5" />
                       <span>Buy with Crypto</span>
                     </div>
                   </button>
