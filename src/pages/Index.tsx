@@ -19,7 +19,6 @@ import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBran
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
-import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 
 const IndexContent = () => {
   const navigate = useNavigate();
@@ -34,7 +33,7 @@ const IndexContent = () => {
   // Add states for presale data
   const [presaleSupply] = useState<string>(TOTAL_PRESALE_SUPPLY.toString());
   const [totalSold, setTotalSold] = useState<string>('0');
-  const [presaleEndTime] = useState<number>(PRESALE_END_TIME * 1000);
+  const [presaleEndTime] = useState<number>(PRESALE_END_TIME * 1000); // Convert to milliseconds
   const [timeLeft, setTimeLeft] = useState({
     days: '00',
     hours: '00',
@@ -108,16 +107,20 @@ const IndexContent = () => {
   // Function to fetch presale data
   const fetchPresaleData = async () => {
     try {
+      // Get total LGR tokens sold using the correct function
       const sold = await fetchTotalLGRSold();
       setTotalSold(sold);
 
+      // Get current price in MATIC
       const price = await fetchPresaleMaticPrice();
       setMaticPrice(price === "0" ? "Loading..." : `${price} MATIC`);
       
+      // If wallet is connected, get user's purchased tokens
       if (primaryWallet?.address) {
-        const purchased = await fetchPurchasedTokens(primaryWallet.address);
-        console.log('Setting myPurchased to:', purchased);
-        setMyPurchased(purchased);
+        const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
+        const presaleContract = await getPresaleContract(provider);
+        const purchased = await (await presaleContract).purchasedTokens(primaryWallet.address);
+        setMyPurchased(ethers.utils.formatEther(purchased));
       }
     } catch (error) {
       console.error('Error fetching presale data:', error);
@@ -319,34 +322,6 @@ const IndexContent = () => {
               </div>
               
               <div className="bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
-                {/* Token Balances Section */}
-                {primaryWallet && Number(myPurchased) > 0 && (
-                  <div className="mb-8 p-4 rounded-lg bg-black/40 border border-yellow-500/10">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Coins className="w-5 h-5 text-yellow-500" />
-                      <h3 className="text-lg font-semibold text-white">Your LGR Balance</h3>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-yellow-500/5 hover:border-yellow-500/20 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <img src="/favicon.ico" alt="LGR" className="w-8 h-8 rounded-full" />
-                          <div>
-                            <div className="text-white font-medium">LGR</div>
-                            <div className="text-sm text-gray-400">LedgerFund Token</div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-white font-medium">
-                            {Number(myPurchased).toFixed(2)}
-                          </div>
-                          <div className="text-sm text-gray-400">Polygon</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Continue with existing presale content */}
                 <div className="mb-8">
                   <div className="relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 blur-xl animate-pulse" />

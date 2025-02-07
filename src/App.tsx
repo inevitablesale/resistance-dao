@@ -12,16 +12,13 @@ import { useToast } from "./hooks/use-toast";
 function App() {
   const { toast } = useToast();
   
-  // Using staging environment ID for development
-  const ENVIRONMENT_ID = "4b729792-4b38-4d73-8a69-4f7559f2c2cd";
-  
   const zeroDevConfig = {
     bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
     paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
   };
 
   const dynamicSettings = {
-    environmentId: ENVIRONMENT_ID,
+    environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2", // Updated to Live environment ID
     walletConnectors: [
       EthereumWalletConnectors,
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
@@ -29,9 +26,6 @@ function App() {
     eventsCallbacks: {
       onAuthSuccess: (args: any) => {
         console.log("Auth Success:", args);
-        if (args.wallet?.chain) {
-          console.log("Connected Wallet Network:", args.wallet.chain);
-        }
         toast({
           title: "Authentication Successful",
           description: "You're now connected to LedgerFund.",
@@ -65,16 +59,13 @@ function App() {
           description: error?.message || "An error occurred",
           variant: "destructive",
         });
-      },
-      onTokenBalancesLoad: (balances: any) => {
-        console.log("Token Balances Loaded:", balances);
       }
     },
     settings: {
       network: {
-        chainId: 137,
+        chainId: 137, // Polygon Mainnet
       },
-      environmentId: ENVIRONMENT_ID,
+      environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2", // Updated to Live environment ID
       appName: "LedgerFund",
       appLogoUrl: "/favicon.ico",
       enableEmbeddedWallets: true,
@@ -84,36 +75,17 @@ function App() {
       persistWalletSession: true,
       enableAuthProviders: true,
       shadowDOMEnabled: false,
-      displayBalances: true,
-      evmNetworks: [{
-        chainId: 137,
-        name: 'Polygon',
-        chainName: 'Polygon Mainnet',
-        nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC',
+      tokens: [
+        {
+          address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
+          symbol: "LGR",
           decimals: 18,
-        },
-        blockExplorerUrls: ['https://polygonscan.com/'],
-        rpcUrls: ['https://polygon-rpc.com']
-      }]
-    },
-    tokens: [{
-      name: "LedgerFund Token",
-      symbol: "LGR",
-      icon: "/favicon.ico",
-      address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
-      decimals: 18,
-      chainId: 137,
-      logoURI: "/favicon.ico",
-      isNative: false,
-      isToken: true,
-      balance: "fetchFromContract",
-      contractAddress: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
-      network: "polygon",
-      displayBalance: true,
-      standard: "ERC20"
-    }]
+          name: "LedgerFund Token",
+          icon: "/favicon.ico",
+          chainId: 137
+        }
+      ]
+    }
   };
 
   return (
