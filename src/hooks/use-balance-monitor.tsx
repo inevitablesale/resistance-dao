@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
+import { RPC_ENDPOINTS } from "@/services/presaleContractService";
 
 const LGR_TOKEN_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
 const LGR_ABI = [
@@ -11,7 +12,7 @@ const LGR_ABI = [
 ];
 
 export const useBalanceMonitor = () => {
-  const { primaryWallet, user } = useDynamicContext();
+  const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -19,8 +20,23 @@ export const useBalanceMonitor = () => {
 
     const setupBalanceMonitoring = async () => {
       try {
-        const walletClient = await primaryWallet.getWalletClient();
-        const provider = new ethers.providers.Web3Provider(walletClient);
+        // Try RPC endpoints until one works
+        let provider;
+        for (const rpc of RPC_ENDPOINTS) {
+          try {
+            provider = new ethers.providers.JsonRpcProvider(rpc);
+            await provider.getNetwork();
+            break;
+          } catch (error) {
+            console.warn(`RPC ${rpc} failed, trying next one...`);
+            continue;
+          }
+        }
+
+        if (!provider) {
+          throw new Error("All RPC endpoints failed");
+        }
+
         const lgrContract = new ethers.Contract(LGR_TOKEN_ADDRESS, LGR_ABI, provider);
 
         // Monitor LGR token transfers
@@ -54,3 +70,4 @@ export const useBalanceMonitor = () => {
     setupBalanceMonitoring();
   }, [primaryWallet?.address, toast]);
 };
+

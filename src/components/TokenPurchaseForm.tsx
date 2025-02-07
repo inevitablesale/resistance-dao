@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Input } from "@/components/ui/input";
@@ -121,3 +122,4 @@ export const TokenPurchaseForm = () => {
     </div>
   );
 };
+
