@@ -460,7 +460,7 @@ const IndexContent = () => {
           <div className="relative mb-16">
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl" />
             <div className="relative bg-black/60 backdrop-blur-sm p-8 md:p-12 rounded-lg border border-yellow-500/20">
-              <div className="grid md:grid-cols-3 gap-8">
+              <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <h4 className="text-xl font-semibold text-yellow-500">Elite M&A Expertise</h4>
                   <p className="text-white/80">Decades of experience in accounting firm acquisitions, mergers, and optimizations.</p>
