@@ -1,3 +1,4 @@
+
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3, Building, Orbit } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
@@ -203,7 +204,7 @@ export const WhatWeBuilding = () => {
                     }}
                   />
                   
-                  <div className="p-8 rounded-lg backdrop-blur-sm border relative overflow-hidden h-full
+                  <div className="p-8 rounded-lg backdrop-blur-sm relative overflow-hidden h-full
                                 bg-black/40 border-yellow-500/20 hover:border-yellow-500/40 
                                 transition-all duration-300 group-hover:translate-y-[-4px]">
                     <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-teal-500/5" />
@@ -245,7 +246,7 @@ export const WhatWeBuilding = () => {
                     
                     <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
                     
-                    <div className="p-6 rounded-lg backdrop-blur border border-opacity-20 transition-all duration-500 relative bg-black/30 hover:translate-y-[-4px] h-full">
+                    <div className="p-6 rounded-lg backdrop-blur border-0 transition-all duration-500 relative bg-black/30 hover:translate-y-[-4px] h-full">
                       <option.icon className="w-8 h-8 text-yellow-400 mb-4" />
                       <h4 className="text-xl font-semibold text-white mb-2">{option.name}</h4>
                       <p className="text-gray-300">{option.description}</p>
@@ -289,7 +290,7 @@ export const WhatWeBuilding = () => {
                       <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-yellow-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
                       
                       <div 
-                        className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
+                        className="p-6 rounded-lg backdrop-blur border-0 transition-all duration-500 relative z-10
                                  bg-black/30 border-teal-500/20 hover:border-teal-500/40
                                  hover:translate-y-[-4px] hover:rotate-1
                                  group-hover:shadow-[0_0_25px_rgba(45,212,191,0.2)]"
@@ -505,3 +506,4 @@ export const WhatWeBuilding = () => {
     </section>
   );
 };
+
