@@ -31,6 +31,13 @@ function App() {
           description: "You're now connected to LedgerFund.",
         });
       },
+      onEmailVerificationSuccess: () => {
+        console.log("Email verification completed");
+        toast({
+          title: "Email Verified",
+          description: "Your email has been successfully verified.",
+        });
+      },
       onVerificationComplete: () => {
         console.log("Verification completed");
         toast({
@@ -74,6 +81,13 @@ function App() {
       enableWalletConnectV2: true,
       persistWalletSession: true,
       enableAuthProviders: true,
+      enablePasskeys: false, // Explicitly disable passkeys
+      emailAuth: {
+        options: {
+          autoVerify: true, // Automatically verify email when code is entered
+          autoClose: true // Automatically close the modal after verification
+        }
+      },
       shadowDOMEnabled: false,
       tokens: [
         {
