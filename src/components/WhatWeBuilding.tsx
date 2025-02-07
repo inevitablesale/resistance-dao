@@ -1,3 +1,4 @@
+
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
@@ -11,122 +12,6 @@ const publicSaleData = [
   { name: 'Community Rewards', value: 10, color: '#0f766e', description: 'Core team compensation for ongoing platform development and operations.' },
   { name: 'Partners', value: 10, color: '#115e59', description: 'Strategic partnerships and ecosystem growth initiatives.' }
 ];
-
-const TokenDistribution = () => {
-  return (
-    <div className="relative h-[400px] w-full">
-      {/* Main Black Hole */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-48 h-48 relative">
-          {/* Core */}
-          <div 
-            className="absolute inset-0 rounded-full bg-black"
-            style={{
-              boxShadow: `
-                0 0 50px 10px rgba(234, 179, 8, 0.4),
-                0 0 100px 20px rgba(20, 184, 166, 0.3),
-                0 0 150px 30px rgba(234, 179, 8, 0.2)
-              `
-            }}
-          />
-          
-          {/* Distribution Orbits */}
-          {publicSaleData.map((segment, index) => (
-            <div
-              key={segment.name}
-              className="absolute inset-0"
-              style={{
-                animation: `orbit ${15 + index * 2}s linear infinite`,
-                transform: `rotate(${index * (360 / publicSaleData.length)}deg)`
-              }}
-            >
-              {/* Token */}
-              <div 
-                className="absolute -top-2 left-1/2 group perspective-3000"
-                style={{
-                  transform: `translateX(-50%) scale(${1 + segment.value / 100})`,
-                }}
-              >
-                <div 
-                  className="w-8 h-8 rounded-full bg-gradient-to-r from-yellow-500 to-teal-400 relative"
-                  style={{
-                    animation: 'cosmic-pulse 2s ease-in-out infinite',
-                    animationDelay: `${index * 0.5}s`
-                  }}
-                >
-                  {/* Token Glow */}
-                  <div
-                    className="absolute inset-0 rounded-full blur-md bg-gradient-to-r from-yellow-500/50 to-teal-400/50"
-                    style={{
-                      animation: 'pulse 2s ease-in-out infinite',
-                      animationDelay: `${index * 0.5}s`
-                    }}
-                  />
-                  
-                  {/* Hover Card */}
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full bg-black/90 backdrop-blur-sm p-3 rounded-lg border border-yellow-500/20 w-48 z-10">
-                    <div className="text-sm font-semibold text-white mb-1">{segment.name}</div>
-                    <div className="text-xs text-yellow-500 mb-2">{segment.value}%</div>
-                    <div className="text-xs text-gray-300">{segment.description}</div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Orbital Path */}
-              <div 
-                className="absolute inset-0 rounded-full border border-yellow-500/10"
-                style={{
-                  transform: `scale(${1 + index * 0.2})`,
-                }}
-              >
-                {/* Energy Trail */}
-                <div
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background: `
-                      linear-gradient(
-                        90deg,
-                        transparent 0%,
-                        ${segment.color}20 50%,
-                        transparent 100%
-                      )
-                    `,
-                    animation: `orbit ${15 + index * 2}s linear infinite reverse`
-                  }}
-                />
-              </div>
-            </div>
-          ))}
-          
-          {/* Accretion Disk */}
-          <div 
-            className="absolute inset-0 opacity-20"
-            style={{
-              background: 'conic-gradient(from 0deg at 50% 50%, #eab308 0%, #2dd4bf 25%, #eab308 50%, #2dd4bf 75%, #eab308 100%)',
-              animation: 'orbit 20s linear infinite'
-            }}
-          />
-        </div>
-      </div>
-      
-      {/* Energy Field */}
-      <div 
-        className="absolute inset-0 rounded-full animate-cosmic-pulse"
-        style={{
-          background: `
-            radial-gradient(circle at center,
-              rgba(0, 0, 0, 1) 0%,
-              rgba(234, 179, 8, 0.3) 30%,
-              rgba(20, 184, 166, 0.2) 50%,
-              rgba(234, 179, 8, 0.1) 70%,
-              transparent 90%
-            )
-          `
-        }}
-      />
-    </div>
-  );
-};
 
 export const WhatWeBuilding = () => {
   return (
@@ -157,10 +42,6 @@ export const WhatWeBuilding = () => {
               Platform Investment: 5,000,000 LGR at $0.10
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="h-[400px] relative">
-                <TokenDistribution />
-              </div>
-
               <div className="space-y-6">
                 {presaleData.map((segment, index) => (
                   <div 
@@ -187,31 +68,6 @@ export const WhatWeBuilding = () => {
               Professional Investment: 4,000,000 LGR for Accountant Acquisition Pool
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="h-[400px] relative">
-                {/*<ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={publicSaleData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={160}
-                      innerRadius={100}
-                      dataKey="value"
-                      label={({ name, value }) => `${name} ${value}%`}
-                    >
-                      {publicSaleData.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={entry.color}
-                          className="hover:opacity-80"
-                        />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>*/}
-                <TokenDistribution />
-              </div>
-
               <div className="space-y-6">
                 {publicSaleData.map((segment, index) => (
                   <div 
@@ -418,3 +274,4 @@ export const WhatWeBuilding = () => {
     </section>
   );
 };
+
