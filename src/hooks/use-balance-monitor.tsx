@@ -42,34 +42,6 @@ export const useBalanceMonitor = () => {
 
         const lgrContract = new ethers.Contract(LGR_TOKEN_ADDRESS, LGR_ABI, provider);
 
-        // Only attempt to add token if we detect MetaMask
-        if (window.ethereum && typeof window.ethereum.request === 'function') {
-          try {
-            // Request wallet to add LGR token
-            const wasAdded = await window.ethereum.request({
-              method: 'wallet_watchAsset',
-              params: {
-                type: 'ERC20',
-                options: {
-                  address: LGR_TOKEN_ADDRESS,
-                  symbol: 'LGR',
-                  decimals: 18,
-                  image: 'https://ledgerfund.finance/favicon.ico',
-                },
-              },
-            });
-
-            if (wasAdded) {
-              toast({
-                title: "LGR Token Added",
-                description: "The LGR token has been added to your wallet.",
-              });
-            }
-          } catch (error) {
-            console.warn("Error adding LGR token to wallet:", error);
-          }
-        }
-
         // Monitor LGR token transfers
         const filterTo = lgrContract.filters.Transfer(null, primaryWallet.address);
         lgrContract.on(filterTo, (from, to, value) => {
