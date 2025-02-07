@@ -450,10 +450,10 @@ const IndexContent = () => {
         <div className="container mx-auto px-4 py-24">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
-              The $LGR Protocol Vision
+              The LedgerFund DAO Vision
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
-              Support Web3's first protocol that brings together elite accountants, trusted managed service providers, and networked capital into an unstoppable acquisition engine.
+              Empowering accountants to reclaim control of their industry through decentralized ownership. Join the revolution that's transforming accounting practices from employee-owned to community-governed, creating value for all stakeholders.
             </p>
           </div>
 
