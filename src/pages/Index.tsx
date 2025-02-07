@@ -427,8 +427,8 @@ const IndexContent = () => {
                 </div>
 
                 <button 
-                  onClick={() => navigate('/mint-nft')}
-                  className="mt-4 text-white/80 hover:text-white underline text-sm transition-colors w-full text-center"
+                  disabled
+                  className="mt-4 text-gray-500 cursor-not-allowed text-sm w-full text-center"
                 >
                   New to crypto? Get started here
                 </button>
