@@ -59,7 +59,9 @@ const Nav = () => {
             >
               Download Whitepaper
             </button>
-            <DynamicWidget />
+            <div className="[&_.dynamic-widget-trigger]:!text-white [&_.dynamic-widget-trigger]:!bg-polygon-primary [&_.dynamic-widget-trigger]:!hover:bg-polygon-primary/90 [&_.dynamic-widget-trigger]:!py-2 [&_.dynamic-widget-trigger]:!px-6 [&_.dynamic-widget-trigger]:!rounded-lg [&_.dynamic-widget-trigger]:!font-medium [&_.dynamic-widget-trigger]:!transition-all [&_.dynamic-widget-trigger]:!hover:scale-105">
+              <DynamicWidget buttonContainerClassName="dynamic-widget-trigger" />
+            </div>
           </div>
         </div>
       </div>
@@ -68,3 +70,4 @@ const Nav = () => {
 };
 
 export default Nav;
+
