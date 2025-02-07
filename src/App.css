@@ -52,74 +52,15 @@
 
 @keyframes cosmic-pulse {
   0%, 100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.1) rotate(180deg);
+    transform: scale(1);
     opacity: 1;
   }
-}
-
-@keyframes event-horizon {
-  0% {
-    transform: scale(1) rotate(0deg);
-  }
   50% {
-    transform: scale(1.2) rotate(180deg);
-  }
-  100% {
-    transform: scale(1) rotate(360deg);
-  }
-}
-
-@keyframes light-distortion {
-  0% {
-    filter: hue-rotate(0deg) brightness(1);
-  }
-  50% {
-    filter: hue-rotate(180deg) brightness(1.2);
-  }
-  100% {
-    filter: hue-rotate(360deg) brightness(1);
+    transform: scale(1.05);
+    opacity: 0.8;
   }
 }
 
 .perspective-3000 {
   perspective: 3000px;
-}
-
-@keyframes cosmic-box-pulse {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(20, 184, 166, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(20, 184, 166, 0.4);
-  }
-}
-
-@keyframes cosmic-glow {
-  0%, 100% {
-    opacity: 0.5;
-    filter: blur(8px);
-  }
-  50% {
-    opacity: 0.8;
-    filter: blur(12px);
-  }
-}
-
-@keyframes space-distortion {
-  0% {
-    transform: scale(1) rotate(0deg);
-    opacity: 0.3;
-  }
-  50% {
-    transform: scale(1.1) rotate(180deg);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(1) rotate(360deg);
-    opacity: 0.3;
-  }
 }

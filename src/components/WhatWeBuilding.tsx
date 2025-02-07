@@ -15,27 +15,8 @@ const publicSaleData = [
 
 export const WhatWeBuilding = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [expandedBox, setExpandedBox] = useState<string | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const orbitContainerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (orbitContainerRef.current) {
-        const rect = orbitContainerRef.current.getBoundingClientRect();
-        setContainerDimensions({
-          width: rect.width,
-          height: rect.height
-        });
-      }
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,64 +46,23 @@ export const WhatWeBuilding = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const toggleBox = (name: string) => {
-    setExpandedBox(expandedBox === name ? null : name);
-  };
-
   return (
     <section ref={sectionRef} className="py-16 relative overflow-hidden min-h-screen perspective-3000">
-      {/* Enhanced Black Hole Effect */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* Cosmic Background */}
+      <div className="absolute inset-0 opacity-90">
         <div 
-          className="absolute inset-0 transition-transform duration-1000"
+          className="absolute inset-0 transition-transform duration-300"
           style={{
-            background: `
-              radial-gradient(circle at 50% 50%, 
-                rgba(0, 0, 0, 1) 0%,
-                rgba(20, 184, 166, 0.1) 20%,
-                rgba(234, 179, 8, 0.05) 40%,
-                transparent 70%
-              )
-            `,
-            transform: `scale(${1 + scrollProgress * 0.5})`,
-            animation: 'cosmic-pulse 8s ease-in-out infinite'
+            background: 'radial-gradient(circle at center, transparent 0%, #000000e6 70%)',
+            transform: `scale(${1 + scrollProgress * 0.5})`
           }}
         />
-        
-        {/* Light Distortion Effect */}
         <div 
-          className="absolute inset-0 transition-all duration-1000"
+          className="absolute inset-0 transition-transform duration-300"
           style={{
-            background: `
-              conic-gradient(
-                from 0deg at 50% 50%,
-                rgba(20, 184, 166, 0.1),
-                rgba(234, 179, 8, 0.1),
-                rgba(20, 184, 166, 0.1),
-                rgba(234, 179, 8, 0.1)
-              )
-            `,
-            transform: `rotate(${scrollProgress * 360}deg) scale(${1 + scrollProgress * 0.3})`,
-            opacity: 0.6,
-            mixBlendMode: 'overlay'
-          }}
-        />
-        
-        {/* Event Horizon Glow */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: `
-              radial-gradient(circle at 50% 50%,
-                rgba(20, 184, 166, 0.2) 0%,
-                rgba(234, 179, 8, 0.15) 30%,
-                transparent 70%
-              )
-            `,
+            background: 'radial-gradient(circle at center, rgba(234,179,8,0.15) 0%, rgba(45,212,191,0.1) 30%, transparent 70%)',
             animation: 'cosmic-pulse 4s ease-in-out infinite',
-            transform: `scale(${1 + scrollProgress * 0.3}) rotate(${scrollProgress * 180}deg)`,
-            opacity: 0.8,
-            mixBlendMode: 'screen'
+            transform: `scale(${1 + scrollProgress * 0.3})`
           }}
         />
       </div>
@@ -152,80 +92,47 @@ export const WhatWeBuilding = () => {
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
               Platform Investment: 5,000,000 LGR at $0.10
             </p>
-            <div className="flex flex-wrap justify-center gap-8 mb-20">
-              {presaleData.map((segment, index) => {
-                const distanceFromCenter = Math.sqrt(
-                  Math.pow(mousePosition.x, 2) + Math.pow(mousePosition.y, 2)
-                );
-                const distortionFactor = Math.max(0, 1 - distanceFromCenter);
-                const offsetX = mousePosition.x * (10 + index * 5) * distortionFactor;
-                const offsetY = mousePosition.y * (10 + index * 5) * distortionFactor;
+            <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
+              <div className="space-y-6 relative">
+                {presaleData.map((segment, index) => {
+                  const orbitRadius = 20 + index * 10;
+                  const orbitDuration = 20 + index * 5;
+                  const offsetX = mousePosition.x * (10 + index * 5);
+                  const offsetY = mousePosition.y * (10 + index * 5);
 
-                return (
-                  <div 
-                    key={segment.name}
-                    className="relative group cursor-pointer flex-1 min-w-[300px] max-w-[400px]"
-                    onClick={() => toggleBox(segment.name)}
-                    style={{
-                      transform: `
-                        translate(${offsetX}px, ${offsetY}px)
-                        scale(${1 - scrollProgress * 0.1})
-                      `,
-                      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
-                    }}
-                  >
-                    {/* Cosmic Energy Field */}
+                  return (
                     <div 
-                      className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-all duration-500"
+                      key={segment.name}
+                      className="relative group animate-cosmic-pulse"
                       style={{
-                        transform: `scale(${1 + scrollProgress * 0.2}) rotate(${scrollProgress * 45}deg)`,
-                      }}
-                    />
-                    
-                    <div 
-                      className={`
-                        p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
-                        bg-black/30 border-yellow-500/20 hover:border-yellow-500/40
-                        group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]
-                        ${expandedBox === segment.name ? 'scale-110' : 'scale-100'}
-                      `}
-                      style={{
-                        background: `
-                          linear-gradient(
-                            135deg,
-                            rgba(13, 148, 136, 0.2) 0%,
-                            rgba(0, 0, 0, 0.4) 100%
-                          )
-                        `,
-                        boxShadow: expandedBox === segment.name 
-                          ? '0 0 30px rgba(234,179,8,0.3)'
-                          : '0 0 15px rgba(234,179,8,0.1)'
+                        animation: `orbit ${orbitDuration}s linear infinite`,
+                        transform: `translate(${offsetX}px, ${offsetY}px)`,
+                        transition: 'transform 0.3s ease-out'
                       }}
                     >
-                      <div className="flex items-center gap-3 mb-2">
-                        <div 
-                          className="w-4 h-4 rounded-full animate-pulse"
-                          style={{ 
-                            backgroundColor: segment.color,
-                            boxShadow: `0 0 ${10 + scrollProgress * 20}px ${segment.color}`
-                          }} 
-                        />
-                        <h3 className="text-xl font-semibold text-white">
-                          {segment.name} ({segment.value}%)
-                        </h3>
-                      </div>
-                      {expandedBox === segment.name && (
-                        <p className="text-gray-300 transform transition-all duration-300 mt-4 animate-fade-in"
-                           style={{
-                             filter: `blur(${scrollProgress * 0.5}px)`,
-                           }}>
+                      {/* Gravitational Lens Effect */}
+                      <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                      
+                      <div 
+                        className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
+                                 bg-black/30 border-yellow-500/20 hover:border-yellow-500/40
+                                 hover:translate-y-[-4px] hover:rotate-1
+                                 group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]"
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
+                          <h3 className="text-xl font-semibold text-white">
+                            {segment.name} ({segment.value}%)
+                          </h3>
+                        </div>
+                        <p className="text-gray-300">
                           {segment.description}
                         </p>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </TabsContent>
 
@@ -233,44 +140,149 @@ export const WhatWeBuilding = () => {
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
               Professional Investment: 4,000,000 LGR for Accountant Acquisition Pool
             </p>
-            
+            <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
+              <div className="space-y-6 relative">
+                {publicSaleData.map((segment, index) => {
+                  const orbitRadius = 20 + index * 10;
+                  const orbitDuration = 20 + index * 5;
+                  const offsetX = mousePosition.x * (10 + index * 5);
+                  const offsetY = mousePosition.y * (10 + index * 5);
+
+                  return (
+                    <div 
+                      key={segment.name}
+                      className="relative group animate-cosmic-pulse"
+                      style={{
+                        animation: `orbit ${orbitDuration}s linear infinite`,
+                        transform: `translate(${offsetX}px, ${offsetY}px)`,
+                        transition: 'transform 0.3s ease-out'
+                      }}
+                    >
+                      {/* Gravitational Lens Effect */}
+                      <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-yellow-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                      
+                      <div 
+                        className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
+                                 bg-black/30 border-teal-500/20 hover:border-teal-500/40
+                                 hover:translate-y-[-4px] hover:rotate-1
+                                 group-hover:shadow-[0_0_25px_rgba(45,212,191,0.2)]"
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
+                          <h3 className="text-xl font-semibold text-white">
+                            {segment.name} ({segment.value}%)
+                          </h3>
+                        </div>
+                        <p className="text-gray-300">
+                          {segment.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Management Fee Structure Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
-              <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 space-y-4">
-                <div className="flex items-center gap-3">
-                  <ArrowDownToLine className="w-8 h-8 text-yellow-400" />
-                  <h4 className="text-xl font-semibold text-white">2% Management Fee</h4>
+            <div className="mb-20">
+              <h3 className="text-3xl font-bold text-white mb-8 text-center">Management Fee Structure</h3>
+              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <ArrowDownToLine className="w-8 h-8 text-yellow-400" />
+                    <h4 className="text-xl font-semibold text-white">2% Management Fee</h4>
+                  </div>
+                  <p className="text-gray-300">
+                    Applied at time of acquisition:
+                  </p>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>2% of capital raised for each acquisition</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>Supports deal sourcing and due diligence</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>Funds platform operations and team</span>
+                    </li>
+                  </ul>
                 </div>
-                <p className="text-gray-300">Applied at time of acquisition</p>
-              </div>
 
-              <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 space-y-4">
-                <div className="flex items-center gap-3">
-                  <BarChart3 className="w-8 h-8 text-teal-400" />
-                  <h4 className="text-xl font-semibold text-white">20% Performance Fee</h4>
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <BarChart3 className="w-8 h-8 text-teal-400" />
+                    <h4 className="text-xl font-semibold text-white">20% Performance Fee</h4>
+                  </div>
+                  <p className="text-gray-300">
+                    Applied at time of distribution:
+                  </p>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>20% of profits after return of capital</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>Incentivizes platform performance</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>Aligns with traditional PE structures</span>
+                    </li>
+                  </ul>
                 </div>
-                <p className="text-gray-300">Applied at time of distribution</p>
               </div>
+            </div>
 
-              <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 space-y-4">
-                <div className="flex items-center gap-3">
-                  <ChartPie className="w-8 h-8 text-yellow-400" />
-                  <h4 className="text-xl font-semibold text-white">Initial Investment</h4>
+            {/* Investment Flow Section */}
+            <div className="mb-20">
+              <h3 className="text-3xl font-bold text-white mb-8 text-center">Investment Flow</h3>
+              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <ChartPie className="w-8 h-8 text-yellow-400" />
+                    <h4 className="text-xl font-semibold text-white">Initial Investment</h4>
+                  </div>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>98% goes to acquisition</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>2% management fee to treasury</span>
+                    </li>
+                  </ul>
                 </div>
-                <p className="text-gray-300">98% to acquisition, 2% management fee</p>
-              </div>
 
-              <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 space-y-4">
-                <div className="flex items-center gap-3">
-                  <Building2 className="w-8 h-8 text-teal-400" />
-                  <h4 className="text-xl font-semibold text-white">Profit Distribution</h4>
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Building2 className="w-8 h-8 text-teal-400" />
+                    <h4 className="text-xl font-semibold text-white">Profit Distribution</h4>
+                  </div>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>70% to RWA token holders</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>20% performance fee to management</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>10% reflections to LGR holders</span>
+                    </li>
+                  </ul>
                 </div>
-                <p className="text-gray-300">70% to RWA tokens, 20% performance fee, 10% reflections</p>
               </div>
             </div>
 
             {/* Token Benefits Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
               {/* LGR Token Section */}
               <div className="space-y-8">
                 <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
@@ -278,7 +290,7 @@ export const WhatWeBuilding = () => {
                   <span>LGR Token Benefits</span>
                 </div>
                 
-                <div className="grid grid-cols-1 gap-6">
+                <div className="space-y-6">
                   <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
                     <div className="mb-4">
                       <Wallet className="w-8 h-8 text-yellow-400" />
@@ -318,7 +330,7 @@ export const WhatWeBuilding = () => {
                   <span>RWA Token Benefits</span>
                 </div>
                 
-                <div className="grid grid-cols-1 gap-6">
+                <div className="space-y-6">
                   <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
                     <div className="mb-4">
                       <Coins className="w-8 h-8 text-teal-400" />
