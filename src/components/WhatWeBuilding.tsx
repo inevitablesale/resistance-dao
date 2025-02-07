@@ -17,14 +17,14 @@ const publicSaleData = [
     name: 'Treasury', 
     value: 30, 
     color: '#14b8a6', 
-    description: 'Management company operations, collecting 2% management fee on acquisitions and 20% performance fee on distributions.',
+    description: 'DAO Management Fee Structure: Strategic treasury management by owner-operators, ensuring aligned incentives and sustainable platform growth.',
     className: 'col-span-1'
   },
   { 
     name: 'Public Sale', 
     value: 50, 
     color: '#0d9488', 
-    description: 'Trading liquidity pool ensuring market stability and token accessibility.',
+    description: 'LP Capital Investment Flow: Decentralized capital allocation through RWA tokens, enabling fractional ownership in multiple accounting firms.',
     className: 'col-span-1'
   },
   { 
@@ -85,7 +85,7 @@ export const WhatWeBuilding = () => {
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('scroll', handleMouseMove);
   }, []);
 
   const calculateEnergyStyles = (element: HTMLElement) => {
