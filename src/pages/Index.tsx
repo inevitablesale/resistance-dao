@@ -317,7 +317,7 @@ const IndexContent = () => {
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 blur-xl animate-pulse" />
                   <h2 className="relative text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-2 text-center">
-                    Presale Stage 1
+                    Presale
                   </h2>
                 </div>
               </div>
