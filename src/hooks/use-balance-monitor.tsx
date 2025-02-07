@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
@@ -8,7 +7,10 @@ import { RPC_ENDPOINTS } from "@/services/presaleContractService";
 const LGR_TOKEN_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
 const LGR_ABI = [
   "function balanceOf(address owner) view returns (uint256)",
-  "event Transfer(address indexed from, address indexed to, uint256 value)"
+  "event Transfer(address indexed from, address indexed to, uint256 value)",
+  "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
+  "function name() view returns (string)"
 ];
 
 export const useBalanceMonitor = () => {
@@ -38,6 +40,34 @@ export const useBalanceMonitor = () => {
         }
 
         const lgrContract = new ethers.Contract(LGR_TOKEN_ADDRESS, LGR_ABI, provider);
+
+        // Check if wallet provider is available (e.g., MetaMask)
+        if (window.ethereum) {
+          try {
+            // Request wallet to add LGR token
+            const wasAdded = await window.ethereum.request({
+              method: 'wallet_watchAsset',
+              params: {
+                type: 'ERC20',
+                options: {
+                  address: LGR_TOKEN_ADDRESS,
+                  symbol: 'LGR',
+                  decimals: 18,
+                  image: 'https://ledgerfund.finance/favicon.ico',
+                },
+              },
+            });
+
+            if (wasAdded) {
+              toast({
+                title: "LGR Token Added",
+                description: "The LGR token has been added to your wallet.",
+              });
+            }
+          } catch (error) {
+            console.warn("Error adding LGR token to wallet:", error);
+          }
+        }
 
         // Monitor LGR token transfers
         const filterTo = lgrContract.filters.Transfer(null, primaryWallet.address);
@@ -70,4 +100,3 @@ export const useBalanceMonitor = () => {
     setupBalanceMonitoring();
   }, [primaryWallet?.address, toast]);
 };
-
