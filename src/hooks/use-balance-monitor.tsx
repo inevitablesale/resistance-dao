@@ -1,10 +1,11 @@
+
 import { useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { RPC_ENDPOINTS } from "@/services/presaleContractService";
 
-const LGR_TOKEN_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
+const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const LGR_ABI = [
   "function balanceOf(address owner) view returns (uint256)",
   "event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -41,8 +42,8 @@ export const useBalanceMonitor = () => {
 
         const lgrContract = new ethers.Contract(LGR_TOKEN_ADDRESS, LGR_ABI, provider);
 
-        // Only attempt to add token to MetaMask if it's the active wallet
-        if (window.ethereum && primaryWallet.connector?.name?.toLowerCase().includes('metamask')) {
+        // Only attempt to add token if we detect MetaMask
+        if (window.ethereum && typeof window.ethereum.request === 'function') {
           try {
             // Request wallet to add LGR token
             const wasAdded = await window.ethereum.request({
