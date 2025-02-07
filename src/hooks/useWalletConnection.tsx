@@ -39,8 +39,6 @@ export const useWalletConnection = () => {
 
   const showWallet = (view: 'send' | 'deposit') => {
     console.log("Attempting to show wallet view:", view);
-    console.log("Wallet connector:", primaryWallet?.connector);
-    console.log("Wallet type:", primaryWallet?.connector?.name);
     
     if (!primaryWallet?.connector) {
       console.warn("No wallet connector available");
@@ -52,32 +50,15 @@ export const useWalletConnection = () => {
       return;
     }
 
-    // Default to assuming it's a Dynamic embedded wallet unless explicitly identified as something else
-    if (!primaryWallet.connector.name?.toLowerCase().includes('zerodev')) {
-      // This is likely a Dynamic embedded wallet
-      if (primaryWallet.connector.showWallet) {
-        primaryWallet.connector.showWallet({ view });
-      } else {
-        console.warn("Dynamic embedded wallet does not support showWallet");
-        toast({
-          title: "Wallet Error",
-          description: "This wallet doesn't support the requested action",
-          variant: "destructive"
-        });
-      }
-    } 
-    // Handle ZeroDev wallet
-    else {
-      if (primaryWallet.connector.openWallet) {
-        primaryWallet.connector.openWallet({ view });
-      } else {
-        console.warn("ZeroDev wallet does not support openWallet");
-        toast({
-          title: "Wallet Error",
-          description: "This wallet doesn't support the requested action",
-          variant: "destructive"
-        });
-      }
+    if (primaryWallet.connector.showWallet) {
+      primaryWallet.connector.showWallet({ view });
+    } else {
+      console.warn("Wallet does not support showWallet");
+      toast({
+        title: "Wallet Error",
+        description: "This wallet doesn't support the requested action",
+        variant: "destructive"
+      });
     }
   };
 
@@ -90,4 +71,3 @@ export const useWalletConnection = () => {
     showWallet
   };
 };
-
