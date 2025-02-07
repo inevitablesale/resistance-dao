@@ -1,10 +1,12 @@
 
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export const useWalletConnection = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const [isConnecting, setIsConnecting] = useState(false);
+  const { toast } = useToast();
 
   const connect = async () => {
     try {
@@ -39,12 +41,29 @@ export const useWalletConnection = () => {
     console.log("Attempting to show wallet view:", view);
     console.log("Wallet connector:", primaryWallet?.connector);
     
-    if (!primaryWallet?.connector?.showWallet) {
-      console.warn("Wallet does not support showWallet functionality");
+    if (!primaryWallet?.connector) {
+      console.warn("No wallet connector available");
+      toast({
+        title: "Wallet Error",
+        description: "Wallet functionality not available",
+        variant: "destructive"
+      });
       return;
     }
-    
-    primaryWallet.connector.showWallet({ view });
+
+    // Try both showWallet and openWallet methods
+    if (primaryWallet.connector.showWallet) {
+      primaryWallet.connector.showWallet({ view });
+    } else if (primaryWallet.connector.openWallet) {
+      primaryWallet.connector.openWallet({ view });
+    } else {
+      console.warn("Wallet does not support wallet view functionality");
+      toast({
+        title: "Wallet Error",
+        description: "This wallet doesn't support the requested action",
+        variant: "destructive"
+      });
+    }
   };
 
   return {
@@ -56,4 +75,3 @@ export const useWalletConnection = () => {
     showWallet
   };
 };
-

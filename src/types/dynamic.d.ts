@@ -28,6 +28,7 @@ declare module "@dynamic-labs/sdk-react-core" {
       connector?: {
         name?: string;
         showWallet?: (options: { view: 'send' | 'deposit' }) => void;
+        openWallet?: (options: { view: 'send' | 'deposit' }) => void;  // Added for ZeroDev compatibility
       };
     } | null;
     setShowAuthFlow?: (show: boolean) => void;
