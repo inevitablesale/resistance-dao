@@ -1,4 +1,4 @@
-import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3, Building } from "lucide-react";
+import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3, Building, Orbit } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
 
@@ -49,14 +49,20 @@ const investmentOptions = [
     description: 'Hold LGR tokens to earn passive reflections from all accounting firm investments and protocol fees.',
     color: '#F2FCE2',
     icon: ChartPie,
-    energyColor: '#9b87f5'
+    energyColor: '#9b87f5',
+    orbitDuration: '20s',
+    orbitDelay: '0s',
+    orbitDirection: '1'
   },
   {
     name: 'Active Investment',
     description: 'Participate in firm acquisitions, due diligence, and governance while earning enhanced rewards.',
     color: '#F2FCE2',
     icon: UsersRound,
-    energyColor: '#14b8a6'
+    energyColor: '#14b8a6',
+    orbitDuration: '25s',
+    orbitDelay: '0.5s',
+    orbitDirection: '-1'
   }
 ];
 
@@ -187,85 +193,117 @@ export const WhatWeBuilding = () => {
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
               Presale Allocation: 5,000,000 LGR
             </p>
-            <div className="flex flex-col items-center mb-20">
-              <div className="grid grid-cols-1 gap-6 max-w-2xl mb-12">
-                {presaleData.map((segment, index) => {
-                  const orbitRadius = 20 + index * 10;
-                  const orbitDuration = 20 + index * 5;
-                  const offsetX = mousePosition.x * (10 + index * 5);
-                  const offsetY = mousePosition.y * (10 + index * 5);
 
+            <div className="relative min-h-[600px] mb-20">
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32">
+                <div className="absolute inset-0 bg-black rounded-full animate-cosmic-pulse">
+                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-full blur-xl" />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-teal-500/10 rounded-full animate-pulse blur-lg" />
+              </div>
+
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl max-h-[500px]">
+                {investmentOptions.map((option, index) => {
+                  const radius = index === 0 ? '45%' : '55%';
+                  const rotateBase = index === 0 ? '0deg' : '180deg';
+                  
                   return (
-                    <div 
-                      key={segment.name}
-                      className={`relative group animate-cosmic-pulse astral-energy ${segment.className}`}
+                    <div
+                      key={option.name}
+                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full"
                       style={{
-                        ...calculateEnergyStyles(sectionRef.current, segment.color),
-                        '--energy-color': segment.color,
-                        animation: `orbit ${orbitDuration}s linear infinite`,
-                        transform: `translate(${offsetX}px, ${offsetY}px)`,
-                        transition: 'transform 0.3s ease-out'
-                      } as React.CSSProperties}
+                        transform: `rotate(${rotateBase})`,
+                      }}
                     >
-                      <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
-                      
                       <div 
-                        className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
-                                 bg-black/30 border-yellow-500/20 hover:border-yellow-500/40
-                                 hover:translate-y-[-4px] hover:rotate-1
-                                 group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]"
+                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-opacity-20"
+                        style={{
+                          width: `${radius}`,
+                          height: `${radius}`,
+                          borderColor: option.energyColor,
+                          boxShadow: `0 0 20px ${option.energyColor}40`
+                        }}
+                      />
+
+                      <div
+                        className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2"
+                        style={{
+                          animation: `orbit ${option.orbitDuration} linear infinite`,
+                          animationDelay: option.orbitDelay,
+                          animationDirection: parseInt(option.orbitDirection) === 1 ? 'normal' : 'reverse'
+                        }}
                       >
-                        <div className="flex items-center gap-3 mb-2 justify-center">
-                          <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
-                          <h3 className="text-xl font-semibold text-white">
-                            {segment.name}
-                          </h3>
+                        <div className="relative group">
+                          <div 
+                            className="absolute left-1/2 top-1/2 w-1 h-[200px] origin-top"
+                            style={{
+                              background: `linear-gradient(to bottom, ${option.energyColor}00, ${option.energyColor}40)`,
+                              transform: 'rotate(180deg)',
+                              animation: 'cosmic-pulse 2s ease-in-out infinite'
+                            }}
+                          />
+
+                          <div className="relative -translate-y-1/2 p-6 rounded-full bg-black/40 backdrop-blur-sm border border-opacity-20 min-w-[300px]"
+                               style={{ borderColor: option.energyColor }}>
+                            <div className="flex flex-col items-center gap-4">
+                              <div 
+                                className="w-16 h-16 rounded-full flex items-center justify-center"
+                                style={{
+                                  background: `radial-gradient(circle at center, ${option.energyColor}40, transparent)`,
+                                  animation: 'cosmic-pulse 2s ease-in-out infinite'
+                                }}
+                              >
+                                <option.icon className="w-8 h-8" style={{ color: option.energyColor }} />
+                              </div>
+                              <div className="text-center">
+                                <h3 className="text-xl font-bold text-white mb-2">{option.name}</h3>
+                                <p className="text-white/80 text-sm">{option.description}</p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-gray-300 text-center">
-                          {segment.description}
-                        </p>
                       </div>
                     </div>
                   );
                 })}
               </div>
+            </div>
 
-              <div className="w-full max-w-5xl">
-                <h3 className="text-2xl font-semibold text-white text-center mb-8">Investment Options</h3>
-                <div className="grid grid-cols-2 gap-8">
-                  {investmentOptions.map((option, index) => (
+            <div className="w-full max-w-5xl">
+              <h3 className="text-2xl font-semibold text-white text-center mb-8">Investment Options</h3>
+              <div className="grid grid-cols-2 gap-8">
+                {investmentOptions.map((option, index) => (
+                  <div 
+                    key={option.name}
+                    ref={el => optionRefs.current[index] = el}
+                    className="relative group astral-energy"
+                    style={calculateEnergyStyles(optionRefs.current[index], option.energyColor)}
+                  >
                     <div 
-                      key={option.name}
-                      ref={el => optionRefs.current[index] = el}
-                      className="relative group astral-energy"
-                      style={calculateEnergyStyles(optionRefs.current[index], option.energyColor)}
-                    >
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: `radial-gradient(circle at center, ${option.energyColor}20 0%, transparent 70%)`,
+                        animation: 'cosmic-pulse 4s ease-in-out infinite',
+                      }}
+                    />
+                    
+                    <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                    
+                    <div className="p-6 rounded-lg backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300 relative bg-black/30 hover:translate-y-[-4px] h-full">
+                      <option.icon className="w-8 h-8 text-yellow-400 mb-4" />
+                      <h4 className="text-xl font-semibold text-white mb-2">{option.name}</h4>
+                      <p className="text-gray-300">{option.description}</p>
+                      
                       <div 
                         className="absolute inset-0 pointer-events-none"
                         style={{
-                          background: `radial-gradient(circle at center, ${option.energyColor}20 0%, transparent 70%)`,
-                          animation: 'cosmic-pulse 4s ease-in-out infinite',
+                          background: `radial-gradient(circle at center, ${option.energyColor}10 0%, transparent 70%)`,
+                          animation: 'particle-flow 2s ease-out infinite',
                         }}
                       />
-                      
-                      <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
-                      
-                      <div className="p-6 rounded-lg backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300 relative bg-black/30 hover:translate-y-[-4px] h-full">
-                        <option.icon className="w-8 h-8 text-yellow-400 mb-4" />
-                        <h4 className="text-xl font-semibold text-white mb-2">{option.name}</h4>
-                        <p className="text-gray-300">{option.description}</p>
-                        
-                        <div 
-                          className="absolute inset-0 pointer-events-none"
-                          style={{
-                            background: `radial-gradient(circle at center, ${option.energyColor}10 0%, transparent 70%)`,
-                            animation: 'particle-flow 2s ease-out infinite',
-                          }}
-                        />
-                      </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           </TabsContent>
