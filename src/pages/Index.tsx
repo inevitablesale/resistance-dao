@@ -31,7 +31,6 @@ const IndexContent = () => {
   const loadTime = Date.now();
   const welcomeToastShown = useRef(false);
 
-  // Add states for presale data
   const [presaleSupply] = useState<string>(TOTAL_PRESALE_SUPPLY.toString());
   const [totalSold, setTotalSold] = useState<string>('0');
   const [presaleEndTime] = useState<number>(PRESALE_END_TIME * 1000); // Convert to milliseconds
@@ -47,11 +46,9 @@ const IndexContent = () => {
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
 
   useEffect(() => {
-    // Set loaded state after a small delay to trigger initial animations
     setTimeout(() => setIsLoaded(true), 100);
   }, []);
 
-  // Show welcome toast only once when component mounts
   useEffect(() => {
     if (!welcomeToastShown.current && !primaryWallet) {
       console.log("[Toast] Showing welcome toast - no wallet detected");
@@ -70,18 +67,14 @@ const IndexContent = () => {
       
       const presaleRect = presaleRef.current.getBoundingClientRect();
       
-      // Calculate when Presale Stage 1 enters viewport (top of section reaches bottom of viewport)
-      // Scale from 0 to 1 as section enters
       const presaleVisibility = Math.max(0, Math.min(1, 
         1 - (presaleRect.top / window.innerHeight)
       ));
       
-      // When scrolling up past the section, scale back down
       const scrollingUpAdjustment = Math.max(0, Math.min(1,
         1 - (Math.abs(presaleRect.bottom) / window.innerHeight)
       ));
       
-      // Use the minimum of both values to ensure proper scaling in both directions
       setScrollProgress(Math.min(presaleVisibility, scrollingUpAdjustment));
     };
 
@@ -91,26 +84,13 @@ const IndexContent = () => {
 
   useEffect(() => {
     const checkWalletStatus = async () => {
-      if (!primaryWallet) {
-        toast({
-          title: "Welcome to LedgerFund",
-          description: "Connect your wallet to participate in the token presale"
-        });
-        return;
-      }
-
-      const isConnected = await primaryWallet.isConnected();
-      if (!isConnected) {
-        toast({
-          title: "Wallet Connection Required",
-          description: "Please connect your wallet to access the platform"
-        });
-        return;
+      if (!primaryWallet?.isConnected()) {
+        setShowAuthFlow?.(true);
       }
     };
 
     checkWalletStatus();
-  }, [primaryWallet, toast]);
+  }, [primaryWallet]);
 
   const parallaxStyle = {
     '--scroll-progress': scrollProgress,
@@ -118,18 +98,14 @@ const IndexContent = () => {
     opacity: 1 - scrollProgress * 0.6
   } as React.CSSProperties;
 
-  // Function to fetch presale data
   const fetchPresaleData = async () => {
     try {
-      // Get total LGR tokens sold using the correct function
       const sold = await fetchTotalLGRSold();
       setTotalSold(sold);
 
-      // Get current price in MATIC
       const price = await fetchPresaleMaticPrice();
       setMaticPrice(price === "0" ? "Loading..." : `${price} MATIC`);
       
-      // If wallet is connected, get user's purchased tokens
       if (primaryWallet?.address) {
         const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
         const presaleContract = await getPresaleContract(provider);
@@ -146,7 +122,6 @@ const IndexContent = () => {
     }
   };
 
-  // Calculate time left
   useEffect(() => {
     const calculateTimeLeft = () => {
       const now = Date.now();
@@ -172,24 +147,20 @@ const IndexContent = () => {
     return () => clearInterval(timer);
   }, [presaleEndTime]);
 
-  // Fetch presale data on component mount and periodically
   useEffect(() => {
     fetchPresaleData();
     const interval = setInterval(fetchPresaleData, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
   }, []);
 
-  // Function to format large numbers
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(num);
   };
 
-  // Function to calculate percentage
   const calculatePercentage = () => {
     return ((Number(totalSold) / Number(presaleSupply)) * 100).toFixed(2);
   };
 
-  // Function to format large numbers with commas
   const formatLargeNumber = (num: string) => {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
@@ -213,7 +184,6 @@ const IndexContent = () => {
         ref={heroRef} 
         className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 min-h-[120vh] flex flex-col items-center justify-start"
       >
-        {/* Background Layer */}
         <div className="fixed inset-0 z-0">
           <div 
             className="absolute inset-0 animate-parallax-slow"
@@ -229,7 +199,6 @@ const IndexContent = () => {
           />
         </div>
 
-        {/* Energy Vortex Effect */}
         <div 
           className="fixed inset-0 z-2 perspective-3000" 
           style={{
@@ -245,7 +214,6 @@ const IndexContent = () => {
                 transition: 'transform 0.5s ease-out'
               }}
             >
-              {/* Core */}
               <div 
                 className={`absolute inset-0 rounded-full bg-black transition-all duration-1000 ${isLoaded ? 'scale-100' : 'scale-0'}`}
                 style={{
@@ -258,7 +226,6 @@ const IndexContent = () => {
                 }}
               />
               
-              {/* Energy Field */}
               <div 
                 className={`absolute inset-0 rounded-full animate-cosmic-pulse transition-all duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
                 style={{
@@ -275,7 +242,6 @@ const IndexContent = () => {
                 }}
               />
               
-              {/* Outer Ring */}
               <div 
                 className={`absolute inset-0 rounded-full transition-all duration-1000 ${isLoaded ? 'scale-100' : 'scale-0'}`}
                 style={{
@@ -296,7 +262,6 @@ const IndexContent = () => {
           </div>
         </div>
 
-        {/* Content Layer with presale information */}
         <div 
           ref={presaleRef}
           className="relative z-3 mt-[30vh]" 
@@ -327,7 +292,6 @@ const IndexContent = () => {
             </div>
           ) : (
             <div className="relative max-w-3xl mx-auto">
-              {/* Sale Start Banner - Now diagonal across presale box */}
               <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-10">
                 <div 
                   className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#ea384c] text-white py-2 px-4 font-bold text-lg shadow-lg transform rotate-[-35deg] w-[150%] text-center"
@@ -350,7 +314,6 @@ const IndexContent = () => {
                   UNTIL PRICE INCREASE
                 </div>
 
-                {/* Countdown Timer with Enhanced Design */}
                 <div className="grid grid-cols-4 gap-4 mb-8">
                   {[
                     { label: 'DAYS', value: timeLeft.days },
@@ -373,7 +336,6 @@ const IndexContent = () => {
                   ))}
                 </div>
 
-                {/* Progress and Stats with Enhanced Visual Design */}
                 <div className="mb-8 relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-teal-500/10 blur-lg" />
                   <div className="relative">
@@ -416,7 +378,6 @@ const IndexContent = () => {
                   </div>
                 </div>
 
-                {/* Enhanced Purchase Options */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <button 
                     onClick={handleBuyClick}
@@ -453,7 +414,6 @@ const IndexContent = () => {
         </div>
       </div>
 
-      {/* How to Buy Section */}
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12">
@@ -495,7 +455,6 @@ const IndexContent = () => {
       </div>
 
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
-        {/* Project Overview Section */}
         <div className="container mx-auto px-4 py-24">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
@@ -506,7 +465,6 @@ const IndexContent = () => {
             </p>
           </div>
 
-          {/* Singularity Effect Box */}
           <div className="relative mb-16">
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl" />
             <div className="relative bg-black/60 backdrop-blur-sm p-8 md:p-12 rounded-lg border border-yellow-500/20">
@@ -534,7 +492,6 @@ const IndexContent = () => {
           </div>
         </div>
 
-        {/* Continue with existing sections */}
         <WhatWeBuilding />
         <LedgerFrens />
         <HowItWorks />
