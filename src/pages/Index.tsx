@@ -477,7 +477,7 @@ const IndexContent = () => {
               The $LGR Protocol Vision
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
-              Building Web3's first protocol that combines elite M&A expertise, battle-tested playbooks, and networked capital into an unstoppable acquisition engine.
+              Building Web3's first protocol that brings together elite accountants, strategic buyers, and networked capital into an unstoppable acquisition engine.
             </p>
           </div>
 
