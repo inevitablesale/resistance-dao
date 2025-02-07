@@ -58,21 +58,6 @@ const investmentOptions = [
   }
 ];
 
-const holdingOptions = [
-  {
-    name: 'Stake for Rewards',
-    description: 'Stake your LGR tokens to earn passive income from protocol fees and firm distributions.',
-    color: '#FEF7CD',
-    icon: ChartPie
-  },
-  {
-    name: 'Participate in Governance',
-    description: 'Use your staked tokens to vote on key protocol decisions and firm acquisitions.',
-    color: '#FEF7CD',
-    icon: UsersRound
-  }
-];
-
 export const WhatWeBuilding = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const sectionRef = useRef<HTMLElement>(null);
@@ -196,7 +181,7 @@ export const WhatWeBuilding = () => {
 
           <TabsContent value="platform" className="relative">
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
-              Initial Presale Allocation: 5,000,000 LGR
+              Presale Allocation: 5,000,000 LGR
             </p>
             <div className="flex flex-col items-center mb-20">
               <div className="grid grid-cols-1 gap-6 max-w-2xl mb-12">
@@ -258,23 +243,6 @@ export const WhatWeBuilding = () => {
                     </div>
                   ))}
                 </div>
-
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-semibold text-white text-center mb-8">Holding Options</h3>
-                  {holdingOptions.map((option, index) => (
-                    <div 
-                      key={option.name}
-                      className="relative group"
-                    >
-                      <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-yellow-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
-                      <div className="p-6 rounded-lg backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300 relative bg-black/30 hover:translate-y-[-4px]">
-                        <option.icon className="w-8 h-8 text-teal-400 mb-4" />
-                        <h4 className="text-xl font-semibold text-white mb-2">{option.name}</h4>
-                        <p className="text-gray-300">{option.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           </TabsContent>
@@ -309,7 +277,7 @@ export const WhatWeBuilding = () => {
                                  hover:translate-y-[-4px] hover:rotate-1
                                  group-hover:shadow-[0_0_25px_rgba(45,212,191,0.2)]"
                       >
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="flex items-center gap-3">
                           <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
                           <h3 className="text-xl font-semibold text-white">
                             {segment.name} ({segment.value}%)
