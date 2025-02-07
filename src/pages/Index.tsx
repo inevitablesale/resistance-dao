@@ -450,7 +450,7 @@ const IndexContent = () => {
         <div className="container mx-auto px-4 py-24">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
-              The $LGR Protocol Vision
+              Join the Singularity
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
               The accounting industry is reaching its event horizon. Private equity wants to pull firms in and consolidate control. But a new force is emerging—a gravitational shift toward fractional ownership. This is LedgerFund DAO.
@@ -460,12 +460,6 @@ const IndexContent = () => {
           <div className="relative mb-16">
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl" />
             <div className="relative bg-black/60 backdrop-blur-sm p-8 md:p-12 rounded-lg border border-yellow-500/20">
-              <div className="flex items-center gap-3 mb-6">
-                <GitBranch className="w-8 h-8 text-teal-500" />
-                <h3 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-300">
-                  The Singularity Effect
-                </h3>
-              </div>
               <div className="grid md:grid-cols-3 gap-8">
                 <div className="space-y-2">
                   <h4 className="text-xl font-semibold text-yellow-500">Elite M&A Expertise</h4>
