@@ -22,25 +22,29 @@ import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
 
 const presaleData = [
   { 
-    name: 'Platform Investment', 
+    name: 'Protocol Investment', 
     value: 100, 
     color: '#14b8a6', 
     description: 'Early supporters invest in the LedgerFund platform, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10.',
     className: 'col-span-2 text-center',
     features: [
       {
+        icon: Trophy,
         title: "Early Access",
         description: "Be among the first to participate in the future of accounting firm ownership"
       },
       {
+        icon: Coins,
         title: "Maximum Allocation",
         description: "Secure the highest possible token allocation at the lowest price point"
       },
       {
+        icon: GitBranch,
         title: "Governance Rights",
         description: "Shape the future of the protocol through early governance participation"
       },
       {
+        icon: Zap,
         title: "Reflection Rewards",
         description: "Earn ongoing rewards from all future firm investments made by the DAO"
       }
@@ -57,7 +61,7 @@ const publicSaleData = [
     className: 'col-span-1'
   },
   { 
-    name: 'Professional Investment', 
+    name: 'Firm Investment', 
     value: 50, 
     color: '#ea384c',
     description: 'Dedicated allocation for accountants to invest in practices identified and vetted by the DAO community.',
