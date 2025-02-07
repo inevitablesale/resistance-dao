@@ -1,4 +1,3 @@
-
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3, Building } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
@@ -6,48 +5,40 @@ import { useEffect, useRef, useState } from "react";
 const presaleData = [
   { 
     name: 'Initial Protocol Investment', 
-    value: 50, 
+    value: 100, 
     color: '#9b87f5',
     description: 'Early supporters invest in the LedgerFund protocol during presale, gaining tokens at $0.10 and earning reflections from all accounting firm investments.',
-    className: 'col-span-1'
-  },
-  { 
-    name: 'Public Sale Reserve', 
-    value: 50, 
-    color: '#F97316',
-    description: 'Reserved allocation for public sale to ensure broad protocol participation and sustainable growth. Available at $1.00 after presale completion.',
-    className: 'col-span-1'
+    className: 'col-span-2 text-center'
   }
 ];
 
-const publicSaleData = [
-  { 
-    name: 'Treasury', 
-    value: 30, 
-    color: '#ea384c',
-    description: 'Strategic treasury management by third-party vault provider ensures secure and transparent fund management for accounting firm acquisitions.',
-    className: 'col-span-1'
+const investmentOptions = [
+  {
+    name: 'Buy with Card',
+    description: 'Purchase LGR tokens directly using your credit or debit card through our secure payment processor.',
+    color: '#F2FCE2',
+    icon: Wallet
   },
-  { 
-    name: 'Firm Investment', 
-    value: 50, 
-    color: '#ea384c',
-    description: 'Dedicated allocation for accountants to invest in practices identified and vetted by the DAO community.',
-    className: 'col-span-1'
+  {
+    name: 'Buy with Crypto',
+    description: 'Use MATIC to purchase LGR tokens through our smart contract on the Polygon network.',
+    color: '#F2FCE2',
+    icon: Coins
+  }
+];
+
+const holdingOptions = [
+  {
+    name: 'Stake for Rewards',
+    description: 'Stake your LGR tokens to earn passive income from protocol fees and firm distributions.',
+    color: '#FEF7CD',
+    icon: ChartPie
   },
-  { 
-    name: 'Community Rewards', 
-    value: 10, 
-    color: '#ea384c',
-    description: 'Incentives for active DAO participation including practice identification, due diligence, and community growth initiatives.',
-    className: 'col-span-1'
-  },
-  { 
-    name: 'Partners', 
-    value: 10, 
-    color: '#ea384c',
-    description: 'Strategic partnerships with banks, staffing agencies, technology providers supporting practice acquisitions.',
-    className: 'col-span-1'
+  {
+    name: 'Participate in Governance',
+    description: 'Use your staked tokens to vote on key protocol decisions and firm acquisitions.',
+    color: '#FEF7CD',
+    icon: UsersRound
   }
 ];
 
@@ -174,10 +165,10 @@ export const WhatWeBuilding = () => {
 
           <TabsContent value="platform" className="relative">
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
-              Protocol Investment: Total Supply 10,000,000 LGR
+              Initial Presale Allocation: 5,000,000 LGR
             </p>
-            <div className="flex justify-center mb-20">
-              <div className="grid grid-cols-2 gap-6 max-w-4xl">
+            <div className="flex flex-col items-center mb-20">
+              <div className="grid grid-cols-1 gap-6 max-w-2xl mb-12">
                 {presaleData.map((segment, index) => {
                   const orbitRadius = 20 + index * 10;
                   const orbitDuration = 20 + index * 5;
@@ -207,7 +198,7 @@ export const WhatWeBuilding = () => {
                         <div className="flex items-center gap-3 mb-2 justify-center">
                           <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
                           <h3 className="text-xl font-semibold text-white">
-                            {segment.name} ({segment.value}%)
+                            {segment.name}
                           </h3>
                         </div>
                         <p className="text-gray-300 text-center">
@@ -217,6 +208,42 @@ export const WhatWeBuilding = () => {
                     </div>
                   );
                 })}
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8 max-w-4xl w-full">
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-semibold text-white text-center mb-8">Investment Options</h3>
+                  {investmentOptions.map((option, index) => (
+                    <div 
+                      key={option.name}
+                      className="relative group"
+                    >
+                      <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                      <div className="p-6 rounded-lg backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300 relative bg-black/30 hover:translate-y-[-4px]">
+                        <option.icon className="w-8 h-8 text-yellow-400 mb-4" />
+                        <h4 className="text-xl font-semibold text-white mb-2">{option.name}</h4>
+                        <p className="text-gray-300">{option.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-semibold text-white text-center mb-8">Holding Options</h3>
+                  {holdingOptions.map((option, index) => (
+                    <div 
+                      key={option.name}
+                      className="relative group"
+                    >
+                      <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-yellow-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                      <div className="p-6 rounded-lg backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300 relative bg-black/30 hover:translate-y-[-4px]">
+                        <option.icon className="w-8 h-8 text-teal-400 mb-4" />
+                        <h4 className="text-xl font-semibold text-white mb-2">{option.name}</h4>
+                        <p className="text-gray-300">{option.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </TabsContent>
@@ -462,4 +489,3 @@ export const WhatWeBuilding = () => {
     </section>
   );
 };
-
