@@ -242,26 +242,19 @@ export const WhatWeBuilding = () => {
                     <div 
                       key={segment.name}
                       className={`relative group animate-cosmic-pulse ${segment.className}`}
-                      ref={el => optionRefs.current[index + investmentOptions.length] = el}
                       style={{
+                        animation: `orbit ${orbitDuration}s linear infinite`,
                         transform: `translate(${offsetX}px, ${offsetY}px)`,
                         transition: 'transform 0.3s ease-out'
                       }}
                     >
-                      <div 
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                          background: `radial-gradient(circle at center, ${segment.color}20 0%, transparent 70%)`,
-                          animation: 'cosmic-pulse 4s ease-in-out infinite',
-                        }}
-                      />
-                      
                       <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-yellow-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
                       
                       <div 
                         className="p-6 rounded-lg backdrop-blur border-0 transition-all duration-500 relative z-10
-                               bg-black/30 hover:translate-y-[-4px] hover:rotate-1
-                               group-hover:shadow-[0_0_25px_rgba(45,212,191,0.2)]"
+                                 bg-black/30 border-teal-500/20 hover:border-teal-500/40
+                                 hover:translate-y-[-4px] hover:rotate-1
+                                 group-hover:shadow-[0_0_25px_rgba(45,212,191,0.2)]"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
@@ -272,203 +265,203 @@ export const WhatWeBuilding = () => {
                         <p className="text-gray-300">
                           {segment.description}
                         </p>
-                      
-                      <div 
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                          background: `radial-gradient(circle at center, ${segment.color}10 0%, transparent 70%)`,
-                          animation: 'particle-flow 2s ease-out infinite',
-                        }}
-                      />
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
 
-          <div className="mb-20">
-            <h3 className="text-3xl font-bold text-white mb-8 text-center">Management Fee Structure</h3>
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              {["Management Fee", "Performance Fee"].map((feeType, index) => (
-                <div 
-                  key={feeType}
-                  ref={el => optionRefs.current[index + investmentOptions.length + publicSaleData.length] = el}
-                  className="relative group cosmic-box"
-                >
-                  <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border-0 space-y-4 relative hover:translate-y-[-4px] transition-all duration-300">
-                    <div className="flex items-center gap-3">
-                      {feeType === "Management Fee" ? (
-                        <ArrowDownToLine className="w-8 h-8 text-yellow-400" />
-                      ) : (
-                        <BarChart3 className="w-8 h-8 text-teal-400" />
-                      )}
-                      <h4 className="text-xl font-semibold text-white">
-                        {feeType === "Management Fee" ? "2% Management Fee" : "20% Performance Fee"}
-                      </h4>
-                    </div>
-                    <p className="text-gray-300">
-                      Applied at time of {feeType === "Management Fee" ? "acquisition" : "distribution"}:
-                    </p>
-                    <ul className="space-y-2 text-gray-300">
-                      <li className="flex items-start gap-2">
-                        <span className={feeType === "Management Fee" ? "text-yellow-400" : "text-teal-400"}>•</span>
-                        <span>{feeType === "Management Fee" ? "2% of capital raised for each acquisition" : "20% of profits after return of capital"}</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className={feeType === "Management Fee" ? "text-yellow-400" : "text-teal-400"}>•</span>
-                        <span>{feeType === "Management Fee" ? "Supports deal sourcing and due diligence" : "Incentivizes platform performance"}</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className={feeType === "Management Fee" ? "text-yellow-400" : "text-teal-400"}>•</span>
-                        <span>{feeType === "Management Fee" ? "Funds platform operations and team" : "Aligns with traditional PE structures"}</span>
-                      </li>
-                    </ul>
+            <div className="mb-20">
+              <h3 className="text-3xl font-bold text-white mb-8 text-center">Management Fee Structure</h3>
+              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <ArrowDownToLine className="w-8 h-8 text-yellow-400" />
+                    <h4 className="text-xl font-semibold text-white">2% Management Fee</h4>
                   </div>
+                  <p className="text-gray-300">
+                    Applied at time of acquisition:
+                  </p>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>2% of capital raised for each acquisition</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>Supports deal sourcing and due diligence</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>Funds platform operations and team</span>
+                    </li>
+                  </ul>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          <div className="mb-20">
-            <h3 className="text-3xl font-bold text-white mb-8 text-center">Firm Management Structure</h3>
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              {["Management Services", "LP Governance"].map((structureType, index) => (
-                <div 
-                  key={structureType}
-                  ref={el => optionRefs.current[index + investmentOptions.length + publicSaleData.length + 2] = el}
-                  className="relative group cosmic-box"
-                >
-                  <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border-0 space-y-4 relative hover:translate-y-[-4px] transition-all duration-300">
-                    <div className="flex items-center gap-3">
-                      {structureType === "Management Services" ? (
-                        <Building className="w-8 h-8 text-yellow-400" />
-                      ) : (
-                        <UsersRound className="w-8 h-8 text-teal-400" />
-                      )}
-                      <h4 className="text-xl font-semibold text-white">
-                        {structureType === "Management Services" ? "Management Services Company" : "LP Governance Rights"}
-                      </h4>
-                    </div>
-                    <p className="text-gray-300">
-                      {structureType === "Management Services" ? "Day-to-day operations are handled by a dedicated management services company that:" : "RWA token holders (Limited Partners) participate in key decisions through:"}
-                    </p>
-                    <ul className="space-y-2 text-gray-300">
-                      {structureType === "Management Services" ? (
-                        <>
-                          <li className="flex items-start gap-2">
-                            <span className="text-yellow-400">•</span>
-                            <span>Provides operational oversight and strategic guidance</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="text-yellow-400">•</span>
-                            <span>Implements best practices across acquired firms</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="text-yellow-400">•</span>
-                            <span>Manages staffing, technology, and growth initiatives</span>
-                          </li>
-                        </>
-                      ) : (
-                        <>
-                          <li className="flex items-start gap-2">
-                            <span className="text-teal-400">•</span>
-                            <span>Quarterly voting on management company performance</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="text-teal-400">•</span>
-                            <span>Approval of major strategic initiatives and acquisitions</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="text-teal-400">•</span>
-                            <span>Input on service expansion and technology investments</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="text-teal-400">•</span>
-                            <span>Ability to propose and vote on management changes</span>
-                          </li>
-                        </>
-                      )}
-                    </ul>
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <BarChart3 className="w-8 h-8 text-teal-400" />
+                    <h4 className="text-xl font-semibold text-white">20% Performance Fee</h4>
                   </div>
+                  <p className="text-gray-300">
+                    Applied at time of distribution:
+                  </p>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>20% of profits after return of capital</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>Incentivizes platform performance</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>Aligns with traditional PE structures</span>
+                    </li>
+                  </ul>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
 
-          <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-            {["LGR", "RWA"].map((tokenType, sectionIndex) => (
-              <div key={tokenType} className="space-y-8">
+            <div className="mb-20">
+              <h3 className="text-3xl font-bold text-white mb-8 text-center">Firm Management Structure</h3>
+              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Building className="w-8 h-8 text-yellow-400" />
+                    <h4 className="text-xl font-semibold text-white">Management Services Company</h4>
+                  </div>
+                  <p className="text-gray-300">
+                    Day-to-day operations are handled by a dedicated management services company that:
+                  </p>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>Provides operational oversight and strategic guidance</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>Implements best practices across acquired firms</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>Manages staffing, technology, and growth initiatives</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <UsersRound className="w-8 h-8 text-teal-400" />
+                    <h4 className="text-xl font-semibold text-white">LP Governance Rights</h4>
+                  </div>
+                  <p className="text-gray-300">
+                    RWA token holders (Limited Partners) participate in key decisions through:
+                  </p>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>Quarterly voting on management company performance</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>Approval of major strategic initiatives and acquisitions</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>Input on service expansion and technology investments</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>Ability to propose and vote on management changes</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+              <div className="space-y-8">
                 <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
-                  {tokenType === "LGR" ? (
-                    <Coins className="w-8 h-8 text-yellow-400" />
-                  ) : (
-                    <Building2 className="w-8 h-8 text-teal-400" />
-                  )}
-                  <span>{tokenType} Token Benefits</span>
+                  <Coins className="w-8 h-8 text-yellow-400" />
+                  <span>LGR Token Benefits</span>
                 </div>
                 
                 <div className="space-y-6">
-                  {[0, 1, 2].map((index) => {
-                    let title = "";
-                    let description = "";
-                    let Icon = null;
-                    
-                    if (tokenType === "LGR") {
-                      if (index === 0) {
-                        title = "Platform Governance";
-                        description = "LGR holders participate in platform governance decisions and contribute to the development of the ecosystem.";
-                        Icon = Wallet;
-                      } else if (index === 1) {
-                        title = "Reflection Rewards";
-                        description = "Earn 10% of all firm distributions, creating passive income from platform success.";
-                        Icon = UsersRound;
-                      } else {
-                        title = "Platform Development";
-                        description = "Support the growth of decentralized accounting firm ownership and professional control.";
-                        Icon = BadgeCheck;
-                      }
-                    } else {
-                      if (index === 0) {
-                        title = "Direct Ownership";
-                        description = "Receive 70% of firm profits through direct fractional ownership.";
-                        Icon = Coins;
-                      } else if (index === 1) {
-                        title = "Professional Control";
-                        description = "Maintain industry standards through accountant-led governance and operations.";
-                        Icon = GanttChartSquare;
-                      } else {
-                        title = "Voting Rights";
-                        description = "Participate in governance decisions for the firm (resourcing, budgeting, processes)";
-                        Icon = Coins;
-                      }
-                    }
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <Wallet className="w-8 h-8 text-yellow-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Platform Governance</h3>
+                    <p className="text-gray-300">
+                      LGR holders participate in platform governance decisions and contribute to the development of the ecosystem.
+                    </p>
+                  </div>
 
-                    return (
-                      <div 
-                        key={index}
-                        ref={el => optionRefs.current[index + sectionIndex * 3 + investmentOptions.length + publicSaleData.length + 4] = el}
-                        className="relative group cosmic-box"
-                      >
-                        <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
-                        <div className="p-6 rounded-lg bg-black/30 backdrop-blur border-0 hover:translate-y-[-4px] transition-all duration-300 relative">
-                          <div className="mb-4">
-                            {Icon && <Icon className={`w-8 h-8 ${tokenType === "LGR" ? "text-yellow-400" : "text-teal-400"}`} />}
-                          </div>
-                          <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
-                          <p className="text-gray-300">
-                            {description}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <UsersRound className="w-8 h-8 text-yellow-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Reflection Rewards</h3>
+                    <p className="text-gray-300">
+                      Earn 10% of all firm distributions, creating passive income from platform success.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <BadgeCheck className="w-8 h-8 text-yellow-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Platform Development</h3>
+                    <p className="text-gray-300">
+                      Support the growth of decentralized accounting firm ownership and professional control.
+                    </p>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
+
+              <div className="space-y-8">
+                <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
+                  <Building2 className="w-8 h-8 text-teal-400" />
+                  <span>RWA Token Benefits</span>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <Coins className="w-8 h-8 text-teal-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Direct Ownership</h3>
+                    <p className="text-gray-300">
+                      Receive 70% of firm profits through direct fractional ownership.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <GanttChartSquare className="w-8 h-8 text-teal-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Professional Control</h3>
+                    <p className="text-gray-300">
+                      Maintain industry standards through accountant-led governance and operations.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <Coins className="w-8 h-8 text-teal-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Voting Rights</h3>
+                    <p className="text-gray-300">
+                      Participate in governance decisions for the firm (resourcing, budgeting, processes)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </section>
