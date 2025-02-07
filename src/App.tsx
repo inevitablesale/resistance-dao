@@ -36,29 +36,42 @@ function App() {
           description: "Connect your wallet to get started.",
         });
       },
-      onEmailVerificationStarted: (args: any) => {
+      onEmailVerificationStarted: (args) => {
         console.log("[Dynamic SDK] Email verification started:", args);
         toast({
           title: "Verification Started",
           description: "Please check your email for the verification code.",
         });
       },
-      onEmailVerificationCompleted: (args: any) => {
+      onEmailVerificationCompleted: (args) => {
         console.log("[Dynamic SDK] Email verification completed:", args);
         toast({
           title: "Verification Successful",
-          description: "Your email has been verified.",
+          description: "Your email has been verified. Proceeding with wallet creation...",
         });
       },
-      onAuthSuccess: (args: any) => {
+      onUserCreated: (args) => {
+        console.log("[Dynamic SDK] New user created:", args);
+        toast({
+          title: "Account Created",
+          description: "Your account has been successfully created.",
+        });
+      },
+      onAuthFlowOpen: () => {
+        console.log("[Dynamic SDK] Auth flow opened");
+      },
+      onAuthFlowClose: () => {
+        console.log("[Dynamic SDK] Auth flow closed");
+      },
+      onAuthSuccess: (args) => {
         console.log("[Dynamic SDK] Auth Success:", args);
         console.log("[Dynamic SDK] Connected wallet:", args?.wallet);
         console.log("[Dynamic SDK] Connected user:", args?.user);
         console.log("[Dynamic SDK] Verification:", args?.user?.verifications);
         
         toast({
-          title: "Wallet Connected",
-          description: `Successfully connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
+          title: "Successfully Connected",
+          description: `Connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
         });
       },
       onEmailVerificationSuccess: () => {
@@ -77,9 +90,17 @@ function App() {
       },
       onSessionConnect: () => {
         console.log("[Dynamic SDK] Session connected");
+        toast({
+          title: "Session Connected",
+          description: "Your session has been restored.",
+        });
       },
       onSessionRestore: () => {
         console.log("[Dynamic SDK] Session restored");
+        toast({
+          title: "Welcome Back",
+          description: "Your previous session has been restored.",
+        });
       }
     },
     settings: {
@@ -107,7 +128,7 @@ function App() {
             signInWithEmail: true,
             autoVerify: false,  // Show verification window
             autoClose: true,   // Close window after successful verification
-            onComplete: (args: any) => {
+            onComplete: (args) => {
               console.log("[Dynamic SDK] Email Auth Complete:", args);
               console.log("[Dynamic SDK] Auth details:", {
                 user: args?.user,
@@ -153,4 +174,3 @@ function App() {
 }
 
 export default App;
-
