@@ -135,6 +135,9 @@ function App() {
           }
         }
       },
+      buttonSettings: {
+        loginButtonText: "Connect Wallet",
+      },
       shadowDOMEnabled: false,
       tokens: [
         {
