@@ -76,19 +76,19 @@ export const SystemWeDeserve = () => {
               ref={el => boxRefs.current[0] = el}
               className="cosmic-box yellow-energy right-drain p-4 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20"
             >
-              A protocol built for professional growth.
+              A protocol built to empower accountants with direct ownership in the firms they serve.
             </p>
             <p 
               ref={el => boxRefs.current[1] = el}
               className="cosmic-box teal-energy right-drain p-4 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20"
             >
-              A platform powered by smart contracts.
+              A decentralized platform where smart contracts automate investments, revenue sharing, and governance.
             </p>
             <p 
               ref={el => boxRefs.current[2] = el}
               className="cosmic-box yellow-energy right-drain p-4 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20"
             >
-              A network owned by the community.
+              A DAO-governed network that aligns the interests of accountants, investors, and firms.
             </p>
           </div>
         </div>
