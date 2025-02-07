@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -61,6 +62,66 @@
   }
 }
 
+@keyframes energy-flow {
+  0% {
+    transform: scaleX(1) translateX(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scaleX(2) translateX(50px);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-flow {
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(var(--flow-x)) translateY(var(--flow-y));
+    opacity: 0;
+  }
+}
+
+.astral-energy {
+  position: relative;
+  overflow: visible;
+}
+
+.astral-energy::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -20px;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--energy-color));
+  filter: blur(8px);
+  transform-origin: right;
+  animation: energy-flow 3s infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.astral-energy::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--energy-color);
+  filter: blur(2px);
+  opacity: 0;
+  animation: particle-flow 2s infinite;
+}
+
+.astral-energy.active::before,
+.astral-energy.active::after {
+  opacity: var(--energy-opacity);
+}
+
 .perspective-3000 {
   perspective: 3000px;
 }
+

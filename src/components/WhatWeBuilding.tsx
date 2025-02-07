@@ -16,7 +16,9 @@ const publicSaleData = [
 export const WhatWeBuilding = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const sectionRef = useRef<HTMLElement>(null);
+  const blackholeRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [centerPoint, setCenterPoint] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,9 +30,19 @@ export const WhatWeBuilding = () => {
       ));
       
       setScrollProgress(scrollPercentage);
+
+      // Update center point of black hole
+      if (blackholeRef.current) {
+        const bhRect = blackholeRef.current.getBoundingClientRect();
+        setCenterPoint({
+          x: bhRect.left + bhRect.width / 2,
+          y: bhRect.top + bhRect.height / 2
+        });
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial calculation
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -46,11 +58,43 @@ export const WhatWeBuilding = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  const calculateEnergyStyles = (element: HTMLElement) => {
+    if (!blackholeRef.current) return {};
+    
+    const rect = element.getBoundingClientRect();
+    const elementCenter = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    };
+
+    // Calculate angle between element and black hole center
+    const angle = Math.atan2(
+      centerPoint.y - elementCenter.y,
+      centerPoint.x - elementCenter.x
+    );
+
+    // Calculate distance for intensity
+    const distance = Math.sqrt(
+      Math.pow(centerPoint.x - elementCenter.x, 2) +
+      Math.pow(centerPoint.y - elementCenter.y, 2)
+    );
+
+    const normalizedDistance = Math.min(1, distance / 500);
+    const intensity = (1 - normalizedDistance) * scrollProgress;
+
+    return {
+      '--flow-x': `${Math.cos(angle) * 100}px`,
+      '--flow-y': `${Math.sin(angle) * 100}px`,
+      '--energy-opacity': intensity,
+    } as React.CSSProperties;
+  };
+
   return (
     <section ref={sectionRef} className="py-16 relative overflow-hidden min-h-screen perspective-3000">
       {/* Cosmic Background */}
       <div className="absolute inset-0 opacity-90">
         <div 
+          ref={blackholeRef}
           className="absolute inset-0 transition-transform duration-300"
           style={{
             background: 'radial-gradient(circle at center, transparent 0%, #000000e6 70%)',
@@ -103,12 +147,14 @@ export const WhatWeBuilding = () => {
                   return (
                     <div 
                       key={segment.name}
-                      className="relative group animate-cosmic-pulse"
+                      className="relative group animate-cosmic-pulse astral-energy"
                       style={{
+                        ...calculateEnergyStyles(sectionRef.current as HTMLElement),
+                        '--energy-color': segment.color,
                         animation: `orbit ${orbitDuration}s linear infinite`,
                         transform: `translate(${offsetX}px, ${offsetY}px)`,
                         transition: 'transform 0.3s ease-out'
-                      }}
+                      } as React.CSSProperties}
                     >
                       {/* Gravitational Lens Effect */}
                       <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
