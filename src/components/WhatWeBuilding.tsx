@@ -1,4 +1,4 @@
-import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3 } from "lucide-react";
+import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3, Building } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
 
@@ -146,23 +146,23 @@ export const WhatWeBuilding = () => {
           Investment Structure & Token Distribution
         </h2>
 
-        <Tabs defaultValue="presale" className="w-full">
+        <Tabs defaultValue="platform" className="w-full">
           <TabsList className="grid w-full max-w-[400px] grid-cols-2 mx-auto mb-8 bg-gradient-to-r from-yellow-950/50 to-teal-950/50 backdrop-blur-sm">
             <TabsTrigger 
-              value="presale" 
+              value="platform" 
               className="data-[state=active]:bg-gradient-to-r from-yellow-500/90 to-yellow-600/90 data-[state=active]:text-white data-[state=active]:shadow-lg text-white/80 hover:text-white transition-all duration-300"
             >
               Platform Investment
             </TabsTrigger>
             <TabsTrigger 
-              value="public" 
+              value="professional" 
               className="data-[state=active]:bg-gradient-to-r from-teal-500/90 to-teal-600/90 data-[state=active]:text-white data-[state=active]:shadow-lg text-white/80 hover:text-white transition-all duration-300"
             >
               Professional Investment
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="presale" className="relative">
+          <TabsContent value="platform" className="relative">
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
               Platform Investment: 5,000,000 LGR at $0.10
             </p>
@@ -212,7 +212,7 @@ export const WhatWeBuilding = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="public" className="relative">
+          <TabsContent value="professional" className="relative">
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
               Professional Investment: 4,000,000 LGR at $1.00
             </p>
@@ -307,6 +307,191 @@ export const WhatWeBuilding = () => {
                     <li className="flex items-start gap-2">
                       <span className="text-teal-400">•</span>
                       <span>Aligns with traditional PE structures</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Investment Flow Section */}
+            <div className="mb-20">
+              <h3 className="text-3xl font-bold text-white mb-8 text-center">Investment Flow</h3>
+              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <ChartPie className="w-8 h-8 text-yellow-400" />
+                    <h4 className="text-xl font-semibold text-white">Initial Investment</h4>
+                  </div>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>98% goes to acquisition</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>2% management fee to treasury</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Building2 className="w-8 h-8 text-teal-400" />
+                    <h4 className="text-xl font-semibold text-white">Profit Distribution</h4>
+                  </div>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>70% to RWA token holders</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>20% performance fee to management</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>10% reflections to LGR holders</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Token Benefits Section */}
+            <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+              {/* LGR Token Section */}
+              <div className="space-y-8">
+                <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
+                  <Coins className="w-8 h-8 text-yellow-400" />
+                  <span>LGR Token Benefits</span>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <Wallet className="w-8 h-8 text-yellow-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Platform Governance</h3>
+                    <p className="text-gray-300">
+                      LGR holders participate in platform governance decisions and contribute to the development of the ecosystem.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <UsersRound className="w-8 h-8 text-yellow-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Reflection Rewards</h3>
+                    <p className="text-gray-300">
+                      Earn 10% of all firm distributions, creating passive income from platform success.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <BadgeCheck className="w-8 h-8 text-yellow-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Platform Development</h3>
+                    <p className="text-gray-300">
+                      Support the growth of decentralized accounting firm ownership and professional control.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* RWA Token Section */}
+              <div className="space-y-8">
+                <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
+                  <Building2 className="w-8 h-8 text-teal-400" />
+                  <span>RWA Token Benefits</span>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <Coins className="w-8 h-8 text-teal-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Direct Ownership</h3>
+                    <p className="text-gray-300">
+                      Receive 70% of firm profits through direct fractional ownership.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <GanttChartSquare className="w-8 h-8 text-teal-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Professional Control</h3>
+                    <p className="text-gray-300">
+                      Maintain industry standards through accountant-led governance and operations.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
+                    <div className="mb-4">
+                      <Coins className="w-8 h-8 text-teal-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Voting Rights</h3>
+                    <p className="text-gray-300">
+                      Participate in governance decisions for the firm (resourcing, budgeting, processes)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Firm Management Section */}
+            <div className="mb-20">
+              <h3 className="text-3xl font-bold text-white mb-8 text-center">Firm Management Structure</h3>
+              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Building className="w-8 h-8 text-yellow-400" />
+                    <h4 className="text-xl font-semibold text-white">Management Services Company</h4>
+                  </div>
+                  <p className="text-gray-300">
+                    Day-to-day operations are handled by a dedicated management services company that:
+                  </p>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>Provides operational oversight and strategic guidance</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>Implements best practices across acquired firms</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow-400">•</span>
+                      <span>Manages staffing, technology, and growth initiatives</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <UsersRound className="w-8 h-8 text-teal-400" />
+                    <h4 className="text-xl font-semibold text-white">LP Governance Rights</h4>
+                  </div>
+                  <p className="text-gray-300">
+                    RWA token holders (Limited Partners) participate in key decisions through:
+                  </p>
+                  <ul className="space-y-2 text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>Quarterly voting on management company performance</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>Approval of major strategic initiatives and acquisitions</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>Input on service expansion and technology investments</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-teal-400">•</span>
+                      <span>Ability to propose and vote on management changes</span>
                     </li>
                   </ul>
                 </div>
