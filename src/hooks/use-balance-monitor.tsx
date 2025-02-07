@@ -11,7 +11,7 @@ const LGR_ABI = [
   "event Transfer(address indexed from, address indexed to, uint256 value)"
 ];
 
-// Function to get a working RPC provider
+// Function to get a working provider
 async function getWorkingProvider() {
   for (const rpc of RPC_ENDPOINTS) {
     try {
@@ -28,7 +28,7 @@ async function getWorkingProvider() {
 }
 
 export const useBalanceMonitor = () => {
-  const { primaryWallet, user } = useDynamicContext();
+  const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
 
 // Array of RPC endpoints to try
-const RPC_ENDPOINTS = [
+export const RPC_ENDPOINTS = [
   "https://polygon.llamarpc.com",
   "https://polygon-rpc.com",
   "https://rpc-mainnet.matic.network",
