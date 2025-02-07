@@ -7,12 +7,37 @@ import { ChevronUp, Coins } from "lucide-react";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { WalletConnectModal } from "./wallet/WalletConnectModal";
 import { WalletActions } from "./wallet/WalletActions";
+import { useToast } from "@/hooks/use-toast";
 
 export const WalletBalance = () => {
   const { address, isConnected } = useWalletConnection();
   const [maticBalance, setMaticBalance] = useState<string>("0");
   const [lgrBalance, setLgrBalance] = useState<string>("0");
+  const [maticPrice, setMaticPrice] = useState<number>(0);
   const [isExpanded, setIsExpanded] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchMaticPrice = async () => {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd');
+        const data = await response.json();
+        setMaticPrice(data['matic-network'].usd);
+      } catch (error) {
+        console.error("Error fetching MATIC price:", error);
+        toast({
+          title: "Error",
+          description: "Could not fetch current MATIC price",
+          variant: "destructive"
+        });
+      }
+    };
+
+    fetchMaticPrice();
+    // Refresh price every 60 seconds
+    const interval = setInterval(fetchMaticPrice, 60000);
+    return () => clearInterval(interval);
+  }, [toast]);
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -50,6 +75,11 @@ export const WalletBalance = () => {
     );
   }
 
+  const calculateUsdValue = (maticAmount: string): string => {
+    if (!maticPrice) return "0.00";
+    return (Number(maticAmount) * maticPrice).toFixed(2);
+  };
+
   return (
     <Card className="bg-[#1A1F2C]/90 border-white/10 p-4 space-y-4">
       <div className="flex items-center justify-between">
@@ -77,7 +107,7 @@ export const WalletBalance = () => {
                 <span className="text-white">Polygon</span>
               </div>
               <div className="text-right">
-                <div className="text-white font-medium">${(Number(maticBalance) * 1.15).toFixed(2)}</div>
+                <div className="text-white font-medium">${calculateUsdValue(maticBalance)}</div>
                 <div className="text-sm text-gray-400">{Number(maticBalance).toFixed(4)} MATIC</div>
               </div>
             </div>
