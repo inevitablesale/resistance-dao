@@ -30,6 +30,11 @@ export const useWalletConnection = () => {
     }
   };
 
+  // Monitor connection state and close auth flow when connected
+  if (primaryWallet?.isConnected?.() && setShowAuthFlow) {
+    setShowAuthFlow(false);
+  }
+
   return {
     isConnected: primaryWallet?.isConnected?.() || false,
     isConnecting,
