@@ -31,11 +31,11 @@ function App() {
           description: "You're now connected to LedgerFund.",
         });
       },
-      onEmailVerificationSuccess: (args: any) => {
-        console.log("Email verification successful", args);
+      onVerificationComplete: () => {
+        console.log("Verification completed");
         toast({
-          title: "Email Verified",
-          description: "Your email has been successfully verified.",
+          title: "Verification Complete",
+          description: "Your verification has been completed successfully.",
         });
       },
       onLogout: () => {
