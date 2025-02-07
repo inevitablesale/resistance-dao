@@ -20,6 +20,65 @@ import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
 
+const presaleData = [
+  { 
+    name: 'Protocol Investment', 
+    value: 100, 
+    color: '#14b8a6', 
+    description: 'Early supporters invest in the LedgerFund platform, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10.',
+    className: 'col-span-2 text-center',
+    features: [
+      {
+        title: "Early Access",
+        description: "Be among the first to participate in the future of accounting firm ownership"
+      },
+      {
+        title: "Maximum Allocation",
+        description: "Secure the highest possible token allocation at the lowest price point"
+      },
+      {
+        title: "Governance Rights",
+        description: "Shape the future of the protocol through early governance participation"
+      },
+      {
+        title: "Reflection Rewards",
+        description: "Earn ongoing rewards from all future firm investments made by the DAO"
+      }
+    ]
+  }
+];
+
+const publicSaleData = [
+  { 
+    name: 'Treasury', 
+    value: 30, 
+    color: '#ea384c',
+    description: 'Strategic treasury management by third-party vault provider ensures secure and transparent fund management for accounting firm acquisitions.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Firm Investment', 
+    value: 50, 
+    color: '#ea384c',
+    description: 'Dedicated allocation for accountants to invest in practices identified and vetted by the DAO community.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Community Rewards', 
+    value: 10, 
+    color: '#ea384c',
+    description: 'Incentives for active DAO participation including practice identification, due diligence, and community growth initiatives.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Partners', 
+    value: 10, 
+    color: '#ea384c',
+    description: 'Strategic partnerships with banks, staffing agencies, technology providers supporting practice acquisitions.',
+    className: 'col-span-1'
+  }
+];
+
 const IndexContent = () => {
   const navigate = useNavigate();
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
