@@ -49,20 +49,14 @@ const investmentOptions = [
     description: 'Hold LGR tokens to earn passive reflections from all accounting firm investments and protocol fees.',
     color: '#F2FCE2',
     icon: ChartPie,
-    energyColor: '#9b87f5',
-    orbitDuration: '20s',
-    orbitDelay: '0s',
-    orbitDirection: '1'
+    energyColor: '#9b87f5'
   },
   {
     name: 'Active Investment',
     description: 'Participate in firm acquisitions, due diligence, and governance while earning enhanced rewards.',
     color: '#F2FCE2',
     icon: UsersRound,
-    energyColor: '#14b8a6',
-    orbitDuration: '25s',
-    orbitDelay: '0.5s',
-    orbitDirection: '-1'
+    energyColor: '#14b8a6'
   }
 ];
 
@@ -194,79 +188,41 @@ export const WhatWeBuilding = () => {
               Presale Allocation: 5,000,000 LGR
             </p>
 
-            <div className="relative min-h-[600px] mb-20">
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32">
-                <div className="absolute inset-0 bg-black rounded-full animate-cosmic-pulse">
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-full blur-xl" />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-teal-500/10 rounded-full animate-pulse blur-lg" />
-              </div>
-
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl max-h-[500px]">
-                {investmentOptions.map((option, index) => {
-                  const radius = index === 0 ? '45%' : '55%';
-                  const rotateBase = index === 0 ? '0deg' : '180deg';
+            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-20">
+              {investmentOptions.map((option, index) => (
+                <div 
+                  key={option.name}
+                  ref={el => optionRefs.current[index] = el}
+                  className="relative group"
+                >
+                  <div 
+                    className="absolute inset-0 opacity-20 transition-opacity duration-500 group-hover:opacity-40"
+                    style={{
+                      background: `radial-gradient(circle at center, ${option.energyColor} 0%, transparent 70%)`,
+                      animation: 'cosmic-pulse 4s ease-in-out infinite'
+                    }}
+                  />
                   
-                  return (
-                    <div
-                      key={option.name}
-                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full"
-                      style={{
-                        transform: `rotate(${rotateBase})`,
-                      }}
-                    >
-                      <div 
-                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-opacity-20"
-                        style={{
-                          width: `${radius}`,
-                          height: `${radius}`,
-                          borderColor: option.energyColor,
-                          boxShadow: `0 0 20px ${option.energyColor}40`
-                        }}
-                      />
-
-                      <div
-                        className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2"
-                        style={{
-                          animation: `orbit ${option.orbitDuration} linear infinite`,
-                          animationDelay: option.orbitDelay,
-                          animationDirection: parseInt(option.orbitDirection) === 1 ? 'normal' : 'reverse'
-                        }}
-                      >
-                        <div className="relative group">
-                          <div 
-                            className="absolute left-1/2 top-1/2 w-1 h-[200px] origin-top"
-                            style={{
-                              background: `linear-gradient(to bottom, ${option.energyColor}00, ${option.energyColor}40)`,
-                              transform: 'rotate(180deg)',
-                              animation: 'cosmic-pulse 2s ease-in-out infinite'
-                            }}
-                          />
-
-                          <div className="relative -translate-y-1/2 p-6 rounded-full bg-black/40 backdrop-blur-sm border border-opacity-20 min-w-[300px]"
-                               style={{ borderColor: option.energyColor }}>
-                            <div className="flex flex-col items-center gap-4">
-                              <div 
-                                className="w-16 h-16 rounded-full flex items-center justify-center"
-                                style={{
-                                  background: `radial-gradient(circle at center, ${option.energyColor}40, transparent)`,
-                                  animation: 'cosmic-pulse 2s ease-in-out infinite'
-                                }}
-                              >
-                                <option.icon className="w-8 h-8" style={{ color: option.energyColor }} />
-                              </div>
-                              <div className="text-center">
-                                <h3 className="text-xl font-bold text-white mb-2">{option.name}</h3>
-                                <p className="text-white/80 text-sm">{option.description}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                  <div className="p-8 rounded-lg backdrop-blur-sm border relative overflow-hidden h-full
+                                bg-black/40 border-yellow-500/20 hover:border-yellow-500/40 
+                                transition-all duration-300 group-hover:translate-y-[-4px]">
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-teal-500/5" />
+                    
+                    <div className="relative z-10">
+                      <div className="w-16 h-16 mb-6 rounded-full flex items-center justify-center"
+                           style={{
+                             background: `radial-gradient(circle at center, ${option.energyColor}40, transparent)`,
+                             animation: 'cosmic-pulse 2s ease-in-out infinite'
+                           }}>
+                        <option.icon className="w-8 h-8" style={{ color: option.energyColor }} />
                       </div>
+                      
+                      <h3 className="text-2xl font-bold text-white mb-4">{option.name}</h3>
+                      <p className="text-lg text-white/80">{option.description}</p>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="w-full max-w-5xl">
@@ -289,7 +245,7 @@ export const WhatWeBuilding = () => {
                     
                     <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
                     
-                    <div className="p-6 rounded-lg backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300 relative bg-black/30 hover:translate-y-[-4px] h-full">
+                    <div className="p-6 rounded-lg backdrop-blur border border-opacity-20 transition-all duration-500 relative bg-black/30 hover:translate-y-[-4px] h-full">
                       <option.icon className="w-8 h-8 text-yellow-400 mb-4" />
                       <h4 className="text-xl font-semibold text-white mb-2">{option.name}</h4>
                       <p className="text-gray-300">{option.description}</p>
