@@ -12,6 +12,37 @@ const presaleData = [
   }
 ];
 
+const publicSaleData = [
+  { 
+    name: 'Treasury', 
+    value: 30, 
+    color: '#14b8a6',
+    description: 'Strategic treasury management by third-party vault provider ensures secure and transparent fund management for accounting firm acquisitions.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Firm Investment', 
+    value: 50, 
+    color: '#14b8a6',
+    description: 'Dedicated allocation for accountants to invest in practices identified and vetted by the DAO community.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Community Rewards', 
+    value: 10, 
+    color: '#14b8a6',
+    description: 'Incentives for active DAO participation including practice identification, due diligence, and community growth initiatives.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Partners', 
+    value: 10, 
+    color: '#14b8a6',
+    description: 'Strategic partnerships with banks, staffing agencies, technology providers supporting practice acquisitions.',
+    className: 'col-span-1'
+  }
+];
+
 const investmentOptions = [
   {
     name: 'Buy with Card',
