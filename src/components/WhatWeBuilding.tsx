@@ -414,35 +414,35 @@ export const WhatWeBuilding = () => {
                   {[0, 1, 2].map((index) => {
                     let title = "";
                     let description = "";
-                    let icon = null;
+                    let Icon = null;
                     
                     if (tokenType === "LGR") {
                       if (index === 0) {
                         title = "Platform Governance";
                         description = "LGR holders participate in platform governance decisions and contribute to the development of the ecosystem.";
-                        icon = Wallet;
+                        Icon = Wallet;
                       } else if (index === 1) {
                         title = "Reflection Rewards";
                         description = "Earn 10% of all firm distributions, creating passive income from platform success.";
-                        icon = UsersRound;
+                        Icon = UsersRound;
                       } else {
                         title = "Platform Development";
                         description = "Support the growth of decentralized accounting firm ownership and professional control.";
-                        icon = BadgeCheck;
+                        Icon = BadgeCheck;
                       }
                     } else {
                       if (index === 0) {
                         title = "Direct Ownership";
                         description = "Receive 70% of firm profits through direct fractional ownership.";
-                        icon = Coins;
+                        Icon = Coins;
                       } else if (index === 1) {
                         title = "Professional Control";
                         description = "Maintain industry standards through accountant-led governance and operations.";
-                        icon = GanttChartSquare;
+                        Icon = GanttChartSquare;
                       } else {
                         title = "Voting Rights";
                         description = "Participate in governance decisions for the firm (resourcing, budgeting, processes)";
-                        icon = Coins;
+                        Icon = Coins;
                       }
                     }
 
@@ -455,7 +455,7 @@ export const WhatWeBuilding = () => {
                         <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
                         <div className="p-6 rounded-lg bg-black/30 backdrop-blur border-0 hover:translate-y-[-4px] transition-all duration-300 relative">
                           <div className="mb-4">
-                            {icon && <icon className={`w-8 h-8 ${tokenType === "LGR" ? "text-yellow-400" : "text-teal-400"}`} />}
+                            {Icon && <Icon className={`w-8 h-8 ${tokenType === "LGR" ? "text-yellow-400" : "text-teal-400"}`} />}
                           </div>
                           <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
                           <p className="text-gray-300">
