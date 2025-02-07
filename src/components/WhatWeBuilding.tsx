@@ -16,29 +16,29 @@ const publicSaleData = [
   { 
     name: 'Treasury', 
     value: 30, 
-    color: '#14b8a6', 
+    color: '#ea384c', // Changed to red
     description: 'Strategic treasury management by third-party vault provider ensures secure and transparent fund management for accounting firm acquisitions.',
     className: 'col-span-1'
   },
   { 
     name: 'Public Sale', 
     value: 50, 
-    color: '#0d9488', 
+    color: '#ea384c', // Changed to red
     description: 'Dedicated allocation for accountants to invest in practices identified and vetted by the DAO community.',
     className: 'col-span-1'
   },
   { 
     name: 'Community Rewards', 
     value: 10, 
-    color: '#0f766e', 
+    color: '#ea384c', // Changed to red
     description: 'Incentives for active DAO participation including practice identification, due diligence, and community growth initiatives.',
     className: 'col-span-1'
   },
   { 
     name: 'Partners', 
     value: 10, 
-    color: '#115e59', 
-    description: 'Strategic partnerships with banks, staffing agencies, technology providers, and other ecosystem participants supporting practice acquisitions.',
+    color: '#ea384c', // Changed to red
+    description: 'Strategic partnerships with banks, staffing agencies, technology providers supporting practice acquisitions.',
     className: 'col-span-1'
   }
 ];
@@ -145,6 +145,12 @@ export const WhatWeBuilding = () => {
         <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 text-center">
           Investment Structure & Token Distribution
         </h2>
+
+        <div className="text-center mb-16">
+          <p className="text-xl text-white/80 max-w-3xl mx-auto">
+            Support Web3's first DAO that brings together elite accountants, trusted managed service providers, and networked capital into an unstoppable acquisition engine.
+          </p>
+        </div>
 
         <Tabs defaultValue="platform" className="w-full">
           <TabsList className="grid w-full max-w-[400px] grid-cols-2 mx-auto mb-8 bg-gradient-to-r from-yellow-950/50 to-teal-950/50 backdrop-blur-sm">
