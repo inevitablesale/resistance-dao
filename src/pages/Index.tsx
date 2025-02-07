@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -480,51 +479,6 @@ const IndexContent = () => {
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
               Building Web3's first protocol that combines elite M&A expertise, battle-tested playbooks, and networked capital into an unstoppable acquisition engine.
             </p>
-          </div>
-
-          {/* Protocol Power Grid */}
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
-            {/* Protocol Power */}
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-teal-500/20 rounded-lg blur-xl group-hover:scale-105 transition-transform duration-300" />
-              <div className="relative bg-black/40 backdrop-blur-sm p-8 rounded-lg border border-yellow-500/20">
-                <div className="flex items-center gap-3 mb-4">
-                  <Zap className="w-6 h-6 text-yellow-500" />
-                  <h3 className="text-2xl font-bold text-white">Protocol Power</h3>
-                </div>
-                <p className="text-white/80">
-                  Decades of M&A expertise and proven playbooks, codified into smart contracts for unstoppable execution.
-                </p>
-              </div>
-            </div>
-
-            {/* Network Effects */}
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/20 to-yellow-500/20 rounded-lg blur-xl group-hover:scale-105 transition-transform duration-300" />
-              <div className="relative bg-black/40 backdrop-blur-sm p-8 rounded-lg border border-teal-500/20">
-                <div className="flex items-center gap-3 mb-4">
-                  <Network className="w-6 h-6 text-teal-500" />
-                  <h3 className="text-2xl font-bold text-white">Network Effects</h3>
-                </div>
-                <p className="text-white/80">
-                  Each acquisition strengthens the network, creating a flywheel of increasing protocol value and market dominance.
-                </p>
-              </div>
-            </div>
-
-            {/* Value Capture */}
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-teal-500/20 rounded-lg blur-xl group-hover:scale-105 transition-transform duration-300" />
-              <div className="relative bg-black/40 backdrop-blur-sm p-8 rounded-lg border border-yellow-500/20">
-                <div className="flex items-center gap-3 mb-4">
-                  <Coins className="w-6 h-6 text-yellow-500" />
-                  <h3 className="text-2xl font-bold text-white">Value Capture</h3>
-                </div>
-                <p className="text-white/80">
-                  Token holders capture value through governance rights and protocol-owned revenue streams from acquisitions.
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* Singularity Effect Box */}
