@@ -29,7 +29,6 @@ const IndexContent = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const presaleRef = useRef<HTMLDivElement>(null);
   const loadTime = Date.now();
-  const welcomeToastShown = useRef(false);
 
   const [presaleSupply] = useState<string>(TOTAL_PRESALE_SUPPLY.toString());
   const [totalSold, setTotalSold] = useState<string>('0');
@@ -50,16 +49,19 @@ const IndexContent = () => {
   }, []);
 
   useEffect(() => {
-    if (!welcomeToastShown.current && !primaryWallet) {
-      console.log("[Toast] Showing welcome toast - no wallet detected");
-      welcomeToastShown.current = true;
-      toast({
-        title: "Welcome to LedgerFund",
-        description: "Connect your wallet to participate in the token presale",
-        duration: 5000,
-      });
-    }
-  }, [primaryWallet]);
+    const timeoutId = setTimeout(() => {
+      if (!primaryWallet) {
+        console.log("[Toast] Showing welcome toast - no wallet detected");
+        toast({
+          title: "Welcome to LedgerFund",
+          description: "Connect your wallet to participate in the token presale",
+          duration: 5000,
+        });
+      }
+    }, 1000); // Small delay to ensure proper initialization
+
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,15 +84,18 @@ const IndexContent = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    const checkWalletStatus = async () => {
-      if (!primaryWallet?.isConnected()) {
-        setShowAuthFlow?.(true);
-      }
-    };
-
-    checkWalletStatus();
-  }, [primaryWallet]);
+  const handleBuyClick = () => {
+    if (!primaryWallet) {
+      setShowAuthFlow?.(true);
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your wallet to purchase tokens.",
+        duration: 5000,
+      });
+    } else {
+      setShowPurchaseForm(true);
+    }
+  };
 
   const parallaxStyle = {
     '--scroll-progress': scrollProgress,
@@ -163,19 +168,6 @@ const IndexContent = () => {
 
   const formatLargeNumber = (num: string) => {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
-
-  const handleBuyClick = () => {
-    if (!primaryWallet) {
-      setShowAuthFlow?.(true);
-      toast({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to purchase tokens.",
-        duration: 5000,
-      });
-    } else {
-      setShowPurchaseForm(true);
-    }
   };
 
   return (
