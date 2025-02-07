@@ -453,7 +453,7 @@ const IndexContent = () => {
               The $LGR Protocol Vision
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
-              Support Web3's first protocol that brings together elite accountants, trusted managed service providers, and networked capital into an unstoppable acquisition engine.
+              The accounting industry is reaching its event horizon. Private equity wants to pull firms in and consolidate control. But a new force is emerging—a gravitational shift toward fractional ownership. This is LedgerFund DAO.
             </p>
           </div>
 
