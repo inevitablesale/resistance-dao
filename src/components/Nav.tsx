@@ -59,9 +59,7 @@ const Nav = () => {
             >
               Download Whitepaper
             </button>
-            <div className="opacity-50 cursor-not-allowed pointer-events-none">
-              <DynamicWidget />
-            </div>
+            <DynamicWidget />
           </div>
         </div>
       </div>
