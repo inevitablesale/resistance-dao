@@ -382,84 +382,76 @@ export const WhatWeBuilding = () => {
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-              <div className="space-y-8">
-                <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
-                  <Coins className="w-8 h-8 text-yellow-400" />
-                  <span>LGR Token Benefits</span>
-                </div>
-                
-                <div className="space-y-6">
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
-                    <div className="mb-4">
-                      <Wallet className="w-8 h-8 text-yellow-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Platform Governance</h3>
-                    <p className="text-gray-300">
-                      LGR holders participate in platform governance decisions and contribute to the development of the ecosystem.
-                    </p>
+            <div className="flex flex-col items-center max-w-6xl mx-auto mb-20">
+              {["LGR", "RWA"].map((tokenType, sectionIndex) => (
+                <div key={tokenType} className="w-full mb-16 last:mb-0">
+                  <div className="text-2xl font-semibold text-white mb-8 text-center flex items-center justify-center gap-3">
+                    {tokenType === "LGR" ? (
+                      <Coins className="w-8 h-8 text-yellow-400" />
+                    ) : (
+                      <Building2 className="w-8 h-8 text-teal-400" />
+                    )}
+                    <span>{tokenType} Token Benefits</span>
                   </div>
+                  
+                  <div className="grid md:grid-cols-3 gap-6">
+                    {[0, 1, 2].map((index) => {
+                      let title = "";
+                      let description = "";
+                      let Icon = null;
+                      
+                      if (tokenType === "LGR") {
+                        if (index === 0) {
+                          title = "Platform Governance";
+                          description = "LGR holders participate in platform governance decisions and contribute to the development of the ecosystem.";
+                          Icon = Wallet;
+                        } else if (index === 1) {
+                          title = "Reflection Rewards";
+                          description = "Earn 10% of all firm distributions, creating passive income from platform success.";
+                          Icon = UsersRound;
+                        } else {
+                          title = "Platform Development";
+                          description = "Support the growth of decentralized accounting firm ownership and professional control.";
+                          Icon = BadgeCheck;
+                        }
+                      } else {
+                        if (index === 0) {
+                          title = "Direct Ownership";
+                          description = "Receive 70% of firm profits through direct fractional ownership.";
+                          Icon = Coins;
+                        } else if (index === 1) {
+                          title = "Professional Control";
+                          description = "Maintain industry standards through accountant-led governance and operations.";
+                          Icon = GanttChartSquare;
+                        } else {
+                          title = "Voting Rights";
+                          description = "Participate in governance decisions for the firm (resourcing, budgeting, processes)";
+                          Icon = Coins;
+                        }
+                      }
 
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
-                    <div className="mb-4">
-                      <UsersRound className="w-8 h-8 text-yellow-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Reflection Rewards</h3>
-                    <p className="text-gray-300">
-                      Earn 10% of all firm distributions, creating passive income from platform success.
-                    </p>
-                  </div>
-
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
-                    <div className="mb-4">
-                      <BadgeCheck className="w-8 h-8 text-yellow-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Platform Development</h3>
-                    <p className="text-gray-300">
-                      Support the growth of decentralized accounting firm ownership and professional control.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-8">
-                <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
-                  <Building2 className="w-8 h-8 text-teal-400" />
-                  <span>RWA Token Benefits</span>
-                </div>
-                
-                <div className="space-y-6">
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
-                    <div className="mb-4">
-                      <Coins className="w-8 h-8 text-teal-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Direct Ownership</h3>
-                    <p className="text-gray-300">
-                      Receive 70% of firm profits through direct fractional ownership.
-                    </p>
-                  </div>
-
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
-                    <div className="mb-4">
-                      <GanttChartSquare className="w-8 h-8 text-teal-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Professional Control</h3>
-                    <p className="text-gray-300">
-                      Maintain industry standards through accountant-led governance and operations.
-                    </p>
-                  </div>
-
-                  <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
-                    <div className="mb-4">
-                      <Coins className="w-8 h-8 text-teal-400" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Voting Rights</h3>
-                    <p className="text-gray-300">
-                      Participate in governance decisions for the firm (resourcing, budgeting, processes)
-                    </p>
+                      return (
+                        <div 
+                          key={index}
+                          ref={el => optionRefs.current[index + sectionIndex * 3 + investmentOptions.length + publicSaleData.length + 4] = el}
+                          className="relative group cosmic-box"
+                        >
+                          <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                          <div className="p-6 rounded-lg bg-black/30 backdrop-blur border-0 hover:translate-y-[-4px] transition-all duration-300 relative text-center">
+                            <div className="mb-4 flex justify-center">
+                              {Icon && <Icon className={`w-8 h-8 ${tokenType === "LGR" ? "text-yellow-400" : "text-teal-400"}`} />}
+                            </div>
+                            <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
+                            <p className="text-gray-300">
+                              {description}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
           </TabsContent>
         </Tabs>
