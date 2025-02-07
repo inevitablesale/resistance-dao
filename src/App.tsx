@@ -29,18 +29,18 @@ function App() {
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
     eventsCallbacks: {
-      onVerificationSuccess: (args: any) => {
-        console.log("[Dynamic SDK] Verification success:", args);
+      onEmailVerificationStarted: (args: any) => {
+        console.log("[Dynamic SDK] Email verification started:", args);
+        toast({
+          title: "Verification Started",
+          description: "Please check your email for the verification code.",
+        });
+      },
+      onEmailVerificationCompleted: (args: any) => {
+        console.log("[Dynamic SDK] Email verification completed:", args);
         toast({
           title: "Verification Successful",
           description: "Your email has been verified.",
-        });
-      },
-      onVerificationComplete: () => {
-        console.log("[Dynamic SDK] Verification completed");
-        toast({
-          title: "Verification Complete",
-          description: "Your account has been verified.",
         });
       },
       onAuthSuccess: (args: any) => {
@@ -54,11 +54,12 @@ function App() {
           description: `Successfully connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
         });
       },
-      onEmailVerificationStart: () => {
-        console.log("[Dynamic SDK] Email verification started");
-      },
-      onEmailVerificationSuccess: () => {
-        console.log("[Dynamic SDK] Email verification succeeded");
+      onEmailVerificationSuccess: (args: any) => {
+        console.log("[Dynamic SDK] Email verification succeeded:", args);
+        toast({
+          title: "Email Verified",
+          description: "Your email has been successfully verified.",
+        });
       },
       onLogout: () => {
         console.log("[Dynamic SDK] User logged out");
