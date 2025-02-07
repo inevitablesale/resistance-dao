@@ -210,20 +210,6 @@ export const WhatWeBuilding = () => {
                 })}
               </div>
             </div>
-            <ul className="space-y-3 text-gray-300">
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-400">•</span>
-                <span>Step into Ownership: By investing LGR, you're securing your stake in a real-world business.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-400">•</span>
-                <span>Log in or sign up to connect your wallet and participate.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-400">•</span>
-                <span>NFT Requirement: You'll need to mint a LedgerFren confirming your industry expertise to participate.</span>
-              </li>
-            </ul>
           </TabsContent>
 
           <TabsContent value="public" className="relative">
