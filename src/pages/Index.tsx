@@ -29,6 +29,7 @@ const IndexContent = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const presaleRef = useRef<HTMLDivElement>(null);
   const loadTime = Date.now();
+  const welcomeToastShown = useRef(false);
 
   // Add states for presale data
   const [presaleSupply] = useState<string>(TOTAL_PRESALE_SUPPLY.toString());
@@ -49,6 +50,23 @@ const IndexContent = () => {
     // Set loaded state after a small delay to trigger initial animations
     setTimeout(() => setIsLoaded(true), 100);
   }, []);
+
+  // Show welcome toast only once when component mounts and wallet is not connected
+  useEffect(() => {
+    const showWelcomeToast = async () => {
+      if (welcomeToastShown.current) return;
+      
+      if (!primaryWallet || !(await primaryWallet?.isConnected())) {
+        welcomeToastShown.current = true;
+        toast({
+          title: "Welcome to LedgerFund",
+          description: "Connect your wallet to participate in the token presale"
+        });
+      }
+    };
+
+    showWelcomeToast();
+  }, [primaryWallet, toast]);
 
   useEffect(() => {
     const handleScroll = () => {
