@@ -24,11 +24,11 @@ export const HowItWorks = () => {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-yellow-400">•</span>
-                <span>KYC Requirement: You'll need to mint a LedgerFren NFT and complete KYC/AML verification to participate.</span>
+                <span>Log in or sign up to connect your wallet and participate.</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-yellow-400">•</span>
-                <span>Regulatory Compliance: Investments conducted under Reg D 506(b) or 506(c) Safe Harbor Exceptions.</span>
+                <span>NFT Requirement: You'll need to mint a LedgerFren NFT to participate.</span>
               </li>
             </ul>
           </Card>
@@ -81,3 +81,4 @@ export const HowItWorks = () => {
     </section>
   );
 };
+
