@@ -18,7 +18,25 @@ export const WhatWeBuilding = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [expandedBox, setExpandedBox] = useState<string | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  const orbitContainerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (orbitContainerRef.current) {
+        const rect = orbitContainerRef.current.getBoundingClientRect();
+        setContainerDimensions({
+          width: rect.width,
+          height: rect.height
+        });
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -216,16 +234,19 @@ export const WhatWeBuilding = () => {
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
               Professional Investment: 4,000,000 LGR for Accountant Acquisition Pool
             </p>
-            <div className="relative h-[600px] mb-20">
+            <div ref={orbitContainerRef} className="relative h-[600px] mb-20">
               {publicSaleData.map((segment, index) => {
                 const angle = (index / publicSaleData.length) * Math.PI * 2;
-                const radius = 200; // Base radius
-                const centerX = window.innerWidth > 768 ? 300 : 150; // Responsive center point
-                const centerY = 300;
+                const radius = Math.min(containerDimensions.width, containerDimensions.height) * 0.3;
+                const centerX = containerDimensions.width / 2;
+                const centerY = containerDimensions.height / 2;
                 
                 // Calculate position on the orbit
                 const x = Math.cos(angle) * radius;
                 const y = Math.sin(angle) * radius;
+
+                // Calculate the total rotation for the black hole effect
+                const totalRotation = scrollProgress * 360;
 
                 return (
                   <div 
@@ -235,6 +256,7 @@ export const WhatWeBuilding = () => {
                       left: `${centerX + x}px`,
                       top: `${centerY + y}px`,
                       transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                      transform: `rotate(${totalRotation}deg)`,
                     }}
                     onClick={() => toggleBox(segment.name)}
                   >
@@ -253,6 +275,7 @@ export const WhatWeBuilding = () => {
                           )
                         `,
                         filter: 'blur(8px)',
+                        transform: `rotate(-${totalRotation}deg)`, // Counter-rotate to keep text upright
                       }}
                     />
 
@@ -273,7 +296,7 @@ export const WhatWeBuilding = () => {
                         boxShadow: expandedBox === segment.name 
                           ? '0 0 30px rgba(20, 184, 166, 0.3)'
                           : '0 0 15px rgba(20, 184, 166, 0.1)',
-                        transform: `rotate(0deg)`, // Keep text upright
+                        transform: `rotate(-${totalRotation}deg)`, // Counter-rotate to keep text upright
                         maxWidth: expandedBox === segment.name ? '300px' : '250px',
                       }}
                     >
