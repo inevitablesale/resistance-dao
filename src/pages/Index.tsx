@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -291,11 +292,10 @@ const IndexContent = () => {
           }}
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Own the future of<br />accounting
+            From Service to<br />Sovereignty
           </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            LedgerFund is building a decentralized network of accounting firms owned and governed by accountants. 
-            We're putting the future of the profession back in the hands of professionals.
+            The accounting industry is reaching its event horizon. Private equity wants to pull firms in and consolidate control. But a new force is emerging—a gravitational shift toward professional ownership. This is the LedgerFund DAO.
           </p>
 
           {showPurchaseForm ? (
@@ -548,3 +548,4 @@ const Index = () => {
 };
 
 export default Index;
+
