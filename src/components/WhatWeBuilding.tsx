@@ -1,3 +1,4 @@
+
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
@@ -15,6 +16,7 @@ const publicSaleData = [
 
 export const WhatWeBuilding = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [expandedBox, setExpandedBox] = useState<string | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
 
@@ -45,6 +47,10 @@ export const WhatWeBuilding = () => {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  const toggleBox = (name: string) => {
+    setExpandedBox(expandedBox === name ? null : name);
+  };
 
   return (
     <section ref={sectionRef} className="py-16 relative overflow-hidden min-h-screen perspective-3000">
@@ -141,7 +147,8 @@ export const WhatWeBuilding = () => {
                 return (
                   <div 
                     key={segment.name}
-                    className="relative group"
+                    className="relative group cursor-pointer"
+                    onClick={() => toggleBox(segment.name)}
                     style={{
                       transform: `
                         translate(${offsetX}px, ${offsetY}px)
@@ -150,7 +157,7 @@ export const WhatWeBuilding = () => {
                       transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}
                   >
-                    {/* Space-Time Distortion Effect */}
+                    {/* Cosmic Energy Field */}
                     <div 
                       className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-all duration-500"
                       style={{
@@ -159,15 +166,23 @@ export const WhatWeBuilding = () => {
                     />
                     
                     <div 
-                      className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
-                               bg-black/30 border-yellow-500/20 hover:border-yellow-500/40
-                               group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]"
+                      className={`
+                        p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
+                        bg-black/30 border-yellow-500/20 hover:border-yellow-500/40
+                        group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]
+                        ${expandedBox === segment.name ? 'scale-110' : 'scale-100'}
+                      `}
                       style={{
-                        transform: `
-                          perspective(1000px)
-                          rotateX(${mousePosition.y * 10}deg)
-                          rotateY(${mousePosition.x * 10}deg)
-                        `
+                        background: `
+                          linear-gradient(
+                            135deg,
+                            rgba(13, 148, 136, 0.2) 0%,
+                            rgba(0, 0, 0, 0.4) 100%
+                          )
+                        `,
+                        boxShadow: expandedBox === segment.name 
+                          ? '0 0 30px rgba(234,179,8,0.3)'
+                          : '0 0 15px rgba(234,179,8,0.1)'
                       }}
                     >
                       <div className="flex items-center gap-3 mb-2">
@@ -182,12 +197,14 @@ export const WhatWeBuilding = () => {
                           {segment.name} ({segment.value}%)
                         </h3>
                       </div>
-                      <p className="text-gray-300 transform transition-all duration-300"
-                         style={{
-                           filter: `blur(${scrollProgress * 0.5}px)`,
-                         }}>
-                        {segment.description}
-                      </p>
+                      {expandedBox === segment.name && (
+                        <p className="text-gray-300 transform transition-all duration-300 mt-4 animate-fade-in"
+                           style={{
+                             filter: `blur(${scrollProgress * 0.5}px)`,
+                           }}>
+                          {segment.description}
+                        </p>
+                      )}
                     </div>
                   </div>
                 );
@@ -199,48 +216,65 @@ export const WhatWeBuilding = () => {
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
               Professional Investment: 4,000,000 LGR for Accountant Acquisition Pool
             </p>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 items-start mb-20">
+            <div className="relative h-[600px] mb-20">
               {publicSaleData.map((segment, index) => {
                 const angle = (index / publicSaleData.length) * Math.PI * 2;
-                const distanceFromCenter = Math.sqrt(
-                  Math.pow(mousePosition.x, 2) + Math.pow(mousePosition.y, 2)
-                );
-                const distortionFactor = Math.max(0, 1 - distanceFromCenter);
-                const offsetX = Math.cos(angle) * 100 * (1 + scrollProgress) + mousePosition.x * 20 * distortionFactor;
-                const offsetY = Math.sin(angle) * 100 * (1 + scrollProgress) + mousePosition.y * 20 * distortionFactor;
+                const radius = 200; // Base radius
+                const centerX = window.innerWidth > 768 ? 300 : 150; // Responsive center point
+                const centerY = 300;
+                
+                // Calculate position on the orbit
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
 
                 return (
                   <div 
                     key={segment.name}
-                    className="relative group"
+                    className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer"
                     style={{
-                      transform: `
-                        translate(${offsetX}px, ${offsetY}px)
-                        rotate(${angle}rad)
-                        scale(${1 - scrollProgress * 0.1})
-                      `,
-                      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+                      left: `${centerX + x}px`,
+                      top: `${centerY + y}px`,
+                      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
+                    onClick={() => toggleBox(segment.name)}
                   >
-                    {/* Space-Time Distortion Effect */}
+                    {/* Cosmic Energy Field */}
                     <div 
-                      className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 to-yellow-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-all duration-500"
+                      className={`
+                        absolute inset-0 rounded-lg transition-all duration-500
+                        ${expandedBox === segment.name ? 'opacity-70' : 'opacity-0 group-hover:opacity-40'}
+                      `}
                       style={{
-                        transform: `scale(${1 + scrollProgress * 0.2}) rotate(${scrollProgress * 45}deg)`,
+                        background: `
+                          radial-gradient(
+                            circle at center,
+                            ${segment.color}40 0%,
+                            transparent 70%
+                          )
+                        `,
+                        filter: 'blur(8px)',
                       }}
                     />
-                    
+
                     <div 
-                      className="p-6 rounded-lg backdrop-blur border transition-all duration-500 relative z-10
-                               bg-black/30 border-teal-500/20 hover:border-teal-500/40
-                               group-hover:shadow-[0_0_25px_rgba(45,212,191,0.2)]"
+                      className={`
+                        relative p-6 rounded-lg backdrop-blur-md transition-all duration-500
+                        ${expandedBox === segment.name ? 'scale-110' : 'scale-100 hover:scale-105'}
+                      `}
                       style={{
-                        transform: `
-                          rotate(${-angle}rad)
-                          perspective(1000px)
-                          rotateX(${mousePosition.y * 10}deg)
-                          rotateY(${mousePosition.x * 10}deg)
-                        `
+                        background: `
+                          linear-gradient(
+                            135deg,
+                            rgba(13, 148, 136, 0.2) 0%,
+                            rgba(0, 0, 0, 0.4) 100%
+                          )
+                        `,
+                        border: '1px solid rgba(20, 184, 166, 0.2)',
+                        boxShadow: expandedBox === segment.name 
+                          ? '0 0 30px rgba(20, 184, 166, 0.3)'
+                          : '0 0 15px rgba(20, 184, 166, 0.1)',
+                        transform: `rotate(0deg)`, // Keep text upright
+                        maxWidth: expandedBox === segment.name ? '300px' : '250px',
                       }}
                     >
                       <div className="flex items-center gap-3 mb-2">
@@ -251,16 +285,15 @@ export const WhatWeBuilding = () => {
                             boxShadow: `0 0 ${10 + scrollProgress * 20}px ${segment.color}`
                           }}
                         />
-                        <h3 className="text-xl font-semibold text-white">
+                        <h3 className="text-xl font-semibold text-white whitespace-nowrap">
                           {segment.name} ({segment.value}%)
                         </h3>
                       </div>
-                      <p className="text-gray-300 transform transition-all duration-300"
-                         style={{
-                           filter: `blur(${scrollProgress * 0.5}px)`,
-                         }}>
-                        {segment.description}
-                      </p>
+                      {expandedBox === segment.name && (
+                        <p className="text-gray-300 transform transition-all duration-300 mt-4 animate-fade-in">
+                          {segment.description}
+                        </p>
+                      )}
                     </div>
                   </div>
                 );
