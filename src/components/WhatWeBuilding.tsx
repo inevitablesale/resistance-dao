@@ -48,13 +48,15 @@ const investmentOptions = [
     name: 'Passive Investment',
     description: 'Hold LGR tokens to earn passive reflections from all accounting firm investments and protocol fees.',
     color: '#F2FCE2',
-    icon: ChartPie
+    icon: ChartPie,
+    energyColor: '#9b87f5'
   },
   {
     name: 'Active Investment',
     description: 'Participate in firm acquisitions, due diligence, and governance while earning enhanced rewards.',
     color: '#F2FCE2',
-    icon: UsersRound
+    icon: UsersRound,
+    energyColor: '#14b8a6'
   }
 ];
 
@@ -64,6 +66,7 @@ export const WhatWeBuilding = () => {
   const blackholeRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [centerPoint, setCenterPoint] = useState({ x: 0, y: 0 });
+  const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -102,7 +105,7 @@ export const WhatWeBuilding = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const calculateEnergyStyles = (element: HTMLElement) => {
+  const calculateEnergyStyles = (element: HTMLElement, energyColor: string) => {
     if (!blackholeRef.current) return {};
     
     const rect = element.getBoundingClientRect();
@@ -128,6 +131,7 @@ export const WhatWeBuilding = () => {
       '--flow-x': `${Math.cos(angle) * 100}px`,
       '--flow-y': `${Math.sin(angle) * 100}px`,
       '--energy-opacity': intensity,
+      '--energy-color': energyColor,
     } as React.CSSProperties;
   };
 
@@ -232,13 +236,32 @@ export const WhatWeBuilding = () => {
                   {investmentOptions.map((option, index) => (
                     <div 
                       key={option.name}
-                      className="relative group"
+                      ref={el => optionRefs.current[index] = el}
+                      className="relative group astral-energy"
+                      style={optionRefs.current[index] ? calculateEnergyStyles(optionRefs.current[index], option.energyColor) : {}}
                     >
+                      <div 
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                          background: `radial-gradient(circle at center, ${option.energyColor}20 0%, transparent 70%)`,
+                          animation: 'cosmic-pulse 4s ease-in-out infinite',
+                        }}
+                      />
+                      
                       <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+                      
                       <div className="p-6 rounded-lg backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300 relative bg-black/30 hover:translate-y-[-4px]">
                         <option.icon className="w-8 h-8 text-yellow-400 mb-4" />
                         <h4 className="text-xl font-semibold text-white mb-2">{option.name}</h4>
                         <p className="text-gray-300">{option.description}</p>
+                        
+                        <div 
+                          className="absolute inset-0 pointer-events-none"
+                          style={{
+                            background: `radial-gradient(circle at center, ${option.energyColor}10 0%, transparent 70%)`,
+                            animation: 'particle-flow 2s ease-out infinite',
+                          }}
+                        />
                       </div>
                     </div>
                   ))}
