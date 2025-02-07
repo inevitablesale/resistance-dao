@@ -7,7 +7,7 @@ const presaleData = [
     name: 'Presale Stake', 
     value: 100, 
     color: '#14b8a6', 
-    description: 'Early supporters invest in the LedgerFund platform, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10, with 1-year lock up period.',
+    description: 'Early supporters invest in the LedgerFund platform, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10.',
     className: 'col-span-2 text-center'
   }
 ];
@@ -214,7 +214,7 @@ export const WhatWeBuilding = () => {
 
           <TabsContent value="public" className="relative">
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
-              Professional Investment: 4,000,000 LGR for Accountant Acquisition Pool
+              Professional Investment: 4,000,000 LGR at $1.00
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
               <div className="grid grid-cols-2 gap-6 relative col-span-2"> {/* Changed to grid with 2 columns */}
