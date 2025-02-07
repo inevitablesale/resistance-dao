@@ -3,14 +3,6 @@ import { ethers } from "ethers";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
 
-// Array of RPC endpoints to try
-export const RPC_ENDPOINTS = [
-  "https://polygon.llamarpc.com",
-  "https://polygon-rpc.com",
-  "https://rpc-mainnet.matic.network",
-  "https://matic-mainnet.chainstacklabs.com"
-];
-
 // Simplified ABI with just the functions we need
 export const PRESALE_ABI = [
   "function getLGRPrice() public view returns (uint256)",
@@ -33,29 +25,13 @@ export const PRESALE_END_TIME = 1746057600; // May 1, 2025
 export const TOTAL_PRESALE_SUPPLY = ethers.utils.parseUnits("5", 24); // 5 million tokens with 18 decimals
 export const USD_PRICE = ethers.utils.parseUnits("0.1", 18); // $0.10 per token
 
-// Function to get a working provider
-async function getWorkingProvider() {
-  for (const rpc of RPC_ENDPOINTS) {
-    try {
-      const provider = new ethers.providers.JsonRpcProvider(rpc);
-      // Test the provider with a simple call
-      await provider.getNetwork();
-      return provider;
-    } catch (error) {
-      console.warn(`RPC ${rpc} failed, trying next one...`);
-      continue;
-    }
-  }
-  throw new Error("All RPC endpoints failed");
-}
-
-export const getPresaleContract = async (providerOrSigner: ethers.providers.Provider | ethers.Signer) => {
-  return new ethers.Contract(PRESALE_CONTRACT_ADDRESS, PRESALE_ABI, providerOrSigner);
+export const getPresaleContract = (provider: ethers.providers.Provider | ethers.Signer) => {
+  return new ethers.Contract(PRESALE_CONTRACT_ADDRESS, PRESALE_ABI, provider);
 };
 
-// Function to get LGR token contract
+// Function to get LGR token contract - now exported
 export const getLgrTokenContract = async (provider: ethers.providers.Provider) => {
-  const presaleContract = await getPresaleContract(provider);
+  const presaleContract = getPresaleContract(provider);
   const lgrTokenAddress = await presaleContract.lgrToken();
   return new ethers.Contract(lgrTokenAddress, ERC20_ABI, provider);
 };
@@ -63,7 +39,7 @@ export const getLgrTokenContract = async (provider: ethers.providers.Provider) =
 // Function to fetch total LGR sold by checking contract's token balance
 export const fetchTotalLGRSold = async () => {
   try {
-    const provider = await getWorkingProvider();
+    const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
     const lgrTokenContract = await getLgrTokenContract(provider);
     const remainingBalance = await lgrTokenContract.balanceOf(PRESALE_CONTRACT_ADDRESS);
     const totalSold = TOTAL_PRESALE_SUPPLY.sub(remainingBalance);
@@ -78,7 +54,7 @@ export const fetchTotalLGRSold = async () => {
 // Function to fetch remaining presale supply
 export const fetchRemainingPresaleSupply = async () => {
   try {
-    const provider = await getWorkingProvider();
+    const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
     const lgrTokenContract = await getLgrTokenContract(provider);
     const remainingBalance = await lgrTokenContract.balanceOf(PRESALE_CONTRACT_ADDRESS);
     return ethers.utils.formatUnits(remainingBalance, 18);
@@ -91,8 +67,8 @@ export const fetchRemainingPresaleSupply = async () => {
 // Function to fetch presale price in USD (fixed at $0.10)
 export const fetchPresaleUSDPrice = async () => {
   try {
-    const provider = await getWorkingProvider();
-    const contract = await getPresaleContract(provider);
+    const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+    const contract = getPresaleContract(provider);
     const usdPrice = await contract.PRESALE_USD_PRICE();
     return ethers.utils.formatUnits(usdPrice, 18);
   } catch (error) {
@@ -104,8 +80,8 @@ export const fetchPresaleUSDPrice = async () => {
 // Function to fetch latest MATIC price and convert presale price to MATIC
 export const fetchPresaleMaticPrice = async () => {
   try {
-    const provider = await getWorkingProvider();
-    const contract = await getPresaleContract(provider);
+    const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+    const contract = getPresaleContract(provider);
     const maticPrice = await contract.getLGRPrice();
     const formattedPrice = Number(ethers.utils.formatEther(maticPrice)).toFixed(4);
     return formattedPrice;
@@ -120,7 +96,7 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
   try {
     console.log('Starting token purchase with MATIC amount:', maticAmount);
     
-    const contract = await getPresaleContract(signer);
+    const contract = getPresaleContract(signer);
     
     // Get current LGR price in MATIC
     const maticPrice = await contract.getLGRPrice();

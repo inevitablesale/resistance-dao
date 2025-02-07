@@ -208,8 +208,7 @@ const IndexContent = () => {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
-  const handleBuyClick = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent default behavior that might cause scrolling
+  const handleBuyClick = () => {
     if (!primaryWallet || !primaryWallet.isConnected()) {
       setShowAuthFlow?.(true);
       toast({
