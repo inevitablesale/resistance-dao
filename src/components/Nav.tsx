@@ -59,7 +59,7 @@ const Nav = () => {
             >
               Download Whitepaper
             </button>
-            <DynamicWidget buttonClassName="!text-[Connect Wallet]" />
+            <DynamicWidget />
           </div>
         </div>
       </div>
@@ -68,4 +68,3 @@ const Nav = () => {
 };
 
 export default Nav;
-
