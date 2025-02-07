@@ -12,13 +12,15 @@ import { useToast } from "./hooks/use-toast";
 function App() {
   const { toast } = useToast();
   
+  const ENVIRONMENT_ID = "00a01fb3-76e6-438d-a77d-342bbf2084e2";
+  
   const zeroDevConfig = {
     bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
     paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
   };
 
   const dynamicSettings = {
-    environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2", // Updated to Live environment ID
+    environmentId: ENVIRONMENT_ID,
     walletConnectors: [
       EthereumWalletConnectors,
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
@@ -65,7 +67,7 @@ function App() {
       network: {
         chainId: 137, // Polygon Mainnet
       },
-      environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2", // Updated to Live environment ID
+      environmentId: ENVIRONMENT_ID,
       appName: "LedgerFund",
       appLogoUrl: "/favicon.ico",
       enableEmbeddedWallets: true,
