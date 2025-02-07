@@ -18,7 +18,7 @@ function App() {
   };
 
   const dynamicSettings = {
-    environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2", // Updated to Live environment ID
+    environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
     walletConnectors: [
       EthereumWalletConnectors,
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
@@ -65,7 +65,6 @@ function App() {
       network: {
         chainId: 137, // Polygon Mainnet
       },
-      environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2", // Updated to Live environment ID
       appName: "LedgerFund",
       appLogoUrl: "/favicon.ico",
       enableEmbeddedWallets: true,
