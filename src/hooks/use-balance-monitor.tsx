@@ -41,8 +41,8 @@ export const useBalanceMonitor = () => {
 
         const lgrContract = new ethers.Contract(LGR_TOKEN_ADDRESS, LGR_ABI, provider);
 
-        // Check if wallet provider is available (e.g., MetaMask)
-        if (window.ethereum) {
+        // Only attempt to add token to MetaMask if it's the active wallet
+        if (window.ethereum && primaryWallet.connector?.name?.toLowerCase().includes('metamask')) {
           try {
             // Request wallet to add LGR token
             const wasAdded = await window.ethereum.request({
