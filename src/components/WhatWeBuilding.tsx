@@ -13,6 +13,83 @@ const publicSaleData = [
   { name: 'Partners', value: 10, color: '#115e59', description: 'Strategic partnerships and ecosystem growth initiatives.' }
 ];
 
+const TokenDistribution = () => {
+  return (
+    <div className="relative h-[400px] w-full">
+      {/* Main Black Hole */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-48 h-48 relative">
+          {/* Core */}
+          <div 
+            className="absolute inset-0 rounded-full bg-black"
+            style={{
+              boxShadow: `
+                0 0 50px 10px rgba(234, 179, 8, 0.4),
+                0 0 100px 20px rgba(20, 184, 166, 0.3),
+                0 0 150px 30px rgba(234, 179, 8, 0.2)
+              `
+            }}
+          />
+          
+          {/* Orbiting Tokens */}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute inset-0"
+              style={{
+                animation: `orbit ${10 + i * 2}s linear infinite`,
+                transform: `rotate(${i * 72}deg)`
+              }}
+            >
+              <div 
+                className="absolute -top-2 left-1/2 w-4 h-4 rounded-full bg-gradient-to-r from-yellow-500 to-teal-400"
+                style={{
+                  animation: 'pulse 2s ease-in-out infinite',
+                  animationDelay: `${i * 0.5}s`
+                }}
+              />
+            </div>
+          ))}
+          
+          {/* Token Distribution Labels */}
+          <div className="absolute inset-0">
+            {presaleData.map((segment, index) => (
+              <div
+                key={segment.name}
+                className="absolute text-sm text-white/80"
+                style={{
+                  top: '50%',
+                  left: '50%',
+                  transform: `rotate(${index * 72}deg) translateX(140px) rotate(-${index * 72}deg)`,
+                  transformOrigin: 'center'
+                }}
+              >
+                {segment.name}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      {/* Energy Field */}
+      <div 
+        className="absolute inset-0 rounded-full animate-cosmic-pulse"
+        style={{
+          background: `
+            radial-gradient(circle at center,
+              rgba(0, 0, 0, 1) 0%,
+              rgba(234, 179, 8, 0.3) 30%,
+              rgba(20, 184, 166, 0.2) 50%,
+              rgba(234, 179, 8, 0.1) 70%,
+              transparent 90%
+            )
+          `
+        }}
+      />
+    </div>
+  );
+};
+
 export const WhatWeBuilding = () => {
   return (
     <section className="py-16 relative overflow-hidden">
@@ -43,27 +120,7 @@ export const WhatWeBuilding = () => {
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
               <div className="h-[400px] relative">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={presaleData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={160}
-                      innerRadius={100}
-                      dataKey="value"
-                      label={({ name, value }) => `${name} ${value}%`}
-                    >
-                      {presaleData.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={entry.color}
-                          className="hover:opacity-80"
-                        />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
+                <TokenDistribution />
               </div>
 
               <div className="space-y-6">

@@ -1,18 +1,18 @@
+
 import { Card } from "./ui/card";
 import { Milestone } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export const Roadmap = () => {
   const [blackHoleScale, setBlackHoleScale] = useState(1);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      // Get the presale section element
-      const presaleSection = document.getElementById('presale-section');
-      if (!presaleSection) return;
+      if (!sectionRef.current) return;
       
-      const rect = presaleSection.getBoundingClientRect();
+      const rect = sectionRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       
       // Calculate visibility percentage as section enters viewport
@@ -83,7 +83,7 @@ export const Roadmap = () => {
   ];
 
   return (
-    <section id="roadmap" className="py-16 relative overflow-hidden">
+    <section ref={sectionRef} id="roadmap" className="py-16 relative overflow-hidden">
       {/* Black Hole Effect Background */}
       <div className="absolute inset-0 opacity-90">
         <div 
