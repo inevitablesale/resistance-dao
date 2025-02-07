@@ -4,11 +4,18 @@ import { useEffect, useRef, useState } from "react";
 
 const presaleData = [
   { 
-    name: 'Protocol Investment', 
-    value: 100, 
-    color: '#14b8a6', 
-    description: 'Early supporters invest in the LedgerFund protocol, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10.',
-    className: 'col-span-2 text-center'
+    name: 'Initial Protocol Investment', 
+    value: 50, 
+    color: '#9b87f5',
+    description: 'Early supporters invest in the LedgerFund protocol during presale, gaining tokens at $0.10 and earning reflections from all accounting firm investments.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Public Sale Reserve', 
+    value: 50, 
+    color: '#F97316',
+    description: 'Reserved allocation for public sale to ensure broad protocol participation and sustainable growth. Available at $1.00 after presale completion.',
+    className: 'col-span-1'
   }
 ];
 
@@ -118,7 +125,6 @@ export const WhatWeBuilding = () => {
 
   return (
     <section ref={sectionRef} className="py-16 relative overflow-hidden min-h-screen perspective-3000">
-      {/* Cosmic Background */}
       <div className="absolute inset-0 opacity-90">
         <div 
           ref={blackholeRef}
@@ -167,10 +173,10 @@ export const WhatWeBuilding = () => {
 
           <TabsContent value="platform" className="relative">
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
-              Platform Investment: 5,000,000 LGR at $0.10
+              Protocol Investment: Total Supply 10,000,000 LGR
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="space-y-6 relative lg:col-span-2">
+              <div className="space-y-6 relative grid grid-cols-2 gap-6">
                 {presaleData.map((segment, index) => {
                   const orbitRadius = 20 + index * 10;
                   const orbitDuration = 20 + index * 5;
@@ -197,13 +203,13 @@ export const WhatWeBuilding = () => {
                                  hover:translate-y-[-4px] hover:rotate-1
                                  group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]"
                       >
-                        <div className="flex items-center gap-3 mb-2 justify-center">
+                        <div className="flex items-center gap-3 mb-2">
                           <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
                           <h3 className="text-xl font-semibold text-white">
                             {segment.name} ({segment.value}%)
                           </h3>
                         </div>
-                        <p className="text-gray-300 text-center">
+                        <p className="text-gray-300">
                           {segment.description}
                         </p>
                       </div>
@@ -260,7 +266,6 @@ export const WhatWeBuilding = () => {
               </div>
             </div>
 
-            {/* Management Fee Structure Section */}
             <div className="mb-20">
               <h3 className="text-3xl font-bold text-white mb-8 text-center">Management Fee Structure</h3>
               <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -314,7 +319,6 @@ export const WhatWeBuilding = () => {
               </div>
             </div>
 
-            {/* Firm Management Section */}
             <div className="mb-20">
               <h3 className="text-3xl font-bold text-white mb-8 text-center">Firm Management Structure</h3>
               <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -372,9 +376,7 @@ export const WhatWeBuilding = () => {
               </div>
             </div>
 
-            {/* Token Benefits Section */}
             <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-              {/* LGR Token Section */}
               <div className="space-y-8">
                 <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
                   <Coins className="w-8 h-8 text-yellow-400" />
@@ -414,7 +416,6 @@ export const WhatWeBuilding = () => {
                 </div>
               </div>
 
-              {/* RWA Token Section */}
               <div className="space-y-8">
                 <div className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
                   <Building2 className="w-8 h-8 text-teal-400" />
