@@ -11,9 +11,9 @@ export const SystemWeDeserve = () => {
           </h2>
           
           <div className="space-y-4 mb-12 text-xl text-gray-300">
-            <p>A protocol built for professional growth.</p>
-            <p>A platform powered by smart contracts.</p>
-            <p>A network owned by the community.</p>
+            <p className="cosmic-box yellow-energy right-drain p-4 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20">A protocol built for professional growth.</p>
+            <p className="cosmic-box teal-energy right-drain p-4 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20">A platform powered by smart contracts.</p>
+            <p className="cosmic-box yellow-energy right-drain p-4 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20">A network owned by the community.</p>
           </div>
         </div>
       </div>

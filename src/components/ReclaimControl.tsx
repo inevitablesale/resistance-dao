@@ -15,7 +15,7 @@ export const ReclaimControl = () => {
         </div>
         
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
+          <div className="cosmic-box yellow-energy left-drain p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
             <Crown className="w-8 h-8 text-yellow-400 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">Own the Value</h3>
             <p className="text-gray-300">
@@ -23,7 +23,7 @@ export const ReclaimControl = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
+          <div className="cosmic-box teal-energy left-drain p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20 hover:border-teal-500/40 transition-all duration-300">
             <Coins className="w-8 h-8 text-teal-400 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">Share the Wealth</h3>
             <p className="text-gray-300">
@@ -31,7 +31,7 @@ export const ReclaimControl = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
+          <div className="cosmic-box yellow-energy left-drain p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300">
             <Vote className="w-8 h-8 text-yellow-400 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">Make the Decisions</h3>
             <p className="text-gray-300">
@@ -43,4 +43,3 @@ export const ReclaimControl = () => {
     </section>
   );
 };
-

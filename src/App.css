@@ -125,3 +125,79 @@
   perspective: 3000px;
 }
 
+/* New Astral Energy Effects */
+.cosmic-box {
+  position: relative;
+  overflow: visible;
+}
+
+.cosmic-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 150%;
+  height: 100%;
+  opacity: 0;
+  filter: blur(8px);
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.cosmic-box.yellow-energy::before {
+  --energy-color: rgba(234, 179, 8, 0.6);
+  background: linear-gradient(90deg, var(--energy-color), transparent);
+}
+
+.cosmic-box.teal-energy::before {
+  --energy-color: rgba(20, 184, 166, 0.6);
+  background: linear-gradient(90deg, var(--energy-color), transparent);
+}
+
+.cosmic-box.left-drain::before {
+  right: -150%;
+  transform-origin: left;
+}
+
+.cosmic-box.right-drain::before {
+  left: -150%;
+  transform-origin: right;
+}
+
+.cosmic-box.active::before {
+  opacity: var(--energy-opacity, 0.6);
+}
+
+@keyframes energy-particle {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--particle-x, 50px), var(--particle-y, 0));
+    opacity: 0;
+  }
+}
+
+.cosmic-box::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  animation: energy-particle 1.5s infinite;
+}
+
+.cosmic-box.yellow-energy::after {
+  background: rgba(234, 179, 8, 0.8);
+}
+
+.cosmic-box.teal-energy::after {
+  background: rgba(20, 184, 166, 0.8);
+}
+
+.cosmic-box.active::after {
+  opacity: var(--energy-opacity, 0.8);
+}
+

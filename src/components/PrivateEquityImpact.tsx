@@ -10,7 +10,7 @@ export const PrivateEquityImpact = () => {
         </h2>
         
         <div className="grid md:grid-cols-4 gap-6">
-          <div className="p-6 rounded-lg bg-black/40 backdrop-blur border border-red-500/20 hover:border-red-500/30 transition-all duration-300">
+          <div className="cosmic-box yellow-energy right-drain p-6 rounded-lg bg-black/40 backdrop-blur border border-red-500/20 hover:border-red-500/30 transition-all duration-300">
             <AlertTriangle className="w-8 h-8 text-red-500 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">Culture Shifts</h3>
             <p className="text-gray-300">
@@ -18,7 +18,7 @@ export const PrivateEquityImpact = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-black/40 backdrop-blur border border-red-500/20 hover:border-red-500/30 transition-all duration-300">
+          <div className="cosmic-box yellow-energy right-drain p-6 rounded-lg bg-black/40 backdrop-blur border border-red-500/20 hover:border-red-500/30 transition-all duration-300">
             <TrendingDown className="w-8 h-8 text-red-500 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">Short-term Profits</h3>
             <p className="text-gray-300">
@@ -26,7 +26,7 @@ export const PrivateEquityImpact = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-black/40 backdrop-blur border border-red-500/20 hover:border-red-500/30 transition-all duration-300">
+          <div className="cosmic-box yellow-energy right-drain p-6 rounded-lg bg-black/40 backdrop-blur border border-red-500/20 hover:border-red-500/30 transition-all duration-300">
             <UserMinus className="w-8 h-8 text-red-500 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">Layoffs and Cutbacks</h3>
             <p className="text-gray-300">
@@ -34,7 +34,7 @@ export const PrivateEquityImpact = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-black/40 backdrop-blur border border-red-500/20 hover:border-red-500/30 transition-all duration-300">
+          <div className="cosmic-box yellow-energy right-drain p-6 rounded-lg bg-black/40 backdrop-blur border border-red-500/20 hover:border-red-500/30 transition-all duration-300">
             <XCircle className="w-8 h-8 text-red-500 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">Lost Trust</h3>
             <p className="text-gray-300">
@@ -46,4 +46,3 @@ export const PrivateEquityImpact = () => {
     </section>
   );
 };
-
