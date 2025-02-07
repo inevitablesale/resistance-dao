@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -477,7 +476,7 @@ const IndexContent = () => {
               The $LGR Protocol Vision
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
-              Building Web3's first protocol that brings together elite accountants, strategic buyers, and networked capital into an unstoppable acquisition engine.
+              Support Web3's first protocol that brings together elite accountants, trusted managed service providers, and networked capital into an unstoppable acquisition engine.
             </p>
           </div>
 
@@ -548,4 +547,3 @@ const Index = () => {
 };
 
 export default Index;
-
