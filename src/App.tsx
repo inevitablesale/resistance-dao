@@ -77,17 +77,23 @@ function App() {
       persistWalletSession: true,
       enableAuthProviders: true,
       shadowDOMEnabled: false,
-      tokens: [
-        {
-          address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
-          symbol: "LGR",
-          decimals: 18,
-          name: "LedgerFund Token",
-          icon: "/favicon.ico",
-          chainId: 137
-        }
-      ]
-    }
+    },
+    // Move tokens to root level of dynamicSettings
+    tokens: [
+      {
+        name: "LedgerFund Token",
+        symbol: "LGR",
+        icon: "/favicon.ico",
+        address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
+        decimals: 18,
+        chainId: 137,
+        // Add these properties for better token display
+        logoURI: "/favicon.ico",
+        isToken: true,
+        balance: "fetchFromContract", // Dynamic will fetch the balance
+        contractAddress: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00"
+      }
+    ]
   };
 
   return (
@@ -105,3 +111,4 @@ function App() {
 }
 
 export default App;
+
