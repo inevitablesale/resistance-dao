@@ -230,9 +230,9 @@ export const WhatWeBuilding = () => {
                 })}
               </div>
 
-              <div className="grid md:grid-cols-2 gap-8 max-w-4xl w-full">
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-semibold text-white text-center mb-8">Investment Options</h3>
+              <div className="w-full max-w-5xl">
+                <h3 className="text-2xl font-semibold text-white text-center mb-8">Investment Options</h3>
+                <div className="grid grid-cols-2 gap-8">
                   {investmentOptions.map((option, index) => (
                     <div 
                       key={option.name}
@@ -250,7 +250,7 @@ export const WhatWeBuilding = () => {
                       
                       <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
                       
-                      <div className="p-6 rounded-lg backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300 relative bg-black/30 hover:translate-y-[-4px]">
+                      <div className="p-6 rounded-lg backdrop-blur border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300 relative bg-black/30 hover:translate-y-[-4px] h-full">
                         <option.icon className="w-8 h-8 text-yellow-400 mb-4" />
                         <h4 className="text-xl font-semibold text-white mb-2">{option.name}</h4>
                         <p className="text-gray-300">{option.description}</p>
