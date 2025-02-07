@@ -281,7 +281,7 @@ const IndexContent = () => {
           </div>
         </div>
 
-        {/* Content Layer with presale information moved from InvestmentReadiness */}
+        {/* Content Layer */}
         <div 
           ref={presaleRef}
           className="relative z-3 mt-[30vh]" 
@@ -291,13 +291,13 @@ const IndexContent = () => {
           }}
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Own the future of<br />accounting
+            The accounting singularity<br />has arrived
           </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            LedgerFund is building a decentralized network of accounting firms owned and governed by accountants. 
-            We're putting the future of the profession back in the hands of professionals.
+            LedgerFund is creating a gravitational force in the accounting industry - a decentralized network that pulls firms into a unified system. Like a cosmic singularity, we're bending the fabric of traditional accounting, collapsing the barriers between firms and creating an event horizon where the profession's future crystallizes into a new form: one owned and governed by accountants themselves.
           </p>
 
+          {/* Presale Information */}
           {showPurchaseForm ? (
             <div className="max-w-3xl mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
               <div className="flex justify-between items-center mb-6">
@@ -469,6 +469,7 @@ const IndexContent = () => {
         </div>
       </div>
 
+      {/* Rest of the sections */}
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
         <WhatWeBuilding />
         <LedgerFrens />
