@@ -25,45 +25,55 @@ function App() {
     ],
     eventsCallbacks: {
       onAuthSuccess: (args: any) => {
-        console.log("Auth Success Event Triggered:", args);
+        console.log("[Dynamic SDK] Auth Success Event:", args);
+        console.log("[Dynamic SDK] User details:", args?.user);
+        console.log("[Dynamic SDK] Wallet details:", args?.wallet);
         toast({
           title: "Authentication Successful",
           description: "You're now connected to LedgerFund.",
         });
       },
       onEmailVerificationStart: () => {
-        console.log("Email verification process started");
+        console.log("[Dynamic SDK] Email verification process started");
+        console.log("[Dynamic SDK] Current verification state:", useDynamicContext()?.user);
       },
       onEmailVerificationSuccess: (args: any) => {
-        console.log("Email Verification Success Event Triggered:", args);
+        console.log("[Dynamic SDK] Email Verification Success:", args);
+        console.log("[Dynamic SDK] Verification details:", args?.verificationDetails);
         toast({
           title: "Email Verified",
           description: "Your email has been successfully verified.",
         });
       },
       onWalletConnectSuccess: (args: any) => {
-        console.log("Wallet Connect Success Event Triggered:", args);
+        console.log("[Dynamic SDK] Wallet Connect Success:", args);
+        console.log("[Dynamic SDK] Connected wallet:", args?.wallet);
         toast({
           title: "Wallet Connected",
           description: "Your wallet has been successfully connected.",
         });
       },
       onLogout: () => {
-        console.log("Logout Event Triggered");
+        console.log("[Dynamic SDK] Logout triggered");
         toast({
           title: "Logged Out",
           description: "You've been successfully logged out.",
         });
       },
       onDisconnect: () => {
-        console.log("Wallet Disconnect Event Triggered");
+        console.log("[Dynamic SDK] Wallet disconnect triggered");
         toast({
           title: "Wallet Disconnected",
           description: "Your wallet has been disconnected.",
         });
       },
       onError: (error: any) => {
-        console.error("Dynamic SDK Error Event Triggered:", error);
+        console.error("[Dynamic SDK] Error occurred:", error);
+        console.error("[Dynamic SDK] Error details:", {
+          message: error?.message,
+          code: error?.code,
+          stack: error?.stack
+        });
         toast({
           title: "Error",
           description: error?.message || "An error occurred",
@@ -71,7 +81,12 @@ function App() {
         });
       },
       onEmailVerificationFailure: (error: any) => {
-        console.error("Email Verification Error Event Triggered:", error);
+        console.error("[Dynamic SDK] Email verification failed:", error);
+        console.error("[Dynamic SDK] Verification error details:", {
+          message: error?.message,
+          code: error?.code,
+          context: error?.context
+        });
         toast({
           title: "Verification Failed",
           description: "Failed to verify email. Please try again.",
@@ -99,10 +114,10 @@ function App() {
             autoVerify: true,
             autoClose: true,
             onChange: () => {
-              console.log("Email auth form changed");
+              console.log("[Dynamic SDK] Email auth form changed");
             },
             onComplete: () => {
-              console.log("Email auth completed");
+              console.log("[Dynamic SDK] Email auth completed");
             }
           }
         }
@@ -136,4 +151,3 @@ function App() {
 }
 
 export default App;
-
