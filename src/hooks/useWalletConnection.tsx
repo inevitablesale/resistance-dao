@@ -39,24 +39,28 @@ export const useWalletConnection = () => {
 
   const showWallet = (view: 'send' | 'deposit') => {
     console.log("Attempting to show wallet view:", view);
+    console.log("Wallet connector details:", primaryWallet);
     
-    if (!primaryWallet?.connector) {
-      console.warn("No wallet connector available");
+    // For Dynamic SDK embedded wallets, we need to use setPrimaryWalletId
+    if (!primaryWallet) {
+      console.warn("No wallet available");
       toast({
         title: "Wallet Error",
-        description: "Wallet functionality not available",
+        description: "Please connect your wallet first",
         variant: "destructive"
       });
       return;
     }
 
-    if (primaryWallet.connector.showWallet) {
-      primaryWallet.connector.showWallet({ view });
-    } else {
-      console.warn("Wallet does not support showWallet");
+    // Use direct wallet interaction methods
+    try {
+      // Open the Dynamic wallet UI
+      setShowAuthFlow?.(true);
+    } catch (error) {
+      console.error("Error showing wallet:", error);
       toast({
         title: "Wallet Error",
-        description: "This wallet doesn't support the requested action",
+        description: "Unable to open wallet interface",
         variant: "destructive"
       });
     }
