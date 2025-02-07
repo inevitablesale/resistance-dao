@@ -12,7 +12,8 @@ import { useToast } from "./hooks/use-toast";
 function App() {
   const { toast } = useToast();
   
-  const ENVIRONMENT_ID = "00a01fb3-76e6-438d-a77d-342bbf2084e2";
+  // Using staging environment ID for development
+  const ENVIRONMENT_ID = "4b729792-4b38-4d73-8a69-4f7559f2c2cd";
   
   const zeroDevConfig = {
     bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -28,7 +29,6 @@ function App() {
     eventsCallbacks: {
       onAuthSuccess: (args: any) => {
         console.log("Auth Success:", args);
-        // Log wallet chain info for debugging
         if (args.wallet?.chain) {
           console.log("Connected Wallet Network:", args.wallet.chain);
         }
@@ -72,7 +72,7 @@ function App() {
     },
     settings: {
       network: {
-        chainId: 137, // Polygon Mainnet
+        chainId: 137,
       },
       environmentId: ENVIRONMENT_ID,
       appName: "LedgerFund",
@@ -84,7 +84,7 @@ function App() {
       persistWalletSession: true,
       enableAuthProviders: true,
       shadowDOMEnabled: false,
-      displayBalances: true, // Enable balance display
+      displayBalances: true,
       evmNetworks: [{
         chainId: 137,
         name: 'Polygon',
@@ -111,8 +111,8 @@ function App() {
       balance: "fetchFromContract",
       contractAddress: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
       network: "polygon",
-      displayBalance: true, // Explicitly enable balance display
-      standard: "ERC20" // Specify token standard
+      displayBalance: true,
+      standard: "ERC20"
     }]
   };
 
