@@ -1,14 +1,13 @@
-
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3, Building } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
 
 const presaleData = [
   { 
-    name: 'Presale Stake', 
+    name: 'Protocol Investment', 
     value: 100, 
     color: '#14b8a6', 
-    description: 'Early supporters invest in the LedgerFund platform, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10.',
+    description: 'Early supporters invest in the LedgerFund protocol, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10.',
     className: 'col-span-2 text-center'
   }
 ];
@@ -22,7 +21,7 @@ const publicSaleData = [
     className: 'col-span-1'
   },
   { 
-    name: 'Public Sale', 
+    name: 'Firm Investment', 
     value: 50, 
     color: '#ea384c',
     description: 'Dedicated allocation for accountants to invest in practices identified and vetted by the DAO community.',
@@ -146,7 +145,7 @@ export const WhatWeBuilding = () => {
 
         <div className="text-center mb-16">
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
-            Carefully designed tokenomics that align platform growth with token holder value, enabling decentralized governance of the world's first accountant-owned practice acquisition engine.
+            Carefully designed tokenomics that align protocol growth with token holder value, enabling decentralized governance of the world's first accountant-owned practice acquisition engine.
           </p>
         </div>
 
@@ -156,13 +155,13 @@ export const WhatWeBuilding = () => {
               value="platform" 
               className="data-[state=active]:bg-gradient-to-r from-yellow-500/90 to-yellow-600/90 data-[state=active]:text-white data-[state=active]:shadow-lg text-white/80 hover:text-white transition-all duration-300"
             >
-              Platform Investment
+              Protocol Investment
             </TabsTrigger>
             <TabsTrigger 
               value="professional" 
               className="data-[state=active]:bg-gradient-to-r from-teal-500/90 to-teal-600/90 data-[state=active]:text-white data-[state=active]:shadow-lg text-white/80 hover:text-white transition-all duration-300"
             >
-              Professional Investment
+              Firm Investment
             </TabsTrigger>
           </TabsList>
 
@@ -217,7 +216,7 @@ export const WhatWeBuilding = () => {
 
           <TabsContent value="professional" className="relative">
             <p className="text-xl text-white/80 mb-12 text-center max-w-3xl mx-auto">
-              Professional Investment: 4,000,000 LGR at $1.00
+              Firm Investment: 4,000,000 LGR at $1.00
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
               <div className="grid grid-cols-2 gap-6 relative col-span-2">
@@ -461,4 +460,3 @@ export const WhatWeBuilding = () => {
     </section>
   );
 };
-
