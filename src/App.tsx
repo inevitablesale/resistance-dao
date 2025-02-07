@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -43,28 +44,22 @@ function App() {
       },
       authSuccess: (args) => {
         console.log("[Dynamic SDK] Auth Success:", args);
-        console.log("[Dynamic SDK] Connected wallet:", args?.wallet);
-        console.log("[Dynamic SDK] Connected user:", args?.user);
-        console.log("[Dynamic SDK] Verification:", args?.user?.verifications);
-        
         toast({
           title: "Successfully Connected",
           description: `Connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
         });
       },
-      emailVerificationStarted: (args) => {
-        console.log("[Dynamic SDK] Email verification started:", args);
-        toast({
-          title: "Verification Started",
-          description: "Please check your email for the verification code.",
-        });
+      emailVerificationStarted: () => {
+        // Immediately close the verification window
+        setTimeout(() => {
+          const verificationDialog = document.querySelector('[data-dynamic-email-verification]');
+          if (verificationDialog) {
+            (verificationDialog as HTMLElement).style.display = 'none';
+          }
+        }, 100);
       },
-      emailVerificationCompleted: (args) => {
-        console.log("[Dynamic SDK] Email verification completed:", args);
-        toast({
-          title: "Verification Successful",
-          description: "Your email has been verified. Proceeding with wallet creation...",
-        });
+      emailVerificationCompleted: () => {
+        console.log("[Dynamic SDK] Email verification completed automatically");
       },
       userCreated: (args) => {
         console.log("[Dynamic SDK] New user created:", args);
@@ -75,10 +70,6 @@ function App() {
       },
       emailVerificationSuccess: () => {
         console.log("[Dynamic SDK] Email verification succeeded");
-        toast({
-          title: "Email Verified",
-          description: "Your email has been successfully verified.",
-        });
       },
       logout: () => {
         console.log("[Dynamic SDK] User logged out");
@@ -121,11 +112,6 @@ function App() {
             autoClose: true,
             onComplete: (args) => {
               console.log("[Dynamic SDK] Email Auth Complete:", args);
-              console.log("[Dynamic SDK] Auth details:", {
-                user: args?.user,
-                wallet: args?.wallet,
-                verificationDetails: args?.verificationDetails
-              });
               toast({
                 title: "Email Authentication Complete",
                 description: "You can now proceed with the token purchase.",
@@ -179,3 +165,4 @@ function App() {
 }
 
 export default App;
+
