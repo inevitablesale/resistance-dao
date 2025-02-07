@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 
 const presaleData = [
   { 
-    name: 'Initial Protocol Investment', 
+    name: 'Protocol Investment', 
     value: 100, 
     color: '#9b87f5',
-    description: 'Early supporters invest in the LedgerFund protocol during presale, gaining tokens at $0.10 and earning reflections from all accounting firm investments.',
+    description: 'Protocol supporters diversify into two investment tracks: passive token holders who earn reflections, and active participants who engage in firm acquisitions.',
     className: 'col-span-2 text-center'
   }
 ];
@@ -45,16 +45,16 @@ const publicSaleData = [
 
 const investmentOptions = [
   {
-    name: 'Buy with Card',
-    description: 'Purchase LGR tokens directly using your credit or debit card through our secure payment processor.',
+    name: 'Passive Investment',
+    description: 'Hold LGR tokens to earn passive reflections from all accounting firm investments and protocol fees.',
     color: '#F2FCE2',
-    icon: Wallet
+    icon: ChartPie
   },
   {
-    name: 'Buy with Crypto',
-    description: 'Use MATIC to purchase LGR tokens through our smart contract on the Polygon network.',
+    name: 'Active Investment',
+    description: 'Participate in firm acquisitions, due diligence, and governance while earning enhanced rewards.',
     color: '#F2FCE2',
-    icon: Coins
+    icon: UsersRound
   }
 ];
 
