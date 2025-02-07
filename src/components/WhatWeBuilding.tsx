@@ -143,12 +143,12 @@ export const WhatWeBuilding = () => {
 
       <div className="container px-4 relative z-10">
         <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 text-center">
-          Investment Structure & Token Distribution
+          Token Distribution & Governance
         </h2>
 
         <div className="text-center mb-16">
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
-            Support Web3's first DAO that brings together elite accountants, trusted managed service providers, and networked capital into an unstoppable acquisition engine.
+            Carefully designed tokenomics that align platform growth with token holder value, enabling decentralized governance of the world's first accountant-owned practice acquisition engine.
           </p>
         </div>
 
