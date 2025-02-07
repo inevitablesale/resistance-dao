@@ -7,8 +7,8 @@ const presaleData = [
     name: 'Presale Stake', 
     value: 100, 
     color: '#14b8a6', 
-    description: 'Reserved for early platform supporters. 5M tokens available at $0.10, with 1-year lock period and projected growth to $1.00.',
-    className: 'col-span-2 text-center' // Added className for full width and centering
+    description: 'Early supporters receive platform tokens and earn reflections from accounting firm investments made by LedgerFund DAO professionals. 5M tokens available at $0.10, with 1-year lock period and projected growth to $1.00.',
+    className: 'col-span-2 text-center'
   }
 ];
 
@@ -17,28 +17,28 @@ const publicSaleData = [
     name: 'Treasury', 
     value: 30, 
     color: '#14b8a6', 
-    description: 'DAO Management Fee Structure: Strategic treasury management by owner-operators, ensuring aligned incentives and sustainable platform growth.',
+    description: 'Strategic treasury management by third-party vault provider, ensuring secure and transparent fund management.',
     className: 'col-span-1'
   },
   { 
     name: 'Public Sale', 
     value: 50, 
     color: '#0d9488', 
-    description: 'LP Capital Investment Flow: Decentralized capital allocation through RWA tokens, enabling fractional ownership in multiple accounting firms.',
+    description: 'Public token sale allocation: tokens available to the broader community after the presale period.',
     className: 'col-span-1'
   },
   { 
     name: 'Community Rewards', 
     value: 10, 
     color: '#0f766e', 
-    description: 'Core team compensation for ongoing platform development and operations.',
+    description: 'Community engagement incentives including contests, milestone rewards, exclusive merchandise, launch events, and special access to platform features.',
     className: 'col-span-1'
   },
   { 
     name: 'Partners', 
     value: 10, 
     color: '#115e59', 
-    description: 'Strategic partnerships and ecosystem growth initiatives.',
+    description: 'Strategic partnerships with banks, staffing agencies, technology providers, and other ecosystem participants to enhance platform capabilities.',
     className: 'col-span-1'
   }
 ];
