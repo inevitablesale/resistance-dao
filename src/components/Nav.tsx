@@ -38,7 +38,7 @@ const Nav = () => {
           </div>
           
           <div className="hidden md:flex items-center gap-8">
-            <a href="#join-our-vision" className="text-white/80 hover:text-white transition-colors">
+            <a href="#presale-stage-1" className="text-white/80 hover:text-white transition-colors">
               Presale
             </a>
             <a href="#private-equity-impact" className="text-white/80 hover:text-white transition-colors">
@@ -68,4 +68,3 @@ const Nav = () => {
 };
 
 export default Nav;
-

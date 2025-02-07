@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -29,6 +30,11 @@ function App() {
           title: "Authentication Successful",
           description: "You're now connected to LedgerFund.",
         });
+      },
+      onEmailVerificationSuccess: () => {
+        console.log("Email verification successful");
+        // This will ensure the verification window closes
+        window.location.reload();
       },
       onLogout: () => {
         console.log("Logged out");
