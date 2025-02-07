@@ -1,30 +1,31 @@
 
 import { useState, useEffect } from "react";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { getWorkingProvider, getLgrTokenContract } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { ChevronUp, Plus, Send, Coins } from "lucide-react";
+import { ChevronUp, Coins } from "lucide-react";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { WalletConnectModal } from "./wallet/WalletConnectModal";
+import { WalletActions } from "./wallet/WalletActions";
 
 export const WalletBalance = () => {
-  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
+  const { address, isConnected } = useWalletConnection();
   const [maticBalance, setMaticBalance] = useState<string>("0");
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [isExpanded, setIsExpanded] = useState(true);
 
   useEffect(() => {
     const fetchBalances = async () => {
-      if (!primaryWallet?.address) return;
+      if (!address) return;
 
       try {
         const provider = await getWorkingProvider();
         const [maticBal, lgrContract] = await Promise.all([
-          provider.getBalance(primaryWallet.address),
+          provider.getBalance(address),
           getLgrTokenContract(provider)
         ]);
         
-        const lgrBal = await lgrContract.balanceOf(primaryWallet.address);
+        const lgrBal = await lgrContract.balanceOf(address);
         
         setMaticBalance(ethers.utils.formatEther(maticBal));
         setLgrBalance(ethers.utils.formatUnits(lgrBal, 18));
@@ -36,29 +37,18 @@ export const WalletBalance = () => {
     fetchBalances();
     const interval = setInterval(fetchBalances, 30000);
     return () => clearInterval(interval);
-  }, [primaryWallet?.address]);
+  }, [address]);
 
-  const handleDeposit = () => {
-    if (!primaryWallet) {
-      setShowAuthFlow?.(true);
-      return;
-    }
-    // This will open Dynamic's deposit flow
-    primaryWallet?.connector?.showWallet?.({
-      view: 'deposit'
-    });
-  };
-
-  const handleSend = () => {
-    if (!primaryWallet) {
-      setShowAuthFlow?.(true);
-      return;
-    }
-    // This will open Dynamic's send flow
-    primaryWallet?.connector?.showWallet?.({
-      view: 'send'
-    });
-  };
+  if (!isConnected) {
+    return (
+      <Card className="bg-[#1A1F2C]/90 border-white/10 p-4">
+        <div className="text-center space-y-4">
+          <p className="text-gray-400">Connect your wallet to view balances</p>
+          <WalletConnectModal />
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="bg-[#1A1F2C]/90 border-white/10 p-4 space-y-4">
@@ -109,28 +99,10 @@ export const WalletBalance = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <Button 
-                variant="outline" 
-                className="w-full bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                onClick={handleDeposit}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Deposit
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                onClick={handleSend}
-              >
-                <Send className="w-4 h-4 mr-2" />
-                Send
-              </Button>
-            </div>
+            <WalletActions />
           </div>
         </>
       )}
     </Card>
   );
 };
-
