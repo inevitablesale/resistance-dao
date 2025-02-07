@@ -306,7 +306,7 @@ const IndexContent = () => {
                   UNTIL PRICE INCREASE
                 </div>
 
-                <div className="grid grid-cols-4 gap-4 mb-8">
+                <div className="grid grid-cols-4 gap-8 mb-8">
                   {[
                     { label: 'DAYS', value: timeLeft.days },
                     { label: 'HOURS', value: timeLeft.hours },
@@ -472,6 +472,10 @@ const IndexContent = () => {
                 <div className="space-y-2">
                   <h4 className="text-xl font-semibold text-yellow-500">Collective Capital</h4>
                   <p className="text-white/80">Protocol-owned liquidity powering a continuous acquisition engine to drive sustainable growth.</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-xl font-semibold text-teal-500">Shared Success</h4>
+                  <p className="text-white/80">Token holders participate in governance and benefit from the performance of acquired practices through the protocol.</p>
                 </div>
               </div>
             </div>
