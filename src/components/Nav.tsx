@@ -1,6 +1,6 @@
 
 import { Link, useNavigate } from "react-router-dom";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 
 const Nav = () => {
@@ -48,12 +48,15 @@ const Nav = () => {
             </a>
           </div>
 
-          <button 
-            onClick={handleLaunchApp}
-            className="hidden md:block px-6 py-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white rounded-lg font-medium transition-all hover:scale-105"
-          >
-            Download Whitepaper
-          </button>
+          <div className="hidden md:flex items-center gap-4">
+            <button 
+              onClick={handleLaunchApp}
+              className="px-6 py-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white rounded-lg font-medium transition-all hover:scale-105"
+            >
+              Download Whitepaper
+            </button>
+            <DynamicWidget />
+          </div>
         </div>
       </div>
     </nav>
@@ -61,3 +64,4 @@ const Nav = () => {
 };
 
 export default Nav;
+
