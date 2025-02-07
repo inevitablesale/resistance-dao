@@ -31,6 +31,20 @@ function App() {
           description: "You're now connected to LedgerFund.",
         });
       },
+      onEmailVerificationSuccess: (args: any) => {
+        console.log("Email Verification Success:", args);
+        toast({
+          title: "Email Verified",
+          description: "Your email has been successfully verified.",
+        });
+      },
+      onWalletConnectSuccess: (args: any) => {
+        console.log("Wallet Connect Success:", args);
+        toast({
+          title: "Wallet Connected",
+          description: "Your wallet has been successfully connected.",
+        });
+      },
       onLogout: () => {
         console.log("Logged out");
         toast({
@@ -50,6 +64,14 @@ function App() {
         toast({
           title: "Error",
           description: error?.message || "An error occurred",
+          variant: "destructive",
+        });
+      },
+      onEmailVerificationFailure: (error: any) => {
+        console.error("Email Verification Error:", error);
+        toast({
+          title: "Verification Failed",
+          description: "Failed to verify email. Please try again.",
           variant: "destructive",
         });
       }
@@ -72,7 +94,13 @@ function App() {
         options: {
           emailAuth: {
             autoVerify: true,
-            autoClose: true
+            autoClose: true,
+            onChange: () => {
+              console.log("Email auth form changed");
+            },
+            onComplete: () => {
+              console.log("Email auth completed");
+            }
           }
         }
       },
