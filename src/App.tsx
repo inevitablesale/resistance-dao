@@ -29,6 +29,13 @@ function App() {
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
     eventsCallbacks: {
+      onInitLoggedOut: () => {
+        console.log("[Dynamic SDK] Initial state: Logged out");
+        toast({
+          title: "Welcome to LedgerFund",
+          description: "Connect your wallet to get started.",
+        });
+      },
       onEmailVerificationStarted: (args: any) => {
         console.log("[Dynamic SDK] Email verification started:", args);
         toast({
@@ -146,3 +153,4 @@ function App() {
 }
 
 export default App;
+
