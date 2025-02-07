@@ -463,15 +463,15 @@ const IndexContent = () => {
               <div className="grid md:grid-cols-3 gap-8">
                 <div className="space-y-2">
                   <h4 className="text-xl font-semibold text-yellow-500">Elite M&A Expertise</h4>
-                  <p className="text-white/80">Decades of experience in accounting firm acquisitions, mergers, and optimizations delivering consistent double-digit ROI.</p>
+                  <p className="text-white/80">Decades of experience in accounting firm acquisitions, mergers, and optimizations.</p>
                 </div>
                 <div className="space-y-2">
                   <h4 className="text-xl font-semibold text-teal-500">Battle-tested Playbooks</h4>
-                  <p className="text-white/80">Proven strategies for firm valuation, integration, and value creation that maximize stakeholder returns.</p>
+                  <p className="text-white/80">Proven strategies for firm valuation, integration, and value creation that maximize stakeholder value.</p>
                 </div>
                 <div className="space-y-2">
                   <h4 className="text-xl font-semibold text-yellow-500">Collective Capital</h4>
-                  <p className="text-white/80">Protocol-owned liquidity powering a continuous acquisition engine to drive sustainable growth and profits.</p>
+                  <p className="text-white/80">Protocol-owned liquidity powering a continuous acquisition engine to drive sustainable growth.</p>
                 </div>
               </div>
             </div>
