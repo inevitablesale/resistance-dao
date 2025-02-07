@@ -371,9 +371,9 @@ export const WhatWeBuilding = () => {
                     <div className="mb-4">
                       <Wallet className="w-8 h-8 text-yellow-400" />
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Price Appreciation</h3>
+                    <h3 className="text-xl font-semibold text-white mb-2">Platform Governance</h3>
                     <p className="text-gray-300">
-                      Potential growth from $0.10 to $1.00 through platform development and adoption.
+                      LGR holders participate in platform governance decisions and contribute to the development of the ecosystem.
                     </p>
                   </div>
 
@@ -391,9 +391,9 @@ export const WhatWeBuilding = () => {
                     <div className="mb-4">
                       <BadgeCheck className="w-8 h-8 text-yellow-400" />
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">Platform Growth</h3>
+                    <h3 className="text-xl font-semibold text-white mb-2">Platform Development</h3>
                     <p className="text-gray-300">
-                      Participate in the overall success of the platform through token value appreciation.
+                      Support the growth of decentralized accounting firm ownership and professional control.
                     </p>
                   </div>
                 </div>
