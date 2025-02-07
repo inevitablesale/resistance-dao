@@ -1,3 +1,4 @@
+
 import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3, Building } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
@@ -176,7 +177,7 @@ export const WhatWeBuilding = () => {
               Protocol Investment: Total Supply 10,000,000 LGR
             </p>
             <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-              <div className="space-y-6 relative grid grid-cols-2 gap-6">
+              <div className="space-y-6 relative grid grid-cols-2 gap-6 max-w-4xl mx-auto">
                 {presaleData.map((segment, index) => {
                   const orbitRadius = 20 + index * 10;
                   const orbitDuration = 20 + index * 5;
@@ -203,13 +204,13 @@ export const WhatWeBuilding = () => {
                                  hover:translate-y-[-4px] hover:rotate-1
                                  group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]"
                       >
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="flex items-center gap-3 mb-2 justify-center">
                           <div className="w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: segment.color }} />
                           <h3 className="text-xl font-semibold text-white">
                             {segment.name} ({segment.value}%)
                           </h3>
                         </div>
-                        <p className="text-gray-300">
+                        <p className="text-gray-300 text-center">
                           {segment.description}
                         </p>
                       </div>
