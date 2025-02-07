@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -29,12 +28,21 @@ function App() {
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
     eventsCallbacks: {
-      onInitLoggedOut: () => {
-        console.log("[Dynamic SDK] Initial state: Logged out");
-        // Single welcome toast when initially logged out
+      onAuthFlowOpen: () => {
+        console.log("[Dynamic SDK] Auth flow opened");
+      },
+      onAuthFlowClose: () => {
+        console.log("[Dynamic SDK] Auth flow closed");
+      },
+      onAuthSuccess: (args) => {
+        console.log("[Dynamic SDK] Auth Success:", args);
+        console.log("[Dynamic SDK] Connected wallet:", args?.wallet);
+        console.log("[Dynamic SDK] Connected user:", args?.user);
+        console.log("[Dynamic SDK] Verification:", args?.user?.verifications);
+        
         toast({
-          title: "Welcome to LedgerFund",
-          description: "Connect your wallet to get started.",
+          title: "Successfully Connected",
+          description: `Connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
         });
       },
       onEmailVerificationStarted: (args) => {
@@ -58,23 +66,6 @@ function App() {
           description: "Your account has been successfully created.",
         });
       },
-      onAuthFlowOpen: () => {
-        console.log("[Dynamic SDK] Auth flow opened");
-      },
-      onAuthFlowClose: () => {
-        console.log("[Dynamic SDK] Auth flow closed");
-      },
-      onAuthSuccess: (args) => {
-        console.log("[Dynamic SDK] Auth Success:", args);
-        console.log("[Dynamic SDK] Connected wallet:", args?.wallet);
-        console.log("[Dynamic SDK] Connected user:", args?.user);
-        console.log("[Dynamic SDK] Verification:", args?.user?.verifications);
-        
-        toast({
-          title: "Successfully Connected",
-          description: `Connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
-        });
-      },
       onEmailVerificationSuccess: () => {
         console.log("[Dynamic SDK] Email verification succeeded");
         toast({
@@ -84,7 +75,6 @@ function App() {
       },
       onLogout: () => {
         console.log("[Dynamic SDK] User logged out");
-        // Single welcome toast when logging out
         toast({
           title: "Logged Out",
           description: "You've been successfully logged out.",
@@ -128,8 +118,8 @@ function App() {
         options: {
           emailAuth: {
             signInWithEmail: true,
-            autoVerify: true,  // Changed to true to auto-verify
-            autoClose: true,   // Keep auto-close true
+            autoVerify: true,
+            autoClose: true,
             onComplete: (args) => {
               console.log("[Dynamic SDK] Email Auth Complete:", args);
               console.log("[Dynamic SDK] Auth details:", {

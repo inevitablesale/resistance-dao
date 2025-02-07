@@ -40,7 +40,7 @@ export const TokenPurchaseForm = () => {
     calculateExpectedLGR(value);
   };
 
-  const handlePurchase = async () => {
+  const handlePurchase = () => {
     if (!primaryWallet) {
       setShowAuthFlow?.(true);
       return;
@@ -55,6 +55,10 @@ export const TokenPurchaseForm = () => {
       return;
     }
 
+    handlePurchaseTransaction();
+  };
+
+  const handlePurchaseTransaction = async () => {
     setIsLoading(true);
     try {
       const walletClient = await primaryWallet.getWalletClient();
@@ -122,4 +126,3 @@ export const TokenPurchaseForm = () => {
     </div>
   );
 };
-
