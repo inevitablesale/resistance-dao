@@ -1,6 +1,6 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
+import { DynamicContextProvider, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
 import Index from "./pages/Index";
@@ -37,9 +37,9 @@ function App() {
           title: "Email Verified",
           description: "Your email has been successfully verified.",
         });
-        // Force the auth flow to close
-        if (dynamicSettings.settings?.setShowAuthFlow) {
-          dynamicSettings.settings.setShowAuthFlow(false);
+        // Use the window.dynamic API to close the auth flow
+        if (window.dynamic) {
+          window.dynamic.closeAuthFlow();
         }
       },
       onLogout: () => {
