@@ -1,9 +1,39 @@
-
 import { Card } from "./ui/card";
 import { Milestone } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export const Roadmap = () => {
+  const [blackHoleScale, setBlackHoleScale] = useState(1);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Get the presale section element
+      const presaleSection = document.getElementById('presale-section');
+      if (!presaleSection) return;
+      
+      const rect = presaleSection.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Calculate visibility percentage as section enters viewport
+      const visibilityPercent = Math.max(0, Math.min(1, 
+        1 - (rect.top / windowHeight)
+      ));
+      
+      // When scrolling back up, scale back down
+      const scrollUpAdjustment = Math.max(0, Math.min(1,
+        1 - (Math.abs(rect.bottom) / windowHeight)
+      ));
+      
+      // Use the minimum of both values to ensure proper scaling in both directions
+      const scale = Math.min(visibilityPercent, scrollUpAdjustment);
+      setBlackHoleScale(1 + (scale * 0.5)); // Scale from 1x to 1.5x
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const phases = [
     {
       title: "Phase 1: Foundation",
@@ -57,25 +87,28 @@ export const Roadmap = () => {
       {/* Black Hole Effect Background */}
       <div className="absolute inset-0 opacity-90">
         <div 
-          className="absolute inset-0 bg-[#000000e6] animate-singularity"
+          className="absolute inset-0 bg-[#000000e6] animate-singularity transition-transform duration-300"
           style={{
             background: 'radial-gradient(circle at center, transparent 0%, #000000e6 70%)',
+            transform: `scale(${blackHoleScale})`
           }}
         />
         {/* Event Horizon Glow */}
         <div 
-          className="absolute inset-0"
+          className="absolute inset-0 transition-transform duration-300"
           style={{
             background: 'radial-gradient(circle at center, rgba(234,179,8,0.15) 0%, rgba(45,212,191,0.1) 30%, transparent 70%)',
-            animation: 'cosmic-pulse 4s ease-in-out infinite'
+            animation: 'cosmic-pulse 4s ease-in-out infinite',
+            transform: `scale(${blackHoleScale * 0.9})`
           }}
         />
         {/* Accretion Disk */}
         <div 
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-20 transition-transform duration-300"
           style={{
             background: 'conic-gradient(from 0deg at 50% 50%, #eab308 0%, #2dd4bf 25%, #eab308 50%, #2dd4bf 75%, #eab308 100%)',
-            animation: 'orbit 20s linear infinite'
+            animation: 'orbit 20s linear infinite',
+            transform: `scale(${blackHoleScale * 1.1})`
           }}
         />
       </div>
