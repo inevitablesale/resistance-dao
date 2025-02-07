@@ -25,28 +25,38 @@ const presaleData = [
     name: 'Protocol Investment', 
     value: 100, 
     color: '#14b8a6', 
-    description: 'Early supporters invest in the LedgerFund platform, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10.',
+    description: 'Early supporters invest in the LedgerFund protocol, gaining tokens and earning reflections from all accounting firm investments made by the DAO. 5M tokens available at $0.10.',
     className: 'col-span-2 text-center',
     features: [
       {
         icon: Trophy,
-        title: "Early Access",
-        description: "Be among the first to participate in the future of accounting firm ownership"
+        title: "Presale Bonus",
+        description: "25% bonus tokens for early supporters"
       },
       {
         icon: Coins,
-        title: "Maximum Allocation",
-        description: "Secure the highest possible token allocation at the lowest price point"
+        title: "Reflection Rights",
+        description: "10% of all future firm distributions"
       },
       {
         icon: GitBranch,
-        title: "Governance Rights",
-        description: "Shape the future of the protocol through early governance participation"
+        title: "Governance Power",
+        description: "Vote on key protocol decisions and future development"
+      },
+      {
+        icon: Network,
+        title: "Network Effects",
+        description: "Be part of the first decentralized accounting network"
       },
       {
         icon: Zap,
-        title: "Reflection Rewards",
-        description: "Earn ongoing rewards from all future firm investments made by the DAO"
+        title: "Early Access",
+        description: "Priority access to future token sales and firm investments"
+      },
+      {
+        icon: UserCircle,
+        title: "Exclusive Access",
+        description: "Join private Discord channels and community events"
       }
     ]
   }
