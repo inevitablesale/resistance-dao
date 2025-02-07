@@ -65,6 +65,7 @@ function App() {
       network: {
         chainId: 137, // Polygon Mainnet
       },
+      environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
       appName: "LedgerFund",
       appLogoUrl: "/favicon.ico",
       enableEmbeddedWallets: true,
