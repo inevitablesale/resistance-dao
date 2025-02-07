@@ -38,10 +38,10 @@ const Nav = () => {
           </div>
           
           <div className="hidden md:flex items-center gap-8">
-            <a href="#presale-stage-1" className="text-white/80 hover:text-white transition-colors">
+            <a href="#presale" className="text-white/80 hover:text-white transition-colors">
               Presale
             </a>
-            <a href="#private-equity-impact" className="text-white/80 hover:text-white transition-colors">
+            <a href="#join-the-singularity" className="text-white/80 hover:text-white transition-colors">
               Why Now
             </a>
             <a href="#how-it-works" className="text-white/80 hover:text-white transition-colors">
