@@ -52,9 +52,21 @@ export const useWalletConnection = () => {
       return;
     }
 
-    // Handle different wallet types
-    if (primaryWallet.connector.name?.toLowerCase().includes('zerodev')) {
-      // ZeroDev wallet handling
+    // Check specifically for Dynamic embedded wallet
+    if (primaryWallet.connector.name?.toLowerCase().includes('embedded')) {
+      if (primaryWallet.connector.showWallet) {
+        primaryWallet.connector.showWallet({ view });
+      } else {
+        console.warn("Dynamic embedded wallet does not support showWallet");
+        toast({
+          title: "Wallet Error",
+          description: "This wallet doesn't support the requested action",
+          variant: "destructive"
+        });
+      }
+    } 
+    // Handle ZeroDev wallet
+    else if (primaryWallet.connector.name?.toLowerCase().includes('zerodev')) {
       if (primaryWallet.connector.openWallet) {
         primaryWallet.connector.openWallet({ view });
       } else {
@@ -65,18 +77,15 @@ export const useWalletConnection = () => {
           variant: "destructive"
         });
       }
-    } else {
-      // Dynamic embedded wallet handling
-      if (primaryWallet.connector.showWallet) {
-        primaryWallet.connector.showWallet({ view });
-      } else {
-        console.warn("Dynamic wallet does not support showWallet");
-        toast({
-          title: "Wallet Error",
-          description: "This wallet doesn't support the requested action",
-          variant: "destructive"
-        });
-      }
+    }
+    // Handle other wallet types
+    else {
+      console.warn("Unknown wallet type");
+      toast({
+        title: "Wallet Error",
+        description: "This wallet type is not supported",
+        variant: "destructive"
+      });
     }
   };
 
@@ -89,3 +98,4 @@ export const useWalletConnection = () => {
     showWallet
   };
 };
+
