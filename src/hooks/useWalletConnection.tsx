@@ -35,14 +35,25 @@ export const useWalletConnection = () => {
     setShowAuthFlow(false);
   }
 
+  const showWallet = (view: 'send' | 'deposit') => {
+    console.log("Attempting to show wallet view:", view);
+    console.log("Wallet connector:", primaryWallet?.connector);
+    
+    if (!primaryWallet?.connector?.showWallet) {
+      console.warn("Wallet does not support showWallet functionality");
+      return;
+    }
+    
+    primaryWallet.connector.showWallet({ view });
+  };
+
   return {
     isConnected: primaryWallet?.isConnected?.() || false,
     isConnecting,
     connect,
     disconnect,
     address: primaryWallet?.address,
-    showWallet: (view: 'send' | 'deposit') => {
-      primaryWallet?.connector?.showWallet?.({ view });
-    }
+    showWallet
   };
 };
+
