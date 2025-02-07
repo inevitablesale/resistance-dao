@@ -19,6 +19,7 @@ import { checkNFTOwnership } from "@/services/contractService";
 import { Trophy, UserCircle, Wallet, ClipboardCopy } from "lucide-react";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
+import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
 
 const IndexContent = () => {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ const IndexContent = () => {
   const [myPurchased, setMyPurchased] = useState<string>('0');
   const [myStakeable, setMyStakeable] = useState<string>('0');
   const [maticPrice, setMaticPrice] = useState<string>('Loading...');
+  const [showPurchaseForm, setShowPurchaseForm] = useState(false);
 
   useEffect(() => {
     // Set loaded state after a small delay to trigger initial animations
@@ -214,11 +216,7 @@ const IndexContent = () => {
         description: "Please connect your wallet to purchase tokens.",
       });
     } else {
-      // Once connected, we can handle the purchase directly here
-      toast({
-        title: "Ready to Purchase",
-        description: "Your wallet is connected. You can now purchase tokens.",
-      });
+      setShowPurchaseForm(true);
     }
   };
 
@@ -328,118 +326,133 @@ const IndexContent = () => {
             We're putting the future of the profession back in the hands of professionals.
           </p>
 
-          <div className="max-w-3xl mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
-            <div className="mb-8">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 blur-xl animate-pulse" />
-                <h2 className="relative text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-2 text-center">
-                  Presale Stage 1
-                </h2>
-              </div>
-            </div>
-
-            <div className="text-center text-white/80 font-medium mb-4">
-              UNTIL PRICE INCREASE
-            </div>
-
-            {/* Countdown Timer with Enhanced Design */}
-            <div className="grid grid-cols-4 gap-4 mb-8">
-              {[
-                { label: 'DAYS', value: timeLeft.days },
-                { label: 'HOURS', value: timeLeft.hours },
-                { label: 'MINUTES', value: timeLeft.minutes },
-                { label: 'SECONDS', value: timeLeft.seconds }
-              ].map(({ label, value }) => (
-                <div 
-                  key={label} 
-                  className="relative group perspective-3000"
+          {showPurchaseForm ? (
+            <div className="max-w-3xl mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-white">Purchase LGR Tokens</h2>
+                <button
+                  onClick={() => setShowPurchaseForm(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                  <div className="relative bg-black/80 p-4 rounded-lg border border-yellow-500/30 transform transition-all duration-300 group-hover:translate-y-[-2px]">
-                    <div className="text-4xl font-bold text-white mb-2 text-center animate-[pulse_2s_ease-in-out_infinite]">
-                      {value}
-                    </div>
-                    <div className="text-sm text-gray-400 text-center">{label}</div>
-                  </div>
-                </div>
-              ))}
+                  ← Back
+                </button>
+              </div>
+              <TokenPurchaseForm />
             </div>
+          ) : (
+            <div className="max-w-3xl mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
+              <div className="mb-8">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 blur-xl animate-pulse" />
+                  <h2 className="relative text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-2 text-center">
+                    Presale Stage 1
+                  </h2>
+                </div>
+              </div>
 
-            {/* Progress and Stats with Enhanced Visual Design */}
-            <div className="mb-8 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-teal-500/10 blur-lg" />
-              <div className="relative">
-                <div className="flex justify-between items-center mb-2">
-                  <div className="text-white text-lg">
-                    <span className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-300">
-                      {formatLargeNumber(totalSold)}
-                    </span>
-                    <span className="text-gray-400"> / </span> 
-                    <span className="text-gray-300">5M</span>
-                    <span className="text-gray-400 ml-2">LGR Tokens Sold</span>
-                  </div>
-                  <div className="text-teal-400 font-bold">
-                    {calculatePercentage()}%
-                  </div>
-                </div>
-                
-                <div className="relative h-4 bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
+              <div className="text-center text-white/80 font-medium mb-4">
+                UNTIL PRICE INCREASE
+              </div>
+
+              {/* Countdown Timer with Enhanced Design */}
+              <div className="grid grid-cols-4 gap-4 mb-8">
+                {[
+                  { label: 'DAYS', value: timeLeft.days },
+                  { label: 'HOURS', value: timeLeft.hours },
+                  { label: 'MINUTES', value: timeLeft.minutes },
+                  { label: 'SECONDS', value: timeLeft.seconds }
+                ].map(({ label, value }) => (
                   <div 
-                    className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 animate-pulse blur-sm"
-                  />
-                  <div 
-                    className="h-full bg-gradient-to-r from-yellow-500 to-teal-500 transition-all duration-1000 relative"
-                    style={{ 
-                      width: `${Math.min(100, (Number(totalSold) / Number(presaleSupply)) * 100)}%` 
-                    }}
+                    key={label} 
+                    className="relative group perspective-3000"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/50 to-teal-500/50 animate-pulse" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
+                    <div className="relative bg-black/80 p-4 rounded-lg border border-yellow-500/30 transform transition-all duration-300 group-hover:translate-y-[-2px]">
+                      <div className="text-4xl font-bold text-white mb-2 text-center animate-[pulse_2s_ease-in-out_infinite]">
+                        {value}
+                      </div>
+                      <div className="text-sm text-gray-400 text-center">{label}</div>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="flex justify-between items-center mt-2">
-                  <div className="text-center text-white/80 font-medium">
-                    90% DISCOUNT ACTIVE
+                ))}
+              </div>
+
+              {/* Progress and Stats with Enhanced Visual Design */}
+              <div className="mb-8 relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-teal-500/10 blur-lg" />
+                <div className="relative">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="text-white text-lg">
+                      <span className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-300">
+                        {formatLargeNumber(totalSold)}
+                      </span>
+                      <span className="text-gray-400"> / </span> 
+                      <span className="text-gray-300">5M</span>
+                      <span className="text-gray-400 ml-2">LGR Tokens Sold</span>
+                    </div>
+                    <div className="text-teal-400 font-bold">
+                      {calculatePercentage()}%
+                    </div>
                   </div>
-                  <div className="text-center text-teal-400 font-medium">
-                    Current Price: {maticPrice} / $0.10 USD
+                  
+                  <div className="relative h-4 bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
+                    <div 
+                      className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 animate-pulse blur-sm"
+                    />
+                    <div 
+                      className="h-full bg-gradient-to-r from-yellow-500 to-teal-500 transition-all duration-1000 relative"
+                      style={{ 
+                        width: `${Math.min(100, (Number(totalSold) / Number(presaleSupply)) * 100)}%` 
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/50 to-teal-500/50 animate-pulse" />
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center mt-2">
+                    <div className="text-center text-white/80 font-medium">
+                      90% DISCOUNT ACTIVE
+                    </div>
+                    <div className="text-center text-teal-400 font-medium">
+                      Current Price: {maticPrice} / $0.10 USD
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Enhanced Purchase Options */}
-            <div className="grid md:grid-cols-2 gap-4">
+              {/* Enhanced Purchase Options */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <button 
+                  onClick={handleBuyClick}
+                  className="group relative px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-yellow-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                  <div className="relative flex items-center justify-center gap-3 text-white font-medium text-lg">
+                    <Trophy className="w-5 h-5 animate-bounce" />
+                    <span>Buy with Card</span>
+                  </div>
+                </button>
+                
+                <button 
+                  onClick={handleBuyClick}
+                  className="group relative px-8 py-4 bg-gradient-to-br from-teal-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-teal-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
+                  <div className="relative flex items-center justify-center gap-3 text-white font-medium text-lg">
+                    <Wallet className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
+                    <span>Buy with Crypto</span>
+                  </div>
+                </button>
+              </div>
+
               <button 
-                onClick={handleBuyClick}
-                className="group relative px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+                onClick={() => navigate('/mint-nft')}
+                className="mt-4 text-white/80 hover:text-white underline text-sm transition-colors w-full text-center"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-600/70 to-yellow-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
-                <div className="relative flex items-center justify-center gap-3 text-white font-medium text-lg">
-                  <Trophy className="w-5 h-5 animate-bounce" />
-                  <span>Buy with Card</span>
-                </div>
-              </button>
-              
-              <button 
-                onClick={handleBuyClick}
-                className="group relative px-8 py-4 bg-gradient-to-br from-teal-600 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-teal-600/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
-                <div className="relative flex items-center justify-center gap-3 text-white font-medium text-lg">
-                  <Wallet className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
-                  <span>Buy with Crypto</span>
-                </div>
+                New to crypto? Get started here
               </button>
             </div>
-
-            <button 
-              onClick={() => navigate('/mint-nft')}
-              className="mt-4 text-white/80 hover:text-white underline text-sm transition-colors w-full text-center"
-            >
-              New to crypto? Get started here
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
