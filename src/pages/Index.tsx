@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -342,84 +341,6 @@ const IndexContent = () => {
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
             Support Web3's first protocol where token holders elect the board, vote on MSP partners, and power an unstoppable acquisition engine. LedgerFund DAO unites elite accountants, trusted managed service providers, and networked capital to revolutionize practice ownership.
           </p>
-
-          {/* Board Election Timeline */}
-          <div className="max-w-4xl mx-auto mb-12 bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500 mb-4">
-                    Join the Singularity
-                  </h2>
-                  <p className="text-white/90 leading-relaxed">
-                    The accounting industry is reaching its event horizon. Private equity wants to pull firms in and consolidate control. But a new force is emerging—a gravitational shift toward fractional ownership. This is LedgerFund DAO.
-                  </p>
-                </div>
-                
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-yellow-500">Elite M&A Expertise</h3>
-                  <p className="text-white/90">
-                    Decades of experience in accounting firm acquisitions, mergers, and optimizations.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <h3 className="text-xl font-semibold text-teal-500">Board Election Timeline</h3>
-                  <div className="space-y-4">
-                    {[
-                      { phase: 'Q2 2024', event: 'Board Nomination Opens', icon: UserCircle },
-                      { phase: 'Q3 2024', event: 'Initial Board Election', icon: GitBranch },
-                      { phase: 'Q4 2024', event: 'First Acquisitions Selected', icon: Network },
-                      { phase: '2025', event: 'Portfolio Expansion Begins', icon: Zap }
-                    ].map((item, index) => (
-                      <div key={index} className="flex items-center gap-3 text-white/80">
-                        <item.icon className="w-5 h-5 text-teal-500" />
-                        <span className="font-semibold text-yellow-500">{item.phase}:</span>
-                        <span>{item.event}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div className="bg-black/40 rounded-lg p-6 border border-teal-500/20">
-                  <h3 className="text-xl font-semibold text-teal-500 mb-4">The Elected Board Will</h3>
-                  <ul className="space-y-3">
-                    {[
-                      { power: 'Review acquisition targets', icon: ClipboardCopy },
-                      { power: 'Set valuation frameworks', icon: Coins },
-                      { power: 'Guide integration strategies', icon: Network },
-                      { power: 'Direct growth initiatives', icon: GitBranch },
-                      { power: 'Allocate optimization resources', icon: Zap }
-                    ].map((item, index) => (
-                      <li key={index} className="flex items-center gap-3 text-white/80">
-                        <item.icon className="w-5 h-5 text-yellow-500" />
-                        <span>{item.power}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="bg-black/40 rounded-lg p-6 border border-yellow-500/20">
-                  <h3 className="text-xl font-semibold text-yellow-500 mb-4">Board Composition</h3>
-                  <ul className="space-y-3">
-                    {[
-                      "Managing partners who've built successful firms",
-                      "M&A specialists who understand true practice value",
-                      "Operations experts who've optimized workflows",
-                      "Technology leaders driving practice innovation"
-                    ].map((text, index) => (
-                      <li key={index} className="flex items-center gap-3 text-white/80">
-                        <Trophy className="w-5 h-5 text-teal-500" />
-                        <span>{text}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {showPurchaseForm ? (
             <div className="max-w-3xl mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
