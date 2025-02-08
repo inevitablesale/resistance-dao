@@ -519,17 +519,6 @@ const IndexContent = () => {
         </div>
       </div>
 
-      <PrivateEquityImpact />
-      <ReclaimControl />
-      <HowItWorks />
-      <AlternativeToEquity />
-      <SystemWeDeserve />
-      <WhatWeBuilding />
-      <CallToAction />
-      <Roadmap />
-      <LedgerFrens />
-      <Partners />
-
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-24">
           <div id="join-the-singularity" className="text-center mb-16 pt-20 relative overflow-hidden">
@@ -552,80 +541,143 @@ const IndexContent = () => {
               </h2>
 
               <div className="relative mt-16 mb-24">
-                <div className="relative h-[600px] mb-24">
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32">
-                    <div className="absolute inset-0 rounded-full animate-cosmic-pulse"
-                         style={{
-                           background: "radial-gradient(circle at center, rgba(234, 179, 8, 0.8) 0%, rgba(20, 184, 166, 0.4) 50%, transparent 70%)",
-                         }} />
-                    <div className="absolute inset-0 rounded-full animate-[spin_20s_linear_infinite]"
-                         style={{
-                           background: "conic-gradient(from 0deg, rgba(234, 179, 8, 0.8), rgba(20, 184, 166, 0.8), rgba(234, 179, 8, 0.8))",
-                           filter: "blur(8px)"
-                         }} />
-                  </div>
-
-                  {[
-                    { name: 'Apply', icon: UserPlus, angle: -120, color: 'yellow' },
-                    { name: 'Nominate', icon: Award, angle: 0, color: 'teal' },
-                    { name: 'Vote', icon: Vote, angle: 120, color: 'yellow' }
-                  ].map((action) => (
-                    <div
-                      key={action.name}
-                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] group"
-                      style={{
-                        transform: `rotate(${action.angle}deg)`
-                      }}
-                    >
-                      <div className="absolute inset-0">
-                        <div 
-                          className={`absolute h-0.5 w-full top-1/2 left-0 origin-left
-                                    ${action.color === 'yellow' ? 'cosmic-box yellow-energy' : 'cosmic-box teal-energy'} active`}
-                          style={{
-                            background: action.color === 'yellow' 
-                              ? 'linear-gradient(90deg, rgba(234, 179, 8, 0.8), transparent)'
-                              : 'linear-gradient(90deg, rgba(20, 184, 166, 0.8), transparent)',
-                          }}
-                        />
-                      </div>
-
-                      <div 
-                        className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1/2"
-                        style={{ transform: `rotate(-${action.angle}deg) translateY(-50%)` }}
-                      >
-                        <div className="relative group">
-                          <div className="absolute inset-0 rounded-full blur-xl animate-cosmic-pulse"
-                               style={{
-                                 background: action.color === 'yellow'
-                                   ? 'radial-gradient(circle at center, rgba(234, 179, 8, 0.5), transparent 70%)'
-                                   : 'radial-gradient(circle at center, rgba(20, 184, 166, 0.5), transparent 70%)'
-                               }} />
-                          <div className="relative p-6 rounded-full backdrop-blur-sm border border-yellow-500/30
-                                        hover:border-yellow-500/60 transition-all duration-300
-                                        flex items-center justify-center group-hover:scale-110">
-                            <div className="text-center">
-                              <action.icon className={`w-8 h-8 mx-auto mb-2 ${
-                                action.color === 'yellow' ? 'text-yellow-500' : 'text-teal-500'
-                              }`} />
-                              <span className="text-white text-sm font-medium whitespace-nowrap">{action.name}</span>
-                            </div>
+                <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-yellow-500 via-teal-500 to-yellow-500 transform -translate-x-1/2" />
+                
+                {[
+                  { phase: 'Q2 2024', event: 'Board Nomination Opens', delay: '0s' },
+                  { phase: 'Q3 2024', event: 'Initial Board Election', delay: '0.2s' },
+                  { phase: 'Q4 2024', event: 'First Acquisitions Selected', delay: '0.4s' },
+                  { phase: '2025', event: 'Portfolio Expansion Begins', delay: '0.6s' }
+                ].map((item, index) => (
+                  <div 
+                    key={index}
+                    className="relative mb-16 group"
+                    style={{ animationDelay: item.delay }}
+                  >
+                    <div className="flex items-center justify-center">
+                      <div className="w-32 h-32 relative animate-orbit">
+                        <div className="absolute inset-0 rounded-full bg-black/60 backdrop-blur-sm border border-yellow-500/30 
+                                      group-hover:border-yellow-500/60 transition-all duration-300
+                                      flex items-center justify-center text-center p-4 animate-cosmic-pulse
+                                      transform group-hover:scale-110">
+                          <div>
+                            <div className="text-yellow-500 font-bold mb-1">{item.phase}</div>
+                            <div className="text-white/80 text-sm">{item.event}</div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
+              </div>
 
-                <div className="grid grid-cols-2 gap-16 relative z-10 max-w-4xl mx-auto">
-                  {[
-                    { role: "Managing Partners", icon: Trophy, description: "Built successful firms", pattern: [
-                      { x: 20, y: 20 }, { x: 40, y: 30 }, { x: 60, y: 20 }, { x: 40, y: 40 }
-                    ]},
-                    { role: "M&A Specialists", icon: Network, description: "Understand true practice value", pattern: [
-                      { x: 30, y: 20 }, { x: 50, y: 40 }, { x: 70, y: 20 }, { x: 50, y: 10 }
-                    ]},
-                    { role: "Operations Experts", icon: Zap, description: "Optimized workflows", pattern: [
-                      { x: 20, y: 30 }, { x: 40, y: 10 }, { x: 60, y: 30 }, { x: 40, y: 50 }
-                    ]},
-                    { role: "Technology Leaders", icon: GitBranch, description: "Drive practice innovation", pattern: [
-                      { x: 30, y: 30 }, { x: 50,
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+                <div className="col-span-full text-center mb-8">
+                  <div className="flex items-center justify-center gap-8 mb-6">
+                    <div className="flex flex-col items-center group">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
+                        <UserPlus className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
+                      </div>
+                      <span className="text-xl font-bold text-white mt-2">Apply</span>
+                    </div>
+                    <div className="flex flex-col items-center group">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-teal-500/20 blur-xl animate-pulse rounded-full" />
+                        <Award className="w-8 h-8 text-teal-500 relative animate-cosmic-pulse" />
+                      </div>
+                      <span className="text-xl font-bold text-white mt-2">Nominate</span>
+                    </div>
+                    <div className="flex flex-col items-center group">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
+                        <Vote className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
+                      </div>
+                      <span className="text-xl font-bold text-white mt-2">Vote</span>
+                    </div>
+                  </div>
+                </div>
+                {[
+                  { role: "Managing Partners", experience: "Built successful firms", icon: Trophy },
+                  { role: "M&A Specialists", experience: "Understand true practice value", icon: Network },
+                  { role: "Operations Experts", experience: "Optimized workflows", icon: Zap },
+                  { role: "Technology Leaders", experience: "Drive practice innovation", icon: GitBranch }
+                ].map((member, index) => (
+                  <div
+                    key={index}
+                    className="group relative"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 blur-xl animate-pulse" />
+                    <div className="relative bg-black/40 backdrop-blur-sm border border-yellow-500/20 
+                                  rounded-lg p-6 transform transition-all duration-300 
+                                  hover:scale-105 hover:border-yellow-500/40">
+                      <member.icon className="w-8 h-8 text-yellow-500 mb-4 mx-auto" />
+                      <h3 className="text-white font-semibold mb-2">{member.role}</h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                {[
+                  { role: "Managing Partners", experience: "Built successful firms", icon: Trophy },
+                  { role: "M&A Specialists", experience: "Understand true practice value", icon: Network },
+                  { role: "Operations Experts", experience: "Optimized workflows", icon: Zap },
+                  { role: "Technology Leaders", experience: "Drive practice innovation", icon: GitBranch }
+                ].map((member, index) => (
+                  <div
+                    key={index}
+                    className="group relative perspective-3000"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 blur-md transform group-hover:scale-110 transition-transform duration-300" />
+                    <div className="relative bg-black/60 p-6 rounded-lg border border-yellow-500/30 
+                                  transform transition-all duration-300 group-hover:translate-y-[-2px]">
+                      <member.icon className="w-10 h-10 text-yellow-500 mb-4 mx-auto animate-bounce" />
+                      <h3 className="text-xl font-bold text-white mb-2">{member.role}</h3>
+                      <p className="text-gray-300">{member.experience}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <WhatWeBuilding />
+          <LedgerFrens />
+          <HowItWorks />
+          <AlternativeToEquity />
+          <PrivateEquityImpact />
+          <ReclaimControl />
+          <SystemWeDeserve />
+          <CallToAction />
+          <Roadmap />
+          <Partners />
+        </div>
+      </div>
+    </>
+  );
+};
+
+const Index = () => {
+  return (
+    <div className="min-h-screen bg-black overflow-hidden relative">
+      <div className="absolute inset-0">
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(circle at center, #eab308 0%, #000000 100%)",
+            opacity: 0.98
+          }}
+        />
+      </div>
+      
+      <Nav />
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <IndexContent />
+      </div>
+    </div>
+  );
+};
+
+export default Index;
