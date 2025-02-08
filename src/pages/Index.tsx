@@ -621,65 +621,18 @@ const IndexContent = () => {
                   </div>
                 </div>
 
-                {[
-                  { 
-                    role: "Managing Partners", 
-                    experience: "Built successful firms", 
-                    icon: Orbit,
-                    glowColor: "yellow-500"
-                  },
-                  { 
-                    role: "M&A Specialists", 
-                    experience: "Understand true practice value", 
-                    icon: Star,
-                    glowColor: "teal-500"
-                  },
-                  { 
-                    role: "Operations Experts", 
-                    experience: "Optimized workflows", 
-                    icon: Moon,
-                    glowColor: "yellow-500"
-                  },
-                  { 
-                    role: "Technology Leaders", 
-                    experience: "Drive practice innovation", 
-                    icon: Rocket,
-                    glowColor: "teal-500"
-                  }
-                ].map((member, index) => (
-                  <div
-                    key={index}
-                    className="group relative perspective-3000"
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br from-${member.glowColor}/30 to-teal-500/30 blur-md transform group-hover:scale-110 transition-transform duration-300`} />
-                    <div className="relative bg-black/60 p-6 rounded-lg border border-yellow-500/30 
-                                  transform transition-all duration-300 group-hover:translate-y-[-2px]
-                                  hover:border-yellow-500/60">
-                      <member.icon className={`w-10 h-10 text-${member.glowColor} mb-4 mx-auto animate-cosmic-pulse`} />
-                      <h3 className="text-xl font-bold text-white mb-2">{member.role}</h3>
-                      <p className="text-gray-300">{member.experience}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-                {[
-                  { role: "Managing Partners", experience: "Built successful firms", icon: Trophy },
-                  { role: "M&A Specialists", experience: "Understand true practice value", icon: Network },
-                  { role: "Operations Experts", experience: "Optimized workflows", icon: Zap },
-                  { role: "Technology Leaders", experience: "Drive practice innovation", icon: GitBranch }
-                ].map((member, index) => (
+                {boardMembers.map((member, index) => (
                   <div
                     key={index}
                     className="group relative perspective-3000"
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 blur-md transform group-hover:scale-110 transition-transform duration-300" />
                     <div className="relative bg-black/60 p-6 rounded-lg border border-yellow-500/30 
-                                  transform transition-all duration-300 group-hover:translate-y-[-2px]">
-                      <member.icon className="w-10 h-10 text-yellow-500 mb-4 mx-auto animate-bounce" />
+                                  transform transition-all duration-300 group-hover:translate-y-[-2px]
+                                  hover:border-yellow-500/60">
+                      <member.icon className="w-10 h-10 text-yellow-500 mb-4 mx-auto animate-cosmic-pulse" />
                       <h3 className="text-xl font-bold text-white mb-2">{member.role}</h3>
-                      <p className="text-gray-300">{member.experience}</p>
+                      <p className="text-gray-300">{member.description}</p>
                     </div>
                   </div>
                 ))}
@@ -706,23 +659,4 @@ const IndexContent = () => {
 const Index = () => {
   return (
     <div className="min-h-screen bg-black overflow-hidden relative">
-      <div className="absolute inset-0">
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: "radial-gradient(circle at center, #eab308 0%, #000000 100%)",
-            opacity: 0.98
-          }}
-        />
-      </div>
-      
-      <Nav />
-      
-      <div className="container mx-auto px-4 relative z-10">
-        <IndexContent />
-      </div>
-    </div>
-  );
-};
-
-export default Index;
+      <div
