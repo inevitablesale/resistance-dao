@@ -581,6 +581,32 @@ const IndexContent = () => {
                 </div>
               ))}
             </div>
+
+            <div className="mt-16 text-center max-w-2xl mx-auto">
+              <div className="space-y-4 bg-black/30 backdrop-blur-sm p-6 rounded-lg border border-yellow-500/20">
+                <h3 className="text-xl font-semibold text-white">Board Member Requirements</h3>
+                <ul className="text-gray-300 space-y-2">
+                  <li className="flex items-center gap-2 justify-center">
+                    <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                    <span>Minimum 100,000 LGR tokens staked</span>
+                  </li>
+                  <li className="flex items-center gap-2 justify-center">
+                    <div className="w-2 h-2 rounded-full bg-teal-500" />
+                    <span>5+ years accounting practice management</span>
+                  </li>
+                  <li className="flex items-center gap-2 justify-center">
+                    <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                    <span>Successful track record of firm growth</span>
+                  </li>
+                </ul>
+                <button 
+                  className="mt-4 px-6 py-2 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-lg text-white hover:from-yellow-500/30 hover:to-teal-500/30 transition-all duration-300 border border-yellow-500/20 hover:border-yellow-500/40"
+                  onClick={() => window.open('https://docs.ledgerfund.finance/governance/board-requirements', '_blank')}
+                >
+                  Learn More
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
