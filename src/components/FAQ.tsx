@@ -1,3 +1,4 @@
+
 import { HelpCircle, UserRound, Coins, Vote, Building2, Calendar, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
@@ -91,7 +92,7 @@ export const FAQ = () => {
 
   const getOrbitalPosition = (index: number, total: number) => {
     const angle = (index / total) * Math.PI * 2 + (rotation * Math.PI / 180);
-    const radius = 200;
+    const radius = 300; // Increased radius for more spread
     return {
       x: Math.cos(angle) * radius,
       y: Math.sin(angle) * radius
@@ -118,7 +119,7 @@ export const FAQ = () => {
 
         <div 
           ref={containerRef}
-          className="relative max-w-6xl mx-auto min-h-[600px] perspective-3000"
+          className="relative max-w-6xl mx-auto min-h-[800px] perspective-3000"
         >
           {/* Knowledge Core */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -147,24 +148,28 @@ export const FAQ = () => {
                       y: isSelected ? 0 : position.y,
                       scale: isSelected ? 1.2 : 1,
                       zIndex: isSelected ? 10 : 0,
-                      rotate: angleInDegrees
                     }}
                     transition={{
                       type: "spring",
                       stiffness: 100,
-                      damping: 15
+                      damping: 15,
+                      duration: isSelected ? 1 : 0.3
                     }}
                   >
                     <motion.div
                       className="relative -translate-x-1/2 -translate-y-1/2 cursor-pointer"
                       whileHover={{ scale: 1.1 }}
                       onClick={() => setSelectedFaq(isSelected ? null : index)}
+                      style={{ rotate: angleInDegrees }}
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-full blur-xl" />
                       <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 p-4 rounded-full h-16 w-16 flex items-center justify-center group hover:border-yellow-500/60 transition-colors">
                         <Icon className="w-8 h-8 text-yellow-500 group-hover:text-yellow-400 transition-colors" />
                       </div>
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap">
+                      <div 
+                        className="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap"
+                        style={{ rotate: -angleInDegrees }} // Counter-rotate to keep text upright
+                      >
                         <span className="text-yellow-500 text-sm font-medium bg-black/80 px-2 py-1 rounded">
                           {faq.question.split('?')[0]}
                         </span>
@@ -259,3 +264,4 @@ export const FAQ = () => {
     </section>
   );
 };
+
