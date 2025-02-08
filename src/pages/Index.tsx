@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -603,46 +604,88 @@ const IndexContent = () => {
             <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
               Join the Singularity
             </h2>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+            <p className="text-xl text-white/80 max-w-3xl mx-auto mb-12">
               The accounting industry is reaching its event horizon. Private equity wants to pull firms in and consolidate control. But a new force is emerging—a gravitational shift toward fractional ownership. This is LedgerFund DAO.
             </p>
-          </div>
 
-          <div id="presale" className="relative mb-16 pt-20">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl" />
-            <div className="relative bg-black/60 backdrop-blur-sm p-8 md:p-12 rounded-lg border border-yellow-500/20">
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="space-y-2">
-                  <h4 className="text-xl font-semibold text-yellow-500">Elite M&A Expertise</h4>
-                  <p className="text-white/80">Decades of experience in accounting firm acquisitions, mergers, and optimizations.</p>
+            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-xl font-semibold text-yellow-500">Elite M&A Expertise</h3>
+                  <p className="text-white/80">
+                    Decades of experience in accounting firm acquisitions, mergers, and optimizations.
+                  </p>
                 </div>
+
                 <div className="space-y-2">
-                  <h4 className="text-xl font-semibold text-teal-500">Battle-tested Playbooks</h4>
-                  <p className="text-white/80">Proven strategies for firm valuation, integration, and value creation that maximize stakeholder value.</p>
+                  <h3 className="text-xl font-semibold text-teal-500">Board Election Timeline</h3>
+                  <div className="space-y-4">
+                    {[
+                      { phase: 'Q2 2024', event: 'Board Nomination Opens', icon: UserCircle },
+                      { phase: 'Q3 2024', event: 'Initial Board Election', icon: GitBranch },
+                      { phase: 'Q4 2024', event: 'First Acquisitions Selected', icon: Network },
+                      { phase: '2025', event: 'Portfolio Expansion Begins', icon: Zap }
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-center gap-3 text-white/80">
+                        <item.icon className="w-5 h-5 text-teal-500" />
+                        <span className="font-semibold text-yellow-500">{item.phase}:</span>
+                        <span>{item.event}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="text-xl font-semibold text-yellow-500">Collective Capital</h4>
-                  <p className="text-white/80">Protocol-owned liquidity powering a continuous acquisition engine to drive sustainable growth.</p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-black/40 rounded-lg p-6 border border-teal-500/20">
+                  <h3 className="text-xl font-semibold text-teal-500 mb-4">The Elected Board Will</h3>
+                  <ul className="space-y-3">
+                    {[
+                      { power: 'Review acquisition targets', icon: ClipboardCopy },
+                      { power: 'Set valuation frameworks', icon: Coins },
+                      { power: 'Guide integration strategies', icon: Network },
+                      { power: 'Direct growth initiatives', icon: GitBranch },
+                      { power: 'Allocate optimization resources', icon: Zap }
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-center gap-3 text-white/80">
+                        <item.icon className="w-5 h-5 text-yellow-500" />
+                        <span>{item.power}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="text-xl font-semibold text-teal-500">Shared Success</h4>
-                  <p className="text-white/80">Token holders participate in governance and benefit from the performance of acquired practices through the protocol.</p>
+
+                <div className="bg-black/40 rounded-lg p-6 border border-yellow-500/20">
+                  <h3 className="text-xl font-semibold text-yellow-500 mb-4">Board Composition</h3>
+                  <ul className="space-y-3">
+                    {[
+                      "Managing partners who've built successful firms",
+                      "M&A specialists who understand true practice value",
+                      "Operations experts who've optimized workflows",
+                      "Technology leaders driving practice innovation"
+                    ].map((text, index) => (
+                      <li key={index} className="flex items-center gap-3 text-white/80">
+                        <Trophy className="w-5 h-5 text-teal-500" />
+                        <span>{text}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <WhatWeBuilding />
-        <LedgerFrens />
-        <HowItWorks />
-        <AlternativeToEquity />
-        <PrivateEquityImpact />
-        <ReclaimControl />
-        <SystemWeDeserve />
-        <CallToAction />
-        <Roadmap />
-        <Partners />
+          <WhatWeBuilding />
+          <LedgerFrens />
+          <HowItWorks />
+          <AlternativeToEquity />
+          <PrivateEquityImpact />
+          <ReclaimControl />
+          <SystemWeDeserve />
+          <CallToAction />
+          <Roadmap />
+          <Partners />
+        </div>
       </div>
     </>
   );
