@@ -4,6 +4,7 @@ import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { Twitter } from "lucide-react";
+import Discord from "./icons/Discord";
 
 const Nav = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
@@ -37,15 +38,6 @@ const Nav = () => {
               </div>
             </Link>
           </div>
-          
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#how-it-works" className="text-white/80 hover:text-white transition-colors">
-              How It Works
-            </a>
-            <a href="#roadmap" className="text-white/80 hover:text-white transition-colors">
-              Roadmap
-            </a>
-          </div>
 
           <div className="hidden md:flex items-center gap-6">
             <a 
@@ -60,9 +52,9 @@ const Nav = () => {
               href="https://discord.gg/ledgerfund" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-white/80 hover:text-white transition-colors flex items-center gap-1"
+              className="text-white/80 hover:text-white transition-colors"
             >
-              <span className="font-medium">Discord</span>
+              <Discord className="w-5 h-5" />
             </a>
             <button 
               disabled
