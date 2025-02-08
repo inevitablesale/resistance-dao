@@ -92,7 +92,7 @@ export const FAQ = () => {
 
   const getOrbitalPosition = (index: number, total: number) => {
     const angle = (index / total) * Math.PI * 2 + (rotation * Math.PI / 180);
-    const radius = 300; // Increased radius for more spread
+    const radius = 300;
     return {
       x: Math.cos(angle) * radius,
       y: Math.sin(angle) * radius
@@ -242,20 +242,6 @@ export const FAQ = () => {
               })}
             </div>
           )}
-        </div>
-
-        <div className="mt-20 text-center">
-          <div className="inline-block relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-lg blur-xl opacity-50" />
-            <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 px-6 py-4 rounded-lg">
-              <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
-                Governance Applications Now Open
-              </h3>
-              <p className="text-white/80 mt-2">
-                Applications and voting begin when $100,000 of funding goal is met
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </section>
