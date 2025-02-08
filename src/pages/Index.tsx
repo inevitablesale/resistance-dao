@@ -521,77 +521,100 @@ const IndexContent = () => {
 
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-24">
-          <div id="join-the-singularity" className="text-center mb-16 pt-20">
-            <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
-              Join the Singularity
-            </h2>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto mb-12">
-              The accounting industry is reaching its event horizon. Private equity wants to pull firms in and consolidate control. But a new force is emerging—a gravitational shift toward fractional ownership. This is LedgerFund DAO.
-            </p>
+          <div id="join-the-singularity" className="text-center mb-16 pt-20 relative overflow-hidden">
+            <div 
+              className="absolute inset-0 -z-10"
+              style={{
+                background: `
+                  radial-gradient(2px 2px at 20% 20%, rgba(234, 179, 8, 0.95) 100%, transparent),
+                  radial-gradient(2px 2px at 40% 40%, rgba(234, 179, 8, 0.92) 100%, transparent),
+                  radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
+                `,
+                backgroundSize: "240px 240px",
+                animation: "parallax-scroll 30s linear infinite"
+              }}
+            />
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-yellow-500">Elite M&A Expertise</h3>
-                  <p className="text-white/80">
-                    Decades of experience in accounting firm acquisitions, mergers, and optimizations.
-                  </p>
-                </div>
+            <div className="container mx-auto px-4 relative">
+              <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 animate-cosmic-pulse">
+                Join the Singularity
+              </h2>
 
-                <div className="space-y-2">
-                  <h3 className="text-xl font-semibold text-teal-500">Board Election Timeline</h3>
-                  <div className="space-y-4">
-                    {[
-                      { phase: 'Q2 2024', event: 'Board Nomination Opens', icon: UserCircle },
-                      { phase: 'Q3 2024', event: 'Initial Board Election', icon: GitBranch },
-                      { phase: 'Q4 2024', event: 'First Acquisitions Selected', icon: Network },
-                      { phase: '2025', event: 'Portfolio Expansion Begins', icon: Zap }
-                    ].map((item, index) => (
-                      <div key={index} className="flex items-center gap-3 text-white/80">
-                        <item.icon className="w-5 h-5 text-teal-500" />
-                        <span className="font-semibold text-yellow-500">{item.phase}:</span>
-                        <span>{item.event}</span>
+              <div className="relative mt-16 mb-24">
+                <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-yellow-500 via-teal-500 to-yellow-500 transform -translate-x-1/2" />
+                
+                {[
+                  { phase: 'Q2 2024', event: 'Board Nomination Opens', delay: '0s' },
+                  { phase: 'Q3 2024', event: 'Initial Board Election', delay: '0.2s' },
+                  { phase: 'Q4 2024', event: 'First Acquisitions Selected', delay: '0.4s' },
+                  { phase: '2025', event: 'Portfolio Expansion Begins', delay: '0.6s' }
+                ].map((item, index) => (
+                  <div 
+                    key={index}
+                    className="relative mb-16 group"
+                    style={{ animationDelay: item.delay }}
+                  >
+                    <div className="flex items-center justify-center">
+                      <div className="w-32 h-32 relative animate-orbit">
+                        <div className="absolute inset-0 rounded-full bg-black/60 backdrop-blur-sm border border-yellow-500/30 
+                                      group-hover:border-yellow-500/60 transition-all duration-300
+                                      flex items-center justify-center text-center p-4 animate-cosmic-pulse
+                                      transform group-hover:scale-110">
+                          <div>
+                            <div className="text-yellow-500 font-bold mb-1">{item.phase}</div>
+                            <div className="text-white/80 text-sm">{item.event}</div>
+                          </div>
+                        </div>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
 
-              <div className="space-y-6">
-                <div className="bg-black/40 rounded-lg p-6 border border-teal-500/20">
-                  <h3 className="text-xl font-semibold text-teal-500 mb-4">The Elected Board Will</h3>
-                  <ul className="space-y-3">
-                    {[
-                      { power: 'Review acquisition targets', icon: ClipboardCopy },
-                      { power: 'Set valuation frameworks', icon: Coins },
-                      { power: 'Guide integration strategies', icon: Network },
-                      { power: 'Direct growth initiatives', icon: GitBranch },
-                      { power: 'Allocate optimization resources', icon: Zap }
-                    ].map((item, index) => (
-                      <li key={index} className="flex items-center gap-3 text-white/80">
-                        <item.icon className="w-5 h-5 text-yellow-500" />
-                        <span>{item.power}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+                {[
+                  { title: 'Review Targets', icon: ClipboardCopy },
+                  { title: 'Set Frameworks', icon: GitBranch },
+                  { title: 'Guide Strategies', icon: Network },
+                  { title: 'Direct Growth', icon: Zap },
+                  { title: 'Allocate Resources', icon: Coins },
+                  { title: 'Build Community', icon: UserCircle }
+                ].map((power, index) => (
+                  <div
+                    key={index}
+                    className="group relative"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 blur-xl animate-pulse" />
+                    <div className="relative bg-black/40 backdrop-blur-sm border border-yellow-500/20 
+                                  rounded-lg p-6 transform transition-all duration-300 
+                                  hover:scale-105 hover:border-yellow-500/40">
+                      <power.icon className="w-8 h-8 text-yellow-500 mb-4 mx-auto" />
+                      <h3 className="text-white font-semibold mb-2">{power.title}</h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-                <div className="bg-black/40 rounded-lg p-6 border border-yellow-500/20">
-                  <h3 className="text-xl font-semibold text-yellow-500 mb-4">Board Composition</h3>
-                  <ul className="space-y-3">
-                    {[
-                      "Managing partners who've built successful firms",
-                      "M&A specialists who understand true practice value",
-                      "Operations experts who've optimized workflows",
-                      "Technology leaders driving practice innovation"
-                    ].map((text, index) => (
-                      <li key={index} className="flex items-center gap-3 text-white/80">
-                        <Trophy className="w-5 h-5 text-teal-500" />
-                        <span>{text}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                {[
+                  { role: "Managing Partners", experience: "Built successful firms", icon: Trophy },
+                  { role: "M&A Specialists", experience: "Understand true practice value", icon: Network },
+                  { role: "Operations Experts", experience: "Optimized workflows", icon: Zap },
+                  { role: "Technology Leaders", experience: "Drive practice innovation", icon: GitBranch }
+                ].map((member, index) => (
+                  <div
+                    key={index}
+                    className="group relative perspective-3000"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 blur-md transform group-hover:scale-110 transition-transform duration-300" />
+                    <div className="relative bg-black/60 p-6 rounded-lg border border-yellow-500/30 
+                                  transform transition-all duration-300 group-hover:translate-y-[-2px]">
+                      <member.icon className="w-10 h-10 text-yellow-500 mb-4 mx-auto animate-bounce" />
+                      <h3 className="text-xl font-bold text-white mb-2">{member.role}</h3>
+                      <p className="text-gray-300">{member.experience}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
