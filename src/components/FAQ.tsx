@@ -1,3 +1,4 @@
+
 import { HelpCircle, UserRound, Coins, Vote, Building2, Calendar, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
@@ -129,7 +130,6 @@ export const FAQ = () => {
             </div>
           </div>
 
-          {/* Orbital FAQs */}
           {!isMobile ? (
             <div className="absolute inset-0">
               {faqs.map((faq, index) => {
@@ -249,10 +249,10 @@ export const FAQ = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-lg blur-xl opacity-50" />
             <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 px-6 py-4 rounded-lg">
               <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
-                {/* Unite. Acquire. Transform. */}
+                Governance Applications Now Open
               </h3>
               <p className="text-white/80 mt-2">
-                {/* Governance board applications open when $50,000 of goal is met */}
+                Applications and voting begin when $100,000 of funding goal is met
               </p>
             </div>
           </div>
