@@ -19,7 +19,6 @@ import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBran
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
-import { CelestialCouncil } from "@/components/CelestialCouncil";
 
 const presaleData = [
   { 
@@ -94,90 +93,26 @@ const publicSaleData = [
   }
 ];
 
-const celestialCouncil = [
-  {
-    title: "Architects of Reality",
-    role: "Managing Partners",
-    description: "Shape the very fabric of our digital universe by guiding the DAO's collective vision",
-    icon: Orbit,
-    color: "yellow",
-    orbitDelay: "0s",
-    particleColor: "rgba(234, 179, 8, 0.8)"
-  },
-  {
-    title: "Celestial Pathfinders",
-    role: "M&A Specialists",
-    description: "Chart courses through unexplored opportunities in the vast expanse of accounting practices",
-    icon: Star,
-    color: "teal",
-    orbitDelay: "5s",
-    particleColor: "rgba(20, 184, 166, 0.8)"
-  },
-  {
-    title: "Harmony Weavers",
-    role: "Operations Experts",
-    description: "Orchestrate the cosmic dance of operations across our growing constellation of practices",
-    icon: Moon,
-    color: "yellow",
-    orbitDelay: "10s",
-    particleColor: "rgba(234, 179, 8, 0.8)"
-  },
-  {
-    title: "Quantum Pioneers",
-    role: "Technology Leaders",
-    description: "Pioneer technologies beyond current horizons, forging the future of accounting",
-    icon: Rocket,
-    color: "teal",
-    orbitDelay: "15s",
-    particleColor: "rgba(20, 184, 166, 0.8)"
-  }
-];
-
 const boardMembers = [
   { 
     role: "Managing Partners",
-    description: "Lead and guide the DAO's direction with industry expertise and strategic vision",
-    icon: Orbit,
-    color: "yellow-500"
+    description: "Built successful firms",
+    icon: Orbit  // Leadership orbit
   },
   { 
     role: "M&A Specialists",
-    description: "Identify and evaluate optimal acquisition targets for maximum community value",
-    icon: Star,
-    color: "teal-500"
+    description: "Understand true practice value",
+    icon: Star   // Representing celestial mergers
   },
   { 
     role: "Operations Experts",
-    description: "Streamline and scale practices while maintaining service excellence",
-    icon: Moon,
-    color: "yellow-500"
+    description: "Optimized workflows",
+    icon: Moon   // Representing cycles and systems
   },
   { 
     role: "Technology Leaders",
-    description: "Drive innovation and technological advancement across the network",
-    icon: Rocket,
-    color: "teal-500"
-  }
-];
-
-const governanceActions = [
-  {
-    action: "Apply",
-    description: "Submit your expertise and vision",
-    icon: UserPlus,
-    color: "yellow-500"
-  },
-  {
-    action: "Nominate",
-    description: "Propose visionary leaders",
-    icon: Award,
-    color: "teal-500"
-  },
-  {
-    action: "Vote",
-    description: "Shape our collective future",
-    icon: Vote,
-    color: "yellow-500"
+    description: "Drive practice innovation",
+    icon: Rocket // Representing forward momentum
   }
 ];
 
@@ -204,7 +139,6 @@ const IndexContent = () => {
   const [myStakeable, setMyStakeable] = useState<string>('0');
   const [maticPrice, setMaticPrice] = useState<string>('Loading...');
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
-  const [activePosition, setActivePosition] = useState<number | null>(null);
 
   useEffect(() => {
     setTimeout(() => setIsLoaded(true), 100);
@@ -480,9 +414,7 @@ const IndexContent = () => {
                       className="relative group perspective-3000"
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                      <div className="relative bg-black/80 p-4 rounded-lg border border-yellow-500/30 transform transition-all duration-300" style={{ 
-                        width: `${Math.min(100, (Number(totalSold) / Number(presaleSupply)) * 100)}%` 
-                      }}>
+                      <div className="relative bg-black/80 p-4 rounded-lg border border-yellow-500/30 transform transition-all duration-300 group-hover:translate-y-[-2px]">
                         <div className="text-4xl font-bold text-white mb-2 text-center animate-[pulse_2s_ease-in-out_infinite]">
                           {value}
                         </div>
@@ -613,7 +545,68 @@ const IndexContent = () => {
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-24">
           <div id="join-the-singularity" className="text-center mb-16 pt-20 relative overflow-hidden">
-            <CelestialCouncil />
+            <div 
+              className="absolute inset-0 -z-10"
+              style={{
+                background: `
+                  radial-gradient(2px 2px at 20% 20%, rgba(234, 179, 8, 0.95) 100%, transparent),
+                  radial-gradient(2px 2px at 40% 40%, rgba(234, 179, 8, 0.92) 100%, transparent),
+                  radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
+                `,
+                backgroundSize: "240px 240px",
+                animation: "parallax-scroll 30s linear infinite"
+              }}
+            />
+
+            <div className="container mx-auto px-4 relative">
+              <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 animate-cosmic-pulse">
+                Join the Singularity
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-24">
+                <div className="col-span-full text-center mb-8">
+                  <div className="flex items-center justify-center gap-8 mb-6">
+                    <div className="flex flex-col items-center group">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
+                        <Orbit className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
+                      </div>
+                      <span className="text-xl font-bold text-white mt-2">Apply</span>
+                    </div>
+                    <div className="flex flex-col items-center group">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-teal-500/20 blur-xl animate-pulse rounded-full" />
+                        <Star className="w-8 h-8 text-teal-500 relative animate-cosmic-pulse" />
+                      </div>
+                      <span className="text-xl font-bold text-white mt-2">Nominate</span>
+                    </div>
+                    <div className="flex flex-col items-center group">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
+                        <Moon className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
+                      </div>
+                      <span className="text-xl font-bold text-white mt-2">Vote</span>
+                    </div>
+                  </div>
+                </div>
+
+                {boardMembers.map((member, index) => (
+                  <div
+                    key={index}
+                    className="group relative perspective-3000"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 blur-md transform group-hover:scale-110 transition-transform duration-300" />
+                    <div className="relative bg-black/60 p-6 rounded-lg border border-yellow-500/30 
+                                  transform transition-all duration-300 group-hover:translate-y-[-2px]
+                                  hover:border-yellow-500/60">
+                      <member.icon className="w-10 h-10 text-yellow-500 mb-4 mx-auto animate-cosmic-pulse" />
+                      <h3 className="text-xl font-bold text-white mb-2">{member.role}</h3>
+                      <p className="text-gray-300">{member.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           <WhatWeBuilding />

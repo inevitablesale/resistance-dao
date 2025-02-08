@@ -83,41 +83,11 @@
   }
 }
 
-.perspective-3000 {
-  perspective: 3000px;
-}
-
-.cosmic-card {
+.astral-energy {
   position: relative;
+  overflow: visible;
+  transform-style: preserve-3d;
   transition: transform 0.3s ease-out;
-}
-
-.cosmic-card::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  background: linear-gradient(to right, rgba(234, 179, 8, 0.5), rgba(20, 184, 166, 0.5));
-  z-index: -1;
-  border-radius: inherit;
-  transition: opacity 0.3s ease;
-  opacity: 0;
-}
-
-.cosmic-card:hover::before {
-  opacity: 1;
-}
-
-.animate-parallax-slow {
-  animation: parallax-scroll 15s linear infinite;
-}
-
-@keyframes parallax-scroll {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 0 100%;
-  }
 }
 
 .cosmic-box {
@@ -193,73 +163,4 @@
 
 .cosmic-box.active::after {
   opacity: var(--energy-opacity, 0.8);
-}
-
-@keyframes celestial-orbit {
-  from {
-    transform: rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg);
-  }
-}
-
-.celestial-container {
-  height: 100vh;
-  max-height: 800px;
-  position: relative;
-  overflow: hidden;
-  perspective: 1000px;
-}
-
-.celestial-orbit {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform-origin: center;
-  width: 0;
-  height: 0;
-}
-
-.planet {
-  --orbit-radius: 200px;
-  position: absolute;
-  transform-origin: center;
-  animation: celestial-orbit 20s linear infinite;
-  animation-play-state: var(--orbit-state, running);
-}
-
-.planet:nth-child(1) { --orbit-radius: 180px; animation-duration: 15s; }
-.planet:nth-child(2) { --orbit-radius: 240px; animation-duration: 20s; }
-.planet:nth-child(3) { --orbit-radius: 300px; animation-duration: 25s; }
-.planet:nth-child(4) { --orbit-radius: 360px; animation-duration: 30s; }
-
-.planet-content {
-  position: absolute;
-  transform: translate(-50%, -50%) rotate(calc(var(--rotation) * -1deg));
-  width: 120px;
-  transition: all 0.3s ease;
-}
-
-.celestial-section {
-  scroll-snap-type: y mandatory;
-  overflow-y: auto;
-  height: 100vh;
-}
-
-.celestial-slide {
-  scroll-snap-align: start;
-  height: 100vh;
-  position: relative;
-}
-
-.celestial-description {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.5s ease;
-}
-
-.celestial-description.visible {
-  opacity: 1;
-  transform: translateY(0);
 }
