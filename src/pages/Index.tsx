@@ -563,37 +563,6 @@ const IndexContent = () => {
                 Join the Singularity
               </h2>
 
-              <div className="relative mt-16 mb-24">
-                <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-yellow-500 via-teal-500 to-yellow-500 transform -translate-x-1/2" />
-                
-                {[
-                  { phase: 'Q2 2024', event: 'Board Nomination Opens', delay: '0s' },
-                  { phase: 'Q3 2024', event: 'Initial Board Election', delay: '0.2s' },
-                  { phase: 'Q4 2024', event: 'First Acquisitions Selected', delay: '0.4s' },
-                  { phase: '2025', event: 'Portfolio Expansion Begins', delay: '0.6s' }
-                ].map((item, index) => (
-                  <div 
-                    key={index}
-                    className="relative mb-16 group"
-                    style={{ animationDelay: item.delay }}
-                  >
-                    <div className="flex items-center justify-center">
-                      <div className="w-32 h-32 relative animate-orbit">
-                        <div className="absolute inset-0 rounded-full bg-black/60 backdrop-blur-sm border border-yellow-500/30 
-                                      group-hover:border-yellow-500/60 transition-all duration-300
-                                      flex items-center justify-center text-center p-4 animate-cosmic-pulse
-                                      transform group-hover:scale-110">
-                          <div>
-                            <div className="text-yellow-500 font-bold mb-1">{item.phase}</div>
-                            <div className="text-white/80 text-sm">{item.event}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-24">
                 <div className="col-span-full text-center mb-8">
                   <div className="flex items-center justify-center gap-8 mb-6">
