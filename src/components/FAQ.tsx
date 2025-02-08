@@ -1,4 +1,3 @@
-
 import { HelpCircle, UserRound, Coins, Vote, Building2, Calendar, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
@@ -53,6 +52,7 @@ export const FAQ = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [rotation, setRotation] = useState(0);
 
   useEffect(() => {
     const handleResize = () => {
@@ -81,8 +81,16 @@ export const FAQ = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const rotateInterval = setInterval(() => {
+      setRotation(prev => (prev + 1) % 360);
+    }, 100);
+    
+    return () => clearInterval(rotateInterval);
+  }, []);
+
   const getOrbitalPosition = (index: number, total: number) => {
-    const angle = (index / total) * Math.PI * 2;
+    const angle = (index / total) * Math.PI * 2 + (rotation * Math.PI / 180);
     const radius = 200;
     return {
       x: Math.cos(angle) * radius,
@@ -128,6 +136,7 @@ export const FAQ = () => {
                 const position = getOrbitalPosition(index, faqs.length);
                 const isSelected = selectedFaq === index;
                 const Icon = faq.icon;
+                const angleInDegrees = (index / faqs.length * 360 + rotation) % 360;
 
                 return (
                   <motion.div
@@ -137,7 +146,8 @@ export const FAQ = () => {
                       x: isSelected ? 0 : position.x,
                       y: isSelected ? 0 : position.y,
                       scale: isSelected ? 1.2 : 1,
-                      zIndex: isSelected ? 10 : 0
+                      zIndex: isSelected ? 10 : 0,
+                      rotate: angleInDegrees
                     }}
                     transition={{
                       type: "spring",
@@ -153,6 +163,11 @@ export const FAQ = () => {
                       <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-full blur-xl" />
                       <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 p-4 rounded-full h-16 w-16 flex items-center justify-center group hover:border-yellow-500/60 transition-colors">
                         <Icon className="w-8 h-8 text-yellow-500 group-hover:text-yellow-400 transition-colors" />
+                      </div>
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap">
+                        <span className="text-yellow-500 text-sm font-medium bg-black/80 px-2 py-1 rounded">
+                          {faq.question.split('?')[0]}
+                        </span>
                       </div>
                     </motion.div>
 
@@ -224,6 +239,21 @@ export const FAQ = () => {
               })}
             </div>
           )}
+        </div>
+
+        {/* Governance Board Applications Message */}
+        <div className="mt-20 text-center">
+          <div className="inline-block relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-lg blur-xl opacity-50" />
+            <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 px-6 py-4 rounded-lg">
+              <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
+                Unite. Acquire. Transform.
+              </h3>
+              <p className="text-white/80 mt-2">
+                Governance board applications open when $50,000 of goal is met
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
