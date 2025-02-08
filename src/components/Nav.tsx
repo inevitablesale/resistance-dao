@@ -40,6 +40,12 @@ const Nav = () => {
 
           <div className="hidden md:flex items-center gap-6">
             <a 
+              href="#tokenomics" 
+              className="text-white/80 hover:text-white transition-colors"
+            >
+              Tokenomics
+            </a>
+            <a 
               href="https://twitter.com/ledgerfund" 
               target="_blank" 
               rel="noopener noreferrer"

@@ -17,21 +17,21 @@ const publicSaleData = [
     name: 'Treasury', 
     value: 30, 
     color: '#14b8a6',
-    description: 'Strategic treasury management by third-party vault provider ensures secure and transparent fund management for accounting firm acquisitions.',
+    description: 'A decentralized organization where smart contracts automate investments, revenue sharing, and governance.',
     className: 'col-span-1'
   },
   { 
     name: 'Firm Investment', 
     value: 50, 
     color: '#14b8a6',
-    description: 'Dedicated allocation for accountants to invest in practices identified and vetted by the DAO community.',
+    description: 'Add MATIC to your wallet to participate in the presale. You can buy MATIC directly with a CC or transfer from another wallet.',
     className: 'col-span-1'
   },
   { 
     name: 'Community Rewards', 
     value: 10, 
     color: '#14b8a6',
-    description: 'Incentives for active DAO participation including practice identification, due diligence, and community growth initiatives.',
+    description: 'Bringing together decades of industry experience, professional resources, and strategic capital to drive the DAO's success through expert leadership.',
     className: 'col-span-1'
   },
   { 
@@ -136,7 +136,7 @@ export const WhatWeBuilding = () => {
   };
 
   return (
-    <section ref={sectionRef} className="py-16 relative overflow-hidden min-h-screen perspective-3000">
+    <section ref={sectionRef} className="py-16 relative overflow-hidden min-h-screen perspective-3000" id="tokenomics">
       <div className="absolute inset-0 opacity-90">
         <div 
           ref={blackholeRef}
