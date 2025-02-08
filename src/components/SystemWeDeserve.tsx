@@ -68,7 +68,7 @@ export const SystemWeDeserve = () => {
       <div className="container px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-8">
-            The Protocol We're Building
+            The DAO We're Building
           </h2>
           
           <div className="space-y-4 mb-12 text-xl text-gray-300">
@@ -76,19 +76,19 @@ export const SystemWeDeserve = () => {
               ref={el => boxRefs.current[0] = el}
               className="cosmic-box yellow-energy right-drain p-4 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20"
             >
-              A protocol built to empower accountants with direct ownership in the firms they serve.
+              A DAO built to empower accountants with direct ownership in the firms they serve.
             </p>
             <p 
               ref={el => boxRefs.current[1] = el}
               className="cosmic-box teal-energy right-drain p-4 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20"
             >
-              A decentralized platform where smart contracts automate investments, revenue sharing, and governance.
+              A decentralized organization where smart contracts automate investments, revenue sharing, and governance.
             </p>
             <p 
               ref={el => boxRefs.current[2] = el}
               className="cosmic-box yellow-energy right-drain p-4 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20"
             >
-              A DAO-governed network that aligns the interests of accountants, investors, and firms.
+              A community-governed network that aligns the interests of accountants, investors, and firms.
             </p>
           </div>
         </div>
