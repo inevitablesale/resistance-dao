@@ -4,7 +4,7 @@ import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import Twitter from "./icons/Twitter";
-import Discord from "./icons/Discord";
+import Linked from "./icons/Linked";
 
 const Nav = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
@@ -59,7 +59,7 @@ const Nav = () => {
               rel="noopener noreferrer"
               className="text-white/80 hover:text-white transition-colors transform transition-all duration-300 hover:scale-105 hover:rotate-3"
             >
-              <Discord className="w-6 h-6" />
+              <Linked className="w-6 h-6" />
             </a>
             <button 
               disabled
@@ -76,3 +76,4 @@ const Nav = () => {
 };
 
 export default Nav;
+
