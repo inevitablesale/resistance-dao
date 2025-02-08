@@ -15,7 +15,7 @@ import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBranch, UserPlus, Award, Vote, Orbit, Galaxy, Constellation, Rocket } from "lucide-react";
+import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBranch, UserPlus, Award, Vote, Orbit, Star, Moon, Rocket } from "lucide-react";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
@@ -90,6 +90,29 @@ const publicSaleData = [
     color: '#ea384c',
     description: 'Strategic partnerships with banks, staffing agencies, technology providers supporting practice acquisitions.',
     className: 'col-span-1'
+  }
+];
+
+const boardMembers = [
+  { 
+    role: "Managing Partners",
+    description: "Built successful firms",
+    icon: Orbit  // Leadership orbit
+  },
+  { 
+    role: "M&A Specialists",
+    description: "Understand true practice value",
+    icon: Star   // Representing celestial mergers
+  },
+  { 
+    role: "Operations Experts",
+    description: "Optimized workflows",
+    icon: Moon   // Representing cycles and systems
+  },
+  { 
+    role: "Technology Leaders",
+    description: "Drive practice innovation",
+    icon: Rocket // Representing forward momentum
   }
 ];
 
@@ -608,13 +631,13 @@ const IndexContent = () => {
                   { 
                     role: "M&A Specialists", 
                     experience: "Understand true practice value", 
-                    icon: Galaxy,
+                    icon: Star,
                     glowColor: "teal-500"
                   },
                   { 
                     role: "Operations Experts", 
                     experience: "Optimized workflows", 
-                    icon: Constellation,
+                    icon: Moon,
                     glowColor: "yellow-500"
                   },
                   { 
