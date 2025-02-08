@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
-import { Twitter, Discord } from "lucide-react";
+import { Twitter } from "lucide-react";
 
 const Nav = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
@@ -60,9 +60,9 @@ const Nav = () => {
               href="https://discord.gg/ledgerfund" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-white/80 hover:text-white transition-colors"
+              className="text-white/80 hover:text-white transition-colors flex items-center gap-1"
             >
-              <Discord className="w-5 h-5" />
+              <span className="font-medium">Discord</span>
             </a>
             <button 
               disabled
