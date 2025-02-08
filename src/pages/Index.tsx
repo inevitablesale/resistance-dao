@@ -560,7 +560,7 @@ const IndexContent = () => {
 
             <div className="container mx-auto px-4 relative">
               <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 animate-cosmic-pulse">
-                Shape the Future of Accounting
+                Unite. Acquire. Transform.
               </h2>
               
               <p className="text-lg text-white/80 max-w-3xl mx-auto mb-12">
