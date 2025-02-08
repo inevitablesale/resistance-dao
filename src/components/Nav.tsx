@@ -1,15 +1,14 @@
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
-import { Twitter } from "lucide-react";
+import Twitter from "./icons/Twitter";
 import Discord from "./icons/Discord";
 
 const Nav = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
-  const navigate = useNavigate();
   
   // Initialize balance monitoring
   useBalanceMonitor();
@@ -44,17 +43,17 @@ const Nav = () => {
               href="https://twitter.com/ledgerfund" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-white/80 hover:text-white transition-colors"
+              className="text-white/80 hover:text-white transition-colors transform transition-all duration-300 hover:scale-105 hover:rotate-3"
             >
-              <Twitter className="w-5 h-5" />
+              <Twitter className="w-6 h-6" />
             </a>
             <a 
               href="https://discord.gg/ledgerfund" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-white/80 hover:text-white transition-colors"
+              className="text-white/80 hover:text-white transition-colors transform transition-all duration-300 hover:scale-105 hover:rotate-3"
             >
-              <Discord className="w-5 h-5" />
+              <Discord className="w-6 h-6" />
             </a>
             <button 
               disabled
