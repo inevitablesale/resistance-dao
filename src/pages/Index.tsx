@@ -15,7 +15,7 @@ import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBranch, UserPlus, Award, Vote } from "lucide-react";
+import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBranch, UserPlus, Award, Vote, Orbit, Galaxy, Constellation, Rocket } from "lucide-react";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
@@ -571,48 +571,70 @@ const IndexContent = () => {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-24">
                 <div className="col-span-full text-center mb-8">
                   <div className="flex items-center justify-center gap-8 mb-6">
                     <div className="flex flex-col items-center group">
                       <div className="relative">
                         <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
-                        <UserPlus className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
+                        <Orbit className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
                       </div>
                       <span className="text-xl font-bold text-white mt-2">Apply</span>
                     </div>
                     <div className="flex flex-col items-center group">
                       <div className="relative">
                         <div className="absolute inset-0 bg-teal-500/20 blur-xl animate-pulse rounded-full" />
-                        <Award className="w-8 h-8 text-teal-500 relative animate-cosmic-pulse" />
+                        <Galaxy className="w-8 h-8 text-teal-500 relative animate-cosmic-pulse" />
                       </div>
                       <span className="text-xl font-bold text-white mt-2">Nominate</span>
                     </div>
                     <div className="flex flex-col items-center group">
                       <div className="relative">
                         <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
-                        <Vote className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
+                        <Constellation className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
                       </div>
                       <span className="text-xl font-bold text-white mt-2">Vote</span>
                     </div>
                   </div>
                 </div>
+
                 {[
-                  { role: "Managing Partners", experience: "Built successful firms", icon: Trophy },
-                  { role: "M&A Specialists", experience: "Understand true practice value", icon: Network },
-                  { role: "Operations Experts", experience: "Optimized workflows", icon: Zap },
-                  { role: "Technology Leaders", experience: "Drive practice innovation", icon: GitBranch }
+                  { 
+                    role: "Managing Partners", 
+                    experience: "Built successful firms", 
+                    icon: Orbit,
+                    glowColor: "yellow-500"
+                  },
+                  { 
+                    role: "M&A Specialists", 
+                    experience: "Understand true practice value", 
+                    icon: Galaxy,
+                    glowColor: "teal-500"
+                  },
+                  { 
+                    role: "Operations Experts", 
+                    experience: "Optimized workflows", 
+                    icon: Constellation,
+                    glowColor: "yellow-500"
+                  },
+                  { 
+                    role: "Technology Leaders", 
+                    experience: "Drive practice innovation", 
+                    icon: Rocket,
+                    glowColor: "teal-500"
+                  }
                 ].map((member, index) => (
                   <div
                     key={index}
-                    className="group relative"
+                    className="group relative perspective-3000"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 blur-xl animate-pulse" />
-                    <div className="relative bg-black/40 backdrop-blur-sm border border-yellow-500/20 
-                                  rounded-lg p-6 transform transition-all duration-300 
-                                  hover:scale-105 hover:border-yellow-500/40">
-                      <member.icon className="w-8 h-8 text-yellow-500 mb-4 mx-auto" />
-                      <h3 className="text-white font-semibold mb-2">{member.role}</h3>
+                    <div className={`absolute inset-0 bg-gradient-to-br from-${member.glowColor}/30 to-teal-500/30 blur-md transform group-hover:scale-110 transition-transform duration-300`} />
+                    <div className="relative bg-black/60 p-6 rounded-lg border border-yellow-500/30 
+                                  transform transition-all duration-300 group-hover:translate-y-[-2px]
+                                  hover:border-yellow-500/60">
+                      <member.icon className={`w-10 h-10 text-${member.glowColor} mb-4 mx-auto animate-cosmic-pulse`} />
+                      <h3 className="text-xl font-bold text-white mb-2">{member.role}</h3>
+                      <p className="text-gray-300">{member.experience}</p>
                     </div>
                   </div>
                 ))}
