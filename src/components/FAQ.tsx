@@ -198,7 +198,6 @@ export const FAQ = () => {
               })}
             </div>
           ) : (
-            // Mobile Timeline View
             <div className="space-y-4 pt-20">
               {faqs.map((faq, index) => {
                 const Icon = faq.icon;
@@ -245,7 +244,6 @@ export const FAQ = () => {
           )}
         </div>
 
-        {/* Governance Board Applications Message */}
         <div className="mt-20 text-center">
           <div className="inline-block relative">
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-lg blur-xl opacity-50" />
