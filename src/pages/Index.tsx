@@ -520,140 +520,52 @@ const IndexContent = () => {
       </div>
 
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-24 perspective-3000">
-          <div className="relative flex flex-col items-center gap-12">
-            <div className="flex gap-8 -mb-8 scale-75 translate-y-8">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={`top-${i}`}
-                  className="relative group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="w-32 h-32 bg-[#aaadb0] rounded-full flex items-center justify-center relative overflow-hidden transition-transform duration-300 group-hover:scale-105">
-                    <span className="text-white text-6xl font-bold">?</span>
-                    <button 
-                      className="absolute -bottom-12 left-1/2 -translate-x-1/2 px-4 py-1 bg-gray-600/30 text-gray-400 rounded-lg text-sm font-medium cursor-not-allowed opacity-0 group-hover:opacity-100 group-hover:-bottom-2 transition-all duration-300"
-                      disabled
-                    >
-                      Vote
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div className="container mx-auto px-4 py-24">
+          <div id="join-the-singularity" className="text-center mb-16 pt-20">
+            <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
+              Join the Singularity
+            </h2>
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+              The accounting industry is reaching its event horizon. Private equity wants to pull firms in and consolidate control. But a new force is emerging—a gravitational shift toward fractional ownership. This is LedgerFund DAO.
+            </p>
+          </div>
 
-            <div className="flex gap-8 -mb-8 scale-90 translate-y-4">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={`middle-${i}`}
-                  className="relative group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="w-32 h-32 bg-[#aaadb0] rounded-full flex items-center justify-center relative overflow-hidden transition-transform duration-300 group-hover:scale-105">
-                    <span className="text-white text-6xl font-bold">?</span>
-                    <button 
-                      className="absolute -bottom-12 left-1/2 -translate-x-1/2 px-4 py-1 bg-gray-600/30 text-gray-400 rounded-lg text-sm font-medium cursor-not-allowed opacity-0 group-hover:opacity-100 group-hover:-bottom-2 transition-all duration-300"
-                      disabled
-                    >
-                      Vote
-                    </button>
-                  </div>
+          <div id="presale" className="relative mb-16 pt-20">
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl" />
+            <div className="relative bg-black/60 backdrop-blur-sm p-8 md:p-12 rounded-lg border border-yellow-500/20">
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <h4 className="text-xl font-semibold text-yellow-500">Elite M&A Expertise</h4>
+                  <p className="text-white/80">Decades of experience in accounting firm acquisitions, mergers, and optimizations.</p>
                 </div>
-              ))}
-            </div>
-
-            <div className="flex gap-8">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={`bottom-${i}`}
-                  className="relative group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="w-32 h-32 bg-[#aaadb0] rounded-full flex items-center justify-center relative overflow-hidden transition-transform duration-300 group-hover:scale-105">
-                    <span className="text-white text-6xl font-bold">?</span>
-                    <button 
-                      className="absolute -bottom-12 left-1/2 -translate-x-1/2 px-4 py-1 bg-gray-600/30 text-gray-400 rounded-lg text-sm font-medium cursor-not-allowed opacity-0 group-hover:opacity-100 group-hover:-bottom-2 transition-all duration-300"
-                      disabled
-                    >
-                      Vote
-                    </button>
-                  </div>
+                <div className="space-y-2">
+                  <h4 className="text-xl font-semibold text-teal-500">Battle-tested Playbooks</h4>
+                  <p className="text-white/80">Proven strategies for firm valuation, integration, and value creation that maximize stakeholder value.</p>
                 </div>
-              ))}
-            </div>
-
-            <div className="mt-16 text-center max-w-2xl mx-auto">
-              <div className="space-y-4 bg-black/30 backdrop-blur-sm p-6 rounded-lg border border-yellow-500/20">
-                <h3 className="text-xl font-semibold text-white">Board Member Requirements</h3>
-                <ul className="text-gray-300 space-y-2">
-                  <li className="flex items-center gap-2 justify-center">
-                    <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                    <span>Minimum 100,000 LGR tokens staked</span>
-                  </li>
-                  <li className="flex items-center gap-2 justify-center">
-                    <div className="w-2 h-2 rounded-full bg-teal-500" />
-                    <span>5+ years accounting practice management</span>
-                  </li>
-                  <li className="flex items-center gap-2 justify-center">
-                    <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                    <span>Successful track record of firm growth</span>
-                  </li>
-                </ul>
-                <button 
-                  className="mt-4 px-6 py-2 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-lg text-white hover:from-yellow-500/30 hover:to-teal-500/30 transition-all duration-300 border border-yellow-500/20 hover:border-yellow-500/40"
-                  onClick={() => window.open('https://docs.ledgerfund.finance/governance/board-requirements', '_blank')}
-                >
-                  Learn More
-                </button>
+                <div className="space-y-2">
+                  <h4 className="text-xl font-semibold text-yellow-500">Collective Capital</h4>
+                  <p className="text-white/80">Protocol-owned liquidity powering a continuous acquisition engine to drive sustainable growth.</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-xl font-semibold text-teal-500">Shared Success</h4>
+                  <p className="text-white/80">Token holders participate in governance and benefit from the performance of acquired practices through the protocol.</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div id="join-the-singularity" className="text-center mb-16 pt-20">
-          <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
-            Join the Singularity
-          </h2>
-          <p className="text-xl text-white/80 max-w-3xl mx-auto">
-            The accounting industry is reaching its event horizon. Private equity wants to pull firms in and consolidate control. But a new force is emerging—a gravitational shift toward fractional ownership. This is LedgerFund DAO.
-          </p>
-        </div>
-
-        <div id="presale" className="relative mb-16 pt-20">
-          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl" />
-          <div className="relative bg-black/60 backdrop-blur-sm p-8 md:p-12 rounded-lg border border-yellow-500/20">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="space-y-2">
-                <h4 className="text-xl font-semibold text-yellow-500">Elite M&A Expertise</h4>
-                <p className="text-white/80">Decades of experience in accounting firm acquisitions, mergers, and optimizations.</p>
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-xl font-semibold text-teal-500">Battle-tested Playbooks</h4>
-                <p className="text-white/80">Proven strategies for firm valuation, integration, and value creation that maximize stakeholder value.</p>
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-xl font-semibold text-yellow-500">Collective Capital</h4>
-                <p className="text-white/80">Protocol-owned liquidity powering a continuous acquisition engine to drive sustainable growth.</p>
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-xl font-semibold text-teal-500">Shared Success</h4>
-                <p className="text-white/80">Token holders participate in governance and benefit from the performance of acquired practices through the protocol.</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <WhatWeBuilding />
+        <LedgerFrens />
+        <HowItWorks />
+        <AlternativeToEquity />
+        <PrivateEquityImpact />
+        <ReclaimControl />
+        <SystemWeDeserve />
+        <CallToAction />
+        <Roadmap />
+        <Partners />
       </div>
-
-      <WhatWeBuilding />
-      <LedgerFrens />
-      <HowItWorks />
-      <AlternativeToEquity />
-      <PrivateEquityImpact />
-      <ReclaimControl />
-      <SystemWeDeserve />
-      <CallToAction />
-      <Roadmap />
-      <Partners />
     </>
   );
 };
