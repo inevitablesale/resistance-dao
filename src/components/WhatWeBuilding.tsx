@@ -158,7 +158,7 @@ export const WhatWeBuilding = () => {
 
       <div className="container px-4 relative z-10">
         <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 text-center">
-          Token Distribution & Governance
+          Tokenomics
         </h2>
 
         <div className="text-center mb-16">
@@ -455,6 +455,19 @@ export const WhatWeBuilding = () => {
             </div>
           </TabsContent>
         </Tabs>
+      </div>
+
+      <div className="max-w-3xl mx-auto text-center mb-12">
+        <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 animate-cosmic-pulse">
+          Your Community, Your Protocol
+        </h2>
+        
+        <p className="text-lg text-white/80 max-w-3xl mx-auto mb-12">
+          As a token holder, you're not just participating – you're driving the future of accounting. 
+          This protocol is built by accountants, for accountants, ensuring decisions are made by those 
+          who understand the industry best. Your expertise shapes our direction, your voice guides our 
+          governance, and your success defines our growth.
+        </p>
       </div>
     </section>
   );
