@@ -59,7 +59,7 @@ const Nav = () => {
               disabled
               className="px-6 py-2 bg-gray-600/30 text-gray-400 rounded-lg font-medium cursor-not-allowed"
             >
-              Download Whitepaper
+              Litepaper
             </button>
             <DynamicWidget />
           </div>
