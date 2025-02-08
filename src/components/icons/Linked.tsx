@@ -14,17 +14,12 @@ const Linked = (props: SVGProps<SVGSVGElement>) => (
     strokeLinejoin="round"
     {...props}
   >
-    <path d="M16 16L22 22" />
-    <path d="M2 2L8 8" />
-    <path d="M22 2L16 8" />
-    <path d="M8 16L2 22" />
-    <circle cx="12" cy="12" r="3" />
-    <path d="M12 9V3" />
-    <path d="M12 21V15" />
-    <path d="M9 12H3" />
-    <path d="M21 12H15" />
+    <rect x="2" y="2" width="20" height="20" rx="3" />
+    <path d="M8 10v8" />
+    <path d="M8 6.5v.5" />
+    <path d="M16 16v-4" />
+    <path d="M16 10c0-1-1-2-2-2s-2 1-2 2v2h4" />
   </svg>
 );
 
 export default Linked;
-
