@@ -1,29 +1,29 @@
 
-import { Trophy, UserCircle, Vote, Zap } from "lucide-react";
+import { Trophy, UserCircle, Briefcase, Building } from "lucide-react";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 const boardRequirements = [
   {
-    title: "Governance Power",
-    description: "Must hold at least 100,000 LGR tokens to be eligible",
-    icon: Vote
+    title: "Practice Experience",
+    description: "Track record of successful practice management and growth",
+    icon: Building
   },
   {
-    title: "Industry Experience",
-    description: "Minimum 5 years accounting or MSP experience",
+    title: "Industry Expertise",
+    description: "Deep understanding of accounting firm operations and valuation",
+    icon: Briefcase
+  },
+  {
+    title: "Strategic Vision",
+    description: "Experience in practice acquisition and integration",
     icon: Trophy
   },
   {
-    title: "Active Participation",
-    description: "Regular participation in DAO governance",
+    title: "Leadership",
+    description: "History of driving operational excellence in accounting firms",
     icon: UserCircle
-  },
-  {
-    title: "Technical Knowledge",
-    description: "Understanding of Web3 and DeFi fundamentals",
-    icon: Zap
   }
 ];
 
@@ -73,7 +73,7 @@ export const BoardSeats = () => {
       
       <div className="container mx-auto px-4 relative">
         <h2 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12">
-          Board Seats
+          Board of Directors
         </h2>
 
         {/* Board Requirements */}
@@ -125,24 +125,17 @@ export const BoardSeats = () => {
         {/* Action Buttons */}
         <div className="flex justify-center gap-4 flex-wrap">
           <Button
-            onClick={() => handleAction("vote")}
+            onClick={() => handleAction("nominate")}
             className="bg-gradient-to-r from-yellow-500 to-teal-500 text-white hover:from-yellow-600 hover:to-teal-600 transition-all duration-300"
           >
-            Vote for Board Member
-          </Button>
-          <Button
-            onClick={() => handleAction("nominate")}
-            variant="outline"
-            className="border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10 transition-all duration-300"
-          >
-            Nominate Candidate
+            Nominate Board Member
           </Button>
           <Button
             onClick={() => handleAction("apply")}
             variant="outline"
-            className="border-teal-500/50 text-teal-500 hover:bg-teal-500/10 transition-all duration-300"
+            className="border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10 transition-all duration-300"
           >
-            Apply for Board Seat
+            Apply for Board Position
           </Button>
         </div>
       </div>
