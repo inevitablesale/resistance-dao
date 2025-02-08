@@ -479,7 +479,9 @@ const IndexContent = () => {
                       className="relative group perspective-3000"
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                      <div className="relative bg-black/80 p-4 rounded-lg border border-yellow-500/30 transform transition-all duration-300 group-hover:translate-y-[-2px]">
+                      <div className="relative bg-black/80 p-4 rounded-lg border border-yellow-500/30 transform transition-all duration-300" style={{ 
+                        width: `${Math.min(100, (Number(totalSold) / Number(presaleSupply)) * 100)}%` 
+                      }}>
                         <div className="text-4xl font-bold text-white mb-2 text-center animate-[pulse_2s_ease-in-out_infinite]">
                           {value}
                         </div>
@@ -610,123 +612,7 @@ const IndexContent = () => {
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-24">
           <div id="join-the-singularity" className="text-center mb-16 pt-20 relative overflow-hidden">
-            <div 
-              className="absolute inset-0 -z-10"
-              style={{
-                background: `
-                  radial-gradient(2px 2px at 20% 20%, rgba(234, 179, 8, 0.95) 100%, transparent),
-                  radial-gradient(2px 2px at 40% 40%, rgba(234, 179, 8, 0.92) 100%, transparent),
-                  radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
-                `,
-                backgroundSize: "240px 240px",
-                animation: "parallax-scroll 30s linear infinite"
-              }}
-            />
-
-            <div className="container mx-auto px-4 relative">
-              <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
-                The Celestial Council
-              </h2>
-              
-              <div className="relative perspective-3000 mt-20">
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-500 to-teal-500 animate-cosmic-pulse" />
-                  <div className="absolute inset-2 rounded-full bg-black" />
-                  <div className="absolute inset-4 rounded-full bg-gradient-to-r from-yellow-500/50 to-teal-500/50 blur-sm animate-pulse" />
-                </div>
-
-                <div className="relative w-full aspect-square max-w-4xl mx-auto">
-                  {celestialCouncil.map((position, index) => {
-                    const angle = (index / celestialCouncil.length) * Math.PI * 2;
-                    const orbitSize = 280; // Orbit radius in pixels
-                    
-                    return (
-                      <div
-                        key={position.role}
-                        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full
-                                  ${activePosition === index ? 'z-20' : 'z-10'}`}
-                        style={{
-                          transform: `rotate(${angle}rad)`,
-                          transformOrigin: 'center',
-                        }}
-                      >
-                        <div 
-                          className="absolute inset-0 rounded-full border border-dashed transition-all duration-500"
-                          style={{
-                            borderColor: activePosition === index ? 
-                              position.color === 'yellow' ? 'rgba(234, 179, 8, 0.5)' : 'rgba(20, 184, 166, 0.5)' :
-                              'rgba(255, 255, 255, 0.1)',
-                            transform: `scale(${orbitSize / 100})`
-                          }}
-                        />
-
-                        <div
-                          className={`absolute left-1/2 -translate-x-1/2 top-0 w-24 h-24 
-                                    transition-all duration-500 cursor-pointer group`}
-                          style={{
-                            transform: `translateY(${-orbitSize/2}px) rotate(${-angle}rad)`,
-                          }}
-                          onMouseEnter={() => setActivePosition(index)}
-                          onMouseLeave={() => setActivePosition(null)}
-                        >
-                          <div className="relative w-full h-full">
-                            <div 
-                              className={`absolute inset-0 rounded-full transition-all duration-500
-                                        ${position.color === 'yellow' ? 'bg-yellow-500' : 'bg-teal-500'}
-                                        opacity-20 group-hover:opacity-30 blur-sm`}
-                            />
-                            <div 
-                              className={`absolute inset-2 rounded-full transition-all duration-500
-                                        ${position.color === 'yellow' ? 'bg-yellow-500' : 'bg-teal-500'}
-                                        opacity-40 group-hover:opacity-60`}
-                            />
-                            <div className="absolute inset-4 rounded-full bg-black" />
-                            
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <position.icon 
-                                className={`w-8 h-8 transition-all duration-500
-                                          ${position.color === 'yellow' ? 'text-yellow-500' : 'text-teal-500'}`}
-                              />
-                            </div>
-
-                            <div 
-                              className="absolute -inset-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                              style={{
-                                background: `radial-gradient(circle at center, ${position.particleColor}, transparent 70%)`
-                              }}
-                            />
-                          </div>
-
-                          <div 
-                            className={`absolute top-full left-1/2 -translate-x-1/2 mt-4 w-64
-                                      bg-black/80 backdrop-blur-sm rounded-lg p-6 transform
-                                      opacity-0 translate-y-2 pointer-events-none
-                                      group-hover:opacity-100 group-hover:translate-y-0
-                                      transition-all duration-500 border border-${position.color}-500/20
-                                      shadow-[0_0_15px_rgba(${position.color === 'yellow' ? '234,179,8' : '20,184,166'},0.3)]`}
-                          >
-                            <h3 className={`text-${position.color}-500 text-xl font-bold mb-2`}>{position.title}</h3>
-                            <p className="text-gray-300 text-sm">{position.description}</p>
-                            
-                            <div className="mt-4 grid grid-cols-3 gap-2">
-                              <button className="px-3 py-1 rounded bg-yellow-500/20 text-yellow-500 text-sm hover:bg-yellow-500/30 transition-colors">
-                                Apply
-                              </button>
-                              <button className="px-3 py-1 rounded bg-teal-500/20 text-teal-500 text-sm hover:bg-teal-500/30 transition-colors">
-                                Nominate
-                              </button>
-                              <button className="px-3 py-1 rounded bg-yellow-500/20 text-yellow-500 text-sm hover:bg-yellow-500/30 transition-colors">
-                                Vote
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+            <CelestialCouncil />
           </div>
 
           <WhatWeBuilding />
