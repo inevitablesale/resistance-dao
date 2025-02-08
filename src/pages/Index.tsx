@@ -1,3 +1,4 @@
+<lov-code>
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -541,106 +542,86 @@ const IndexContent = () => {
               </h2>
 
               <div className="relative mt-16 mb-24">
-                <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-yellow-500 via-teal-500 to-yellow-500 transform -translate-x-1/2" />
-                
-                {/* Orbital Ring with Action Items */}
-                <div className="relative h-[300px] mb-24">
-                  {/* Orbital Track */}
-                  <div className="absolute inset-0 rounded-full border border-yellow-500/20 
-                                before:absolute before:inset-0 before:rounded-full before:border before:border-teal-500/20 before:-rotate-45
-                                after:absolute after:inset-0 after:rounded-full after:border after:border-yellow-500/20 after:rotate-45">
-                    {/* Action Orbs */}
-                    {[
-                      { name: 'Apply', icon: UserPlus, delay: '0s', rotate: '0deg' },
-                      { name: 'Nominate', icon: Award, delay: '0.2s', rotate: '120deg' },
-                      { name: 'Vote', icon: Vote, delay: '0.4s', rotate: '240deg' }
-                    ].map((action, index) => (
-                      <div
-                        key={action.name}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group"
-                        style={{
-                          transform: `rotate(${action.rotate}) translateX(120px) rotate(-${action.rotate})`,
-                        }}
+                {/* Central Energy Core */}
+                <div className="relative h-[600px] mb-24">
+                  {/* Core Sphere */}
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32">
+                    <div className="absolute inset-0 rounded-full animate-cosmic-pulse"
+                         style={{
+                           background: "radial-gradient(circle at center, rgba(234, 179, 8, 0.8) 0%, rgba(20, 184, 166, 0.4) 50%, transparent 70%)",
+                         }} />
+                    <div className="absolute inset-0 rounded-full animate-[spin_20s_linear_infinite]"
+                         style={{
+                           background: "conic-gradient(from 0deg, rgba(234, 179, 8, 0.8), rgba(20, 184, 166, 0.8), rgba(234, 179, 8, 0.8))",
+                           filter: "blur(8px)"
+                         }} />
+                  </div>
+
+                  {/* Action Paths */}
+                  {[
+                    { name: 'Apply', icon: UserPlus, angle: -120, color: 'yellow' },
+                    { name: 'Nominate', icon: Award, angle: 0, color: 'teal' },
+                    { name: 'Vote', icon: Vote, angle: 120, color: 'yellow' }
+                  ].map((action, index) => (
+                    <div
+                      key={action.name}
+                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] group"
+                      style={{
+                        transform: `rotate(${action.angle}deg)`
+                      }}
+                    >
+                      {/* Energy Path */}
+                      <div className="absolute inset-0">
+                        <div 
+                          className={`absolute h-0.5 w-full top-1/2 left-0 origin-left
+                                    ${action.color === 'yellow' ? 'cosmic-box yellow-energy' : 'cosmic-box teal-energy'} active`}
+                          style={{
+                            background: action.color === 'yellow' 
+                              ? 'linear-gradient(90deg, rgba(234, 179, 8, 0.8), transparent)'
+                              : 'linear-gradient(90deg, rgba(20, 184, 166, 0.8), transparent)',
+                          }}
+                        />
+                      </div>
+
+                      {/* Action Node */}
+                      <div 
+                        className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1/2"
+                        style={{ transform: `rotate(-${action.angle}deg) translateY(-50%)` }}
                       >
-                        <div className="relative w-20 h-20 animate-cosmic-pulse">
-                          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500" />
-                          <div className="relative h-full rounded-full bg-black/60 backdrop-blur-sm border border-yellow-500/30 
-                                        group-hover:border-yellow-500/60 transition-all duration-300
-                                        flex items-center justify-center">
+                        <div className="relative group">
+                          <div className="absolute inset-0 rounded-full blur-xl animate-cosmic-pulse"
+                               style={{
+                                 background: action.color === 'yellow'
+                                   ? 'radial-gradient(circle at center, rgba(234, 179, 8, 0.5), transparent 70%)'
+                                   : 'radial-gradient(circle at center, rgba(20, 184, 166, 0.5), transparent 70%)'
+                               }} />
+                          <div className="relative p-6 rounded-full backdrop-blur-sm border border-yellow-500/30
+                                        hover:border-yellow-500/60 transition-all duration-300
+                                        flex items-center justify-center group-hover:scale-110">
                             <div className="text-center">
-                              <action.icon className="w-8 h-8 mx-auto mb-1 text-yellow-500 group-hover:scale-110 transition-transform duration-300" />
-                              <span className="text-white text-sm font-medium">{action.name}</span>
+                              <action.icon className={`w-8 h-8 mx-auto mb-2 ${
+                                action.color === 'yellow' ? 'text-yellow-500' : 'text-teal-500'
+                              }`} />
+                              <span className="text-white text-sm font-medium whitespace-nowrap">{action.name}</span>
                             </div>
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Board Member Categories */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
-                  {[
-                    { role: "Managing Partners", icon: Trophy, description: "Built successful firms" },
-                    { role: "M&A Specialists", icon: Network, description: "Understand true practice value" },
-                    { role: "Operations Experts", icon: Zap, description: "Optimized workflows" },
-                    { role: "Technology Leaders", icon: GitBranch, description: "Drive practice innovation" }
-                  ].map((member, index) => (
-                    <div
-                      key={member.role}
-                      className="group relative perspective-3000"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                      <div className="relative bg-black/60 p-6 rounded-lg border border-yellow-500/30 
-                                    transform transition-all duration-300 group-hover:translate-y-[-2px]
-                                    hover:border-yellow-500/60">
-                        <member.icon className="w-10 h-10 text-yellow-500 mb-4 mx-auto animate-cosmic-pulse" />
-                        <h3 className="text-xl font-bold text-white mb-2">{member.role}</h3>
-                        <p className="text-gray-300">{member.description}</p>
-                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
-          </div>
 
-          <WhatWeBuilding />
-          <LedgerFrens />
-          <HowItWorks />
-          <AlternativeToEquity />
-          <PrivateEquityImpact />
-          <ReclaimControl />
-          <SystemWeDeserve />
-          <CallToAction />
-          <Roadmap />
-          <Partners />
-        </div>
-      </div>
-    </>
-  );
-};
-
-const Index = () => {
-  return (
-    <div className="min-h-screen bg-black overflow-hidden relative">
-      <div className="absolute inset-0">
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: "radial-gradient(circle at center, #eab308 0%, #000000 100%)",
-            opacity: 0.98
-          }}
-        />
-      </div>
-      
-      <Nav />
-      
-      <div className="container mx-auto px-4 relative z-10">
-        <IndexContent />
-      </div>
-    </div>
-  );
-};
-
-export default Index;
+                {/* Board Member Constellations */}
+                <div className="grid grid-cols-2 gap-16 relative z-10 max-w-4xl mx-auto">
+                  {[
+                    { role: "Managing Partners", icon: Trophy, description: "Built successful firms", pattern: [
+                      { x: 20, y: 20 }, { x: 40, y: 30 }, { x: 60, y: 20 }, { x: 40, y: 40 }
+                    ]},
+                    { role: "M&A Specialists", icon: Network, description: "Understand true practice value", pattern: [
+                      { x: 30, y: 20 }, { x: 50, y: 40 }, { x: 70, y: 20 }, { x: 50, y: 10 }
+                    ]},
+                    { role: "Operations Experts", icon: Zap, description: "Optimized workflows", pattern: [
+                      { x: 20, y: 30 }, { x: 40, y: 10 }, { x: 60, y: 30 }, { x: 40, y: 50 }
+                    ]},
+                    { role: "Technology Leaders", icon: GitBranch, description: "Drive practice innovation", pattern: [
+                      { x: 30, y: 30 }, { x: 50, y: 20 }, { x: 70, y: 30
