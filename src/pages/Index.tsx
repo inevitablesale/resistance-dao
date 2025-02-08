@@ -93,6 +93,45 @@ const publicSaleData = [
   }
 ];
 
+const celestialCouncil = [
+  {
+    title: "Architects of Reality",
+    role: "Managing Partners",
+    description: "Shape the very fabric of our digital universe by guiding the DAO's collective vision",
+    icon: Orbit,
+    color: "yellow",
+    orbitDelay: "0s",
+    particleColor: "rgba(234, 179, 8, 0.8)"
+  },
+  {
+    title: "Celestial Pathfinders",
+    role: "M&A Specialists",
+    description: "Chart courses through unexplored opportunities in the vast expanse of accounting practices",
+    icon: Star,
+    color: "teal",
+    orbitDelay: "5s",
+    particleColor: "rgba(20, 184, 166, 0.8)"
+  },
+  {
+    title: "Harmony Weavers",
+    role: "Operations Experts",
+    description: "Orchestrate the cosmic dance of operations across our growing constellation of practices",
+    icon: Moon,
+    color: "yellow",
+    orbitDelay: "10s",
+    particleColor: "rgba(234, 179, 8, 0.8)"
+  },
+  {
+    title: "Quantum Pioneers",
+    role: "Technology Leaders",
+    description: "Pioneer technologies beyond current horizons, forging the future of accounting",
+    icon: Rocket,
+    color: "teal",
+    orbitDelay: "15s",
+    particleColor: "rgba(20, 184, 166, 0.8)"
+  }
+];
+
 const boardMembers = [
   { 
     role: "Managing Partners",
@@ -164,6 +203,7 @@ const IndexContent = () => {
   const [myStakeable, setMyStakeable] = useState<string>('0');
   const [maticPrice, setMaticPrice] = useState<string>('Loading...');
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
+  const [activePosition, setActivePosition] = useState<number | null>(null);
 
   useEffect(() => {
     setTimeout(() => setIsLoaded(true), 100);
@@ -584,56 +624,107 @@ const IndexContent = () => {
             />
 
             <div className="container mx-auto px-4 relative">
-              <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 animate-cosmic-pulse">
-                Join the Singularity
+              <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
+                The Celestial Council
               </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-24">
-                <div className="col-span-full text-center mb-8">
-                  <div className="flex items-center justify-center gap-8 mb-6">
-                    <div className="flex flex-col items-center group">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
-                        <Orbit className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
-                      </div>
-                      <span className="text-xl font-bold text-white mt-2">Apply</span>
-                    </div>
-                    <div className="flex flex-col items-center group">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-teal-500/20 blur-xl animate-pulse rounded-full" />
-                        <Star className="w-8 h-8 text-teal-500 relative animate-cosmic-pulse" />
-                      </div>
-                      <span className="text-xl font-bold text-white mt-2">Nominate</span>
-                    </div>
-                    <div className="flex flex-col items-center group">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
-                        <Moon className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
-                      </div>
-                      <span className="text-xl font-bold text-white mt-2">Vote</span>
-                    </div>
-                  </div>
+              
+              <div className="relative perspective-3000 mt-20">
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-500 to-teal-500 animate-cosmic-pulse" />
+                  <div className="absolute inset-2 rounded-full bg-black" />
+                  <div className="absolute inset-4 rounded-full bg-gradient-to-r from-yellow-500/50 to-teal-500/50 blur-sm animate-pulse" />
                 </div>
 
-                {governanceActions.map((action, index) => (
-                  <div
-                    key={index}
-                    className="group relative perspective-3000"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                    <div className={`relative p-8 rounded-lg border border-${action.color}/30 bg-black/60 backdrop-blur-sm
-                                  transform transition-all duration-300 group-hover:translate-y-[-2px]
-                                  hover:border-${action.color}/60`}>
-                      <div className="relative mb-4">
-                        <div className={`absolute inset-0 bg-${action.color}/20 blur-xl animate-pulse rounded-full`} />
-                        <action.icon className={`w-12 h-12 text-${action.color} mx-auto animate-cosmic-pulse`} />
+                <div className="relative w-full aspect-square max-w-4xl mx-auto">
+                  {celestialCouncil.map((position, index) => {
+                    const angle = (index / celestialCouncil.length) * Math.PI * 2;
+                    const orbitSize = 280; // Orbit radius in pixels
+                    
+                    return (
+                      <div
+                        key={position.role}
+                        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full
+                                  ${activePosition === index ? 'z-20' : 'z-10'}`}
+                        style={{
+                          transform: `rotate(${angle}rad)`,
+                          transformOrigin: 'center',
+                        }}
+                      >
+                        <div 
+                          className="absolute inset-0 rounded-full border border-dashed transition-all duration-500"
+                          style={{
+                            borderColor: activePosition === index ? 
+                              position.color === 'yellow' ? 'rgba(234, 179, 8, 0.5)' : 'rgba(20, 184, 166, 0.5)' :
+                              'rgba(255, 255, 255, 0.1)',
+                            transform: `scale(${orbitSize / 100})`
+                          }}
+                        />
+
+                        <div
+                          className={`absolute left-1/2 -translate-x-1/2 top-0 w-24 h-24 
+                                    transition-all duration-500 cursor-pointer group`}
+                          style={{
+                            transform: `translateY(${-orbitSize/2}px) rotate(${-angle}rad)`,
+                          }}
+                          onMouseEnter={() => setActivePosition(index)}
+                          onMouseLeave={() => setActivePosition(null)}
+                        >
+                          <div className="relative w-full h-full">
+                            <div 
+                              className={`absolute inset-0 rounded-full transition-all duration-500
+                                        ${position.color === 'yellow' ? 'bg-yellow-500' : 'bg-teal-500'}
+                                        opacity-20 group-hover:opacity-30 blur-sm`}
+                            />
+                            <div 
+                              className={`absolute inset-2 rounded-full transition-all duration-500
+                                        ${position.color === 'yellow' ? 'bg-yellow-500' : 'bg-teal-500'}
+                                        opacity-40 group-hover:opacity-60`}
+                            />
+                            <div className="absolute inset-4 rounded-full bg-black" />
+                            
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <position.icon 
+                                className={`w-8 h-8 transition-all duration-500
+                                          ${position.color === 'yellow' ? 'text-yellow-500' : 'text-teal-500'}`}
+                              />
+                            </div>
+
+                            <div 
+                              className="absolute -inset-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                              style={{
+                                background: `radial-gradient(circle at center, ${position.particleColor}, transparent 70%)`
+                              }}
+                            />
+                          </div>
+
+                          <div 
+                            className={`absolute top-full left-1/2 -translate-x-1/2 mt-4 w-64
+                                      bg-black/80 backdrop-blur-sm rounded-lg p-6 transform
+                                      opacity-0 translate-y-2 pointer-events-none
+                                      group-hover:opacity-100 group-hover:translate-y-0
+                                      transition-all duration-500 border border-${position.color}-500/20
+                                      shadow-[0_0_15px_rgba(${position.color === 'yellow' ? '234,179,8' : '20,184,166'},0.3)]`}
+                          >
+                            <h3 className={`text-${position.color}-500 text-xl font-bold mb-2`}>{position.title}</h3>
+                            <p className="text-gray-300 text-sm">{position.description}</p>
+                            
+                            <div className="mt-4 grid grid-cols-3 gap-2">
+                              <button className="px-3 py-1 rounded bg-yellow-500/20 text-yellow-500 text-sm hover:bg-yellow-500/30 transition-colors">
+                                Apply
+                              </button>
+                              <button className="px-3 py-1 rounded bg-teal-500/20 text-teal-500 text-sm hover:bg-teal-500/30 transition-colors">
+                                Nominate
+                              </button>
+                              <button className="px-3 py-1 rounded bg-yellow-500/20 text-yellow-500 text-sm hover:bg-yellow-500/30 transition-colors">
+                                Vote
+                              </button>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-2">{action.action}</h3>
-                      <p className="text-gray-300">{action.description}</p>
-                      <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-yellow-500/50 to-teal-500/50 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
