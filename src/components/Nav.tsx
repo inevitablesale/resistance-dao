@@ -46,7 +46,7 @@ const Nav = () => {
               Tokenomics
             </a>
             <a 
-              href="https://twitter.com/ledgerfund" 
+              href="https://x.com/LedgerFundDAO" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-white/80 hover:text-white transition-colors transform transition-all duration-300 hover:scale-105 hover:rotate-3"
@@ -76,4 +76,3 @@ const Nav = () => {
 };
 
 export default Nav;
-
