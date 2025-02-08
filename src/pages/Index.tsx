@@ -19,6 +19,7 @@ import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBran
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
+import { CelestialCouncil } from "@/components/CelestialCouncil";
 
 const presaleData = [
   { 
