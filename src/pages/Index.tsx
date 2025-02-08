@@ -610,32 +610,34 @@ const IndexContent = () => {
                   </div>
                 </div>
               ))}
+
+              <div className="mt-12 flex justify-center w-full">
+                <div className="relative max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 via-teal-500/20 to-yellow-500/20 rounded-lg blur-xl opacity-50 animate-pulse" />
+                  <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 px-8 py-6 rounded-lg">
+                    <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-500 to-yellow-300 mb-3">
+                      Governance Applications Coming Soon
+                    </h3>
+                    <p className="text-white/80">
+                      Applications and voting will begin when $100,000 of funding goal is met
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <WhatWeBuilding />
+              <LedgerFrens />
+              <HowItWorks />
+              <AlternativeToEquity />
+              <PrivateEquityImpact />
+              <ReclaimControl />
+              <SystemWeDeserve />
+              <CallToAction />
+              <Roadmap />
+              <FAQ />
+              <Partners />
             </div>
           </div>
-
-          <div className="mt-12 inline-block relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-lg blur-xl opacity-50" />
-            <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 px-6 py-4 rounded-lg">
-              <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
-                Governance Applications Coming Soon
-              </h3>
-              <p className="text-white/80 mt-2">
-                Applications and voting will begin when $100,000 of funding goal is met
-              </p>
-            </div>
-          </div>
-
-          <WhatWeBuilding />
-          <LedgerFrens />
-          <HowItWorks />
-          <AlternativeToEquity />
-          <PrivateEquityImpact />
-          <ReclaimControl />
-          <SystemWeDeserve />
-          <CallToAction />
-          <Roadmap />
-          <FAQ />
-          <Partners />
         </div>
       </div>
     </>
