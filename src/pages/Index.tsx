@@ -564,9 +564,7 @@ const IndexContent = () => {
               </h2>
               
               <p className="text-lg text-white/80 max-w-3xl mx-auto mb-12">
-                As a token holder, you help select the leaders who will guide LedgerFund's development. 
-                Our board brings together decades of experience in firm management, M&A, operations, 
-                and technology to drive the protocol's success.
+                Bringing together decades of industry experience, professional resources, and strategic capital to drive the protocol's success through expert leadership.
               </p>
 
               <div className="flex items-center justify-center gap-8 mb-12">
