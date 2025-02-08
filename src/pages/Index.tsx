@@ -562,7 +562,7 @@ const IndexContent = () => {
                     { name: 'Apply', icon: UserPlus, angle: -120, color: 'yellow' },
                     { name: 'Nominate', icon: Award, angle: 0, color: 'teal' },
                     { name: 'Vote', icon: Vote, angle: 120, color: 'yellow' }
-                  ].map((action, index) => (
+                  ].map((action) => (
                     <div
                       key={action.name}
                       className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] group"
@@ -624,4 +624,4 @@ const IndexContent = () => {
                       { x: 20, y: 30 }, { x: 40, y: 10 }, { x: 60, y: 30 }, { x: 40, y: 50 }
                     ]},
                     { role: "Technology Leaders", icon: GitBranch, description: "Drive practice innovation", pattern: [
-                      { x: 30, y: 30 }, { x: 50, y: 20 }, { x: 70, y: 30
+                      { x: 30, y: 30 }, { x: 50, y: 20 }, { x: 70, y: 30 }
