@@ -19,6 +19,7 @@ import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBran
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
+import { BoardSeats } from "@/components/BoardSeats";
 
 const presaleData = [
   { 
@@ -391,7 +392,9 @@ const IndexContent = () => {
                       className="relative group perspective-3000"
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                      <div className="relative bg-black/80 p-4 rounded-lg border border-yellow-500/30 transform transition-all duration-300 group-hover:translate-y-[-2px]">
+                      <div className="relative bg-black/80 p-4 rounded-lg border border-yellow-500/30 transform transition-all duration-300" style={{ 
+                        width: `${Math.min(100, (Number(totalSold) / Number(presaleSupply)) * 100)}%` 
+                      }}>
                         <div className="text-4xl font-bold text-white mb-2 text-center animate-[pulse_2s_ease-in-out_infinite]">
                           {value}
                         </div>
@@ -529,6 +532,8 @@ const IndexContent = () => {
               The accounting industry is reaching its event horizon. Private equity wants to pull firms in and consolidate control. But a new force is emerging—a gravitational shift toward fractional ownership. This is LedgerFund DAO.
             </p>
           </div>
+
+          <BoardSeats />
 
           <div id="presale" className="relative mb-16 pt-20">
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/30 to-teal-500/30 rounded-lg blur-xl" />
