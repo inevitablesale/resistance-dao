@@ -659,4 +659,23 @@ const IndexContent = () => {
 const Index = () => {
   return (
     <div className="min-h-screen bg-black overflow-hidden relative">
-      <div
+      <div className="absolute inset-0">
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(circle at center, #eab308 0%, #000000 100%)",
+            opacity: 0.98
+          }}
+        />
+      </div>
+      
+      <Nav />
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <IndexContent />
+      </div>
+    </div>
+  );
+};
+
+export default Index;
