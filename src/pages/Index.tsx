@@ -404,10 +404,10 @@ const IndexContent = () => {
                   <h3 className="text-xl font-semibold text-yellow-500 mb-4">Board Composition</h3>
                   <ul className="space-y-3">
                     {[
-                      'Managing partners who've built successful firms',
-                      'M&A specialists who understand true practice value',
-                      'Operations experts who've optimized workflows',
-                      'Technology leaders driving practice innovation'
+                      "Managing partners who've built successful firms",
+                      "M&A specialists who understand true practice value",
+                      "Operations experts who've optimized workflows",
+                      "Technology leaders driving practice innovation"
                     ].map((text, index) => (
                       <li key={index} className="flex items-center gap-3 text-white/80">
                         <Trophy className="w-5 h-5 text-teal-500" />
