@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -363,6 +362,9 @@ const IndexContent = () => {
             Unite. Acquire.<br />Transform.
           </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
+            Your Community, Your Protocol
+          </p>
+          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
             Bringing together decades of industry experience, professional resources, and strategic capital to drive the protocol's success through expert leadership.
           </p>
 
@@ -652,4 +654,3 @@ const Index = () => {
 };
 
 export default Index;
-
