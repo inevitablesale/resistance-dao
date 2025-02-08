@@ -362,7 +362,7 @@ const IndexContent = () => {
             Next-Gen<br />Accounting Ownership
           </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Join the revolution in firm ownership. LedgerFund DAO empowers accountants to collectively acquire, govern, and transform accounting practices through blockchain and democratic decision-making.
+            Join the revolution in firm ownership. LedgerFund DAO empowers accountants to collectively acquire, govern, and transform accounting practices through blockchain technology and democratic decision-making.
           </p>
 
           {showPurchaseForm ? (
