@@ -3,13 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
+import { Twitter, Discord } from "lucide-react";
 
 const Nav = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   const navigate = useNavigate();
   
-  // Initialize balance monitoring
   useBalanceMonitor();
 
   const handleLaunchApp = async () => {
@@ -38,12 +38,6 @@ const Nav = () => {
           </div>
           
           <div className="hidden md:flex items-center gap-8">
-            <a href="#presale" className="text-white/80 hover:text-white transition-colors">
-              Presale
-            </a>
-            <a href="#join-the-singularity" className="text-white/80 hover:text-white transition-colors">
-              Why Now
-            </a>
             <a href="#how-it-works" className="text-white/80 hover:text-white transition-colors">
               How It Works
             </a>
@@ -53,6 +47,22 @@ const Nav = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-4">
+            <a 
+              href="https://twitter.com/ledgerfund" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="p-2 text-white/80 hover:text-white transition-colors"
+            >
+              <Twitter className="w-5 h-5" />
+            </a>
+            <a 
+              href="https://discord.gg/ledgerfund" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="p-2 text-white/80 hover:text-white transition-colors"
+            >
+              <Discord className="w-5 h-5" />
+            </a>
             <button 
               disabled
               className="px-6 py-2 bg-gray-600/30 text-gray-400 rounded-lg font-medium cursor-not-allowed"
