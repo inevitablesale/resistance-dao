@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -520,6 +519,17 @@ const IndexContent = () => {
         </div>
       </div>
 
+      <PrivateEquityImpact />
+      <ReclaimControl />
+      <HowItWorks />
+      <AlternativeToEquity />
+      <SystemWeDeserve />
+      <WhatWeBuilding />
+      <CallToAction />
+      <Roadmap />
+      <LedgerFrens />
+      <Partners />
+
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-24">
           <div id="join-the-singularity" className="text-center mb-16 pt-20 relative overflow-hidden">
@@ -618,47 +628,4 @@ const IndexContent = () => {
                       { x: 20, y: 30 }, { x: 40, y: 10 }, { x: 60, y: 30 }, { x: 40, y: 50 }
                     ]},
                     { role: "Technology Leaders", icon: GitBranch, description: "Drive practice innovation", pattern: [
-                      { x: 30, y: 30 }, { x: 50, y: 20 }, { x: 70, y: 30 }
-                    ]}
-                  ].map((member, index) => (
-                    <div key={member.role} className="relative p-6">
-                      <member.icon className="w-12 h-12 mx-auto mb-4 text-yellow-500" />
-                      <h3 className="text-xl font-semibold text-white mb-2">{member.role}</h3>
-                      <p className="text-gray-400">{member.description}</p>
-                      
-                      <svg className="absolute inset-0 w-full h-full -z-10" viewBox="0 0 100 100">
-                        {member.pattern.map((point, i, arr) => (
-                          <g key={i}>
-                            {i < arr.length - 1 && (
-                              <line
-                                x1={point.x}
-                                y1={point.y}
-                                x2={arr[i + 1].x}
-                                y2={arr[i + 1].y}
-                                stroke="rgba(234, 179, 8, 0.3)"
-                                strokeWidth="0.5"
-                              />
-                            )}
-                            <circle
-                              cx={point.x}
-                              cy={point.y}
-                              r="1"
-                              fill="rgba(234, 179, 8, 0.8)"
-                              className="animate-cosmic-pulse"
-                            />
-                          </g>
-                        ))}
-                      </svg>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
-export default IndexContent;
+                      { x: 30, y: 30 }, { x: 50,
