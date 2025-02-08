@@ -1,4 +1,4 @@
-<lov-code>
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -542,9 +542,7 @@ const IndexContent = () => {
               </h2>
 
               <div className="relative mt-16 mb-24">
-                {/* Central Energy Core */}
                 <div className="relative h-[600px] mb-24">
-                  {/* Core Sphere */}
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32">
                     <div className="absolute inset-0 rounded-full animate-cosmic-pulse"
                          style={{
@@ -557,7 +555,6 @@ const IndexContent = () => {
                          }} />
                   </div>
 
-                  {/* Action Paths */}
                   {[
                     { name: 'Apply', icon: UserPlus, angle: -120, color: 'yellow' },
                     { name: 'Nominate', icon: Award, angle: 0, color: 'teal' },
@@ -570,7 +567,6 @@ const IndexContent = () => {
                         transform: `rotate(${action.angle}deg)`
                       }}
                     >
-                      {/* Energy Path */}
                       <div className="absolute inset-0">
                         <div 
                           className={`absolute h-0.5 w-full top-1/2 left-0 origin-left
@@ -583,7 +579,6 @@ const IndexContent = () => {
                         />
                       </div>
 
-                      {/* Action Node */}
                       <div 
                         className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1/2"
                         style={{ transform: `rotate(-${action.angle}deg) translateY(-50%)` }}
@@ -611,7 +606,6 @@ const IndexContent = () => {
                   ))}
                 </div>
 
-                {/* Board Member Constellations */}
                 <div className="grid grid-cols-2 gap-16 relative z-10 max-w-4xl mx-auto">
                   {[
                     { role: "Managing Partners", icon: Trophy, description: "Built successful firms", pattern: [
@@ -625,3 +619,46 @@ const IndexContent = () => {
                     ]},
                     { role: "Technology Leaders", icon: GitBranch, description: "Drive practice innovation", pattern: [
                       { x: 30, y: 30 }, { x: 50, y: 20 }, { x: 70, y: 30 }
+                    ]}
+                  ].map((member, index) => (
+                    <div key={member.role} className="relative p-6">
+                      <member.icon className="w-12 h-12 mx-auto mb-4 text-yellow-500" />
+                      <h3 className="text-xl font-semibold text-white mb-2">{member.role}</h3>
+                      <p className="text-gray-400">{member.description}</p>
+                      
+                      <svg className="absolute inset-0 w-full h-full -z-10" viewBox="0 0 100 100">
+                        {member.pattern.map((point, i, arr) => (
+                          <g key={i}>
+                            {i < arr.length - 1 && (
+                              <line
+                                x1={point.x}
+                                y1={point.y}
+                                x2={arr[i + 1].x}
+                                y2={arr[i + 1].y}
+                                stroke="rgba(234, 179, 8, 0.3)"
+                                strokeWidth="0.5"
+                              />
+                            )}
+                            <circle
+                              cx={point.x}
+                              cy={point.y}
+                              r="1"
+                              fill="rgba(234, 179, 8, 0.8)"
+                              className="animate-cosmic-pulse"
+                            />
+                          </g>
+                        ))}
+                      </svg>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default IndexContent;
