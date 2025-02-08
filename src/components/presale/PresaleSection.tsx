@@ -5,7 +5,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { Trophy, Wallet } from "lucide-react";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
-import { PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
+import { PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice, getPresaleContract } from "@/services/presaleContractService";
 
 export const PresaleSection = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
@@ -47,7 +47,7 @@ export const PresaleSection = () => {
       if (primaryWallet?.address) {
         const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
         const presaleContract = await getPresaleContract(provider);
-        const purchased = await (await presaleContract).purchasedTokens(primaryWallet.address);
+        const purchased = await presaleContract.purchasedTokens(primaryWallet.address);
         setMyPurchased(ethers.utils.formatEther(purchased));
       }
     } catch (error) {
