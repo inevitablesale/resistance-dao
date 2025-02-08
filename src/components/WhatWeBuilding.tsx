@@ -31,7 +31,7 @@ const publicSaleData = [
     name: 'Community Rewards', 
     value: 10, 
     color: '#14b8a6',
-    description: 'Bringing together decades of industry experience, professional resources, and strategic capital to drive the DAO's success through expert leadership.',
+    description: 'Bringing together decades of industry experience, professional resources, and strategic capital to drive the DAOs success through expert leadership.',
     className: 'col-span-1'
   },
   { 
