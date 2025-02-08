@@ -607,14 +607,14 @@ const IndexContent = () => {
                     <div className="flex flex-col items-center group">
                       <div className="relative">
                         <div className="absolute inset-0 bg-teal-500/20 blur-xl animate-pulse rounded-full" />
-                        <Galaxy className="w-8 h-8 text-teal-500 relative animate-cosmic-pulse" />
+                        <Star className="w-8 h-8 text-teal-500 relative animate-cosmic-pulse" />
                       </div>
                       <span className="text-xl font-bold text-white mt-2">Nominate</span>
                     </div>
                     <div className="flex flex-col items-center group">
                       <div className="relative">
                         <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
-                        <Constellation className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
+                        <Moon className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
                       </div>
                       <span className="text-xl font-bold text-white mt-2">Vote</span>
                     </div>
