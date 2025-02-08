@@ -96,23 +96,48 @@ const publicSaleData = [
 const boardMembers = [
   { 
     role: "Managing Partners",
-    description: "Built successful firms",
-    icon: Orbit  // Leadership orbit
+    description: "Lead and guide the DAO's direction with industry expertise and strategic vision",
+    icon: Orbit,
+    color: "yellow-500"
   },
   { 
     role: "M&A Specialists",
-    description: "Understand true practice value",
-    icon: Star   // Representing celestial mergers
+    description: "Identify and evaluate optimal acquisition targets for maximum community value",
+    icon: Star,
+    color: "teal-500"
   },
   { 
     role: "Operations Experts",
-    description: "Optimized workflows",
-    icon: Moon   // Representing cycles and systems
+    description: "Streamline and scale practices while maintaining service excellence",
+    icon: Moon,
+    color: "yellow-500"
   },
   { 
     role: "Technology Leaders",
-    description: "Drive practice innovation",
-    icon: Rocket // Representing forward momentum
+    description: "Drive innovation and technological advancement across the network",
+    icon: Rocket,
+    color: "teal-500"
+  }
+];
+
+const governanceActions = [
+  {
+    action: "Apply",
+    description: "Submit your expertise and vision",
+    icon: UserPlus,
+    color: "yellow-500"
+  },
+  {
+    action: "Nominate",
+    description: "Propose visionary leaders",
+    icon: Award,
+    color: "teal-500"
+  },
+  {
+    action: "Vote",
+    description: "Shape our collective future",
+    icon: Vote,
+    color: "yellow-500"
   }
 ];
 
@@ -590,18 +615,22 @@ const IndexContent = () => {
                   </div>
                 </div>
 
-                {boardMembers.map((member, index) => (
+                {governanceActions.map((action, index) => (
                   <div
                     key={index}
                     className="group relative perspective-3000"
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                    <div className="relative bg-black/60 p-6 rounded-lg border border-yellow-500/30 
+                    <div className={`relative p-8 rounded-lg border border-${action.color}/30 bg-black/60 backdrop-blur-sm
                                   transform transition-all duration-300 group-hover:translate-y-[-2px]
-                                  hover:border-yellow-500/60">
-                      <member.icon className="w-10 h-10 text-yellow-500 mb-4 mx-auto animate-cosmic-pulse" />
-                      <h3 className="text-xl font-bold text-white mb-2">{member.role}</h3>
-                      <p className="text-gray-300">{member.description}</p>
+                                  hover:border-${action.color}/60`}>
+                      <div className="relative mb-4">
+                        <div className={`absolute inset-0 bg-${action.color}/20 blur-xl animate-pulse rounded-full`} />
+                        <action.icon className={`w-12 h-12 text-${action.color} mx-auto animate-cosmic-pulse`} />
+                      </div>
+                      <h3 className="text-2xl font-bold text-white mb-2">{action.action}</h3>
+                      <p className="text-gray-300">{action.description}</p>
+                      <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-yellow-500/50 to-teal-500/50 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
                     </div>
                   </div>
                 ))}

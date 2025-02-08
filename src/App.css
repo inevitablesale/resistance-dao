@@ -83,11 +83,41 @@
   }
 }
 
-.astral-energy {
+.perspective-3000 {
+  perspective: 3000px;
+}
+
+.cosmic-card {
   position: relative;
-  overflow: visible;
-  transform-style: preserve-3d;
   transition: transform 0.3s ease-out;
+}
+
+.cosmic-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(to right, rgba(234, 179, 8, 0.5), rgba(20, 184, 166, 0.5));
+  z-index: -1;
+  border-radius: inherit;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.cosmic-card:hover::before {
+  opacity: 1;
+}
+
+.animate-parallax-slow {
+  animation: parallax-scroll 15s linear infinite;
+}
+
+@keyframes parallax-scroll {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
 }
 
 .cosmic-box {
