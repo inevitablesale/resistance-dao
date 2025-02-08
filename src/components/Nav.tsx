@@ -54,7 +54,7 @@ const Nav = () => {
               <Twitter className="w-6 h-6" />
             </a>
             <a 
-              href="https://discord.gg/ledgerfund" 
+              href="https://www.linkedin.com/company/ledgerfund-dao/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-white/80 hover:text-white transition-colors transform transition-all duration-300 hover:scale-105 hover:rotate-3"
