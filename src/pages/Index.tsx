@@ -15,7 +15,7 @@ import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBranch } from "lucide-react";
+import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBranch, UserPlus, Award, Vote } from "lucide-react";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
@@ -571,15 +571,38 @@ const IndexContent = () => {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+                <div className="col-span-full text-center mb-8">
+                  <div className="flex items-center justify-center gap-8 mb-6">
+                    <div className="flex flex-col items-center group">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
+                        <UserPlus className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
+                      </div>
+                      <span className="text-xl font-bold text-white mt-2">Apply</span>
+                    </div>
+                    <div className="flex flex-col items-center group">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-teal-500/20 blur-xl animate-pulse rounded-full" />
+                        <Award className="w-8 h-8 text-teal-500 relative animate-cosmic-pulse" />
+                      </div>
+                      <span className="text-xl font-bold text-white mt-2">Nominate</span>
+                    </div>
+                    <div className="flex flex-col items-center group">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
+                        <Vote className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
+                      </div>
+                      <span className="text-xl font-bold text-white mt-2">Vote</span>
+                    </div>
+                  </div>
+                </div>
                 {[
-                  { title: 'Review Targets', icon: ClipboardCopy },
-                  { title: 'Set Frameworks', icon: GitBranch },
-                  { title: 'Guide Strategies', icon: Network },
-                  { title: 'Direct Growth', icon: Zap },
-                  { title: 'Allocate Resources', icon: Coins },
-                  { title: 'Build Community', icon: UserCircle }
-                ].map((power, index) => (
+                  { role: "Managing Partners", experience: "Built successful firms", icon: Trophy },
+                  { role: "M&A Specialists", experience: "Understand true practice value", icon: Network },
+                  { role: "Operations Experts", experience: "Optimized workflows", icon: Zap },
+                  { role: "Technology Leaders", experience: "Drive practice innovation", icon: GitBranch }
+                ].map((member, index) => (
                   <div
                     key={index}
                     className="group relative"
@@ -588,8 +611,8 @@ const IndexContent = () => {
                     <div className="relative bg-black/40 backdrop-blur-sm border border-yellow-500/20 
                                   rounded-lg p-6 transform transition-all duration-300 
                                   hover:scale-105 hover:border-yellow-500/40">
-                      <power.icon className="w-8 h-8 text-yellow-500 mb-4 mx-auto" />
-                      <h3 className="text-white font-semibold mb-2">{power.title}</h3>
+                      <member.icon className="w-8 h-8 text-yellow-500 mb-4 mx-auto" />
+                      <h3 className="text-white font-semibold mb-2">{member.role}</h3>
                     </div>
                   </div>
                 ))}
