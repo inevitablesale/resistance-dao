@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
+import { Analytics } from '@vercel/analytics/react';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import GovernanceVoting from "./pages/GovernanceVoting";
@@ -160,9 +161,9 @@ function App() {
         </Routes>
       </Router>
       <Toaster />
+      <Analytics />
     </DynamicContextProvider>
   );
 }
 
 export default App;
-
