@@ -26,16 +26,35 @@ const Litepaper = () => {
     return -1;
   };
 
+  const getAllSectionsFlat = (): string[] => {
+    const flatSections: string[] = [];
+    sections.forEach(section => {
+      flatSections.push(section.id);
+      if (section.subsections) {
+        section.subsections.forEach(subsection => {
+          flatSections.push(subsection.id);
+        });
+      }
+    });
+    return flatSections;
+  };
+
   const findNextSection = (): string => {
-    const currentIndex = findSectionIndex(activeSection);
-    if (currentIndex === -1 || currentIndex === sections.length - 1) return sections[0].id;
-    return sections[currentIndex + 1].id;
+    const flatSections = getAllSectionsFlat();
+    const currentIndex = flatSections.indexOf(activeSection);
+    if (currentIndex === -1 || currentIndex === flatSections.length - 1) {
+      return flatSections[0];
+    }
+    return flatSections[currentIndex + 1];
   };
 
   const findPreviousSection = (): string => {
-    const currentIndex = findSectionIndex(activeSection);
-    if (currentIndex === -1 || currentIndex === 0) return sections[sections.length - 1].id;
-    return sections[currentIndex - 1].id;
+    const flatSections = getAllSectionsFlat();
+    const currentIndex = flatSections.indexOf(activeSection);
+    if (currentIndex === -1 || currentIndex === 0) {
+      return flatSections[flatSections.length - 1];
+    }
+    return flatSections[currentIndex - 1];
   };
 
   const handleNextSection = () => {
