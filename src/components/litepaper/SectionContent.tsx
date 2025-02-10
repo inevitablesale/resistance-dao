@@ -158,9 +158,84 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
     "industry-landscape": (
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">6.0 Industry Landscape</h2>
-        <p className="text-gray-300 leading-relaxed">
+        <p className="text-gray-300 leading-relaxed mb-6">
           The accounting industry faces several critical challenges that create opportunities for innovative solutions.
         </p>
+
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">The Succession Crisis</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>70% of accounting firm owners are over 50, with many nearing retirement.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Limited succession options force firms to sell at a discount or struggle with leadership transitions.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Internal buyouts fail because younger CPAs lack the capital or risk tolerance to acquire firms.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Private equity roll-ups aggressively strip firms of independence through rapid consolidation.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">The Private Equity Problem</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>PE firms focus on aggressive cost-cutting and rapid fee increases, often harming firm culture.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>High-leverage models leave firms overburdened with debt once PE firms exit.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Short-term exit cycles (3-5 years) prioritize financial engineering over sustainable growth.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Barriers to Traditional M&A</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Opaque valuations create pricing inconsistencies and risk for buyers.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>High transaction costs limit M&A accessibility for smaller firms.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Slow, inefficient deal structures discourage independent investors.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Regulatory complexities create costly and time-consuming acquisition processes.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <p className="text-gray-300 leading-relaxed">
+            LedgerFund DAO provides a modern, decentralized alternative—eliminating inefficiencies, 
+            increasing transparency, and giving investors direct control over firm ownership.
+          </p>
+        </div>
       </div>
     ),
     "succession-crisis": (
