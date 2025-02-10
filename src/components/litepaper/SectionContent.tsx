@@ -466,14 +466,45 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
     "roadmap": (
       <div className="space-y-4">
         <h2 className="text-2xl font-bold text-yellow-500">17.0 Roadmap & Milestones</h2>
-        <p className="text-gray-300 leading-relaxed">
-          Our roadmap is designed to ensure the long-term 
-          sustainability and growth of the platform. We 
-          have identified several key milestones, including 
-          the launch of the platform, the acquisition of 
-          the first accounting firm, and the development 
-          of new investment strategies.
-        </p>
+        <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-semibold text-teal-400 mb-4">Phase 1: Foundation (Q1-Q2 2024)</h3>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>DAO structure establishment and legal framework.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Token launch and initial governance implementation.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>First investment pool formation.</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-semibold text-teal-400 mb-4">Phase 2: First Acquisitions (Q3-Q4 2024)</h3>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Initial firm acquisitions and integrations.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Operational optimization implementation.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Revenue sharing initiation.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     )
   };
