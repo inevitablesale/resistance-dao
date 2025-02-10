@@ -17,7 +17,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
     ),
     "how-it-works": (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-yellow-500">2.0 How LedgerFund DAO Acquires & Optimizes Firms</h2>
+        <h2 className="text-2xl font-bold text-yellow-500">2.0 How LedgerFund DAO Works</h2>
         <div className="grid gap-4">
           <div className="bg-white/5 p-6 rounded-lg border border-white/10">
             <h3 className="text-xl font-semibold mb-4 text-teal-400">Key Strategies</h3>
@@ -62,7 +62,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
     ),
     "purpose": (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-yellow-500">3.0 Purpose of This Whitepaper</h2>
+        <h2 className="text-2xl font-bold text-yellow-500">3.0 Purpose</h2>
         <div className="bg-white/5 p-6 rounded-lg border border-white/10">
           <ul className="space-y-3 text-gray-300">
             <li className="flex items-start">
@@ -91,7 +91,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
     ),
     "audience": (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-yellow-500">4.0 Who This Whitepaper Is For</h2>
+        <h2 className="text-2xl font-bold text-yellow-500">4.0 Target Audience</h2>
         <p className="text-gray-300 leading-relaxed mb-4">
           LedgerFund DAO is designed for those looking to redefine firm acquisitions through blockchain-enabled investment strategies.
         </p>
@@ -120,13 +120,39 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
     "executive-summary": (
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">5.0 Executive Summary</h2>
-        <p className="text-gray-300 leading-relaxed">
-          LedgerFund DAO is a decentralized acquisition platform designed to buy, govern, 
-          and scale accounting firms through blockchain-powered investment strategies. 
-          Unlike traditional private equity roll-ups that focus on short-term profits 
-          and aggressive cost-cutting, LedgerFund DAO is investor-led, ensuring sustainable 
-          growth, operational efficiency, and long-term value creation in firm ownership.
-        </p>
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Key Objectives & Vision</h3>
+            <p className="text-gray-300 leading-relaxed">
+              LedgerFund DAO is a strategic acquisition engine focused on buying, governing, and optimizing 
+              accounting firms at scale. Our mission is to modernize firm ownership through blockchain-driven 
+              investment models that prioritize long-term value creation over short-term profit extraction.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Core Objectives</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Acquire Profitable Firms – Targeting under-optimized firms with strong fundamentals and growth potential.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Enhance Operational Efficiency – Deploying technology, automation, and streamlined management for value growth.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Tokenized Ownership – Enabling exposure to real-world assets (RWAs) through governance and revenue-sharing.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Transparent, Investor-Led Governance – Utilizing on-chain voting and smart contracts to drive acquisitions and operations.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     ),
     "industry-landscape": (
@@ -464,44 +490,50 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
       </div>
     ),
     "roadmap": (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">17.0 Roadmap & Milestones</h2>
-        <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-xl font-semibold text-teal-400 mb-4">Phase 1: Foundation (Q1-Q2 2024)</h3>
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start">
-                  <span className="mr-2">🔹</span>
-                  <span>DAO structure establishment and legal framework.</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">🔹</span>
-                  <span>Token launch and initial governance implementation.</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">🔹</span>
-                  <span>First investment pool formation.</span>
-                </li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold text-teal-400 mb-4">Phase 2: First Acquisitions (Q3-Q4 2024)</h3>
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start">
-                  <span className="mr-2">🔹</span>
-                  <span>Initial firm acquisitions and integrations.</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">🔹</span>
-                  <span>Operational optimization implementation.</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">🔹</span>
-                  <span>Revenue sharing initiation.</span>
-                </li>
-              </ul>
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Phased Development Plan</h3>
+            <div className="space-y-6">
+              <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+                <h4 className="text-lg font-semibold text-yellow-400 mb-4">🚀 Phase 1: Foundation & Infrastructure (Q1 2025)</h4>
+                <ul className="space-y-3 text-gray-300">
+                  <li className="flex items-start">
+                    <span className="mr-2">✔</span>
+                    <span>Presale launch & governance onboarding.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">✔</span>
+                    <span>Legal structuring (SPVs, compliance frameworks).</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">✔</span>
+                    <span>Smart contract audits & DAO voting system deployment.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">✔</span>
+                    <span>LP-funded pool structuring & early investor participation.</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+                <h4 className="text-lg font-semibold text-yellow-400 mb-4">🏗 Phase 2: Private Token Sale & Community Growth (Q2 2025)</h4>
+                <ul className="space-y-3 text-gray-300">
+                  <li className="flex items-start">
+                    <span className="mr-2">✔</span>
+                    <span>Private sale for accredited investors.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">✔</span>
+                    <span>LP-funded acquisition pools go live.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2">✔</span>
+                    <span>First batch of target firm sourcing & due diligence.</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
