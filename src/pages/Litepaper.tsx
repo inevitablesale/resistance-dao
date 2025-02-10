@@ -294,7 +294,7 @@ const Litepaper = () => {
                   </p>
                 </section>
 
-                <section id="industry-landscape" className="space-y-4">
+                <section id="industry-landscape" className="space-y-6">
                   <h2 className="text-2xl font-bold text-yellow-500">6.0 Industry Landscape</h2>
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="bg-white/5 p-6 rounded-lg border border-white/10">
@@ -312,9 +312,77 @@ const Litepaper = () => {
                       </p>
                     </div>
                   </div>
+
+                  <div id="succession-crisis" className="space-y-4">
+                    <h3 className="text-xl font-semibold text-teal-400">The Succession Crisis</h3>
+                    <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+                      <ul className="space-y-3 text-gray-300">
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>70% of accounting firm owners are over 50, with many nearing retirement.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Limited succession options force firms to sell at a discount or struggle with leadership transitions.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Internal buyouts fail because younger CPAs lack the capital or risk tolerance to acquire firms.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Private equity roll-ups aggressively strip firms of independence through rapid consolidation.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div id="pe-problem" className="space-y-4">
+                    <h3 className="text-xl font-semibold text-teal-400">The Private Equity Problem</h3>
+                    <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+                      <ul className="space-y-3 text-gray-300">
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>PE firms focus on aggressive cost-cutting and rapid fee increases, often harming firm culture.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>High-leverage models leave firms overburdened with debt once PE firms exit.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Short-term exit cycles (3-5 years) prioritize financial engineering over sustainable growth.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div id="barriers" className="space-y-4">
+                    <h3 className="text-xl font-semibold text-teal-400">Barriers to Traditional M&A</h3>
+                    <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+                      <ul className="space-y-3 text-gray-300">
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Opaque valuations create pricing inconsistencies and risk for buyers.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>High transaction costs limit M&A accessibility for smaller firms.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Slow, inefficient deal structures discourage independent investors.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Regulatory complexities create costly and time-consuming acquisition processes.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                 </section>
 
-                <section id="market-opportunity" className="space-y-4">
+                <section id="market-opportunity" className="space-y-6">
                   <h2 className="text-2xl font-bold text-yellow-500">7.0 Market Opportunity</h2>
                   <p className="text-gray-300 leading-relaxed">
                     The accounting firm acquisition market is ripe for disruption, with 
@@ -323,6 +391,102 @@ const Litepaper = () => {
                     more sustainable and scalable solution that aligns with the 
                     needs of modern businesses.
                   </p>
+
+                  <div id="tokenized-ownership" className="space-y-4">
+                    <h3 className="text-xl font-semibold text-teal-400">Tokenized Firm Ownership & Fractional Investment</h3>
+                    <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+                      <ul className="space-y-3 text-gray-300">
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>LedgerFund DAO enables tokenized ownership, making firm M&A accessible to a broader investor base.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>$LGR tokens provide exposure to a diversified portfolio of acquired firms.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Decentralized investment pools lower capital barriers, increasing participation in firm acquisitions.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div id="efficient-ma" className="space-y-4">
+                    <h3 className="text-xl font-semibold text-teal-400">Efficient, Transparent & Scalable M&A</h3>
+                    <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+                      <ul className="space-y-3 text-gray-300">
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Smart contracts eliminate middlemen, reducing costs and accelerating deal flow.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>On-chain governance ensures transparency—investors vote directly on acquisitions and firm decisions.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Standardized deal structuring enables scalable and repeatable firm acquisitions.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div id="investment-models" className="space-y-4">
+                    <h3 className="text-xl font-semibold text-teal-400">Passive & Active Investment Models</h3>
+                    <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+                      <ul className="space-y-3 text-gray-300">
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Passive $LGR holders earn revenue-sharing from firm acquisitions.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Active investors participate in governance, voting on acquisitions, leadership, and strategic direction.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div id="pe-alternative" className="space-y-4">
+                    <h3 className="text-xl font-semibold text-teal-400">A Better Alternative to Private Equity</h3>
+                    <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+                      <ul className="space-y-3 text-gray-300">
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>No forced cost-cutting for short-term exits—LedgerFund DAO prioritizes long-term firm growth.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Investor-aligned governance prevents misaligned incentives common in PE roll-ups.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Expanded access to M&A beyond traditional private equity acquisition targets.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div id="next-wave" className="space-y-4">
+                    <h3 className="text-xl font-semibold text-teal-400">Unlocking the Next Wave of Firm Growth</h3>
+                    <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+                      <ul className="space-y-3 text-gray-300">
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Tech-driven acquisitions integrate AI, automation, and digital-first workflows.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Decentralized ownership attracts new investors and next-gen firm operators.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="mr-2">🔹</span>
+                          <span>Optimized capital deployment ensures sustainable firm growth without excessive debt financing.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                 </section>
 
                 <section id="dao-framework" className="space-y-4">
