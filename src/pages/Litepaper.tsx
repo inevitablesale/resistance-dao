@@ -18,6 +18,14 @@ const Litepaper = () => {
     );
   };
 
+  const handleSectionClick = (sectionId: string) => {
+    setActiveSection(sectionId);
+  };
+
+  const handleSubsectionClick = (subsectionId: string) => {
+    setActiveSection(subsectionId);
+  };
+
   const sections = [
     { id: "introduction", title: "1.0 Introduction" },
     { id: "how-it-works", title: "2.0 How LedgerFund DAO Works" },
@@ -618,6 +626,7 @@ const Litepaper = () => {
                               ? "bg-white/10 text-white" 
                               : "text-white/60 hover:text-white hover:bg-white/5"
                           )}
+                          onClick={() => handleSectionClick(section.id)}
                         >
                           {openSections.includes(section.id) ? (
                             <ChevronDown className="h-4 w-4 mr-2" />
@@ -639,7 +648,7 @@ const Litepaper = () => {
                                   ? "bg-white/10 text-white" 
                                   : "text-white/60 hover:text-white hover:bg-white/5"
                               )}
-                              onClick={() => setActiveSection(subsection.id)}
+                              onClick={() => handleSubsectionClick(subsection.id)}
                             >
                               {subsection.title}
                             </Button>
@@ -656,7 +665,7 @@ const Litepaper = () => {
                           ? "bg-white/10 text-white" 
                           : "text-white/60 hover:text-white hover:bg-white/5"
                       )}
-                      onClick={() => setActiveSection(section.id)}
+                      onClick={() => handleSectionClick(section.id)}
                     >
                       <div className="w-4 mr-2" />
                       {section.title}
