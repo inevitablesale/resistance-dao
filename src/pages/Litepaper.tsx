@@ -8,6 +8,14 @@ import { cn } from "@/lib/utils";
 const Litepaper = () => {
   const [activeSection, setActiveSection] = useState("introduction");
 
+  const scrollToSection = (sectionId: string) => {
+    setActiveSection(sectionId);
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   const sections = [
     { id: "introduction", title: "1.0 Introduction" },
     { id: "how-it-works", title: "2.0 How LedgerFund DAO Works" },
@@ -117,7 +125,7 @@ const Litepaper = () => {
                         ? "bg-white/10 text-white" 
                         : "text-white/60 hover:text-white hover:bg-white/5"
                     )}
-                    onClick={() => setActiveSection(section.id)}
+                    onClick={() => scrollToSection(section.id)}
                   >
                     {section.subsections ? (
                       <ChevronRight className="h-4 w-4 mr-2" />
@@ -139,7 +147,7 @@ const Litepaper = () => {
                               ? "bg-white/10 text-white" 
                               : "text-white/60 hover:text-white hover:bg-white/5"
                           )}
-                          onClick={() => setActiveSection(subsection.id)}
+                          onClick={() => scrollToSection(subsection.id)}
                         >
                           {subsection.title}
                         </Button>
