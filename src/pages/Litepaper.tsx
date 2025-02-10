@@ -2,11 +2,21 @@ import { useState } from "react";
 import Nav from "@/components/Nav";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const Litepaper = () => {
   const [activeSection, setActiveSection] = useState("introduction");
+  const [openSections, setOpenSections] = useState<string[]>([]);
+
+  const toggleSection = (sectionId: string) => {
+    setOpenSections(prev => 
+      prev.includes(sectionId) 
+        ? prev.filter(id => id !== sectionId)
+        : [...prev, sectionId]
+    );
+  };
 
   const sections = [
     { id: "introduction", title: "1.0 Introduction" },
@@ -594,42 +604,63 @@ const Litepaper = () => {
             <div className="p-4 space-y-2">
               {sections.map((section) => (
                 <div key={section.id} className="space-y-2">
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start text-sm font-medium transition-colors text-left",
-                      activeSection === section.id 
-                        ? "bg-white/10 text-white" 
-                        : "text-white/60 hover:text-white hover:bg-white/5"
-                    )}
-                    onClick={() => setActiveSection(section.id)}
-                  >
-                    {section.subsections ? (
-                      <ChevronRight className="h-4 w-4 mr-2" />
-                    ) : (
-                      <div className="w-4 mr-2" />
-                    )}
-                    {section.title}
-                  </Button>
-                  
-                  {section.subsections && (
-                    <div className="ml-4 space-y-1">
-                      {section.subsections.map((subsection) => (
+                  {section.subsections ? (
+                    <Collapsible
+                      open={openSections.includes(section.id)}
+                      onOpenChange={() => toggleSection(section.id)}
+                    >
+                      <CollapsibleTrigger asChild>
                         <Button
-                          key={subsection.id}
                           variant="ghost"
                           className={cn(
-                            "w-full justify-start text-sm font-medium transition-colors text-left pl-6",
-                            activeSection === subsection.id 
+                            "w-full justify-start text-sm font-medium transition-colors text-left",
+                            activeSection === section.id 
                               ? "bg-white/10 text-white" 
                               : "text-white/60 hover:text-white hover:bg-white/5"
                           )}
-                          onClick={() => setActiveSection(subsection.id)}
                         >
-                          {subsection.title}
+                          {openSections.includes(section.id) ? (
+                            <ChevronDown className="h-4 w-4 mr-2" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4 mr-2" />
+                          )}
+                          {section.title}
                         </Button>
-                      ))}
-                    </div>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <div className="ml-4 space-y-1">
+                          {section.subsections.map((subsection) => (
+                            <Button
+                              key={subsection.id}
+                              variant="ghost"
+                              className={cn(
+                                "w-full justify-start text-sm font-medium transition-colors text-left pl-6",
+                                activeSection === subsection.id 
+                                  ? "bg-white/10 text-white" 
+                                  : "text-white/60 hover:text-white hover:bg-white/5"
+                              )}
+                              onClick={() => setActiveSection(subsection.id)}
+                            >
+                              {subsection.title}
+                            </Button>
+                          ))}
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      className={cn(
+                        "w-full justify-start text-sm font-medium transition-colors text-left",
+                        activeSection === section.id 
+                          ? "bg-white/10 text-white" 
+                          : "text-white/60 hover:text-white hover:bg-white/5"
+                      )}
+                      onClick={() => setActiveSection(section.id)}
+                    >
+                      <div className="w-4 mr-2" />
+                      {section.title}
+                    </Button>
                   )}
                 </div>
               ))}
