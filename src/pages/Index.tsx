@@ -380,14 +380,7 @@ const IndexContent = () => {
               <TokenPurchaseForm />
             </div>
           ) : (
-            <div className="relative max-w-3xl mx-auto">
-              <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-10">
-                <div 
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#ea384c] text-white py-2 px-4 font-bold text-lg shadow-lg transform rotate-[-35deg] w-[150%] text-center"
-                >
-                  SALE STARTS 2/10/2025
-                </div>
-              </div>
+            <div className="max-w-3xl mx-auto">
               
               <div className="bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
                 <div className="mb-8">
