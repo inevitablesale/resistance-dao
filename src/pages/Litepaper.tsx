@@ -10,6 +10,44 @@ const Litepaper = () => {
   const [activeSection, setActiveSection] = useState("introduction");
   const [openSections, setOpenSections] = useState<string[]>([]);
 
+  const findSectionIndex = (sectionId: string): number => {
+    const mainIndex = sections.findIndex(s => s.id === sectionId);
+    if (mainIndex !== -1) return mainIndex;
+
+    for (let i = 0; i < sections.length; i++) {
+      const section = sections[i];
+      if (section.subsections) {
+        const subIndex = section.subsections.findIndex(sub => sub.id === sectionId);
+        if (subIndex !== -1) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  };
+
+  const findNextSection = (): string => {
+    const currentIndex = findSectionIndex(activeSection);
+    if (currentIndex === -1 || currentIndex === sections.length - 1) return sections[0].id;
+    return sections[currentIndex + 1].id;
+  };
+
+  const findPreviousSection = (): string => {
+    const currentIndex = findSectionIndex(activeSection);
+    if (currentIndex === -1 || currentIndex === 0) return sections[sections.length - 1].id;
+    return sections[currentIndex - 1].id;
+  };
+
+  const handleNextSection = () => {
+    const nextSection = findNextSection();
+    setActiveSection(nextSection);
+  };
+
+  const handlePreviousSection = () => {
+    const prevSection = findPreviousSection();
+    setActiveSection(prevSection);
+  };
+
   const toggleSection = (sectionId: string) => {
     setOpenSections(prev => 
       prev.includes(sectionId) 
@@ -693,12 +731,14 @@ const Litepaper = () => {
                   <Button 
                     variant="ghost" 
                     className="text-white/60 hover:text-white"
+                    onClick={handlePreviousSection}
                   >
                     ← Previous
                   </Button>
                   <Button 
                     variant="ghost"
                     className="text-white/60 hover:text-white"
+                    onClick={handleNextSection}
                   >
                     Next →
                   </Button>
