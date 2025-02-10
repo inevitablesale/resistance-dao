@@ -45,6 +45,12 @@ const Nav = () => {
             >
               Tokenomics
             </a>
+            <Link 
+              to="/litepaper" 
+              className="px-6 py-2 bg-gradient-to-r from-yellow-500 via-teal-400 to-yellow-400 text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
+            >
+              Litepaper
+            </Link>
             <a 
               href="https://x.com/LedgerFundDAO" 
               target="_blank" 
@@ -61,12 +67,6 @@ const Nav = () => {
             >
               <Linked className="w-6 h-6" />
             </a>
-            <button 
-              disabled
-              className="px-6 py-2 bg-gray-600/30 text-gray-400 rounded-lg font-medium cursor-not-allowed"
-            >
-              Litepaper
-            </button>
             <DynamicWidget />
           </div>
         </div>

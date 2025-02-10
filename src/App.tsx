@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import GovernanceVoting from "./pages/GovernanceVoting";
 import MintNFT from "./pages/MintNFT";
 import ShareToEarn from "./pages/ShareToEarn";
+import Litepaper from "./pages/Litepaper";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
 
@@ -159,6 +160,7 @@ function App() {
           <Route path="/governance-voting" element={<GovernanceVoting />} />
           <Route path="/mint-nft" element={<MintNFT />} />
           <Route path="/share-to-earn" element={<ShareToEarn />} />
+          <Route path="/litepaper" element={<Litepaper />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
