@@ -305,23 +305,23 @@ const Litepaper = () => {
         <div id="succession-crisis" className="space-y-4">
           <h3 className="text-xl font-semibold text-teal-400">The Succession Crisis</h3>
           <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-            <h4 className="text-xl font-semibold text-yellow-500 mb-4">Aging Firm Owners with No Exit Plan</h4>
+            <h4 className="text-xl font-semibold text-yellow-500 mb-4">Critical Industry Challenge</h4>
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>70% of accounting firm owners are over 50, with many nearing retirement.</span>
+                <span>Over 75% of accounting firm owners are approaching retirement age within the next decade.</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>Limited succession options force firms to sell at a discount or struggle with leadership transitions.</span>
+                <span>Less than 10% of firms have a formal succession plan in place.</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>Internal buyouts fail because younger CPAs lack the capital or risk tolerance to acquire firms.</span>
+                <span>Traditional succession options are limited and often result in undervalued sales.</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>Private equity roll-ups aggressively strip firms of independence through rapid consolidation.</span>
+                <span>Next-gen leaders lack capital access for internal buyouts.</span>
               </li>
             </ul>
           </div>
@@ -333,15 +333,19 @@ const Litepaper = () => {
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>PE firms focus on aggressive cost-cutting and rapid fee increases, often harming firm culture.</span>
+                <span>PE firms prioritize aggressive cost-cutting over sustainable growth.</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>High-leverage models leave firms overburdened with debt once PE firms exit.</span>
+                <span>Short investment horizons (3-5 years) create misaligned incentives.</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>Short-term exit cycles (3-5 years) prioritize financial engineering over sustainable growth.</span>
+                <span>High leverage models burden firms with unsustainable debt.</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">🔹</span>
+                <span>Client relationships suffer from rapid consolidation tactics.</span>
               </li>
             </ul>
           </div>
@@ -353,19 +357,19 @@ const Litepaper = () => {
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>Opaque valuations create pricing inconsistencies and risk for buyers.</span>
+                <span>Complex valuation processes create pricing uncertainty.</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>High transaction costs limit M&A accessibility for smaller firms.</span>
+                <span>High transaction costs limit deal accessibility.</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>Slow, inefficient deal structures discourage independent investors.</span>
+                <span>Lengthy due diligence periods drain resources.</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>Regulatory complexities create costly and time-consuming acquisition processes.</span>
+                <span>Regulatory compliance adds significant complexity.</span>
               </li>
             </ul>
           </div>
