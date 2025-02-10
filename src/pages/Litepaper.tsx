@@ -285,94 +285,84 @@ const Litepaper = () => {
     "industry-landscape": (
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">6.0 Industry Landscape</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-            <h3 className="text-xl font-semibold mb-2 text-teal-400">Smart Contracts</h3>
-            <p className="text-gray-300 leading-relaxed">
-              Built on Polygon for scalability and efficiency, our smart contracts 
-              ensure transparent and secure operations with minimal gas fees.
-            </p>
-          </div>
-          <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-            <h3 className="text-xl font-semibold mb-2 text-teal-400">Governance</h3>
-            <p className="text-gray-300 leading-relaxed">
-              Decentralized governance through LGR tokens enables community-driven 
-              decision-making and protocol evolution.
-            </p>
-          </div>
+        <p className="text-gray-300 leading-relaxed">
+          The accounting industry faces several critical challenges that create opportunities for innovative solutions.
+        </p>
+      </div>
+    ),
+    "succession-crisis": (
+      <div className="space-y-4">
+        <h3 className="text-xl font-semibold text-teal-400">The Succession Crisis</h3>
+        <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+          <h4 className="text-xl font-semibold text-yellow-500 mb-4">Critical Industry Challenge</h4>
+          <ul className="space-y-3 text-gray-300">
+            <li className="flex items-start">
+              <span className="mr-2">🔹</span>
+              <span>Over 75% of accounting firm owners are approaching retirement age within the next decade.</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">🔹</span>
+              <span>Less than 10% of firms have a formal succession plan in place.</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">🔹</span>
+              <span>Traditional succession options are limited and often result in undervalued sales.</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">🔹</span>
+              <span>Next-gen leaders lack capital access for internal buyouts.</span>
+            </li>
+          </ul>
         </div>
-
-        <div id="succession-crisis" className="space-y-4">
-          <h3 className="text-xl font-semibold text-teal-400">The Succession Crisis</h3>
-          <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-            <h4 className="text-xl font-semibold text-yellow-500 mb-4">Critical Industry Challenge</h4>
-            <ul className="space-y-3 text-gray-300">
-              <li className="flex items-start">
-                <span className="mr-2">🔹</span>
-                <span>Over 75% of accounting firm owners are approaching retirement age within the next decade.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">🔹</span>
-                <span>Less than 10% of firms have a formal succession plan in place.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">🔹</span>
-                <span>Traditional succession options are limited and often result in undervalued sales.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">🔹</span>
-                <span>Next-gen leaders lack capital access for internal buyouts.</span>
-              </li>
-            </ul>
-          </div>
+      </div>
+    ),
+    "pe-problem": (
+      <div className="space-y-4">
+        <h3 className="text-xl font-semibold text-teal-400">The Private Equity Problem</h3>
+        <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+          <ul className="space-y-3 text-gray-300">
+            <li className="flex items-start">
+              <span className="mr-2">🔹</span>
+              <span>PE firms prioritize aggressive cost-cutting over sustainable growth.</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">🔹</span>
+              <span>Short investment horizons (3-5 years) create misaligned incentives.</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">🔹</span>
+              <span>High leverage models burden firms with unsustainable debt.</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">🔹</span>
+              <span>Client relationships suffer from rapid consolidation tactics.</span>
+            </li>
+          </ul>
         </div>
-
-        <div id="pe-problem" className="space-y-4">
-          <h3 className="text-xl font-semibold text-teal-400">The Private Equity Problem</h3>
-          <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-            <ul className="space-y-3 text-gray-300">
-              <li className="flex items-start">
-                <span className="mr-2">🔹</span>
-                <span>PE firms prioritize aggressive cost-cutting over sustainable growth.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">🔹</span>
-                <span>Short investment horizons (3-5 years) create misaligned incentives.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">🔹</span>
-                <span>High leverage models burden firms with unsustainable debt.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">🔹</span>
-                <span>Client relationships suffer from rapid consolidation tactics.</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div id="barriers" className="space-y-4">
-          <h3 className="text-xl font-semibold text-teal-400">Barriers to Traditional M&A</h3>
-          <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-            <ul className="space-y-3 text-gray-300">
-              <li className="flex items-start">
-                <span className="mr-2">🔹</span>
-                <span>Complex valuation processes create pricing uncertainty.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">🔹</span>
-                <span>High transaction costs limit deal accessibility.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">🔹</span>
-                <span>Lengthy due diligence periods drain resources.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">🔹</span>
-                <span>Regulatory compliance adds significant complexity.</span>
-              </li>
-            </ul>
-          </div>
+      </div>
+    ),
+    "barriers": (
+      <div className="space-y-4">
+        <h3 className="text-xl font-semibold text-teal-400">Barriers to Traditional M&A</h3>
+        <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+          <ul className="space-y-3 text-gray-300">
+            <li className="flex items-start">
+              <span className="mr-2">🔹</span>
+              <span>Complex valuation processes create pricing uncertainty.</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">🔹</span>
+              <span>High transaction costs limit deal accessibility.</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">🔹</span>
+              <span>Lengthy due diligence periods drain resources.</span>
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">🔹</span>
+              <span>Regulatory compliance adds significant complexity.</span>
+            </li>
+          </ul>
         </div>
       </div>
     ),
