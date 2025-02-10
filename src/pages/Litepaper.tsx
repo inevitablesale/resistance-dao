@@ -12,7 +12,14 @@ const Litepaper = () => {
     setActiveSection(sectionId);
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      const offset = 100; 
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
     }
   };
 
@@ -580,6 +587,38 @@ const Litepaper = () => {
                     participate in the governance of the platform 
                     through the use of LGR tokens.
                   </p>
+                </section>
+
+                <section id="revenue-sharing" className="space-y-4">
+                  <h3 className="text-xl font-semibold text-teal-400">Revenue Sharing</h3>
+                  <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+                    <ul className="space-y-3 text-gray-300">
+                      <li className="flex items-start">
+                        <span className="mr-2">🔹</span>
+                        <span>The DAO distributes a portion of firm revenues to active $LGR token holders.</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">🔹</span>
+                        <span>On-chain, automated distributions ensure full transparency and fairness.</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2">🔹</span>
+                        <span>Revenue Breakdown:</span>
+                      </li>
+                      <li className="flex items-start ml-6">
+                        <span className="mr-2">✔</span>
+                        <span>50% reinvested into future acquisitions & DAO expansion.</span>
+                      </li>
+                      <li className="flex items-start ml-6">
+                        <span className="mr-2">✔</span>
+                        <span>40% distributed to token holders via staking rewards.</span>
+                      </li>
+                      <li className="flex items-start ml-6">
+                        <span className="mr-2">✔</span>
+                        <span>10% allocated to DAO operations & legal compliance.</span>
+                      </li>
+                    </ul>
+                  </div>
                 </section>
 
                 <section id="regulatory" className="space-y-4">
