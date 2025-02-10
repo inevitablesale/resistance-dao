@@ -267,6 +267,7 @@ const Litepaper = () => {
         <div id="succession-crisis" className="space-y-4">
           <h3 className="text-xl font-semibold text-teal-400">The Succession Crisis</h3>
           <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+            <h4 className="text-xl font-semibold text-yellow-500 mb-4">Aging Firm Owners with No Exit Plan</h4>
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
