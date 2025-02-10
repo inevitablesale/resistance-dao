@@ -39,7 +39,7 @@ const Litepaper = () => {
         { id: "barriers", title: "Barriers to Traditional M&A" }
       ]
     },
-    { id: "market-opportunity", title: "7.0 Market Opportunity",
+    { id: "market-opportunity", title: "7.0 Market Opportunity for Decentralized Solutions",
       subsections: [
         { id: "tokenized-ownership", title: "Tokenized Ownership" },
         { id: "efficient-ma", title: "Efficient M&A" },
@@ -335,13 +335,9 @@ const Litepaper = () => {
     ),
     "market-opportunity": (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-yellow-500">7.0 Market Opportunity</h2>
+        <h2 className="text-2xl font-bold text-yellow-500">7.0 Market Opportunity for Decentralized Solutions</h2>
         <p className="text-gray-300 leading-relaxed">
-          The accounting firm acquisition market is ripe for disruption, with 
-          traditional private equity roll-ups facing challenges in scaling 
-          and maintaining operational efficiency. LedgerFund DAO offers a 
-          more sustainable and scalable solution that aligns with the 
-          needs of modern businesses.
+          The $140B+ accounting industry is ripe for disruption. Blockchain-based investment models provide a scalable, transparent, and investor-driven approach to firm ownership.
         </p>
 
         <div id="tokenized-ownership" className="space-y-4">
