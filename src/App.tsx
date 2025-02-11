@@ -11,6 +11,7 @@ import MintNFT from "./pages/MintNFT";
 import ShareToEarn from "./pages/ShareToEarn";
 import Litepaper from "./pages/Litepaper";
 import GettingStarted from "./pages/GettingStarted";
+import ChatAgent from "./components/ChatAgent";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
 
@@ -165,6 +166,7 @@ function App() {
           <Route path="/getting-started" element={<GettingStarted />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <ChatAgent />
       </Router>
       <Toaster />
       <Analytics />

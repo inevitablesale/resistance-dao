@@ -44,12 +44,6 @@ const Nav = () => {
             >
               Get Started
             </Link>
-            <a 
-              href="#tokenomics" 
-              className="text-white/80 hover:text-white transition-colors"
-            >
-              Tokenomics
-            </a>
             <Link 
               to="/litepaper" 
               className="px-6 py-2 bg-gradient-to-r from-yellow-500 via-teal-400 to-yellow-400 text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
