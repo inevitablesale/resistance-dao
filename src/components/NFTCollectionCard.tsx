@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
 import { Hexagon, Cpu, Box, Blocks, Binary, Network, Shield, Database } from "lucide-react";
@@ -32,10 +31,6 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
   const [isHovered, setIsHovered] = useState(false);
   const [isExperienceOpen, setIsExperienceOpen] = useState(false);
 
-  const governancePower = metadata.attributes?.find(
-    attr => attr.trait_type === "Governance Power"
-  )?.value || "Unknown";
-
   const getAttribute = (traitType: string) => 
     metadata.attributes?.find(attr => attr.trait_type === traitType)?.value || "N/A";
 
@@ -54,7 +49,6 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
       onHoverEnd={() => setIsHovered(false)}
     >
       <Card className="relative overflow-hidden bg-transparent border-0">
-        {/* Animated Background Layer */}
         <div className="absolute inset-0 bg-black">
           <motion.div 
             className="absolute inset-0 opacity-30"
@@ -72,7 +66,6 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
               repeatType: "reverse",
             }}
           />
-          {/* Tech Grid Pattern */}
           <div className="absolute inset-0 opacity-20">
             <div className="w-full h-full" 
               style={{
@@ -87,9 +80,7 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
         </div>
 
         <div className="relative z-10">
-          {/* Main Content Container */}
           <div className="p-8 space-y-8">
-            {/* Header Section with Holographic Effect */}
             <motion.div 
               className="text-center space-y-4 relative"
               animate={{ y: isHovered ? -10 : 0 }}
@@ -105,12 +96,11 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
               </div>
             </motion.div>
 
-            {/* Attributes Grid with Cyber Effect */}
             <div className="grid grid-cols-2 gap-6">
               <AttributeBox
                 icon={Shield}
                 label="Governance Power"
-                value={governancePower}
+                value={getAttribute("Governance Power")}
                 className="cyber-box"
               />
               <AttributeBox
@@ -145,7 +135,6 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
               />
             </div>
 
-            {/* Experience Section */}
             {metadata.experiences && (
               <ExperienceSection
                 experiences={metadata.experiences}
@@ -154,12 +143,10 @@ export const NFTCollectionCard = ({ tokenId, owner, metadata }: NFTCollectionCar
               />
             )}
 
-            {/* Voting Section */}
             <VotingSection tokenId={tokenId} owner={owner} />
           </div>
         </div>
 
-        {/* Decorative Elements */}
         <motion.div 
           className="absolute top-0 left-0 w-full h-full pointer-events-none"
           animate={{
