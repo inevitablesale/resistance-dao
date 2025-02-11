@@ -256,12 +256,12 @@ export default function KnowledgeBase() {
       </div>
 
       <div className="max-w-7xl mx-auto px-8 py-12">
-        {!showExamples ? (
+        {!showExamples && (
           <div className="text-center py-12">
             <h3 className="text-2xl font-semibold text-white/80 mb-4">Create Your Professional NFT</h3>
-            <p className="text-white/60 mb-8">Choose the type of NFT you want to create or view examples for inspiration.</p>
+            <p className="text-white/60 mb-8">Choose the type of NFT you want to create.</p>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
               <div onClick={() => setShowArticleOverlay(true)} className="cursor-pointer">
                 <Card className="p-6 bg-white/5 border-white/10 hover:border-teal-400/50 transition-all duration-300">
                   <div className="text-center space-y-4">
@@ -297,20 +297,11 @@ export default function KnowledgeBase() {
                   </div>
                 </Card>
               </div>
-
-              <div className="flex justify-center">
-                <Button
-                  variant="outline"
-                  className="whitespace-nowrap rounded-xl px-6 text-black hover:text-white"
-                  onClick={() => setShowExamples(true)}
-                >
-                  <Eye className="w-4 h-4 mr-2 text-black" />
-                  View Examples
-                </Button>
-              </div>
             </div>
           </div>
-        ) : (
+        )}
+
+        {showExamples && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Object.entries(categorizedArticles).map(([category, categoryArticles]) => (
               categoryArticles.map((article) => (
