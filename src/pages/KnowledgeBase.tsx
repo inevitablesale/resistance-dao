@@ -260,7 +260,7 @@ export default function KnowledgeBase() {
                   <Card className="h-full bg-gray-800/50 border-white/10 hover:border-white/20 transition-all duration-300 relative overflow-hidden backdrop-blur-xl group-hover:transform group-hover:scale-[1.02]">
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0" />
                     <div className="relative p-6">
-                      <div className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-teal-400 backdrop-blur-sm border border-white/10">
+                      <div className="absolute -right-12 top-8 px-12 py-1 rotate-45 text-xs font-medium bg-white/10 text-teal-400 backdrop-blur-sm border-y border-white/10 w-48 text-center">
                         {getContentTypeLabel(category)}
                       </div>
                       <div className="flex items-center gap-4 mb-6">
