@@ -378,6 +378,12 @@ const IndexContent = () => {
                 </button>
               </div>
               <TokenPurchaseForm />
+              <button 
+                onClick={() => window.open('https://www.ledgerfund.info/litepaper', '_blank')}
+                className="mt-4 text-gray-400 hover:text-white transition-colors text-sm w-full text-center"
+              >
+                New to crypto? Get started here
+              </button>
             </div>
           ) : (
             <div className="max-w-3xl mx-auto">
