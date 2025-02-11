@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Search, Loader2, BookOpen, Briefcase, User } from 'lucide-react';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { useToast } from "@/hooks/use-toast";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { VotingSection } from '@/components/nft-card/VotingSection';
 
 export default function KnowledgeBase() {
   const [publications, setPublications] = useState<Publication[]>([]);
@@ -18,6 +20,7 @@ export default function KnowledgeBase() {
   const [error, setError] = useState<string | null>(null);
   const { isConnected, address } = useWalletConnection();
   const { toast } = useToast();
+  const [isExampleOpen, setIsExampleOpen] = useState(true);
 
   useEffect(() => {
     fetchArticles();
@@ -158,33 +161,51 @@ export default function KnowledgeBase() {
           <p className="mt-2 text-sm text-white/60">Browse through our example content below to see what's possible in the marketplace.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Object.entries(categorizedArticles).map(([category, categoryArticles]) => (
-            <Card key={category} className="p-6 bg-gray-900/50 border-white/10 relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-yellow-500/10 px-2 py-1 text-xs text-yellow-500 rounded-bl">
-                Example Content
-              </div>
-              <div className="flex items-center gap-2 mb-4">
-                {getContentTypeIcon(category)}
-                <h2 className="text-xl font-semibold">{getContentTypeLabel(category)}</h2>
-              </div>
-              <ScrollArea className="h-[300px]">
-                <ul className="space-y-2">
-                  {categoryArticles.map((article) => (
-                    <li key={article.id}>
-                      <Link
-                        to={`/marketplace/${article.contentType}/${article.id}`}
-                        className="text-white/80 hover:text-white transition-colors block py-2 px-3 rounded-md hover:bg-white/5"
-                      >
-                        {article.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </ScrollArea>
-            </Card>
-          ))}
-        </div>
+        <Collapsible
+          open={isExampleOpen}
+          onOpenChange={setIsExampleOpen}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold text-white/90">Example Content</h2>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="bg-black/40 border-white/10">
+                {isExampleOpen ? 'Hide Examples' : 'Show Examples'}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          
+          <CollapsibleContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Object.entries(categorizedArticles).map(([category, categoryArticles]) => (
+                <Card key={category} className="p-6 bg-gray-900/50 border-white/10 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 bg-yellow-500/10 px-2 py-1 text-xs text-yellow-500 rounded-bl">
+                    Example Content
+                  </div>
+                  <div className="flex items-center gap-2 mb-4">
+                    {getContentTypeIcon(category)}
+                    <h2 className="text-xl font-semibold">{getContentTypeLabel(category)}</h2>
+                  </div>
+                  <ScrollArea className="h-[300px] mb-4">
+                    <ul className="space-y-2">
+                      {categoryArticles.map((article) => (
+                        <li key={article.id}>
+                          <Link
+                            to={`/marketplace/${article.contentType}/${article.id}`}
+                            className="text-white/80 hover:text-white transition-colors block py-2 px-3 rounded-md hover:bg-white/5"
+                          >
+                            {article.title}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </ScrollArea>
+                  <VotingSection tokenId={category} owner={categoryArticles[0].publisher} />
+                </Card>
+              ))}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
     </div>
   );
