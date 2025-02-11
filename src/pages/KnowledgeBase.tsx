@@ -240,10 +240,10 @@ export default function KnowledgeBase() {
               ))}
               <Button
                 variant={showExamples ? "default" : "outline"}
-                className="ml-auto whitespace-nowrap rounded-xl px-6"
+                className={`ml-auto whitespace-nowrap rounded-xl px-6 ${showExamples ? 'text-white' : 'text-black hover:text-white'}`}
                 onClick={() => setShowExamples(!showExamples)}
               >
-                <Eye className={`w-4 h-4 mr-2 ${showExamples ? 'text-white' : 'text-white/60'}`} />
+                <Eye className={`w-4 h-4 mr-2 ${showExamples ? 'text-white' : 'text-black'}`} />
                 {showExamples ? 'Hide Examples' : 'View Examples'}
               </Button>
             </div>
@@ -254,16 +254,57 @@ export default function KnowledgeBase() {
       <div className="max-w-7xl mx-auto px-8 py-12">
         {!showExamples ? (
           <div className="text-center py-12">
-            <h3 className="text-2xl font-semibold text-white/80 mb-4">No Active Listings</h3>
-            <p className="text-white/60 mb-6">Click "View Examples" to see sample listings or connect your wallet to create a listing.</p>
-            <Button
-              variant="outline"
-              className="whitespace-nowrap rounded-xl px-6"
-              onClick={() => setShowExamples(true)}
-            >
-              <Eye className="w-4 h-4 mr-2" />
-              View Examples
-            </Button>
+            <h3 className="text-2xl font-semibold text-white/80 mb-4">Create Your Professional NFT</h3>
+            <p className="text-white/60 mb-8">Choose the type of NFT you want to create or view examples for inspiration.</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-12">
+              <Link to="/mint-nft?type=article" className="group">
+                <Card className="p-6 bg-white/5 border-white/10 hover:border-teal-400/50 transition-all duration-300">
+                  <div className="text-center space-y-4">
+                    <div className="w-12 h-12 bg-teal-400/10 rounded-xl flex items-center justify-center mx-auto">
+                      <BookOpen className="w-6 h-6 text-teal-400" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-white">Article</h4>
+                    <p className="text-sm text-white/60">Share your knowledge and insights with the community</p>
+                  </div>
+                </Card>
+              </Link>
+
+              <Link to="/mint-nft?type=job" className="group">
+                <Card className="p-6 bg-white/5 border-white/10 hover:border-yellow-400/50 transition-all duration-300">
+                  <div className="text-center space-y-4">
+                    <div className="w-12 h-12 bg-yellow-400/10 rounded-xl flex items-center justify-center mx-auto">
+                      <Briefcase className="w-6 h-6 text-yellow-400" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-white">Job Posting</h4>
+                    <p className="text-sm text-white/60">List opportunities and find talented professionals</p>
+                  </div>
+                </Card>
+              </Link>
+
+              <Link to="/mint-nft?type=resume" className="group">
+                <Card className="p-6 bg-white/5 border-white/10 hover:border-purple-400/50 transition-all duration-300">
+                  <div className="text-center space-y-4">
+                    <div className="w-12 h-12 bg-purple-400/10 rounded-xl flex items-center justify-center mx-auto">
+                      <User className="w-6 h-6 text-purple-400" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-white">Resume</h4>
+                    <p className="text-sm text-white/60">Showcase your skills and professional experience</p>
+                  </div>
+                </Card>
+              </Link>
+            </div>
+
+            <div className="flex justify-center">
+              <Button
+                variant="outline"
+                className="whitespace-nowrap rounded-xl px-6 text-black hover:text-white"
+                onClick={() => setShowExamples(true)}
+              >
+                <Eye className="w-4 h-4 mr-2 text-black" />
+                View Examples
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
