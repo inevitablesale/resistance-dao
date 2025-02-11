@@ -419,29 +419,152 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
       </div>
     ),
     "dao-framework": (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">8.0 DAO Framework</h2>
-        <p className="text-gray-300 leading-relaxed">
-          Our framework is designed to facilitate the acquisition, 
-          governance, and scaling of accounting firms through 
-          blockchain-powered investment strategies. We leverage 
-          decentralized governance to ensure transparency and 
-          accountability, while also providing a platform for 
-          investors to participate in the decision-making process.
-        </p>
+        <div className="space-y-8">
+          <p className="text-gray-300 leading-relaxed">
+            LedgerFund DAO is a decentralized, permissionless network, where governance and investment 
+            decisions are executed via smart contracts and community voting.
+          </p>
+
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Key Governance Components</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>$LGR Token Holders – Vote on acquisitions, firm operations, and governance decisions.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Governance Board – Elected to oversee deal sourcing, acquisitions, and operational strategy.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Special Purpose Vehicles (SPVs) – Each acquired firm is structured under an SPV for legal compliance and financial separation.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>On-Chain Proposal & Voting System – Ensures fully transparent, investor-driven decision-making.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Governance Process</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">📌</span>
+                  <span>1. Proposal Submission – Investors and stakeholders submit acquisition and operational proposals.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">📌</span>
+                  <span>2. On-Chain Voting – $LGR holders vote on:</span>
+                  <ul className="ml-8 mt-2 space-y-2">
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Firm acquisitions & due diligence approvals.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Operational improvements & leadership decisions.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Revenue allocation & governance updates.</span>
+                    </li>
+                  </ul>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">📌</span>
+                  <span>3. Smart Contract Execution – Approved votes trigger automated, immutable smart contract execution.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     ),
     "tokenomics": (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">9.0 Tokenomics</h2>
-        <p className="text-gray-300 leading-relaxed">
-          Our tokenomics are designed to incentivize participation 
-          in the acquisition process and ensure the long-term 
-          sustainability of the platform. We use a combination of 
-          staking, governance, and liquidity rewards to create 
-          a robust ecosystem that supports the growth and 
-          development of the platform.
+        <p className="text-gray-300 leading-relaxed mb-6">
+          LedgerFund DAO operates with two token models, offering governance rights, revenue-sharing, and liquidity incentives.
         </p>
+
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">$LGR Token (Governance)</h3>
+            <p className="text-gray-300 mb-4">
+              $LGR is the core governance token, granting holders:
+            </p>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Voting Rights – Influence acquisitions, firm decisions, and DAO operations.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>DAO Revenue Sharing – Earn token reflections from firm-generated revenue.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Exclusive Access – Only $LGR holders can participate in DAO-backed firm acquisitions.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Token Distribution Model</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Presale Allocation: 5,000,000 $LGR tokens.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Liquidity & Operations: 20% for DAO operations and firm scaling.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Staking & Governance Rewards: Incentives for long-term participation.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Treasury Reserve: Capital for future acquisitions and growth.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">$LGR LP Tokens (Liquidity Pool & Passive Income)</h3>
+            <p className="text-gray-300 mb-4">
+              LGR LP represents liquidity pool shares and provides passive income exposure to firm acquisitions.
+            </p>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Earn from firm revenues – A portion of acquisition fees and profits is distributed to LP holders.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Liquidity pool stability – Supports on-chain trading and enhances market depth.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Staking & Yield Farming – LP holders stake tokens for additional rewards.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     ),
     "blockchain": (
