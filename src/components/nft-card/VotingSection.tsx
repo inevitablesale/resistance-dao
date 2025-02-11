@@ -1,5 +1,5 @@
 
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ThumbsUp, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
@@ -11,11 +11,11 @@ interface VotingSectionProps {
 export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
   const { toast } = useToast();
 
-  const handleVote = async (voteType: 'up' | 'down') => {
+  const handleVote = async () => {
     try {
       toast({
         title: "Coming Soon",
-        description: `Voting ${voteType} will be implemented through smart contracts`,
+        description: `Voting will be implemented through smart contracts`,
       });
     } catch (error) {
       console.error('Error voting:', error);
@@ -40,8 +40,8 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
         <Button
           variant="outline"
           size="lg"
-          className="flex items-center gap-2 bg-black/40 border-white/10 hover:bg-green-500/20 hover:border-green-500/40 transition-all duration-300"
-          onClick={() => handleVote('up')}
+          className="flex items-center gap-2 bg-teal-900/40 border-teal-500/40 hover:bg-teal-500/20 hover:border-teal-500/40 transition-all duration-300"
+          onClick={() => handleVote()}
         >
           <ThumbsUp className="w-5 h-5" />
           Vote Up
@@ -49,11 +49,11 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
         <Button
           variant="outline"
           size="lg"
-          className="flex items-center gap-2 bg-black/40 border-white/10 hover:bg-red-500/20 hover:border-red-500/40 transition-all duration-300"
-          onClick={() => handleVote('down')}
+          className="flex items-center gap-2 bg-purple-900/40 border-purple-500/40 hover:bg-purple-500/20 hover:border-purple-500/40 transition-all duration-300"
+          onClick={() => window.location.href = `/marketplace/${tokenId}`}
         >
-          <ThumbsDown className="w-5 h-5" />
-          Vote Down
+          <ChevronRight className="w-5 h-5" />
+          Learn More
         </Button>
       </div>
     </>
