@@ -4,7 +4,6 @@ import { supabase } from '../integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Input } from '@/components/ui/input';
 import { 
   Table,
   TableBody,
@@ -20,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue 
 } from '@/components/ui/select';
-import { PenSquare, Plus, Loader2, EyeIcon, Trash2 } from 'lucide-react';
+import { PenSquare, Plus, Loader2, EyeIcon, Trash2, Linkedin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface KnowledgeArticle {
@@ -37,9 +36,9 @@ export default function KnowledgeAdmin() {
   const [articles, setArticles] = useState<KnowledgeArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [showApplyForm, setShowApplyForm] = useState(false);
+  const [reason, setReason] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -51,28 +50,16 @@ export default function KnowledgeAdmin() {
   async function checkAdminStatus() {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      const { error } = await supabase.auth.getSession();
-      if (error || !session) {
-        toast({
-          variant: "destructive",
-          title: "Authentication Required",
-          description: "Please sign in to access the admin panel."
-        });
-        setLoading(false);
-        return;
-      }
+      setLoading(false);
+      return;
     }
 
     const { data: roleCheck, error: roleError } = await supabase
       .rpc('is_admin', { user_id: session.user.id });
 
     if (roleError || !roleCheck) {
-      toast({
-        variant: "destructive",
-        title: "Access Denied",
-        description: "You don't have permission to access this page."
-      });
-      navigate('/');
+      setShowApplyForm(true);
+      setLoading(false);
       return;
     }
 
@@ -80,43 +67,59 @@ export default function KnowledgeAdmin() {
     setLoading(false);
   }
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setIsLoggingIn(true);
-
+  async function handleLinkedInSignIn() {
+    setIsSigningIn(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'linkedin_oidc',
+        options: {
+          redirectTo: `${window.location.origin}/knowledge/admin`
+        }
       });
 
       if (error) throw error;
-
-      if (data.session) {
-        const { data: roleCheck, error: roleError } = await supabase
-          .rpc('is_admin', { user_id: data.session.user.id });
-
-        if (roleError || !roleCheck) {
-          throw new Error('Access denied: Not an admin user');
-        }
-
-        toast({
-          title: "Success",
-          description: "Successfully logged in"
-        });
-        
-        setIsAdmin(true);
-        await fetchArticles();
-      }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('LinkedIn sign in error:', error);
       toast({
         variant: "destructive",
-        title: "Login Failed",
-        description: error instanceof Error ? error.message : "Failed to login"
+        title: "Sign In Failed",
+        description: error instanceof Error ? error.message : "Failed to sign in with LinkedIn"
       });
     } finally {
-      setIsLoggingIn(false);
+      setIsSigningIn(false);
+    }
+  }
+
+  async function handleAdminRequest(e: React.FormEvent) {
+    e.preventDefault();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    try {
+      const { error } = await supabase
+        .from('admin_requests')
+        .insert([
+          { 
+            user_id: session.user.id,
+            reason,
+            status: 'pending'
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Request Submitted",
+        description: "Your admin access request has been submitted for review."
+      });
+      setShowApplyForm(false);
+    } catch (error) {
+      console.error('Admin request error:', error);
+      toast({
+        variant: "destructive",
+        title: "Request Failed",
+        description: "Failed to submit admin access request"
+      });
     }
   }
 
@@ -209,39 +212,49 @@ export default function KnowledgeAdmin() {
       <div className="min-h-screen bg-black text-white p-8">
         <div className="max-w-md mx-auto mt-20">
           <Card className="p-6 bg-gray-900/50 border-white/10">
-            <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <Input
-                type="email"
-                placeholder="Email"
-                className="bg-white/5 border-white/10"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <Input
-                type="password"
-                placeholder="Password"
-                className="bg-white/5 border-white/10"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <Button 
-                type="submit"
-                className="w-full bg-yellow-500 hover:bg-yellow-600"
-                disabled={isLoggingIn}
-              >
-                {isLoggingIn ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Signing In...
-                  </>
-                ) : (
-                  'Sign In'
-                )}
-              </Button>
-            </form>
+            <h1 className="text-2xl font-bold mb-6 text-center">Admin Access</h1>
+            {!showApplyForm ? (
+              <div className="space-y-4">
+                <Button 
+                  className="w-full bg-[#0077B5] hover:bg-[#006497] flex items-center justify-center gap-2"
+                  onClick={handleLinkedInSignIn}
+                  disabled={isSigningIn}
+                >
+                  {isSigningIn ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Connecting...
+                    </>
+                  ) : (
+                    <>
+                      <Linkedin className="w-5 h-5" />
+                      Sign in with LinkedIn
+                    </>
+                  )}
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleAdminRequest} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Why do you need admin access?
+                  </label>
+                  <textarea
+                    className="w-full h-32 p-3 bg-white/5 border border-white/10 rounded-md text-white"
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    required
+                    placeholder="Please explain why you need admin access..."
+                  />
+                </div>
+                <Button 
+                  type="submit"
+                  className="w-full bg-yellow-500 hover:bg-yellow-600"
+                >
+                  Submit Request
+                </Button>
+              </form>
+            )}
           </Card>
         </div>
       </div>
