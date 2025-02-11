@@ -37,8 +37,6 @@ export default function KnowledgeAdmin() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
-  const [showApplyForm, setShowApplyForm] = useState(false);
-  const [reason, setReason] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -58,8 +56,12 @@ export default function KnowledgeAdmin() {
       .rpc('is_admin', { user_id: session.user.id });
 
     if (roleError || !roleCheck) {
-      setShowApplyForm(true);
-      setLoading(false);
+      toast({
+        title: "Access Restricted",
+        description: "Please contact an administrator for access to this area.",
+        variant: "destructive"
+      });
+      navigate('/');
       return;
     }
 
@@ -87,39 +89,6 @@ export default function KnowledgeAdmin() {
       });
     } finally {
       setIsSigningIn(false);
-    }
-  }
-
-  async function handleAdminRequest(e: React.FormEvent) {
-    e.preventDefault();
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-
-    try {
-      const { error } = await supabase
-        .from('admin_requests')
-        .insert([
-          { 
-            user_id: session.user.id,
-            reason,
-            status: 'pending'
-          }
-        ]);
-
-      if (error) throw error;
-
-      toast({
-        title: "Request Submitted",
-        description: "Your admin access request has been submitted for review."
-      });
-      setShowApplyForm(false);
-    } catch (error) {
-      console.error('Admin request error:', error);
-      toast({
-        variant: "destructive",
-        title: "Request Failed",
-        description: "Failed to submit admin access request"
-      });
     }
   }
 
@@ -213,48 +182,28 @@ export default function KnowledgeAdmin() {
         <div className="max-w-md mx-auto mt-20">
           <Card className="p-6 bg-gray-900/50 border-white/10">
             <h1 className="text-2xl font-bold mb-6 text-center">Admin Access</h1>
-            {!showApplyForm ? (
-              <div className="space-y-4">
-                <Button 
-                  className="w-full bg-[#0077B5] hover:bg-[#006497] flex items-center justify-center gap-2"
-                  onClick={handleLinkedInSignIn}
-                  disabled={isSigningIn}
-                >
-                  {isSigningIn ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Connecting...
-                    </>
-                  ) : (
-                    <>
-                      <Linkedin className="w-5 h-5" />
-                      Sign in with LinkedIn
-                    </>
-                  )}
-                </Button>
-              </div>
-            ) : (
-              <form onSubmit={handleAdminRequest} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Why do you need admin access?
-                  </label>
-                  <textarea
-                    className="w-full h-32 p-3 bg-white/5 border border-white/10 rounded-md text-white"
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    required
-                    placeholder="Please explain why you need admin access..."
-                  />
-                </div>
-                <Button 
-                  type="submit"
-                  className="w-full bg-yellow-500 hover:bg-yellow-600"
-                >
-                  Submit Request
-                </Button>
-              </form>
-            )}
+            <div className="space-y-4">
+              <Button 
+                className="w-full bg-[#0077B5] hover:bg-[#006497] flex items-center justify-center gap-2"
+                onClick={handleLinkedInSignIn}
+                disabled={isSigningIn}
+              >
+                {isSigningIn ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Connecting...
+                  </>
+                ) : (
+                  <>
+                    <Linkedin className="w-5 h-5" />
+                    Sign in with LinkedIn
+                  </>
+                )}
+              </Button>
+              <p className="text-sm text-gray-400 text-center">
+                Contact an administrator to request access after signing in.
+              </p>
+            </div>
           </Card>
         </div>
       </div>
