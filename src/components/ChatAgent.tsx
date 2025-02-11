@@ -20,7 +20,10 @@ const ChatAgent = () => {
   const handleSend = async () => {
     if (!input.trim()) return;
     
-    const userMessage = { role: 'user', content: input.trim() };
+    const userMessage: Message = {
+      role: 'user',
+      content: input.trim()
+    };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
@@ -28,7 +31,7 @@ const ChatAgent = () => {
     // Here you would typically make an API call to your chat service
     // For now, we'll simulate a response
     setTimeout(() => {
-      const assistantMessage = {
+      const assistantMessage: Message = {
         role: 'assistant',
         content: 'Hello! I\'m here to help you learn about LedgerFund DAO. What would you like to know?'
       };
