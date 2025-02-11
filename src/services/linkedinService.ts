@@ -1,4 +1,4 @@
-import { generateNFTMetadata } from "./geminiService";
+
 import { uploadImageToPinata } from "./pinataService";
 
 interface LinkedInProfile {
@@ -12,17 +12,37 @@ interface LinkedInProfile {
     skills: Array<{ title: string }>;
     experiences: Array<{
       title: string;
-      subtitle: string;
-      caption: string;
+      subtitle: string;  // company name
+      caption: string;   // contains duration
+      location?: string;
     }>;
     educations: Array<{
-      title: string;
-      subtitle: string;
+      title: string;     // degree
+      subtitle: string;  // school
     }>;
   };
 }
 
-export const analyzeLinkedInProfile = async (profileUrl: string) => {
+interface MarketplaceMetadata {
+  name: string;
+  description: string;
+  image: string;
+  contentType: string;
+  category: string;
+  experiences: Array<{
+    title: string;
+    company: string;
+    duration: string;
+    location: string;
+  }>;
+  education: Array<{
+    degree: string;
+    school: string;
+  }>;
+  skills: Array<string>;
+}
+
+export const analyzeLinkedInProfile = async (profileUrl: string): Promise<MarketplaceMetadata> => {
   try {
     const response = await fetch('https://linkedin-bulk-data-scraper.p.rapidapi.com/person', {
       method: 'POST',
@@ -39,27 +59,49 @@ export const analyzeLinkedInProfile = async (profileUrl: string) => {
       throw new Error('Failed to analyze LinkedIn profile');
     }
 
-    const linkedInData = await response.json();
+    const linkedInData: LinkedInProfile = await response.json();
     console.log('LinkedIn API Response:', linkedInData);
 
     // Upload profile picture to IPFS if available
-    let profilePicCID = '';
+    let profilePicUrl = '';
     if (linkedInData.data?.profilePic) {
       console.log('Uploading profile picture to IPFS...');
-      profilePicCID = await uploadImageToPinata(linkedInData.data.profilePic);
-      console.log('Profile picture uploaded to IPFS:', profilePicCID);
+      const profilePicCID = await uploadImageToPinata(linkedInData.data.profilePic);
+      profilePicUrl = `ipfs://${profilePicCID}`;
+      console.log('Profile picture uploaded to IPFS:', profilePicUrl);
     }
 
-    // Generate NFT metadata using Gemini
-    const nftMetadata = await generateNFTMetadata(linkedInData);
-    
-    // Add the IPFS profile picture URL to the metadata if available
-    if (profilePicCID) {
-      nftMetadata.profilePicCID = profilePicCID;
-    }
+    // Process experiences
+    const experiences = linkedInData.data.experiences.map(exp => ({
+      title: exp.title,
+      company: exp.subtitle,
+      duration: exp.caption,
+      location: exp.location || 'Remote'
+    }));
 
-    console.log('Generated NFT Metadata:', nftMetadata);
-    return nftMetadata;
+    // Process education
+    const education = linkedInData.data.educations.map(edu => ({
+      degree: edu.title,
+      school: edu.subtitle
+    }));
+
+    // Process skills
+    const skills = linkedInData.data.skills.map(skill => skill.title);
+
+    // Create marketplace metadata
+    const metadata: MarketplaceMetadata = {
+      name: `${linkedInData.data.firstName} ${linkedInData.data.lastName}`,
+      description: linkedInData.data.headline,
+      image: profilePicUrl,
+      contentType: 'resume',  // This is a professional resume listing
+      category: 'Professional Services',
+      experiences,
+      education,
+      skills
+    };
+
+    console.log('Generated Marketplace Metadata:', metadata);
+    return metadata;
   } catch (error) {
     console.error('Error analyzing LinkedIn profile:', error);
     throw error;
