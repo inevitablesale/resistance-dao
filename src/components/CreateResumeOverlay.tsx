@@ -21,6 +21,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
   const { user, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [profileData, setProfileData] = useState<any>(null);
 
   const linkedInUrl = user?.metadata?.["LinkedIn Profile URL"];
 
@@ -38,8 +39,11 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
     try {
       const metadata = await analyzeLinkedInProfile(linkedInUrl);
       console.log('LinkedIn profile analyzed:', metadata);
-      // Navigate to mint page with LinkedIn data
-      window.location.href = `/mint-nft?type=resume&data=${encodeURIComponent(JSON.stringify(metadata))}`;
+      setProfileData(metadata);
+      toast({
+        title: "Profile Imported",
+        description: "Your LinkedIn profile has been successfully imported.",
+      });
     } catch (error) {
       console.error('Error analyzing LinkedIn profile:', error);
       toast({
@@ -112,6 +116,78 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                           Open Wallet Settings
                         </Button>
                       </div>
+                    </div>
+                  </div>
+                ) : profileData ? (
+                  <div className="space-y-8">
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-medium text-center">Review Your Resume NFT</h3>
+                      <div className="bg-white/5 rounded-lg p-6 space-y-6">
+                        <div>
+                          <h4 className="text-lg font-medium mb-2">{profileData.name}</h4>
+                          <p className="text-white/60">{profileData.description}</p>
+                        </div>
+
+                        <div>
+                          <h4 className="text-sm font-medium text-white/80 mb-2">Experience</h4>
+                          <div className="space-y-4">
+                            {profileData.experiences.map((exp: any, index: number) => (
+                              <div key={index} className="bg-white/5 p-4 rounded-lg">
+                                <h5 className="font-medium">{exp.title}</h5>
+                                <p className="text-sm text-white/60">{exp.company}</p>
+                                <p className="text-sm text-white/40">{exp.duration} • {exp.location}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <h4 className="text-sm font-medium text-white/80 mb-2">Education</h4>
+                          <div className="space-y-2">
+                            {profileData.education.map((edu: any, index: number) => (
+                              <div key={index} className="bg-white/5 p-4 rounded-lg">
+                                <h5 className="font-medium">{edu.degree}</h5>
+                                <p className="text-sm text-white/60">{edu.school}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <h4 className="text-sm font-medium text-white/80 mb-2">Skills</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {profileData.skills.map((skill: string, index: number) => (
+                              <span 
+                                key={index}
+                                className="px-3 py-1 bg-purple-500/10 text-purple-400 rounded-full text-sm"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4">
+                      <Button
+                        className="flex-1 bg-transparent border border-white/10 hover:bg-white/5"
+                        onClick={() => setProfileData(null)}
+                      >
+                        Start Over
+                      </Button>
+                      <Button
+                        className="flex-1 bg-purple-500 hover:bg-purple-600"
+                        onClick={() => {
+                          toast({
+                            title: "NFT Created",
+                            description: "Your Resume NFT has been successfully created!",
+                          });
+                          onClose();
+                        }}
+                      >
+                        Create NFT
+                      </Button>
                     </div>
                   </div>
                 ) : (
