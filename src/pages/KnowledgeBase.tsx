@@ -8,7 +8,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Loader2 } from 'lucide-react';
-import { WalletConnectModal } from '@/components/wallet/WalletConnectModal';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 export default function KnowledgeBase() {
@@ -73,12 +72,10 @@ export default function KnowledgeBase() {
             Attention Marketplace
           </h1>
           <div className="flex items-center gap-4">
-            {isConnected ? (
+            {isConnected && (
               <div className="text-sm text-white/60">
                 Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
               </div>
-            ) : (
-              <WalletConnectModal />
             )}
           </div>
         </div>
