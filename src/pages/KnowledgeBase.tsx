@@ -260,7 +260,7 @@ export default function KnowledgeBase() {
                   <Card className="h-full bg-gray-800/50 border-white/10 hover:border-white/20 transition-all duration-300 relative overflow-hidden backdrop-blur-xl group-hover:transform group-hover:scale-[1.02]">
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0" />
                     <div className="relative p-6">
-                      <div className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-white/60 backdrop-blur-sm border border-white/10">
+                      <div className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-teal-400 backdrop-blur-sm border border-white/10">
                         {getContentTypeLabel(category)}
                       </div>
                       <div className="flex items-center gap-4 mb-6">
@@ -268,7 +268,7 @@ export default function KnowledgeBase() {
                           {getContentTypeIcon(category)}
                         </div>
                         <div>
-                          <h3 className="text-xl font-semibold group-hover:text-teal-400 transition-colors line-clamp-2">
+                          <h3 className="text-xl font-semibold text-teal-400 transition-colors line-clamp-2">
                             {article.title}
                           </h3>
                           <p className="text-sm text-white/60 mt-1">
