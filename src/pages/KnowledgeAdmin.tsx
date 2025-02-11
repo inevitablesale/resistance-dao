@@ -37,6 +37,9 @@ export default function KnowledgeAdmin() {
   const [articles, setArticles] = useState<KnowledgeArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -75,6 +78,46 @@ export default function KnowledgeAdmin() {
 
     setIsAdmin(true);
     setLoading(false);
+  }
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setIsLoggingIn(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data.session) {
+        const { data: roleCheck, error: roleError } = await supabase
+          .rpc('is_admin', { user_id: data.session.user.id });
+
+        if (roleError || !roleCheck) {
+          throw new Error('Access denied: Not an admin user');
+        }
+
+        toast({
+          title: "Success",
+          description: "Successfully logged in"
+        });
+        
+        setIsAdmin(true);
+        await fetchArticles();
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: error instanceof Error ? error.message : "Failed to login"
+      });
+    } finally {
+      setIsLoggingIn(false);
+    }
   }
 
   async function fetchArticles() {
@@ -167,32 +210,38 @@ export default function KnowledgeAdmin() {
         <div className="max-w-md mx-auto mt-20">
           <Card className="p-6 bg-gray-900/50 border-white/10">
             <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
-            <div className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-4">
               <Input
                 type="email"
                 placeholder="Email"
                 className="bg-white/5 border-white/10"
-                onChange={(e) => {
-                  // We'll implement login functionality next
-                }}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
               <Input
                 type="password"
                 placeholder="Password"
                 className="bg-white/5 border-white/10"
-                onChange={(e) => {
-                  // We'll implement login functionality next
-                }}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
               <Button 
+                type="submit"
                 className="w-full bg-yellow-500 hover:bg-yellow-600"
-                onClick={async () => {
-                  // We'll implement login functionality next
-                }}
+                disabled={isLoggingIn}
               >
-                Sign In
+                {isLoggingIn ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Signing In...
+                  </>
+                ) : (
+                  'Sign In'
+                )}
               </Button>
-            </div>
+            </form>
           </Card>
         </div>
       </div>
