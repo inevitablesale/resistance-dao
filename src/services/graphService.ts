@@ -33,6 +33,17 @@ const MOCK_PUBLICATIONS: Publication[] = [
     category: 'Jobs',
     lgrBalance: '2000000000000000000',
     version: 1
+  },
+  {
+    id: '3',
+    ipfsHash: 'QmYz92DyEx4dDZrcYLEEyhL1DJP9J9j4VhYYemL6pDD2TZ',
+    publisher: '0x1234567890123456789012345678901234567890',
+    timestamp: Date.now() - 259200000,
+    contentType: 'resume',
+    title: 'Senior Blockchain Developer - 5 Years Experience',
+    category: 'Resumes',
+    lgrBalance: '3000000000000000000',
+    version: 1
   }
 ];
 

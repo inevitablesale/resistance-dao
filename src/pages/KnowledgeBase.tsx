@@ -8,12 +8,15 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Loader2 } from 'lucide-react';
+import { WalletConnectModal } from '@/components/wallet/WalletConnectModal';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 export default function KnowledgeBase() {
   const [publications, setPublications] = useState<Publication[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const { isConnected, address } = useWalletConnection();
 
   useEffect(() => {
     fetchArticles();
@@ -69,6 +72,15 @@ export default function KnowledgeBase() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-500 via-teal-400 to-yellow-400 text-transparent bg-clip-text">
             Attention Marketplace
           </h1>
+          <div className="flex items-center gap-4">
+            {isConnected ? (
+              <div className="text-sm text-white/60">
+                Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
+              </div>
+            ) : (
+              <WalletConnectModal />
+            )}
+          </div>
         </div>
 
         <div className="relative mb-8 max-w-md">
@@ -91,7 +103,7 @@ export default function KnowledgeBase() {
                   {categoryArticles.map((article) => (
                     <li key={article.id}>
                       <Link
-                        to={`/knowledge/${article.contentType}/${article.id}`}
+                        to={`/marketplace/${article.contentType}/${article.id}`}
                         className="text-white/80 hover:text-white transition-colors block py-2 px-3 rounded-md hover:bg-white/5"
                       >
                         {article.title}

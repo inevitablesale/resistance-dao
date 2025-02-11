@@ -165,8 +165,8 @@ function App() {
           <Route path="/share-to-earn" element={<ShareToEarn />} />
           <Route path="/litepaper" element={<Litepaper />} />
           <Route path="/getting-started" element={<GettingStarted />} />
-          <Route path="/knowledge" element={<KnowledgeBase />} />
-          <Route path="/knowledge/:category/:slug" element={<KnowledgeArticle />} />
+          <Route path="/marketplace" element={<KnowledgeBase />} />
+          <Route path="/marketplace/:category/:slug" element={<KnowledgeArticle />} />
           <Route path="/content" element={<ContentHub />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
