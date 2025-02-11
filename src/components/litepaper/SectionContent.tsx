@@ -568,78 +568,234 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
       </div>
     ),
     "blockchain": (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">10.0 Blockchain & Smart Contracts</h2>
-        <p className="text-gray-300 leading-relaxed">
-          Our smart contracts are built on Polygon for scalability and efficiency, 
-          ensuring transparent and secure operations with minimal gas fees. 
-          Decentralized governance through LGR tokens enables community-driven 
-          decision-making and protocol evolution.
-        </p>
+        
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">1️⃣ Transparent & Trustless Firm Acquisitions</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <p className="text-gray-300 mb-4">Smart contracts eliminate manual, opaque M&A processes, automating:</p>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Investment structures & equity allocations</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Revenue-sharing & profit distributions</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>On-chain voting & governance execution</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">2️⃣ Decentralized Governance Execution</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Automated fund allocations for firm acquisitions</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Real-time investor voting & execution of governance decisions</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Immutable records of financials, contracts, and firm ownership</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">3️⃣ Automated Revenue Distribution</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Smart contract-based revenue sharing – Token holders receive earnings directly</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>On-chain staking rewards – Passive income model for long-term investors</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">✔</span>
+                  <span>Decentralized liquidity management – $LGR LP tokens allow exposure to firm-backed investments</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     ),
     "investment-strategy": (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">11.0 Investment Strategy</h2>
-        <p className="text-gray-300 leading-relaxed">
-          Our investment strategy is focused on identifying and 
-          acquiring accounting firms that have the potential to 
-          generate long-term value through strategic acquisitions 
-          and operational improvements. We use a combination of 
-          financial analysis, market research, and industry 
-          expertise to make informed investment decisions.
-        </p>
+        
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Firm Selection Criteria</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-6 text-gray-300">
+                <li>
+                  <h4 className="font-semibold text-yellow-400 mb-2">📈 Revenue & Profitability</h4>
+                  <ul className="space-y-2 ml-6">
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Firms generating $250K–$5M in revenue with strong cash flow</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Recurring client base with long-term contracts</span>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <h4 className="font-semibold text-yellow-400 mb-2">📊 Market Position</h4>
+                  <ul className="space-y-2 ml-6">
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Located in high-demand metro areas</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Specializing in high-margin services</span>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     ),
     "risk-assessment": (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">12.0 Risk Assessment</h2>
-        <p className="text-gray-300 leading-relaxed">
-          We take a comprehensive approach to risk assessment 
-          throughout the acquisition process, including 
-          financial, operational, and regulatory risks. We 
-          use a combination of due diligence, market analysis, 
-          and industry expertise to identify and mitigate 
-          potential risks.
-        </p>
+        
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Risk Mitigation Strategies</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-6 text-gray-300">
+                <li>
+                  <h4 className="font-semibold text-yellow-400 mb-2">1️⃣ Deal Structure Protection</h4>
+                  <ul className="space-y-2 ml-6">
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Performance-based payouts</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Smart contract escrow</span>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <h4 className="font-semibold text-yellow-400 mb-2">2️⃣ Regulatory Compliance</h4>
+                  <ul className="space-y-2 ml-6">
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>KYC/AML verification</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>SEC-compliant token model</span>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     ),
     "acquisition-process": (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">13.0 Acquisition Process</h2>
-        <p className="text-gray-300 leading-relaxed">
-          Our acquisition process is designed to be efficient 
-          and transparent, with a focus on minimizing 
-          operational costs and maximizing value creation. We 
-          use a combination of blockchain technology, 
-          decentralized governance, and investor-led 
-          decision-making to ensure a smooth and successful 
-          acquisition process.
-        </p>
+        
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Sourcing & Due Diligence</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">🔍</span>
+                  <span>Data-driven firm analysis and market positioning</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">📈</span>
+                  <span>Financial and operational due diligence</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">⚖️</span>
+                  <span>Legal and compliance review</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     ),
     "post-acquisition": (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">14.0 Post-Acquisition</h2>
-        <p className="text-gray-300 leading-relaxed">
-          After the acquisition, we provide leadership transition 
-          support, tech enhancements, and performance tracking 
-          to ensure the successful integration of the acquired 
-          firm into the LedgerFund DAO ecosystem.
-        </p>
+        
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Integration & Optimization</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">👥</span>
+                  <span>Leadership transition and team retention</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔧</span>
+                  <span>Technology and workflow optimization</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">📊</span>
+                  <span>Performance tracking and reporting</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     ),
     "token-benefits": (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">15.0 Token Benefits</h2>
-        <p className="text-gray-300 leading-relaxed">
-          As a token holder, you will have the opportunity to 
-          participate in the decision-making process, receive 
-          staking rewards, and benefit from liquidity 
-          rewards. You will also have the ability to 
-          participate in the governance of the platform 
-          through the use of LGR tokens.
-        </p>
+        
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">$LGR Token Utilities</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">🗳️</span>
+                  <span>Governance rights and voting power</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">💰</span>
+                  <span>Revenue sharing from firm operations</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔄</span>
+                  <span>Staking rewards and liquidity mining</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     ),
     "revenue-sharing": (
@@ -678,18 +834,34 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
     "regulatory": (
       <div className="space-y-4">
         <h2 className="text-2xl font-bold text-yellow-500">16.0 Regulatory Compliance</h2>
-        <p className="text-gray-300 leading-relaxed">
-          We are committed to regulatory compliance and 
-          adhere to all relevant laws and regulations. We 
-          have implemented a robust compliance framework 
-          to ensure that our platform is operated in a 
-          legal and ethical manner.
-        </p>
+        
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Legal Framework</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">⚖️</span>
+                  <span>SEC Reg D 506(b) compliance</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔒</span>
+                  <span>KYC/AML requirements</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">📜</span>
+                  <span>SPV legal structuring</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     ),
     "roadmap": (
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">17.0 Roadmap & Milestones</h2>
+        
         <div className="space-y-8">
           <div>
             <h3 className="text-xl font-semibold text-teal-400 mb-4">Phased Development Plan</h3>
