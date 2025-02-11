@@ -120,11 +120,44 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                   </div>
                 ) : profileData ? (
                   <div className="space-y-8">
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <h3 className="text-xl font-medium text-center">Review Your Resume NFT</h3>
+                      
+                      {/* Profile Image Section */}
+                      <div className="relative w-32 h-32 mx-auto">
+                        <motion.div 
+                          className="absolute inset-0 rounded-full border-2 border-purple-500/30"
+                          animate={{
+                            rotate: [0, 360],
+                            scale: [1, 1.05, 1],
+                          }}
+                          transition={{
+                            duration: 10,
+                            repeat: Infinity,
+                            ease: "linear"
+                          }}
+                        />
+                        <div className="relative w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-purple-500/20 to-transparent backdrop-blur-sm">
+                          {profileData.imageUrl ? (
+                            <img 
+                              src={profileData.imageUrl} 
+                              alt={profileData.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                          ) : null}
+                          <div className={`absolute inset-0 flex items-center justify-center ${profileData.imageUrl ? 'hidden' : ''}`}>
+                            <User className="w-12 h-12 text-purple-400" />
+                          </div>
+                        </div>
+                      </div>
+
                       <div className="bg-white/5 rounded-lg p-6 space-y-6">
-                        <div>
-                          <h4 className="text-lg font-medium mb-2">{profileData.name}</h4>
+                        <div className="text-center">
+                          <h4 className="text-2xl font-medium mb-2">{profileData.name}</h4>
                           <p className="text-white/60">{profileData.description}</p>
                         </div>
 
@@ -169,7 +202,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                       </div>
                     </div>
 
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 sticky bottom-0 bg-black/95 p-4 -mx-4">
                       <Button
                         className="flex-1 bg-transparent border border-white/10 hover:bg-white/5"
                         onClick={() => setProfileData(null)}
