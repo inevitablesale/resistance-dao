@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Loader2, BookOpen, Briefcase, User, Users, ChevronRight, Star, Clock, Shield } from 'lucide-react';
+import { Search, Loader2, BookOpen, Briefcase, User, Users, ChevronRight, Star, Clock, Shield, Eye } from 'lucide-react';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { useToast } from "@/hooks/use-toast";
 import { VotingSection } from '@/components/nft-card/VotingSection';
@@ -19,6 +19,7 @@ export default function KnowledgeBase() {
   const { isConnected, address } = useWalletConnection();
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showExamples, setShowExamples] = useState(false);
 
   useEffect(() => {
     fetchArticles();
@@ -72,23 +73,6 @@ export default function KnowledgeBase() {
     }
   }
 
-  // Filter articles based on search query and category
-  const filteredArticles = publications.filter(article =>
-    (searchQuery === '' || 
-     article.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     article.category?.toLowerCase().includes(searchQuery.toLowerCase())) &&
-    (selectedCategory === null || article.contentType === selectedCategory)
-  );
-
-  // Group articles by category
-  const categorizedArticles = filteredArticles.reduce((acc, article) => {
-    if (!acc[article.contentType]) {
-      acc[article.contentType] = [];
-    }
-    acc[article.contentType].push(article);
-    return acc;
-  }, {} as Record<string, Publication[]>);
-
   const getContentTypeIcon = (type: string) => {
     switch (type) {
       case 'article':
@@ -105,15 +89,31 @@ export default function KnowledgeBase() {
   const getContentTypeLabel = (type: string) => {
     switch (type) {
       case 'article':
-        return 'Example Articles';
+        return 'Articles';
       case 'job':
-        return 'Example Job Postings';
+        return 'Job Postings';
       case 'resume':
-        return 'Example Resumes';
+        return 'Resumes';
       default:
         return type;
     }
   };
+
+  const filteredArticles = publications.filter(article =>
+    (searchQuery === '' || 
+     article.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     article.category?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+    (selectedCategory === null || article.contentType === selectedCategory) &&
+    (showExamples)
+  );
+
+  const categorizedArticles = filteredArticles.reduce((acc, article) => {
+    if (!acc[article.contentType]) {
+      acc[article.contentType] = [];
+    }
+    acc[article.contentType].push(article);
+    return acc;
+  }, {} as Record<string, Publication[]>);
 
   if (loading) {
     return (
@@ -218,7 +218,7 @@ export default function KnowledgeBase() {
       <div className="border-b border-white/10 bg-black/40 backdrop-blur-xl sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-8">
           <ScrollArea className="w-full">
-            <div className="flex space-x-2 py-4">
+            <div className="flex items-center space-x-2 py-4">
               <Button
                 variant="ghost"
                 className={`whitespace-nowrap rounded-xl px-6 ${!selectedCategory ? 'bg-white/10 hover:bg-white/20' : 'hover:bg-white/10'}`}
@@ -238,75 +238,98 @@ export default function KnowledgeBase() {
                   <span className="ml-2">{getContentTypeLabel(category)}</span>
                 </Button>
               ))}
+              <Button
+                variant={showExamples ? "default" : "outline"}
+                className="ml-auto whitespace-nowrap rounded-xl px-6"
+                onClick={() => setShowExamples(!showExamples)}
+              >
+                <Eye className={`w-4 h-4 mr-2 ${showExamples ? 'text-white' : 'text-white/60'}`} />
+                {showExamples ? 'Hide Examples' : 'View Examples'}
+              </Button>
             </div>
           </ScrollArea>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Object.entries(categorizedArticles).map(([category, categoryArticles]) => (
-            categoryArticles.map((article) => (
-              <Link
-                key={article.id}
-                to={`/marketplace/${article.contentType}/${article.id}`}
-                className="group"
-              >
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
+        {!showExamples ? (
+          <div className="text-center py-12">
+            <h3 className="text-2xl font-semibold text-white/80 mb-4">No Active Listings</h3>
+            <p className="text-white/60 mb-6">Click "View Examples" to see sample listings or connect your wallet to create a listing.</p>
+            <Button
+              variant="outline"
+              className="whitespace-nowrap rounded-xl px-6"
+              onClick={() => setShowExamples(true)}
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              View Examples
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Object.entries(categorizedArticles).map(([category, categoryArticles]) => (
+              categoryArticles.map((article) => (
+                <Link
+                  key={article.id}
+                  to={`/marketplace/${article.contentType}/${article.id}`}
+                  className="group"
                 >
-                  <Card className="h-full bg-gray-800/50 border-white/10 hover:border-white/20 transition-all duration-300 relative overflow-hidden backdrop-blur-xl group-hover:transform group-hover:scale-[1.02]">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0" />
-                    <div className="relative p-6">
-                      <div className="absolute -right-12 top-8 px-12 py-1 rotate-45 text-xs font-medium bg-white/10 text-teal-400 backdrop-blur-sm border-y border-white/10 w-48 text-center">
-                        {getContentTypeLabel(category)}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Card className="h-full bg-gray-800/50 border-white/10 hover:border-white/20 transition-all duration-300 relative overflow-hidden backdrop-blur-xl group-hover:transform group-hover:scale-[1.02]">
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0" />
+                      <div className="relative p-6">
+                        <div className="absolute -right-12 top-8 px-12 py-1 rotate-45 text-xs font-medium bg-white/10 text-teal-400 backdrop-blur-sm border-y border-white/10 w-48 text-center">
+                          {getContentTypeLabel(category)}
+                        </div>
+                        <div className="flex items-center gap-4 mb-6">
+                          <div className="p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+                            {getContentTypeIcon(category)}
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-semibold text-teal-400 transition-colors line-clamp-2">
+                              {article.title}
+                            </h3>
+                            <p className="text-sm text-white/60 mt-1">
+                              {article.category}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                          <div className="flex items-center gap-2 text-sm text-white/60">
+                            <Shield className="w-4 h-4" />
+                            <span>Verified Pro</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-white/60">
+                            <Star className="w-4 h-4" />
+                            <span>Top Rated</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-white/60">
+                            <Clock className="w-4 h-4" />
+                            <span>Quick Response</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-white/60">
+                            <User className="w-4 h-4" />
+                            <span>{article.publisher.slice(0, 6)}...{article.publisher.slice(-4)}</span>
+                          </div>
+                        </div>
+                        <div className="pt-6 border-t border-white/5">
+                          <VotingSection tokenId={article.id} owner={article.publisher} />
+                        </div>
+                        <div className="absolute bottom-4 right-4 text-white/40 group-hover:text-white/60 transition-colors">
+                          <ChevronRight className="w-5 h-5" />
+                        </div>
                       </div>
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-                          {getContentTypeIcon(category)}
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-semibold text-teal-400 transition-colors line-clamp-2">
-                            {article.title}
-                          </h3>
-                          <p className="text-sm text-white/60 mt-1">
-                            {article.category}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 mb-6">
-                        <div className="flex items-center gap-2 text-sm text-white/60">
-                          <Shield className="w-4 h-4" />
-                          <span>Verified Pro</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-white/60">
-                          <Star className="w-4 h-4" />
-                          <span>Top Rated</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-white/60">
-                          <Clock className="w-4 h-4" />
-                          <span>Quick Response</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-white/60">
-                          <User className="w-4 h-4" />
-                          <span>{article.publisher.slice(0, 6)}...{article.publisher.slice(-4)}</span>
-                        </div>
-                      </div>
-                      <div className="pt-6 border-t border-white/5">
-                        <VotingSection tokenId={article.id} owner={article.publisher} />
-                      </div>
-                      <div className="absolute bottom-4 right-4 text-white/40 group-hover:text-white/60 transition-colors">
-                        <ChevronRight className="w-5 h-5" />
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              </Link>
-            ))
-          ))}
-        </div>
+                    </Card>
+                  </motion.div>
+                </Link>
+              ))
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
