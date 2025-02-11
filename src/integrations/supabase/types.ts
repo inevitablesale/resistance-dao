@@ -9,6 +9,41 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      litepaper_sections: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          order_index: number
+          parent_section_id: string | null
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id: string
+          order_index: number
+          parent_section_id?: string | null
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          order_index?: number
+          parent_section_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "litepaper_sections_parent_section_id_fkey"
+            columns: ["parent_section_id"]
+            isOneToOne: false
+            referencedRelation: "litepaper_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wallets: {
         Row: {
           created_at: string
