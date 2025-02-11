@@ -40,7 +40,7 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
         <Button
           variant="outline"
           size="lg"
-          className="flex items-center gap-2 bg-teal-900/40 border-teal-500/40 hover:bg-teal-500/20 hover:border-teal-500/40 transition-all duration-300"
+          className="flex items-center gap-2 bg-teal-900/40 border-teal-500/40 hover:bg-teal-500/20 hover:border-teal-500/40 transition-all duration-300 text-white"
           onClick={() => handleVote()}
         >
           <ThumbsUp className="w-5 h-5" />
@@ -49,7 +49,7 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
         <Button
           variant="outline"
           size="lg"
-          className="flex items-center gap-2 bg-purple-900/40 border-purple-500/40 hover:bg-purple-500/20 hover:border-purple-500/40 transition-all duration-300"
+          className="flex items-center gap-2 bg-purple-900/40 border-purple-500/40 hover:bg-purple-500/20 hover:border-purple-500/40 transition-all duration-300 text-white"
           onClick={() => window.location.href = `/marketplace/${tokenId}`}
         >
           <ChevronRight className="w-5 h-5" />
