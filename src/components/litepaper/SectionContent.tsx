@@ -670,6 +670,19 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
                     </li>
                   </ul>
                 </li>
+                <li>
+                  <h4 className="font-semibold text-yellow-400 mb-2">🔄 Succession & Exit</h4>
+                  <ul className="space-y-2 ml-6">
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Owners seeking retirement with no internal succession plan.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Clean acquisition opportunities without PE involvement.</span>
+                    </li>
+                  </ul>
+                </li>
               </ul>
             </div>
           </div>
@@ -695,6 +708,10 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
                     <li className="flex items-start">
                       <span className="mr-2">✔</span>
                       <span>Smart contract escrow</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Tiered investment models with staged capital deployment</span>
                     </li>
                   </ul>
                 </li>
@@ -725,18 +742,40 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
           <div>
             <h3 className="text-xl font-semibold text-teal-400 mb-4">Sourcing & Due Diligence</h3>
             <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start">
-                  <span className="mr-2">🔍</span>
-                  <span>Data-driven firm analysis and market positioning</span>
+              <ul className="space-y-6 text-gray-300">
+                <li>
+                  <h4 className="font-semibold text-yellow-400 mb-2">1️⃣ Sourcing Strategy</h4>
+                  <ul className="space-y-2 ml-6">
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Direct outreach & broker networks.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>AI-driven firm analysis and targeting.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Industry partnerships and referrals.</span>
+                    </li>
+                  </ul>
                 </li>
-                <li className="flex items-start">
-                  <span className="mr-2">📈</span>
-                  <span>Financial and operational due diligence</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">⚖️</span>
-                  <span>Legal and compliance review</span>
+                <li>
+                  <h4 className="font-semibold text-yellow-400 mb-2">2️⃣ Due Diligence</h4>
+                  <ul className="space-y-2 ml-6">
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Financial analysis and verification.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Operational assessment.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Legal and compliance review.</span>
+                    </li>
+                  </ul>
                 </li>
               </ul>
             </div>
@@ -750,20 +789,42 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
         
         <div className="space-y-8">
           <div>
-            <h3 className="text-xl font-semibold text-teal-400 mb-4">Integration & Optimization</h3>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Integration & Value Creation</h3>
             <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start">
-                  <span className="mr-2">👥</span>
-                  <span>Leadership transition and team retention</span>
+              <ul className="space-y-6 text-gray-300">
+                <li>
+                  <h4 className="font-semibold text-yellow-400 mb-2">1️⃣ Leadership & Operations</h4>
+                  <ul className="space-y-2 ml-6">
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>DAO-approved operators and management teams.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Key personnel retention strategies.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Performance-based incentives.</span>
+                    </li>
+                  </ul>
                 </li>
-                <li className="flex items-start">
-                  <span className="mr-2">🔧</span>
-                  <span>Technology and workflow optimization</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">📊</span>
-                  <span>Performance tracking and reporting</span>
+                <li>
+                  <h4 className="font-semibold text-yellow-400 mb-2">2️⃣ Technology Enhancement</h4>
+                  <ul className="space-y-2 ml-6">
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>AI & automation implementation.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Cloud-based system migration.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">✔</span>
+                      <span>Digital workflow optimization.</span>
+                    </li>
+                  </ul>
                 </li>
               </ul>
             </div>
