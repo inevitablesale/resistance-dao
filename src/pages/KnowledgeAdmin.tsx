@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
@@ -31,7 +30,7 @@ interface KnowledgeArticle {
   status: string;
   last_updated: string;
   published_at: string | null;
-  slug: string; // Added the missing slug property
+  slug: string;
 }
 
 export default function KnowledgeAdmin() {
@@ -49,8 +48,16 @@ export default function KnowledgeAdmin() {
   async function checkAdminStatus() {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      navigate('/login');
-      return;
+      const { error } = await supabase.auth.getSession();
+      if (error || !session) {
+        toast({
+          variant: "destructive",
+          title: "Authentication Required",
+          description: "Please sign in to access the admin panel."
+        });
+        setLoading(false);
+        return;
+      }
     }
 
     const { data: roleCheck, error: roleError } = await supabase
@@ -67,6 +74,7 @@ export default function KnowledgeAdmin() {
     }
 
     setIsAdmin(true);
+    setLoading(false);
   }
 
   async function fetchArticles() {
@@ -145,14 +153,48 @@ export default function KnowledgeAdmin() {
     }
   }
 
-  if (!isAdmin) {
-    return null;
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-yellow-500" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-black text-white p-8">
+        <div className="max-w-md mx-auto mt-20">
+          <Card className="p-6 bg-gray-900/50 border-white/10">
+            <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
+            <div className="space-y-4">
+              <Input
+                type="email"
+                placeholder="Email"
+                className="bg-white/5 border-white/10"
+                onChange={(e) => {
+                  // We'll implement login functionality next
+                }}
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                className="bg-white/5 border-white/10"
+                onChange={(e) => {
+                  // We'll implement login functionality next
+                }}
+              />
+              <Button 
+                className="w-full bg-yellow-500 hover:bg-yellow-600"
+                onClick={async () => {
+                  // We'll implement login functionality next
+                }}
+              >
+                Sign In
+              </Button>
+            </div>
+          </Card>
+        </div>
       </div>
     );
   }
