@@ -9,6 +9,100 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      knowledge_article_votes: {
+        Row: {
+          article_id: string | null
+          created_at: string | null
+          helpful: boolean
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string | null
+          helpful: boolean
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string | null
+          helpful?: boolean
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_article_votes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_articles: {
+        Row: {
+          category: string
+          content: string
+          created_at: string | null
+          helpful_votes: number | null
+          id: string
+          last_updated: string | null
+          metadata: Json | null
+          order_index: number
+          parent_id: string | null
+          search_vector: unknown | null
+          slug: string
+          status: string
+          title: string
+          total_votes: number | null
+          views: number | null
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string | null
+          helpful_votes?: number | null
+          id?: string
+          last_updated?: string | null
+          metadata?: Json | null
+          order_index?: number
+          parent_id?: string | null
+          search_vector?: unknown | null
+          slug: string
+          status?: string
+          title: string
+          total_votes?: number | null
+          views?: number | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string | null
+          helpful_votes?: number | null
+          id?: string
+          last_updated?: string | null
+          metadata?: Json | null
+          order_index?: number
+          parent_id?: string | null
+          search_vector?: unknown | null
+          slug?: string
+          status?: string
+          title?: string
+          total_votes?: number | null
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_articles_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       litepaper_sections: {
         Row: {
           content: string
