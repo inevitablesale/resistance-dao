@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Progress } from "@/components/ui/progress";
@@ -6,18 +7,25 @@ import { analyzeLinkedInProfile } from "@/services/linkedinService";
 import { mintNFT } from "@/services/contractService";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
-import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { LoadingSlides } from "./LoadingSlides";
 import { motion } from "framer-motion";
+import { MarketplaceMetadata } from "@/types/marketplace";
 
 interface NFTPreview {
-  fullName: string;
-  profilePicCID?: string;
-  attributes: Array<{
-    trait_type: string;
-    value: string;
+  name: string;
+  image: string;
+  skills: string[];
+  experiences: Array<{
+    title: string;
+    company: string;
+    duration: string;
+    location: string;
+  }>;
+  education: Array<{
+    degree: string;
+    school: string;
   }>;
 }
 
@@ -67,28 +75,19 @@ export const WalletInfo = () => {
     setIsAnalyzing(true);
     try {
       console.log('Fetching LinkedIn profile data...');
-      const nftMetadata = await analyzeLinkedInProfile(linkedInUrl);
+      const metadata = await analyzeLinkedInProfile(linkedInUrl);
       setProgress(50);
       
       const preview: NFTPreview = {
-        fullName: nftMetadata.fullName,
-        profilePicCID: nftMetadata.profilePicCID,
-        attributes: nftMetadata.attributes.map(attr => ({
-          trait_type: attr.trait_type,
-          value: String(attr.value)
-        }))
+        name: metadata.name,
+        image: metadata.image,
+        skills: metadata.skills,
+        experiences: metadata.experiences,
+        education: metadata.education
       };
       
-      if (nftMetadata.profilePicCID) {
-        setPreviewImageUrl(`https://ipfs.io/ipfs/${nftMetadata.profilePicCID}`);
-      } else {
-        const governancePowerAttr = preview.attributes.find(
-          attr => attr.trait_type === "Governance Power"
-        );
-        if (governancePowerAttr) {
-          const imageCID = getGovernanceImageCID(governancePowerAttr.value);
-          setPreviewImageUrl(`https://ipfs.io/ipfs/${imageCID}`);
-        }
+      if (metadata.image) {
+        setPreviewImageUrl(metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/'));
       }
       
       setNFTPreview(preview);
@@ -134,11 +133,11 @@ export const WalletInfo = () => {
       
       toast({
         title: "NFT Minted Successfully!",
-        description: "Your LedgerFren NFT has been minted. Redirecting to governance voting...",
+        description: "Your Professional NFT has been minted. Redirecting to marketplace...",
       });
 
       setTimeout(() => {
-        navigate('/governance-voting');
+        navigate('/marketplace');
       }, 2000);
     } catch (error) {
       console.error('Minting failed:', error);
@@ -220,7 +219,7 @@ export const WalletInfo = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          Become a LedgerFren
+          Professional Services NFT
         </motion.h3>
         <motion.p 
           className="text-gray-400"
@@ -228,7 +227,7 @@ export const WalletInfo = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          Your LinkedIn profile will be analyzed to generate a unique ID Badge that represents your professional experience and qualifications.
+          Your LinkedIn profile will be analyzed to generate a professional NFT representing your experience and qualifications.
         </motion.p>
         
         {isAnalyzing && <LoadingSlides isAnalyzing={isAnalyzing} />}
@@ -269,30 +268,25 @@ export const WalletInfo = () => {
                 <div className="space-y-6 animate-fade-in w-full">
                   <div className="space-y-2 text-center">
                     <h4 className="text-3xl font-bold bg-gradient-to-r from-white to-polygon-primary bg-clip-text text-transparent">
-                      LedgerFren NFT
+                      {nftPreview.name}
                     </h4>
-                    <p className="text-xl text-gray-400">Ledger Fund ID Badge</p>
+                    <p className="text-xl text-gray-400">Professional Services NFT</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    {nftPreview.attributes.map((attr, index) => {
-                      const displayValue = attr.trait_type === "Governance Power" 
-                        ? String(attr.value).replace("Governance-Power-", "")
-                        : attr.value;
-
-                      return (
-                        <div 
-                          key={index}
-                          className="animate-fade-in"
-                          style={{ animationDelay: `${150 + index * 100}ms` }}
-                        >
-                          <div className="flex flex-col p-4 rounded-lg bg-black/20 border border-white/5 hover:border-polygon-primary/20 transition-colors">
-                            <span className="text-sm text-gray-400 mb-1">{attr.trait_type}</span>
-                            <span className="text-lg font-semibold text-white">{displayValue}</span>
-                          </div>
+                    {nftPreview.experiences.map((exp, index) => (
+                      <div 
+                        key={index}
+                        className="animate-fade-in"
+                        style={{ animationDelay: `${150 + index * 100}ms` }}
+                      >
+                        <div className="flex flex-col p-4 rounded-lg bg-black/20 border border-white/5 hover:border-polygon-primary/20 transition-colors">
+                          <span className="text-sm text-gray-400 mb-1">{exp.title}</span>
+                          <span className="text-lg font-semibold text-white">{exp.company}</span>
+                          <span className="text-sm text-gray-400">{exp.duration}</span>
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                   </div>
 
                   <div className="flex gap-4">
@@ -353,7 +347,7 @@ export const WalletInfo = () => {
               )}
             >
               <Eye className="w-4 h-4" />
-              {isAnalyzing ? 'Analyzing Profile...' : 'Preview ID Badge'}
+              {isAnalyzing ? 'Analyzing Profile...' : 'Preview NFT'}
             </button>
           </motion.div>
         )}
