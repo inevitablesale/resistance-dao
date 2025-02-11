@@ -13,6 +13,7 @@ import Litepaper from "./pages/Litepaper";
 import GettingStarted from "./pages/GettingStarted";
 import KnowledgeBase from "./pages/KnowledgeBase";
 import KnowledgeArticle from "./pages/KnowledgeArticle";
+import KnowledgeAdmin from "./pages/KnowledgeAdmin";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
 
@@ -167,6 +168,7 @@ function App() {
           <Route path="/getting-started" element={<GettingStarted />} />
           <Route path="/knowledge" element={<KnowledgeBase />} />
           <Route path="/knowledge/:category/:slug" element={<KnowledgeArticle />} />
+          <Route path="/knowledge/admin" element={<KnowledgeAdmin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

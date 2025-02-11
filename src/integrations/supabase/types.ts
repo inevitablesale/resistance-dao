@@ -43,54 +43,66 @@ export type Database = {
       }
       knowledge_articles: {
         Row: {
+          author_id: string | null
           category: string
           content: string
           created_at: string | null
+          created_by: string | null
           helpful_votes: number | null
           id: string
           last_updated: string | null
           metadata: Json | null
           order_index: number
           parent_id: string | null
+          published_at: string | null
           search_vector: unknown | null
           slug: string
           status: string
           title: string
           total_votes: number | null
+          updated_by: string | null
           views: number | null
         }
         Insert: {
+          author_id?: string | null
           category: string
           content: string
           created_at?: string | null
+          created_by?: string | null
           helpful_votes?: number | null
           id?: string
           last_updated?: string | null
           metadata?: Json | null
           order_index?: number
           parent_id?: string | null
+          published_at?: string | null
           search_vector?: unknown | null
           slug: string
           status?: string
           title: string
           total_votes?: number | null
+          updated_by?: string | null
           views?: number | null
         }
         Update: {
+          author_id?: string | null
           category?: string
           content?: string
           created_at?: string | null
+          created_by?: string | null
           helpful_votes?: number | null
           id?: string
           last_updated?: string | null
           metadata?: Json | null
           order_index?: number
           parent_id?: string | null
+          published_at?: string | null
           search_vector?: unknown | null
           slug?: string
           status?: string
           title?: string
           total_votes?: number | null
+          updated_by?: string | null
           views?: number | null
         }
         Relationships: [
@@ -138,6 +150,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       wallets: {
         Row: {
           created_at: string
@@ -164,10 +197,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
