@@ -10,7 +10,6 @@ const Nav = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   
-  // Initialize balance monitoring
   useBalanceMonitor();
 
   const handleLaunchApp = async () => {
@@ -39,6 +38,12 @@ const Nav = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-6">
+            <Link 
+              to="/getting-started" 
+              className="text-white/80 hover:text-white transition-colors"
+            >
+              Get Started
+            </Link>
             <a 
               href="#tokenomics" 
               className="text-white/80 hover:text-white transition-colors"
