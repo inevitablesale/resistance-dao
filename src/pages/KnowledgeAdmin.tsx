@@ -165,7 +165,7 @@ export default function KnowledgeAdmin() {
       <div className="min-h-screen bg-black text-white p-8">
         <div className="max-w-md mx-auto mt-20">
           <Card className="p-6 bg-gray-900/50 border-white/10">
-            <h1 className="text-2xl font-bold mb-6 text-center">Admin Access</h1>
+            <h1 className="text-2xl font-bold mb-6 text-center">Publisher Access</h1>
             <div className="space-y-4">
               <Button 
                 className="w-full bg-[#0077B5] hover:bg-[#006497] flex items-center justify-center gap-2"
@@ -185,7 +185,7 @@ export default function KnowledgeAdmin() {
                 )}
               </Button>
               <p className="text-sm text-gray-400 text-center">
-                Sign in to access the admin panel
+                Sign in to access the publisher panel
               </p>
             </div>
           </Card>
@@ -199,7 +199,7 @@ export default function KnowledgeAdmin() {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-500 via-teal-400 to-yellow-400 text-transparent bg-clip-text">
-            Knowledge Base Admin
+            Knowledge Base Publisher
           </h1>
           <Button onClick={() => navigate('/knowledge/new')} className="bg-yellow-500 hover:bg-yellow-600">
             <Plus className="w-4 h-4 mr-2" />
