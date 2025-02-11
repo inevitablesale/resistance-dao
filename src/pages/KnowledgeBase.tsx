@@ -10,6 +10,7 @@ import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { useToast } from "@/hooks/use-toast";
 import { VotingSection } from '@/components/nft-card/VotingSection';
 import { motion } from "framer-motion";
+import { CreateArticleOverlay } from "@/components/CreateArticleOverlay";
 
 export default function KnowledgeBase() {
   const [publications, setPublications] = useState<Publication[]>([]);
@@ -20,6 +21,7 @@ export default function KnowledgeBase() {
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showExamples, setShowExamples] = useState(false);
+  const [showArticleOverlay, setShowArticleOverlay] = useState(false);
 
   useEffect(() => {
     fetchArticles();
@@ -258,7 +260,7 @@ export default function KnowledgeBase() {
             <p className="text-white/60 mb-8">Choose the type of NFT you want to create or view examples for inspiration.</p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-12">
-              <Link to="/mint-nft?type=article" className="group">
+              <div onClick={() => setShowArticleOverlay(true)} className="cursor-pointer">
                 <Card className="p-6 bg-white/5 border-white/10 hover:border-teal-400/50 transition-all duration-300">
                   <div className="text-center space-y-4">
                     <div className="w-12 h-12 bg-teal-400/10 rounded-xl flex items-center justify-center mx-auto">
@@ -268,7 +270,7 @@ export default function KnowledgeBase() {
                     <p className="text-sm text-white/60">Share your knowledge and insights with the community</p>
                   </div>
                 </Card>
-              </Link>
+              </div>
 
               <Link to="/mint-nft?type=job" className="group">
                 <Card className="p-6 bg-white/5 border-white/10 hover:border-yellow-400/50 transition-all duration-300">
@@ -372,6 +374,11 @@ export default function KnowledgeBase() {
           </div>
         )}
       </div>
+
+      <CreateArticleOverlay 
+        isOpen={showArticleOverlay}
+        onClose={() => setShowArticleOverlay(false)}
+      />
     </div>
   );
 }
