@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { VotingSection } from '@/components/nft-card/VotingSection';
 import { motion } from "framer-motion";
 import { CreateArticleOverlay } from "@/components/CreateArticleOverlay";
+import { CreateResumeOverlay } from "@/components/CreateResumeOverlay";
 
 export default function KnowledgeBase() {
   const [publications, setPublications] = useState<Publication[]>([]);
@@ -22,6 +23,7 @@ export default function KnowledgeBase() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showExamples, setShowExamples] = useState(false);
   const [showArticleOverlay, setShowArticleOverlay] = useState(false);
+  const [showResumeOverlay, setShowResumeOverlay] = useState(false);
 
   useEffect(() => {
     fetchArticles();
@@ -284,7 +286,7 @@ export default function KnowledgeBase() {
                 </Card>
               </Link>
 
-              <Link to="/mint-nft?type=resume" className="group">
+              <div onClick={() => setShowResumeOverlay(true)} className="cursor-pointer">
                 <Card className="p-6 bg-white/5 border-white/10 hover:border-purple-400/50 transition-all duration-300">
                   <div className="text-center space-y-4">
                     <div className="w-12 h-12 bg-purple-400/10 rounded-xl flex items-center justify-center mx-auto">
@@ -294,18 +296,18 @@ export default function KnowledgeBase() {
                     <p className="text-sm text-white/60">Showcase your skills and professional experience</p>
                   </div>
                 </Card>
-              </Link>
-            </div>
+              </div>
 
-            <div className="flex justify-center">
-              <Button
-                variant="outline"
-                className="whitespace-nowrap rounded-xl px-6 text-black hover:text-white"
-                onClick={() => setShowExamples(true)}
-              >
-                <Eye className="w-4 h-4 mr-2 text-black" />
-                View Examples
-              </Button>
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  className="whitespace-nowrap rounded-xl px-6 text-black hover:text-white"
+                  onClick={() => setShowExamples(true)}
+                >
+                  <Eye className="w-4 h-4 mr-2 text-black" />
+                  View Examples
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
@@ -378,6 +380,11 @@ export default function KnowledgeBase() {
       <CreateArticleOverlay 
         isOpen={showArticleOverlay}
         onClose={() => setShowArticleOverlay(false)}
+      />
+
+      <CreateResumeOverlay 
+        isOpen={showResumeOverlay}
+        onClose={() => setShowResumeOverlay(false)}
       />
     </div>
   );
