@@ -2,13 +2,14 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { X, User, Briefcase, AlertCircle } from "lucide-react";
+import { User, Briefcase, AlertCircle } from "lucide-react";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 
 interface CreateResumeOverlayProps {
   isOpen: boolean;
@@ -17,7 +18,7 @@ interface CreateResumeOverlayProps {
 
 export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProps) {
   const { isConnected, address } = useWalletConnection();
-  const { user } = useDynamicContext();
+  const { user, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -54,17 +55,6 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl h-[80vh] bg-black/95 border-white/10 text-white p-0 overflow-hidden">
-        <div className="absolute right-4 top-4 z-10">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="text-white/60 hover:text-white"
-            onClick={onClose}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-        
         <div className="h-full flex flex-col">
           <div className="p-6 border-b border-white/10 bg-gradient-to-r from-purple-500/10 to-transparent">
             <div className="flex items-center gap-3">
@@ -86,7 +76,22 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                 transition={{ duration: 0.5 }}
                 className="space-y-8"
               >
-                {!linkedInUrl ? (
+                {!user ? (
+                  <div className="p-4 border border-yellow-500/20 rounded-lg bg-yellow-500/5">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5" />
+                      <div>
+                        <h3 className="font-medium text-yellow-500">Authentication Required</h3>
+                        <p className="text-sm text-white/60 mt-1">
+                          Please log in or sign up to create a Resume NFT.
+                        </p>
+                        <div className="mt-4">
+                          <DynamicWidget />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : !linkedInUrl ? (
                   <div className="p-4 border border-yellow-500/20 rounded-lg bg-yellow-500/5">
                     <div className="flex items-start gap-3">
                       <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5" />
@@ -99,7 +104,6 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                           variant="outline"
                           className="mt-4 border-yellow-500/20 hover:border-yellow-500/40 text-yellow-500"
                           onClick={() => {
-                            // Open Dynamic wallet settings
                             document.querySelector('[data-dynamic-settings-button]')?.dispatchEvent(
                               new MouseEvent('click', { bubbles: true })
                             );
