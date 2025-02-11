@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Publication, fetchPublications } from '../services/graphService';
@@ -180,7 +181,7 @@ export default function KnowledgeBase() {
 
       <div className="border-b border-white/10 bg-black/40 backdrop-blur-xl sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-8">
-          <ScrollArea className="w-full" orientation="horizontal">
+          <ScrollArea className="w-full">
             <div className="flex space-x-2 py-4">
               <Button
                 variant="ghost"

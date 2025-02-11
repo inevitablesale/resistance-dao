@@ -168,8 +168,8 @@ export default function KnowledgeArticle() {
 
           {/* Topics */}
           {article.topics && (
-            <ScrollArea className="w-full" orientation="horizontal">
-              <div className="flex gap-2 mb-8">
+            <ScrollArea className="w-full">
+              <div className="flex gap-2 mb-8 pb-4">
                 {article.topics.map((topic, index) => (
                   <span
                     key={index}
