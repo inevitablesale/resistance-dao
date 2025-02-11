@@ -31,6 +31,7 @@ interface KnowledgeArticle {
   status: string;
   last_updated: string;
   published_at: string | null;
+  slug: string; // Added the missing slug property
 }
 
 export default function KnowledgeAdmin() {
