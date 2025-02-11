@@ -37,35 +37,26 @@ export default function KnowledgeAdmin() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const [userSession, setUserSession] = useState<any>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    checkAdminStatus();
-    fetchArticles();
+    checkSession();
   }, []);
 
-  async function checkAdminStatus() {
+  async function checkSession() {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      setLoading(false);
-      return;
+    setUserSession(session);
+    
+    if (session) {
+      const { data: roleCheck } = await supabase
+        .rpc('is_admin', { user_id: session.user.id });
+      setIsAdmin(!!roleCheck);
+      if (roleCheck) {
+        fetchArticles();
+      }
     }
-
-    const { data: roleCheck, error: roleError } = await supabase
-      .rpc('is_admin', { user_id: session.user.id });
-
-    if (roleError || !roleCheck) {
-      toast({
-        title: "Access Restricted",
-        description: "Please contact an administrator for access to this area.",
-        variant: "destructive"
-      });
-      navigate('/');
-      return;
-    }
-
-    setIsAdmin(true);
     setLoading(false);
   }
 
@@ -89,6 +80,39 @@ export default function KnowledgeAdmin() {
       });
     } finally {
       setIsSigningIn(false);
+    }
+  }
+
+  async function becomeAdmin() {
+    if (!userSession) return;
+
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .insert([
+          { 
+            user_id: userSession.user.id,
+            role: 'admin'
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: "You are now an admin. The page will refresh.",
+      });
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } catch (error) {
+      console.error('Error becoming admin:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to become an admin. Please try again."
+      });
     }
   }
 
@@ -176,7 +200,7 @@ export default function KnowledgeAdmin() {
     );
   }
 
-  if (!isAdmin) {
+  if (!userSession) {
     return (
       <div className="min-h-screen bg-black text-white p-8">
         <div className="max-w-md mx-auto mt-20">
@@ -201,8 +225,32 @@ export default function KnowledgeAdmin() {
                 )}
               </Button>
               <p className="text-sm text-gray-400 text-center">
-                Contact an administrator to request access after signing in.
+                Sign in to access the admin panel
               </p>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-black text-white p-8">
+        <div className="max-w-md mx-auto mt-20">
+          <Card className="p-6 bg-gray-900/50 border-white/10">
+            <h1 className="text-2xl font-bold mb-6 text-center">Welcome to Admin Panel</h1>
+            <div className="space-y-6">
+              <p className="text-gray-400 text-center">
+                You're signed in but don't have admin privileges yet. 
+                Click below to become an admin and start managing content.
+              </p>
+              <Button 
+                onClick={becomeAdmin}
+                className="w-full bg-yellow-500 hover:bg-yellow-600"
+              >
+                Become an Admin
+              </Button>
             </div>
           </Card>
         </div>
