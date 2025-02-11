@@ -7,8 +7,9 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, BookOpen, Briefcase, User } from 'lucide-react';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
+import { useToast } from "@/hooks/use-toast";
 
 export default function KnowledgeBase() {
   const [publications, setPublications] = useState<Publication[]>([]);
@@ -16,10 +17,47 @@ export default function KnowledgeBase() {
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState<string | null>(null);
   const { isConnected, address } = useWalletConnection();
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchArticles();
+    
+    // Check if this is the first visit
+    const hasVisited = localStorage.getItem('has_visited_marketplace');
+    if (!hasVisited) {
+      startOnboarding();
+      localStorage.setItem('has_visited_marketplace', 'true');
+    }
   }, []);
+
+  const startOnboarding = () => {
+    // Welcome message
+    setTimeout(() => {
+      toast({
+        title: "Welcome to the Attention Marketplace! 👋",
+        description: "This is where value meets attention. Let's show you around.",
+        duration: 5000,
+      });
+    }, 1000);
+
+    // Explain the content types
+    setTimeout(() => {
+      toast({
+        title: "Example Content",
+        description: "We've prepared some example content to show you what's possible. Browse through articles, job postings, and professional resumes.",
+        duration: 5000,
+      });
+    }, 6000);
+
+    // Search functionality
+    setTimeout(() => {
+      toast({
+        title: "Easy Search",
+        description: "Use the search bar to find specific content across all categories.",
+        duration: 5000,
+      });
+    }, 11000);
+  };
 
   async function fetchArticles() {
     try {
@@ -47,6 +85,32 @@ export default function KnowledgeBase() {
     acc[article.contentType].push(article);
     return acc;
   }, {} as Record<string, Publication[]>);
+
+  const getContentTypeIcon = (type: string) => {
+    switch (type) {
+      case 'article':
+        return <BookOpen className="w-5 h-5 text-yellow-500" />;
+      case 'job':
+        return <Briefcase className="w-5 h-5 text-teal-500" />;
+      case 'resume':
+        return <User className="w-5 h-5 text-purple-500" />;
+      default:
+        return null;
+    }
+  };
+
+  const getContentTypeLabel = (type: string) => {
+    switch (type) {
+      case 'article':
+        return 'Example Articles';
+      case 'job':
+        return 'Example Job Postings';
+      case 'resume':
+        return 'Example Resumes';
+      default:
+        return type;
+    }
+  };
 
   if (loading) {
     return (
@@ -80,21 +144,30 @@ export default function KnowledgeBase() {
           </div>
         </div>
 
-        <div className="relative mb-8 max-w-md">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-white/40" />
-          <Input
-            type="search"
-            placeholder="Search content..."
-            className="pl-10 bg-white/5 border-white/10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+        <div className="mb-8">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-white/40" />
+            <Input
+              type="search"
+              placeholder="Search content..."
+              className="pl-10 bg-white/5 border-white/10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <p className="mt-2 text-sm text-white/60">Browse through our example content below to see what's possible in the marketplace.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Object.entries(categorizedArticles).map(([category, categoryArticles]) => (
-            <Card key={category} className="p-6 bg-gray-900/50 border-white/10">
-              <h2 className="text-xl font-semibold mb-4">{category}</h2>
+            <Card key={category} className="p-6 bg-gray-900/50 border-white/10 relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-yellow-500/10 px-2 py-1 text-xs text-yellow-500 rounded-bl">
+                Example Content
+              </div>
+              <div className="flex items-center gap-2 mb-4">
+                {getContentTypeIcon(category)}
+                <h2 className="text-xl font-semibold">{getContentTypeLabel(category)}</h2>
+              </div>
               <ScrollArea className="h-[300px]">
                 <ul className="space-y-2">
                   {categoryArticles.map((article) => (
