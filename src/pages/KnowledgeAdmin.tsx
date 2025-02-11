@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
@@ -35,7 +36,6 @@ interface KnowledgeArticle {
 export default function KnowledgeAdmin() {
   const [articles, setArticles] = useState<KnowledgeArticle[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [userSession, setUserSession] = useState<any>(null);
   const navigate = useNavigate();
@@ -50,12 +50,7 @@ export default function KnowledgeAdmin() {
     setUserSession(session);
     
     if (session) {
-      const { data: roleCheck } = await supabase
-        .rpc('is_admin', { user_id: session.user.id });
-      setIsAdmin(!!roleCheck);
-      if (roleCheck) {
-        fetchArticles();
-      }
+      fetchArticles();
     }
     setLoading(false);
   }
@@ -83,39 +78,6 @@ export default function KnowledgeAdmin() {
     }
   }
 
-  async function becomeAdmin() {
-    if (!userSession) return;
-
-    try {
-      const { error } = await supabase
-        .from('user_roles')
-        .insert([
-          { 
-            user_id: userSession.user.id,
-            role: 'admin'
-          }
-        ]);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success!",
-        description: "You are now an admin. The page will refresh.",
-      });
-      
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
-    } catch (error) {
-      console.error('Error becoming admin:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to become an admin. Please try again."
-      });
-    }
-  }
-
   async function fetchArticles() {
     try {
       const { data, error } = await supabase
@@ -132,8 +94,6 @@ export default function KnowledgeAdmin() {
         title: "Error",
         description: "Failed to load articles"
       });
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -227,30 +187,6 @@ export default function KnowledgeAdmin() {
               <p className="text-sm text-gray-400 text-center">
                 Sign in to access the admin panel
               </p>
-            </div>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-black text-white p-8">
-        <div className="max-w-md mx-auto mt-20">
-          <Card className="p-6 bg-gray-900/50 border-white/10">
-            <h1 className="text-2xl font-bold mb-6 text-center">Welcome to Admin Panel</h1>
-            <div className="space-y-6">
-              <p className="text-gray-400 text-center">
-                You're signed in but don't have admin privileges yet. 
-                Click below to become an admin and start managing content.
-              </p>
-              <Button 
-                onClick={becomeAdmin}
-                className="w-full bg-yellow-500 hover:bg-yellow-600"
-              >
-                Become an Admin
-              </Button>
             </div>
           </Card>
         </div>
