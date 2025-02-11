@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Publication, fetchPublications } from '../services/graphService';
@@ -6,10 +5,11 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Loader2, BookOpen, Briefcase, User, Users, ChevronRight } from 'lucide-react';
+import { Search, Loader2, BookOpen, Briefcase, User, Users, ChevronRight, Star, Clock, Shield } from 'lucide-react';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { useToast } from "@/hooks/use-toast";
 import { VotingSection } from '@/components/nft-card/VotingSection';
+import { motion } from "framer-motion";
 
 export default function KnowledgeBase() {
   const [publications, setPublications] = useState<Publication[]>([]);
@@ -134,48 +134,84 @@ export default function KnowledgeBase() {
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white">
       <div className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-20">
+        <motion.div 
+          className="absolute inset-0 opacity-30"
+          animate={{
+            background: [
+              "radial-gradient(circle at 0% 0%, #00ff87 0%, transparent 50%)",
+              "radial-gradient(circle at 100% 100%, #00ff87 0%, transparent 50%)",
+              "radial-gradient(circle at 0% 100%, #00ff87 0%, transparent 50%)",
+              "radial-gradient(circle at 100% 0%, #00ff87 0%, transparent 50%)",
+            ],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
+        />
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
         <div className="max-w-7xl mx-auto px-8">
           <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-teal-400 via-yellow-400 to-purple-400 text-transparent bg-clip-text mb-4">
+            <motion.h1 
+              className="text-6xl font-bold bg-gradient-to-r from-teal-400 via-yellow-400 to-purple-400 text-transparent bg-clip-text mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               Professional Services Marketplace
-            </h1>
-            <p className="text-lg text-white/60 max-w-2xl mx-auto">
+            </motion.h1>
+            <motion.p 
+              className="text-xl text-white/60 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               Connect with verified accounting professionals and access premium services through our decentralized marketplace.
-            </p>
+            </motion.p>
           </div>
 
-          <div className="max-w-2xl mx-auto">
+          <motion.div 
+            className="max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
             <div className="relative">
               <Search className="absolute left-4 top-3.5 h-5 w-5 text-white/40" />
               <Input
                 type="search"
                 placeholder="Search for services or professionals..."
-                className="w-full pl-12 py-3 bg-white/5 border-white/10 rounded-xl text-white placeholder:text-white/40"
+                className="w-full pl-12 py-6 bg-white/5 border-white/10 rounded-2xl text-white placeholder:text-white/40 hover:border-white/20 transition-colors focus:border-teal-500/50 text-lg"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-3 gap-8 max-w-3xl mx-auto mt-12">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-teal-400 mb-2">{publications.length}</div>
+          <motion.div 
+            className="grid grid-cols-3 gap-8 max-w-3xl mx-auto mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <div className="text-center p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+              <div className="text-4xl font-bold text-teal-400 mb-2">{publications.length}</div>
               <div className="text-sm text-white/60">Total Services</div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-400 mb-2">
+            <div className="text-center p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+              <div className="text-4xl font-bold text-yellow-400 mb-2">
                 {new Set(publications.map(p => p.publisher)).size}
               </div>
               <div className="text-sm text-white/60">Active Professionals</div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-400 mb-2">
+            <div className="text-center p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+              <div className="text-4xl font-bold text-purple-400 mb-2">
                 {Object.keys(categorizedArticles).length}
               </div>
               <div className="text-sm text-white/60">Categories</div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
@@ -185,7 +221,7 @@ export default function KnowledgeBase() {
             <div className="flex space-x-2 py-4">
               <Button
                 variant="ghost"
-                className={`whitespace-nowrap ${!selectedCategory ? 'bg-white/10' : ''}`}
+                className={`whitespace-nowrap rounded-xl px-6 ${!selectedCategory ? 'bg-white/10 hover:bg-white/20' : 'hover:bg-white/10'}`}
                 onClick={() => setSelectedCategory(null)}
               >
                 <Users className="w-4 h-4 mr-2" />
@@ -195,7 +231,7 @@ export default function KnowledgeBase() {
                 <Button
                   key={category}
                   variant="ghost"
-                  className={`whitespace-nowrap ${selectedCategory === category ? 'bg-white/10' : ''}`}
+                  className={`whitespace-nowrap rounded-xl px-6 ${selectedCategory === category ? 'bg-white/10 hover:bg-white/20' : 'hover:bg-white/10'}`}
                   onClick={() => setSelectedCategory(category)}
                 >
                   {getContentTypeIcon(category)}
@@ -216,38 +252,57 @@ export default function KnowledgeBase() {
                 to={`/marketplace/${article.contentType}/${article.id}`}
                 className="group"
               >
-                <Card className="h-full p-6 bg-gray-800/50 border-white/10 hover:border-white/20 transition-all duration-300 relative overflow-hidden backdrop-blur-xl">
-                  <div className="absolute top-0 right-0 bg-gradient-to-l from-teal-500/10 via-yellow-500/10 to-purple-500/10 px-3 py-1 text-xs text-white/60 rounded-bl">
-                    {getContentTypeLabel(category)}
-                  </div>
-                  
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 rounded-lg bg-white/5">
-                      {getContentTypeIcon(category)}
-                    </div>
-                    <h3 className="text-lg font-semibold group-hover:text-teal-400 transition-colors">
-                      {article.title}
-                    </h3>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="text-sm text-white/60">
-                      {article.category}
-                    </div>
-                    
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center text-white/40">
-                        <User className="w-4 h-4 mr-2" />
-                        {article.publisher.slice(0, 6)}...{article.publisher.slice(-4)}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card className="h-full bg-gray-800/50 border-white/10 hover:border-white/20 transition-all duration-300 relative overflow-hidden backdrop-blur-xl group-hover:transform group-hover:scale-[1.02]">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0" />
+                    <div className="relative p-6">
+                      <div className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-white/60 backdrop-blur-sm border border-white/10">
+                        {getContentTypeLabel(category)}
                       </div>
-                      <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-white/40 transition-colors" />
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+                          {getContentTypeIcon(category)}
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-semibold group-hover:text-teal-400 transition-colors line-clamp-2">
+                            {article.title}
+                          </h3>
+                          <p className="text-sm text-white/60 mt-1">
+                            {article.category}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="flex items-center gap-2 text-sm text-white/60">
+                          <Shield className="w-4 h-4" />
+                          <span>Verified Pro</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-white/60">
+                          <Star className="w-4 h-4" />
+                          <span>Top Rated</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-white/60">
+                          <Clock className="w-4 h-4" />
+                          <span>Quick Response</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-white/60">
+                          <User className="w-4 h-4" />
+                          <span>{article.publisher.slice(0, 6)}...{article.publisher.slice(-4)}</span>
+                        </div>
+                      </div>
+                      <div className="pt-6 border-t border-white/5">
+                        <VotingSection tokenId={article.id} owner={article.publisher} />
+                      </div>
+                      <div className="absolute bottom-4 right-4 text-white/40 group-hover:text-white/60 transition-colors">
+                        <ChevronRight className="w-5 h-5" />
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="mt-6 pt-6 border-t border-white/5">
-                    <VotingSection tokenId={article.id} owner={article.publisher} />
-                  </div>
-                </Card>
+                  </Card>
+                </motion.div>
               </Link>
             ))
           ))}
