@@ -57,16 +57,6 @@ function App() {
           description: `Connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
         });
       },
-      emailVerificationCompleted: () => {
-        console.log("[Dynamic SDK] Email verification completed");
-        toast({
-          title: "Email Verified",
-          description: "Your email has been successfully verified.",
-        });
-      },
-      emailVerificationSuccess: () => {
-        console.log("[Dynamic SDK] Email verification succeeded");
-      },
       userCreated: (args) => {
         console.log("[Dynamic SDK] New user created:", args);
         toast({
@@ -109,11 +99,33 @@ function App() {
             signInWithEmail: true,
             autoVerify: true,
             autoClose: true,
+            onVerificationSuccess: (args) => {
+              console.log("[Dynamic SDK] Email verification succeeded", args);
+            },
+            onVerificationComplete: () => {
+              console.log("[Dynamic SDK] Email verification completed");
+              // Explicitly close the auth flow
+              dynamicSettings.setShowAuthFlow?.(false);
+              toast({
+                title: "Email Verified",
+                description: "Your email has been successfully verified.",
+              });
+            },
             onComplete: (args) => {
               console.log("[Dynamic SDK] Email Auth Complete:", args);
+              // Explicitly close the auth flow
+              dynamicSettings.setShowAuthFlow?.(false);
               toast({
                 title: "Email Authentication Complete",
                 description: "You can now proceed with the token purchase.",
+              });
+            },
+            onError: (error) => {
+              console.error("[Dynamic SDK] Email verification error:", error);
+              toast({
+                title: "Verification Error",
+                description: "There was an error verifying your email. Please try again.",
+                variant: "destructive",
               });
             }
           }
