@@ -1,6 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { useDynamicContext, useOnramp } from "@dynamic-labs/sdk-react-core";
-import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -20,7 +20,6 @@ const TOKEN_USD_PRICE = 0.10; // Fixed price of $0.10 per token
 
 export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
-  const { enabled: banxaEnabled, open: openBanxa } = useOnramp();
   const [amount, setAmount] = useState(initialAmount || "");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -105,22 +104,32 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     }
 
     try {
-      const maticAmount = (Number(amount) / maticUsdRate).toString();
-      await openBanxa({
-        onrampProvider: OnrampProviders.Banxa,
-        token: 'MATIC',
-        address: primaryWallet.address,
-      });
-      
-      toast({
-        title: "Purchase Initiated",
-        description: "You will be redirected to complete your purchase",
-      });
+      // In v4.4.4, we use the direct payment API
+      if (primaryWallet.connector?.name === 'MetaMask') {
+        const maticAmount = (Number(amount) / maticUsdRate).toString();
+        
+        // Open MetaMask buy flow directly
+        await primaryWallet.connector.openWallet?.({
+          view: 'deposit'
+        });
+        
+        toast({
+          title: "Purchase Initiated",
+          description: "Please complete the purchase in MetaMask",
+        });
+      } else {
+        // For other wallets, show a more generic message
+        toast({
+          title: "Card Purchase",
+          description: "Please use your wallet's built-in fiat onramp or visit an exchange to purchase MATIC.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
-      console.error("Banxa error:", error);
+      console.error("Card purchase error:", error);
       toast({
         title: "Purchase Failed",
-        description: "Failed to initiate card purchase",
+        description: "Failed to initiate card purchase. Please try again.",
         variant: "destructive",
       });
     }
@@ -205,7 +214,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       <Card className="bg-white/5 border-white/10 p-6">
         <Tabs defaultValue="card" className="w-full" onValueChange={(value) => setPurchaseMethod(value as 'matic' | 'card')}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="card" disabled={!banxaEnabled} className="flex items-center gap-2">
+            <TabsTrigger value="card" className="flex items-center gap-2">
               <CreditCard className="w-4 h-4" />
               Card
             </TabsTrigger>
@@ -281,7 +290,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
 
             <Button 
               onClick={handlePurchase}
-              disabled={isLoading || !amount || (purchaseMethod === 'card' && !banxaEnabled)}
+              disabled={isLoading || !amount}
               className="w-full mt-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
             >
               {isLoading ? (

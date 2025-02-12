@@ -84,6 +84,28 @@ function App() {
           title: "Wallet Disconnected",
           description: "Your wallet has been disconnected.",
         });
+      },
+      onPaymentCancel: () => {
+        console.log("[Dynamic SDK] Payment cancelled");
+        toast({
+          title: "Payment Cancelled",
+          description: "The payment process was cancelled.",
+        });
+      },
+      onPaymentSuccess: () => {
+        console.log("[Dynamic SDK] Payment successful");
+        toast({
+          title: "Payment Successful",
+          description: "Your payment has been processed successfully.",
+        });
+      },
+      onPaymentError: (error) => {
+        console.error("[Dynamic SDK] Payment error:", error);
+        toast({
+          title: "Payment Error",
+          description: "There was an error processing your payment.",
+          variant: "destructive",
+        });
       }
     },
     settings: {
