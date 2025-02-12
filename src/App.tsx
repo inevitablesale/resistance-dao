@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -36,61 +35,9 @@ function App() {
       EthereumWalletConnectors,
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
-    events: {
-      authFlowOpen: () => {
-        console.log("[Dynamic SDK] Auth flow opened");
-      },
-      authFlowClose: () => {
-        console.log("[Dynamic SDK] Auth flow closed");
-      },
-      authFailure: (reason) => {
-        console.log("[Dynamic SDK] Auth failure:", reason);
-        toast({
-          title: "Authentication Failed",
-          description: "There was an error connecting your wallet.",
-        });
-      },
-      authSuccess: (args) => {
-        console.log("[Dynamic SDK] Auth Success:", args);
-        toast({
-          title: "Successfully Connected",
-          description: `Connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
-        });
-      },
-      emailVerificationCompleted: () => {
-        console.log("[Dynamic SDK] Email verification completed");
-        toast({
-          title: "Email Verified",
-          description: "Your email has been successfully verified.",
-        });
-      },
-      emailVerificationSuccess: () => {
-        console.log("[Dynamic SDK] Email verification succeeded");
-      },
-      userCreated: (args) => {
-        console.log("[Dynamic SDK] New user created:", args);
-        toast({
-          title: "Account Created",
-          description: "Your account has been successfully created.",
-        });
-      },
-      logout: () => {
-        console.log("[Dynamic SDK] User logged out");
-        toast({
-          title: "Logged Out",
-          description: "You've been successfully logged out.",
-        });
-      },
-      userWalletsChanged: (params) => {
-        console.log("[Dynamic SDK] User wallets changed:", params);
-      },
-      primaryWalletChanged: (newPrimaryWallet) => {
-        console.log("[Dynamic SDK] Primary wallet changed:", newPrimaryWallet);
-      }
-    },
     settings: {
       network: {
-        chainId: 137, // Polygon Mainnet
+        chainId: 137,
       },
       environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
       appName: "LedgerFund",
@@ -103,6 +50,7 @@ function App() {
       enableSessionRestoration: true,
       enableAuthProviders: true,
       enablePasskeys: false,
+      displayNetworkName: false, // This hides the network name in the header
       evmWallets: {
         options: {
           emailAuth: {
@@ -173,4 +121,3 @@ function App() {
 }
 
 export default App;
-

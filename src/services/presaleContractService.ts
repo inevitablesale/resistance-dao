@@ -106,34 +106,34 @@ export const fetchPresaleUSDPrice = async () => {
   }
 };
 
-// Function to fetch latest MATIC price and convert presale price to MATIC
+// Function to fetch latest POL price and convert presale price to POL
 export const fetchPresaleMaticPrice = async () => {
   try {
     const provider = await getWorkingProvider();
     const contract = await getPresaleContract(provider);
-    const maticPrice = await contract.getLGRPrice();
-    const formattedPrice = Number(ethers.utils.formatEther(maticPrice)).toFixed(4);
+    const polPrice = await contract.getLGRPrice();
+    const formattedPrice = Number(ethers.utils.formatEther(polPrice)).toFixed(4);
     return formattedPrice;
   } catch (error) {
-    console.error("Error fetching MATIC price:", error);
+    console.error("Error fetching POL price:", error);
     return "0";
   }
 };
 
 // Function to purchase tokens
-export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string) => {
+export const purchaseTokens = async (signer: ethers.Signer, polAmount: string) => {
   try {
-    console.log('Starting token purchase with MATIC amount:', maticAmount);
+    console.log('Starting token purchase with POL amount:', polAmount);
     
     const contract = await getPresaleContract(signer);
     
-    // Get current LGR price in MATIC
-    const maticPrice = await contract.getLGRPrice();
-    console.log('Current MATIC price per token:', ethers.utils.formatEther(maticPrice));
+    // Get current LGR price in POL
+    const polPrice = await contract.getLGRPrice();
+    console.log('Current POL price per token:', ethers.utils.formatEther(polPrice));
     
     // Calculate expected number of tokens
-    const maticAmountWei = ethers.utils.parseEther(maticAmount);
-    const expectedTokens = maticAmountWei.mul(ethers.utils.parseEther("1")).div(maticPrice);
+    const polAmountWei = ethers.utils.parseEther(polAmount);
+    const expectedTokens = polAmountWei.mul(ethers.utils.parseEther("1")).div(polPrice);
     console.log('Expected tokens:', ethers.utils.formatEther(expectedTokens));
     
     // Add 1% slippage protection
@@ -142,7 +142,7 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
 
     // Execute purchase transaction
     const tx = await contract.buyTokens(minExpectedTokens, {
-      value: maticAmountWei
+      value: polAmountWei
     });
     
     console.log('Purchase transaction submitted:', tx.hash);

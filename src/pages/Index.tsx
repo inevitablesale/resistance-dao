@@ -326,7 +326,7 @@ const IndexContent = () => {
                     <div className="text-3xl font-bold text-yellow-500 mb-4">
                       $100 USD
                     </div>
-                    <div className="text-xl text-white mb-6">1,000 LGR Tokens</div>
+                    <div className="text-xl text-white mb-6">receive 1,000 LGR Tokens</div>
                     <ul className="space-y-3 text-gray-300 mb-6">
                       <li className="flex items-center">
                         <Award className="w-5 h-5 text-yellow-500 mr-2" />
@@ -368,7 +368,7 @@ const IndexContent = () => {
                     <div className="text-3xl font-bold text-yellow-500 mb-4">
                       $500 USD
                     </div>
-                    <div className="text-xl text-white mb-6">5,000 LGR Tokens</div>
+                    <div className="text-xl text-white mb-6">receive 5,000 LGR Tokens</div>
                     <ul className="space-y-3 text-gray-300 mb-6">
                       <li className="flex items-center">
                         <Crown className="w-5 h-5 text-yellow-500 mr-2" />
@@ -411,7 +411,7 @@ const IndexContent = () => {
                     <div className="text-3xl font-bold text-yellow-500 mb-4">
                       $2,500 USD
                     </div>
-                    <div className="text-xl text-white mb-6">25,000 LGR Tokens</div>
+                    <div className="text-xl text-white mb-6">receive 25,000 LGR Tokens</div>
                     <ul className="space-y-3 text-gray-300 mb-6">
                       <li className="flex items-center">
                         <Crown className="w-5 h-5 text-yellow-500 mr-2" />
