@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -98,9 +99,9 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl h-[90vh] bg-black/95 border-white/10 text-white overflow-hidden">
+      <DialogContent className="max-w-4xl h-[90vh] bg-black/95 border-white/10 text-white p-0">
         <div className="flex flex-col h-full">
-          <div className="flex-none p-6 border-b border-white/10 bg-gradient-to-r from-purple-500/10 to-transparent">
+          <div className="flex-none px-6 py-4 border-b border-white/10 bg-gradient-to-r from-purple-500/10 to-transparent">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
                 <User className="w-5 h-5 text-purple-400" />
@@ -111,6 +112,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
               </div>
             </div>
           </div>
+
           <div 
             className="flex-1 overflow-y-scroll min-h-0 scrollbar-thin scrollbar-thumb-purple-500/50 hover:scrollbar-thumb-purple-500/70 scrollbar-track-white/5"
             style={{
@@ -118,7 +120,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
               scrollbarColor: 'rgba(168, 85, 247, 0.5) rgba(255, 255, 255, 0.05)'
             }}
           >
-            <div className="p-6">
+            <div className="px-6 py-4">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -299,8 +301,9 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
               </motion.div>
             </div>
           </div>
+
           {profileData && (
-            <div className="flex-none border-t border-white/10 bg-black/95 p-4">
+            <div className="flex-none px-6 py-4 border-t border-white/10 bg-black/95">
               <div className="max-w-2xl mx-auto flex gap-4">
                 <Button
                   className="flex-1 bg-transparent border border-white/10 hover:bg-white/5"
