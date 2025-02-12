@@ -1,33 +1,70 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Publication, fetchPublications } from '../services/graphService';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Loader2, BookOpen, Briefcase, User, Users, ChevronRight, Star, Clock, Shield, Eye } from 'lucide-react';
+import { Search, Loader2, Building2, DollarSign, Users, ChevronRight, Handshake, Clock, Shield, MapPin } from 'lucide-react';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { useToast } from "@/hooks/use-toast";
 import { VotingSection } from '@/components/nft-card/VotingSection';
 import { motion } from "framer-motion";
 import { CreateArticleOverlay } from "@/components/CreateArticleOverlay";
-import { CreateResumeOverlay } from "@/components/CreateResumeOverlay";
+
+// Mock data for client listings
+const MOCK_LISTINGS = [
+  {
+    id: '1',
+    title: 'Manufacturing Client Portfolio',
+    publisher: '0x1234567890123456789012345678901234567890',
+    category: 'Manufacturing',
+    contentType: 'client',
+    annual_revenue: '$2.5M - $5M',
+    location: 'Northeast US',
+    client_since: '2018',
+    service_mix: ['Tax Planning', 'Audit', 'Advisory'],
+    royalty_terms: '5% Year 1, 3% Year 2',
+    transition_period: '6 months'
+  },
+  {
+    id: '2',
+    title: 'Healthcare Practice Group',
+    publisher: '0x1234567890123456789012345678901234567890',
+    category: 'Healthcare',
+    contentType: 'client',
+    annual_revenue: '$1M - $2.5M',
+    location: 'West Coast',
+    client_since: '2019',
+    service_mix: ['Tax Compliance', 'CFO Services'],
+    royalty_terms: '7% Year 1, 4% Year 2',
+    transition_period: '4 months'
+  },
+  {
+    id: '3',
+    title: 'Technology Startup Portfolio',
+    publisher: '0x1234567890123456789012345678901234567890',
+    category: 'Technology',
+    contentType: 'client',
+    annual_revenue: '$500K - $1M',
+    location: 'Southeast US',
+    client_since: '2021',
+    service_mix: ['Bookkeeping', 'Tax Planning'],
+    royalty_terms: '5% Year 1',
+    transition_period: '3 months'
+  }
+];
 
 export default function KnowledgeBase() {
-  const [publications, setPublications] = useState<Publication[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState<string | null>(null);
   const { isConnected, address } = useWalletConnection();
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showExamples, setShowExamples] = useState(false);
-  const [showArticleOverlay, setShowArticleOverlay] = useState(false);
-  const [showResumeOverlay, setShowResumeOverlay] = useState(false);
+  const [showListingOverlay, setShowListingOverlay] = useState(false);
 
   useEffect(() => {
-    fetchArticles();
-    
     // Check if this is the first visit
     const hasVisited = localStorage.getItem('has_visited_marketplace');
     if (!hasVisited) {
@@ -37,87 +74,39 @@ export default function KnowledgeBase() {
   }, []);
 
   const startOnboarding = () => {
-    // Welcome message
     setTimeout(() => {
       toast({
-        title: "Welcome to the Attention Marketplace! 👋",
-        description: "This is where value meets attention. Let's show you around.",
+        title: "Welcome to the Client Transfer Marketplace! 👋",
+        description: "Securely buy and sell accounting clients with built-in royalties and smooth transitions.",
         duration: 5000,
       });
     }, 1000);
 
-    // Explain the content types
     setTimeout(() => {
       toast({
-        title: "Example Content",
-        description: "We've prepared some example content to show you what's possible. Browse through articles, job postings, and professional resumes.",
+        title: "Smart Contracts & Royalties",
+        description: "Our platform uses smart contracts to ensure secure transfers and automated royalty payments.",
         duration: 5000,
       });
     }, 6000);
 
-    // Search functionality
     setTimeout(() => {
       toast({
-        title: "Easy Search",
-        description: "Use the search bar to find specific content across all categories.",
+        title: "Getting Started",
+        description: "Browse available clients or list your own for transfer. Each listing includes detailed information and terms.",
         duration: 5000,
       });
     }, 11000);
   };
 
-  async function fetchArticles() {
-    try {
-      const { publications: newPubs } = await fetchPublications(1, 50);
-      setPublications(newPubs);
-    } catch (err) {
-      console.error('Error fetching articles:', err);
-      setError('Failed to load articles');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const getContentTypeIcon = (type: string) => {
-    switch (type) {
-      case 'article':
-        return <BookOpen className="w-5 h-5 text-teal-400" />;
-      case 'job':
-        return <Briefcase className="w-5 h-5 text-yellow-400" />;
-      case 'resume':
-        return <User className="w-5 h-5 text-purple-400" />;
-      default:
-        return null;
-    }
-  };
-
-  const getContentTypeLabel = (type: string) => {
-    switch (type) {
-      case 'article':
-        return 'Articles';
-      case 'job':
-        return 'Job Postings';
-      case 'resume':
-        return 'Resumes';
-      default:
-        return type;
-    }
-  };
-
-  const filteredArticles = publications.filter(article =>
+  const filteredListings = MOCK_LISTINGS.filter(listing =>
     (searchQuery === '' || 
-     article.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     article.category?.toLowerCase().includes(searchQuery.toLowerCase())) &&
-    (selectedCategory === null || article.contentType === selectedCategory) &&
-    (showExamples)
+     listing.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     listing.category?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+    (selectedCategory === null || listing.category === selectedCategory)
   );
 
-  const categorizedArticles = filteredArticles.reduce((acc, article) => {
-    if (!acc[article.contentType]) {
-      acc[article.contentType] = [];
-    }
-    acc[article.contentType].push(article);
-    return acc;
-  }, {} as Record<string, Publication[]>);
+  const categories = Array.from(new Set(MOCK_LISTINGS.map(listing => listing.category)));
 
   if (loading) {
     return (
@@ -158,12 +147,12 @@ export default function KnowledgeBase() {
         <div className="max-w-7xl mx-auto px-8">
           <div className="text-center mb-12">
             <motion.h1 
-              className="text-6xl font-bold bg-gradient-to-r from-teal-400 via-yellow-400 to-purple-400 text-transparent bg-clip-text mb-6"
+              className="text-6xl font-bold bg-gradient-to-r from-teal-400 via-emerald-400 to-green-400 text-transparent bg-clip-text mb-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              Professional Services Marketplace
+              Client Transfer Marketplace
             </motion.h1>
             <motion.p 
               className="text-xl text-white/60 max-w-2xl mx-auto"
@@ -171,7 +160,7 @@ export default function KnowledgeBase() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              Connect with verified accounting professionals and access premium services through our decentralized marketplace.
+              Buy and sell accounting clients with built-in royalties and secure transfers. Smart contracts ensure smooth transitions and protect both parties.
             </motion.p>
           </div>
 
@@ -185,7 +174,7 @@ export default function KnowledgeBase() {
               <Search className="absolute left-4 top-3.5 h-5 w-5 text-white/40" />
               <Input
                 type="search"
-                placeholder="Search for services or professionals..."
+                placeholder="Search by industry, revenue range, or location..."
                 className="w-full pl-12 py-6 bg-white/5 border-white/10 rounded-2xl text-white placeholder:text-white/40 hover:border-white/20 transition-colors focus:border-teal-500/50 text-lg"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -200,20 +189,16 @@ export default function KnowledgeBase() {
             transition={{ duration: 0.5, delay: 0.6 }}
           >
             <div className="text-center p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-4xl font-bold text-teal-400 mb-2">{publications.length}</div>
-              <div className="text-sm text-white/60">Total Services</div>
+              <div className="text-4xl font-bold text-teal-400 mb-2">{MOCK_LISTINGS.length}</div>
+              <div className="text-sm text-white/60">Available Clients</div>
             </div>
             <div className="text-center p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-4xl font-bold text-yellow-400 mb-2">
-                {new Set(publications.map(p => p.publisher)).size}
-              </div>
-              <div className="text-sm text-white/60">Active Professionals</div>
+              <div className="text-4xl font-bold text-emerald-400 mb-2">12</div>
+              <div className="text-sm text-white/60">Successful Transfers</div>
             </div>
             <div className="text-center p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-4xl font-bold text-purple-400 mb-2">
-                {Object.keys(categorizedArticles).length}
-              </div>
-              <div className="text-sm text-white/60">Categories</div>
+              <div className="text-4xl font-bold text-green-400 mb-2">{categories.length}</div>
+              <div className="text-sm text-white/60">Industries</div>
             </div>
           </motion.div>
         </div>
@@ -228,154 +213,116 @@ export default function KnowledgeBase() {
                 className={`whitespace-nowrap rounded-xl px-6 ${!selectedCategory ? 'bg-white/10 hover:bg-white/20' : 'hover:bg-white/10'}`}
                 onClick={() => setSelectedCategory(null)}
               >
-                <Users className="w-4 h-4 mr-2" />
-                All Categories
+                <Building2 className="w-4 h-4 mr-2" />
+                All Industries
               </Button>
-              {Object.keys(categorizedArticles).map((category) => (
+              {categories.map((category) => (
                 <Button
                   key={category}
                   variant="ghost"
                   className={`whitespace-nowrap rounded-xl px-6 ${selectedCategory === category ? 'bg-white/10 hover:bg-white/20' : 'hover:bg-white/10'}`}
                   onClick={() => setSelectedCategory(category)}
                 >
-                  {getContentTypeIcon(category)}
-                  <span className="ml-2">{getContentTypeLabel(category)}</span>
+                  <Building2 className="w-4 h-4 mr-2" />
+                  <span>{category}</span>
                 </Button>
               ))}
-              <Button
-                variant={showExamples ? "default" : "outline"}
-                className={`ml-auto whitespace-nowrap rounded-xl px-6 ${showExamples ? 'text-white' : 'text-black hover:text-white'}`}
-                onClick={() => setShowExamples(!showExamples)}
-              >
-                <Eye className={`w-4 h-4 mr-2 ${showExamples ? 'text-white' : 'text-black'}`} />
-                {showExamples ? 'Hide Examples' : 'View Examples'}
-              </Button>
             </div>
           </ScrollArea>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-8 py-12">
-        {!showExamples && (
-          <div className="text-center py-12">
-            <h3 className="text-2xl font-semibold text-white/80 mb-4">Create Your Professional NFT</h3>
-            <p className="text-white/60 mb-8">Choose the type of NFT you want to create.</p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-              <div onClick={() => setShowArticleOverlay(true)} className="cursor-pointer">
-                <Card className="p-6 bg-white/5 border-white/10 hover:border-teal-400/50 transition-all duration-300">
-                  <div className="text-center space-y-4">
-                    <div className="w-12 h-12 bg-teal-400/10 rounded-xl flex items-center justify-center mx-auto">
-                      <BookOpen className="w-6 h-6 text-teal-400" />
-                    </div>
-                    <h4 className="text-lg font-semibold text-white">Article</h4>
-                    <p className="text-sm text-white/60">Share your knowledge and insights with the community</p>
+        <div className="text-center py-12">
+          <h3 className="text-2xl font-semibold text-white/80 mb-4">List Your Clients for Transfer</h3>
+          <p className="text-white/60 mb-8">Set your terms, royalties, and transition period.</p>
+          
+          <div className="max-w-3xl mx-auto">
+            <div onClick={() => setShowListingOverlay(true)} className="cursor-pointer">
+              <Card className="p-6 bg-white/5 border-white/10 hover:border-teal-400/50 transition-all duration-300">
+                <div className="text-center space-y-4">
+                  <div className="w-12 h-12 bg-teal-400/10 rounded-xl flex items-center justify-center mx-auto">
+                    <Handshake className="w-6 h-6 text-teal-400" />
                   </div>
-                </Card>
-              </div>
-
-              <Link to="/mint-nft?type=job" className="group">
-                <Card className="p-6 bg-white/5 border-white/10 hover:border-yellow-400/50 transition-all duration-300">
-                  <div className="text-center space-y-4">
-                    <div className="w-12 h-12 bg-yellow-400/10 rounded-xl flex items-center justify-center mx-auto">
-                      <Briefcase className="w-6 h-6 text-yellow-400" />
-                    </div>
-                    <h4 className="text-lg font-semibold text-white">Job Posting</h4>
-                    <p className="text-sm text-white/60">List opportunities and find talented professionals</p>
-                  </div>
-                </Card>
-              </Link>
-
-              <div onClick={() => setShowResumeOverlay(true)} className="cursor-pointer">
-                <Card className="p-6 bg-white/5 border-white/10 hover:border-purple-400/50 transition-all duration-300">
-                  <div className="text-center space-y-4">
-                    <div className="w-12 h-12 bg-purple-400/10 rounded-xl flex items-center justify-center mx-auto">
-                      <User className="w-6 h-6 text-purple-400" />
-                    </div>
-                    <h4 className="text-lg font-semibold text-white">Resume</h4>
-                    <p className="text-sm text-white/60">Showcase your skills and professional experience</p>
-                  </div>
-                </Card>
-              </div>
+                  <h4 className="text-lg font-semibold text-white">Create Client Listing</h4>
+                  <p className="text-sm text-white/60">
+                    Specify client details, revenue, service mix, and transfer terms
+                  </p>
+                </div>
+              </Card>
             </div>
           </div>
-        )}
+        </div>
 
-        {showExamples && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Object.entries(categorizedArticles).map(([category, categoryArticles]) => (
-              categoryArticles.map((article) => (
-                <Link
-                  key={article.id}
-                  to={`/marketplace/${article.contentType}/${article.id}`}
-                  className="group"
-                >
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Card className="h-full bg-gray-800/50 border-white/10 hover:border-white/20 transition-all duration-300 relative overflow-hidden backdrop-blur-xl group-hover:transform group-hover:scale-[1.02]">
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0" />
-                      <div className="relative p-6">
-                        <div className="absolute -right-12 top-8 px-12 py-1 rotate-45 text-xs font-medium bg-white/10 text-teal-400 backdrop-blur-sm border-y border-white/10 w-48 text-center">
-                          {getContentTypeLabel(category)}
-                        </div>
-                        <div className="flex items-center gap-4 mb-6">
-                          <div className="p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-                            {getContentTypeIcon(category)}
-                          </div>
-                          <div>
-                            <h3 className="text-xl font-semibold text-teal-400 transition-colors line-clamp-2">
-                              {article.title}
-                            </h3>
-                            <p className="text-sm text-white/60 mt-1">
-                              {article.category}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                          <div className="flex items-center gap-2 text-sm text-white/60">
-                            <Shield className="w-4 h-4" />
-                            <span>Verified Pro</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-white/60">
-                            <Star className="w-4 h-4" />
-                            <span>Top Rated</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-white/60">
-                            <Clock className="w-4 h-4" />
-                            <span>Quick Response</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-white/60">
-                            <User className="w-4 h-4" />
-                            <span>{article.publisher.slice(0, 6)}...{article.publisher.slice(-4)}</span>
-                          </div>
-                        </div>
-                        <div className="pt-6 border-t border-white/5">
-                          <VotingSection tokenId={article.id} owner={article.publisher} />
-                        </div>
-                        <div className="absolute bottom-4 right-4 text-white/40 group-hover:text-white/60 transition-colors">
-                          <ChevronRight className="w-5 h-5" />
-                        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredListings.map((listing) => (
+            <Link
+              key={listing.id}
+              to={`/marketplace/client/${listing.id}`}
+              className="group"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="h-full bg-gray-800/50 border-white/10 hover:border-white/20 transition-all duration-300 relative overflow-hidden backdrop-blur-xl group-hover:transform group-hover:scale-[1.02]">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0" />
+                  <div className="relative p-6">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+                        <Building2 className="w-5 h-5 text-teal-400" />
                       </div>
-                    </Card>
-                  </motion.div>
-                </Link>
-              ))
-            ))}
-          </div>
-        )}
+                      <div>
+                        <h3 className="text-xl font-semibold text-teal-400 transition-colors line-clamp-2">
+                          {listing.title}
+                        </h3>
+                        <p className="text-sm text-white/60 mt-1">
+                          {listing.category}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div className="flex items-center gap-2 text-sm text-white/60">
+                        <DollarSign className="w-4 h-4" />
+                        <span>{listing.annual_revenue}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-white/60">
+                        <MapPin className="w-4 h-4" />
+                        <span>{listing.location}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-white/60">
+                        <Clock className="w-4 h-4" />
+                        <span>Since {listing.client_since}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-white/60">
+                        <Shield className="w-4 h-4" />
+                        <span>{listing.transition_period}</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-white/5">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-white/60">Royalty Terms:</span>
+                        <span className="text-teal-400 font-medium">{listing.royalty_terms}</span>
+                      </div>
+                    </div>
+
+                    <div className="absolute bottom-4 right-4 text-white/40 group-hover:text-white/60 transition-colors">
+                      <ChevronRight className="w-5 h-5" />
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            </Link>
+          ))}
+        </div>
       </div>
 
       <CreateArticleOverlay 
-        isOpen={showArticleOverlay}
-        onClose={() => setShowArticleOverlay(false)}
-      />
-
-      <CreateResumeOverlay 
-        isOpen={showResumeOverlay}
-        onClose={() => setShowResumeOverlay(false)}
+        isOpen={showListingOverlay}
+        onClose={() => setShowListingOverlay(false)}
       />
     </div>
   );
