@@ -98,7 +98,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl h-[90vh] bg-black/95 border-white/10 text-white">
+      <DialogContent className="max-w-4xl h-[90vh] bg-black/95 border-white/10 text-white overflow-hidden">
         <div className="flex flex-col h-full">
           <div className="flex-none p-6 border-b border-white/10 bg-gradient-to-r from-purple-500/10 to-transparent">
             <div className="flex items-center gap-3">
@@ -111,7 +111,13 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
               </div>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent min-h-0">
+          <div 
+            className="flex-1 overflow-y-scroll min-h-0 scrollbar-thin scrollbar-thumb-purple-500/50 hover:scrollbar-thumb-purple-500/70 scrollbar-track-white/5"
+            style={{
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(168, 85, 247, 0.5) rgba(255, 255, 255, 0.05)'
+            }}
+          >
             <div className="p-6">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
