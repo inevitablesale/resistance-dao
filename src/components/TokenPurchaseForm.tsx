@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useOnramp } from '@dynamic-labs/sdk-react-core';
+import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -20,7 +21,7 @@ interface TokenPurchaseFormProps {
 const TOKEN_USD_PRICE = 0.10; // Fixed price of $0.10 per token
 
 export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => {
-  const { primaryWallet, setShowAuthFlow, isAuthenticated } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { enabled: banxaEnabled, open: openBanxa } = useOnramp();
   const [amount, setAmount] = useState(initialAmount || "");
   const [isLoading, setIsLoading] = useState(false);
@@ -28,8 +29,22 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   const [expectedLGR, setExpectedLGR] = useState<string | null>(null);
   const [purchaseMethod, setPurchaseMethod] = useState<'matic' | 'card'>('card');
   const [maticUsdRate, setMaticUsdRate] = useState<number>(0);
+  const [isConnected, setIsConnected] = useState(false);
 
   useBalanceMonitor();
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      if (primaryWallet) {
+        const connected = await primaryWallet.isConnected();
+        setIsConnected(connected);
+      } else {
+        setIsConnected(false);
+      }
+    };
+
+    checkConnection();
+  }, [primaryWallet]);
 
   useEffect(() => {
     const fetchMaticPrice = async () => {
@@ -86,7 +101,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   };
 
   const handleCardPurchase = async () => {
-    if (!isAuthenticated || !primaryWallet?.address) {
+    if (!isConnected || !primaryWallet?.address) {
       setShowAuthFlow?.(true);
       return;
     }
@@ -94,6 +109,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     try {
       const maticAmount = (Number(amount) / maticUsdRate).toString();
       await openBanxa({
+        onrampProvider: OnrampProviders.Banxa,
         token: 'MATIC',
         address: primaryWallet.address,
       });
@@ -113,7 +129,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   };
 
   const handlePurchase = () => {
-    if (!isAuthenticated || !primaryWallet) {
+    if (!isConnected || !primaryWallet) {
       setShowAuthFlow?.(true);
       return;
     }
@@ -275,7 +291,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Processing...
                 </>
-              ) : !isAuthenticated ? (
+              ) : !isConnected ? (
                 "Connect Wallet"
               ) : (
                 <>
