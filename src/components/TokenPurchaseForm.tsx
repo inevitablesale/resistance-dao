@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { purchaseTokens, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Loader2, ArrowLeft, Bitcoin, CreditCard, AlertCircle } from "lucide-react";
+import { Loader2, ArrowLeft, Bitcoin, CreditCard } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletAssets } from "@/components/wallet/WalletAssets";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -19,7 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-type PurchaseView = 'initial' | 'crypto' | 'creditCard';
+type PurchaseView = 'initial' | 'crypto';
 
 interface TokenPurchaseFormProps {
   initialAmount?: string;
@@ -76,7 +76,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     setCurrentView('crypto');
   };
 
-  const handleCreditCardPayment = () => {
+  const handleCreditCardPayment = async () => {
     if (!maticAmount || isNaN(Number(maticAmount)) || Number(maticAmount) <= 0) {
       toast({
         title: "Invalid Amount",
@@ -85,7 +85,33 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       });
       return;
     }
-    setCurrentView('creditCard');
+
+    if (Number(maticAmount) < 30) {
+      toast({
+        title: "Minimum Amount Required",
+        description: "Minimum purchase amount is $30 USD",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      if (!primaryWallet) {
+        setShowAuthFlow?.(true);
+        return;
+      }
+      showBanxaDeposit();
+    } catch (error) {
+      console.error("Credit card purchase error:", error);
+      toast({
+        title: "Purchase Error",
+        description: "Failed to initiate credit card purchase",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handlePurchaseTransaction = async () => {
@@ -114,32 +140,6 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       toast({
         title: "Purchase Failed",
         description: error instanceof Error ? error.message : "Failed to purchase tokens",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleCreditCardPurchase = async () => {
-    if (Number(maticAmount) < 30) {
-      toast({
-        title: "Minimum Amount Required",
-        description: "Minimum purchase amount is $30 USD",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      setIsProcessing(true);
-      console.log("Opening Banxa deposit view with amount:", maticAmount);
-      showBanxaDeposit();
-    } catch (error) {
-      console.error("Credit card purchase error:", error);
-      toast({
-        title: "Purchase Error",
-        description: "Failed to initiate credit card purchase",
         variant: "destructive",
       });
     } finally {
@@ -255,88 +255,9 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     </Card>
   );
 
-  const renderCreditCardView = () => (
-    <Card className="w-full max-w-md mx-auto bg-black/20 border-white/10">
-      <CardHeader>
-        <div className="flex items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCurrentView('initial')}
-            className="mr-2 text-white hover:text-white/80 hover:bg-white/10"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <CardTitle className="text-white">Credit Card Purchase</CardTitle>
-            <CardDescription className="text-gray-400">
-              Purchase MATIC with your credit or debit card
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="rounded-lg border border-white/10 p-4 space-y-3">
-          <div className="flex items-center gap-2 text-white">
-            <CreditCard className="h-5 w-5" />
-            <span className="font-medium">Purchase Summary</span>
-          </div>
-          <div className="text-sm text-gray-400 space-y-2">
-            <div className="flex justify-between">
-              <span>Amount:</span>
-              <span className="text-white">{maticAmount} MATIC</span>
-            </div>
-            {expectedLGR && (
-              <div className="flex justify-between">
-                <span>Expected LGR:</span>
-                <span className="text-white">~{expectedLGR} LGR</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="text-sm text-gray-400 space-y-1">
-          <p>• Instant processing</p>
-          <p>• Major cards accepted</p>
-          <p>• Secure payment processing</p>
-        </div>
-
-        <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-4">
-          <div className="flex gap-2 text-yellow-500">
-            <AlertCircle className="h-5 w-5 shrink-0" />
-            <div className="text-sm">
-              <p className="font-medium">Important</p>
-              <p className="text-yellow-500/90 mt-1">
-                Minimum deposit amount is $30 USD. Fees will be displayed before confirming your purchase.
-              </p>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button
-          onClick={handleCreditCardPurchase}
-          disabled={isProcessing}
-          className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
-        >
-          {isProcessing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Processing...
-            </>
-          ) : (
-            "Continue to Payment"
-          )}
-        </Button>
-      </CardFooter>
-    </Card>
-  );
-
   switch (currentView) {
     case 'crypto':
       return renderCryptoView();
-    case 'creditCard':
-      return renderCreditCardView();
     default:
       return renderInitialView();
   }
