@@ -534,20 +534,20 @@ const IndexContent = () => {
                   </div>
                 </div>
               </div>
-
-              <WhatWeBuilding />
-              <LedgerFrens />
-              <HowItWorks />
-              <AlternativeToEquity />
-              <PrivateEquityImpact />
-              <ReclaimControl />
-              <SystemWeDeserve />
-              <CallToAction />
-              <Roadmap />
-              <FAQ />
-              <Partners />
             </div>
           </div>
+
+          <WhatWeBuilding />
+          <LedgerFrens />
+          <HowItWorks />
+          <AlternativeToEquity />
+          <PrivateEquityImpact />
+          <ReclaimControl />
+          <SystemWeDeserve />
+          <CallToAction />
+          <Roadmap />
+          <FAQ />
+          <Partners />
         </div>
       </div>
     </>
