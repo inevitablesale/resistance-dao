@@ -39,6 +39,12 @@ const Nav = () => {
 
           <div className="hidden md:flex items-center gap-6">
             <Link 
+              to="/getting-started" 
+              className="text-white/80 hover:text-white transition-colors"
+            >
+              Get Started
+            </Link>
+            <Link 
               to="/litepaper" 
               className="px-6 py-2 bg-gradient-to-r from-yellow-500 via-teal-400 to-yellow-400 text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
             >

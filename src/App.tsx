@@ -10,6 +10,7 @@ import GovernanceVoting from "./pages/GovernanceVoting";
 import MintNFT from "./pages/MintNFT";
 import ShareToEarn from "./pages/ShareToEarn";
 import Litepaper from "./pages/Litepaper";
+import GettingStarted from "./pages/GettingStarted";
 import KnowledgeArticle from "./pages/KnowledgeArticle";
 import ContentHub from "./pages/ContentHub";
 import { Marketplace } from "./pages/Marketplace";
@@ -35,77 +36,56 @@ function App() {
       EthereumWalletConnectors,
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
-    eventsCallbacks: {
-      onAuthFlowOpen: () => {
+    events: {
+      authFlowOpen: () => {
         console.log("[Dynamic SDK] Auth flow opened");
       },
-      onAuthFlowClose: () => {
+      authFlowClose: () => {
         console.log("[Dynamic SDK] Auth flow closed");
       },
-      onAuthFailure: (reason) => {
+      authFailure: (reason) => {
         console.log("[Dynamic SDK] Auth failure:", reason);
         toast({
           title: "Authentication Failed",
           description: "There was an error connecting your wallet.",
         });
       },
-      onAuthSuccess: (args) => {
+      authSuccess: (args) => {
         console.log("[Dynamic SDK] Auth Success:", args);
         toast({
           title: "Successfully Connected",
           description: `Connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
         });
       },
-      onVerificationSuccess: (args) => {
-        console.log("[Dynamic SDK] Verification success:", args);
+      emailVerificationCompleted: () => {
+        console.log("[Dynamic SDK] Email verification completed");
+        toast({
+          title: "Email Verified",
+          description: "Your email has been successfully verified.",
+        });
       },
-      onSessionConnect: () => {
-        console.log("[Dynamic SDK] Session connected");
+      emailVerificationSuccess: () => {
+        console.log("[Dynamic SDK] Email verification succeeded");
       },
-      onSessionRestore: () => {
-        console.log("[Dynamic SDK] Session restored");
+      userCreated: (args) => {
+        console.log("[Dynamic SDK] New user created:", args);
+        toast({
+          title: "Account Created",
+          description: "Your account has been successfully created.",
+        });
       },
-      onLogout: () => {
+      logout: () => {
         console.log("[Dynamic SDK] User logged out");
         toast({
           title: "Logged Out",
           description: "You've been successfully logged out.",
         });
       },
-      onEmailVerificationStart: () => {
-        console.log("[Dynamic SDK] Email verification started");
+      userWalletsChanged: (params) => {
+        console.log("[Dynamic SDK] User wallets changed:", params);
       },
-      onEmailVerificationSuccess: () => {
-        console.log("[Dynamic SDK] Email verification succeeded");
-      },
-      onDisconnect: () => {
-        console.log("[Dynamic SDK] Wallet disconnected");
-        toast({
-          title: "Wallet Disconnected",
-          description: "Your wallet has been disconnected.",
-        });
-      },
-      onPaymentCancel: () => {
-        console.log("[Dynamic SDK] Payment cancelled");
-        toast({
-          title: "Payment Cancelled",
-          description: "The payment process was cancelled.",
-        });
-      },
-      onPaymentSuccess: () => {
-        console.log("[Dynamic SDK] Payment successful");
-        toast({
-          title: "Payment Successful",
-          description: "Your payment has been processed successfully.",
-        });
-      },
-      onPaymentError: (error) => {
-        console.error("[Dynamic SDK] Payment error:", error);
-        toast({
-          title: "Payment Error",
-          description: "There was an error processing your payment.",
-          variant: "destructive",
-        });
+      primaryWalletChanged: (newPrimaryWallet) => {
+        console.log("[Dynamic SDK] Primary wallet changed:", newPrimaryWallet);
       }
     },
     settings: {
@@ -123,11 +103,6 @@ function App() {
       enableSessionRestoration: true,
       enableAuthProviders: true,
       enablePasskeys: false,
-      fiatOnRamp: {
-        defaultFiatCurrency: 'USD',
-        defaultCrypto: 'LGR',
-        providers: ['banxa'],
-      },
       evmWallets: {
         options: {
           emailAuth: {
@@ -140,16 +115,23 @@ function App() {
                 title: "Email Authentication Complete",
                 description: "You can now proceed with the token purchase.",
               });
-            },
-            onError: (error) => {
-              console.error("[Dynamic SDK] Email verification error:", error);
-              toast({
-                title: "Verification Error",
-                description: "There was an error verifying your email. Please try again.",
-                variant: "destructive",
-              });
             }
           }
+        }
+      },
+      style: {
+        buttonClassName: "dynamic-button",
+        theme: "dark",
+        displaySiweStatement: false,
+        buttonText: {
+          connectWallet: "Connect Wallet",
+          disconnect: "Disconnect",
+          signIn: "Connect Wallet",
+          signUp: "Connect Wallet",
+          connected: "Connected",
+          connecting: "Connecting...",
+          viewAccount: "View Account",
+          loggedOut: "Connect Wallet"
         }
       },
       shadowDOMEnabled: false,
@@ -176,8 +158,10 @@ function App() {
             <Route path="/mint-nft" element={<MintNFT />} />
             <Route path="/share-to-earn" element={<ShareToEarn />} />
             <Route path="/litepaper" element={<Litepaper />} />
+            <Route path="/getting-started" element={<GettingStarted />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/marketplace/:category/:slug" element={<KnowledgeArticle />} />
+            <Route path="/content" element={<ContentHub />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
@@ -189,3 +173,4 @@ function App() {
 }
 
 export default App;
+

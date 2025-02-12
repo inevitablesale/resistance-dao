@@ -1,61 +1,48 @@
+
 import { useState, useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useOnramp } from '@dynamic-labs/sdk-react-core';
+import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { fetchPresaleMaticPrice } from "@/services/presaleContractService";
+import { purchaseTokens, fetchPresaleMaticPrice } from "@/services/presaleContractService";
+import { ethers } from "ethers";
 import { Loader2, CreditCard, Wallet } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletBalance } from "./WalletBalance";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { PurchaseSummary } from "./purchase/PurchaseSummary";
-import { WalletAddressDisplay } from "./purchase/WalletAddressDisplay";
-import { handleCardPurchase, handleMaticPurchase, fetchMaticPrice } from "@/services/purchaseService";
 
 interface TokenPurchaseFormProps {
   initialAmount?: string;
 }
 
-const TOKEN_USD_PRICE = 0.10;
-
 export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
+  const { enabled: banxaEnabled, open: openBanxa } = useOnramp();
   const [amount, setAmount] = useState(initialAmount || "");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [expectedLGR, setExpectedLGR] = useState<string | null>(null);
   const [purchaseMethod, setPurchaseMethod] = useState<'matic' | 'card'>('card');
   const [maticUsdRate, setMaticUsdRate] = useState<number>(0);
-  const [isConnected, setIsConnected] = useState(false);
 
   useBalanceMonitor();
 
   useEffect(() => {
-    const checkConnection = async () => {
-      if (primaryWallet) {
-        const connected = await primaryWallet.isConnected();
-        setIsConnected(connected);
-      } else {
-        setIsConnected(false);
-      }
-    };
-
-    checkConnection();
-  }, [primaryWallet]);
-
-  useEffect(() => {
-    const updateMaticPrice = async () => {
+    const fetchMaticPrice = async () => {
       try {
-        const price = await fetchMaticPrice();
-        setMaticUsdRate(price);
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd');
+        const data = await response.json();
+        setMaticUsdRate(data['matic-network'].usd);
       } catch (error) {
         console.error("Error fetching MATIC price:", error);
       }
     };
 
-    updateMaticPrice();
-    const interval = setInterval(updateMaticPrice, 60000);
+    fetchMaticPrice();
+    const interval = setInterval(fetchMaticPrice, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -71,20 +58,12 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
         setExpectedLGR(null);
         return;
       }
-
-      if (purchaseMethod === 'card') {
-        const tokenAmount = Number(inputAmount) / TOKEN_USD_PRICE;
-        setExpectedLGR(tokenAmount.toFixed(2));
-      } else {
-        const maticPrice = await fetchPresaleMaticPrice();
-        if (maticPrice === "0") {
-          console.error("Failed to fetch MATIC price from contract");
-          setExpectedLGR(null);
-          return;
-        }
-        const expectedTokens = Number(inputAmount) / Number(maticPrice);
-        setExpectedLGR(expectedTokens.toFixed(2));
-      }
+      const maticPrice = await fetchPresaleMaticPrice();
+      const maticAmount = purchaseMethod === 'card' ? 
+        (Number(inputAmount) / maticUsdRate).toString() : 
+        inputAmount;
+      const expectedTokens = Number(maticAmount) / Number(maticPrice);
+      setExpectedLGR(expectedTokens.toFixed(2));
     } catch (error) {
       console.error("Error calculating expected LGR:", error);
       setExpectedLGR(null);
@@ -97,7 +76,40 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     calculateExpectedLGR(value);
   };
 
-  const handlePurchaseClick = async () => {
+  const handleCardPurchase = async () => {
+    if (!primaryWallet?.address) {
+      setShowAuthFlow?.(true);
+      return;
+    }
+
+    try {
+      const maticAmount = (Number(amount) / maticUsdRate).toString();
+      await openBanxa({
+        onrampProvider: OnrampProviders.Banxa,
+        token: 'MATIC',
+        address: primaryWallet.address,
+      });
+      
+      toast({
+        title: "Purchase Initiated",
+        description: "You will be redirected to complete your purchase",
+      });
+    } catch (error) {
+      console.error("Banxa error:", error);
+      toast({
+        title: "Purchase Failed",
+        description: "Failed to initiate card purchase",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePurchase = () => {
+    if (!primaryWallet) {
+      setShowAuthFlow?.(true);
+      return;
+    }
+
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
       toast({
         title: "Invalid Amount",
@@ -107,25 +119,28 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       return;
     }
 
+    if (purchaseMethod === 'card') {
+      handleCardPurchase();
+    } else {
+      handlePurchaseTransaction();
+    }
+  };
+
+  const handlePurchaseTransaction = async () => {
     setIsLoading(true);
     try {
-      if (purchaseMethod === 'card') {
-        await handleCardPurchase(primaryWallet);
-      } else {
-        if (!isConnected || !primaryWallet) {
-          setShowAuthFlow?.(true);
-          return;
-        }
-        
-        const walletClient = await primaryWallet.getWalletClient();
-        const result = await handleMaticPurchase(walletClient, amount);
-        toast({
-          title: "Purchase Successful!",
-          description: `Successfully purchased ${Number(result.amount).toFixed(2)} LGR tokens`,
-        });
-        setAmount("");
-        setExpectedLGR(null);
-      }
+      const walletClient = await primaryWallet.getWalletClient();
+      const signer = new ethers.providers.Web3Provider(walletClient).getSigner();
+      
+      const result = await purchaseTokens(signer, amount);
+      
+      toast({
+        title: "Purchase Successful!",
+        description: `Successfully purchased ${Number(result.amount).toFixed(2)} LGR tokens`,
+      });
+      
+      setAmount("");
+      setExpectedLGR(null);
     } catch (error) {
       console.error("Purchase error:", error);
       toast({
@@ -145,7 +160,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       <Card className="bg-white/5 border-white/10 p-6">
         <Tabs defaultValue="card" className="w-full" onValueChange={(value) => setPurchaseMethod(value as 'matic' | 'card')}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="card" className="flex items-center gap-2">
+            <TabsTrigger value="card" disabled={!banxaEnabled} className="flex items-center gap-2">
               <CreditCard className="w-4 h-4" />
               Card
             </TabsTrigger>
@@ -156,10 +171,6 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
           </TabsList>
 
           <div className="space-y-4 mt-6">
-            {purchaseMethod === 'matic' && primaryWallet?.address && (
-              <WalletAddressDisplay address={primaryWallet.address} />
-            )}
-
             <div className="space-y-2">
               <label htmlFor="amount" className="block text-sm font-medium text-gray-200">
                 Amount in {purchaseMethod === 'card' ? 'USD' : 'MATIC'}
@@ -178,17 +189,34 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
             </div>
 
             {expectedLGR && (
-              <PurchaseSummary
-                amount={amount}
-                purchaseMethod={purchaseMethod}
-                expectedLGR={expectedLGR}
-                maticUsdRate={maticUsdRate}
-              />
+              <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                <h4 className="text-sm font-medium text-gray-300 mb-2">Purchase Summary</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Amount:</span>
+                    <span className="text-white">
+                      {purchaseMethod === 'card' ? '$' : ''}{amount} {purchaseMethod === 'card' ? 'USD' : 'MATIC'}
+                    </span>
+                  </div>
+                  {purchaseMethod === 'card' && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Estimated MATIC:</span>
+                      <span className="text-white">
+                        {(Number(amount) / maticUsdRate).toFixed(4)} MATIC
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm border-t border-white/10 pt-2">
+                    <span className="text-gray-400">Expected LGR:</span>
+                    <span className="text-white font-medium">{expectedLGR} LGR</span>
+                  </div>
+                </div>
+              </div>
             )}
 
-            <Button 
-              onClick={handlePurchaseClick}
-              disabled={isLoading || !amount}
+            <Button
+              onClick={handlePurchase}
+              disabled={isLoading || !amount || (purchaseMethod === 'card' && !banxaEnabled)}
               className="w-full mt-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
             >
               {isLoading ? (
@@ -196,8 +224,6 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Processing...
                 </>
-              ) : !isConnected ? (
-                "Connect Wallet"
               ) : (
                 <>
                   {purchaseMethod === 'card' ? 'Purchase with Card' : 'Purchase with MATIC'}

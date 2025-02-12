@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
@@ -24,37 +25,29 @@ export const PRESALE_END_TIME = 1746057600; // May 1, 2025
 export const TOTAL_PRESALE_SUPPLY = ethers.utils.parseUnits("5", 24); // 5 million tokens with 18 decimals
 export const USD_PRICE = ethers.utils.parseUnits("0.1", 18); // $0.10 per token
 
-// Updated array of RPC endpoints for redundancy with more reliable providers
+// Array of RPC endpoints for redundancy
 export const RPC_ENDPOINTS = [
-  "https://polygon-mainnet.g.alchemy.com/v2/demo",
-  "https://polygon.llamarpc.com",
-  "https://polygon.rpc.blxrbdn.com",
-  "https://polygon-bor.publicnode.com",
-  "https://1rpc.io/matic"
+  "https://polygon-rpc.com",
+  "https://rpc-mainnet.matic.network",
+  "https://matic-mainnet.chainstacklabs.com",
+  "https://rpc-mainnet.maticvigil.com",
+  "https://rpc-mainnet.matic.quiknode.pro"
 ];
 
 // Function to get a working RPC provider
 export const getWorkingProvider = async () => {
-  let lastError;
   for (const rpc of RPC_ENDPOINTS) {
     try {
       const provider = new ethers.providers.JsonRpcProvider(rpc);
-      // Test the connection with a timeout
-      const networkPromise = provider.getNetwork();
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout')), 3000)
-      );
-      
-      await Promise.race([networkPromise, timeoutPromise]);
-      console.log(`Connected to RPC: ${rpc}`);
+      // Test the connection
+      await provider.getNetwork();
       return provider;
     } catch (error) {
-      console.warn(`RPC ${rpc} failed, trying next one...`, error);
-      lastError = error;
+      console.warn(`RPC ${rpc} failed, trying next one...`);
       continue;
     }
   }
-  throw new Error(`All RPC endpoints failed. Last error: ${lastError?.message}`);
+  throw new Error("All RPC endpoints failed");
 };
 
 export const getPresaleContract = async (providerOrSigner: ethers.providers.Provider | ethers.Signer) => {
@@ -114,7 +107,7 @@ export const fetchPresaleMaticPrice = async () => {
   try {
     const provider = await getWorkingProvider();
     const contract = await getPresaleContract(provider);
-    const maticPrice = await contract.getLatestMaticPrice();
+    const maticPrice = await contract.getLGRPrice();
     const formattedPrice = Number(ethers.utils.formatEther(maticPrice)).toFixed(4);
     return formattedPrice;
   } catch (error) {
@@ -131,7 +124,7 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
     const contract = await getPresaleContract(signer);
     
     // Get current LGR price in MATIC
-    const maticPrice = await contract.getLatestMaticPrice();
+    const maticPrice = await contract.getLGRPrice();
     console.log('Current MATIC price per token:', ethers.utils.formatEther(maticPrice));
     
     // Calculate expected number of tokens
@@ -162,3 +155,4 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
     throw error;
   }
 };
+
