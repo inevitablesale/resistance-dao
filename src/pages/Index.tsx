@@ -145,16 +145,8 @@ const IndexContent = () => {
   }, []);
 
   useEffect(() => {
-    // Close verification window when wallet connects
-    if (primaryWallet?.isConnected?.()) {
-      const verificationDialog = document.querySelector('[data-dynamic-email-verification]');
-      if (verificationDialog) {
-        (verificationDialog as HTMLElement).style.display = 'none';
-      }
-      // Show purchase form if amount was selected
-      if (selectedAmount) {
-        setShowPurchaseForm(true);
-      }
+    if (primaryWallet?.isConnected?.() && selectedAmount) {
+      setShowPurchaseForm(true);
     }
   }, [primaryWallet, selectedAmount]);
 

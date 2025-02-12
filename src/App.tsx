@@ -56,17 +56,15 @@ function App() {
           description: `Connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
         });
       },
-      emailVerificationStarted: () => {
-        // Immediately close the verification window
-        setTimeout(() => {
-          const verificationDialog = document.querySelector('[data-dynamic-email-verification]');
-          if (verificationDialog) {
-            (verificationDialog as HTMLElement).style.display = 'none';
-          }
-        }, 100);
-      },
       emailVerificationCompleted: () => {
-        console.log("[Dynamic SDK] Email verification completed automatically");
+        console.log("[Dynamic SDK] Email verification completed");
+        toast({
+          title: "Email Verified",
+          description: "Your email has been successfully verified.",
+        });
+      },
+      emailVerificationSuccess: () => {
+        console.log("[Dynamic SDK] Email verification succeeded");
       },
       userCreated: (args) => {
         console.log("[Dynamic SDK] New user created:", args);
@@ -74,9 +72,6 @@ function App() {
           title: "Account Created",
           description: "Your account has been successfully created.",
         });
-      },
-      emailVerificationSuccess: () => {
-        console.log("[Dynamic SDK] Email verification succeeded");
       },
       logout: () => {
         console.log("[Dynamic SDK] User logged out");
