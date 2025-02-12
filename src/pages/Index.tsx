@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -444,104 +445,6 @@ const IndexContent = () => {
                     >
                       Get Started
                     </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
-                <div className="container mx-auto px-4 py-24">
-                  <div id="join-the-singularity" className="text-center mb-16 pt-20 relative overflow-hidden">
-                    <div 
-                      className="absolute inset-0 -z-10"
-                      style={{
-                        background: `
-                          radial-gradient(2px 2px at 20% 20%, rgba(234, 179, 8, 0.95) 100%, transparent),
-                          radial-gradient(2px 2px at 40% 40%, rgba(234, 179, 8, 0.92) 100%, transparent),
-                          radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
-                        `,
-                        backgroundSize: "240px 240px",
-                        animation: "parallax-scroll 30s linear infinite"
-                      }}
-                    />
-
-                    <div className="container mx-auto px-4 relative">
-                      <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 animate-cosmic-pulse">
-                        Unite. Acquire. Transform.
-                      </h2>
-                      
-                      <p className="text-lg text-white/80 max-w-3xl mx-auto mb-12">
-                        Bringing together decades of industry experience, professional resources, and strategic capital to drive the protocol's success through expert leadership.
-                      </p>
-
-                      <div className="flex items-center justify-center gap-8 mb-12">
-                        <div className="flex flex-col items-center group">
-                          <div className="relative">
-                            <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
-                            <Trophy className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
-                          </div>
-                          <span className="text-xl font-bold text-white mt-2">Apply</span>
-                          <span className="text-sm text-white/60">Submit your expertise</span>
-                        </div>
-                        <div className="flex flex-col items-center group">
-                          <div className="relative">
-                            <div className="absolute inset-0 bg-teal-500/20 blur-xl animate-pulse rounded-full" />
-                            <Star className="w-8 h-8 text-teal-500 relative animate-cosmic-pulse" />
-                          </div>
-                          <span className="text-xl font-bold text-white mt-2">Nominate</span>
-                          <span className="text-sm text-white/60">Propose board candidates</span>
-                        </div>
-                        <div className="flex flex-col items-center group">
-                          <div className="relative">
-                            <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
-                            <Shield className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
-                          </div>
-                          <span className="text-xl font-bold text-white mt-2">Vote</span>
-                          <span className="text-sm text-white/60">Shape protocol governance</span>
-                        </div>
-                      </div>
-
-                      {boardMembers.map((member, index) => (
-                        <div
-                          key={index}
-                          className="group relative perspective-3000"
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                          <div className="relative bg-black/60 p-6 rounded-lg border border-yellow-500/30 
-                                        transform transition-all duration-300 group-hover:translate-y-[-2px]
-                                        hover:border-yellow-500/60">
-                            <member.icon className="w-10 h-10 text-yellow-500 mb-4 mx-auto animate-cosmic-pulse" />
-                            <h3 className="text-xl font-bold text-white mb-2">{member.role}</h3>
-                            <p className="text-gray-300">{member.description}</p>
-                          </div>
-                        </div>
-                      ))}
-
-                      <div className="mt-12 flex justify-center w-full">
-                        <div className="relative max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300">
-                          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 via-teal-500/20 to-yellow-500/20 rounded-lg blur-xl opacity-50 animate-pulse" />
-                          <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 px-8 py-6 rounded-lg">
-                            <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-500 to-yellow-300 mb-3">
-                              Governance Applications Coming Soon
-                            </h3>
-                            <p className="text-white/80">
-                              Applications and voting will begin when $100,000 of funding goal is met
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <WhatWeBuilding />
-                      <LedgerFrens />
-                      <HowItWorks />
-                      <AlternativeToEquity />
-                      <PrivateEquityImpact />
-                      <ReclaimControl />
-                      <SystemWeDeserve />
-                      <CallToAction />
-                      <Roadmap />
-                      <FAQ />
-                      <Partners />
-                    </div>
                   </div>
                 </div>
               </div>
