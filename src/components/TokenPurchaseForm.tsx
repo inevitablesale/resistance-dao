@@ -104,20 +104,20 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     }
 
     try {
-      // Use the wallet's deposit flow
-      await primaryWallet.connector?.openWallet?.({
+      // Use Dynamic's built-in Banxa integration
+      await primaryWallet.connector?.showWallet?.({
         view: 'deposit'
       });
       
       toast({
         title: "Purchase Initiated",
-        description: "Please complete the purchase in your wallet",
+        description: "Please complete the purchase in Banxa",
       });
     } catch (error) {
       console.error("Card purchase error:", error);
       toast({
         title: "Purchase Failed",
-        description: "Failed to initiate card purchase. Please try again.",
+        description: "Failed to initiate Banxa purchase. Please try again.",
         variant: "destructive",
       });
     }
