@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useOnramp } from '@dynamic-labs/sdk-react-core';
@@ -8,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { purchaseTokens, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Loader2, CreditCard, Wallet } from "lucide-react";
+import { Loader2, CreditCard, Wallet, Copy } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletBalance } from "./WalletBalance";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -165,6 +164,24 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     }
   };
 
+  const handleCopyAddress = async () => {
+    if (primaryWallet?.address) {
+      try {
+        await navigator.clipboard.writeText(primaryWallet.address);
+        toast({
+          title: "Address copied",
+          description: "Wallet address copied to clipboard",
+        });
+      } catch (error) {
+        toast({
+          title: "Copy failed",
+          description: "Failed to copy address to clipboard",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   return (
     <div className="space-y-4 w-full max-w-md mx-auto">
       <WalletBalance />
@@ -183,6 +200,26 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
           </TabsList>
 
           <div className="space-y-4 mt-6">
+            {purchaseMethod === 'matic' && primaryWallet?.address && (
+              <div className="p-4 bg-white/5 rounded-lg border border-white/10 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Wallet className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm text-gray-400">Your wallet:</span>
+                  <span className="text-sm font-medium text-white">
+                    {`${primaryWallet.address.slice(0, 6)}...${primaryWallet.address.slice(-4)}`}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCopyAddress}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+
             <div className="space-y-2">
               <label htmlFor="amount" className="block text-sm font-medium text-gray-200">
                 Amount in {purchaseMethod === 'card' ? 'USD' : 'MATIC'}
@@ -248,4 +285,3 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     </div>
   );
 };
-
