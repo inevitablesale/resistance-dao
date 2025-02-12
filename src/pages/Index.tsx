@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -22,7 +21,6 @@ import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
 import { Button } from "@/components/ui/button";
-import { usePurchase } from "../contexts/PurchaseContext";
 
 const presaleData = [
   { 
@@ -126,10 +124,11 @@ const IndexContent = () => {
   const { toast } = useToast();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [maticPrice, setMaticPrice] = useState("0"); // Add this line to define the state
   const heroRef = useRef<HTMLDivElement>(null);
   const presaleRef = useRef<HTMLDivElement>(null);
-  const { selectedAmount, setSelectedAmount, showPurchaseForm, setShowPurchaseForm } = usePurchase();
+  const [showPurchaseForm, setShowPurchaseForm] = useState(false);
+  const [selectedAmount, setSelectedAmount] = useState("");
+  const [maticPrice, setMaticPrice] = useState<string>("Loading...");
 
   useEffect(() => {
     setTimeout(() => setIsLoaded(true), 100);
@@ -149,7 +148,7 @@ const IndexContent = () => {
     if (primaryWallet?.isConnected?.() && selectedAmount) {
       setShowPurchaseForm(true);
     }
-  }, [primaryWallet, selectedAmount, setShowPurchaseForm]);
+  }, [primaryWallet, selectedAmount]);
 
   const handleTierSelect = (amount: string) => {
     if (!primaryWallet) {
