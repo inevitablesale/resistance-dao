@@ -58,9 +58,9 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl h-[80vh] bg-black/95 border-white/10 text-white p-0 overflow-hidden">
+      <DialogContent className="max-w-4xl h-[90vh] bg-black/95 border-white/10 text-white p-0 overflow-hidden">
         <div className="h-full flex flex-col">
-          <div className="p-6 border-b border-white/10 bg-gradient-to-r from-purple-500/10 to-transparent">
+          <div className="flex-none p-6 border-b border-white/10 bg-gradient-to-r from-purple-500/10 to-transparent">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
                 <User className="w-5 h-5 text-purple-400" />
@@ -72,8 +72,8 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6">
-            <div className="max-w-2xl mx-auto">
+          <div className="flex-1 overflow-y-auto">
+            <div className="max-w-2xl mx-auto p-6">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -119,7 +119,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                     </div>
                   </div>
                 ) : profileData ? (
-                  <div className="space-y-8">
+                  <div className="relative space-y-8 pb-24">
                     <div className="space-y-6">
                       <h3 className="text-xl font-medium text-center">Review Your Resume NFT</h3>
                       
@@ -201,27 +201,6 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                         </div>
                       </div>
                     </div>
-
-                    <div className="flex gap-4 sticky bottom-0 bg-black/95 p-4 -mx-4">
-                      <Button
-                        className="flex-1 bg-transparent border border-white/10 hover:bg-white/5"
-                        onClick={() => setProfileData(null)}
-                      >
-                        Start Over
-                      </Button>
-                      <Button
-                        className="flex-1 bg-purple-500 hover:bg-purple-600"
-                        onClick={() => {
-                          toast({
-                            title: "NFT Created",
-                            description: "Your Resume NFT has been successfully created!",
-                          });
-                          onClose();
-                        }}
-                      >
-                        Create NFT
-                      </Button>
-                    </div>
                   </div>
                 ) : (
                   <>
@@ -258,6 +237,31 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
               </motion.div>
             </div>
           </div>
+
+          {profileData && (
+            <div className="flex-none border-t border-white/10 bg-black/95 p-4">
+              <div className="max-w-2xl mx-auto flex gap-4">
+                <Button
+                  className="flex-1 bg-transparent border border-white/10 hover:bg-white/5"
+                  onClick={() => setProfileData(null)}
+                >
+                  Start Over
+                </Button>
+                <Button
+                  className="flex-1 bg-purple-500 hover:bg-purple-600"
+                  onClick={() => {
+                    toast({
+                      title: "NFT Created",
+                      description: "Your Resume NFT has been successfully created!",
+                    });
+                    onClose();
+                  }}
+                >
+                  Create NFT
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
