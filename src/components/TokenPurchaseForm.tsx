@@ -12,6 +12,7 @@ import { Loader2, CreditCard, Wallet } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletBalance } from "./WalletBalance";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
 
 interface TokenPurchaseFormProps {
   initialAmount?: string;
@@ -24,10 +25,9 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [expectedLGR, setExpectedLGR] = useState<string | null>(null);
-  const [purchaseMethod, setPurchaseMethod] = useState<'matic' | 'card'>('matic');
+  const [purchaseMethod, setPurchaseMethod] = useState<'matic' | 'card'>('card');
   const [maticUsdRate, setMaticUsdRate] = useState<number>(0);
 
-  // Initialize balance monitoring
   useBalanceMonitor();
 
   useEffect(() => {
@@ -157,57 +157,82 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     <div className="space-y-4 w-full max-w-md mx-auto">
       <WalletBalance />
 
-      <Tabs defaultValue="matic" className="w-full" onValueChange={(value) => setPurchaseMethod(value as 'matic' | 'card')}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="matic" className="flex items-center gap-2">
-            <Wallet className="w-4 h-4" />
-            MATIC
-          </TabsTrigger>
-          <TabsTrigger value="card" disabled={!banxaEnabled} className="flex items-center gap-2">
-            <CreditCard className="w-4 h-4" />
-            Card
-          </TabsTrigger>
-        </TabsList>
+      <Card className="bg-white/5 border-white/10 p-6">
+        <Tabs defaultValue="card" className="w-full" onValueChange={(value) => setPurchaseMethod(value as 'matic' | 'card')}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="card" disabled={!banxaEnabled} className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4" />
+              Card
+            </TabsTrigger>
+            <TabsTrigger value="matic" className="flex items-center gap-2">
+              <Wallet className="w-4 h-4" />
+              MATIC
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="space-y-2 mt-4">
-          <label htmlFor="amount" className="block text-sm font-medium text-gray-200">
-            Amount in {purchaseMethod === 'card' ? 'USD' : 'MATIC'}
-          </label>
-          <Input
-            id="amount"
-            type="number"
-            value={amount}
-            onChange={handleAmountChange}
-            placeholder={`Enter ${purchaseMethod === 'card' ? 'USD' : 'MATIC'} amount`}
-            min="0"
-            step="0.01"
-            disabled={isLoading}
-            className="bg-black/20 border-white/10 text-white placeholder:text-gray-400"
-          />
-          {expectedLGR && (
-            <p className="text-sm text-gray-300">
-              Expected LGR: ~{expectedLGR} LGR
-            </p>
-          )}
-        </div>
+          <div className="space-y-4 mt-6">
+            <div className="space-y-2">
+              <label htmlFor="amount" className="block text-sm font-medium text-gray-200">
+                Amount in {purchaseMethod === 'card' ? 'USD' : 'MATIC'}
+              </label>
+              <Input
+                id="amount"
+                type="number"
+                value={amount}
+                onChange={handleAmountChange}
+                placeholder={`Enter ${purchaseMethod === 'card' ? 'USD' : 'MATIC'} amount`}
+                min="0"
+                step="0.01"
+                disabled={isLoading}
+                className="bg-black/20 border-white/10 text-white placeholder:text-gray-400"
+              />
+            </div>
 
-        <Button
-          onClick={handlePurchase}
-          disabled={isLoading || !amount || (purchaseMethod === 'card' && !banxaEnabled)}
-          className="w-full mt-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Processing...
-            </>
-          ) : (
-            <>
-              {purchaseMethod === 'card' ? 'Purchase with Card' : 'Purchase with MATIC'}
-            </>
-          )}
-        </Button>
-      </Tabs>
+            {expectedLGR && (
+              <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                <h4 className="text-sm font-medium text-gray-300 mb-2">Purchase Summary</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Amount:</span>
+                    <span className="text-white">
+                      {purchaseMethod === 'card' ? '$' : ''}{amount} {purchaseMethod === 'card' ? 'USD' : 'MATIC'}
+                    </span>
+                  </div>
+                  {purchaseMethod === 'card' && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Estimated MATIC:</span>
+                      <span className="text-white">
+                        {(Number(amount) / maticUsdRate).toFixed(4)} MATIC
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm border-t border-white/10 pt-2">
+                    <span className="text-gray-400">Expected LGR:</span>
+                    <span className="text-white font-medium">{expectedLGR} LGR</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <Button
+              onClick={handlePurchase}
+              disabled={isLoading || !amount || (purchaseMethod === 'card' && !banxaEnabled)}
+              className="w-full mt-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  {purchaseMethod === 'card' ? 'Purchase with Card' : 'Purchase with MATIC'}
+                </>
+              )}
+            </Button>
+          </div>
+        </Tabs>
+      </Card>
     </div>
   );
 };
