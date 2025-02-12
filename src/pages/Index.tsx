@@ -36,27 +36,27 @@ const presaleData = [
         description: "25% bonus tokens for early supporters"
       },
       {
-        icon: Coins,
+        icon: Award,
         title: "Reflection Rights",
         description: "10% of all future firm distributions"
       },
       {
-        icon: GitBranch,
+        icon: Vote,
         title: "Governance Power",
         description: "Vote on key protocol decisions and future development"
       },
       {
-        icon: Network,
+        icon: Star,
         title: "Network Effects",
         description: "Be part of the first decentralized accounting network"
       },
       {
-        icon: Zap,
+        icon: Rocket,
         title: "Early Access",
         description: "Priority access to future token sales and firm investments"
       },
       {
-        icon: UserCircle,
+        icon: Users,
         title: "Exclusive Access",
         description: "Join private Discord channels and community events"
       }
@@ -99,7 +99,7 @@ const boardMembers = [
   { 
     role: "Managing Partners",
     description: "Led multiple successful accounting firms through growth and acquisition phases, bringing hands-on leadership experience.",
-    icon: Orbit
+    icon: Trophy
   },
   { 
     role: "M&A Specialists",
@@ -109,7 +109,7 @@ const boardMembers = [
   { 
     role: "Operations Experts",
     description: "Streamlined practice operations and implemented efficient workflows across multiple firms.",
-    icon: Moon
+    icon: Shield
   },
   { 
     role: "Technology Leaders",
@@ -158,12 +158,6 @@ const IndexContent = () => {
     setShowPurchaseForm(true);
   };
 
-  const parallaxStyle = {
-    '--scroll-progress': scrollProgress,
-    transform: `scale(${1 + scrollProgress * 0.5})`,
-    opacity: 1 - scrollProgress * 0.6
-  } as React.CSSProperties;
-
   const handleScroll = () => {
     if (!heroRef.current || !presaleRef.current) return;
     
@@ -180,72 +174,16 @@ const IndexContent = () => {
     setScrollProgress(Math.min(presaleVisibility, scrollingUpAdjustment));
   };
 
-  const fetchPresaleData = async () => {
-    try {
-      const sold = await fetchTotalLGRSold();
-      setTotalSold(sold);
-
-      const price = await fetchPresaleMaticPrice();
-      setMaticPrice(price === "0" ? "Loading..." : `${price} MATIC`);
-      
-      if (primaryWallet?.address) {
-        const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com');
-        const presaleContract = await getPresaleContract(provider);
-        const purchased = await (await presaleContract).purchasedTokens(primaryWallet.address);
-        setMyPurchased(ethers.utils.formatEther(purchased));
-      }
-    } catch (error) {
-      console.error('Error fetching presale data:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch presale data",
-        variant: "destructive"
-      });
-    }
-  };
-
   useEffect(() => {
-    const calculateTimeLeft = () => {
-      const now = Date.now();
-      const difference = presaleEndTime - now;
-
-      if (difference > 0) {
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((difference / 1000 / 60) % 60);
-        const seconds = Math.floor((difference / 1000) % 60);
-
-        setTimeLeft({
-          days: String(days).padStart(2, '0'),
-          hours: String(hours).padStart(2, '0'),
-          minutes: String(minutes).padStart(2, '0'),
-          seconds: String(seconds).padStart(2, '0')
-        });
-      }
-    };
-
-    calculateTimeLeft(); // Initial calculation
-    const timer = setInterval(calculateTimeLeft, 1000);
-    return () => clearInterval(timer);
-  }, [presaleEndTime]);
-
-  useEffect(() => {
-    fetchPresaleData();
-    const interval = setInterval(fetchPresaleData, 30000); // Refresh every 30 seconds
-    return () => clearInterval(interval);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('en-US').format(num);
-  };
-
-  const calculatePercentage = () => {
-    return ((Number(totalSold) / Number(presaleSupply)) * 100).toFixed(2);
-  };
-
-  const formatLargeNumber = (num: string) => {
-    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
+  const parallaxStyle = {
+    '--scroll-progress': scrollProgress,
+    transform: `scale(${1 + scrollProgress * 0.5})`,
+    opacity: 1 - scrollProgress * 0.6
+  } as React.CSSProperties;
 
   return (
     <>
@@ -580,7 +518,7 @@ const IndexContent = () => {
                 <div className="flex flex-col items-center group">
                   <div className="relative">
                     <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
-                    <Orbit className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
+                    <Trophy className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
                   </div>
                   <span className="text-xl font-bold text-white mt-2">Apply</span>
                   <span className="text-sm text-white/60">Submit your expertise</span>
@@ -596,7 +534,7 @@ const IndexContent = () => {
                 <div className="flex flex-col items-center group">
                   <div className="relative">
                     <div className="absolute inset-0 bg-yellow-500/20 blur-xl animate-pulse rounded-full" />
-                    <Moon className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
+                    <Shield className="w-8 h-8 text-yellow-500 relative animate-cosmic-pulse" />
                   </div>
                   <span className="text-xl font-bold text-white mt-2">Vote</span>
                   <span className="text-sm text-white/60">Shape protocol governance</span>
