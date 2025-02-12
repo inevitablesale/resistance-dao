@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -49,6 +48,28 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
       toast({
         title: "Analysis Failed",
         description: "Could not analyze your LinkedIn profile. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleRegenerateNFT = async () => {
+    setIsAnalyzing(true);
+    try {
+      const metadata = await analyzeLinkedInProfile(linkedInUrl);
+      console.log('LinkedIn profile regenerated:', metadata);
+      setProfileData(metadata);
+      toast({
+        title: "Profile Regenerated",
+        description: "Your LinkedIn profile has been regenerated with new variations.",
+      });
+    } catch (error) {
+      console.error('Error regenerating LinkedIn profile:', error);
+      toast({
+        title: "Regeneration Failed",
+        description: "Could not regenerate your profile. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -121,7 +142,24 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                 ) : profileData ? (
                   <div className="relative space-y-8 pb-24">
                     <div className="space-y-6">
-                      <h3 className="text-xl font-medium text-center">Review Your Resume NFT</h3>
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-xl font-medium">Review Your Resume NFT</h3>
+                        <Button
+                          variant="outline"
+                          className="border-purple-500/20 hover:border-purple-500/40 text-purple-400"
+                          onClick={handleRegenerateNFT}
+                          disabled={isAnalyzing}
+                        >
+                          {isAnalyzing ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Regenerating...
+                            </>
+                          ) : (
+                            <>Regenerate NFT</>
+                          )}
+                        </Button>
+                      </div>
                       
                       {/* Profile Image Section */}
                       <div className="relative w-32 h-32 mx-auto">
