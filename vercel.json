@@ -9,11 +9,11 @@
           "value": "preview--dynamic-wallet-explorer\\.lovable\\.app"
         }
       ],
-      "destination": "/index.html"
+      "destination": "/index"
     },
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/index"
     }
   ]
 }
