@@ -104,23 +104,10 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     }
 
     try {
-      // Use Dynamic's payment flow
-      const maticAmount = (Number(amount) / maticUsdRate).toString();
-      
-      // Open Dynamic's native payment flow
-      if (primaryWallet.connector?.name === 'MetaMask') {
-        await primaryWallet.connector.openBuyFiatFlow?.({
-          defaultCrypto: 'MATIC',
-          defaultFiat: 'USD',
-          amount: Number(amount),
-          destinationWallets: [primaryWallet.address]
-        });
-      } else {
-        // Fallback to the wallet's default method
-        await primaryWallet.connector.openWallet?.({
-          view: 'buy'
-        });
-      }
+      // Use the wallet's deposit flow
+      await primaryWallet.connector?.openWallet?.({
+        view: 'deposit'
+      });
       
       toast({
         title: "Purchase Initiated",
