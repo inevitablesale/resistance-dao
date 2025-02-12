@@ -3,17 +3,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "preview--dynamic-wallet-explorer\\.lovable\\.app"
-        }
-      ],
-      "destination": "/index"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index"
+      "destination": "/"
     }
   ]
 }
