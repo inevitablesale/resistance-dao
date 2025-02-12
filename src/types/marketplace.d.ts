@@ -3,6 +3,7 @@ export interface MarketplaceMetadata {
   name: string;
   description: string;
   image: string;
+  imageUrl?: string; // Add optional imageUrl for HTTP version of IPFS image
   contentType: string;
   category: string;
   experiences: Array<{

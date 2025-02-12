@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { MarketplaceMetadata } from "@/types/marketplace";
 
 interface CreateResumeOverlayProps {
   isOpen: boolean;
@@ -21,7 +22,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
   const { user, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [profileData, setProfileData] = useState<any>(null);
+  const [profileData, setProfileData] = useState<MarketplaceMetadata | null>(null);
 
   const linkedInUrl = user?.metadata?.["LinkedIn Profile URL"];
 
@@ -48,10 +49,11 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
       const metadata = await analyzeLinkedInProfile(linkedInUrl);
       console.log('LinkedIn profile analyzed:', metadata);
       // Convert IPFS URL to HTTP URL if present
-      if (metadata.image) {
-        metadata.imageUrl = getIpfsHttpUrl(metadata.image);
-      }
-      setProfileData(metadata);
+      const enrichedMetadata: MarketplaceMetadata = {
+        ...metadata,
+        imageUrl: getIpfsHttpUrl(metadata.image)
+      };
+      setProfileData(enrichedMetadata);
       toast({
         title: "Profile Imported",
         description: "Your LinkedIn profile has been successfully imported.",
@@ -74,10 +76,11 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
       const metadata = await analyzeLinkedInProfile(linkedInUrl);
       console.log('LinkedIn profile regenerated:', metadata);
       // Convert IPFS URL to HTTP URL if present
-      if (metadata.image) {
-        metadata.imageUrl = getIpfsHttpUrl(metadata.image);
-      }
-      setProfileData(metadata);
+      const enrichedMetadata: MarketplaceMetadata = {
+        ...metadata,
+        imageUrl: getIpfsHttpUrl(metadata.image)
+      };
+      setProfileData(enrichedMetadata);
       toast({
         title: "Profile Regenerated",
         description: "Your LinkedIn profile has been regenerated with new variations.",
