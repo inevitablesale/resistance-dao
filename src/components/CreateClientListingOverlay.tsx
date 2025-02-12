@@ -38,7 +38,7 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="fixed inset-0 mx-auto my-4 max-w-4xl bg-black/95 border-white/10 text-white rounded-xl flex flex-col overflow-hidden">
+      <DialogContent className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-[85vh] bg-black/95 border-white/10 text-white rounded-xl flex flex-col overflow-hidden">
         <DialogTitle className="sr-only">List Client Portfolio for Transfer</DialogTitle>
         
         <div className="absolute right-4 top-4 z-10">
