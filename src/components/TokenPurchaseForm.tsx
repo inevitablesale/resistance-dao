@@ -1,7 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useOnramp } from '@dynamic-labs/sdk-react-core';
+import { useDynamicContext, useOnramp } from "@dynamic-labs/sdk-react-core";
 import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
