@@ -37,7 +37,7 @@ export function SimpleListingForm({ onClose }: { onClose: () => void }) {
       return;
     }
 
-    // TODO: Implement on-chain listing creation
+    // TODO: Will implement on-chain listing creation here
     toast({
       title: "Success",
       description: "Your work opportunity has been posted",
