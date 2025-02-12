@@ -99,8 +99,10 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl h-[90vh] bg-black/95 border-white/10 text-white p-0">
-        <div className="h-full flex flex-col">
+      <DialogContent className="max-w-4xl h-[90vh] bg-black/95 border-white/10 text-white">
+        {/* Main container with flex column */}
+        <div className="flex flex-col h-full">
+          {/* Fixed Header */}
           <div className="flex-none p-6 border-b border-white/10 bg-gradient-to-r from-purple-500/10 to-transparent">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
@@ -113,13 +115,14 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6">
-            <div className="max-w-2xl mx-auto py-6">
+          {/* Scrollable Content Area */}
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <div className="p-6">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="space-y-8"
+                className="space-y-8 max-w-2xl mx-auto"
               >
                 {!user ? (
                   <div className="p-4 border border-yellow-500/20 rounded-lg bg-yellow-500/5">
@@ -160,7 +163,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                     </div>
                   </div>
                 ) : profileData ? (
-                  <div className="space-y-8 pb-24">
+                  <div className="space-y-8">
                     <div className="space-y-6">
                       <div className="flex items-center justify-between">
                         <h3 className="text-xl font-medium">Review Your Resume NFT</h3>
@@ -223,7 +226,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                         <div>
                           <h4 className="text-sm font-medium text-white/80 mb-2">Experience</h4>
                           <div className="space-y-4">
-                            {profileData.experiences.map((exp: any, index: number) => (
+                            {profileData.experiences.map((exp, index) => (
                               <div key={index} className="bg-white/5 p-4 rounded-lg">
                                 <h5 className="font-medium">{exp.title}</h5>
                                 <p className="text-sm text-white/60">{exp.company}</p>
@@ -236,7 +239,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                         <div>
                           <h4 className="text-sm font-medium text-white/80 mb-2">Education</h4>
                           <div className="space-y-2">
-                            {profileData.education.map((edu: any, index: number) => (
+                            {profileData.education.map((edu, index) => (
                               <div key={index} className="bg-white/5 p-4 rounded-lg">
                                 <h5 className="font-medium">{edu.degree}</h5>
                                 <p className="text-sm text-white/60">{edu.school}</p>
@@ -248,7 +251,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                         <div>
                           <h4 className="text-sm font-medium text-white/80 mb-2">Skills</h4>
                           <div className="flex flex-wrap gap-2">
-                            {profileData.skills.map((skill: string, index: number) => (
+                            {profileData.skills.map((skill, index) => (
                               <span 
                                 key={index}
                                 className="px-3 py-1 bg-purple-500/10 text-purple-400 rounded-full text-sm"
@@ -297,6 +300,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
             </div>
           </div>
 
+          {/* Fixed Footer */}
           {profileData && (
             <div className="flex-none border-t border-white/10 bg-black/95 p-4">
               <div className="max-w-2xl mx-auto flex gap-4">
