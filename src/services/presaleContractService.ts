@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
@@ -27,27 +26,32 @@ export const USD_PRICE = ethers.utils.parseUnits("0.1", 18); // $0.10 per token
 
 // Array of RPC endpoints for redundancy
 export const RPC_ENDPOINTS = [
-  "https://polygon-rpc.com",
+  "https://polygon-mainnet.g.alchemy.com/v2/demo",  // Alchemy's public endpoint
+  "https://polygon.llamarpc.com",                   // LlamaRPC endpoint
+  "https://polygon.rpc.blxrbdn.com",               // Blockdaemon endpoint
+  "https://polygon-rpc.com",                       // Original endpoint as fallback
   "https://rpc-mainnet.matic.network",
-  "https://matic-mainnet.chainstacklabs.com",
-  "https://rpc-mainnet.maticvigil.com",
-  "https://rpc-mainnet.matic.quiknode.pro"
+  "https://matic-mainnet.chainstacklabs.com"
 ];
 
-// Function to get a working RPC provider
+// Function to get a working RPC provider with improved error handling
 export const getWorkingProvider = async () => {
+  let lastError;
   for (const rpc of RPC_ENDPOINTS) {
     try {
+      console.log(`Attempting to connect to RPC endpoint: ${rpc}`);
       const provider = new ethers.providers.JsonRpcProvider(rpc);
-      // Test the connection
+      // Test the connection with a simple call
       await provider.getNetwork();
+      console.log(`Successfully connected to RPC endpoint: ${rpc}`);
       return provider;
     } catch (error) {
-      console.warn(`RPC ${rpc} failed, trying next one...`);
+      console.warn(`RPC ${rpc} failed:`, error);
+      lastError = error;
       continue;
     }
   }
-  throw new Error("All RPC endpoints failed");
+  throw new Error(`All RPC endpoints failed. Last error: ${lastError?.message}`);
 };
 
 export const getPresaleContract = async (providerOrSigner: ethers.providers.Provider | ethers.Signer) => {
@@ -155,4 +159,3 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
     throw error;
   }
 };
-
