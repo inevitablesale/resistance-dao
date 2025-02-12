@@ -136,16 +136,13 @@ const TokenPackage = ({ name, tokens, price, features }: {
     <div className="text-xl font-semibold text-white mb-6">
       {tokens} LGR Tokens
     </div>
-    <ul className="space-y-3 mb-6">
+    <div className="space-y-3 mb-6">
       {features.map((feature, index) => (
-        <li key={index} className="flex items-center gap-2 text-white/80">
-          <div className="h-5 w-5 rounded-full bg-teal-500/20 flex items-center justify-center">
-            <div className="h-2 w-2 rounded-full bg-teal-500" />
-          </div>
+        <p key={index} className="text-white/80">
           {feature}
-        </li>
+        </p>
       ))}
-    </ul>
+    </div>
     <Button 
       className="w-full bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white"
       onClick={() => window.open('https://docs.ledgerfund.finance/guides/buying-lgr', '_blank')}
