@@ -16,6 +16,7 @@ import ContentHub from "./pages/ContentHub";
 import { Marketplace } from "./pages/Marketplace";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
+import { PurchaseProvider } from "./contexts/PurchaseContext";
 
 function App() {
   const { toast } = useToast();
@@ -94,18 +95,14 @@ function App() {
       environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
       appName: "LedgerFund",
       appLogoUrl: "/favicon.ico",
-      // Wallet settings
       enableEmbeddedWallets: true,
       enableVisitTrackingOnConnectOnly: true,
       enableWalletConnectV1: false,
       enableWalletConnectV2: true,
-      // Session settings
       persistWalletSession: true,
       enableSessionRestoration: true,
-      // Authentication settings
       enableAuthProviders: true,
       enablePasskeys: false,
-      // Email authentication settings
       evmWallets: {
         options: {
           emailAuth: {
@@ -153,24 +150,27 @@ function App() {
 
   return (
     <DynamicContextProvider settings={dynamicSettings}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/governance-voting" element={<GovernanceVoting />} />
-          <Route path="/mint-nft" element={<MintNFT />} />
-          <Route path="/share-to-earn" element={<ShareToEarn />} />
-          <Route path="/litepaper" element={<Litepaper />} />
-          <Route path="/getting-started" element={<GettingStarted />} />
-          <Route path="/marketplace" element={<Marketplace />} />
-          <Route path="/marketplace/:category/:slug" element={<KnowledgeArticle />} />
-          <Route path="/content" element={<ContentHub />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-      <Toaster />
-      <Analytics />
+      <PurchaseProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/governance-voting" element={<GovernanceVoting />} />
+            <Route path="/mint-nft" element={<MintNFT />} />
+            <Route path="/share-to-earn" element={<ShareToEarn />} />
+            <Route path="/litepaper" element={<Litepaper />} />
+            <Route path="/getting-started" element={<GettingStarted />} />
+            <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/marketplace/:category/:slug" element={<KnowledgeArticle />} />
+            <Route path="/content" element={<ContentHub />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Router>
+        <Toaster />
+        <Analytics />
+      </PurchaseProvider>
     </DynamicContextProvider>
   );
 }
 
 export default App;
+

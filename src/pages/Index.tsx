@@ -21,6 +21,7 @@ import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
 import { Button } from "@/components/ui/button";
+import { usePurchase } from "../contexts/PurchaseContext";
 
 const presaleData = [
   { 
@@ -126,9 +127,7 @@ const IndexContent = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const presaleRef = useRef<HTMLDivElement>(null);
-  const [showPurchaseForm, setShowPurchaseForm] = useState(false);
-  const [selectedAmount, setSelectedAmount] = useState("");
-  const [maticPrice, setMaticPrice] = useState<string>("Loading...");
+  const { selectedAmount, setSelectedAmount, showPurchaseForm, setShowPurchaseForm } = usePurchase();
 
   useEffect(() => {
     setTimeout(() => setIsLoaded(true), 100);
@@ -148,7 +147,7 @@ const IndexContent = () => {
     if (primaryWallet?.isConnected?.() && selectedAmount) {
       setShowPurchaseForm(true);
     }
-  }, [primaryWallet, selectedAmount]);
+  }, [primaryWallet, selectedAmount, setShowPurchaseForm]);
 
   const handleTierSelect = (amount: string) => {
     if (!primaryWallet) {
