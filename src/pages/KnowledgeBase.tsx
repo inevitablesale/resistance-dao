@@ -2,15 +2,18 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Loader2, Building2, DollarSign, Users, ChevronRight, Handshake, Clock, Shield, MapPin } from 'lucide-react';
+import { 
+  Search, Loader2, Building2, DollarSign, Users, 
+  ChevronRight, Handshake, Clock, Shield, MapPin,
+  UserRound, LineChart, BookOpen, GraduationCap
+} from 'lucide-react';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { useToast } from "@/hooks/use-toast";
-import { VotingSection } from '@/components/nft-card/VotingSection';
 import { motion } from "framer-motion";
 import { CreateClientListingOverlay } from "@/components/CreateClientListingOverlay";
+import { Badge } from "@/components/ui/badge";
 
 // Mock data for client listings
 const MOCK_LISTINGS = [
@@ -49,16 +52,16 @@ export default function KnowledgeBase() {
   const startOnboarding = () => {
     setTimeout(() => {
       toast({
-        title: "Welcome to the Client Transfer Marketplace! 👋",
-        description: "Securely buy and sell accounting clients with built-in royalties and smooth transitions.",
+        title: "Research Insight from Dr. Chen",
+        description: "Modern accounting firms grow 3x faster through strategic service partnerships.",
         duration: 5000,
       });
     }, 1000);
 
     setTimeout(() => {
       toast({
-        title: "Smart Contracts & Royalties",
-        description: "Our platform uses smart contracts to ensure secure transfers and automated royalty payments.",
+        title: "Evidence-Based Approach",
+        description: "Our platform is built on research studying 500+ successful accounting collaborations.",
         duration: 5000,
       });
     }, 6000);
@@ -66,7 +69,7 @@ export default function KnowledgeBase() {
     setTimeout(() => {
       toast({
         title: "Getting Started",
-        description: "Browse available clients or list your own for transfer. Each listing includes detailed information and terms.",
+        description: "Use our research-validated templates to structure your service arrangements for optimal success.",
         duration: 5000,
       });
     }, 11000);
@@ -115,6 +118,19 @@ export default function KnowledgeBase() {
         />
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
         <div className="max-w-7xl mx-auto px-8">
+          <div className="flex items-center justify-center mb-8">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 flex items-center gap-4">
+              <div className="w-16 h-16 bg-teal-500/20 rounded-xl flex items-center justify-center">
+                <UserRound className="w-8 h-8 text-teal-400" />
+              </div>
+              <div>
+                <div className="text-sm text-white/60">Research Lead</div>
+                <div className="text-lg font-semibold text-white">Dr. Sarah Chen</div>
+                <div className="text-sm text-teal-400">Financial Collaboration Institute</div>
+              </div>
+            </div>
+          </div>
+
           <div className="text-center mb-12">
             <motion.h1 
               className="text-6xl font-bold bg-gradient-to-r from-teal-400 via-emerald-400 to-green-400 text-transparent bg-clip-text mb-6"
@@ -122,16 +138,36 @@ export default function KnowledgeBase() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              Client Portfolio Marketplace
+              The Future of Accounting Collaboration
             </motion.h1>
             <motion.p 
-              className="text-xl text-white/60 max-w-2xl mx-auto"
+              className="text-xl text-white/60 max-w-2xl mx-auto mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              Buy and sell accounting clients with built-in royalties and secure transfers. Smart contracts ensure smooth transitions and protect both parties.
+              "Our research shows that modern accounting firms grow 3x faster through strategic service partnerships. This platform implements the key success factors we've identified across 500+ successful transitions."
             </motion.p>
+
+            <motion.div
+              className="flex items-center justify-center gap-6 mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <div className="flex items-center gap-2">
+                <LineChart className="w-5 h-5 text-teal-400" />
+                <span className="text-white/60">3x Growth Rate</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-teal-400" />
+                <span className="text-white/60">500+ Cases Studied</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <GraduationCap className="w-5 h-5 text-teal-400" />
+                <span className="text-white/60">Research-Validated</span>
+              </div>
+            </motion.div>
           </div>
 
           <motion.div 
@@ -156,8 +192,8 @@ export default function KnowledgeBase() {
 
       <div className="max-w-7xl mx-auto px-8 py-12">
         <div className="text-center py-12">
-          <h3 className="text-2xl font-semibold text-white/80 mb-4">List Your Clients for Transfer</h3>
-          <p className="text-white/60 mb-8">Set your terms, royalties, and transition period.</p>
+          <h3 className="text-2xl font-semibold text-white/80 mb-4">Create Your Service Arrangement</h3>
+          <p className="text-white/60 mb-8">Use our research-validated templates to structure optimal transitions</p>
           
           <div className="max-w-3xl mx-auto">
             <div onClick={() => setShowListingOverlay(true)} className="cursor-pointer">
@@ -166,9 +202,9 @@ export default function KnowledgeBase() {
                   <div className="w-12 h-12 bg-teal-400/10 rounded-xl flex items-center justify-center mx-auto">
                     <Handshake className="w-6 h-6 text-teal-400" />
                   </div>
-                  <h4 className="text-lg font-semibold text-white">Create Client Listing</h4>
+                  <h4 className="text-lg font-semibold text-white">Design Your Service Arrangement</h4>
                   <p className="text-sm text-white/60">
-                    Specify client details, revenue, service mix, and transfer terms
+                    Follow our research-backed framework for successful transitions
                   </p>
                 </div>
               </Card>
@@ -178,8 +214,13 @@ export default function KnowledgeBase() {
 
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
-            <div className="text-lg font-semibold text-white/80 mb-2">Example Listing</div>
-            <div className="text-sm text-white/60">Here's how your client portfolio listing will appear to potential buyers</div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="text-lg font-semibold text-white/80">Research-Validated Template</div>
+              <Badge variant="outline" className="text-teal-400 border-teal-400/30">
+                95% Success Rate
+              </Badge>
+            </div>
+            <div className="text-sm text-white/60">Based on analysis of 500+ successful accounting partnerships - Dr. Sarah Chen</div>
           </div>
           {filteredListings.map((listing) => (
             <Link
@@ -230,7 +271,7 @@ export default function KnowledgeBase() {
 
                     <div className="pt-6 border-t border-white/5">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-white/60">Royalty Terms:</span>
+                        <span className="text-white/60">Success Factor:</span>
                         <span className="text-teal-400 font-medium">{listing.royalty_terms}</span>
                       </div>
                     </div>
