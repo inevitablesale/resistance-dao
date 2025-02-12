@@ -15,7 +15,7 @@ export function StepContent({ currentStep, durationType }: StepContentProps) {
     if (currentStep === 1) {
       return durationType === 'short-term' ? <ShortTermForm /> : <LongTermForm />;
     }
-    if (currentStep === 3) {
+    if (currentStep === 2) {
       return durationType === 'short-term' ? <ShortTermSkills /> : <LongTermSkills />;
     }
     return null;

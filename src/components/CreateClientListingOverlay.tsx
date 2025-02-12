@@ -43,7 +43,10 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setDurationType('short-term')}
+            onClick={() => {
+              setDurationType('short-term');
+              handleNext();
+            }}
             className={`group relative overflow-hidden rounded-2xl border ${
               durationType === 'short-term' 
                 ? 'border-teal-500/50 bg-teal-500/10' 
@@ -69,7 +72,10 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setDurationType('long-term')}
+            onClick={() => {
+              setDurationType('long-term');
+              handleNext();
+            }}
             className={`group relative overflow-hidden rounded-2xl border ${
               durationType === 'long-term' 
                 ? 'border-teal-500/50 bg-teal-500/10' 
@@ -110,7 +116,7 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-white">List Service Opportunity</h2>
-                <p className="text-sm text-white/60">Step {currentStep + 1} of 4</p>
+                <p className="text-sm text-white/60">Step {currentStep + 1} of 3</p>
               </div>
             </div>
             <Button 
@@ -142,17 +148,14 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
               Back
             </Button>
             
-            <Button 
-              disabled={!durationType}
-              className={`min-w-[100px] ${
-                durationType 
-                  ? 'bg-teal-500 hover:bg-teal-600' 
-                  : 'bg-white/5 text-white/60'
-              }`}
-              onClick={handleNext}
-            >
-              Next
-            </Button>
+            {currentStep === 0 ? null : (
+              <Button 
+                className="min-w-[100px] bg-teal-500 hover:bg-teal-600"
+                onClick={handleNext}
+              >
+                Next
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>
