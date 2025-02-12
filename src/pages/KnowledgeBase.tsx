@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
@@ -10,7 +9,7 @@ import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { useToast } from "@/hooks/use-toast";
 import { VotingSection } from '@/components/nft-card/VotingSection';
 import { motion } from "framer-motion";
-import { CreateArticleOverlay } from "@/components/CreateArticleOverlay";
+import { CreateClientListingOverlay } from "@/components/CreateClientListingOverlay";
 
 // Mock data for client listings
 const MOCK_LISTINGS = [
@@ -320,7 +319,7 @@ export default function KnowledgeBase() {
         </div>
       </div>
 
-      <CreateArticleOverlay 
+      <CreateClientListingOverlay 
         isOpen={showListingOverlay}
         onClose={() => setShowListingOverlay(false)}
       />
