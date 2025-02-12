@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
@@ -26,32 +27,27 @@ export const USD_PRICE = ethers.utils.parseUnits("0.1", 18); // $0.10 per token
 
 // Array of RPC endpoints for redundancy
 export const RPC_ENDPOINTS = [
-  "https://polygon-mainnet.g.alchemy.com/v2/demo",  // Alchemy's public endpoint
-  "https://polygon.llamarpc.com",                   // LlamaRPC endpoint
-  "https://polygon.rpc.blxrbdn.com",               // Blockdaemon endpoint
-  "https://polygon-rpc.com",                       // Original endpoint as fallback
+  "https://polygon-rpc.com",
   "https://rpc-mainnet.matic.network",
-  "https://matic-mainnet.chainstacklabs.com"
+  "https://matic-mainnet.chainstacklabs.com",
+  "https://rpc-mainnet.maticvigil.com",
+  "https://rpc-mainnet.matic.quiknode.pro"
 ];
 
-// Function to get a working RPC provider with improved error handling
+// Function to get a working RPC provider
 export const getWorkingProvider = async () => {
-  let lastError;
   for (const rpc of RPC_ENDPOINTS) {
     try {
-      console.log(`Attempting to connect to RPC endpoint: ${rpc}`);
       const provider = new ethers.providers.JsonRpcProvider(rpc);
-      // Test the connection with a simple call
+      // Test the connection
       await provider.getNetwork();
-      console.log(`Successfully connected to RPC endpoint: ${rpc}`);
       return provider;
     } catch (error) {
-      console.warn(`RPC ${rpc} failed:`, error);
-      lastError = error;
+      console.warn(`RPC ${rpc} failed, trying next one...`);
       continue;
     }
   }
-  throw new Error(`All RPC endpoints failed. Last error: ${lastError?.message}`);
+  throw new Error("All RPC endpoints failed");
 };
 
 export const getPresaleContract = async (providerOrSigner: ethers.providers.Provider | ethers.Signer) => {
@@ -106,34 +102,34 @@ export const fetchPresaleUSDPrice = async () => {
   }
 };
 
-// Function to fetch latest POL price and convert presale price to POL
+// Function to fetch latest MATIC price and convert presale price to MATIC
 export const fetchPresaleMaticPrice = async () => {
   try {
     const provider = await getWorkingProvider();
     const contract = await getPresaleContract(provider);
-    const polPrice = await contract.getLGRPrice();
-    const formattedPrice = Number(ethers.utils.formatEther(polPrice)).toFixed(4);
+    const maticPrice = await contract.getLGRPrice();
+    const formattedPrice = Number(ethers.utils.formatEther(maticPrice)).toFixed(4);
     return formattedPrice;
   } catch (error) {
-    console.error("Error fetching POL price:", error);
+    console.error("Error fetching MATIC price:", error);
     return "0";
   }
 };
 
 // Function to purchase tokens
-export const purchaseTokens = async (signer: ethers.Signer, polAmount: string) => {
+export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string) => {
   try {
-    console.log('Starting token purchase with POL amount:', polAmount);
+    console.log('Starting token purchase with MATIC amount:', maticAmount);
     
     const contract = await getPresaleContract(signer);
     
-    // Get current LGR price in POL
-    const polPrice = await contract.getLGRPrice();
-    console.log('Current POL price per token:', ethers.utils.formatEther(polPrice));
+    // Get current LGR price in MATIC
+    const maticPrice = await contract.getLGRPrice();
+    console.log('Current MATIC price per token:', ethers.utils.formatEther(maticPrice));
     
     // Calculate expected number of tokens
-    const polAmountWei = ethers.utils.parseEther(polAmount);
-    const expectedTokens = polAmountWei.mul(ethers.utils.parseEther("1")).div(polPrice);
+    const maticAmountWei = ethers.utils.parseEther(maticAmount);
+    const expectedTokens = maticAmountWei.mul(ethers.utils.parseEther("1")).div(maticPrice);
     console.log('Expected tokens:', ethers.utils.formatEther(expectedTokens));
     
     // Add 1% slippage protection
@@ -142,7 +138,7 @@ export const purchaseTokens = async (signer: ethers.Signer, polAmount: string) =
 
     // Execute purchase transaction
     const tx = await contract.buyTokens(minExpectedTokens, {
-      value: polAmountWei
+      value: maticAmountWei
     });
     
     console.log('Purchase transaction submitted:', tx.hash);
@@ -159,3 +155,4 @@ export const purchaseTokens = async (signer: ethers.Signer, polAmount: string) =
     throw error;
   }
 };
+

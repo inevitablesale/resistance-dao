@@ -18,8 +18,6 @@ interface TokenPurchaseFormProps {
   initialAmount?: string;
 }
 
-const LGR_USD_PRICE = 0.10; // Fixed price of $0.10 per LGR token
-
 export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { enabled: banxaEnabled, open: openBanxa } = useOnramp();
@@ -60,18 +58,11 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
         setExpectedLGR(null);
         return;
       }
-
-      let usdAmount: number;
-      if (purchaseMethod === 'card') {
-        // For card purchases, the input is already in USD
-        usdAmount = Number(inputAmount);
-      } else {
-        // For MATIC purchases, convert MATIC to USD
-        usdAmount = Number(inputAmount) * maticUsdRate;
-      }
-
-      // Calculate expected LGR tokens based on fixed price of $0.10 per token
-      const expectedTokens = usdAmount / LGR_USD_PRICE;
+      const maticPrice = await fetchPresaleMaticPrice();
+      const maticAmount = purchaseMethod === 'card' ? 
+        (Number(inputAmount) / maticUsdRate).toString() : 
+        inputAmount;
+      const expectedTokens = Number(maticAmount) / Number(maticPrice);
       setExpectedLGR(expectedTokens.toFixed(2));
     } catch (error) {
       console.error("Error calculating expected LGR:", error);
@@ -182,16 +173,6 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
           <div className="space-y-4 mt-6">
             <div className="space-y-2">
               <label htmlFor="amount" className="block text-sm font-medium text-gray-200">
-                Starter
-              </label>
-              <div className="text-xl font-bold text-yellow-500 mb-2">
-                $100 USD
-              </div>
-              <div className="text-sm text-gray-300 mb-4">
-                receive<br />
-                1,000 LGR Tokens
-              </div>
-              <label htmlFor="amount" className="block text-sm font-medium text-gray-200">
                 Amount in {purchaseMethod === 'card' ? 'USD' : 'MATIC'}
               </label>
               <Input
@@ -245,7 +226,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                 </>
               ) : (
                 <>
-                  {purchaseMethod === 'card' ? 'Fund Platform Development' : 'Fund Platform Development'}
+                  {purchaseMethod === 'card' ? 'Purchase with Card' : 'Purchase with MATIC'}
                 </>
               )}
             </Button>
