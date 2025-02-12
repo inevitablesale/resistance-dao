@@ -1,5 +1,9 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { useEffect, useRef, useState } from "react";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
 import { PrivateEquityImpact } from "@/components/PrivateEquityImpact";
@@ -12,17 +16,8 @@ import { Roadmap } from "@/components/Roadmap";
 import { LedgerFrens } from "@/components/LedgerFrens";
 import { Partners } from "@/components/Partners";
 import { FAQ } from "@/components/FAQ";
-import { useNavigate } from "react-router-dom";
-import { WalletInfo } from "@/components/WalletInfo";
-import { useEffect, useRef, useState } from "react";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useToast } from "@/hooks/use-toast";
-import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown } from "lucide-react";
-import { ethers } from "ethers";
-import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
-import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
-import { Button } from "@/components/ui/button";
 import { usePurchase } from "../contexts/PurchaseContext";
+import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown } from "lucide-react";
 
 const presaleData = [
   { 
@@ -126,7 +121,7 @@ const IndexContent = () => {
   const { toast } = useToast();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [maticPrice, setMaticPrice] = useState("0"); // Add this line to define the state
+  const [maticPrice, setMaticPrice] = useState("0");
   const heroRef = useRef<HTMLDivElement>(null);
   const presaleRef = useRef<HTMLDivElement>(null);
   const { selectedAmount, setSelectedAmount, showPurchaseForm, setShowPurchaseForm } = usePurchase();
@@ -137,13 +132,23 @@ const IndexContent = () => {
 
   useEffect(() => {
     const fetchMaticPrice = async () => {
-      const price = await fetchPresaleMaticPrice();
-      setMaticPrice(price);
+      try {
+        const price = await fetchPresaleMaticPrice();
+        setMaticPrice(price);
+      } catch (error) {
+        console.error("Error fetching MATIC price:", error);
+        toast({
+          title: "Error",
+          description: "Could not fetch current MATIC price",
+          variant: "destructive"
+        });
+      }
     };
+    
     fetchMaticPrice();
     const interval = setInterval(fetchMaticPrice, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     if (primaryWallet?.isConnected?.() && selectedAmount) {
