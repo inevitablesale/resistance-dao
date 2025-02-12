@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
@@ -34,7 +35,6 @@ export default function KnowledgeBase() {
   const [error, setError] = useState<string | null>(null);
   const { isConnected, address } = useWalletConnection();
   const { toast } = useToast();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showListingOverlay, setShowListingOverlay] = useState(false);
 
   useEffect(() => {
@@ -73,13 +73,10 @@ export default function KnowledgeBase() {
   };
 
   const filteredListings = MOCK_LISTINGS.filter(listing =>
-    (searchQuery === '' || 
-     listing.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     listing.category?.toLowerCase().includes(searchQuery.toLowerCase())) &&
-    (selectedCategory === null || listing.category === selectedCategory)
+    searchQuery === '' || 
+    listing.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    listing.category?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const categories = Array.from(new Set(MOCK_LISTINGS.map(listing => listing.category)));
 
   if (loading) {
     return (
@@ -154,54 +151,6 @@ export default function KnowledgeBase() {
               />
             </div>
           </motion.div>
-
-          <motion.div 
-            className="grid grid-cols-3 gap-8 max-w-3xl mx-auto mt-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-          >
-            <div className="text-center p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-4xl font-bold text-teal-400 mb-2">{MOCK_LISTINGS.length}</div>
-              <div className="text-sm text-white/60">Available Clients</div>
-            </div>
-            <div className="text-center p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-4xl font-bold text-emerald-400 mb-2">12</div>
-              <div className="text-sm text-white/60">Successful Transfers</div>
-            </div>
-            <div className="text-center p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <div className="text-4xl font-bold text-green-400 mb-2">{categories.length}</div>
-              <div className="text-sm text-white/60">Industries</div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-
-      <div className="border-b border-white/10 bg-black/40 backdrop-blur-xl sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-8">
-          <ScrollArea className="w-full">
-            <div className="flex items-center space-x-2 py-4">
-              <Button
-                variant="ghost"
-                className={`whitespace-nowrap rounded-xl px-6 ${!selectedCategory ? 'bg-white/10 hover:bg-white/20' : 'hover:bg-white/10'}`}
-                onClick={() => setSelectedCategory(null)}
-              >
-                <Building2 className="w-4 h-4 mr-2" />
-                All Industries
-              </Button>
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant="ghost"
-                  className={`whitespace-nowrap rounded-xl px-6 ${selectedCategory === category ? 'bg-white/10 hover:bg-white/20' : 'hover:bg-white/10'}`}
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  <Building2 className="w-4 h-4 mr-2" />
-                  <span>{category}</span>
-                </Button>
-              ))}
-            </div>
-          </ScrollArea>
         </div>
       </div>
 
