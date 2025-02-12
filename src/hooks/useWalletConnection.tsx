@@ -39,9 +39,8 @@ export const useWalletConnection = () => {
 
   const showWallet = (view: 'send' | 'deposit') => {
     console.log("Attempting to show wallet view:", view);
-    console.log("Wallet connector details:", primaryWallet);
+    console.log("Wallet connector details:", primaryWallet?.connector);
     
-    // For Dynamic SDK embedded wallets, we need to use setPrimaryWalletId
     if (!primaryWallet) {
       console.warn("No wallet available");
       toast({
@@ -52,10 +51,17 @@ export const useWalletConnection = () => {
       return;
     }
 
-    // Use direct wallet interaction methods
     try {
-      // Open the Dynamic wallet UI
-      setShowAuthFlow?.(true);
+      // Try using showWallet first, then openWallet as fallback
+      if (primaryWallet.connector?.showWallet) {
+        primaryWallet.connector.showWallet({ view });
+      } else if (primaryWallet.connector?.openWallet) {
+        primaryWallet.connector.openWallet({ view });
+      } else {
+        // Fallback to showing auth flow if direct navigation isn't available
+        console.warn("Direct wallet navigation not available, falling back to auth flow");
+        setShowAuthFlow?.(true);
+      }
     } catch (error) {
       console.error("Error showing wallet:", error);
       toast({
@@ -75,3 +81,4 @@ export const useWalletConnection = () => {
     showWallet
   };
 };
+
