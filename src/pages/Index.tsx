@@ -20,7 +20,9 @@ import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBran
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
-import { Button } from "@/components/ui/button"; // Added Button import
+import { Button } from "@/components/ui/button";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { Loader2 } from "lucide-react";
 
 const presaleData = [
   { 
@@ -123,37 +125,75 @@ const TokenPackage = ({ name, tokens, price, features }: {
   tokens: string;
   price: string;
   features: string[];
-}) => (
-  <div className="relative p-6 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300 transform hover:scale-[1.02]">
-    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-teal-500/5 rounded-xl" />
-    <h3 className="text-2xl font-bold text-white mb-2">{name}</h3>
-    <div className="flex items-baseline gap-2 mb-4">
-      <span className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
-        {price}
-      </span>
-      <span className="text-white/60">USD</span>
+}) => {
+  const { connect, isConnecting, isConnected } = useWalletConnection();
+  const { toast } = useToast();
+
+  const handleGetStarted = async () => {
+    if (!isConnected) {
+      try {
+        await connect();
+        toast({
+          title: "Welcome to LedgerFund",
+          description: `You've selected the ${name} package. Please proceed with your purchase.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Connection Failed",
+          description: "Unable to connect wallet. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "Package Selected",
+        description: `You've selected the ${name} package (${tokens} LGR tokens).`,
+      });
+    }
+  };
+
+  return (
+    <div className="relative p-6 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300 transform hover:scale-[1.02]">
+      <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-teal-500/5 rounded-xl" />
+      <h3 className="text-2xl font-bold text-white mb-2">{name}</h3>
+      <div className="flex items-baseline gap-2 mb-4">
+        <span className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
+          {price}
+        </span>
+        <span className="text-white/60">USD</span>
+      </div>
+      <div className="text-xl font-semibold text-white mb-6">
+        {tokens} LGR Tokens
+      </div>
+      <ul className="space-y-3 mb-6">
+        {features.map((feature, index) => (
+          <li key={index} className="flex items-center gap-2 text-white/80">
+            <div className="h-5 w-5 rounded-full bg-teal-500/20 flex items-center justify-center">
+              <div className="h-2 w-2 rounded-full bg-teal-500" />
+            </div>
+            {feature}
+          </li>
+        ))}
+      </ul>
+      <Button 
+        className="w-full bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white"
+        onClick={handleGetStarted}
+        disabled={isConnecting}
+      >
+        {isConnecting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Connecting...
+          </>
+        ) : isConnected ? (
+          'Purchase Tokens'
+        ) : (
+          'Get Started'
+        )}
+      </Button>
     </div>
-    <div className="text-xl font-semibold text-white mb-6">
-      {tokens} LGR Tokens
-    </div>
-    <ul className="space-y-3 mb-6">
-      {features.map((feature, index) => (
-        <li key={index} className="flex items-center gap-2 text-white/80">
-          <div className="h-5 w-5 rounded-full bg-teal-500/20 flex items-center justify-center">
-            <div className="h-2 w-2 rounded-full bg-teal-500" />
-          </div>
-          {feature}
-        </li>
-      ))}
-    </ul>
-    <Button 
-      className="w-full bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white"
-      onClick={() => window.open('https://docs.ledgerfund.finance/guides/buying-lgr', '_blank')}
-    >
-      Get Started
-    </Button>
-  </div>
-);
+  );
+};
 
 const packages = [
   {
