@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Input } from "@/components/ui/input";
@@ -111,11 +110,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     setIsLoading(true);
     try {
       if (purchaseMethod === 'card') {
-        await handleCardPurchase(setShowAuthFlow);
-        toast({
-          title: "Purchase Initiated",
-          description: "Please complete your purchase through Banxa",
-        });
+        await handleCardPurchase(primaryWallet);
       } else {
         if (!isConnected || !primaryWallet) {
           setShowAuthFlow?.(true);

@@ -2,13 +2,14 @@
 import { ethers } from "ethers";
 import { purchaseTokens } from "@/services/presaleContractService";
 
-interface ShowAuthFlowOptions {
-  view?: 'deposit';
-}
-
-export const handleCardPurchase = async (setShowAuthFlow: ((show: boolean, options?: ShowAuthFlowOptions) => void) | undefined) => {
-  if (setShowAuthFlow) {
-    setShowAuthFlow(true, { view: 'deposit' });
+export const handleCardPurchase = async (primaryWallet: any) => {
+  if (primaryWallet?.connector?.openWallet) {
+    primaryWallet.connector.openWallet({
+      view: 'fiatOnRamp',
+      defaultFiatAmount: '100',
+      defaultCrypto: 'LGR',
+      defaultFiat: 'USD'
+    });
   }
 };
 

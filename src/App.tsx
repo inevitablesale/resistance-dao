@@ -123,6 +123,11 @@ function App() {
       enableSessionRestoration: true,
       enableAuthProviders: true,
       enablePasskeys: false,
+      fiatOnRamp: {
+        defaultFiatCurrency: 'USD',
+        defaultCrypto: 'LGR',
+        providers: ['banxa'],
+      },
       evmWallets: {
         options: {
           emailAuth: {
