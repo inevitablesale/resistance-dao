@@ -16,10 +16,11 @@ import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBranch, UserPlus, Award, Vote, Orbit, Star, Moon, Rocket } from "lucide-react";
+import { Trophy, UserCircle, Wallet, ClipboardCopy, Zap, Network, Coins, GitBranch, UserPlus, Award, Vote, Orbit, Star, Moon, Rocket, Users, Shield, Crown } from "lucide-react";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, PRESALE_END_TIME, TOTAL_PRESALE_SUPPLY, fetchTotalLGRSold, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
+import { Button } from "@/components/ui/button";
 
 const presaleData = [
   { 
