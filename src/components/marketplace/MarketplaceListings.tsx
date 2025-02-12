@@ -8,34 +8,66 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Clock, Calendar, Briefcase, DollarSign } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 // Mock data for demonstration
 const MOCK_LISTINGS = [
   {
     id: '1',
-    title: 'Tax Season Support Needed',
-    description: 'Looking for experienced CPA to help with tax preparation during busy season.',
+    title: 'Tax Return Review Needed',
+    description: 'Need experienced CPA to review 25 individual tax returns before filing deadline.',
     category: 'tax_prep',
-    lgrAmount: 1000,
+    lgrAmount: 500,
     durationType: 'short-term',
-    timeframe: '3 months',
-    skills: ['Tax Preparation', 'CPA', 'Individual Returns']
+    timeframe: '2 weeks',
+    skills: ['Tax Review', '1040 Forms', 'Individual Returns']
   },
   {
     id: '2',
-    title: 'Monthly Bookkeeping Assistant',
-    description: 'Need ongoing support with bookkeeping and monthly reconciliations.',
+    title: 'Monthly Bank Reconciliation',
+    description: 'Looking for help with QuickBooks bank reconciliation for small retail business.',
     category: 'bookkeeping',
-    lgrAmount: 500,
-    durationType: 'long-term',
-    timeframe: 'Ongoing',
-    skills: ['QuickBooks', 'Reconciliation', 'Financial Reports']
+    lgrAmount: 200,
+    durationType: 'short-term',
+    timeframe: '3 days',
+    skills: ['QuickBooks', 'Bank Reconciliation']
+  },
+  {
+    id: '3',
+    title: 'Audit Support - Manufacturing',
+    description: 'Need assistance with preparing audit documentation for manufacturing client.',
+    category: 'audit_support',
+    lgrAmount: 1000,
+    durationType: 'short-term',
+    timeframe: '1 week',
+    skills: ['Audit Prep', 'Manufacturing', 'Documentation']
   }
 ];
 
 export function MarketplaceListings() {
   const [filter, setFilter] = useState('all');
+  const { toast } = useToast();
+  const { isConnected, connect } = useWalletConnection();
+
+  const handleInterested = (listingId: string) => {
+    if (!isConnected) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to express interest in opportunities",
+        variant: "destructive"
+      });
+      connect();
+      return;
+    }
+
+    toast({
+      title: "Interest Registered",
+      description: "The client will be notified of your interest",
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -65,28 +97,36 @@ export function MarketplaceListings() {
             key={listing.id}
             className="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
           >
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-2">{listing.title}</h3>
-                <p className="text-white/60 mb-4">{listing.description}</p>
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex-1">
+                <h3 className="text-2xl font-semibold text-white mb-2">{listing.title}</h3>
+                <p className="text-white/60 text-lg mb-4">{listing.description}</p>
               </div>
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-teal-400" />
-                <span className="text-lg font-semibold text-teal-400">{listing.lgrAmount} LGR</span>
+              <div className="flex flex-col items-end gap-2 ml-8">
+                <div className="flex items-center gap-2 text-2xl font-bold text-teal-400">
+                  <DollarSign className="w-6 h-6" />
+                  <span>{listing.lgrAmount} LGR</span>
+                </div>
+                <Button 
+                  onClick={() => handleInterested(listing.id)}
+                  className="bg-teal-500 hover:bg-teal-600 w-full"
+                >
+                  I'm Interested
+                </Button>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex flex-wrap items-center gap-6 mb-4 text-lg">
               <div className="flex items-center gap-2 text-white/60">
-                <Clock className="w-4 h-4" />
+                <Clock className="w-5 h-5" />
                 <span>{listing.durationType === 'short-term' ? 'Short Term' : 'Long Term'}</span>
               </div>
               <div className="flex items-center gap-2 text-white/60">
-                <Calendar className="w-4 h-4" />
+                <Calendar className="w-5 h-5" />
                 <span>{listing.timeframe}</span>
               </div>
               <div className="flex items-center gap-2 text-white/60">
-                <Briefcase className="w-4 h-4" />
+                <Briefcase className="w-5 h-5" />
                 <span>{listing.category.replace('_', ' ')}</span>
               </div>
             </div>
@@ -96,7 +136,7 @@ export function MarketplaceListings() {
                 <Badge 
                   key={skill} 
                   variant="secondary"
-                  className="bg-teal-500/10 text-teal-400 border-none"
+                  className="bg-teal-500/10 text-teal-400 border-none text-sm"
                 >
                   {skill}
                 </Badge>
