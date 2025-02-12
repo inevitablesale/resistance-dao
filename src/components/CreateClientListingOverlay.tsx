@@ -116,7 +116,7 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-white">List Service Opportunity</h2>
-                <p className="text-sm text-white/60">Step {currentStep + 1} of 3</p>
+                <p className="text-sm text-white/60">Step {currentStep + 1} of 5</p>
               </div>
             </div>
             <Button 
@@ -153,7 +153,7 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
                 className="min-w-[100px] bg-teal-500 hover:bg-teal-600"
                 onClick={handleNext}
               >
-                Next
+                {currentStep === 4 ? 'Mint NFT' : 'Next'}
               </Button>
             )}
           </div>

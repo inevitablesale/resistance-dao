@@ -4,6 +4,8 @@ import { ShortTermForm } from "./ShortTermForm";
 import { LongTermForm } from "./LongTermForm";
 import { ShortTermSkills } from "./ShortTermSkills";
 import { LongTermSkills } from "./LongTermSkills";
+import { PaymentTermsForm } from "./PaymentTermsForm";
+import { MintNFTForm } from "./MintNFTForm";
 
 interface StepContentProps {
   currentStep: number;
@@ -17,6 +19,12 @@ export function StepContent({ currentStep, durationType }: StepContentProps) {
     }
     if (currentStep === 2) {
       return durationType === 'short-term' ? <ShortTermSkills /> : <LongTermSkills />;
+    }
+    if (currentStep === 3) {
+      return <PaymentTermsForm durationType={durationType} />;
+    }
+    if (currentStep === 4) {
+      return <MintNFTForm durationType={durationType} />;
     }
     return null;
   };
