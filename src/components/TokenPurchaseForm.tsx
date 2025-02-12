@@ -20,14 +20,31 @@ interface TokenPurchaseFormProps {
 export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { enabled: banxaEnabled, open: openBanxa } = useOnramp();
-  const [maticAmount, setMaticAmount] = useState(initialAmount || "");
+  const [amount, setAmount] = useState(initialAmount || "");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [expectedLGR, setExpectedLGR] = useState<string | null>(null);
   const [purchaseMethod, setPurchaseMethod] = useState<'matic' | 'card'>('matic');
+  const [maticUsdRate, setMaticUsdRate] = useState<number>(0);
 
   // Initialize balance monitoring
   useBalanceMonitor();
+
+  useEffect(() => {
+    const fetchMaticPrice = async () => {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd');
+        const data = await response.json();
+        setMaticUsdRate(data['matic-network'].usd);
+      } catch (error) {
+        console.error("Error fetching MATIC price:", error);
+      }
+    };
+
+    fetchMaticPrice();
+    const interval = setInterval(fetchMaticPrice, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (initialAmount) {
@@ -35,14 +52,17 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     }
   }, [initialAmount]);
 
-  const calculateExpectedLGR = async (amount: string) => {
+  const calculateExpectedLGR = async (inputAmount: string) => {
     try {
-      if (!amount || isNaN(Number(amount))) {
+      if (!inputAmount || isNaN(Number(inputAmount))) {
         setExpectedLGR(null);
         return;
       }
       const maticPrice = await fetchPresaleMaticPrice();
-      const expectedTokens = Number(amount) / Number(maticPrice);
+      const maticAmount = purchaseMethod === 'card' ? 
+        (Number(inputAmount) / maticUsdRate).toString() : 
+        inputAmount;
+      const expectedTokens = Number(maticAmount) / Number(maticPrice);
       setExpectedLGR(expectedTokens.toFixed(2));
     } catch (error) {
       console.error("Error calculating expected LGR:", error);
@@ -52,7 +72,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setMaticAmount(value);
+    setAmount(value);
     calculateExpectedLGR(value);
   };
 
@@ -63,11 +83,11 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     }
 
     try {
+      const maticAmount = (Number(amount) / maticUsdRate).toString();
       await openBanxa({
         onrampProvider: OnrampProviders.Banxa,
         token: 'MATIC',
         address: primaryWallet.address,
-        amount: maticAmount,
       });
       
       toast({
@@ -90,10 +110,10 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       return;
     }
 
-    if (!maticAmount || isNaN(Number(maticAmount)) || Number(maticAmount) <= 0) {
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
       toast({
         title: "Invalid Amount",
-        description: "Please enter a valid MATIC amount",
+        description: `Please enter a valid ${purchaseMethod === 'card' ? 'USD' : 'MATIC'} amount`,
         variant: "destructive",
       });
       return;
@@ -112,14 +132,14 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       const walletClient = await primaryWallet.getWalletClient();
       const signer = new ethers.providers.Web3Provider(walletClient).getSigner();
       
-      const result = await purchaseTokens(signer, maticAmount);
+      const result = await purchaseTokens(signer, amount);
       
       toast({
         title: "Purchase Successful!",
         description: `Successfully purchased ${Number(result.amount).toFixed(2)} LGR tokens`,
       });
       
-      setMaticAmount("");
+      setAmount("");
       setExpectedLGR(null);
     } catch (error) {
       console.error("Purchase error:", error);
@@ -150,15 +170,15 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
         </TabsList>
 
         <div className="space-y-2 mt-4">
-          <label htmlFor="maticAmount" className="block text-sm font-medium text-gray-200">
-            Amount in MATIC
+          <label htmlFor="amount" className="block text-sm font-medium text-gray-200">
+            Amount in {purchaseMethod === 'card' ? 'USD' : 'MATIC'}
           </label>
           <Input
-            id="maticAmount"
+            id="amount"
             type="number"
-            value={maticAmount}
+            value={amount}
             onChange={handleAmountChange}
-            placeholder="Enter MATIC amount"
+            placeholder={`Enter ${purchaseMethod === 'card' ? 'USD' : 'MATIC'} amount`}
             min="0"
             step="0.01"
             disabled={isLoading}
@@ -173,7 +193,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
 
         <Button
           onClick={handlePurchase}
-          disabled={isLoading || !maticAmount || (purchaseMethod === 'card' && !banxaEnabled)}
+          disabled={isLoading || !amount || (purchaseMethod === 'card' && !banxaEnabled)}
           className="w-full mt-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
         >
           {isLoading ? (

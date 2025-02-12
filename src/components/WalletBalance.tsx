@@ -34,7 +34,6 @@ export const WalletBalance = () => {
     };
 
     fetchMaticPrice();
-    // Refresh price every 60 seconds
     const interval = setInterval(fetchMaticPrice, 60000);
     return () => clearInterval(interval);
   }, [toast]);
@@ -95,22 +94,24 @@ export const WalletBalance = () => {
       {isExpanded && (
         <>
           <div className="space-y-4">
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-polygon-primary flex items-center justify-center">
-                  <img 
-                    src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-                    alt="Polygon"
-                    className="w-6 h-6"
-                  />
+            {Number(maticBalance) > 0 && (
+              <div className="flex items-center justify-between py-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-polygon-primary flex items-center justify-center">
+                    <img 
+                      src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+                      alt="Polygon"
+                      className="w-6 h-6"
+                    />
+                  </div>
+                  <span className="text-white">Polygon</span>
                 </div>
-                <span className="text-white">Polygon</span>
+                <div className="text-right">
+                  <div className="text-white font-medium">${calculateUsdValue(maticBalance)}</div>
+                  <div className="text-sm text-gray-400">{Number(maticBalance).toFixed(4)} MATIC</div>
+                </div>
               </div>
-              <div className="text-right">
-                <div className="text-white font-medium">${calculateUsdValue(maticBalance)}</div>
-                <div className="text-sm text-gray-400">{Number(maticBalance).toFixed(4)} MATIC</div>
-              </div>
-            </div>
+            )}
 
             <div className="flex items-center justify-between py-2 border-t border-white/10">
               <div className="flex items-center gap-2">
