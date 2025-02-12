@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -10,7 +9,6 @@ import GovernanceVoting from "./pages/GovernanceVoting";
 import MintNFT from "./pages/MintNFT";
 import ShareToEarn from "./pages/ShareToEarn";
 import Litepaper from "./pages/Litepaper";
-import GettingStarted from "./pages/GettingStarted";
 import KnowledgeArticle from "./pages/KnowledgeArticle";
 import ContentHub from "./pages/ContentHub";
 import { Marketplace } from "./pages/Marketplace";
@@ -156,10 +154,8 @@ function App() {
             <Route path="/mint-nft" element={<MintNFT />} />
             <Route path="/share-to-earn" element={<ShareToEarn />} />
             <Route path="/litepaper" element={<Litepaper />} />
-            <Route path="/getting-started" element={<GettingStarted />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/marketplace/:category/:slug" element={<KnowledgeArticle />} />
-            <Route path="/content" element={<ContentHub />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
@@ -171,4 +167,3 @@ function App() {
 }
 
 export default App;
-
