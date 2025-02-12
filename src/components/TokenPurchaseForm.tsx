@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { purchaseTokens, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Loader2, ArrowLeft, Bitcoin, CreditCard } from "lucide-react";
+import { Loader2, ArrowLeft, CreditCard } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletAssets } from "@/components/wallet/WalletAssets";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -179,7 +179,11 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
           disabled={isProcessing || !maticAmount}
           className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
         >
-          <Bitcoin className="mr-2 h-4 w-4" />
+          <img 
+            src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+            alt="Polygon"
+            className="mr-2 h-4 w-4"
+          />
           Pay with Crypto
         </Button>
         <Button
@@ -217,7 +221,11 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       <CardContent className="space-y-6">
         <div className="rounded-lg border border-white/10 p-4 space-y-3">
           <div className="flex items-center gap-2 text-white">
-            <Bitcoin className="h-5 w-5" />
+            <img 
+              src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+              alt="Polygon"
+              className="h-5 w-5"
+            />
             <span className="font-medium">Purchase Summary</span>
           </div>
           <div className="text-sm text-gray-400 space-y-2">
@@ -262,4 +270,3 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       return renderInitialView();
   }
 };
-
