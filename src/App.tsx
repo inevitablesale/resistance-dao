@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -10,9 +11,9 @@ import MintNFT from "./pages/MintNFT";
 import ShareToEarn from "./pages/ShareToEarn";
 import Litepaper from "./pages/Litepaper";
 import GettingStarted from "./pages/GettingStarted";
-import KnowledgeBase from "./pages/KnowledgeBase";
 import KnowledgeArticle from "./pages/KnowledgeArticle";
 import ContentHub from "./pages/ContentHub";
+import { Marketplace } from "./pages/Marketplace";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
 
@@ -165,7 +166,7 @@ function App() {
           <Route path="/share-to-earn" element={<ShareToEarn />} />
           <Route path="/litepaper" element={<Litepaper />} />
           <Route path="/getting-started" element={<GettingStarted />} />
-          <Route path="/marketplace" element={<KnowledgeBase />} />
+          <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/marketplace/:category/:slug" element={<KnowledgeArticle />} />
           <Route path="/content" element={<ContentHub />} />
           <Route path="*" element={<NotFound />} />
