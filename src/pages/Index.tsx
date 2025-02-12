@@ -197,41 +197,39 @@ const TokenPackage = ({ name, tokens, price, features }: {
 
 const packages = [
   {
-    name: "Early Supporter",
+    name: "Starter",
     tokens: "1,000",
     price: "$100",
     features: [
-      "Early access to protocol launch",
-      "Basic governance voting rights",
-      "Protocol reflection rewards",
-      "Private Discord channel access",
-      "Early supporter NFT badge"
+      "Basic governance rights",
+      "Access to community forums",
+      "Vote on minor proposals",
+      "Basic reflection rewards"
     ]
   },
   {
-    name: "Core Supporter",
+    name: "Professional",
     tokens: "5,000",
     price: "$500",
     features: [
       "Enhanced governance power",
-      "Higher reflection rate",
-      "Private investment group access",
-      "Priority protocol feature access",
-      "Core supporter NFT badge",
-      "Direct team communication"
+      "Priority access to new features",
+      "Vote on all proposals",
+      "Higher reflection rewards",
+      "Access to exclusive events"
     ]
   },
   {
-    name: "Foundation Partner",
+    name: "Enterprise",
     tokens: "25,000",
     price: "$2,500",
     features: [
-      "Maximum governance weight",
-      "Highest reflection rate",
-      "Protocol development input",
-      "Foundation partner NFT badge",
-      "Strategic partner meetings",
-      "Direct founder access"
+      "Maximum governance power",
+      "First access to new features",
+      "Proposal creation rights",
+      "Maximum reflection rewards",
+      "VIP access to all events",
+      "Direct team communication"
     ]
   }
 ];
