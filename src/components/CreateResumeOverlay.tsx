@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -24,6 +25,14 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
 
   const linkedInUrl = user?.metadata?.["LinkedIn Profile URL"];
 
+  const getIpfsHttpUrl = (ipfsUrl: string) => {
+    if (!ipfsUrl) return '';
+    if (ipfsUrl.startsWith('ipfs://')) {
+      return `https://gateway.pinata.cloud/ipfs/${ipfsUrl.replace('ipfs://', '')}`;
+    }
+    return ipfsUrl;
+  };
+
   const handleImportFromLinkedIn = async () => {
     if (!linkedInUrl) {
       toast({
@@ -38,6 +47,10 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
     try {
       const metadata = await analyzeLinkedInProfile(linkedInUrl);
       console.log('LinkedIn profile analyzed:', metadata);
+      // Convert IPFS URL to HTTP URL if present
+      if (metadata.image) {
+        metadata.imageUrl = getIpfsHttpUrl(metadata.image);
+      }
       setProfileData(metadata);
       toast({
         title: "Profile Imported",
@@ -60,6 +73,10 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
     try {
       const metadata = await analyzeLinkedInProfile(linkedInUrl);
       console.log('LinkedIn profile regenerated:', metadata);
+      // Convert IPFS URL to HTTP URL if present
+      if (metadata.image) {
+        metadata.imageUrl = getIpfsHttpUrl(metadata.image);
+      }
       setProfileData(metadata);
       toast({
         title: "Profile Regenerated",
@@ -79,7 +96,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl h-[90vh] bg-black/95 border-white/10 text-white p-0 overflow-hidden">
+      <DialogContent className="max-w-4xl h-[90vh] bg-black/95 border-white/10 text-white p-0">
         <div className="h-full flex flex-col">
           <div className="flex-none p-6 border-b border-white/10 bg-gradient-to-r from-purple-500/10 to-transparent">
             <div className="flex items-center gap-3">
@@ -93,8 +110,8 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
-            <div className="max-w-2xl mx-auto p-6">
+          <div className="flex-1 overflow-y-auto px-6">
+            <div className="max-w-2xl mx-auto py-6">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -140,7 +157,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                     </div>
                   </div>
                 ) : profileData ? (
-                  <div className="relative space-y-8 pb-24">
+                  <div className="space-y-8 pb-24">
                     <div className="space-y-6">
                       <div className="flex items-center justify-between">
                         <h3 className="text-xl font-medium">Review Your Resume NFT</h3>
@@ -176,17 +193,18 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                           }}
                         />
                         <div className="relative w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-purple-500/20 to-transparent backdrop-blur-sm">
-                          {profileData.imageUrl ? (
+                          {profileData.imageUrl && (
                             <img 
                               src={profileData.imageUrl} 
                               alt={profileData.name}
                               className="w-full h-full object-cover"
                               onError={(e) => {
+                                console.error('Image failed to load:', profileData.imageUrl);
                                 e.currentTarget.style.display = 'none';
                                 e.currentTarget.nextElementSibling?.classList.remove('hidden');
                               }}
                             />
-                          ) : null}
+                          )}
                           <div className={`absolute inset-0 flex items-center justify-center ${profileData.imageUrl ? 'hidden' : ''}`}>
                             <User className="w-12 h-12 text-purple-400" />
                           </div>
