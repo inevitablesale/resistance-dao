@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { X, DollarSign, Users, Clock, Building2, FileText, Briefcase } from "lucide-react";
+import { X, DollarSign, Users, Clock, Building2, FileText, Briefcase, Calendar, MapPin, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 
@@ -33,13 +33,34 @@ const CLIENT_INDUSTRIES = [
   "Retail"
 ];
 
+const SERVICE_PERIODS = [
+  "Tax Season Only",
+  "Year-Round",
+  "Quarterly",
+  "Monthly",
+  "Project-Based"
+];
+
+const SERVICE_LOCATIONS = [
+  "Remote Only",
+  "On-Site Required",
+  "Hybrid",
+  "Flexible"
+];
+
+const BILLING_ARRANGEMENTS = [
+  "Original Firm Bills Client",
+  "Service Provider Bills Client",
+  "Split Billing"
+];
+
 export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientListingOverlayProps) {
   const [step, setStep] = useState(1);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-[85vh] bg-black/95 border-white/10 text-white rounded-xl flex flex-col overflow-hidden">
-        <DialogTitle className="sr-only">List Client Portfolio for Transfer</DialogTitle>
+        <DialogTitle className="sr-only">List Service Opportunity</DialogTitle>
         
         <div className="absolute right-4 top-4 z-10">
           <Button 
@@ -59,8 +80,8 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
                 <Briefcase className="w-5 h-5 text-teal-400" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-white">List Client Portfolio for Transfer</h2>
-                <p className="text-sm text-white/60">Create a detailed listing of the client portfolio you wish to transfer</p>
+                <h2 className="text-xl font-semibold text-white">List Service Opportunity</h2>
+                <p className="text-sm text-white/60">Specify service needs and terms for client servicing arrangement</p>
               </div>
             </div>
           </div>
@@ -74,26 +95,26 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
                   transition={{ duration: 0.5 }}
                   className="space-y-6"
                 >
-                  {/* Portfolio Basics */}
+                  {/* Service Requirements */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-white/90">Portfolio Details</h3>
+                    <h3 className="text-lg font-medium text-white/90">Service Requirements</h3>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="title">Portfolio Title</Label>
+                        <Label htmlFor="title">Service Opportunity Title</Label>
                         <Input
                           id="title"
-                          placeholder="e.g., Small Business Tax Clients - Northeast"
+                          placeholder="e.g., Tax Season Support - Manufacturing Clients"
                           className="bg-white/5 border-white/10 text-white"
                         />
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="annual-fees">Annual Fees</Label>
+                        <Label htmlFor="annual-value">Annual Service Value</Label>
                         <div className="relative">
                           <DollarSign className="absolute left-3 top-2.5 h-5 w-5 text-white/40" />
                           <Input
-                            id="annual-fees"
+                            id="annual-value"
                             placeholder="100,000"
                             className="pl-10 bg-white/5 border-white/10 text-white"
                           />
@@ -131,20 +152,52 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
                           </SelectContent>
                         </Select>
                       </div>
+
+                      <div className="space-y-2">
+                        <Label>Service Period</Label>
+                        <Select>
+                          <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                            <SelectValue placeholder="Select service period" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {SERVICE_PERIODS.map((period) => (
+                              <SelectItem key={period} value={period.toLowerCase()}>
+                                {period}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Service Location</Label>
+                        <Select>
+                          <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                            <SelectValue placeholder="Select location preference" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {SERVICE_LOCATIONS.map((location) => (
+                              <SelectItem key={location} value={location.toLowerCase()}>
+                                {location}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Transfer Terms */}
+                  {/* Service Terms */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-white/90">Transfer Terms</h3>
+                    <h3 className="text-lg font-medium text-white/90">Service Terms</h3>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label>Royalty Percentage</Label>
+                        <Label>Fee Split Percentage</Label>
                         <div className="relative">
                           <Input
                             type="number"
-                            placeholder="20"
+                            placeholder="70"
                             min="0"
                             max="100"
                             className="bg-white/5 border-white/10 text-white"
@@ -154,29 +207,13 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Royalty Duration</Label>
+                        <Label>Start Date</Label>
                         <div className="relative">
+                          <Calendar className="absolute left-3 top-2.5 h-5 w-5 text-white/40" />
                           <Input
-                            type="number"
-                            placeholder="12"
-                            min="1"
-                            className="bg-white/5 border-white/10 text-white"
-                          />
-                          <span className="absolute right-3 top-2.5 text-white/40">months</span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Transition Period</Label>
-                        <div className="relative">
-                          <Clock className="absolute left-3 top-2.5 h-5 w-5 text-white/40" />
-                          <Input
-                            type="number"
-                            placeholder="3"
-                            min="1"
+                            type="date"
                             className="pl-10 bg-white/5 border-white/10 text-white"
                           />
-                          <span className="absolute right-3 top-2.5 text-white/40">months</span>
                         </div>
                       </div>
 
@@ -192,27 +229,59 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
                           />
                         </div>
                       </div>
+
+                      <div className="space-y-2">
+                        <Label>Billing Arrangement</Label>
+                        <Select>
+                          <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                            <SelectValue placeholder="Select billing arrangement" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {BILLING_ARRANGEMENTS.map((arrangement) => (
+                              <SelectItem key={arrangement} value={arrangement.toLowerCase()}>
+                                {arrangement}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Additional Details */}
+                  {/* Service Scope */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-white/90">Additional Details</h3>
+                    <h3 className="text-lg font-medium text-white/90">Service Scope & Requirements</h3>
                     
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label>Software Systems Used</Label>
-                        <Input
-                          placeholder="e.g., QuickBooks Online, Drake Tax, Bill.com"
-                          className="bg-white/5 border-white/10 text-white"
+                        <Label>Service Deliverables</Label>
+                        <Textarea
+                          placeholder="List key deliverables and deadlines..."
+                          className="min-h-[100px] bg-white/5 border-white/10 text-white"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Detailed Description</Label>
+                        <Label>Quality Control Requirements</Label>
                         <Textarea
-                          placeholder="Describe the client portfolio, including any special requirements or notable aspects..."
+                          placeholder="Specify quality control processes and standards..."
                           className="min-h-[100px] bg-white/5 border-white/10 text-white"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Communication Protocol</Label>
+                        <Textarea
+                          placeholder="Outline expected communication frequency and methods..."
+                          className="min-h-[100px] bg-white/5 border-white/10 text-white"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Staff Requirements</Label>
+                        <Input
+                          placeholder="e.g., Senior Accountant with 5+ years experience"
+                          className="bg-white/5 border-white/10 text-white"
                         />
                       </div>
                     </div>
@@ -226,7 +295,7 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
             <div className="flex justify-end gap-3">
               <Button variant="ghost" onClick={onClose}>Cancel</Button>
               <Button className="bg-teal-500 hover:bg-teal-600">
-                Create Listing
+                Create Service Listing
               </Button>
             </div>
           </div>
@@ -235,3 +304,4 @@ export function CreateClientListingOverlay({ isOpen, onClose }: CreateClientList
     </Dialog>
   );
 }
+
