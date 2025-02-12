@@ -99,22 +99,8 @@ function App() {
             signInWithEmail: true,
             autoVerify: true,
             autoClose: true,
-            onVerificationSuccess: (args) => {
-              console.log("[Dynamic SDK] Email verification succeeded", args);
-            },
-            onVerificationComplete: () => {
-              console.log("[Dynamic SDK] Email verification completed");
-              // Explicitly close the auth flow
-              dynamicSettings.setShowAuthFlow?.(false);
-              toast({
-                title: "Email Verified",
-                description: "Your email has been successfully verified.",
-              });
-            },
             onComplete: (args) => {
               console.log("[Dynamic SDK] Email Auth Complete:", args);
-              // Explicitly close the auth flow
-              dynamicSettings.setShowAuthFlow?.(false);
               toast({
                 title: "Email Authentication Complete",
                 description: "You can now proceed with the token purchase.",
