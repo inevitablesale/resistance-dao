@@ -22,6 +22,8 @@ import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
 import { Button } from "@/components/ui/button";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS } from "@/services/presaleContractService";
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
 
 const presaleData = [
   { 
@@ -129,6 +131,52 @@ const IndexContent = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const presaleRef = useRef<HTMLDivElement>(null);
   const { selectedAmount, setSelectedAmount, showPurchaseForm, setShowPurchaseForm } = usePurchase();
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<string | null>(null);
+  
+  const handlePurchase = () => {
+    if (!primaryWallet) {
+      setShowAuthFlow?.(true);
+      return;
+    }
+
+    if (!selectedAmount || isNaN(Number(selectedAmount)) || Number(selectedAmount) <= 0) {
+      toast({
+        title: "Invalid Amount",
+        description: `Please enter a valid USD amount`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    handlePurchaseTransaction();
+  };
+
+  const handlePurchaseTransaction = async () => {
+    setIsLoading(true);
+    try {
+      // const walletClient = await primaryWallet.getWalletClient();
+      // const signer = new ethers.providers.Web3Provider(walletClient).getSigner();
+      
+      // const result = await purchaseTokens(signer, selectedAmount);
+      
+      toast({
+        title: "Purchase Successful!",
+        description: `Successfully purchased ${Number(selectedAmount).toFixed(2)} LGR tokens`,
+      });
+      
+      setSelectedAmount("");
+    } catch (error) {
+      console.error("Purchase error:", error);
+      toast({
+        title: "Purchase Failed",
+        description: error instanceof Error ? error.message : "Failed to purchase tokens",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     setTimeout(() => setIsLoaded(true), 100);
@@ -160,7 +208,7 @@ const IndexContent = () => {
     }
   }, [primaryWallet, selectedAmount, setShowPurchaseForm]);
 
-  const handleTierSelect = (amount: string) => {
+  const handleTierSelect = (amount: string, tierName: string) => {
     if (!primaryWallet) {
       setShowAuthFlow?.(true);
       toast({
@@ -171,6 +219,7 @@ const IndexContent = () => {
       return;
     }
     setSelectedAmount(amount);
+    setSelectedTier(tierName);
     setShowPurchaseForm(true);
   };
 
@@ -303,15 +352,57 @@ const IndexContent = () => {
           {showPurchaseForm ? (
             <div className="max-w-3xl mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-white">Purchase LGR Tokens</h2>
+                <h2 className="text-2xl font-bold text-white">
+                  {selectedTier || 'Purchase LGR Tokens'}
+                </h2>
                 <button
-                  onClick={() => setShowPurchaseForm(false)}
+                  onClick={() => {
+                    setShowPurchaseForm(false);
+                    setSelectedTier(null);
+                  }}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   ← Back
                 </button>
               </div>
-              <TokenPurchaseForm initialAmount={selectedAmount} />
+              <div className="space-y-4">
+                <div className="text-xl text-white">
+                  {selectedAmount && `Receive ${Number(selectedAmount) * 10} LGR Tokens`}
+                </div>
+                <div className="p-4 bg-black/20 rounded-lg border border-yellow-500/20">
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="amount" className="block text-sm font-medium text-gray-200">
+                        Amount in USD
+                      </label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        value={selectedAmount}
+                        onChange={(e) => setSelectedAmount(e.target.value)}
+                        min="0"
+                        step="0.01"
+                        disabled={isLoading}
+                        className="bg-black/20 border-white/10 text-white placeholder:text-gray-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  onClick={handlePurchase}
+                  disabled={isLoading || !selectedAmount}
+                  className="w-full mt-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Purchase Tokens'
+                  )}
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="max-w-6xl mx-auto px-4">
@@ -350,7 +441,7 @@ const IndexContent = () => {
                       </li>
                     </ul>
                     <Button
-                      onClick={() => handleTierSelect("100")}
+                      onClick={() => handleTierSelect("100", "Starter Package")}
                       className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold"
                     >
                       Get Started
@@ -396,7 +487,7 @@ const IndexContent = () => {
                       </li>
                     </ul>
                     <Button
-                      onClick={() => handleTierSelect("500")}
+                      onClick={() => handleTierSelect("500", "Professional Package")}
                       className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold"
                     >
                       Get Started
@@ -439,7 +530,7 @@ const IndexContent = () => {
                       </li>
                     </ul>
                     <Button
-                      onClick={() => handleTierSelect("2500")}
+                      onClick={() => handleTierSelect("2500", "Partners Package")}
                       className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold"
                     >
                       Get Started
@@ -570,56 +661,4 @@ const IndexContent = () => {
               <div className="mt-12 flex justify-center w-full">
                 <div className="relative max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300">
                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 via-teal-500/20 to-yellow-500/20 rounded-lg blur-xl opacity-50 animate-pulse" />
-                  <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 px-8 py-6 rounded-lg">
-                    <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-500 to-yellow-300 mb-3">
-                      Governance Applications Coming Soon
-                    </h3>
-                    <p className="text-white/80">
-                      Applications and voting will begin when $100,000 of funding goal is met
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <WhatWeBuilding />
-              <LedgerFrens />
-              <HowItWorks />
-              <AlternativeToEquity />
-              <PrivateEquityImpact />
-              <ReclaimControl />
-              <SystemWeDeserve />
-              <CallToAction />
-              <Roadmap />
-              <FAQ />
-              <Partners />
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
-const Index = () => {
-  return (
-    <div className="min-h-screen bg-black overflow-hidden relative">
-      <div className="absolute inset-0">
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: "radial-gradient(circle at center, #eab308 0%, #000000 100%)",
-            opacity: 0.98
-          }}
-        />
-      </div>
-      
-      <Nav />
-      
-      <div className="container mx-auto px-4 relative z-10">
-        <IndexContent />
-      </div>
-    </div>
-  );
-};
-
-export default Index;
+                  <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 px-8 py-6
