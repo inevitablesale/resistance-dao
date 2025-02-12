@@ -1,7 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useOnramp } from '@dynamic-labs/sdk-react-core';
-import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -20,7 +20,7 @@ interface TokenPurchaseFormProps {
 const TOKEN_USD_PRICE = 0.10; // Fixed price of $0.10 per token
 
 export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => {
-  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow, isAuthenticated } = useDynamicContext();
   const { enabled: banxaEnabled, open: openBanxa } = useOnramp();
   const [amount, setAmount] = useState(initialAmount || "");
   const [isLoading, setIsLoading] = useState(false);
@@ -61,11 +61,9 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       }
 
       if (purchaseMethod === 'card') {
-        // For card purchases (USD), simply divide by token price ($0.10)
         const tokenAmount = Number(inputAmount) / TOKEN_USD_PRICE;
         setExpectedLGR(tokenAmount.toFixed(2));
       } else {
-        // For MATIC purchases, use the contract's price
         const maticPrice = await fetchPresaleMaticPrice();
         if (maticPrice === "0") {
           console.error("Failed to fetch MATIC price from contract");
@@ -88,7 +86,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   };
 
   const handleCardPurchase = async () => {
-    if (!primaryWallet?.address) {
+    if (!isAuthenticated || !primaryWallet?.address) {
       setShowAuthFlow?.(true);
       return;
     }
@@ -96,7 +94,6 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     try {
       const maticAmount = (Number(amount) / maticUsdRate).toString();
       await openBanxa({
-        onrampProvider: OnrampProviders.Banxa,
         token: 'MATIC',
         address: primaryWallet.address,
       });
@@ -116,7 +113,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   };
 
   const handlePurchase = () => {
-    if (!primaryWallet) {
+    if (!isAuthenticated || !primaryWallet) {
       setShowAuthFlow?.(true);
       return;
     }
@@ -138,6 +135,11 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   };
 
   const handlePurchaseTransaction = async () => {
+    if (!primaryWallet) {
+      setShowAuthFlow?.(true);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const walletClient = await primaryWallet.getWalletClient();
@@ -263,7 +265,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
               </div>
             )}
 
-            <Button
+            <Button 
               onClick={handlePurchase}
               disabled={isLoading || !amount || (purchaseMethod === 'card' && !banxaEnabled)}
               className="w-full mt-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
@@ -273,6 +275,8 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Processing...
                 </>
+              ) : !isAuthenticated ? (
+                "Connect Wallet"
               ) : (
                 <>
                   {purchaseMethod === 'card' ? 'Purchase with Card' : 'Purchase with MATIC'}
