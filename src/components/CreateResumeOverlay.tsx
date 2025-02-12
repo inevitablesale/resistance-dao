@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -100,9 +99,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl h-[90vh] bg-black/95 border-white/10 text-white">
-        {/* Main container with flex column */}
         <div className="flex flex-col h-full">
-          {/* Fixed Header */}
           <div className="flex-none p-6 border-b border-white/10 bg-gradient-to-r from-purple-500/10 to-transparent">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
@@ -114,9 +111,7 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
               </div>
             </div>
           </div>
-
-          {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto min-h-0">
+          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent min-h-0">
             <div className="p-6">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -184,7 +179,6 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
                         </Button>
                       </div>
                       
-                      {/* Profile Image Section */}
                       <div className="relative w-32 h-32 mx-auto">
                         <motion.div 
                           className="absolute inset-0 rounded-full border-2 border-purple-500/30"
@@ -299,8 +293,6 @@ export function CreateResumeOverlay({ isOpen, onClose }: CreateResumeOverlayProp
               </motion.div>
             </div>
           </div>
-
-          {/* Fixed Footer */}
           {profileData && (
             <div className="flex-none border-t border-white/10 bg-black/95 p-4">
               <div className="max-w-2xl mx-auto flex gap-4">
