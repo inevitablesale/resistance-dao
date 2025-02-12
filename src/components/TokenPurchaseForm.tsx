@@ -4,19 +4,21 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { purchaseTokens, fetchPresaleMaticPrice } from "@/services/presaleContractService";
-import { ethers } from "ethers";
-import { Loader2, CreditCard, Wallet, Copy } from "lucide-react";
+import { fetchPresaleMaticPrice } from "@/services/presaleContractService";
+import { Loader2, CreditCard, Wallet } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletBalance } from "./WalletBalance";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
+import { PurchaseSummary } from "./purchase/PurchaseSummary";
+import { WalletAddressDisplay } from "./purchase/WalletAddressDisplay";
+import { handleCardPurchase, handleMaticPurchase, fetchMaticPrice } from "@/services/purchaseService";
 
 interface TokenPurchaseFormProps {
   initialAmount?: string;
 }
 
-const TOKEN_USD_PRICE = 0.10; // Fixed price of $0.10 per token
+const TOKEN_USD_PRICE = 0.10;
 
 export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
@@ -44,18 +46,17 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   }, [primaryWallet]);
 
   useEffect(() => {
-    const fetchMaticPrice = async () => {
+    const updateMaticPrice = async () => {
       try {
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd');
-        const data = await response.json();
-        setMaticUsdRate(data['matic-network'].usd);
+        const price = await fetchMaticPrice();
+        setMaticUsdRate(price);
       } catch (error) {
         console.error("Error fetching MATIC price:", error);
       }
     };
 
-    fetchMaticPrice();
-    const interval = setInterval(fetchMaticPrice, 60000);
+    updateMaticPrice();
+    const interval = setInterval(updateMaticPrice, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -97,33 +98,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     calculateExpectedLGR(value);
   };
 
-  const handleCardPurchase = async () => {
-    if (!isConnected || !primaryWallet?.address) {
-      setShowAuthFlow?.(true);
-      return;
-    }
-
-    try {
-      // Open Dynamic's Banxa integration directly
-      setShowAuthFlow?.(true, {
-        view: 'deposit'
-      });
-      
-      toast({
-        title: "Purchase Initiated",
-        description: "Please complete your purchase through Banxa",
-      });
-    } catch (error) {
-      console.error("Card purchase error:", error);
-      toast({
-        title: "Purchase Failed",
-        description: "Failed to initiate Banxa purchase. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handlePurchase = () => {
+  const handlePurchaseClick = async () => {
     if (!isConnected || !primaryWallet) {
       setShowAuthFlow?.(true);
       return;
@@ -138,33 +113,24 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       return;
     }
 
-    if (purchaseMethod === 'card') {
-      handleCardPurchase();
-    } else {
-      handlePurchaseTransaction();
-    }
-  };
-
-  const handlePurchaseTransaction = async () => {
-    if (!primaryWallet) {
-      setShowAuthFlow?.(true);
-      return;
-    }
-
     setIsLoading(true);
     try {
-      const walletClient = await primaryWallet.getWalletClient();
-      const signer = new ethers.providers.Web3Provider(walletClient).getSigner();
-      
-      const result = await purchaseTokens(signer, amount);
-      
-      toast({
-        title: "Purchase Successful!",
-        description: `Successfully purchased ${Number(result.amount).toFixed(2)} LGR tokens`,
-      });
-      
-      setAmount("");
-      setExpectedLGR(null);
+      if (purchaseMethod === 'card') {
+        await handleCardPurchase(setShowAuthFlow);
+        toast({
+          title: "Purchase Initiated",
+          description: "Please complete your purchase through Banxa",
+        });
+      } else {
+        const walletClient = await primaryWallet.getWalletClient();
+        const result = await handleMaticPurchase(walletClient, amount);
+        toast({
+          title: "Purchase Successful!",
+          description: `Successfully purchased ${Number(result.amount).toFixed(2)} LGR tokens`,
+        });
+        setAmount("");
+        setExpectedLGR(null);
+      }
     } catch (error) {
       console.error("Purchase error:", error);
       toast({
@@ -174,24 +140,6 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleCopyAddress = async () => {
-    if (primaryWallet?.address) {
-      try {
-        await navigator.clipboard.writeText(primaryWallet.address);
-        toast({
-          title: "Address copied",
-          description: "Wallet address copied to clipboard",
-        });
-      } catch (error) {
-        toast({
-          title: "Copy failed",
-          description: "Failed to copy address to clipboard",
-          variant: "destructive",
-        });
-      }
     }
   };
 
@@ -214,23 +162,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
 
           <div className="space-y-4 mt-6">
             {purchaseMethod === 'matic' && primaryWallet?.address && (
-              <div className="p-4 bg-white/5 rounded-lg border border-white/10 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Wallet className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-400">Your wallet:</span>
-                  <span className="text-sm font-medium text-white">
-                    {`${primaryWallet.address.slice(0, 6)}...${primaryWallet.address.slice(-4)}`}
-                  </span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCopyAddress}
-                  className="text-gray-400 hover:text-white"
-                >
-                  <Copy className="w-4 h-4" />
-                </Button>
-              </div>
+              <WalletAddressDisplay address={primaryWallet.address} />
             )}
 
             <div className="space-y-2">
@@ -251,33 +183,16 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
             </div>
 
             {expectedLGR && (
-              <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                <h4 className="text-sm font-medium text-gray-300 mb-2">Purchase Summary</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Amount:</span>
-                    <span className="text-white">
-                      {purchaseMethod === 'card' ? '$' : ''}{amount} {purchaseMethod === 'card' ? 'USD' : 'MATIC'}
-                    </span>
-                  </div>
-                  {purchaseMethod === 'card' && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Estimated MATIC:</span>
-                      <span className="text-white">
-                        {(Number(amount) / maticUsdRate).toFixed(4)} MATIC
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-sm border-t border-white/10 pt-2">
-                    <span className="text-gray-400">Expected LGR:</span>
-                    <span className="text-white font-medium">{expectedLGR} LGR</span>
-                  </div>
-                </div>
-              </div>
+              <PurchaseSummary
+                amount={amount}
+                purchaseMethod={purchaseMethod}
+                expectedLGR={expectedLGR}
+                maticUsdRate={maticUsdRate}
+              />
             )}
 
             <Button 
-              onClick={handlePurchase}
+              onClick={handlePurchaseClick}
               disabled={isLoading || !amount}
               className="w-full mt-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
             >
