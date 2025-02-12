@@ -107,7 +107,7 @@ export const fetchPresaleMaticPrice = async () => {
   try {
     const provider = await getWorkingProvider();
     const contract = await getPresaleContract(provider);
-    const maticPrice = await contract.getLGRPrice();
+    const maticPrice = await contract.getLatestMaticPrice();
     const formattedPrice = Number(ethers.utils.formatEther(maticPrice)).toFixed(4);
     return formattedPrice;
   } catch (error) {
@@ -124,7 +124,7 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
     const contract = await getPresaleContract(signer);
     
     // Get current LGR price in MATIC
-    const maticPrice = await contract.getLGRPrice();
+    const maticPrice = await contract.getLatestMaticPrice();
     console.log('Current MATIC price per token:', ethers.utils.formatEther(maticPrice));
     
     // Calculate expected number of tokens
