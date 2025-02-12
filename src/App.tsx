@@ -29,7 +29,16 @@ function App() {
   const dynamicSettings = {
     environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
     walletConnectorOptions: {
-      zeroDevOptions: zeroDevConfig
+      zeroDevOptions: zeroDevConfig,
+      viewTypes: ['deposit', 'send'],
+      onramp: {
+        providers: ['banxa'],
+        defaultProvider: 'banxa',
+        defaultFiatAmount: 100,
+        defaultNetwork: {
+          chainId: 137
+        }
+      }
     },
     walletConnectors: [
       EthereumWalletConnectors,
@@ -105,6 +114,19 @@ function App() {
       // Authentication settings
       enableAuthProviders: true,
       enablePasskeys: false,
+      // Wallet connector settings
+      walletConnectors: {
+        enableDirectNavigation: true,
+        views: {
+          deposit: {
+            enabled: true,
+            defaultProvider: 'banxa'
+          },
+          send: {
+            enabled: true
+          }
+        }
+      },
       // Email authentication settings
       evmWallets: {
         options: {
