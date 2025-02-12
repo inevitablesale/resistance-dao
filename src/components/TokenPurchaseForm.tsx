@@ -10,15 +10,25 @@ import { Loader2 } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletBalance } from "./WalletBalance";
 
-export const TokenPurchaseForm = () => {
+interface TokenPurchaseFormProps {
+  initialAmount?: string;
+}
+
+export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
-  const [maticAmount, setMaticAmount] = useState("");
+  const [maticAmount, setMaticAmount] = useState(initialAmount || "");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [expectedLGR, setExpectedLGR] = useState<string | null>(null);
 
   // Initialize balance monitoring
   useBalanceMonitor();
+
+  useEffect(() => {
+    if (initialAmount) {
+      calculateExpectedLGR(initialAmount);
+    }
+  }, [initialAmount]);
 
   const calculateExpectedLGR = async (amount: string) => {
     try {
