@@ -144,6 +144,20 @@ const IndexContent = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    // Close verification window when wallet connects
+    if (primaryWallet?.isConnected?.()) {
+      const verificationDialog = document.querySelector('[data-dynamic-email-verification]');
+      if (verificationDialog) {
+        (verificationDialog as HTMLElement).style.display = 'none';
+      }
+      // Show purchase form if amount was selected
+      if (selectedAmount) {
+        setShowPurchaseForm(true);
+      }
+    }
+  }, [primaryWallet, selectedAmount]);
+
   const handleTierSelect = (amount: string) => {
     if (!primaryWallet) {
       setShowAuthFlow?.(true);
@@ -299,6 +313,9 @@ const IndexContent = () => {
             </div>
           ) : (
             <div className="max-w-6xl mx-auto px-4">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
+                Become an Early Supporter
+              </h2>
               <div className="grid md:grid-cols-3 gap-6">
                 <div className="relative group perspective-3000">
                   <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
