@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -125,6 +126,7 @@ const IndexContent = () => {
   const { toast } = useToast();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [maticPrice, setMaticPrice] = useState("0"); // Add this line to define the state
   const heroRef = useRef<HTMLDivElement>(null);
   const presaleRef = useRef<HTMLDivElement>(null);
   const { selectedAmount, setSelectedAmount, showPurchaseForm, setShowPurchaseForm } = usePurchase();
