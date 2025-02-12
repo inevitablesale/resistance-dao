@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
@@ -34,46 +35,55 @@ function App() {
       EthereumWalletConnectors,
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
-    events: {
-      authFlowOpen: () => {
+    eventsCallbacks: {
+      onAuthFlowOpen: () => {
         console.log("[Dynamic SDK] Auth flow opened");
       },
-      authFlowClose: () => {
+      onAuthFlowClose: () => {
         console.log("[Dynamic SDK] Auth flow closed");
       },
-      authFailure: (reason) => {
+      onAuthFailure: (reason) => {
         console.log("[Dynamic SDK] Auth failure:", reason);
         toast({
           title: "Authentication Failed",
           description: "There was an error connecting your wallet.",
         });
       },
-      authSuccess: (args) => {
+      onAuthSuccess: (args) => {
         console.log("[Dynamic SDK] Auth Success:", args);
         toast({
           title: "Successfully Connected",
           description: `Connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
         });
       },
-      userCreated: (args) => {
-        console.log("[Dynamic SDK] New user created:", args);
-        toast({
-          title: "Account Created",
-          description: "Your account has been successfully created.",
-        });
+      onVerificationSuccess: (args) => {
+        console.log("[Dynamic SDK] Verification success:", args);
       },
-      logout: () => {
+      onSessionConnect: () => {
+        console.log("[Dynamic SDK] Session connected");
+      },
+      onSessionRestore: () => {
+        console.log("[Dynamic SDK] Session restored");
+      },
+      onLogout: () => {
         console.log("[Dynamic SDK] User logged out");
         toast({
           title: "Logged Out",
           description: "You've been successfully logged out.",
         });
       },
-      userWalletsChanged: (params) => {
-        console.log("[Dynamic SDK] User wallets changed:", params);
+      onEmailVerificationStart: () => {
+        console.log("[Dynamic SDK] Email verification started");
       },
-      primaryWalletChanged: (newPrimaryWallet) => {
-        console.log("[Dynamic SDK] Primary wallet changed:", newPrimaryWallet);
+      onEmailVerificationSuccess: () => {
+        console.log("[Dynamic SDK] Email verification succeeded");
+      },
+      onDisconnect: () => {
+        console.log("[Dynamic SDK] Wallet disconnected");
+        toast({
+          title: "Wallet Disconnected",
+          description: "Your wallet has been disconnected.",
+        });
       }
     },
     settings: {
@@ -113,21 +123,6 @@ function App() {
               });
             }
           }
-        }
-      },
-      style: {
-        buttonClassName: "dynamic-button",
-        theme: "dark",
-        displaySiweStatement: false,
-        buttonText: {
-          connectWallet: "Connect Wallet",
-          disconnect: "Disconnect",
-          signIn: "Connect Wallet",
-          signUp: "Connect Wallet",
-          connected: "Connected",
-          connecting: "Connecting...",
-          viewAccount: "View Account",
-          loggedOut: "Connect Wallet"
         }
       },
       shadowDOMEnabled: false,
