@@ -25,32 +25,6 @@ const MOCK_LISTINGS = [
     service_mix: ['Tax Planning', 'Audit', 'Advisory'],
     royalty_terms: '5% Year 1, 3% Year 2',
     transition_period: '6 months'
-  },
-  {
-    id: '2',
-    title: 'Healthcare Practice Group',
-    publisher: '0x1234567890123456789012345678901234567890',
-    category: 'Healthcare',
-    contentType: 'client',
-    annual_revenue: '$1M - $2.5M',
-    location: 'West Coast',
-    client_since: '2019',
-    service_mix: ['Tax Compliance', 'CFO Services'],
-    royalty_terms: '7% Year 1, 4% Year 2',
-    transition_period: '4 months'
-  },
-  {
-    id: '3',
-    title: 'Technology Startup Portfolio',
-    publisher: '0x1234567890123456789012345678901234567890',
-    category: 'Technology',
-    contentType: 'client',
-    annual_revenue: '$500K - $1M',
-    location: 'Southeast US',
-    client_since: '2021',
-    service_mix: ['Bookkeeping', 'Tax Planning'],
-    royalty_terms: '5% Year 1',
-    transition_period: '3 months'
   }
 ];
 
@@ -253,12 +227,16 @@ export default function KnowledgeBase() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6">
+            <div className="text-lg font-semibold text-white/80 mb-2">Example Listing</div>
+            <div className="text-sm text-white/60">Here's how your client portfolio listing will appear to potential buyers</div>
+          </div>
           {filteredListings.map((listing) => (
             <Link
               key={listing.id}
               to={`/marketplace/client/${listing.id}`}
-              className="group"
+              className="group block"
             >
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
