@@ -661,5 +661,17 @@ const IndexContent = () => {
               <div className="mt-12 flex justify-center w-full">
                 <div className="relative max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300">
                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 via-teal-500/20 to-yellow-500/20 rounded-lg blur-xl opacity-50 animate-pulse" />
-                  <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 px-8 py-6
-</initial_code>
+                  <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 px-8 py-6">
+                    {/* Additional content can go here */}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default IndexContent;
