@@ -99,11 +99,6 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   };
 
   const handlePurchaseClick = async () => {
-    if (!isConnected || !primaryWallet) {
-      setShowAuthFlow?.(true);
-      return;
-    }
-
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
       toast({
         title: "Invalid Amount",
@@ -122,6 +117,11 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
           description: "Please complete your purchase through Banxa",
         });
       } else {
+        if (!isConnected || !primaryWallet) {
+          setShowAuthFlow?.(true);
+          return;
+        }
+        
         const walletClient = await primaryWallet.getWalletClient();
         const result = await handleMaticPurchase(walletClient, amount);
         toast({

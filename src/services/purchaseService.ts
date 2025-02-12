@@ -3,7 +3,9 @@ import { ethers } from "ethers";
 import { purchaseTokens } from "@/services/presaleContractService";
 
 export const handleCardPurchase = async (setShowAuthFlow: ((show: boolean) => void) | undefined) => {
-  setShowAuthFlow?.(true);
+  setShowAuthFlow?.(true, {
+    view: 'deposit'
+  });
 };
 
 export const handleMaticPurchase = async (
