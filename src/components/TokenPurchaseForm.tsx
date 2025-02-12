@@ -182,6 +182,16 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
           <div className="space-y-4 mt-6">
             <div className="space-y-2">
               <label htmlFor="amount" className="block text-sm font-medium text-gray-200">
+                Starter
+              </label>
+              <div className="text-xl font-bold text-yellow-500 mb-2">
+                $100 USD
+              </div>
+              <div className="text-sm text-gray-300 mb-4">
+                receive<br />
+                1,000 LGR Tokens
+              </div>
+              <label htmlFor="amount" className="block text-sm font-medium text-gray-200">
                 Amount in {purchaseMethod === 'card' ? 'USD' : 'MATIC'}
               </label>
               <Input
@@ -235,7 +245,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                 </>
               ) : (
                 <>
-                  {purchaseMethod === 'card' ? 'Purchase with Card' : 'Purchase with MATIC'}
+                  {purchaseMethod === 'card' ? 'Fund Platform Development' : 'Fund Platform Development'}
                 </>
               )}
             </Button>
