@@ -117,6 +117,82 @@ const boardMembers = [
   }
 ];
 
+const TokenPackage = ({ name, tokens, price, features }: { 
+  name: string;
+  tokens: string;
+  price: string;
+  features: string[];
+}) => (
+  <div className="relative p-6 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300 transform hover:scale-[1.02]">
+    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-teal-500/5 rounded-xl" />
+    <h3 className="text-2xl font-bold text-white mb-2">{name}</h3>
+    <div className="flex items-baseline gap-2 mb-4">
+      <span className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
+        {price}
+      </span>
+      <span className="text-white/60">USD</span>
+    </div>
+    <div className="text-xl font-semibold text-white mb-6">
+      {tokens} LGR Tokens
+    </div>
+    <ul className="space-y-3 mb-6">
+      {features.map((feature, index) => (
+        <li key={index} className="flex items-center gap-2 text-white/80">
+          <div className="h-5 w-5 rounded-full bg-teal-500/20 flex items-center justify-center">
+            <div className="h-2 w-2 rounded-full bg-teal-500" />
+          </div>
+          {feature}
+        </li>
+      ))}
+    </ul>
+    <Button 
+      className="w-full bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white"
+      onClick={() => window.open('https://docs.ledgerfund.finance/guides/buying-lgr', '_blank')}
+    >
+      Get Started
+    </Button>
+  </div>
+);
+
+const packages = [
+  {
+    name: "Starter",
+    tokens: "1,000",
+    price: "$100",
+    features: [
+      "Basic governance rights",
+      "Access to community forums",
+      "Vote on minor proposals",
+      "Basic reflection rewards"
+    ]
+  },
+  {
+    name: "Professional",
+    tokens: "5,000",
+    price: "$500",
+    features: [
+      "Enhanced governance power",
+      "Priority access to new features",
+      "Vote on all proposals",
+      "Higher reflection rewards",
+      "Access to exclusive events"
+    ]
+  },
+  {
+    name: "Enterprise",
+    tokens: "25,000",
+    price: "$2,500",
+    features: [
+      "Maximum governance power",
+      "First access to new features",
+      "Proposal creation rights",
+      "Maximum reflection rewards",
+      "VIP access to all events",
+      "Direct team communication"
+    ]
+  }
+];
+
 const IndexContent = () => {
   const navigate = useNavigate();
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
@@ -366,139 +442,11 @@ const IndexContent = () => {
             Join the revolution in firm ownership. LedgerFund DAO empowers accountants to collectively acquire, govern, and transform accounting practices through blockchain technology and democratic decision-making.
           </p>
 
-          {showPurchaseForm ? (
-            <div className="max-w-3xl mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-white">Purchase LGR Tokens</h2>
-                <button
-                  onClick={() => setShowPurchaseForm(false)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  ← Back
-                </button>
-              </div>
-              <TokenPurchaseForm />
-              <button 
-                onClick={() => window.open('https://www.ledgerfund.info/litepaper', '_blank')}
-                className="mt-4 text-gray-400 hover:text-white transition-colors text-sm w-full text-center"
-              >
-                New to crypto? Get started here
-              </button>
-            </div>
-          ) : (
-            <div className="max-w-3xl mx-auto">
-              
-              <div className="bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
-                <div className="mb-8">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 blur-xl animate-pulse" />
-                    <h2 className="relative text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-2 text-center">
-                      Presale
-                    </h2>
-                  </div>
-                </div>
-
-                <div className="text-center text-white/80 font-medium mb-4">
-                  UNTIL PRICE INCREASE
-                </div>
-
-                <div className="grid grid-cols-4 gap-8 mb-8">
-                  {[
-                    { label: 'DAYS', value: timeLeft.days },
-                    { label: 'HOURS', value: timeLeft.hours },
-                    { label: 'MINUTES', value: timeLeft.minutes },
-                    { label: 'SECONDS', value: timeLeft.seconds }
-                  ].map(({ label, value }) => (
-                    <div 
-                      key={label} 
-                      className="relative group perspective-3000"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                      <div className="relative bg-black/80 p-4 rounded-lg border border-yellow-500/30 transform transition-all duration-300 group-hover:translate-y-[-2px]">
-                        <div className="text-4xl font-bold text-white mb-2 text-center animate-[pulse_2s_ease-in-out_infinite]">
-                          {value}
-                        </div>
-                        <div className="text-sm text-gray-400 text-center">{label}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mb-8 relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-teal-500/10 blur-lg" />
-                  <div className="relative">
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="text-white text-lg">
-                        <span className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-300">
-                          {formatLargeNumber(totalSold)}
-                        </span>
-                        <span className="text-gray-400"> / </span> 
-                        <span className="text-gray-300">5M</span>
-                        <span className="text-gray-400 ml-2">LGR Tokens Sold</span>
-                      </div>
-                      <div className="text-teal-400 font-bold">
-                        {calculatePercentage()}%
-                      </div>
-                    </div>
-                    
-                    <div className="relative h-4 bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
-                      <div 
-                        className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 animate-pulse blur-sm"
-                      />
-                      <div 
-                        className="h-full bg-gradient-to-r from-yellow-500 to-teal-500 transition-all duration-1000 relative"
-                        style={{ 
-                          width: `${Math.min(100, (Number(totalSold) / Number(presaleSupply)) * 100)}%` 
-                        }}
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/50 to-teal-500/50 animate-pulse" />
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between items-center mt-2">
-                      <div className="text-center text-white/80 font-medium">
-                        90% DISCOUNT ACTIVE
-                      </div>
-                      <div className="text-center text-teal-400 font-medium">
-                        Current Price: {maticPrice} / $0.10 USD
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <button 
-                    onClick={handleBuyClick}
-                    className="group relative px-8 py-4 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-[1.02]"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
-                    <div className="relative flex items-center justify-center gap-3 text-white font-medium text-lg">
-                      <Trophy className="w-5 h-5" />
-                      <span>Buy with Card</span>
-                    </div>
-                  </button>
-                  
-                  <button 
-                    onClick={handleBuyClick}
-                    className="group relative px-8 py-4 bg-gradient-to-br from-yellow-500 to-teal-500 rounded-lg overflow-hidden transition-all duration-300 hover:scale-[1.02]"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/70 to-teal-500/70 blur-lg group-hover:blur-xl transition-all duration-300" />
-                    <div className="relative flex items-center justify-center gap-3 text-white font-medium text-lg">
-                      <Wallet className="w-5 h-5" />
-                      <span>Buy with Crypto</span>
-                    </div>
-                  </button>
-                </div>
-
-                <button 
-                  onClick={() => window.open('https://docs.ledgerfund.finance/guides/buying-lgr', '_blank')}
-                  className="mt-4 text-gray-400 hover:text-white transition-colors text-sm w-full text-center"
-                >
-                  New to crypto? Get started here
-                </button>
-              </div>
-            </div>
-          )}
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
+            {packages.map((pkg, index) => (
+              <TokenPackage key={index} {...pkg} />
+            ))}
+          </div>
         </div>
       </div>
 
