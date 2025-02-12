@@ -315,9 +315,6 @@ const IndexContent = () => {
                     <h3 className="text-2xl font-bold text-white mb-2">Starter</h3>
                     <div className="text-3xl font-bold text-yellow-500 mb-4">
                       $100 USD
-                      <div className="text-sm text-gray-400 font-normal">
-                        ≈ {maticPrice} MATIC
-                      </div>
                     </div>
                     <div className="text-xl text-white mb-6">1,000 LGR Tokens</div>
                     <ul className="space-y-3 text-gray-300 mb-6">
@@ -360,9 +357,6 @@ const IndexContent = () => {
                     <h3 className="text-2xl font-bold text-white mb-2">Professional</h3>
                     <div className="text-3xl font-bold text-yellow-500 mb-4">
                       $500 USD
-                      <div className="text-sm text-gray-400 font-normal">
-                        ≈ {maticPrice} MATIC
-                      </div>
                     </div>
                     <div className="text-xl text-white mb-6">5,000 LGR Tokens</div>
                     <ul className="space-y-3 text-gray-300 mb-6">
@@ -406,9 +400,6 @@ const IndexContent = () => {
                     <h3 className="text-2xl font-bold text-white mb-2">Partners</h3>
                     <div className="text-3xl font-bold text-yellow-500 mb-4">
                       $2,500 USD
-                      <div className="text-sm text-gray-400 font-normal">
-                        ≈ {maticPrice} MATIC
-                      </div>
                     </div>
                     <div className="text-xl text-white mb-6">25,000 LGR Tokens</div>
                     <ul className="space-y-3 text-gray-300 mb-6">
