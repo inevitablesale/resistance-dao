@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
@@ -25,29 +24,37 @@ export const PRESALE_END_TIME = 1746057600; // May 1, 2025
 export const TOTAL_PRESALE_SUPPLY = ethers.utils.parseUnits("5", 24); // 5 million tokens with 18 decimals
 export const USD_PRICE = ethers.utils.parseUnits("0.1", 18); // $0.10 per token
 
-// Array of RPC endpoints for redundancy
+// Updated array of RPC endpoints for redundancy with more reliable providers
 export const RPC_ENDPOINTS = [
-  "https://polygon-rpc.com",
-  "https://rpc-mainnet.matic.network",
-  "https://matic-mainnet.chainstacklabs.com",
-  "https://rpc-mainnet.maticvigil.com",
-  "https://rpc-mainnet.matic.quiknode.pro"
+  "https://polygon-mainnet.g.alchemy.com/v2/demo",
+  "https://polygon.llamarpc.com",
+  "https://polygon.rpc.blxrbdn.com",
+  "https://polygon-bor.publicnode.com",
+  "https://1rpc.io/matic"
 ];
 
 // Function to get a working RPC provider
 export const getWorkingProvider = async () => {
+  let lastError;
   for (const rpc of RPC_ENDPOINTS) {
     try {
       const provider = new ethers.providers.JsonRpcProvider(rpc);
-      // Test the connection
-      await provider.getNetwork();
+      // Test the connection with a timeout
+      const networkPromise = provider.getNetwork();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 3000)
+      );
+      
+      await Promise.race([networkPromise, timeoutPromise]);
+      console.log(`Connected to RPC: ${rpc}`);
       return provider;
     } catch (error) {
-      console.warn(`RPC ${rpc} failed, trying next one...`);
+      console.warn(`RPC ${rpc} failed, trying next one...`, error);
+      lastError = error;
       continue;
     }
   }
-  throw new Error("All RPC endpoints failed");
+  throw new Error(`All RPC endpoints failed. Last error: ${lastError?.message}`);
 };
 
 export const getPresaleContract = async (providerOrSigner: ethers.providers.Provider | ethers.Signer) => {
@@ -155,4 +162,3 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
     throw error;
   }
 };
-
