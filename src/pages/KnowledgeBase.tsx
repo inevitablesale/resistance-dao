@@ -151,7 +151,7 @@ export default function KnowledgeBase() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              Client Transfer Marketplace
+              Client Portfolio Marketplace
             </motion.h1>
             <motion.p 
               className="text-xl text-white/60 max-w-2xl mx-auto"
