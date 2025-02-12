@@ -8,7 +8,7 @@ import { purchaseTokens, fetchPresaleMaticPrice } from "@/services/presaleContra
 import { ethers } from "ethers";
 import { Loader2 } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
-import { WalletBalance } from "./WalletBalance";
+import { WalletAssets } from "@/components/wallet/WalletAssets";
 
 interface TokenPurchaseFormProps {
   initialAmount?: string;
@@ -98,7 +98,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
 
   return (
     <div className="space-y-4 w-full max-w-md mx-auto">
-      <WalletBalance />
+      <WalletAssets />
 
       <div className="space-y-2">
         <label htmlFor="maticAmount" className="block text-sm font-medium text-gray-200">

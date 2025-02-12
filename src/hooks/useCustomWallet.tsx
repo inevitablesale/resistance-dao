@@ -1,9 +1,8 @@
-
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
-export type WalletView = 'assets' | 'buy' | 'send' | 'history';
+export type WalletView = 'assets' | 'actions' | 'buy' | 'send' | 'history';
 
 export const useCustomWallet = () => {
   const { primaryWallet, setShowAuthFlow, user } = useDynamicContext();
