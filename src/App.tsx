@@ -36,22 +36,6 @@ function App() {
       EthereumWalletConnectors,
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
-    evmNetworks: [
-      {
-        chainId: 137,
-        name: 'Polygon',
-        vanityName: 'Polygon',
-        chainName: 'Polygon Mainnet',
-        // Setting this to ensure proper network handling
-        rpcUrls: ['https://polygon-rpc.com'],
-        blockExplorerUrls: ['https://polygonscan.com/'],
-        nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC',
-          decimals: 18,
-        },
-      },
-    ],
     events: {
       authFlowOpen: () => {
         console.log("[Dynamic SDK] Auth flow opened");
@@ -135,12 +119,6 @@ function App() {
           }
         }
       },
-      walletConnectorOptions: {
-        banxa: {
-          enabled: true,
-          environment: 'production'
-        }
-      },
       style: {
         buttonClassName: "dynamic-button",
         theme: "dark",
@@ -195,3 +173,4 @@ function App() {
 }
 
 export default App;
+
