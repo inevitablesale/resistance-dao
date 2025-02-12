@@ -18,6 +18,10 @@ import { Partners } from "@/components/Partners";
 import { FAQ } from "@/components/FAQ";
 import { usePurchase } from "../contexts/PurchaseContext";
 import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown } from "lucide-react";
+import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
+import { Button } from "@/components/ui/button";
+import { ethers } from "ethers";
+import { getPresaleContract, PRESALE_CONTRACT_ADDRESS } from "@/services/presaleContractService";
 
 const presaleData = [
   { 
