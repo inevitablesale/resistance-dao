@@ -18,6 +18,8 @@ interface TokenPurchaseFormProps {
   initialAmount?: string;
 }
 
+const TOKEN_USD_PRICE = 0.10; // Fixed price of $0.10 per token
+
 export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { enabled: banxaEnabled, open: openBanxa } = useOnramp();
@@ -58,12 +60,22 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
         setExpectedLGR(null);
         return;
       }
-      const maticPrice = await fetchPresaleMaticPrice();
-      const maticAmount = purchaseMethod === 'card' ? 
-        (Number(inputAmount) / maticUsdRate).toString() : 
-        inputAmount;
-      const expectedTokens = Number(maticAmount) / Number(maticPrice);
-      setExpectedLGR(expectedTokens.toFixed(2));
+
+      if (purchaseMethod === 'card') {
+        // For card purchases (USD), simply divide by token price ($0.10)
+        const tokenAmount = Number(inputAmount) / TOKEN_USD_PRICE;
+        setExpectedLGR(tokenAmount.toFixed(2));
+      } else {
+        // For MATIC purchases, use the contract's price
+        const maticPrice = await fetchPresaleMaticPrice();
+        if (maticPrice === "0") {
+          console.error("Failed to fetch MATIC price from contract");
+          setExpectedLGR(null);
+          return;
+        }
+        const expectedTokens = Number(inputAmount) / Number(maticPrice);
+        setExpectedLGR(expectedTokens.toFixed(2));
+      }
     } catch (error) {
       console.error("Error calculating expected LGR:", error);
       setExpectedLGR(null);
@@ -236,3 +248,4 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     </div>
   );
 };
+
