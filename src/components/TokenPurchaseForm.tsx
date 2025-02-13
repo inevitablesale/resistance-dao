@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Input } from "@/components/ui/input";
@@ -38,6 +37,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   const [maticAmount, setMaticAmount] = useState(initialAmount || "");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const [expectedLGR, setExpectedLGR] = useState<string | null>(null);
   const [usdAmount, setUsdAmount] = useState("");
@@ -50,14 +50,18 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
 
   const updatePrices = async () => {
     setIsLoadingPrices(true);
+    setError(null);
     try {
+      console.log('Updating prices...');
       const rates = await fetchConversionRates();
+      console.log('Received rates:', rates);
       setConversionRates(rates);
     } catch (error) {
-      console.error("Error updating prices:", error);
+      console.error("Price update failed:", error);
+      setError("Failed to fetch latest prices");
       toast({
         title: "Price Update Failed",
-        description: "Using cached prices. Please try again.",
+        description: "Unable to fetch current prices. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -93,8 +97,12 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   };
 
   const calculateConversions = (usdValue: string) => {
+    console.log('Calculating conversions with rates:', conversionRates);
     const usd = Number(usdValue);
-    if (isNaN(usd) || !conversionRates.usdToMatic || !conversionRates.maticToLgr) return null;
+    if (isNaN(usd) || !conversionRates.usdToMatic || !conversionRates.maticToLgr) {
+      console.log('Invalid input or missing rates');
+      return null;
+    }
 
     // Add 1% buffer to account for price movement
     const bufferedUsdToMatic = conversionRates.usdToMatic * 1.01;
@@ -103,10 +111,12 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     const maticAmount = usd / bufferedUsdToMatic;
     const lgrAmount = maticAmount / bufferedMaticToLgr;
 
-    return {
+    const result = {
       matic: maticAmount.toFixed(2),
       lgr: lgrAmount.toFixed(2)
     };
+    console.log('Conversion result:', result);
+    return result;
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -395,7 +405,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                 placeholder="Enter USD amount"
                 min="30"
                 step="1"
-                disabled={isProcessing || isLoadingPrices || !conversionRates.usdToMatic}
+                disabled={isProcessing || isLoadingPrices}
                 className="bg-black/20 border-white/10 text-white placeholder:text-gray-400 pl-7"
               />
             </div>
@@ -408,7 +418,11 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
             </div>
           </div>
 
-          {conversions && (
+          {error ? (
+            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <p className="text-sm text-red-400">{error}</p>
+            </div>
+          ) : conversions && (
             <div className="space-y-4 bg-black/30 rounded-lg p-4">
               <h4 className="text-sm font-medium text-gray-200 mb-3">Conversion Path</h4>
               
@@ -424,7 +438,16 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                 </div>
                 
                 <div className="text-xs text-gray-400 text-center">
-                  Current rate: ${conversionRates.usdToMatic.toFixed(2)}/MATIC
+                  {isLoadingPrices ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      <span>Updating rates...</span>
+                    </div>
+                  ) : error ? (
+                    <span className="text-red-400">{error}</span>
+                  ) : (
+                    <span>Current rate: ${conversionRates.usdToMatic.toFixed(2)}/MATIC</span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -438,7 +461,16 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                 </div>
                 
                 <div className="text-xs text-gray-400 text-center">
-                  Current rate: {conversionRates.maticToLgr.toFixed(4)} MATIC/LGR
+                  {isLoadingPrices ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      <span>Updating rates...</span>
+                    </div>
+                  ) : error ? (
+                    <span className="text-red-400">{error}</span>
+                  ) : (
+                    <span>Current rate: {conversionRates.maticToLgr.toFixed(4)} MATIC/LGR</span>
+                  )}
                 </div>
               </div>
 
@@ -470,7 +502,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
 
           <Button
             onClick={handleCreditCardPayment}
-            disabled={isProcessing || !usdAmount || Number(usdAmount) < 30 || isLoadingPrices || !conversionRates.usdToMatic}
+            disabled={isProcessing || !usdAmount || Number(usdAmount) < 30 || isLoadingPrices || Boolean(error)}
             className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
           >
             {isProcessing ? (

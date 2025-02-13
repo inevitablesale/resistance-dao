@@ -157,19 +157,34 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
 
 export const fetchConversionRates = async () => {
   try {
+    console.log('Fetching conversion rates...');
+    
     const provider = await getWorkingProvider();
+    console.log('Provider connected');
+    
     const contract = await getPresaleContract(provider);
+    console.log('Contract instance created');
     
     const maticUsdPrice = await contract.getLatestMaticPrice();
-    const lgrMaticPrice = await contract.getLGRPrice();
+    console.log('MATIC USD price:', maticUsdPrice.toString());
     
-    return {
+    const lgrMaticPrice = await contract.getLGRPrice();
+    console.log('LGR MATIC price:', lgrMaticPrice.toString());
+    
+    const rates = {
       usdToMatic: Number(ethers.utils.formatUnits(maticUsdPrice, 18)),
       maticToLgr: Number(ethers.utils.formatEther(lgrMaticPrice)),
       lastUpdated: new Date()
     };
+    
+    console.log('Formatted rates:', rates);
+    return rates;
   } catch (error) {
-    console.error("Error fetching conversion rates:", error);
+    console.error("Error details:", {
+      message: error.message,
+      code: error.code,
+      data: error.data
+    });
     throw error;
   }
 };
