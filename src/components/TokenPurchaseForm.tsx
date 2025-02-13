@@ -257,7 +257,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-white mb-2">Choose Investment Package</h2>
-        <p className="text-gray-400">Select your preferred tokenized firm investment tier</p>
+        <p className="text-gray-400">Select your preferred investment tier</p>
       </div>
 
       <div className="grid gap-6">
@@ -279,7 +279,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
             }}
             className="w-full p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-colors group text-left"
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
                   <pkg.icon className="w-6 h-6 text-yellow-500" />
@@ -293,15 +293,6 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                 <p className="text-lg font-bold text-white">${pkg.amount}</p>
                 <p className="text-sm text-gray-400">USD</p>
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              {pkg.features.map((feature, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-sm text-gray-400">
-                  <CheckCircle2 className="h-4 w-4 text-yellow-500" />
-                  <span>{feature}</span>
-                </div>
-              ))}
             </div>
           </button>
         ))}
