@@ -82,13 +82,13 @@ export const SystemWeDeserve = () => {
               ref={el => boxRefs.current[1] = el}
               className="cosmic-box teal-energy right-drain p-4 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20"
             >
-              A decentralized organization where smart contracts automate investments, revenue sharing, and governance.
+              A solution to the scarcity of quality firms by combining resources to access premium practices typically out of reach.
             </p>
             <p 
               ref={el => boxRefs.current[2] = el}
               className="cosmic-box yellow-energy right-drain p-4 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20"
             >
-              A community-governed network that aligns the interests of accountants, investors, and firms.
+              A non-custodial system where investors maintain direct control of their assets without intermediaries.
             </p>
           </div>
         </div>
