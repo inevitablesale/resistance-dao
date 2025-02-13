@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
@@ -156,3 +155,21 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
   }
 };
 
+export const fetchConversionRates = async () => {
+  try {
+    const provider = await getWorkingProvider();
+    const contract = await getPresaleContract(provider);
+    
+    const maticUsdPrice = await contract.getLatestMaticPrice();
+    const lgrMaticPrice = await contract.getLGRPrice();
+    
+    return {
+      usdToMatic: Number(ethers.utils.formatUnits(maticUsdPrice, 18)),
+      maticToLgr: Number(ethers.utils.formatEther(lgrMaticPrice)),
+      lastUpdated: new Date()
+    };
+  } catch (error) {
+    console.error("Error fetching conversion rates:", error);
+    throw error;
+  }
+};

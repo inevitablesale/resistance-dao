@@ -4,17 +4,17 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { purchaseTokens, fetchPresaleMaticPrice } from "@/services/presaleContractService";
+import { purchaseTokens, fetchPresaleMaticPrice, fetchConversionRates } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Loader2, ArrowLeft, CreditCard, CheckCircle2, ArrowRight } from "lucide-react";
+import { Loader2, ArrowLeft, CreditCard, CheckCircle2, ArrowRight, RefreshCw } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletAssets } from "@/components/wallet/WalletAssets";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
+import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -25,23 +25,51 @@ interface TokenPurchaseFormProps {
   initialAmount?: string;
 }
 
+interface ConversionRates {
+  usdToMatic: number;
+  maticToLgr: number;
+  lastUpdated?: Date;
+}
+
 export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { showBanxaDeposit } = useCustomWallet();
   const [currentView, setCurrentView] = useState<PurchaseView>('payment-select');
   const [maticAmount, setMaticAmount] = useState(initialAmount || "");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const { toast } = useToast();
   const [expectedLGR, setExpectedLGR] = useState<string | null>(null);
-  
-  // Move card payment related state to the top level
   const [usdAmount, setUsdAmount] = useState("");
-  const [conversionRates] = useState({
-    usdToMatic: 1.25, // Example rate, should be fetched from an API
-    maticToLgr: 0.24  // Example rate, calculated from contract
+  const [conversionRates, setConversionRates] = useState<ConversionRates>({
+    usdToMatic: 0,
+    maticToLgr: 0
   });
 
   useBalanceMonitor();
+
+  const updatePrices = async () => {
+    setIsLoadingPrices(true);
+    try {
+      const rates = await fetchConversionRates();
+      setConversionRates(rates);
+    } catch (error) {
+      console.error("Error updating prices:", error);
+      toast({
+        title: "Price Update Failed",
+        description: "Using cached prices. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingPrices(false);
+    }
+  };
+
+  useEffect(() => {
+    updatePrices();
+    const interval = setInterval(updatePrices, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (initialAmount) {
@@ -66,10 +94,14 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
 
   const calculateConversions = (usdValue: string) => {
     const usd = Number(usdValue);
-    if (isNaN(usd)) return null;
+    if (isNaN(usd) || !conversionRates.usdToMatic || !conversionRates.maticToLgr) return null;
 
-    const maticAmount = usd / conversionRates.usdToMatic;
-    const lgrAmount = maticAmount / conversionRates.maticToLgr;
+    // Add 1% buffer to account for price movement
+    const bufferedUsdToMatic = conversionRates.usdToMatic * 1.01;
+    const bufferedMaticToLgr = conversionRates.maticToLgr * 1.01;
+
+    const maticAmount = usd / bufferedUsdToMatic;
+    const lgrAmount = maticAmount / bufferedMaticToLgr;
 
     return {
       matic: maticAmount.toFixed(2),
@@ -315,26 +347,37 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     return (
       <Card className="w-full max-w-md mx-auto bg-black/20 border-white/10">
         <CardHeader>
-          <div className="flex items-center">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setCurrentView('payment-select')}
+                className="mr-2 text-white hover:text-white/80 hover:bg-white/10"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                  <CreditCard className="w-3 h-3 text-yellow-500" />
+                </div>
+                <div>
+                  <CardTitle className="text-white">Card Payment</CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Enter purchase amount in USD
+                  </CardDescription>
+                </div>
+              </div>
+            </div>
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setCurrentView('payment-select')}
-              className="mr-2 text-white hover:text-white/80 hover:bg-white/10"
+              onClick={updatePrices}
+              disabled={isLoadingPrices}
+              className="text-white hover:text-white/80 hover:bg-white/10"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <RefreshCw className={cn("h-4 w-4", isLoadingPrices && "animate-spin")} />
             </Button>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                <CreditCard className="w-3 h-3 text-yellow-500" />
-              </div>
-              <div>
-                <CardTitle className="text-white">Card Payment</CardTitle>
-                <CardDescription className="text-gray-400">
-                  Enter purchase amount in USD
-                </CardDescription>
-              </div>
-            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -352,13 +395,17 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                 placeholder="Enter USD amount"
                 min="30"
                 step="1"
-                disabled={isProcessing}
+                disabled={isProcessing || isLoadingPrices || !conversionRates.usdToMatic}
                 className="bg-black/20 border-white/10 text-white placeholder:text-gray-400 pl-7"
               />
             </div>
-            <p className="text-sm text-gray-400">
-              Minimum purchase amount: $30 USD
-            </p>
+            <div className="flex items-center justify-between text-sm text-gray-400">
+              <span>Minimum purchase amount: $30 USD</span>
+              <div className="flex items-center gap-2">
+                <span>Live rates</span>
+                {isLoadingPrices ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+              </div>
+            </div>
           </div>
 
           {conversions && (
@@ -377,7 +424,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                 </div>
                 
                 <div className="text-xs text-gray-400 text-center">
-                  Current rate: ${conversionRates.usdToMatic}/MATIC
+                  Current rate: ${conversionRates.usdToMatic.toFixed(2)}/MATIC
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -391,7 +438,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                 </div>
                 
                 <div className="text-xs text-gray-400 text-center">
-                  Current rate: {conversionRates.maticToLgr} MATIC/LGR
+                  Current rate: {conversionRates.maticToLgr.toFixed(4)} MATIC/LGR
                 </div>
               </div>
 
@@ -410,6 +457,12 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                     <span>Network:</span>
                     <span>Polygon</span>
                   </li>
+                  {conversionRates.lastUpdated && (
+                    <li className="flex justify-between">
+                      <span>Last updated:</span>
+                      <span>{new Date(conversionRates.lastUpdated).toLocaleTimeString()}</span>
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>
@@ -417,7 +470,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
 
           <Button
             onClick={handleCreditCardPayment}
-            disabled={isProcessing || !usdAmount || Number(usdAmount) < 30}
+            disabled={isProcessing || !usdAmount || Number(usdAmount) < 30 || isLoadingPrices || !conversionRates.usdToMatic}
             className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
           >
             {isProcessing ? (
