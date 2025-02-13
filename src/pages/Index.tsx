@@ -121,7 +121,7 @@ const boardMembers = [
 const processSteps = [
   {
     title: "Build Your Thesis",
-    description: "Join a community of experts to identify ideal accounting practices based on size, revenue, services, and growth potential",
+    description: "Join a community of like-minded investors to propose and develop investment strategies for accounting practices you want to acquire",
     icon: Trophy,
     color: "yellow",
     className: "cosmic-box yellow-energy"
@@ -313,13 +313,13 @@ const IndexContent = () => {
               onClick={() => setShowPurchaseForm(true)}
               className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-lg font-bold text-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105"
             >
-              GET STARTED
+              Buy Token
             </button>
             <button 
               onClick={() => window.open('https://docs.ledgerfund.finance', '_blank')}
               className="px-8 py-4 bg-white/10 text-white rounded-lg font-bold text-lg hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
             >
-              LEARN MORE
+              Book a Demo
             </button>
           </div>
 
