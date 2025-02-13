@@ -37,10 +37,10 @@ const IndexContent = () => {
     <>
       <div className="text-center mb-8 max-w-5xl mx-auto pt-32">
         <h1 className="text-6xl md:text-7xl font-bold mb-6 text-white leading-tight">
-          Invest in the Future of<br />Accounting Practice Ownership
+          Own the Future of<br />Accounting Practices
         </h1>
         <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
-          Join our $500,000 funding round to revolutionize accounting firm acquisitions. Secure your tokens starting at just $100.
+          Be part of our $500,000 investment round to build a better model for accounting practice succession. Minimum investment: $100.
         </p>
 
         <div className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto px-4 mb-12">
@@ -56,7 +56,7 @@ const IndexContent = () => {
             <CreditCard className="w-8 h-8 text-teal-500 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-3">Easy Payment</h3>
             <p className="text-gray-300">
-              Buy with credit card or bank transfer
+              Purchase securely with credit card
             </p>
           </Card>
 
