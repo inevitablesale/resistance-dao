@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { purchaseTokens, fetchPresaleMaticPrice, fetchConversionRates } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Loader2, ArrowLeft, CreditCard, CheckCircle2, ArrowRight, RefreshCw } from "lucide-react";
+import { Loader2, ArrowLeft, CreditCard, CheckCircle2, ArrowRight, RefreshCw, Copy } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletAssets } from "@/components/wallet/WalletAssets";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -196,6 +196,24 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     }
   };
 
+  const copyAddressToClipboard = async () => {
+    if (primaryWallet?.address) {
+      try {
+        await navigator.clipboard.writeText(primaryWallet.address);
+        toast({
+          title: "Address Copied",
+          description: "Wallet address copied to clipboard",
+        });
+      } catch (error) {
+        toast({
+          title: "Copy Failed",
+          description: "Failed to copy address to clipboard",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   const renderPaymentSelect = () => (
     <div className="space-y-6 w-full max-w-md mx-auto">
       <div className="text-center mb-8">
@@ -309,6 +327,22 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        {primaryWallet?.address && (
+          <div className="flex items-center gap-2 p-3 bg-black/30 rounded-lg">
+            <div className="flex-1 text-sm text-gray-300 font-mono truncate">
+              {primaryWallet.address}
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={copyAddressToClipboard}
+              className="text-gray-400 hover:text-white"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+
         <div className="space-y-2">
           <label htmlFor="maticAmount" className="block text-sm font-medium text-gray-200">
             Amount in MATIC
