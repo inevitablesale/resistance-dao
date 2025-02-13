@@ -61,7 +61,8 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
             <p>• Minimum purchase: $30 USD</p>
             <p>• Major cards accepted</p>
             <p>• Secure payment processing</p>
-            <p>• Purchase MATIC which will be used to buy LGR tokens</p>
+            <p>• Click "Deposit" then "Buy Crypto" to purchase POLY</p>
+            <p>• Your POLY will be used to buy LGR tokens</p>
           </div>
         </div>
 
