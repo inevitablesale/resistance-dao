@@ -254,6 +254,7 @@ const IndexContent = () => {
         className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 min-h-[120vh] flex flex-col items-center justify-start"
       >
         <div className="fixed inset-0 z-0">
+          <div className="circuit-board" />
           <div 
             className="absolute inset-0 animate-parallax-slow"
             style={{
@@ -269,69 +270,6 @@ const IndexContent = () => {
         </div>
 
         <div 
-          className="fixed inset-0 z-2 perspective-3000" 
-          style={{
-            ...parallaxStyle,
-            transform: `scale(${1 + scrollProgress * 1.5})`,
-          }}
-        >
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div 
-              className="w-[800px] h-[800px] relative"
-              style={{
-                transform: `translateZ(${scrollProgress * 200}px)`,
-                transition: 'transform 0.5s ease-out'
-              }}
-            >
-              <div 
-                className={`absolute inset-0 rounded-full bg-black transition-all duration-1000 ${isLoaded ? 'scale-100' : 'scale-0'}`}
-                style={{
-                  boxShadow: `
-                    0 0 ${100 + scrollProgress * 200}px ${20 + scrollProgress * 40}px rgba(234, 179, 8, 0.4),
-                    0 0 ${200 + scrollProgress * 400}px ${40 + scrollProgress * 80}px rgba(20, 184, 166, 0.3),
-                    0 0 ${300 + scrollProgress * 600}px ${60 + scrollProgress * 120}px rgba(234, 179, 8, 0.2)
-                  `,
-                  transform: `scale(${0.2 + scrollProgress * 1.8})`,
-                }}
-              />
-              
-              <div 
-                className={`absolute inset-0 rounded-full animate-cosmic-pulse transition-all duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-                style={{
-                  background: `
-                    radial-gradient(circle at center,
-                      rgba(0, 0, 0, 1) 0%,
-                      rgba(234, 179, 8, ${0.3 + scrollProgress * 0.7}) 30%,
-                      rgba(20, 184, 166, ${0.2 + scrollProgress * 0.6}) 50%,
-                      rgba(234, 179, 8, ${0.1 + scrollProgress * 0.5}) 70%,
-                      transparent 90%
-                    )
-                  `,
-                  transform: `scale(${0.5 + scrollProgress * 1.5}) rotate(${scrollProgress * 360}deg)`,
-                }}
-              />
-              
-              <div 
-                className={`absolute inset-0 rounded-full transition-all duration-1000 ${isLoaded ? 'scale-100' : 'scale-0'}`}
-                style={{
-                  background: `
-                    radial-gradient(circle at center,
-                      rgba(0, 0, 0, 0.9) 0%,
-                      rgba(234, 179, 8, ${0.1 + scrollProgress * 0.4}) 40%,
-                      rgba(20, 184, 166, ${0.1 + scrollProgress * 0.3}) 60%,
-                      rgba(234, 179, 8, ${0.05 + scrollProgress * 0.25}) 80%,
-                      transparent 90%
-                    )
-                  `,
-                  border: '2px solid rgba(234, 179, 8, 0.5)',
-                  transform: `scale(${0.8 + scrollProgress * 1.7})`,
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div 
           ref={presaleRef}
           className="relative z-3 mt-[30vh]" 
           style={{
@@ -340,179 +278,32 @@ const IndexContent = () => {
           }}
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Transform Your Practice<br />Into Liquid Assets
+            The Future of Private<br />Equity is Digital
           </h1>
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
+          <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
+            We are eliminating the barriers to invest-in, trade, and leverage exclusive real estate, private equity, and other real-world assets through decentralized finance ("DeFi").
+          </p>
+          <button 
+            onClick={() => setShowPurchaseForm(true)}
+            className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-lg font-bold text-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105"
+          >
+            GET STARTED
+          </button>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mt-24">
             <div className="cosmic-box yellow-energy p-6 rounded-lg backdrop-blur-sm relative">
-              <h3 className="text-xl font-bold text-yellow-500 mb-2">Build Your Thesis</h3>
-              <p className="text-white/80">Transform client relationships into predictable revenue streams</p>
+              <h3 className="text-xl font-bold text-yellow-500 mb-2">Buy</h3>
+              <p className="text-white/80">Acquire ownership in top-performing accounting firms</p>
             </div>
             <div className="cosmic-box teal-energy p-6 rounded-lg backdrop-blur-sm relative">
-              <h3 className="text-xl font-bold text-teal-500 mb-2">Create Liquidity Pools</h3>
-              <p className="text-white/80">Pool resources with other accountants to acquire and scale practices</p>
+              <h3 className="text-xl font-bold text-teal-500 mb-2">Trade</h3>
+              <p className="text-white/80">Exchange firm ownership with other investors</p>
             </div>
             <div className="cosmic-box yellow-energy p-6 rounded-lg backdrop-blur-sm relative">
-              <h3 className="text-xl font-bold text-yellow-500 mb-2">Acquire Firms</h3>
-              <p className="text-white/80">Use smart contracts to automate practice acquisitions and governance</p>
+              <h3 className="text-xl font-bold text-yellow-500 mb-2">Leverage</h3>
+              <p className="text-white/80">Use your ownership as collateral for DeFi loans</p>
             </div>
           </div>
-
-          {showPurchaseForm ? (
-            <div className="max-w-3xl mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-white">Purchase LGR Tokens</h2>
-                <button
-                  onClick={() => setShowPurchaseForm(false)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  ← Back
-                </button>
-              </div>
-              <TokenPurchaseForm initialAmount={selectedAmount} />
-            </div>
-          ) : (
-            <div className="max-w-6xl mx-auto px-4">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
-                Become an Early Supporter
-              </h2>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="relative group perspective-3000">
-                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                  <div className="relative bg-black/60 backdrop-blur-sm p-8 rounded-lg border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300 transform group-hover:translate-y-[-2px]">
-                    <h3 className="text-2xl font-bold text-white mb-2">Starter</h3>
-                    <div className="text-3xl font-bold text-yellow-500 mb-4">
-                      $100 USD
-                    </div>
-                    <div className="text-xl text-white mb-6">1,000 LGR Tokens</div>
-                    <ul className="space-y-3 text-gray-300 mb-6">
-                      <li className="flex items-center">
-                        <Award className="w-5 h-5 text-yellow-500 mr-2" />
-                        Early Supporter Status
-                      </li>
-                      <li className="flex items-center">
-                        <Vote className="w-5 h-5 text-yellow-500 mr-2" />
-                        Early Access to DAO Governance
-                      </li>
-                      <li className="flex items-center">
-                        <Users className="w-5 h-5 text-yellow-500 mr-2" />
-                        First Wave Community Access
-                      </li>
-                      <li className="flex items-center">
-                        <Star className="w-5 h-5 text-yellow-500 mr-2" />
-                        Foundation Member Benefits
-                      </li>
-                      <li className="flex items-center">
-                        <Rocket className="w-5 h-5 text-yellow-500 mr-2" />
-                        Early Protocol Participation
-                      </li>
-                    </ul>
-                    <Button
-                      onClick={() => handleTierSelect("100")}
-                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold"
-                    >
-                      Get Started
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="relative group perspective-3000">
-                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/40 to-teal-500/40 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                  <div className="relative bg-black/60 backdrop-blur-sm p-8 rounded-lg border border-yellow-500/30 hover:border-yellow-500/50 transition-all duration-300 transform group-hover:translate-y-[-2px] scale-105">
-                    <div className="absolute -top-4 right-4 bg-gradient-to-r from-yellow-500 to-teal-500 text-black text-sm font-bold px-3 py-1 rounded-full">
-                      Popular
-                    </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">Professional</h3>
-                    <div className="text-3xl font-bold text-yellow-500 mb-4">
-                      $500 USD
-                    </div>
-                    <div className="text-xl text-white mb-6">5,000 LGR Tokens</div>
-                    <ul className="space-y-3 text-gray-300 mb-6">
-                      <li className="flex items-center">
-                        <Crown className="w-5 h-5 text-yellow-500 mr-2" />
-                        Founding Member Status
-                      </li>
-                      <li className="flex items-center">
-                        <Shield className="w-5 h-5 text-yellow-500 mr-2" />
-                        Priority Access to DAO Features
-                      </li>
-                      <li className="flex items-center">
-                        <Vote className="w-5 h-5 text-yellow-500 mr-2" />
-                        Advanced Governance Access
-                      </li>
-                      <li className="flex items-center">
-                        <Star className="w-5 h-5 text-yellow-500 mr-2" />
-                        Enhanced Early Supporter Benefits
-                      </li>
-                      <li className="flex items-center">
-                        <Rocket className="w-5 h-5 text-yellow-500 mr-2" />
-                        First-Round Investment Access
-                      </li>
-                      <li className="flex items-center">
-                        <Award className="w-5 h-5 text-yellow-500 mr-2" />
-                        Pioneer Community Status
-                      </li>
-                    </ul>
-                    <Button
-                      onClick={() => handleTierSelect("500")}
-                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold"
-                    >
-                      Get Started
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="relative group perspective-3000">
-                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-teal-500/30 rounded-lg blur-md transform group-hover:scale-110 transition-transform duration-300" />
-                  <div className="relative bg-black/60 backdrop-blur-sm p-8 rounded-lg border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-300 transform group-hover:translate-y-[-2px]">
-                    <h3 className="text-2xl font-bold text-white mb-2">Partners</h3>
-                    <div className="text-3xl font-bold text-yellow-500 mb-4">
-                      $2,500 USD
-                    </div>
-                    <div className="text-xl text-white mb-6">25,000 LGR Tokens</div>
-                    <ul className="space-y-3 text-gray-300 mb-6">
-                      <li className="flex items-center">
-                        <Crown className="w-5 h-5 text-yellow-500 mr-2" />
-                        Founding Partner Status
-                      </li>
-                      <li className="flex items-center">
-                        <Rocket className="w-5 h-5 text-yellow-500 mr-2" />
-                        First-Access to All Features
-                      </li>
-                      <li className="flex items-center">
-                        <Vote className="w-5 h-5 text-yellow-500 mr-2" />
-                        Pioneer Governance Rights
-                      </li>
-                      <li className="flex items-center">
-                        <Star className="w-5 h-5 text-yellow-500 mr-2" />
-                        Maximum Early Supporter Benefits
-                      </li>
-                      <li className="flex items-center">
-                        <Shield className="w-5 h-5 text-yellow-500 mr-2" />
-                        Strategic Partner Access
-                      </li>
-                      <li className="flex items-center">
-                        <Award className="w-5 h-5 text-yellow-500 mr-2" />
-                        Foundation Builder Status
-                      </li>
-                    </ul>
-                    <Button
-                      onClick={() => handleTierSelect("2500")}
-                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold"
-                    >
-                      Get Started
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <button 
-                onClick={() => window.open('https://docs.ledgerfund.finance/guides/buying-lgr', '_blank')}
-                className="mt-4 text-gray-400 hover:text-white transition-colors text-sm w-full text-center"
-              >
-                New to crypto? Get started here
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
