@@ -1,4 +1,3 @@
-
 import { Card } from "./ui/card";
 import { Milestone } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -39,45 +38,38 @@ export const Roadmap = () => {
       title: "Phase 1: Foundation",
       subtitle: "Q1 2025",
       items: [
-        "Market Analysis & Strategic Partnerships",
-        "Tokenomics Development & Whitepaper",
-        "Smart Contract Development & Audit"
+        "Website Development",
+        "Token Contract Development",
+        "Presale Contract Development",
+        "Listed on top100token.com",
+        "Listed on coinmooner.com",
+        "Applied for Polygon Community Grant",
+        "Developed Litepaper",
+        "Launched Presale"
       ]
     },
     {
-      title: "Phase 2: Private Sale",
+      title: "Phase 2: Growth & Integration",
       subtitle: "Q2 2025",
       items: [
-        "Launch Private Token Sale",
-        "Investor Dashboard Development",
-        "Secondary Marketplace Launch"
+        "Apply for Direct Listing with Banxa",
+        "Onboard Partners into Ecosystem",
+        "Launch LedgerFren NFT Platform",
+        "Form DAO in Wyoming",
+        "Launch Community",
+        "Continue Marketing Campaign",
+        "Expand Strategic Partnerships"
       ]
     },
     {
-      title: "Phase 3: Public Sale",
+      title: "Phase 3: Infrastructure & Deal Flow",
       subtitle: "Q3 2025",
       items: [
-        "Launch Public Presale",
-        "Marketing Campaign Execution",
-        "Begin Acquisition Planning"
-      ]
-    },
-    {
-      title: "Phase 4: First Acquisition",
-      subtitle: "Q4 2025",
-      items: [
-        "First Firm Acquisition",
-        "Operational Transition",
-        "Performance Metrics Sharing"
-      ]
-    },
-    {
-      title: "Phase 5: Scaling",
-      subtitle: "Q1-Q2 2026",
-      items: [
-        "Secondary Market Expansion",
-        "Portfolio Growth",
-        "Profit Reinvestment"
+        "Integrate flowinc.com for SPV Management",
+        "Build Deal Flow Bounties System",
+        "Deploy Deal Thesis Framework",
+        "Deploy Liquidity Pool UI and Allocation Voting",
+        "Launch Community Governance"
       ]
     }
   ];
