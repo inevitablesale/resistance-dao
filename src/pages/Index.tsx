@@ -118,6 +118,30 @@ const boardMembers = [
   }
 ];
 
+const processSteps = [
+  {
+    title: "Build Your Thesis",
+    description: "Transform client relationships into predictable revenue streams",
+    icon: Trophy,
+    color: "yellow",
+    className: "cosmic-box yellow-energy"
+  },
+  {
+    title: "Create Liquidity Pools",
+    description: "Pool resources with other accountants to acquire and scale practices",
+    icon: Users,
+    color: "teal",
+    className: "cosmic-box teal-energy"
+  },
+  {
+    title: "Manage Firms",
+    description: "Leverage centralized services model to separate work from accounts, creating scalable digital assets",
+    icon: Crown,
+    color: "yellow",
+    className: "cosmic-box yellow-energy"
+  }
+];
+
 const IndexContent = () => {
   const navigate = useNavigate();
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
@@ -271,7 +295,7 @@ const IndexContent = () => {
 
         <div 
           ref={presaleRef}
-          className="relative z-3 mt-[30vh]" 
+          className="relative z-3 mt-[20vh]" 
           style={{
             ...parallaxStyle,
             transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * -50}px)`
@@ -283,26 +307,43 @@ const IndexContent = () => {
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
             We are eliminating the barriers to invest-in, trade, and leverage exclusive real estate, private equity, and other real-world assets through decentralized finance ("DeFi").
           </p>
-          <button 
-            onClick={() => setShowPurchaseForm(true)}
-            className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-lg font-bold text-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105"
-          >
-            GET STARTED
-          </button>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mt-24">
-            <div className="cosmic-box yellow-energy p-6 rounded-lg backdrop-blur-sm relative">
-              <h3 className="text-xl font-bold text-yellow-500 mb-2">Buy</h3>
-              <p className="text-white/80">Acquire ownership in top-performing accounting firms</p>
-            </div>
-            <div className="cosmic-box teal-energy p-6 rounded-lg backdrop-blur-sm relative">
-              <h3 className="text-xl font-bold text-teal-500 mb-2">Trade</h3>
-              <p className="text-white/80">Exchange firm ownership with other investors</p>
-            </div>
-            <div className="cosmic-box yellow-energy p-6 rounded-lg backdrop-blur-sm relative">
-              <h3 className="text-xl font-bold text-yellow-500 mb-2">Leverage</h3>
-              <p className="text-white/80">Use your ownership as collateral for DeFi loans</p>
-            </div>
+          <div className="flex gap-4 justify-center mb-24">
+            <button 
+              onClick={() => setShowPurchaseForm(true)}
+              className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-lg font-bold text-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105"
+            >
+              GET STARTED
+            </button>
+            <button 
+              onClick={() => window.open('https://docs.ledgerfund.finance', '_blank')}
+              className="px-8 py-4 bg-white/10 text-white rounded-lg font-bold text-lg hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
+            >
+              LEARN MORE
+            </button>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto relative">
+            {processSteps.map((step, index) => (
+              <div 
+                key={index}
+                className={`${step.className} p-8 rounded-xl backdrop-blur-sm relative overflow-hidden group transition-all duration-500 hover:scale-105`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-0" />
+                <div className="relative z-10">
+                  <div className="mb-6">
+                    <step.icon className={`w-12 h-12 mx-auto text-${step.color}-500 animate-cosmic-pulse`} />
+                  </div>
+                  <h3 className={`text-2xl font-bold text-${step.color}-500 mb-4`}>
+                    {step.title}
+                  </h3>
+                  <p className="text-white/80 text-lg">
+                    {step.description}
+                  </p>
+                </div>
+                <div className="absolute inset-0 border border-white/10 rounded-xl z-20 pointer-events-none" />
+              </div>
+            ))}
           </div>
         </div>
       </div>
