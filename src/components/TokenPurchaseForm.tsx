@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { purchaseTokens, fetchPresaleMaticPrice, fetchConversionRates } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Loader2, ArrowLeft, CreditCard, CheckCircle2, ArrowRight, RefreshCw, Copy } from "lucide-react";
+import { Loader2, ArrowLeft, CreditCard, CheckCircle2, ArrowRight, RefreshCw, Copy, Building2, Wallet, ChartBar } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletAssets } from "@/components/wallet/WalletAssets";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -18,7 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-type PurchaseView = 'payment-select' | 'polygon-amount' | 'card-amount';
+type PurchaseView = 'packages' | 'payment-select' | 'polygon-amount' | 'card-amount';
 
 interface TokenPurchaseFormProps {
   initialAmount?: string;
@@ -30,10 +30,49 @@ interface ConversionRates {
   lastUpdated?: Date;
 }
 
+const investmentPackages = [
+  {
+    name: "Starter",
+    amount: "100",
+    lgrAmount: "1,000",
+    features: [
+      "Access to firm token marketplace",
+      "Voting rights on firm acquisitions",
+      "Monthly dividend distributions",
+      "Basic governance participation"
+    ],
+    icon: Building2
+  },
+  {
+    name: "Growth",
+    amount: "500",
+    lgrAmount: "5,000",
+    features: [
+      "Enhanced voting power",
+      "Priority access to new firm listings",
+      "Quarterly performance reports",
+      "Committee participation rights"
+    ],
+    icon: ChartBar
+  },
+  {
+    name: "Professional",
+    amount: "1000",
+    lgrAmount: "10,000",
+    features: [
+      "Premium governance rights",
+      "Direct access to firm management",
+      "Strategic decision participation",
+      "First access to new features"
+    ],
+    icon: Wallet
+  }
+];
+
 export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { showBanxaDeposit } = useCustomWallet();
-  const [currentView, setCurrentView] = useState<PurchaseView>('payment-select');
+  const [currentView, setCurrentView] = useState<PurchaseView>('packages');
   const [maticAmount, setMaticAmount] = useState(initialAmount || "");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
@@ -213,6 +252,53 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       }
     }
   };
+
+  const renderPackages = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-white mb-2">Choose Investment Package</h2>
+        <p className="text-gray-400">Select your preferred tokenized firm investment tier</p>
+      </div>
+
+      <div className="grid gap-6">
+        {investmentPackages.map((pkg, index) => (
+          <button
+            key={index}
+            onClick={() => {
+              setMaticAmount(pkg.amount);
+              setCurrentView('payment-select');
+            }}
+            className="w-full p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-colors group text-left"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                  <pkg.icon className="w-6 h-6 text-yellow-500" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">{pkg.name}</h3>
+                  <p className="text-sm text-gray-400">{pkg.lgrAmount} LGR tokens</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold text-white">${pkg.amount}</p>
+                <p className="text-sm text-gray-400">USD</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {pkg.features.map((feature, idx) => (
+                <div key={idx} className="flex items-center gap-2 text-sm text-gray-400">
+                  <CheckCircle2 className="h-4 w-4 text-yellow-500" />
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 
   const renderPaymentSelect = () => (
     <div className="space-y-6 w-full max-w-md mx-auto">
@@ -459,11 +545,13 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   };
 
   switch (currentView) {
+    case 'packages':
+      return renderPackages();
+    case 'payment-select':
+      return renderPaymentSelect();
     case 'polygon-amount':
       return renderPolygonAmount();
     case 'card-amount':
       return renderCardAmount();
-    default:
-      return renderPaymentSelect();
   }
 };
