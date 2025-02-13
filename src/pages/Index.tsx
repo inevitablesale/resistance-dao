@@ -16,11 +16,18 @@ import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2 } from "lucide-react";
+import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2, ArrowRight, BarChart2, Briefcase, Calculator, Clock, Calendar, DollarSign, BookOpen } from "lucide-react";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const presaleData = [
   { 
@@ -362,39 +369,122 @@ const IndexContent = () => {
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12">
-            How to Buy $LGR
+            Tokenize Your Practice
           </h2>
           
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="relative p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20">
-              <div className="absolute -top-4 -left-4 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold">
-                1
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-4">Create Your Wallet</h3>
-              <p className="text-gray-300">
-                Enter and confirm your email address to create a wallet. You can also sign in using your MetaMask wallet.
-              </p>
-            </div>
+          <div className="max-w-2xl mx-auto text-center mb-12">
+            <p className="text-xl text-gray-300">
+              Transform your firm's resources, client relationships, and advisory services into tradeable assets on our decentralized marketplace.
+            </p>
+          </div>
 
-            <div className="relative p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20">
-              <div className="absolute -top-4 -left-4 w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-black font-bold">
-                2
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-4">Load Wallet With Crypto</h3>
-              <p className="text-gray-300">
-                Add MATIC to your wallet to participate in the presale. You can buy MATIC directly or transfer from another wallet.
-              </p>
-            </div>
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group">
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center">
+                    <Building2 className="h-6 w-6 text-teal-400" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-white">Firm Valuation</CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Tokenize your practice based on revenue and growth metrics
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">Average Token Price</span>
+                  <span className="text-white font-medium">50,000 LGR</span>
+                </div>
+                <Button className="w-full group-hover:translate-x-1 transition-transform">
+                  Tokenize Practice <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </CardContent>
+            </Card>
 
-            <div className="relative p-6 rounded-lg bg-black/30 backdrop-blur border border-yellow-500/20">
-              <div className="absolute -top-4 -left-4 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold">
-                3
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-4">Buy and Stake $LGR</h3>
-              <p className="text-gray-300">
-                Purchase $LGR tokens at the presale price and stake them to earn rewards and participate in governance.
-              </p>
-            </div>
+            <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group">
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                    <Users className="h-6 w-6 text-purple-400" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-white">Client Portfolio</CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Create tradeable assets from recurring client relationships
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">Average Token Price</span>
+                  <span className="text-white font-medium">10,000 LGR</span>
+                </div>
+                <Button className="w-full group-hover:translate-x-1 transition-transform">
+                  Tokenize Clients <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group">
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center">
+                    <Briefcase className="h-6 w-6 text-yellow-400" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-white">Advisory Services</CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Package and sell specialized consulting and advisory services
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">Average Token Price</span>
+                  <span className="text-white font-medium">25,000 LGR</span>
+                </div>
+                <Button className="w-full group-hover:translate-x-1 transition-transform">
+                  Tokenize Services <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group">
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center">
+                    <BarChart2 className="h-6 w-6 text-pink-400" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-white">Resources & IP</CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Leverage community validated centralized services providers from within the DAO
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">Average Token Price</span>
+                  <span className="text-white font-medium">15,000 LGR</span>
+                </div>
+                <Button className="w-full group-hover:translate-x-1 transition-transform">
+                  Tokenize Resources <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center text-gray-400 max-w-2xl mx-auto mt-12">
+            <p className="text-sm">
+              Join our DAO-governed marketplace where community-validated service providers can trade 
+              tokenized firm assets, creating new opportunities for growth and collaboration.
+            </p>
           </div>
         </div>
       </div>
