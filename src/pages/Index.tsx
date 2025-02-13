@@ -312,10 +312,10 @@ const IndexContent = () => {
             <Building2 className="w-24 h-24 mx-auto text-yellow-500 animate-cosmic-pulse" />
           </div>
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Invest in<br />Accounting Firms On-Chain
+            Accounting Firm<br />Ownership Simplified
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
-            Start with $100 and own fractions of high-quality accounting practices. Pool resources, earn passive income, and trade firm tokens on our decentralized marketplace.
+            Start with $100 and own fractions of high-quality accounting practices. Pool resources, earn passive income, and trade firm assets on our decentralized marketplace.
           </p>
 
           <div className="space-y-6">
@@ -343,25 +343,47 @@ const IndexContent = () => {
         </div>
       </div>
 
-      <section className="py-24 relative z-10">
+      {/* Step 1: Submit Your Thesis */}
+      <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
-          <h2 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-16">
-            How It Works
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {processSteps.map((step, index) => (
-              <div
-                key={index}
-                className={`${step.className} p-8 rounded-xl bg-black/30 border border-white/10 backdrop-blur-sm relative overflow-hidden group hover:scale-105 transition-all duration-300`}
-              >
-                <div className={`w-12 h-12 rounded-full bg-${step.color}-500/20 flex items-center justify-center mb-6`}>
-                  {<step.icon className={`w-6 h-6 text-${step.color}-500`} />}
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-4">{step.title}</h3>
-                <p className="text-white/70">{step.description}</p>
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
-            ))}
+          <div className="max-w-4xl mx-auto text-center">
+            <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-6" />
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
+              Submit Your Thesis
+            </h2>
+            <p className="text-xl text-white/80 mb-8">
+              Share your vision for acquiring and scaling accounting practices. Connect with like-minded investors to form investment pools.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Step 2: Build Liquidity Pools */}
+      <section className="py-24 relative z-10 bg-black/40 backdrop-blur-sm">
+        <div className="container px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <Users className="w-16 h-16 mx-auto text-teal-500 mb-6" />
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-teal-200">
+              Build Liquidity Pools
+            </h2>
+            <p className="text-xl text-white/80 mb-8">
+              Pool resources with other accountants to acquire practices. Smart contracts ensure transparent fund management and investor rights.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Step 3: Tokenize Firm Assets */}
+      <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
+        <div className="container px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <Crown className="w-16 h-16 mx-auto text-yellow-500 mb-6" />
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
+              Tokenize Firm Assets
+            </h2>
+            <p className="text-xl text-white/80 mb-8">
+              Convert accounting practices into tradeable digital assets. Access the decentralized marketplace for seamless buying and selling.
+            </p>
           </div>
         </div>
       </section>
