@@ -134,13 +134,6 @@ const processSteps = [
     className: "cosmic-box yellow-energy"
   },
   {
-    title: "Build Liquidity Pools",
-    description: "Pool resources with other accountants to acquire practices. Smart contracts ensure transparent fund management and investor rights.",
-    icon: Users,
-    color: "teal",
-    className: "cosmic-box teal-energy"
-  },
-  {
     title: "Tokenize Firm Assets",
     description: "Convert accounting practices into tradeable digital assets. Access the decentralized marketplace for seamless buying and selling.",
     icon: Crown,
@@ -372,7 +365,7 @@ const IndexContent = () => {
                 </div>
               </div>
 
-              {/* Build Support */}
+              {/* Token-Based Voting */}
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
@@ -404,22 +397,7 @@ const IndexContent = () => {
         </div>
       </section>
 
-      {/* Step 2: Build Liquidity Pools */}
-      <section className="py-24 relative z-10 bg-black/40 backdrop-blur-sm">
-        <div className="container px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <Users className="w-16 h-16 mx-auto text-teal-500 mb-6" />
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-teal-200">
-              Build Liquidity Pools
-            </h2>
-            <p className="text-xl text-white/80 mb-8">
-              Pool resources with other accountants to acquire practices. Smart contracts ensure transparent fund management and investor rights.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Step 3: Tokenize Firm Assets */}
+      {/* Step 2: Tokenize Firm Assets */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
