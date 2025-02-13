@@ -376,14 +376,106 @@ const IndexContent = () => {
       {/* Step 3: Tokenize Firm Assets */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <Crown className="w-16 h-16 mx-auto text-yellow-500 mb-6" />
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
-              Tokenize Firm Assets
-            </h2>
-            <p className="text-xl text-white/80 mb-8">
-              Convert accounting practices into tradeable digital assets. Access the decentralized marketplace for seamless buying and selling.
-            </p>
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <Crown className="w-16 h-16 mx-auto text-yellow-500 mb-6" />
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
+                Tokenize Acquired Practices
+              </h2>
+              <p className="text-xl text-white/80 mb-12 max-w-4xl mx-auto">
+                Convert illiquid practice assets into tradeable tokens on our decentralized exchange, unlocking new value from human capital, client relationships, and intellectual property.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Firm Valuation */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-2 bg-teal-500/10 rounded-lg">
+                      <Building2 className="w-8 h-8 text-teal-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-white mb-2">Firm Valuation</h3>
+                      <p className="text-white/70">Tokenize partner expertise, specialized skills, and professional certifications into tradeable assets</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center mt-6">
+                    <span className="text-sm text-white/60">Asset Class: Professional Expertise</span>
+                    <span className="text-yellow-500 px-3 py-1 rounded-full text-sm border border-yellow-500/20 bg-yellow-500/10">
+                      Available after presale
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Client Portfolio */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-2 bg-purple-500/10 rounded-lg">
+                      <Users className="w-8 h-8 text-purple-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-white mb-2">Client Portfolio</h3>
+                      <p className="text-white/70">Transform long-term client relationships and recurring revenue streams into liquid digital assets</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center mt-6">
+                    <span className="text-sm text-white/60">Asset Class: Customer Relations</span>
+                    <span className="text-yellow-500 px-3 py-1 rounded-full text-sm border border-yellow-500/20 bg-yellow-500/10">
+                      Available after presale
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Advisory Services */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-2 bg-yellow-500/10 rounded-lg">
+                      <Briefcase className="w-8 h-8 text-yellow-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-white mb-2">Advisory Services</h3>
+                      <p className="text-white/70">Monetize industry networks, referral partnerships, and community relationships through tokenization</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center mt-6">
+                    <span className="text-sm text-white/60">Asset Class: Professional Network</span>
+                    <span className="text-yellow-500 px-3 py-1 rounded-full text-sm border border-yellow-500/20 bg-yellow-500/10">
+                      Available after presale
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Resources & IP */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="p-2 bg-pink-500/10 rounded-lg">
+                      <BarChart2 className="w-8 h-8 text-pink-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-white mb-2">Resources & IP</h3>
+                      <p className="text-white/70">Convert proprietary processes, workflows, and systems into tradeable digital assets</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center mt-6">
+                    <span className="text-sm text-white/60">Asset Class: Intellectual Property</span>
+                    <span className="text-yellow-500 px-3 py-1 rounded-full text-sm border border-yellow-500/20 bg-yellow-500/10">
+                      Available after presale
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
