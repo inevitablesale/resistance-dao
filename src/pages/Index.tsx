@@ -1,7 +1,6 @@
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
-import { PrivateEquityImpact } from "@/components/PrivateEquityImpact";
 import { ReclaimControl } from "@/components/ReclaimControl";
 import { HowItWorks } from "@/components/HowItWorks";
 import { AlternativeToEquity } from "@/components/AlternativeToEquity";
@@ -16,18 +15,10 @@ import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2, ArrowRight, BarChart2, Briefcase, Calculator, Clock, Calendar, DollarSign, BookOpen } from "lucide-react";
+import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2, Calculator, Clock, Calendar, DollarSign, BookOpen, BarChart2, Briefcase } from "lucide-react";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 const presaleData = [
   { 
