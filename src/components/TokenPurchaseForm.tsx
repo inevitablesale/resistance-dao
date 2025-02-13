@@ -23,7 +23,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
 
-  const handleCreditCardPayment = async () => {
+  const handlePurchase = async () => {
     try {
       setIsProcessing(true);
       if (!primaryWallet) {
@@ -32,10 +32,10 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       }
       showBanxaDeposit();
     } catch (error) {
-      console.error("Credit card purchase error:", error);
+      console.error("Purchase error:", error);
       toast({
         title: "Purchase Error",
-        description: "Failed to initiate credit card purchase",
+        description: "Failed to initiate purchase",
         variant: "destructive",
       });
     } finally {
@@ -46,9 +46,9 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   return (
     <Card className="w-full bg-black/20 border-white/10">
       <CardHeader>
-        <CardTitle className="text-white">Purchase LGR Tokens</CardTitle>
+        <CardTitle className="text-white">Purchase Shares</CardTitle>
         <CardDescription className="text-gray-400">
-          You'll be redirected to our secure payment partner Banxa to complete your purchase
+          You'll be redirected to our secure payment partner to complete your purchase
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -58,16 +58,16 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
             <span className="font-medium">Credit/Debit Card</span>
           </div>
           <div className="text-sm text-gray-400 space-y-1">
-            <p>• Minimum purchase: $30 USD</p>
+            <p>• Minimum purchase: $30</p>
             <p>• Major cards accepted</p>
             <p>• Secure payment processing</p>
-            <p>• Click "Deposit" then "Buy Crypto" to purchase POLY</p>
-            <p>• Your POLY will be used to buy LGR tokens</p>
+            <p>• Digital ownership confirmed instantly</p>
+            <p>• Your shares will be registered immediately</p>
           </div>
         </div>
 
         <Button
-          onClick={handleCreditCardPayment}
+          onClick={handlePurchase}
           disabled={isProcessing}
           className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white"
         >
