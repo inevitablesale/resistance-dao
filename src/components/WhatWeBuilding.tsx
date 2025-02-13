@@ -1,4 +1,4 @@
-import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3, Building, Orbit } from "lucide-react";
+import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3, Building, Orbit, CheckCircle2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
 
@@ -158,12 +158,12 @@ export const WhatWeBuilding = () => {
 
       <div className="container px-4 relative z-10">
         <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6 text-center">
-          Tokenomics
+          Submit Your Investment Thesis
         </h2>
 
         <div className="text-center mb-16">
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
-            Carefully designed tokenomics that align protocol growth with token holder value, enabling decentralized governance of the world's first accountant-owned practice acquisition engine.
+            Join our decentralized governance model that aligns protocol growth with token holder value, enabling community-driven decisions in the world's first accountant-owned practice acquisition engine.
           </p>
         </div>
 
@@ -455,6 +455,72 @@ export const WhatWeBuilding = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+        <div className="mt-20 pt-20 border-t border-white/10">
+          <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12 text-center">
+            Ecosystem & Partnerships
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            <div className="p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-all duration-300 group">
+              <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center mb-6">
+                <Building2 className="w-6 h-6 text-yellow-500" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-4">Centralized Services</h3>
+              <p className="text-gray-300">
+                Strategic partnerships with leading financial institutions, compliance firms, and technology providers to support seamless practice acquisitions and management.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-all duration-300 group">
+              <div className="w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center mb-6">
+                <Orbit className="w-6 h-6 text-teal-500" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-4">Governance & Voting</h3>
+              <p className="text-gray-300">
+                Participate in key decisions through our decentralized voting system. Token holders shape acquisition strategies, operational improvements, and protocol development.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-all duration-300 group">
+              <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center mb-6">
+                <BarChart3 className="w-6 h-6 text-yellow-500" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-4">Performance Tracking</h3>
+              <p className="text-gray-300">
+                Real-time analytics and reporting on firm acquisitions, revenue growth, and protocol metrics. Transparent tracking of governance decisions and their impacts.
+              </p>
+            </div>
+          </div>
+
+          {/* Partner Network Showcase */}
+          <div className="text-center mb-16">
+            <h3 className="text-2xl font-bold text-white mb-8">Our Partner Network</h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { category: "Financial Services", items: ["Banking Solutions", "Payment Processing", "Investment Management"] },
+                { category: "Technology", items: ["Cloud Infrastructure", "Practice Management", "Security Solutions"] },
+                { category: "Professional Services", items: ["Legal Advisory", "Compliance Support", "Industry Research"] },
+                { category: "Support Services", items: ["Training Programs", "Technical Support", "Community Management"] }
+              ].map((network, index) => (
+                <div 
+                  key={index}
+                  className="p-6 rounded-lg bg-black/20 border border-white/10 text-left"
+                >
+                  <h4 className="text-lg font-semibold text-yellow-500 mb-4">{network.category}</h4>
+                  <ul className="space-y-2">
+                    {network.items.map((item, itemIndex) => (
+                      <li key={itemIndex} className="text-gray-300 flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-teal-500" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="max-w-3xl mx-auto text-center mb-12">
