@@ -386,157 +386,77 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   );
 
   const renderCardAmount = () => {
-    const conversions = calculateConversions(usdAmount);
-
     return (
       <Card className="w-full max-w-md mx-auto bg-black/20 border-white/10">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setCurrentView('payment-select')}
-                className="mr-2 text-white hover:text-white/80 hover:bg-white/10"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                  <CreditCard className="w-3 h-3 text-yellow-500" />
-                </div>
-                <div>
-                  <CardTitle className="text-white">Card Payment</CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Enter purchase amount in USD
-                  </CardDescription>
-                </div>
-              </div>
-            </div>
+          <div className="flex items-center">
             <Button
               variant="ghost"
               size="icon"
-              onClick={updatePrices}
-              disabled={isLoadingPrices}
-              className="text-white hover:text-white/80 hover:bg-white/10"
+              onClick={() => setCurrentView('payment-select')}
+              className="mr-2 text-white hover:text-white/80 hover:bg-white/10"
             >
-              <RefreshCw className={cn("h-4 w-4", isLoadingPrices && "animate-spin")} />
+              <ArrowLeft className="h-4 w-4" />
             </Button>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                <CreditCard className="w-3 h-3 text-yellow-500" />
+              </div>
+              <div>
+                <CardTitle className="text-white">Card Payment</CardTitle>
+                <CardDescription className="text-gray-400">
+                  Purchase crypto with your card
+                </CardDescription>
+              </div>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <label htmlFor="usdAmount" className="block text-sm font-medium text-gray-200">
-              Amount in USD
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-              <Input
-                id="usdAmount"
-                type="number"
-                value={usdAmount}
-                onChange={(e) => setUsdAmount(e.target.value)}
-                placeholder="Enter USD amount"
-                min="30"
-                step="1"
-                disabled={isProcessing || isLoadingPrices}
-                className="bg-black/20 border-white/10 text-white placeholder:text-gray-400 pl-7"
-              />
+          <div className="space-y-4">
+            <div className="rounded-lg border border-white/10 p-4">
+              <h3 className="text-lg font-semibold text-white mb-4">How to Purchase</h3>
+              <ol className="space-y-3 text-gray-300">
+                <li className="flex gap-2">
+                  <span className="font-bold text-yellow-500">1.</span>
+                  <span>Click 'Continue to Payment' below to access our payment partner Banxa</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="font-bold text-yellow-500">2.</span>
+                  <span>Select your preferred payment method (credit/debit card, bank transfer, etc.)</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="font-bold text-yellow-500">3.</span>
+                  <span>Enter the amount you wish to purchase (minimum $30 USD)</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="font-bold text-yellow-500">4.</span>
+                  <span>Complete the payment process to receive MATIC in your wallet</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="font-bold text-yellow-500">5.</span>
+                  <span>Use your MATIC to purchase LGR tokens through the Polygon payment option</span>
+                </li>
+              </ol>
             </div>
-            <div className="flex items-center justify-between text-sm text-gray-400">
-              <span>Minimum purchase amount: $30 USD</span>
-              <div className="flex items-center gap-2">
-                <span>Live rates</span>
-                {isLoadingPrices ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+
+            <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-4">
+              <div className="flex gap-2 text-yellow-500">
+                <CheckCircle2 className="h-5 w-5 shrink-0" />
+                <div className="text-sm">
+                  <p className="font-medium">Important Notes</p>
+                  <ul className="mt-2 space-y-1 text-yellow-500/90">
+                    <li>• Minimum purchase amount: $30 USD</li>
+                    <li>• Major credit & debit cards accepted</li>
+                    <li>• Secure payment processing</li>
+                    <li>• 24/7 support available</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
 
-          {error ? (
-            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-              <p className="text-sm text-red-400">{error}</p>
-            </div>
-          ) : conversions && (
-            <div className="space-y-4 bg-black/30 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-200 mb-3">Conversion Path</h4>
-              
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 p-2 rounded bg-black/20">
-                    <span className="text-yellow-500">${usdAmount} USD</span>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                  <div className="flex-1 p-2 rounded bg-black/20">
-                    <span className="text-purple-500">~{conversions.matic} MATIC</span>
-                  </div>
-                </div>
-                
-                <div className="text-xs text-gray-400 text-center">
-                  {isLoadingPrices ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      <span>Updating rates...</span>
-                    </div>
-                  ) : error ? (
-                    <span className="text-red-400">{error}</span>
-                  ) : (
-                    <span>Current rate: ${conversionRates.usdToMatic.toFixed(2)}/MATIC</span>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 p-2 rounded bg-black/20">
-                    <span className="text-purple-500">~{conversions.matic} MATIC</span>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                  <div className="flex-1 p-2 rounded bg-black/20">
-                    <span className="text-green-500">~{conversions.lgr} LGR</span>
-                  </div>
-                </div>
-                
-                <div className="text-xs text-gray-400 text-center">
-                  {isLoadingPrices ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      <span>Updating rates...</span>
-                    </div>
-                  ) : error ? (
-                    <span className="text-red-400">{error}</span>
-                  ) : (
-                    <span>Current rate: {conversionRates.maticToLgr.toFixed(4)} MATIC/LGR</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-white/10">
-                <h4 className="text-sm font-medium text-gray-200 mb-2">Summary</h4>
-                <ul className="space-y-1 text-sm text-gray-400">
-                  <li className="flex justify-between">
-                    <span>You will receive:</span>
-                    <span className="text-green-500">~{conversions.lgr} LGR</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span>Rate:</span>
-                    <span>${(Number(usdAmount) / Number(conversions.lgr)).toFixed(2)}/LGR</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span>Network:</span>
-                    <span>Polygon</span>
-                  </li>
-                  {conversionRates.lastUpdated && (
-                    <li className="flex justify-between">
-                      <span>Last updated:</span>
-                      <span>{new Date(conversionRates.lastUpdated).toLocaleTimeString()}</span>
-                    </li>
-                  )}
-                </ul>
-              </div>
-            </div>
-          )}
-
           <Button
             onClick={handleCreditCardPayment}
-            disabled={isProcessing || !usdAmount || Number(usdAmount) < 30 || isLoadingPrices || Boolean(error)}
             className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
           >
             {isProcessing ? (
