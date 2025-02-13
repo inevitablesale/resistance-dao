@@ -121,7 +121,7 @@ const boardMembers = [
 const processSteps = [
   {
     title: "Build Your Thesis",
-    description: "Transform client relationships into predictable revenue streams",
+    description: "Join a community of experts to identify ideal accounting practices based on size, revenue, services, and growth potential",
     icon: Trophy,
     color: "yellow",
     className: "cosmic-box yellow-energy"
