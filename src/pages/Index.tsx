@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -610,7 +611,6 @@ const IndexContent = () => {
       <LedgerFrens />
       <HowItWorks />
       <AlternativeToEquity />
-      <PrivateEquityImpact />
       <ReclaimControl />
       <SystemWeDeserve />
       <CallToAction />
