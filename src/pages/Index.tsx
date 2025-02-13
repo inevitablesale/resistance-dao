@@ -16,7 +16,7 @@ import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown } from "lucide-react";
+import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2 } from "lucide-react";
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
@@ -301,6 +301,9 @@ const IndexContent = () => {
             transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * -50}px)`
           }}
         >
+          <div className="mb-8">
+            <Building2 className="w-24 h-24 mx-auto text-yellow-500 animate-cosmic-pulse" />
+          </div>
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
             The Future of<br />Accounting is Digital
           </h1>
@@ -340,6 +343,27 @@ const IndexContent = () => {
                   <p className="text-white/80 text-lg">
                     {step.description}
                   </p>
+                  {index === 2 && (
+                    <div className="mt-4 p-4 bg-black/30 rounded-lg border border-white/10">
+                      <p className="text-sm text-white/70">
+                        By centralizing services and separating work from client relationships, we create tokenized assets that:
+                      </p>
+                      <ul className="mt-2 space-y-2 text-sm text-white/70">
+                        <li className="flex items-center gap-2">
+                          <Star className="w-4 h-4 text-yellow-500" />
+                          Generate passive income through token staking
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Shield className="w-4 h-4 text-teal-500" />
+                          Reduce risk through diversified investment pools
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Award className="w-4 h-4 text-yellow-500" />
+                          Create additional liquidity through token trading
+                        </li>
+                      </ul>
+                    </div>
+                  )}
                 </div>
                 <div className="absolute inset-0 border border-white/10 rounded-xl z-20 pointer-events-none" />
               </div>
@@ -347,6 +371,10 @@ const IndexContent = () => {
           </div>
         </div>
       </div>
+
+      {showPurchaseForm && (
+        <TokenPurchaseForm />
+      )}
 
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm py-16">
         <div className="container mx-auto px-4">
