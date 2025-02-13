@@ -369,12 +369,12 @@ const IndexContent = () => {
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12">
-            Tokenize Your Practice
+            Tokenize Acquired Practices
           </h2>
           
           <div className="max-w-2xl mx-auto text-center mb-12">
             <p className="text-xl text-gray-300">
-              Transform your firm's resources, client relationships, and advisory services into tradeable assets on our decentralized marketplace.
+              Convert illiquid practice assets into tradeable tokens on our decentralized exchange, unlocking new value from human capital, client relationships, and intellectual property.
             </p>
           </div>
 
@@ -386,20 +386,20 @@ const IndexContent = () => {
                     <Building2 className="h-6 w-6 text-teal-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-white">Firm Valuation</CardTitle>
+                    <CardTitle className="text-white">Human Capital</CardTitle>
                     <CardDescription className="text-gray-400">
-                      Tokenize your practice based on revenue and growth metrics
+                      Tokenize partner expertise, specialized skills, and professional certifications into tradeable assets
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">Average Token Price</span>
-                  <span className="text-white font-medium">50,000 LGR</span>
+                  <span className="text-gray-400">Asset Class</span>
+                  <span className="text-white font-medium">Professional Expertise</span>
                 </div>
                 <Button className="w-full group-hover:translate-x-1 transition-transform">
-                  Tokenize Practice <ArrowRight className="ml-2 h-4 w-4" />
+                  Tokenize Human Capital <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>
             </Card>
@@ -411,20 +411,20 @@ const IndexContent = () => {
                     <Users className="h-6 w-6 text-purple-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-white">Client Portfolio</CardTitle>
+                    <CardTitle className="text-white">Client Capital</CardTitle>
                     <CardDescription className="text-gray-400">
-                      Create tradeable assets from recurring client relationships
+                      Transform long-term client relationships and recurring revenue streams into liquid digital assets
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">Average Token Price</span>
-                  <span className="text-white font-medium">10,000 LGR</span>
+                  <span className="text-gray-400">Asset Class</span>
+                  <span className="text-white font-medium">Customer Relations</span>
                 </div>
                 <Button className="w-full group-hover:translate-x-1 transition-transform">
-                  Tokenize Clients <ArrowRight className="ml-2 h-4 w-4" />
+                  Tokenize Client Base <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>
             </Card>
@@ -436,20 +436,20 @@ const IndexContent = () => {
                     <Briefcase className="h-6 w-6 text-yellow-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-white">Advisory Services</CardTitle>
+                    <CardTitle className="text-white">Social Capital</CardTitle>
                     <CardDescription className="text-gray-400">
-                      Package and sell specialized consulting and advisory services
+                      Monetize industry networks, referral partnerships, and community relationships through tokenization
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">Average Token Price</span>
-                  <span className="text-white font-medium">25,000 LGR</span>
+                  <span className="text-gray-400">Asset Class</span>
+                  <span className="text-white font-medium">Network Value</span>
                 </div>
                 <Button className="w-full group-hover:translate-x-1 transition-transform">
-                  Tokenize Services <ArrowRight className="ml-2 h-4 w-4" />
+                  Tokenize Networks <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>
             </Card>
@@ -461,20 +461,20 @@ const IndexContent = () => {
                     <BarChart2 className="h-6 w-6 text-pink-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-white">Resources & IP</CardTitle>
+                    <CardTitle className="text-white">Structural Capital</CardTitle>
                     <CardDescription className="text-gray-400">
-                      Leverage community validated centralized services providers from within the DAO
+                      Convert proprietary processes, workflows, and systems into tradeable digital assets
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">Average Token Price</span>
-                  <span className="text-white font-medium">15,000 LGR</span>
+                  <span className="text-gray-400">Asset Class</span>
+                  <span className="text-white font-medium">Operational IP</span>
                 </div>
                 <Button className="w-full group-hover:translate-x-1 transition-transform">
-                  Tokenize Resources <ArrowRight className="ml-2 h-4 w-4" />
+                  Tokenize Infrastructure <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>
             </Card>
@@ -482,8 +482,8 @@ const IndexContent = () => {
 
           <div className="text-center text-gray-400 max-w-2xl mx-auto mt-12">
             <p className="text-sm">
-              Join our DAO-governed marketplace where community-validated service providers can trade 
-              tokenized firm assets, creating new opportunities for growth and collaboration.
+              Access our DAO-governed marketplace to trade tokenized practice assets, creating new opportunities 
+              for wealth creation and practice value realization.
             </p>
           </div>
         </div>
