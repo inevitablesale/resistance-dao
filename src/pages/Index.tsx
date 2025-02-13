@@ -346,14 +346,60 @@ const IndexContent = () => {
       {/* Step 1: Submit Your Thesis */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-6" />
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
-              Submit Your Thesis
-            </h2>
-            <p className="text-xl text-white/80 mb-8">
-              Share your vision for acquiring and scaling accounting practices. Connect with like-minded investors to form investment pools.
-            </p>
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-6" />
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
+                Build Your Investment Thesis
+              </h2>
+              <p className="text-xl text-white/80 mb-12 max-w-4xl mx-auto">
+                Join a community of like-minded investors to propose and develop investment strategies for accounting practices you want to acquire.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Create Thesis */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div className="p-2 bg-yellow-500/10 rounded-lg inline-block mb-6">
+                    <Trophy className="w-12 h-12 text-yellow-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Create Thesis</h3>
+                  <p className="text-white/70">
+                    Propose your vision for acquiring and growing accounting practices. Define your strategy, target metrics, and growth plans.
+                  </p>
+                </div>
+              </div>
+
+              {/* Build Support */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div className="p-2 bg-teal-500/10 rounded-lg inline-block mb-6">
+                    <Users className="w-12 h-12 text-teal-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Build Support</h3>
+                  <p className="text-white/70">
+                    Share your thesis with the community. Gather feedback, build consensus, and attract potential co-investors.
+                  </p>
+                </div>
+              </div>
+
+              {/* Pool Resources */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div className="p-2 bg-yellow-500/10 rounded-lg inline-block mb-6">
+                    <Crown className="w-12 h-12 text-yellow-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Pool Resources</h3>
+                  <p className="text-white/70">
+                    Create or join liquidity pools with your LGR tokens to participate in practice acquisitions you believe in.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
