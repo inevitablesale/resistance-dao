@@ -604,7 +604,7 @@ const IndexContent = () => {
                   <div className="relative bg-black/60 p-6 rounded-lg border border-yellow-500/30 
                                 transform transition-all duration-300 group-hover:translate-y-[-2px]
                                 hover:border-yellow-500/60">
-                    <member.icon className="w-10 h-10 text-yellow-500 mb-4 mx-auto animate-cosmic-pulse" />
+                    <member.icon className="w-10 h-10 text-yellow-500 mb-4" />
                     <h3 className="text-xl font-bold text-white mb-2">{member.role}</h3>
                     <p className="text-gray-300">{member.description}</p>
                   </div>
