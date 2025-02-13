@@ -386,7 +386,7 @@ const IndexContent = () => {
                     <Building2 className="h-6 w-6 text-teal-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-white">Human Capital</CardTitle>
+                    <CardTitle className="text-white">Firm Valuation</CardTitle>
                     <CardDescription className="text-gray-400">
                       Tokenize partner expertise, specialized skills, and professional certifications into tradeable assets
                     </CardDescription>
@@ -399,7 +399,7 @@ const IndexContent = () => {
                   <span className="text-white font-medium">Professional Expertise</span>
                 </div>
                 <Button className="w-full group-hover:translate-x-1 transition-transform">
-                  Tokenize Human Capital <ArrowRight className="ml-2 h-4 w-4" />
+                  Tokenize Practice <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>
             </Card>
@@ -411,7 +411,7 @@ const IndexContent = () => {
                     <Users className="h-6 w-6 text-purple-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-white">Client Capital</CardTitle>
+                    <CardTitle className="text-white">Client Portfolio</CardTitle>
                     <CardDescription className="text-gray-400">
                       Transform long-term client relationships and recurring revenue streams into liquid digital assets
                     </CardDescription>
@@ -424,7 +424,7 @@ const IndexContent = () => {
                   <span className="text-white font-medium">Customer Relations</span>
                 </div>
                 <Button className="w-full group-hover:translate-x-1 transition-transform">
-                  Tokenize Client Base <ArrowRight className="ml-2 h-4 w-4" />
+                  Tokenize Clients <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>
             </Card>
@@ -436,7 +436,7 @@ const IndexContent = () => {
                     <Briefcase className="h-6 w-6 text-yellow-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-white">Social Capital</CardTitle>
+                    <CardTitle className="text-white">Advisory Services</CardTitle>
                     <CardDescription className="text-gray-400">
                       Monetize industry networks, referral partnerships, and community relationships through tokenization
                     </CardDescription>
@@ -449,7 +449,7 @@ const IndexContent = () => {
                   <span className="text-white font-medium">Network Value</span>
                 </div>
                 <Button className="w-full group-hover:translate-x-1 transition-transform">
-                  Tokenize Networks <ArrowRight className="ml-2 h-4 w-4" />
+                  Tokenize Services <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>
             </Card>
@@ -461,7 +461,7 @@ const IndexContent = () => {
                     <BarChart2 className="h-6 w-6 text-pink-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-white">Structural Capital</CardTitle>
+                    <CardTitle className="text-white">Resources & IP</CardTitle>
                     <CardDescription className="text-gray-400">
                       Convert proprietary processes, workflows, and systems into tradeable digital assets
                     </CardDescription>
@@ -474,7 +474,7 @@ const IndexContent = () => {
                   <span className="text-white font-medium">Operational IP</span>
                 </div>
                 <Button className="w-full group-hover:translate-x-1 transition-transform">
-                  Tokenize Infrastructure <ArrowRight className="ml-2 h-4 w-4" />
+                  Tokenize Resources <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>
             </Card>
