@@ -265,7 +265,16 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
           <button
             key={index}
             onClick={() => {
+              if (!primaryWallet) {
+                toast({
+                  title: "Connect Wallet",
+                  description: "Please connect your wallet to continue",
+                });
+                setShowAuthFlow?.(true);
+                return;
+              }
               setMaticAmount(pkg.amount);
+              setUsdAmount(pkg.amount);
               setCurrentView('payment-select');
             }}
             className="w-full p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-colors group text-left"
@@ -308,7 +317,13 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       </div>
 
       <button
-        onClick={() => setCurrentView('polygon-amount')}
+        onClick={() => {
+          if (!primaryWallet) {
+            setShowAuthFlow?.(true);
+            return;
+          }
+          setCurrentView('polygon-amount');
+        }}
         className="w-full p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-colors mb-4 group"
       >
         <div className="flex items-center justify-between mb-4">
@@ -348,7 +363,13 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       </button>
 
       <button
-        onClick={() => setCurrentView('card-amount')}
+        onClick={() => {
+          if (!primaryWallet) {
+            setShowAuthFlow?.(true);
+            return;
+          }
+          setCurrentView('card-amount');
+        }}
         className="w-full p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-colors group"
       >
         <div className="flex items-center justify-between mb-4">
@@ -491,7 +512,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
               <div>
                 <CardTitle className="text-white">Card Payment</CardTitle>
                 <CardDescription className="text-gray-400">
-                  Purchase crypto with your card
+                  Purchase ${usdAmount} of tokens
                 </CardDescription>
               </div>
             </div>
