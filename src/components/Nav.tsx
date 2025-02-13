@@ -38,19 +38,17 @@ const Nav = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-6">
-            <a 
-              href="https://www.linkedin.com/build-relation/newsletter-follow?entityUrn=7259300749644357632"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link 
+              to="/buyers" 
               className="text-white/80 hover:text-white transition-colors"
             >
-              Read by 1,500+ Accountants
-            </a>
+              Buyers
+            </Link>
             <Link 
-              to="/litepaper" 
-              className="px-6 py-2 bg-gradient-to-r from-yellow-500 via-teal-400 to-yellow-400 text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
+              to="/sellers" 
+              className="text-white/80 hover:text-white transition-colors"
             >
-              Litepaper
+              Sellers
             </Link>
             <a 
               href="https://x.com/LedgerFundDAO" 
