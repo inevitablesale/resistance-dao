@@ -18,17 +18,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowRight, CreditCard, PieChart, Users, Building2, DollarSign } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
-import { fetchTotalLGRSold, fetchRemainingPresaleSupply } from "@/services/presaleContractService";
 
 const IndexContent = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isProcessing, setIsProcessing] = useState(false);
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
-  const [totalSold, setTotalSold] = useState("0");
-  const [remainingSupply, setRemainingSupply] = useState("5000000");
 
   const handleGetStarted = () => {
     navigate('/getting-started');
@@ -38,22 +33,6 @@ const IndexContent = () => {
     setShowPurchaseForm(true);
   };
 
-  useEffect(() => {
-    const loadPresaleData = async () => {
-      try {
-        const [sold, remaining] = await Promise.all([
-          fetchTotalLGRSold(),
-          fetchRemainingPresaleSupply()
-        ]);
-        setTotalSold(sold);
-        setRemainingSupply(remaining);
-      } catch (error) {
-        console.error("Error fetching presale data:", error);
-      }
-    };
-    loadPresaleData();
-  }, []);
-
   return (
     <>
       <div className="text-center mb-8 max-w-5xl mx-auto pt-32">
@@ -61,31 +40,8 @@ const IndexContent = () => {
           Invest in the Future of<br />Accounting Practice Ownership
         </h1>
         <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
-          Join our $5M funding round to revolutionize accounting firm acquisitions. Secure your tokens starting at just $100.
+          Join our $500,000 funding round to revolutionize accounting firm acquisitions. Secure your tokens starting at just $100.
         </p>
-
-        <div className="max-w-lg mx-auto mb-12">
-          <div className="bg-black/30 rounded-lg p-6 backdrop-blur border border-teal-500/20">
-            <div className="flex justify-between text-sm text-gray-300 mb-2">
-              <span>Raised: ${Number(totalSold) * 0.10} USD</span>
-              <span>Goal: $500,000 USD</span>
-            </div>
-            <Progress 
-              value={Number(totalSold) / 50000 * 100} 
-              className="h-3 mb-4"
-            />
-            <div className="grid grid-cols-2 gap-4 text-sm text-gray-300">
-              <div>
-                <span className="block text-white font-semibold">{totalSold} LGR</span>
-                <span>Tokens Sold</span>
-              </div>
-              <div>
-                <span className="block text-white font-semibold">$0.10 USD</span>
-                <span>Per Token</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <div className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto px-4 mb-12">
           <Card className="bg-white/5 backdrop-blur p-6 rounded-xl border border-white/10 text-left">
