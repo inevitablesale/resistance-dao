@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -312,10 +311,10 @@ const IndexContent = () => {
                 Buy Token
               </button>
               <button 
-                onClick={() => window.open('https://docs.ledgerfund.finance', '_blank')}
+                onClick={() => window.open('https://calendly.com/inevitable-sale/new-meeting', '_blank')}
                 className="px-8 py-4 bg-white/10 text-white rounded-lg font-bold text-lg hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
               >
-                Book a Demo
+                Request Meeting
               </button>
             </div>
 
