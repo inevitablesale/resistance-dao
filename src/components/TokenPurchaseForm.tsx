@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Input } from "@/components/ui/input";
@@ -289,74 +288,149 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     </Card>
   );
 
-  const renderCardAmount = () => (
-    <Card className="w-full max-w-md mx-auto bg-black/20 border-white/10">
-      <CardHeader>
-        <div className="flex items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCurrentView('payment-select')}
-            className="mr-2 text-white hover:text-white/80 hover:bg-white/10"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-yellow-500/20 flex items-center justify-center">
-              <CreditCard className="w-3 h-3 text-yellow-500" />
-            </div>
-            <div>
-              <CardTitle className="text-white">Card Payment</CardTitle>
-              <CardDescription className="text-gray-400">
-                Enter purchase amount
-              </CardDescription>
+  const renderCardAmount = () => {
+    const [usdAmount, setUsdAmount] = useState("");
+    const [conversionRates, setConversionRates] = useState({
+      usdToMatic: 1.25, // Example rate, should be fetched from an API
+      maticToLgr: 0.24  // Example rate, calculated from contract
+    });
+
+    const calculateConversions = (usdValue: string) => {
+      const usd = Number(usdValue);
+      if (isNaN(usd)) return null;
+
+      const maticAmount = usd / conversionRates.usdToMatic;
+      const lgrAmount = maticAmount / conversionRates.maticToLgr;
+
+      return {
+        matic: maticAmount.toFixed(2),
+        lgr: lgrAmount.toFixed(2)
+      };
+    };
+
+    const conversions = calculateConversions(usdAmount);
+
+    return (
+      <Card className="w-full max-w-md mx-auto bg-black/20 border-white/10">
+        <CardHeader>
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCurrentView('payment-select')}
+              className="mr-2 text-white hover:text-white/80 hover:bg-white/10"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                <CreditCard className="w-3 h-3 text-yellow-500" />
+              </div>
+              <div>
+                <CardTitle className="text-white">Card Payment</CardTitle>
+                <CardDescription className="text-gray-400">
+                  Enter purchase amount in USD
+                </CardDescription>
+              </div>
             </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <label htmlFor="maticAmount" className="block text-sm font-medium text-gray-200">
-            Amount in MATIC
-          </label>
-          <Input
-            id="maticAmount"
-            type="number"
-            value={maticAmount}
-            onChange={handleAmountChange}
-            placeholder="Enter MATIC amount"
-            min="30"
-            step="0.01"
-            disabled={isProcessing}
-            className="bg-black/20 border-white/10 text-white placeholder:text-gray-400"
-          />
-          <p className="text-sm text-gray-400">
-            Minimum purchase amount: $30 USD
-          </p>
-          {expectedLGR && (
-            <p className="text-sm text-gray-300">
-              Expected LGR: ~{expectedLGR} LGR
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <label htmlFor="usdAmount" className="block text-sm font-medium text-gray-200">
+              Amount in USD
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+              <Input
+                id="usdAmount"
+                type="number"
+                value={usdAmount}
+                onChange={(e) => setUsdAmount(e.target.value)}
+                placeholder="Enter USD amount"
+                min="30"
+                step="1"
+                disabled={isProcessing}
+                className="bg-black/20 border-white/10 text-white placeholder:text-gray-400 pl-7"
+              />
+            </div>
+            <p className="text-sm text-gray-400">
+              Minimum purchase amount: $30 USD
             </p>
-          )}
-        </div>
+          </div>
 
-        <Button
-          onClick={handleCreditCardPayment}
-          disabled={isProcessing || !maticAmount}
-          className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
-        >
-          {isProcessing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Processing...
-            </>
-          ) : (
-            "Continue to Payment"
+          {conversions && (
+            <div className="space-y-4 bg-black/30 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-gray-200 mb-3">Conversion Path</h4>
+              
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 p-2 rounded bg-black/20">
+                    <span className="text-yellow-500">${usdAmount} USD</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                  <div className="flex-1 p-2 rounded bg-black/20">
+                    <span className="text-purple-500">~{conversions.matic} MATIC</span>
+                  </div>
+                </div>
+                
+                <div className="text-xs text-gray-400 text-center">
+                  Current rate: ${conversionRates.usdToMatic}/MATIC
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 p-2 rounded bg-black/20">
+                    <span className="text-purple-500">~{conversions.matic} MATIC</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                  <div className="flex-1 p-2 rounded bg-black/20">
+                    <span className="text-green-500">~{conversions.lgr} LGR</span>
+                  </div>
+                </div>
+                
+                <div className="text-xs text-gray-400 text-center">
+                  Current rate: {conversionRates.maticToLgr} MATIC/LGR
+                </div>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-white/10">
+                <h4 className="text-sm font-medium text-gray-200 mb-2">Summary</h4>
+                <ul className="space-y-1 text-sm text-gray-400">
+                  <li className="flex justify-between">
+                    <span>You will receive:</span>
+                    <span className="text-green-500">~{conversions.lgr} LGR</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Rate:</span>
+                    <span>${(Number(usdAmount) / Number(conversions.lgr)).toFixed(2)}/LGR</span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span>Network:</span>
+                    <span>Polygon</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           )}
-        </Button>
-      </CardContent>
-    </Card>
-  );
+
+          <Button
+            onClick={handleCreditCardPayment}
+            disabled={isProcessing || !usdAmount || Number(usdAmount) < 30}
+            className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              "Continue to Payment"
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  };
 
   switch (currentView) {
     case 'polygon-amount':
