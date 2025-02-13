@@ -640,6 +640,71 @@ const IndexContent = () => {
           </div>
         </div>
       </div>
+
+      <div className="relative z-10 bg-black/95 py-24">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
+                Decentralized Practice Marketplace
+              </h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Browse and participate in practice acquisition opportunities vetted by the community. Pool your LGR tokens with other investors to acquire the practices you believe in.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 mb-16">
+              <div className="bg-black/20 border border-white/10 rounded-xl p-8 relative overflow-hidden group hover:bg-black/30 transition-all">
+                <div className="absolute -right-20 top-12 rotate-45 bg-yellow-500/90 text-black px-24 py-1 text-sm font-semibold z-10">
+                  Available after presale
+                </div>
+                <Users className="w-12 h-12 text-yellow-500 mb-6 animate-cosmic-pulse" />
+                <h3 className="text-2xl font-bold text-white mb-4">Browse Opportunities</h3>
+                <p className="text-white/80 mb-6">
+                  Explore curated practice listings and investment opportunities validated by the DAO.
+                </p>
+                <Button disabled className="w-full opacity-50 cursor-not-allowed">
+                  View Listings <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="bg-black/20 border border-white/10 rounded-xl p-8 relative overflow-hidden group hover:bg-black/30 transition-all">
+                <div className="absolute -right-20 top-12 rotate-45 bg-yellow-500/90 text-black px-24 py-1 text-sm font-semibold z-10">
+                  Available after presale
+                </div>
+                <DollarSign className="w-12 h-12 text-teal-500 mb-6 animate-cosmic-pulse" />
+                <h3 className="text-2xl font-bold text-white mb-4">Pool Resources</h3>
+                <p className="text-white/80 mb-6">
+                  Join existing pools or create new ones to participate in practice acquisitions.
+                </p>
+                <Button disabled className="w-full opacity-50 cursor-not-allowed">
+                  View Pools <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="bg-black/20 border border-white/10 rounded-xl p-8 relative overflow-hidden group hover:bg-black/30 transition-all">
+                <div className="absolute -right-20 top-12 rotate-45 bg-yellow-500/90 text-black px-24 py-1 text-sm font-semibold z-10">
+                  Available after presale
+                </div>
+                <Calculator className="w-12 h-12 text-yellow-500 mb-6 animate-cosmic-pulse" />
+                <h3 className="text-2xl font-bold text-white mb-4">Track Performance</h3>
+                <p className="text-white/80 mb-6">
+                  Monitor your investments and track the performance of acquired practices.
+                </p>
+                <Button disabled className="w-full opacity-50 cursor-not-allowed">
+                  View Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="text-center text-gray-400 max-w-2xl mx-auto">
+              <p className="text-sm">
+                All marketplace features will be activated after the successful completion of the token presale. Join now to get early access and maximum benefits.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
