@@ -377,11 +377,11 @@ const IndexContent = () => {
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
                   <div className="p-2 bg-teal-500/10 rounded-lg inline-block mb-6">
-                    <Users className="w-12 h-12 text-teal-500" />
+                    <Vote className="w-12 h-12 text-teal-500" />
                   </div>
-                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Build Support</h3>
+                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Token-Based Voting</h3>
                   <p className="text-white/70">
-                    Share your thesis with the community. Gather feedback, build consensus, and attract potential co-investors.
+                    Community members vote on theses by dedicating their LGR tokens, aligning incentives and building consensus.
                   </p>
                 </div>
               </div>
@@ -395,7 +395,7 @@ const IndexContent = () => {
                   </div>
                   <h3 className="text-2xl font-bold text-yellow-500 mb-4">Pool Resources</h3>
                   <p className="text-white/70">
-                    Create or join liquidity pools with your LGR tokens to participate in practice acquisitions you believe in.
+                    Once approved, create or join liquidity pools with your LGR tokens to participate in practice acquisitions.
                   </p>
                 </div>
               </div>
