@@ -305,7 +305,7 @@ const IndexContent = () => {
             <Building2 className="w-24 h-24 mx-auto text-yellow-500 animate-cosmic-pulse" />
           </div>
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            The Future of<br />Accounting is Digital
+            Tokenized<br />Accounting Firms On-Chain
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
             Join a community of investors pooling resources to acquire, digitize, and scale accounting practices through decentralized finance.
