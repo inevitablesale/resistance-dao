@@ -33,6 +33,13 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const [expectedLGR, setExpectedLGR] = useState<string | null>(null);
+  
+  // Move card payment related state to the top level
+  const [usdAmount, setUsdAmount] = useState("");
+  const [conversionRates] = useState({
+    usdToMatic: 1.25, // Example rate, should be fetched from an API
+    maticToLgr: 0.24  // Example rate, calculated from contract
+  });
 
   useBalanceMonitor();
 
@@ -57,6 +64,19 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     }
   };
 
+  const calculateConversions = (usdValue: string) => {
+    const usd = Number(usdValue);
+    if (isNaN(usd)) return null;
+
+    const maticAmount = usd / conversionRates.usdToMatic;
+    const lgrAmount = maticAmount / conversionRates.maticToLgr;
+
+    return {
+      matic: maticAmount.toFixed(2),
+      lgr: lgrAmount.toFixed(2)
+    };
+  };
+
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setMaticAmount(value);
@@ -64,7 +84,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   };
 
   const handleCreditCardPayment = async () => {
-    if (!maticAmount || isNaN(Number(maticAmount)) || Number(maticAmount) <= 0) {
+    if (!usdAmount || isNaN(Number(usdAmount)) || Number(usdAmount) <= 0) {
       toast({
         title: "Invalid Amount",
         description: "Please enter a valid amount",
@@ -73,7 +93,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       return;
     }
 
-    if (Number(maticAmount) < 30) {
+    if (Number(usdAmount) < 30) {
       toast({
         title: "Minimum Amount Required",
         description: "Minimum purchase amount is $30 USD",
@@ -290,25 +310,6 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
   );
 
   const renderCardAmount = () => {
-    const [usdAmount, setUsdAmount] = useState("");
-    const [conversionRates, setConversionRates] = useState({
-      usdToMatic: 1.25, // Example rate, should be fetched from an API
-      maticToLgr: 0.24  // Example rate, calculated from contract
-    });
-
-    const calculateConversions = (usdValue: string) => {
-      const usd = Number(usdValue);
-      if (isNaN(usd)) return null;
-
-      const maticAmount = usd / conversionRates.usdToMatic;
-      const lgrAmount = maticAmount / conversionRates.maticToLgr;
-
-      return {
-        matic: maticAmount.toFixed(2),
-        lgr: lgrAmount.toFixed(2)
-      };
-    };
-
     const conversions = calculateConversions(usdAmount);
 
     return (
