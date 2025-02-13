@@ -83,6 +83,88 @@
   }
 }
 
+@keyframes circuit-pulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes data-flow {
+  0% {
+    opacity: 0;
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(var(--flow-x, 100px)) translateY(var(--flow-y, 100px));
+  }
+}
+
+@keyframes node-pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px var(--node-color, #14b8a6);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--node-color, #14b8a6);
+  }
+}
+
+.circuit-board {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(20, 184, 166, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 184, 166, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  transform: perspective(1000px) rotateX(60deg);
+  transform-origin: center center;
+  pointer-events: none;
+}
+
+.circuit-node {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: node-pulse 2s infinite;
+}
+
+.circuit-node.yellow {
+  --node-color: #eab308;
+  background: #eab308;
+}
+
+.circuit-node.teal {
+  --node-color: #14b8a6;
+  background: #14b8a6;
+}
+
+.data-point {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  animation: data-flow 3s infinite linear;
+}
+
+.data-point.yellow {
+  background: #eab308;
+  box-shadow: 0 0 10px #eab308;
+}
+
+.data-point.teal {
+  background: #14b8a6;
+  box-shadow: 0 0 10px #14b8a6;
+}
+
 .astral-energy {
   position: relative;
   overflow: visible;

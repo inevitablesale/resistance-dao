@@ -191,6 +191,62 @@ const IndexContent = () => {
     opacity: 1 - scrollProgress * 0.6
   } as React.CSSProperties;
 
+  useEffect(() => {
+    const createNodes = () => {
+      const nodes = [];
+      for (let i = 0; i < 5; i++) {
+        nodes.push({
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+          type: Math.random() > 0.5 ? 'yellow' : 'teal'
+        });
+      }
+      return nodes;
+    };
+
+    const createDataPoints = () => {
+      const points = [];
+      for (let i = 0; i < 10; i++) {
+        points.push({
+          startX: Math.random() * 100,
+          startY: Math.random() * 100,
+          endX: Math.random() * 100,
+          endY: Math.random() * 100,
+          type: Math.random() > 0.5 ? 'yellow' : 'teal',
+          delay: Math.random() * 2
+        });
+      }
+      return points;
+    };
+
+    const nodes = createNodes();
+    const dataPoints = createDataPoints();
+
+    // Add nodes to the circuit board
+    const circuitBoard = document.querySelector('.circuit-board');
+    if (circuitBoard) {
+      nodes.forEach(node => {
+        const nodeElement = document.createElement('div');
+        nodeElement.className = `circuit-node ${node.type}`;
+        nodeElement.style.left = `${node.x}%`;
+        nodeElement.style.top = `${node.y}%`;
+        circuitBoard.appendChild(nodeElement);
+      });
+
+      // Add data points
+      dataPoints.forEach(point => {
+        const pointElement = document.createElement('div');
+        pointElement.className = `data-point ${point.type}`;
+        pointElement.style.left = `${point.startX}%`;
+        pointElement.style.top = `${point.startY}%`;
+        pointElement.style.setProperty('--flow-x', `${point.endX - point.startX}%`);
+        pointElement.style.setProperty('--flow-y', `${point.endY - point.startY}%`);
+        pointElement.style.animationDelay = `${point.delay}s`;
+        circuitBoard.appendChild(pointElement);
+      });
+    }
+  }, []);
+
   return (
     <>
       <div 
@@ -284,11 +340,22 @@ const IndexContent = () => {
           }}
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Next-Gen<br />Accounting Ownership
+            Transform Your Practice<br />Into Liquid Assets
           </h1>
-          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto mb-12 drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Join the revolution in firm ownership. LedgerFund DAO empowers accountants to collectively acquire, govern, and transform accounting practices through blockchain technology and democratic decision-making.
-          </p>
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
+            <div className="cosmic-box yellow-energy p-6 rounded-lg backdrop-blur-sm relative">
+              <h3 className="text-xl font-bold text-yellow-500 mb-2">Build Your Thesis</h3>
+              <p className="text-white/80">Transform client relationships into predictable revenue streams</p>
+            </div>
+            <div className="cosmic-box teal-energy p-6 rounded-lg backdrop-blur-sm relative">
+              <h3 className="text-xl font-bold text-teal-500 mb-2">Create Liquidity Pools</h3>
+              <p className="text-white/80">Pool resources with other accountants to acquire and scale practices</p>
+            </div>
+            <div className="cosmic-box yellow-energy p-6 rounded-lg backdrop-blur-sm relative">
+              <h3 className="text-xl font-bold text-yellow-500 mb-2">Acquire Firms</h3>
+              <p className="text-white/80">Use smart contracts to automate practice acquisitions and governance</p>
+            </div>
+          </div>
 
           {showPurchaseForm ? (
             <div className="max-w-3xl mx-auto bg-black/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
