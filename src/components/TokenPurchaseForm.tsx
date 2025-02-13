@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { purchaseTokens, fetchPresaleMaticPrice, fetchConversionRates } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Loader2, ArrowLeft, CreditCard, CheckCircle2, ArrowRight, RefreshCw, Copy, Building2, Wallet, ChartBar, BarChart2, Users, Briefcase } from "lucide-react";
+import { Loader2, ArrowLeft, CreditCard, CheckCircle2, ArrowRight, RefreshCw, Copy, Building2, Wallet, ChartBar } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletAssets } from "@/components/wallet/WalletAssets";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -30,41 +30,23 @@ interface ConversionRates {
   lastUpdated?: Date;
 }
 
-const investmentPackages = [
+const simplePackages = [
   {
     name: "Starter",
     amount: "100",
     lgrAmount: "1,000",
-    features: [
-      "Access to firm token marketplace",
-      "Voting rights on firm acquisitions",
-      "Monthly dividend distributions",
-      "Basic governance participation"
-    ],
     icon: Building2
   },
   {
     name: "Growth",
     amount: "500",
     lgrAmount: "5,000",
-    features: [
-      "Enhanced voting power",
-      "Priority access to new firm listings",
-      "Quarterly performance reports",
-      "Committee participation rights"
-    ],
     icon: ChartBar
   },
   {
     name: "Professional",
     amount: "1000",
     lgrAmount: "10,000",
-    features: [
-      "Premium governance rights",
-      "Direct access to firm management",
-      "Strategic decision participation",
-      "First access to new features"
-    ],
     icon: Wallet
   }
 ];
@@ -261,7 +243,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       </div>
 
       <div className="grid gap-6">
-        {investmentPackages.map((pkg, index) => (
+        {simplePackages.map((pkg, index) => (
           <button
             key={index}
             onClick={() => {
