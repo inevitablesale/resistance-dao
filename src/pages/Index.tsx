@@ -127,22 +127,22 @@ const boardMembers = [
 
 const processSteps = [
   {
-    title: "Build Your Thesis",
-    description: "Join a community of like-minded investors to propose and develop investment strategies for accounting practices you want to acquire",
+    title: "Submit Your Thesis",
+    description: "Share your vision for acquiring and scaling accounting practices. Connect with like-minded investors to form investment pools.",
     icon: Trophy,
     color: "yellow",
     className: "cosmic-box yellow-energy"
   },
   {
-    title: "Create Liquidity Pools",
-    description: "Pool resources with other accountants to acquire and scale practices",
+    title: "Build Liquidity Pools",
+    description: "Pool resources with other accountants to acquire practices. Smart contracts ensure transparent fund management and investor rights.",
     icon: Users,
     color: "teal",
     className: "cosmic-box teal-energy"
   },
   {
-    title: "Manage Firms",
-    description: "Leverage centralized services model to separate work from accounts, creating scalable digital assets",
+    title: "Tokenize Firm Assets",
+    description: "Convert accounting practices into tradeable digital assets. Access the decentralized marketplace for seamless buying and selling.",
     icon: Crown,
     color: "yellow",
     className: "cosmic-box yellow-energy"
@@ -342,6 +342,29 @@ const IndexContent = () => {
           </div>
         </div>
       </div>
+
+      <section className="py-24 relative z-10">
+        <div className="container px-4">
+          <h2 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-16">
+            How It Works
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {processSteps.map((step, index) => (
+              <div
+                key={index}
+                className={`${step.className} p-8 rounded-xl bg-black/30 border border-white/10 backdrop-blur-sm relative overflow-hidden group hover:scale-105 transition-all duration-300`}
+              >
+                <div className={`w-12 h-12 rounded-full bg-${step.color}-500/20 flex items-center justify-center mb-6`}>
+                  {<step.icon className={`w-6 h-6 text-${step.color}-500`} />}
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-4">{step.title}</h3>
+                <p className="text-white/70">{step.description}</p>
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <WhatWeBuilding />
       <LedgerFrens />
