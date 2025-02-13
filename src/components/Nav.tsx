@@ -38,12 +38,14 @@ const Nav = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-6">
-            <Link 
-              to="/getting-started" 
+            <a 
+              href="https://www.linkedin.com/build-relation/newsletter-follow?entityUrn=7259300749644357632"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-white/80 hover:text-white transition-colors"
             >
-              Get Started
-            </Link>
+              Read by 1,500+ Accountants
+            </a>
             <Link 
               to="/litepaper" 
               className="px-6 py-2 bg-gradient-to-r from-yellow-500 via-teal-400 to-yellow-400 text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
