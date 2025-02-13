@@ -343,27 +343,6 @@ const IndexContent = () => {
                   <p className="text-white/80 text-lg">
                     {step.description}
                   </p>
-                  {index === 2 && (
-                    <div className="mt-4 p-4 bg-black/30 rounded-lg border border-white/10">
-                      <p className="text-sm text-white/70">
-                        By centralizing services and separating work from client relationships, we create tokenized assets that:
-                      </p>
-                      <ul className="mt-2 space-y-2 text-sm text-white/70">
-                        <li className="flex items-center gap-2">
-                          <Star className="w-4 h-4 text-yellow-500" />
-                          Generate passive income through token staking
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Shield className="w-4 h-4 text-teal-500" />
-                          Reduce risk through diversified investment pools
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Award className="w-4 h-4 text-yellow-500" />
-                          Create additional liquidity through token trading
-                        </li>
-                      </ul>
-                    </div>
-                  )}
                 </div>
                 <div className="absolute inset-0 border border-white/10 rounded-xl z-20 pointer-events-none" />
               </div>
@@ -373,7 +352,7 @@ const IndexContent = () => {
       </div>
 
       {showPurchaseForm && (
-        <TokenPurchaseForm />
+        <TokenPurchaseForm onClose={() => setShowPurchaseForm(false)} />
       )}
 
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm py-16">
