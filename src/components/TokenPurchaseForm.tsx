@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { purchaseTokens, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Loader2, ArrowLeft, CreditCard } from "lucide-react";
+import { Loader2, ArrowLeft, CreditCard, CheckCircle2 } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletAssets } from "@/components/wallet/WalletAssets";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -19,7 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-type PurchaseView = 'initial' | 'crypto';
+type PurchaseView = 'payment-select' | 'polygon-amount' | 'card-amount';
 
 interface TokenPurchaseFormProps {
   initialAmount?: string;
@@ -28,13 +28,12 @@ interface TokenPurchaseFormProps {
 export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { showBanxaDeposit } = useCustomWallet();
-  const [currentView, setCurrentView] = useState<PurchaseView>('initial');
+  const [currentView, setCurrentView] = useState<PurchaseView>('payment-select');
   const [maticAmount, setMaticAmount] = useState(initialAmount || "");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const [expectedLGR, setExpectedLGR] = useState<string | null>(null);
 
-  // Initialize balance monitoring
   useBalanceMonitor();
 
   useEffect(() => {
@@ -62,18 +61,6 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     const value = e.target.value;
     setMaticAmount(value);
     calculateExpectedLGR(value);
-  };
-
-  const handleCryptoPayment = () => {
-    if (!maticAmount || isNaN(Number(maticAmount)) || Number(maticAmount) <= 0) {
-      toast({
-        title: "Invalid Amount",
-        description: "Please enter a valid MATIC amount",
-        variant: "destructive",
-      });
-      return;
-    }
-    setCurrentView('crypto');
   };
 
   const handleCreditCardPayment = async () => {
@@ -134,7 +121,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       
       setMaticAmount("");
       setExpectedLGR(null);
-      setCurrentView('initial');
+      setCurrentView('payment-select');
     } catch (error) {
       console.error("Purchase error:", error);
       toast({
@@ -147,107 +134,146 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     }
   };
 
-  const renderInitialView = () => (
-    <div className="space-y-4 w-full max-w-md mx-auto">
-      <WalletAssets />
-
-      <div className="space-y-2">
-        <label htmlFor="maticAmount" className="block text-sm font-medium text-gray-200">
-          Amount in MATIC
-        </label>
-        <Input
-          id="maticAmount"
-          type="number"
-          value={maticAmount}
-          onChange={handleAmountChange}
-          placeholder="Enter MATIC amount"
-          min="0"
-          step="0.01"
-          disabled={isProcessing}
-          className="bg-black/20 border-white/10 text-white placeholder:text-gray-400"
-        />
-        {expectedLGR && (
-          <p className="text-sm text-gray-300">
-            Expected LGR: ~{expectedLGR} LGR
-          </p>
-        )}
+  const renderPaymentSelect = () => (
+    <div className="space-y-6 w-full max-w-md mx-auto">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-white mb-2">Choose Payment Method</h2>
+        <p className="text-gray-400">Select how you'd like to purchase LGR tokens</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Button
-          onClick={handleCryptoPayment}
-          disabled={isProcessing || !maticAmount}
-          className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
-        >
-          <img 
-            src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-            alt="Polygon"
-            className="mr-2 h-4 w-4"
-          />
-          Pay with Crypto
-        </Button>
-        <Button
-          onClick={handleCreditCardPayment}
-          disabled={isProcessing || !maticAmount}
-          className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
-        >
-          <CreditCard className="mr-2 h-4 w-4" />
-          Pay with Card
-        </Button>
-      </div>
+      <button
+        onClick={() => setCurrentView('polygon-amount')}
+        className="w-full p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-colors mb-4 group"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-polygon-primary/20 flex items-center justify-center p-2">
+              <img 
+                src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+                alt="Polygon"
+                className="w-full h-full"
+              />
+            </div>
+            <div className="text-left">
+              <h3 className="text-lg font-semibold text-white">Pay with Polygon</h3>
+              <p className="text-sm text-gray-400">Use MATIC to purchase directly</p>
+            </div>
+          </div>
+          <CheckCircle2 className="text-white/20 group-hover:text-white/40 transition-colors" />
+        </div>
+        <div className="grid grid-cols-2 gap-4 text-sm text-gray-400">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <span>Direct token purchase</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <span>Instant processing</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <span>Lower fees</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <span>No KYC required</span>
+          </div>
+        </div>
+      </button>
+
+      <button
+        onClick={() => setCurrentView('card-amount')}
+        className="w-full p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-colors group"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+              <CreditCard className="w-6 h-6 text-yellow-500" />
+            </div>
+            <div className="text-left">
+              <h3 className="text-lg font-semibold text-white">Pay with Card</h3>
+              <p className="text-sm text-gray-400">Use credit/debit card</p>
+            </div>
+          </div>
+          <CheckCircle2 className="text-white/20 group-hover:text-white/40 transition-colors" />
+        </div>
+        <div className="grid grid-cols-2 gap-4 text-sm text-gray-400">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <span>Easy onboarding</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <span>Major cards accepted</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <span>Secure processing</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <span>24/7 support</span>
+          </div>
+        </div>
+      </button>
     </div>
   );
 
-  const renderCryptoView = () => (
+  const renderPolygonAmount = () => (
     <Card className="w-full max-w-md mx-auto bg-black/20 border-white/10">
       <CardHeader>
         <div className="flex items-center">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setCurrentView('initial')}
+            onClick={() => setCurrentView('payment-select')}
             className="mr-2 text-white hover:text-white/80 hover:bg-white/10"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
-            <CardTitle className="text-white">Confirm Purchase</CardTitle>
-            <CardDescription className="text-gray-400">
-              Purchase LGR tokens with MATIC
-            </CardDescription>
+          <div className="flex items-center gap-2">
+            <img 
+              src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+              alt="Polygon"
+              className="h-6 w-6"
+            />
+            <div>
+              <CardTitle className="text-white">Pay with Polygon</CardTitle>
+              <CardDescription className="text-gray-400">
+                Enter the amount in MATIC
+              </CardDescription>
+            </div>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="rounded-lg border border-white/10 p-4 space-y-3">
-          <div className="flex items-center gap-2 text-white">
-            <img 
-              src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-              alt="Polygon"
-              className="h-5 w-5"
-            />
-            <span className="font-medium">Purchase Summary</span>
-          </div>
-          <div className="text-sm text-gray-400 space-y-2">
-            <div className="flex justify-between">
-              <span>Amount:</span>
-              <span className="text-white">{maticAmount} MATIC</span>
-            </div>
-            {expectedLGR && (
-              <div className="flex justify-between">
-                <span>Expected LGR:</span>
-                <span className="text-white">~{expectedLGR} LGR</span>
-              </div>
-            )}
-          </div>
+        <div className="space-y-2">
+          <label htmlFor="maticAmount" className="block text-sm font-medium text-gray-200">
+            Amount in MATIC
+          </label>
+          <Input
+            id="maticAmount"
+            type="number"
+            value={maticAmount}
+            onChange={handleAmountChange}
+            placeholder="Enter MATIC amount"
+            min="0"
+            step="0.01"
+            disabled={isProcessing}
+            className="bg-black/20 border-white/10 text-white placeholder:text-gray-400"
+          />
+          {expectedLGR && (
+            <p className="text-sm text-gray-300">
+              Expected LGR: ~{expectedLGR} LGR
+            </p>
+          )}
         </div>
 
         <WalletAssets />
-      </CardContent>
-      <CardFooter>
+
         <Button
           onClick={handlePurchaseTransaction}
-          disabled={isProcessing}
+          disabled={isProcessing || !maticAmount}
           className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
         >
           {isProcessing ? (
@@ -256,17 +282,88 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
               Processing...
             </>
           ) : (
-            "Confirm Purchase"
+            "Continue to Purchase"
           )}
         </Button>
-      </CardFooter>
+      </CardContent>
+    </Card>
+  );
+
+  const renderCardAmount = () => (
+    <Card className="w-full max-w-md mx-auto bg-black/20 border-white/10">
+      <CardHeader>
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCurrentView('payment-select')}
+            className="mr-2 text-white hover:text-white/80 hover:bg-white/10"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-full bg-yellow-500/20 flex items-center justify-center">
+              <CreditCard className="w-3 h-3 text-yellow-500" />
+            </div>
+            <div>
+              <CardTitle className="text-white">Card Payment</CardTitle>
+              <CardDescription className="text-gray-400">
+                Enter purchase amount
+              </CardDescription>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-2">
+          <label htmlFor="maticAmount" className="block text-sm font-medium text-gray-200">
+            Amount in MATIC
+          </label>
+          <Input
+            id="maticAmount"
+            type="number"
+            value={maticAmount}
+            onChange={handleAmountChange}
+            placeholder="Enter MATIC amount"
+            min="30"
+            step="0.01"
+            disabled={isProcessing}
+            className="bg-black/20 border-white/10 text-white placeholder:text-gray-400"
+          />
+          <p className="text-sm text-gray-400">
+            Minimum purchase amount: $30 USD
+          </p>
+          {expectedLGR && (
+            <p className="text-sm text-gray-300">
+              Expected LGR: ~{expectedLGR} LGR
+            </p>
+          )}
+        </div>
+
+        <Button
+          onClick={handleCreditCardPayment}
+          disabled={isProcessing || !maticAmount}
+          className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            "Continue to Payment"
+          )}
+        </Button>
+      </CardContent>
     </Card>
   );
 
   switch (currentView) {
-    case 'crypto':
-      return renderCryptoView();
+    case 'polygon-amount':
+      return renderPolygonAmount();
+    case 'card-amount':
+      return renderCardAmount();
     default:
-      return renderInitialView();
+      return renderPaymentSelect();
   }
 };
