@@ -21,6 +21,7 @@ import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
 import { Button } from "@/components/ui/button";
+import { CustomWalletSheet } from "@/components/wallet/CustomWalletSheet";
 
 const presaleData = [
   { 
@@ -312,12 +313,7 @@ const IndexContent = () => {
           </p>
 
           <div className="flex gap-4 justify-center mb-24">
-            <button 
-              onClick={() => setShowPurchaseForm(true)}
-              className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-lg font-bold text-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105"
-            >
-              Buy Token
-            </button>
+            <CustomWalletSheet />
             <button 
               onClick={() => window.open('https://docs.ledgerfund.finance', '_blank')}
               className="px-8 py-4 bg-white/10 text-white rounded-lg font-bold text-lg hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
@@ -352,7 +348,7 @@ const IndexContent = () => {
       </div>
 
       {showPurchaseForm && (
-        <TokenPurchaseForm onClose={() => setShowPurchaseForm(false)} />
+        <TokenPurchaseForm initialAmount={selectedAmount} />
       )}
 
       <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm py-16">
