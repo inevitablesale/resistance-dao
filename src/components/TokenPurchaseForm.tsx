@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Input } from "@/components/ui/input";
@@ -102,7 +103,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
 
   useEffect(() => {
     updatePrices();
-    const interval = setInterval(updatePrices, 30000); // Update every 30 seconds
+    const interval = setInterval(updatePrices, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -135,7 +136,6 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
       return null;
     }
 
-    // Add 1% buffer to account for price movement
     const bufferedUsdToMatic = conversionRates.usdToMatic * 1.01;
     const bufferedMaticToLgr = conversionRates.maticToLgr * 1.01;
 
@@ -439,14 +439,12 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
           </label>
           <Input
             id="maticAmount"
-            type="number"
+            type="text"
             value={maticAmount}
             onChange={handleAmountChange}
             placeholder="Enter MATIC amount"
-            min="0"
-            step="0.01"
-            disabled={isProcessing}
             className="bg-black/20 border-white/10 text-white placeholder:text-gray-400"
+            min="0"
           />
           {expectedLGR && (
             <p className="text-sm text-gray-300">
@@ -475,208 +473,80 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     </Card>
   );
 
-  const renderCardAmount = () => {
-    return (
-      <Card className="w-full max-w-md mx-auto bg-black/20 border-white/10">
-        <CardHeader>
-          <div className="flex items-center">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setCurrentView('payment-select')}
-              className="mr-2 text-white hover:text-white/80 hover:bg-white/10"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                <CreditCard className="w-3 h-3 text-yellow-500" />
-              </div>
-              <div>
-                <CardTitle className="text-white">Card Payment</CardTitle>
-                <CardDescription className="text-gray-400">
-                  Purchase ${usdAmount} of tokens
-                </CardDescription>
-              </div>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <div className="rounded-lg border border-white/10 p-4">
-              <h3 className="text-lg font-semibold text-white mb-4">How to Purchase</h3>
-              <ol className="space-y-3 text-gray-300">
-                <li className="flex gap-2">
-                  <span className="font-bold text-yellow-500">1.</span>
-                  <span>Click 'Continue to Payment' below to access our payment partner Banxa</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="font-bold text-yellow-500">2.</span>
-                  <span>Select your preferred payment method (credit/debit card, bank transfer, etc.)</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="font-bold text-yellow-500">3.</span>
-                  <span>Enter the amount you wish to purchase (minimum $30 USD)</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="font-bold text-yellow-500">4.</span>
-                  <span>Complete the payment process to receive MATIC in your wallet</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="font-bold text-yellow-500">5.</span>
-                  <span>Use your MATIC to purchase LGR tokens through the Polygon payment option</span>
-                </li>
-              </ol>
-            </div>
-          </div>
-
+  const renderCardAmount = () => (
+    <Card className="w-full max-w-md mx-auto bg-black/20 border-white/10">
+      <CardHeader>
+        <div className="flex items-center">
           <Button
-            onClick={handleCreditCardPayment}
-            className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
+            variant="ghost"
+            size="icon"
+            onClick={() => setCurrentView('payment-select')}
+            className="mr-2 text-white hover:text-white/80 hover:bg-white/10"
           >
-            {isProcessing ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              "Continue to Payment"
-            )}
+            <ArrowLeft className="h-4 w-4" />
           </Button>
-        </CardContent>
-      </Card>
-    );
-  };
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-full bg-yellow-500/20 flex items-center justify-center">
+              <CreditCard className="w-3 h-3 text-yellow-500" />
+            </div>
+            <div>
+              <CardTitle className="text-white">Card Payment</CardTitle>
+              <CardDescription className="text-gray-400">
+                Purchase ${usdAmount} of tokens
+              </CardDescription>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <div className="rounded-lg border border-white/10 p-4">
+            <h3 className="text-lg font-semibold text-white mb-4">How to Purchase</h3>
+            <ol className="space-y-3 text-gray-300">
+              <li className="flex gap-2">
+                <span className="font-bold text-yellow-500">1.</span>
+                <span>Click 'Continue to Payment' below to access our payment partner Banxa</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-bold text-yellow-500">2.</span>
+                <span>Select your preferred payment method (credit/debit card, bank transfer, etc.)</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-bold text-yellow-500">3.</span>
+                <span>Enter the amount you wish to purchase (minimum $30 USD)</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-bold text-yellow-500">4.</span>
+                <span>Complete the payment process to receive MATIC in your wallet</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-bold text-yellow-500">5.</span>
+                <span>Use your MATIC to purchase LGR tokens through the Polygon payment option</span>
+              </li>
+            </ol>
+          </div>
+        </div>
 
-  const renderTokenizationMarketplace = () => (
-    <div className="space-y-12 max-w-4xl mx-auto px-4 mt-12">
-      <div className="text-center space-y-4">
-        <h2 className="text-3xl font-bold text-white">Tokenize Your Practice</h2>
-        <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-          Separate work from accounts by creating scalable digital assets. Transform your firm's resources, 
-          client relationships, and advisory services into tradeable assets on our decentralized marketplace.
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group">
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center">
-                <Building2 className="h-6 w-6 text-teal-400" />
-              </div>
-              <div>
-                <CardTitle className="text-white">Firm Valuation</CardTitle>
-                <CardDescription className="text-gray-400">
-                  Tokenize your practice based on revenue and growth metrics
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">Average Token Price</span>
-              <span className="text-white font-medium">50,000 LGR</span>
-            </div>
-            <Button className="w-full group-hover:translate-x-1 transition-transform">
-              Tokenize Practice <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group">
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                <Users className="h-6 w-6 text-purple-400" />
-              </div>
-              <div>
-                <CardTitle className="text-white">Client Portfolio</CardTitle>
-                <CardDescription className="text-gray-400">
-                  Create tradeable assets from recurring client relationships
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">Average Token Price</span>
-              <span className="text-white font-medium">10,000 LGR</span>
-            </div>
-            <Button className="w-full group-hover:translate-x-1 transition-transform">
-              Tokenize Clients <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group">
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center">
-                <Briefcase className="h-6 w-6 text-yellow-400" />
-              </div>
-              <div>
-                <CardTitle className="text-white">Advisory Services</CardTitle>
-                <CardDescription className="text-gray-400">
-                  Package and sell specialized consulting and advisory services
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">Average Token Price</span>
-              <span className="text-white font-medium">25,000 LGR</span>
-            </div>
-            <Button className="w-full group-hover:translate-x-1 transition-transform">
-              Tokenize Services <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group">
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center">
-                <BarChart2 className="h-6 w-6 text-pink-400" />
-              </div>
-              <div>
-                <CardTitle className="text-white">Resources & IP</CardTitle>
-                <CardDescription className="text-gray-400">
-                  Convert intellectual property and resources into digital assets
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">Average Token Price</span>
-              <span className="text-white font-medium">15,000 LGR</span>
-            </div>
-            <Button className="w-full group-hover:translate-x-1 transition-transform">
-              Tokenize Resources <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="text-center text-gray-400 max-w-2xl mx-auto">
-        <p className="text-sm">
-          Join our DAO-governed marketplace where community-validated service providers can trade 
-          tokenized firm assets, creating new opportunities for growth and collaboration.
-        </p>
-      </div>
-    </div>
+        <Button
+          onClick={handleCreditCardPayment}
+          className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            "Continue to Payment"
+          )}
+        </Button>
+      </CardContent>
+    </Card>
   );
 
   switch (currentView) {
     case 'packages':
-      return (
-        <>
-          {renderPackages()}
-          {renderTokenizationMarketplace()}
-        </>
-      );
+      return renderPackages();
     case 'payment-select':
       return renderPaymentSelect();
     case 'polygon-amount':
