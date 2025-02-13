@@ -36,15 +36,15 @@ const IndexContent = () => {
   return (
     <>
       <div className="text-center mb-8 max-w-5xl mx-auto pt-32">
-        <h1 className="text-6xl md:text-7xl font-bold mb-6 text-white leading-tight">
+        <h1 className="text-6xl md:text-7xl font-bold mb-6 text-white leading-tight animate-fade-in">
           Own the Future of<br />Accounting Practices
         </h1>
-        <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12">
+        <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-12 animate-fade-in animation-delay-200">
           Be part of our $500,000 investment round to build a better model for accounting practice succession. Minimum investment: $100.
         </p>
 
         <div className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto px-4 mb-12">
-          <Card className="bg-white/5 backdrop-blur p-6 rounded-xl border border-white/10 text-left">
+          <Card className="bg-white/5 backdrop-blur p-6 rounded-xl border border-white/10 text-left animate-fade-in animation-delay-300 hover:scale-105 transition-transform duration-300">
             <DollarSign className="w-8 h-8 text-teal-500 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-3">$100 Minimum</h3>
             <p className="text-gray-300">
@@ -52,7 +52,7 @@ const IndexContent = () => {
             </p>
           </Card>
 
-          <Card className="bg-white/5 backdrop-blur p-6 rounded-xl border border-white/10 text-left">
+          <Card className="bg-white/5 backdrop-blur p-6 rounded-xl border border-white/10 text-left animate-fade-in animation-delay-400 hover:scale-105 transition-transform duration-300">
             <CreditCard className="w-8 h-8 text-teal-500 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-3">Easy Payment</h3>
             <p className="text-gray-300">
@@ -60,7 +60,7 @@ const IndexContent = () => {
             </p>
           </Card>
 
-          <Card className="bg-white/5 backdrop-blur p-6 rounded-xl border border-white/10 text-left">
+          <Card className="bg-white/5 backdrop-blur p-6 rounded-xl border border-white/10 text-left animate-fade-in animation-delay-500 hover:scale-105 transition-transform duration-300">
             <PieChart className="w-8 h-8 text-teal-500 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-3">Revenue Share</h3>
             <p className="text-gray-300">
@@ -68,7 +68,7 @@ const IndexContent = () => {
             </p>
           </Card>
 
-          <Card className="bg-white/5 backdrop-blur p-6 rounded-xl border border-white/10 text-left">
+          <Card className="bg-white/5 backdrop-blur p-6 rounded-xl border border-white/10 text-left animate-fade-in animation-delay-600 hover:scale-105 transition-transform duration-300">
             <Users className="w-8 h-8 text-teal-500 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-3">Governance</h3>
             <p className="text-gray-300">
@@ -77,10 +77,10 @@ const IndexContent = () => {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 animate-fade-in animation-delay-700">
           <Button
             onClick={handleInvestNow}
-            className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-6 rounded-xl text-lg font-semibold"
+            className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-6 rounded-xl text-lg font-semibold hover:scale-105 transition-all duration-300"
           >
             Invest Now
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -92,8 +92,8 @@ const IndexContent = () => {
         </div>
 
         {showPurchaseForm && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-black/90 border border-white/10 rounded-xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+            <div className="bg-black/90 border border-white/10 rounded-xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto animate-scale-in">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-white">Purchase Tokens</h3>
                 <button 
@@ -107,83 +107,6 @@ const IndexContent = () => {
             </div>
           </div>
         )}
-      </div>
-
-      <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-white mb-8">
-            Use of Funds
-          </h2>
-          
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="relative p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20">
-              <div className="absolute -top-4 -left-4 w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-black font-bold">
-                70%
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-4">Practice Acquisitions</h3>
-              <p className="text-gray-300">
-                Direct investment into accounting practice acquisitions and growth capital.
-              </p>
-            </div>
-
-            <div className="relative p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20">
-              <div className="absolute -top-4 -left-4 w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-black font-bold">
-                20%
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-4">Operations</h3>
-              <p className="text-gray-300">
-                Platform development, legal compliance, and professional services.
-              </p>
-            </div>
-
-            <div className="relative p-6 rounded-lg bg-black/30 backdrop-blur border border-teal-500/20">
-              <div className="absolute -top-4 -left-4 w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-black font-bold">
-                10%
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-4">Reserve</h3>
-              <p className="text-gray-300">
-                Strategic reserve for future opportunities and market stabilization.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="relative z-10 bg-black/95">
-        <div className="container mx-auto px-4 py-24">
-          <div className="max-w-4xl mx-auto text-center space-y-16">
-            <div>
-              <h2 className="text-3xl font-bold text-white mb-6">
-                Investment Benefits
-              </h2>
-              <p className="text-lg text-gray-300 mb-8">
-                Join hundreds of accountants already participating in the future of practice ownership.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card className="bg-white/5 backdrop-blur p-6 rounded-xl border border-white/10">
-                <h3 className="text-xl font-semibold text-white mb-3">For Investors</h3>
-                <ul className="text-gray-300 space-y-2">
-                  <li>✓ Low minimum investment ($100)</li>
-                  <li>✓ Revenue share from acquisitions</li>
-                  <li>✓ Voting rights on key decisions</li>
-                  <li>✓ Early access to new features</li>
-                </ul>
-              </Card>
-
-              <Card className="bg-white/5 backdrop-blur p-6 rounded-xl border border-white/10">
-                <h3 className="text-xl font-semibold text-white mb-3">For Practice Owners</h3>
-                <ul className="text-gray-300 space-y-2">
-                  <li>✓ Access to acquisition capital</li>
-                  <li>✓ Professional network support</li>
-                  <li>✓ Simplified exit planning</li>
-                  <li>✓ Technology resources</li>
-                </ul>
-              </Card>
-            </div>
-          </div>
-        </div>
       </div>
 
       <WhatWeBuilding />
