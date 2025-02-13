@@ -336,6 +336,117 @@ const IndexContent = () => {
         </div>
       </div>
 
+      {/* Market Dynamics Section */}
+      <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
+        <div className="container px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <BarChart2 className="w-16 h-16 mx-auto text-teal-500 mb-6" />
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-teal-200">
+                Market Opportunity
+              </h2>
+              <p className="text-xl text-white/80 mb-12 max-w-4xl mx-auto">
+                In today's accounting practice market, quality firms are scarce while buyers are abundant. We're solving this through collaborative investing and blockchain technology.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 mb-16">
+              {/* Market Challenge */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-orange-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div className="p-2 bg-red-500/10 rounded-lg inline-block mb-6">
+                    <Calculator className="w-12 h-12 text-red-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-red-500 mb-4">Supply-Demand Imbalance</h3>
+                  <ul className="space-y-4 text-white/70">
+                    <li className="flex items-start gap-3">
+                      <Clock className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                      <span>Quality accounting practices rarely come to market, with long wait times for interested buyers</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <DollarSign className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                      <span>High competition drives up prices, making individual acquisitions increasingly challenging</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Calendar className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                      <span>Traditional deal sourcing can take years, limiting growth opportunities</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Solution */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div className="p-2 bg-teal-500/10 rounded-lg inline-block mb-6">
+                    <Users className="w-12 h-12 text-teal-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Collaborative Solution</h3>
+                  <ul className="space-y-4 text-white/70">
+                    <li className="flex items-start gap-3">
+                      <BookOpen className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
+                      <span>Pool expertise from experienced practitioners to better evaluate and manage practices</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Building2 className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
+                      <span>Combine resources to access larger, higher-quality practices typically out of reach</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Shield className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
+                      <span>Reduce individual risk through diversified ownership and shared due diligence</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Blockchain Benefits */}
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10 h-full">
+                  <div className="p-2 bg-yellow-500/10 rounded-lg inline-block mb-6">
+                    <Shield className="w-12 h-12 text-yellow-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-yellow-500 mb-4">Non-Custodial</h3>
+                  <p className="text-white/70">
+                    Maintain direct control of your assets through smart contracts. No intermediaries hold your tokens or investment rights.
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10 h-full">
+                  <div className="p-2 bg-teal-500/10 rounded-lg inline-block mb-6">
+                    <Users className="w-12 h-12 text-teal-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-teal-500 mb-4">Decentralized</h3>
+                  <p className="text-white/70">
+                    Community-driven governance ensures decisions align with token holder interests, not centralized authorities.
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10 h-full">
+                  <div className="p-2 bg-yellow-500/10 rounded-lg inline-block mb-6">
+                    <Briefcase className="w-12 h-12 text-yellow-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-yellow-500 mb-4">Transparent</h3>
+                  <p className="text-white/70">
+                    All investments, voting, and distributions are recorded on-chain, providing unprecedented visibility into operations.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Step 1: Submit Your Thesis */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
