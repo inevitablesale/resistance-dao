@@ -366,185 +366,8 @@ const IndexContent = () => {
         </div>
       </div>
 
-      <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm py-16">
+      <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm py-24">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12">
-            Tokenize Acquired Practices
-          </h2>
-          
-          <div className="max-w-2xl mx-auto text-center mb-12">
-            <p className="text-xl text-gray-300">
-              Convert illiquid practice assets into tradeable tokens on our decentralized exchange, unlocking new value from human capital, client relationships, and intellectual property.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {[
-              {
-                title: "Firm Valuation",
-                description: "Tokenize partner expertise, specialized skills, and professional certifications into tradeable assets",
-                icon: Building2,
-                iconBg: "teal",
-                assetClass: "Professional Expertise",
-                buttonText: "Tokenize Practice"
-              },
-              {
-                title: "Client Portfolio",
-                description: "Transform long-term client relationships and recurring revenue streams into liquid digital assets",
-                icon: Users,
-                iconBg: "purple",
-                assetClass: "Customer Relations",
-                buttonText: "Tokenize Clients"
-              },
-              {
-                title: "Advisory Services",
-                description: "Monetize industry networks, referral partnerships, and community relationships through tokenization",
-                icon: Briefcase,
-                iconBg: "yellow",
-                assetClass: "Network Value",
-                buttonText: "Tokenize Services"
-              },
-              {
-                title: "Resources & IP",
-                description: "Convert proprietary processes, workflows, and systems into tradeable digital assets",
-                icon: BarChart2,
-                iconBg: "pink",
-                assetClass: "Operational IP",
-                buttonText: "Tokenize Resources"
-              }
-            ].map((card, index) => (
-              <Card key={index} className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group overflow-hidden relative">
-                <div className="absolute -right-20 top-12 rotate-45 bg-yellow-500/90 text-black px-24 py-1 text-sm font-semibold z-10">
-                  Available after presale
-                </div>
-                <CardHeader>
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-${card.iconBg}-500/10 flex items-center justify-center`}>
-                      <card.icon className={`h-6 w-6 text-${card.iconBg}-400`} />
-                    </div>
-                    <div>
-                      <CardTitle className="text-white">{card.title}</CardTitle>
-                      <CardDescription className="text-gray-400">
-                        {card.description}
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-400">Asset Class</span>
-                    <span className="text-white font-medium">{card.assetClass}</span>
-                  </div>
-                  <Button disabled className="w-full group-hover:translate-x-1 transition-transform opacity-50 cursor-not-allowed">
-                    {card.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center text-gray-400 max-w-2xl mx-auto mt-12">
-            <p className="text-sm">
-              Access our DAO-governed marketplace to trade tokenized practice assets, creating new opportunities 
-              for wealth creation and practice value realization.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="relative z-10 bg-black/95 py-24">
-        <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
-                After Acquisition: Building Value
-              </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Access a curated network of vetted service providers to transform traditional practices into scalable digital assets.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8 mb-16">
-              <div className="cosmic-box yellow-energy p-8 rounded-xl backdrop-blur-sm relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-0" />
-                <div className="relative z-10">
-                  <Shield className="w-12 h-12 text-yellow-500 mb-6 animate-cosmic-pulse" />
-                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Vetted Providers</h3>
-                  <p className="text-white/80">
-                    Access our network of DAO-approved service providers for tax, audit, bookkeeping, and advisory work.
-                  </p>
-                </div>
-              </div>
-
-              <div className="cosmic-box teal-energy p-8 rounded-xl backdrop-blur-sm relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-0" />
-                <div className="relative z-10">
-                  <Star className="w-12 h-12 text-teal-500 mb-6 animate-cosmic-pulse" />
-                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Community Ratings</h3>
-                  <p className="text-white/80">
-                    Benefit from transparent provider ratings and reviews from other practice owners in the network.
-                  </p>
-                </div>
-              </div>
-
-              <div className="cosmic-box yellow-energy p-8 rounded-xl backdrop-blur-sm relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-0" />
-                <div className="relative z-10">
-                  <Vote className="w-12 h-12 text-yellow-500 mb-6 animate-cosmic-pulse" />
-                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Governance Power</h3>
-                  <p className="text-white/80">
-                    Use your LGR tokens to vote on provider additions and shape the future of the service network.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-4 gap-6">
-              {[
-                {
-                  title: "Staff Augmentation",
-                  icon: Users,
-                  description: "On-demand access to qualified accounting professionals"
-                },
-                {
-                  title: "Technology Stack",
-                  icon: Rocket,
-                  description: "Modern practice management and workflow tools"
-                },
-                {
-                  title: "Quality Control",
-                  icon: Shield,
-                  description: "Standardized review processes and risk management"
-                },
-                {
-                  title: "Advisory Network",
-                  icon: Briefcase,
-                  description: "Specialized expertise for complex client needs"
-                }
-              ].map((service, index) => (
-                <div key={index} className="bg-black/20 border border-white/10 rounded-xl p-6 hover:bg-black/30 transition-all">
-                  <service.icon className="w-8 h-8 text-yellow-500 mb-4" />
-                  <h4 className="text-lg font-semibold text-white mb-2">{service.title}</h4>
-                  <p className="text-sm text-gray-400">{service.description}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-16 text-center">
-              <p className="text-gray-400 max-w-3xl mx-auto mb-8">
-                By separating service delivery from client relationships, we enable practice owners to focus on growth 
-                while maintaining quality through our decentralized provider network.
-              </p>
-              <Button disabled className="opacity-50 cursor-not-allowed">
-                Explore Service Network <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="relative z-10 bg-gradient-to-b from-black/80 to-black/95 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-24">
           <div id="join-the-singularity" className="text-center mb-16 pt-20 relative overflow-hidden">
             <div 
               className="absolute inset-0 -z-10"
@@ -636,6 +459,97 @@ const IndexContent = () => {
               <Roadmap />
               <FAQ />
               <Partners />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="relative z-10 bg-black/95 py-24">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
+                Managing Value: Centralized Services
+              </h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Access a curated network of vetted service providers to transform traditional practices into scalable digital assets.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 mb-16">
+              <div className="cosmic-box yellow-energy p-8 rounded-xl backdrop-blur-sm relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-0" />
+                <div className="relative z-10">
+                  <Shield className="w-12 h-12 text-yellow-500 mb-6 animate-cosmic-pulse" />
+                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Vetted Providers</h3>
+                  <p className="text-white/80">
+                    Access our network of DAO-approved service providers for tax, audit, bookkeeping, and advisory work.
+                  </p>
+                </div>
+              </div>
+
+              <div className="cosmic-box teal-energy p-8 rounded-xl backdrop-blur-sm relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-0" />
+                <div className="relative z-10">
+                  <Star className="w-12 h-12 text-teal-500 mb-6 animate-cosmic-pulse" />
+                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Community Ratings</h3>
+                  <p className="text-white/80">
+                    Benefit from transparent provider ratings and reviews from other practice owners in the network.
+                  </p>
+                </div>
+              </div>
+
+              <div className="cosmic-box yellow-energy p-8 rounded-xl backdrop-blur-sm relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-0" />
+                <div className="relative z-10">
+                  <Vote className="w-12 h-12 text-yellow-500 mb-6 animate-cosmic-pulse" />
+                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Governance Power</h3>
+                  <p className="text-white/80">
+                    Use your LGR tokens to vote on provider additions and shape the future of the service network.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-4 gap-6">
+              {[
+                {
+                  title: "Staff Augmentation",
+                  icon: Users,
+                  description: "On-demand access to qualified accounting professionals"
+                },
+                {
+                  title: "Technology Stack",
+                  icon: Rocket,
+                  description: "Modern practice management and workflow tools"
+                },
+                {
+                  title: "Quality Control",
+                  icon: Shield,
+                  description: "Standardized review processes and risk management"
+                },
+                {
+                  title: "Advisory Network",
+                  icon: Briefcase,
+                  description: "Specialized expertise for complex client needs"
+                }
+              ].map((service, index) => (
+                <div key={index} className="bg-black/20 border border-white/10 rounded-xl p-6 hover:bg-black/30 transition-all">
+                  <service.icon className="w-8 h-8 text-yellow-500 mb-4" />
+                  <h4 className="text-lg font-semibold text-white mb-2">{service.title}</h4>
+                  <p className="text-sm text-gray-400">{service.description}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-16 text-center">
+              <p className="text-gray-400 max-w-3xl mx-auto mb-8">
+                By separating service delivery from client relationships, we enable practice owners to focus on growth 
+                while maintaining quality through our decentralized provider network.
+              </p>
+              <Button disabled className="opacity-50 cursor-not-allowed">
+                Explore Service Network <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
