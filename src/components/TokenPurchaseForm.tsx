@@ -5,11 +5,21 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { purchaseTokens, fetchPresaleMaticPrice, fetchConversionRates } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Loader2, ArrowLeft, CreditCard, CheckCircle2, ArrowRight, RefreshCw, Copy, Building2, Wallet, ChartBar } from "lucide-react";
+import { 
+  Loader2, 
+  ArrowLeft, 
+  CreditCard, 
+  CheckCircle2, 
+  ArrowRight, 
+  RefreshCw, 
+  Copy, 
+  Building2, 
+  Wallet, 
+  BarChart2 
+} from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletAssets } from "@/components/wallet/WalletAssets";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
-import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -41,7 +51,7 @@ const simplePackages = [
     name: "Growth",
     amount: "500",
     lgrAmount: "5,000",
-    icon: ChartBar
+    icon: BarChart2
   },
   {
     name: "Professional",
