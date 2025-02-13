@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { purchaseTokens, fetchPresaleMaticPrice, fetchConversionRates } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Loader2, ArrowLeft, CreditCard, CheckCircle2, ArrowRight, RefreshCw, Copy, Building2, Wallet, ChartBar } from "lucide-react";
+import { Loader2, ArrowLeft, CreditCard, CheckCircle2, ArrowRight, RefreshCw, Copy, Building2, Wallet, ChartBar, BarChart2, Users, Briefcase } from "lucide-react";
 import { useBalanceMonitor } from "@/hooks/use-balance-monitor";
 import { WalletAssets } from "@/components/wallet/WalletAssets";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -565,9 +565,135 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
     );
   };
 
+  const renderTokenizationMarketplace = () => (
+    <div className="space-y-12 max-w-4xl mx-auto px-4 mt-12">
+      <div className="text-center space-y-4">
+        <h2 className="text-3xl font-bold text-white">Tokenize Your Practice</h2>
+        <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+          Separate work from accounts by creating scalable digital assets. Transform your firm's resources, 
+          client relationships, and advisory services into tradeable assets on our decentralized marketplace.
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group">
+          <CardHeader>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center">
+                <Building2 className="h-6 w-6 text-teal-400" />
+              </div>
+              <div>
+                <CardTitle className="text-white">Firm Valuation</CardTitle>
+                <CardDescription className="text-gray-400">
+                  Tokenize your practice based on revenue and growth metrics
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-400">Average Token Price</span>
+              <span className="text-white font-medium">50,000 LGR</span>
+            </div>
+            <Button className="w-full group-hover:translate-x-1 transition-transform">
+              Tokenize Practice <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group">
+          <CardHeader>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                <Users className="h-6 w-6 text-purple-400" />
+              </div>
+              <div>
+                <CardTitle className="text-white">Client Portfolio</CardTitle>
+                <CardDescription className="text-gray-400">
+                  Create tradeable assets from recurring client relationships
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-400">Average Token Price</span>
+              <span className="text-white font-medium">10,000 LGR</span>
+            </div>
+            <Button className="w-full group-hover:translate-x-1 transition-transform">
+              Tokenize Clients <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group">
+          <CardHeader>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center">
+                <Briefcase className="h-6 w-6 text-yellow-400" />
+              </div>
+              <div>
+                <CardTitle className="text-white">Advisory Services</CardTitle>
+                <CardDescription className="text-gray-400">
+                  Package and sell specialized consulting and advisory services
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-400">Average Token Price</span>
+              <span className="text-white font-medium">25,000 LGR</span>
+            </div>
+            <Button className="w-full group-hover:translate-x-1 transition-transform">
+              Tokenize Services <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-all cursor-pointer group">
+          <CardHeader>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center">
+                <BarChart2 className="h-6 w-6 text-pink-400" />
+              </div>
+              <div>
+                <CardTitle className="text-white">Resources & IP</CardTitle>
+                <CardDescription className="text-gray-400">
+                  Convert intellectual property and resources into digital assets
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-400">Average Token Price</span>
+              <span className="text-white font-medium">15,000 LGR</span>
+            </div>
+            <Button className="w-full group-hover:translate-x-1 transition-transform">
+              Tokenize Resources <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="text-center text-gray-400 max-w-2xl mx-auto">
+        <p className="text-sm">
+          Join our DAO-governed marketplace where community-validated service providers can trade 
+          tokenized firm assets, creating new opportunities for growth and collaboration.
+        </p>
+      </div>
+    </div>
+  );
+
   switch (currentView) {
     case 'packages':
-      return renderPackages();
+      return (
+        <>
+          {renderPackages()}
+          {renderTokenizationMarketplace()}
+        </>
+      );
     case 'payment-select':
       return renderPaymentSelect();
     case 'polygon-amount':
