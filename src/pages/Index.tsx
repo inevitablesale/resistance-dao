@@ -302,10 +302,10 @@ const IndexContent = () => {
           }}
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            The Future of Private<br />Equity is Digital
+            The Future of<br />Accounting is Digital
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
-            We are eliminating the barriers to invest-in, trade, and leverage exclusive real estate, private equity, and other real-world assets through decentralized finance ("DeFi").
+            Join a community of investors pooling resources to acquire, digitize, and scale accounting practices through decentralized finance.
           </p>
 
           <div className="flex gap-4 justify-center mb-24">
