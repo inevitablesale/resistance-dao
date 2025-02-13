@@ -315,7 +315,7 @@ const IndexContent = () => {
             Invest in<br />Accounting Firms On-Chain
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
-            Start with $100 and own fractions of high-quality accounting practices. Pool resources, earn passive income, and trade firm tokens on our decentralized marketplace.
+            Start with $100 and own fractions of high-quality accounting practices. Pool resources with other professionals and trade tokenized assets on our decentralized marketplace.
           </p>
 
           <div className="space-y-6">
@@ -457,21 +457,21 @@ const IndexContent = () => {
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
-                Build Your Investment Thesis
+                After Acquisition: Building Value
               </h2>
               <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Join a community of like-minded investors to propose and develop investment strategies for accounting practices you want to acquire.
+                Access a curated network of vetted service providers to transform traditional practices into scalable digital assets.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-8 mb-16">
               <div className="cosmic-box yellow-energy p-8 rounded-xl backdrop-blur-sm relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-0" />
                 <div className="relative z-10">
-                  <Trophy className="w-12 h-12 text-yellow-500 mb-6 animate-cosmic-pulse" />
-                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Create Thesis</h3>
+                  <Shield className="w-12 h-12 text-yellow-500 mb-6 animate-cosmic-pulse" />
+                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Vetted Providers</h3>
                   <p className="text-white/80">
-                    Propose your vision for acquiring and growing accounting practices. Define your strategy, target metrics, and growth plans.
+                    Access our network of DAO-approved service providers for tax, audit, bookkeeping, and advisory work.
                   </p>
                 </div>
               </div>
@@ -479,10 +479,10 @@ const IndexContent = () => {
               <div className="cosmic-box teal-energy p-8 rounded-xl backdrop-blur-sm relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-0" />
                 <div className="relative z-10">
-                  <Users className="w-12 h-12 text-teal-500 mb-6 animate-cosmic-pulse" />
-                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Build Support</h3>
+                  <Star className="w-12 h-12 text-teal-500 mb-6 animate-cosmic-pulse" />
+                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Community Ratings</h3>
                   <p className="text-white/80">
-                    Share your thesis with the community. Gather feedback, build consensus, and attract potential co-investors.
+                    Benefit from transparent provider ratings and reviews from other practice owners in the network.
                   </p>
                 </div>
               </div>
@@ -490,22 +490,53 @@ const IndexContent = () => {
               <div className="cosmic-box yellow-energy p-8 rounded-xl backdrop-blur-sm relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-0" />
                 <div className="relative z-10">
-                  <Crown className="w-12 h-12 text-yellow-500 mb-6 animate-cosmic-pulse" />
-                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Pool Resources</h3>
+                  <Vote className="w-12 h-12 text-yellow-500 mb-6 animate-cosmic-pulse" />
+                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Governance Power</h3>
                   <p className="text-white/80">
-                    Create or join liquidity pools with your LGR tokens to participate in practice acquisitions you believe in.
+                    Use your LGR tokens to vote on provider additions and shape the future of the service network.
                   </p>
                 </div>
               </div>
             </div>
 
+            <div className="grid md:grid-cols-4 gap-6">
+              {[
+                {
+                  title: "Staff Augmentation",
+                  icon: Users,
+                  description: "On-demand access to qualified accounting professionals"
+                },
+                {
+                  title: "Technology Stack",
+                  icon: Rocket,
+                  description: "Modern practice management and workflow tools"
+                },
+                {
+                  title: "Quality Control",
+                  icon: Shield,
+                  description: "Standardized review processes and risk management"
+                },
+                {
+                  title: "Advisory Network",
+                  icon: Briefcase,
+                  description: "Specialized expertise for complex client needs"
+                }
+              ].map((service, index) => (
+                <div key={index} className="bg-black/20 border border-white/10 rounded-xl p-6 hover:bg-black/30 transition-all">
+                  <service.icon className="w-8 h-8 text-yellow-500 mb-4" />
+                  <h4 className="text-lg font-semibold text-white mb-2">{service.title}</h4>
+                  <p className="text-sm text-gray-400">{service.description}</p>
+                </div>
+              ))}
+            </div>
+
             <div className="mt-16 text-center">
               <p className="text-gray-400 max-w-3xl mx-auto mb-8">
-                Browse existing investment theses or create your own. Use LGR tokens to participate in liquidity pools 
-                and earn returns from successful practice acquisitions.
+                By separating service delivery from client relationships, we enable practice owners to focus on growth 
+                while maintaining quality through our decentralized provider network.
               </p>
               <Button disabled className="opacity-50 cursor-not-allowed">
-                Explore Investment Theses <ArrowRight className="ml-2 h-4 w-4" />
+                Explore Service Network <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>
