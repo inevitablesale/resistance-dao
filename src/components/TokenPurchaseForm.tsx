@@ -438,21 +438,6 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
                 </li>
               </ol>
             </div>
-
-            <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-4">
-              <div className="flex gap-2 text-yellow-500">
-                <CheckCircle2 className="h-5 w-5 shrink-0" />
-                <div className="text-sm">
-                  <p className="font-medium">Important Notes</p>
-                  <ul className="mt-2 space-y-1 text-yellow-500/90">
-                    <li>• Minimum purchase amount: $30 USD</li>
-                    <li>• Major credit & debit cards accepted</li>
-                    <li>• Secure payment processing</li>
-                    <li>• 24/7 support available</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
           </div>
 
           <Button
