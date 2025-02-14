@@ -20,6 +20,18 @@ const faqs = [
     answer: "The presale launches in Q1 2025 with a soft cap of $250K. Early supporters can participate in the initial phase, followed by a hard cap target of $500K in Q2 2025. The project aims for $5M AUM in Q3 2025 for infrastructure development.",
   },
   {
+    question: "What is the total token supply?",
+    answer: "The LedgerFren token smart contract has a fixed supply of 10 million tokens, with no ability to mint additional tokens. Of this total, 5 million tokens are allocated for the pre-sale phase, making it a truly limited opportunity for early supporters.",
+  },
+  {
+    question: "How does the pre-sale smart contract work?",
+    answer: "The pre-sale smart contract is designed with fairness and transparency in mind. It automatically calculates token prices based on current market rates, enforces individual purchase caps, and distributes tokens immediately upon purchase. All transactions are verifiable on-chain, and the contract includes built-in protections against price manipulation.",
+  },
+  {
+    question: "What are Special Purpose Vehicles (SPVs)?",
+    answer: "Special Purpose Vehicles are LLCs structured specifically for investment purposes. These entities enable various types of investors - including individuals, trusts, and other entities - to participate in alternative investments like accounting firm acquisitions. SPVs provide a compliant and flexible structure for pooling capital while maintaining clear governance and distribution rights.",
+  },
+  {
     question: "Can I participate if I am not an accredited investor?",
     answer: "As a member, you will have access to Regulation D 506(b) raises on the platform that will accept an unlimited number of accredited investors and up to 35 unaccredited investors per firm investment. This structure ensures inclusive participation while maintaining regulatory compliance.",
   },
