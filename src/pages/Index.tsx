@@ -293,13 +293,7 @@ const IndexContent = () => {
           </p>
 
           <div className="space-y-6">
-            <div className="flex gap-4 justify-center">
-              <button 
-                onClick={handleBuyToken}
-                className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-lg font-bold text-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105"
-              >
-                Buy Token
-              </button>
+            <div className="flex justify-center">
               <button 
                 onClick={() => window.open('https://calendly.com/inevitable-sale/lgr-presale', '_blank')}
                 className="px-8 py-4 bg-white/10 text-white rounded-lg font-bold text-lg hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
