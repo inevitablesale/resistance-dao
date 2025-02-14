@@ -19,7 +19,6 @@ import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2, Cal
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
-import { FloatingBalanceChecker } from "@/components/wallet/FloatingBalanceChecker";
 
 const presaleData = [
   { 
