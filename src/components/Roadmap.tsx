@@ -57,7 +57,8 @@ export const Roadmap = () => {
         "Launch LedgerFren NFT Platform",
         "Form DAO in Wyoming",
         "Launch Community",
-        "Apply to CoinGeko and CoinMarketCap for listings"
+        "Apply to CoinGeko and CoinMarketCap for listings",
+        "Build Deal Flow Bounties System"
       ]
     },
     {
@@ -65,9 +66,8 @@ export const Roadmap = () => {
       subtitle: "Q3 2025",
       items: [
         "Integrate flowinc.com for SPV Management",
-        "Build Deal Flow Bounties System",
         "Deploy Deal Thesis Framework",
-        "Deploy Liquidity Pool UI and Allocation Voting",
+        "Deploy Liquidity Pool UI",
         "Launch Community Governance",
         "First Acquisition"
       ]
