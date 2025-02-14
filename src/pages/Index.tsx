@@ -302,12 +302,6 @@ const IndexContent = () => {
                 Request Meeting
               </button>
             </div>
-
-            {showPurchaseForm && (
-              <div className="max-w-md mx-auto bg-black/40 backdrop-blur-md rounded-xl border border-white/10 p-6 animate-in slide-in-from-top duration-300">
-                <TokenPurchaseForm initialAmount={selectedAmount} />
-              </div>
-            )}
           </div>
         </div>
       </div>
