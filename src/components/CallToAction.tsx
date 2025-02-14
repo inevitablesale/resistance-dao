@@ -23,7 +23,7 @@ export const CallToAction = () => {
             <Button
               onClick={() => navigate('/litepaper')}
               variant="outline"
-              className="text-white border-white/20 hover:bg-white/10"
+              className="bg-white hover:bg-white/90 text-black border-white/20"
             >
               <FileText className="mr-2 h-4 w-4" />
               Read Litepaper
