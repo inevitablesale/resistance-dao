@@ -147,21 +147,21 @@ export const LGRFloatingWidget = () => {
                     className="w-5 h-5"
                   />
                 </div>
-                <span className="text-white">MATIC Balance</span>
+                <span className="text-white">POLYGON Balance</span>
               </div>
               <div className="text-right">
                 <div className="text-white font-medium">
                   {Number(maticBalance).toLocaleString(undefined, {
                     minimumFractionDigits: 4,
                     maximumFractionDigits: 4
-                  })} MATIC
+                  })} POLYGON
                 </div>
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="text-sm text-gray-400">
-                Current Price: {Number(maticPrice)} MATIC per LGR
+                Current Price: {Number(maticPrice)} POLYGON per LGR
               </div>
 
               <div className="flex flex-col gap-2">
@@ -179,7 +179,7 @@ export const LGRFloatingWidget = () => {
                   onClick={handleBuyMatic}
                 >
                   <Wallet className="w-4 h-4 mr-2" />
-                  Buy MATIC
+                  Buy POLYGON
                 </Button>
 
                 <Button 
@@ -202,16 +202,16 @@ export const LGRFloatingWidget = () => {
           <DialogHeader>
             <DialogTitle className="text-yellow-500">Confirm LGR Purchase</DialogTitle>
             <DialogDescription>
-              Enter the amount of MATIC you want to spend
+              Enter the amount of POLYGON you want to spend
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm text-gray-400">Amount in MATIC</label>
+              <label className="text-sm text-gray-400">Amount in POLYGON</label>
               <Input
                 type="number"
-                placeholder="Enter MATIC amount"
+                placeholder="Enter POLYGON amount"
                 value={purchaseAmount}
                 onChange={(e) => setPurchaseAmount(e.target.value)}
                 className="bg-black/50 border border-yellow-500/20"
@@ -229,7 +229,7 @@ export const LGRFloatingWidget = () => {
             </div>
 
             <div className="text-sm text-gray-400">
-              Your MATIC Balance: {Number(maticBalance).toLocaleString()} MATIC
+              Your POLYGON Balance: {Number(maticBalance).toLocaleString()} POLYGON
             </div>
           </div>
 
@@ -256,9 +256,9 @@ export const LGRFloatingWidget = () => {
       <Dialog open={isInstructionsOpen} onOpenChange={setIsInstructionsOpen}>
         <DialogContent className="bg-black/95 border border-purple-500/20 max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-purple-500">How to Buy MATIC</DialogTitle>
+            <DialogTitle className="text-purple-500">How to Buy POLYGON</DialogTitle>
             <DialogDescription>
-              Follow these steps to purchase MATIC for your wallet
+              Follow these steps to purchase POLYGON for your wallet
             </DialogDescription>
           </DialogHeader>
           
@@ -266,7 +266,7 @@ export const LGRFloatingWidget = () => {
             <div className="space-y-4">
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-white">Step 1: Access the Buy Feature</h3>
-                <p className="text-gray-400">Click the "Buy MATIC" button in your wallet widget. This will open our integrated MATIC purchase system.</p>
+                <p className="text-gray-400">Click the "Buy POLYGON" button in your wallet widget. This will open our integrated POLYGON purchase system.</p>
               </div>
 
               <div className="space-y-2">
@@ -276,7 +276,7 @@ export const LGRFloatingWidget = () => {
 
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-white">Step 3: Enter Purchase Amount</h3>
-                <p className="text-gray-400">Specify how much MATIC you want to buy. The minimum purchase amount is typically around $30 worth of MATIC.</p>
+                <p className="text-gray-400">Specify how much POLYGON you want to buy. The minimum purchase amount is typically around $30 worth of POLYGON.</p>
               </div>
 
               <div className="space-y-2">
@@ -286,7 +286,7 @@ export const LGRFloatingWidget = () => {
 
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-white">Step 5: Wait for Confirmation</h3>
-                <p className="text-gray-400">Once your payment is processed, the MATIC will be automatically sent to your wallet. This typically takes a few minutes.</p>
+                <p className="text-gray-400">Once your payment is processed, the POLYGON will be automatically sent to your wallet. This typically takes a few minutes.</p>
               </div>
             </div>
 
@@ -305,7 +305,7 @@ export const LGRFloatingWidget = () => {
               }}
               className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
             >
-              Buy MATIC Now
+              Buy POLYGON Now
             </Button>
           </DialogFooter>
         </DialogContent>

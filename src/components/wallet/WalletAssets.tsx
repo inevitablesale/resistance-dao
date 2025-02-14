@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { getWorkingProvider, getLgrTokenContract, getPresaleContract } from "@/services/presaleContractService";
@@ -81,7 +80,7 @@ export const WalletAssets = () => {
         </div>
         <div className="text-right">
           <div className="text-white font-medium">${calculateUsdValue(maticBalance)}</div>
-          <div className="text-sm text-gray-400">{Number(maticBalance).toFixed(4)} MATIC</div>
+          <div className="text-sm text-gray-400">{Number(maticBalance).toFixed(4)} POLYGON</div>
         </div>
       </div>
 
@@ -112,4 +111,3 @@ export const WalletAssets = () => {
 };
 
 export default WalletAssets;
-
