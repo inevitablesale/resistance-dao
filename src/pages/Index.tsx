@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
@@ -296,7 +297,7 @@ const IndexContent = () => {
             <div className="flex justify-center">
               <button 
                 onClick={() => window.open('https://calendly.com/inevitable-sale/lgr-presale', '_blank')}
-                className="px-8 py-4 bg-white/10 text-white rounded-lg font-bold text-lg hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
+                className="px-12 py-6 bg-white/10 text-white rounded-lg font-bold text-2xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
               >
                 Request Meeting
               </button>
