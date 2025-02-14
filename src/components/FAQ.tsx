@@ -11,6 +11,10 @@ const faqs = [
     answer: "Blockchain technology provides the foundation for LedgerFund's transparent and immutable operations. Smart contracts automate and enforce rules around token distribution, voting, and profit sharing, while blockchain timestamps and assets create a verifiable record of all transactions. This technology ensures trustless execution of platform functions without relying on traditional intermediaries.",
   },
   {
+    question: "How does the non-custodial wallet system work?",
+    answer: "When you sign up, you create a non-custodial wallet that remains fully under your control. Your assets stay in your wallet until you choose to invest. Smart contracts handle all fund movements automatically and securely, including converting and transferring funds to acquired companies' bank accounts, distributing returns to LGR LP holders, and managing reflections to LGR holders. This ensures complete transparency and security while maintaining your full control over your assets.",
+  },
+  {
     question: "What is LedgerFund DAO?",
     answer: "LedgerFund DAO is a decentralized autonomous organization that will be formally established in Wyoming (Q2 2025). It enables accounting professionals to collectively acquire, govern, and transform accounting practices through blockchain technology and democratic decision-making.",
   },
@@ -97,6 +101,10 @@ const faqs = [
   {
     question: "How is governance power calculated?",
     answer: "Our innovative governance system combines two key factors: your LGR token holdings and your professional experience 'node' generated from LinkedIn data. This dual approach ensures that both capital allocation and professional expertise contribute to governance power. The experience node analyzes factors like industry tenure, specializations, and relevant certifications, creating a comprehensive score that works alongside your token holdings to determine overall governance influence. More details about this system will be released as we approach the LedgerFren member NFT minting milestone.",
+  },
+  {
+    question: "Will I receive a K-1?",
+    answer: "Yes, you will receive a K-1 annually from LedgerFund DAO regarding investment activity for each investment which are structured as pass-through vehicles.",
   },
 ];
 
