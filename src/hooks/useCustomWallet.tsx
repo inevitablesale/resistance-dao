@@ -77,8 +77,7 @@ export const useCustomWallet = () => {
       const options = {
         defaultNetwork: {
           chainId: 137
-        },
-        ...(typeof amount === 'number' && !isNaN(amount) && amount > 0 && { defaultFiatAmount: amount })
+        }
       };
 
       console.log("[Deposit] Opening onramp with options:", options);
