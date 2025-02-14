@@ -62,11 +62,17 @@ function App() {
     paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
   };
 
+  const lgrToken = {
+    networkId: 137,
+    address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
+    name: "LedgerFund Token",
+    symbol: "LGR",
+    decimals: 18,
+    logoURI: "/favicon.ico"
+  };
+
   const customTokenFilter = (tokens: any[]) => {
-    return tokens.filter(token => 
-      token.symbol === 'MATIC' || 
-      token.symbol === 'LGR'
-    );
+    return [...tokens.filter(token => token.symbol === 'MATIC'), lgrToken];
   };
 
   const dynamicSettings = {
@@ -142,12 +148,12 @@ function App() {
       shadowDOMEnabled: false,
       tokens: [
         {
+          networkId: 137,
           address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
           symbol: "LGR",
           decimals: 18,
           name: "LedgerFund Token",
-          icon: "/favicon.ico",
-          chainId: 137
+          logoURI: "/favicon.ico"
         }
       ]
     }
@@ -165,4 +171,3 @@ function App() {
 }
 
 export default App;
-
