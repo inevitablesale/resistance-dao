@@ -1,9 +1,10 @@
 
 import { Link } from "react-router-dom";
-import { useDynamicContext, DynamicWidget, DynamicUserProfile } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import Twitter from "./icons/Twitter";
 import Linked from "./icons/Linked";
+import WalletAssets from "./wallet/WalletAssets";
 
 const Nav = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
@@ -66,8 +67,8 @@ const Nav = () => {
             <div className="relative">
               <DynamicWidget />
               {primaryWallet?.address && (
-                <div className="absolute top-full right-0 mt-2">
-                  <DynamicUserProfile />
+                <div className="absolute top-full right-0 mt-2 w-72 p-4 bg-black/90 backdrop-blur-lg border border-white/10 rounded-lg shadow-xl">
+                  <WalletAssets />
                 </div>
               )}
             </div>

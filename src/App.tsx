@@ -27,13 +27,11 @@ function Layout() {
     if (tokenBalances && !isLoading && !error) {
       console.log("Token balances updated:", tokenBalances);
       // Find LGR token balance
-      const lgrToken = tokenBalances.find(token => 
-        token.address?.toLowerCase() === "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00".toLowerCase()
-      );
+      const lgrToken = tokenBalances.find(token => token.symbol === 'LGR');
       if (lgrToken) {
         toast({
           title: "LGR Balance Updated",
-          description: `Your LGR balance: ${lgrToken.balance || '0'} LGR`,
+          description: `Your LGR balance: ${lgrToken.balance} LGR`,
         });
       }
     }
@@ -64,27 +62,12 @@ function App() {
     paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
   };
 
-  const customTokenFilter = (tokens: any[]) => {
-    const maticToken = tokens.find(token => token.symbol === 'MATIC' && token.chainId === 137);
-    const lgrToken = {
-      address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
-      symbol: "LGR",
-      decimals: 18,
-      name: "LedgerFund Token",
-      icon: "/favicon.ico",
-      chainId: 137
-    };
-    
-    return maticToken ? [maticToken, lgrToken] : [lgrToken];
-  };
-
   const dynamicSettings = {
     environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
     walletConnectors: [
       EthereumWalletConnectors,
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
-    tokenFilter: customTokenFilter,
     eventsCallbacks: {
       onAuthSuccess: (args: any) => {
         console.log("[Dynamic SDK] Auth Success:", args);
