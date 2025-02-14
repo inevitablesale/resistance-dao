@@ -1,3 +1,4 @@
+
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
@@ -9,6 +10,22 @@ const faqs = [
   {
     question: "When does the presale start and what are the caps?",
     answer: "The presale launches in Q1 2025 with a soft cap of $250K. Early supporters can participate in the initial phase, followed by a hard cap target of $500K in Q2 2025. The project aims for $5M AUM in Q3 2025 for infrastructure development.",
+  },
+  {
+    question: "Can I participate if I am not an accredited investor?",
+    answer: "As a member, you will have access to Regulation D 506(b) raises on the platform that will accept an unlimited number of accredited investors and up to 35 unaccredited investors per firm investment. This structure ensures inclusive participation while maintaining regulatory compliance.",
+  },
+  {
+    question: "What are the benefits of participating in the pre-sale?",
+    answer: "Early supporters who participate in the pre-sale stage will receive priority access to future investment opportunities on the platform, subject to meeting KYC/AML and eligibility requirements. This early participation establishes your status as a qualified member for accessing private capital raising opportunities once the platform launches.",
+  },
+  {
+    question: "When can I participate in governance?",
+    answer: "Community governance launches in Phase 3 (Q3 2025). As a token holder who has completed self-attestation of accreditation status, you'll be able to vote on key protocol decisions, including firm acquisitions, operational changes, and future development initiatives through our DAO structure. This attestation process ensures compliant participation in investment decisions.",
+  },
+  {
+    question: "What is the Deal Thesis Framework?",
+    answer: "The Deal Thesis Framework, launching in Phase 3, is a member-driven system where LGR token holders can submit and evaluate proposals for accounting firm acquisitions. Members create and submit detailed investment proposals to attract capital from fellow members, with clear criteria and transparent governance ensuring collective decision-making on all investments.",
   },
   {
     question: "How do LedgerFund's liquidity pools work?",
@@ -25,14 +42,6 @@ const faqs = [
   {
     question: "What's the difference between LGR reflections and LP investment returns?",
     answer: "There are two distinct ways to earn with LedgerFund: 1) All LGR token holders automatically receive 10% of firm distributions as reflections, simply for holding the token. 2) LGR LP holders who actively invest in specific firm acquisitions through our liquidity pools receive 70% of net profits from those specific firms, represented by RWA tokens. This means you can earn both passive reflections as a token holder and direct profits as an LP investor.",
-  },
-  {
-    question: "When can I participate in governance?",
-    answer: "Community governance launches in Phase 3 (Q3 2025). As a token holder, you'll be able to vote on key protocol decisions, including firm acquisitions, operational changes, and future development initiatives through our DAO structure.",
-  },
-  {
-    question: "What is the Deal Thesis Framework?",
-    answer: "The Deal Thesis Framework, launching in Phase 3, is our systematic approach to evaluating and acquiring accounting firms. It establishes clear criteria for acquisitions and ensures transparent governance on investment decisions.",
   },
   {
     question: "How are accounting firms managed post-acquisition?",
