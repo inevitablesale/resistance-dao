@@ -4,6 +4,14 @@ import { useState } from "react";
 
 const faqs = [
   {
+    question: "What is decentralization and why is it important?",
+    answer: "Decentralization is a core principle of LedgerFund that ensures no single entity controls the platform. By distributing power across our community of token holders, we create a more transparent, fair, and resilient system for acquiring and managing accounting practices. This approach eliminates traditional intermediaries and enables direct member participation in governance and value creation.",
+  },
+  {
+    question: "How does blockchain technology power LedgerFund?",
+    answer: "Blockchain technology provides the foundation for LedgerFund's transparent and immutable operations. Smart contracts automate and enforce rules around token distribution, voting, and profit sharing, while blockchain timestamps and assets create a verifiable record of all transactions. This technology ensures trustless execution of platform functions without relying on traditional intermediaries.",
+  },
+  {
     question: "What is LedgerFund DAO?",
     answer: "LedgerFund DAO is a decentralized autonomous organization that will be formally established in Wyoming (Q2 2025). It enables accounting professionals to collectively acquire, govern, and transform accounting practices through blockchain technology and democratic decision-making.",
   },
@@ -16,24 +24,36 @@ const faqs = [
     answer: "The platform is designed to operate in a fully decentralized manner, utilizing smart contracts, blockchain assets, and timestamps instead of traditional databases. While we enable the infrastructure, we do not participate in decision-making, voting, or capital raising after the pre-sale stage. The platform serves purely as an enabler for member-driven activities.",
   },
   {
+    question: "How does tokenized ownership work?",
+    answer: "LedgerFund implements a dual-token model for ownership and investment. The LGR token represents governance rights and reflection earnings in the overall protocol, while RWA tokens represent direct ownership in specific accounting firm investments through our Series SPVs. This structure allows for both passive protocol earnings through LGR holdings and active investment participation through RWA tokens.",
+  },
+  {
+    question: "What are RWA tokens and LGR LP tokens?",
+    answer: "Real World Asset (RWA) tokens are digital representations of ownership in physical accounting firms. When you invest in a specific firm through our liquidity pools, you receive LGR LP tokens, which are RWA tokens that represent your proportional ownership in that investment. These tokens are backed by real-world revenue streams and enable fractional ownership and automated distribution of profits.",
+  },
+  {
+    question: "How does the Decentralized Marketplace work?",
+    answer: "The Decentralized Marketplace enables the tokenization of accounting firms' intangible capital, including client relationships, intellectual property, and recurring revenue streams. Through smart contracts and RWA tokens, we unlock these traditionally illiquid assets, making them tradable and accessible to our community. This creates new opportunities for value creation and liquidity in professional services.",
+  },
+  {
     question: "Is this an investment opportunity?",
     answer: "No, this is not an investment opportunity. We are conducting an Initial Coin Offering (ICO) where participants are funding the creation of the platform's utility features. The funds raised during pre-sale will be used to develop the infrastructure and smart contracts that enable the platform's decentralized operations.",
   },
   {
-    question: "When does the presale start and what are the caps?",
-    answer: "The presale launches in Q1 2025 with a soft cap of $250K. Early supporters can participate in the initial phase, followed by a hard cap target of $500K in Q2 2025. The project aims for $5M AUM in Q3 2025 for infrastructure development.",
+    question: "How does the pre-sale smart contract work?",
+    answer: "The pre-sale smart contract is designed with fairness and transparency in mind. It uses a strict presale price of $0.10 per token, enforces individual purchase caps, and distributes tokens immediately upon purchase. All transactions are verifiable on-chain, and the contract includes built-in protections against price manipulation.",
+  },
+  {
+    question: "What are Special Purpose Vehicles (SPVs)?",
+    answer: "Special Purpose Vehicles are structured as Series SPVs under the Wyoming DAO LLC, which acts as the SPV manager. This structure allows individuals, trusts, and other entities to participate in alternative investments like accounting firm acquisitions while maintaining clear governance and distribution rights. Each Series SPV operates as a separate legal entity with its own assets and liabilities, providing maximum protection and flexibility for investors.",
   },
   {
     question: "What is the total token supply?",
     answer: "The LedgerFren token smart contract has a fixed supply of 10 million tokens, with no ability to mint additional tokens. Of this total, 5 million tokens are allocated for the pre-sale phase, making it a truly limited opportunity for early supporters.",
   },
   {
-    question: "How does the pre-sale smart contract work?",
-    answer: "The pre-sale smart contract is designed with fairness and transparency in mind. It automatically calculates token prices based on current market rates, enforces individual purchase caps, and distributes tokens immediately upon purchase. All transactions are verifiable on-chain, and the contract includes built-in protections against price manipulation.",
-  },
-  {
-    question: "What are Special Purpose Vehicles (SPVs)?",
-    answer: "Special Purpose Vehicles are structured as Series SPVs under the Wyoming DAO LLC, which acts as the SPV manager. This structure allows individuals, trusts, and other entities to participate in alternative investments like accounting firm acquisitions while maintaining clear governance and distribution rights. Each Series SPV operates as a separate legal entity with its own assets and liabilities, providing maximum protection and flexibility for investors.",
+    question: "When does the presale start and what are the caps?",
+    answer: "The presale launches in Q1 2025 with a soft cap of $250K. Early supporters can participate in the initial phase, followed by a hard cap target of $500K in Q2 2025. The project aims for $5M AUM in Q3 2025 for infrastructure development.",
   },
   {
     question: "Can I participate if I am not an accredited investor?",
@@ -54,10 +74,6 @@ const faqs = [
   {
     question: "How do LedgerFund's liquidity pools work?",
     answer: "Liquidity pools are launched in Phase 3 (Q3 2025) as part of our infrastructure development. These pools enable collective investment in accounting firm acquisitions, with the first acquisitions beginning after the deployment of our Deal Thesis Framework.",
-  },
-  {
-    question: "How does tokenized ownership work?",
-    answer: "LGR tokens represent ownership rights in the LedgerFund protocol. Token holders earn reflections from accounting firm investments made through our liquidity pools and participate in governance decisions.",
   },
   {
     question: "What are reflection rights?",
