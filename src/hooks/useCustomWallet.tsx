@@ -1,6 +1,5 @@
-
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export type WalletView = 'assets' | 'actions' | 'buy' | 'send' | 'history';
@@ -8,8 +7,27 @@ export type WalletView = 'assets' | 'actions' | 'buy' | 'send' | 'history';
 export const useCustomWallet = () => {
   const { primaryWallet, setShowAuthFlow, user, setShowOnRamp } = useDynamicContext();
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [currentView, setCurrentView] = useState<WalletView>('assets');
   const { toast } = useToast();
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      if (primaryWallet?.isConnected) {
+        try {
+          const connected = await primaryWallet.isConnected();
+          setIsWalletConnected(connected);
+        } catch (error) {
+          console.error("Error checking wallet connection:", error);
+          setIsWalletConnected(false);
+        }
+      } else {
+        setIsWalletConnected(false);
+      }
+    };
+
+    checkConnection();
+  }, [primaryWallet]);
 
   const connect = async () => {
     try {
@@ -32,6 +50,7 @@ export const useCustomWallet = () => {
       setIsConnecting(true);
       if (primaryWallet?.disconnect) {
         await primaryWallet.disconnect();
+        setIsWalletConnected(false);
       }
     } catch (error) {
       console.error("Disconnect error:", error);
@@ -46,28 +65,7 @@ export const useCustomWallet = () => {
   };
 
   const showBanxaDeposit = (amount?: number) => {
-    if (!primaryWallet) {
-      console.log("[Deposit] No wallet connected, opening auth flow");
-      setShowAuthFlow?.(true);
-      return;
-    }
-
-    try {
-      console.log("[Deposit] Opening onramp with amount:", amount);
-      setShowOnRamp?.(true, {
-        defaultFiatAmount: amount,
-        defaultNetwork: {
-          chainId: 137
-        }
-      });
-    } catch (error) {
-      console.error("[Deposit] Error showing deposit view:", error);
-      toast({
-        title: "Error",
-        description: "Failed to open deposit interface",
-        variant: "destructive",
-      });
-    }
+    console.log("Deposit functionality temporarily disabled");
   };
 
   const sendTransaction = () => {
@@ -97,7 +95,7 @@ export const useCustomWallet = () => {
   };
 
   return {
-    isConnected: primaryWallet?.isConnected?.() || false,
+    isConnected: isWalletConnected,
     isConnecting,
     currentView,
     setCurrentView,
