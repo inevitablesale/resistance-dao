@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -119,7 +120,7 @@ const boardMembers = [
 const processSteps = [
   {
     title: "Submit Your Thesis",
-    description: "Share your vision for acquiring and scaling accounting practices. Connect with like-minded investors to form investment pools.",
+    description: "Join a community of like-minded investors to propose and develop investment strategies for accounting practices you want to acquire.",
     icon: Trophy,
     color: "yellow",
     className: "cosmic-box yellow-energy"
