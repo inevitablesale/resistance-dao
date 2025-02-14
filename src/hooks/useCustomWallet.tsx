@@ -1,14 +1,12 @@
 
-import { useDynamicContext, useOnramp } from "@dynamic-labs/sdk-react-core";
-import { OnrampProviders } from "@dynamic-labs/sdk-api-core";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export type WalletView = 'assets' | 'actions' | 'buy' | 'send' | 'history';
 
 export const useCustomWallet = () => {
-  const { primaryWallet, setShowAuthFlow, user } = useDynamicContext();
-  const { open: openOnramp, enabled: onrampEnabled } = useOnramp();
+  const { primaryWallet, setShowAuthFlow, user, setShowOnRamp } = useDynamicContext();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [currentView, setCurrentView] = useState<WalletView>('assets');
@@ -74,33 +72,15 @@ export const useCustomWallet = () => {
       return;
     }
 
-    if (!onrampEnabled) {
-      console.error("[Deposit] Onramp not enabled");
-      toast({
-        title: "Error",
-        description: "Onramp functionality is not available",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
-      console.log("[Deposit] Opening Banxa onramp for address:", primaryWallet.address);
-      openOnramp({
-        onrampProvider: OnrampProviders.Banxa,
-        token: 'MATIC',
-        address: primaryWallet.address,
-        ...(amount && { fiatAmount: amount })
-      }).then(() => {
-        console.log("[Deposit] Banxa window opened successfully");
-      }).catch((error) => {
-        console.error("[Deposit] Error opening Banxa:", error);
-        toast({
-          title: "Error",
-          description: "Failed to open deposit interface",
-          variant: "destructive",
-        });
+      console.log("[Deposit] Opening Dynamic onramp for address:", primaryWallet.address);
+      setShowOnRamp?.(true, {
+        defaultFiatAmount: amount,
+        defaultNetwork: {
+          chainId: 137 // Polygon
+        }
       });
+      console.log("[Deposit] Dynamic onramp window opened successfully");
     } catch (error) {
       console.error("[Deposit] Error showing deposit view:", error);
       toast({

@@ -48,7 +48,7 @@ export const WalletDeposit = () => {
 
     try {
       setIsProcessing(true);
-      console.log("[Deposit] Opening Banxa deposit with amount:", parseFloat(amount));
+      console.log("[Deposit] Opening Dynamic onramp with amount:", parseFloat(amount));
       showBanxaDeposit(parseFloat(amount));
     } catch (error) {
       console.error("[Deposit] Error:", error);
