@@ -19,6 +19,7 @@ import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2, Cal
 import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
+import { NewsletterSubscription } from "@/components/NewsletterSubscription";
 
 const presaleData = [
   { 
@@ -442,27 +443,7 @@ const IndexContent = () => {
       <section className="py-12 relative z-10 bg-black/30 backdrop-blur-sm border-t border-white/5">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8 bg-white/5 rounded-lg p-8 backdrop-blur-sm border border-white/10">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-yellow-500/10 rounded-lg">
-                  <Users className="w-8 h-8 text-yellow-500" />
-                </div>
-                <div className="text-left">
-                  <h3 className="text-2xl font-semibold text-white">Join 1,500+ Accountants</h3>
-                  <p className="text-white/70">Building the future of practice ownership</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <input 
-                  type="email" 
-                  placeholder="Enter your email" 
-                  className="px-4 py-2 bg-black/40 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
-                />
-                <button className="px-4 py-2 bg-yellow-500/10 text-yellow-500 rounded-lg border border-yellow-500/20 hover:bg-yellow-500/20 transition-colors">
-                  Subscribe
-                </button>
-              </div>
-            </div>
+            <NewsletterSubscription />
           </div>
         </div>
       </section>
