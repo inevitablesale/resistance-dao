@@ -1,20 +1,21 @@
 
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { getWorkingProvider, getLgrTokenContract, getPresaleContract } from "@/services/presaleContractService";
+import { getWorkingProvider, getLgrTokenContract, getPresaleContract, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Coins, Lock, Vote, ChevronRight } from "lucide-react";
+import { Coins, ArrowRight } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
+  const [maticPrice, setMaticPrice] = useState<string>("0");
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const { setShowOnRamp } = useDynamicContext();
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -34,6 +35,10 @@ export const LGRFloatingWidget = () => {
         
         setLgrBalance(ethers.utils.formatUnits(lgrBal, 18));
         setPurchasedTokens(ethers.utils.formatUnits(purchased, 18));
+
+        // Fetch current MATIC price
+        const currentMaticPrice = await fetchPresaleMaticPrice();
+        setMaticPrice(currentMaticPrice);
       } catch (error) {
         console.error("Error fetching LGR balances:", error);
       }
@@ -44,21 +49,8 @@ export const LGRFloatingWidget = () => {
     return () => clearInterval(interval);
   }, [address]);
 
-  const handleAction = (action: 'stake' | 'vote' | 'governance') => {
-    switch (action) {
-      case 'stake':
-        toast({
-          title: "Staking Coming Soon",
-          description: "LGR staking will be available after the presale period.",
-        });
-        break;
-      case 'vote':
-        navigate('/governance-voting');
-        break;
-      case 'governance':
-        navigate('/governance-voting');
-        break;
-    }
+  const handleBuyAction = () => {
+    setShowOnRamp?.(true);
   };
 
   if (!address) return null;
@@ -95,41 +87,18 @@ export const LGRFloatingWidget = () => {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-between text-white hover:text-yellow-500 hover:bg-yellow-500/10"
-              onClick={() => handleAction('stake')}
-            >
-              <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4" />
-                <span>Stake LGR</span>
-              </div>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+          <div className="space-y-3">
+            <div className="text-sm text-gray-400">
+              Current Price: {Number(maticPrice)} MATIC per LGR
+            </div>
 
             <Button 
-              variant="ghost" 
-              className="w-full justify-between text-white hover:text-yellow-500 hover:bg-yellow-500/10"
-              onClick={() => handleAction('vote')}
+              className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold"
+              onClick={handleBuyAction}
             >
-              <div className="flex items-center gap-2">
-                <Vote className="w-4 h-4" />
-                <span>Vote on Proposals</span>
-              </div>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-
-            <Button 
-              variant="ghost" 
-              className="w-full justify-between text-white hover:text-yellow-500 hover:bg-yellow-500/10"
-              onClick={() => handleAction('governance')}
-            >
-              <div className="flex items-center gap-2">
-                <Coins className="w-4 h-4" />
-                <span>Governance Dashboard</span>
-              </div>
-              <ChevronRight className="w-4 h-4" />
+              <Coins className="w-4 h-4 mr-2" />
+              Buy LGR Tokens
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
         </div>
