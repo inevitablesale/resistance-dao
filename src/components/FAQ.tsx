@@ -1,3 +1,4 @@
+
 import { HelpCircle, UserRound, Coins, Vote, Building2, Calendar, Users, Wallet, LineChart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
@@ -104,6 +105,10 @@ export const FAQ = () => {
     };
   };
 
+  const handleFaqClick = (index: number) => {
+    setSelectedFaq(selectedFaq === index ? null : index);
+  };
+
   return (
     <section className="py-16 relative overflow-hidden min-h-screen" id="faq">
       <div className="absolute inset-0">
@@ -146,7 +151,7 @@ export const FAQ = () => {
                 return (
                   <motion.div
                     key={index}
-                    className="absolute left-1/2 top-1/2"
+                    className="absolute left-1/2 top-1/2 cursor-pointer"
                     animate={{
                       x: isSelected ? 0 : position.x,
                       y: isSelected ? 0 : position.y,
@@ -159,11 +164,11 @@ export const FAQ = () => {
                       damping: 15,
                       duration: isSelected ? 1 : 0.3
                     }}
+                    onClick={() => handleFaqClick(index)}
                   >
                     <motion.div
-                      className="relative -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+                      className="relative -translate-x-1/2 -translate-y-1/2"
                       whileHover={{ scale: 1.1 }}
-                      onClick={() => setSelectedFaq(isSelected ? null : index)}
                       style={{ transform: `rotate(${angleInDegrees}deg)` }}
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-full blur-xl" />
@@ -174,8 +179,8 @@ export const FAQ = () => {
                         className="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap"
                         style={{ transform: `rotate(-${angleInDegrees}deg)` }}
                       >
-                        <span className="text-yellow-500 text-sm font-medium bg-black/80 px-2 py-1 rounded">
-                          {faq.question.split('?')[0]}
+                        <span className="text-yellow-500 text-sm font-medium bg-black/80 px-2 py-1 rounded cursor-pointer hover:bg-black/90 transition-colors">
+                          {faq.question.split('?')[0]}?
                         </span>
                       </div>
                     </motion.div>
@@ -206,6 +211,7 @@ export const FAQ = () => {
             <div className="space-y-4 pt-20">
               {faqs.map((faq, index) => {
                 const Icon = faq.icon;
+                const isSelected = selectedFaq === index;
                 return (
                   <motion.div
                     key={index}
@@ -214,9 +220,8 @@ export const FAQ = () => {
                     transition={{ delay: index * 0.1 }}
                     className="relative"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-teal-500/5 rounded-lg group-hover:opacity-100 transition-opacity" />
                     <button
-                      onClick={() => setSelectedFaq(selectedFaq === index ? null : index)}
+                      onClick={() => handleFaqClick(index)}
                       className="w-full text-left"
                     >
                       <div className="relative bg-black/60 backdrop-blur-sm border border-yellow-500/30 p-4 rounded-lg group hover:border-yellow-500/60 transition-all">
@@ -229,7 +234,7 @@ export const FAQ = () => {
                           </h3>
                         </div>
                         <AnimatePresence>
-                          {selectedFaq === index && (
+                          {isSelected && (
                             <motion.div
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: "auto", opacity: 1 }}
