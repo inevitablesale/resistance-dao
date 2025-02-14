@@ -99,7 +99,7 @@ const faqCategories = [
       },
       {
         question: "When does the presale start and what are the caps?",
-        answer: "The presale launches in Q1 2025 with a soft cap of $250K. Early supporters can participate in the initial phase, followed by a hard cap target of $500K in Q2 2025. The project aims for $5M AUM in Q3 2025 for infrastructure development.",
+        answer: "The presale launches in Q1 2025 with a soft cap of $250K. Early supporters can participate in the initial phase, followed by a hard cap target of $500K in Q2 2025.",
       },
       {
         question: "What are reflection rights?",

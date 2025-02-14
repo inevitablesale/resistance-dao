@@ -6,7 +6,7 @@ export const Partners = () => {
   const partners = [
     {
       name: "Canary Accountants",
-      logo: "https://media.licdn.com/dms/image/v2/D4E0BAQEr0Gqno7LjdQ/company-logo_200_200/company-logo_200_200/0/1738001481312?e=1747267200&v=beta&t=NcKimGeTjTru_eJgnaivnRzZaeVDfDYNS_2i1o8OfDY", // Updated path to match the uploaded image
+      logo: "https://i.postimg.cc/XvvZrjLP/DALL-E-2025-02-13-22-32-46-A-minimalistic-modern-logo-featuring-a-stylized-canary-bird-icon-in-a.webp",
       url: "https://canary.accountants/"
     }
   ]
