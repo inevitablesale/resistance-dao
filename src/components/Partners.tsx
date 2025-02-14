@@ -20,27 +20,36 @@ export const Partners = () => {
 
         <div className="flex flex-wrap justify-center items-center gap-12">
           {partners.map((partner) => (
-            <a
-              key={partner.name}
-              href={partner.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative group"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 via-teal-500/20 to-yellow-500/20 rounded-lg blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative bg-black/30 backdrop-blur p-8 rounded-lg border border-yellow-500/20 group-hover:border-yellow-500/40 transition-all duration-300">
-                <Image
-                  src={partner.logo}
-                  alt={partner.name}
-                  width={200}
-                  height={80}
-                  className={cn(
-                    "transition-all duration-300",
-                    "filter brightness-90 group-hover:brightness-100"
-                  )}
-                />
-              </div>
-            </a>
+            <div key={partner.name} className="flex flex-col items-center gap-3">
+              <a
+                href={partner.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 via-teal-500/20 to-yellow-500/20 rounded-lg blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative bg-black/30 backdrop-blur p-8 rounded-lg border border-yellow-500/20 group-hover:border-yellow-500/40 transition-all duration-300">
+                  <Image
+                    src={partner.logo}
+                    alt={partner.name}
+                    width={200}
+                    height={80}
+                    className={cn(
+                      "transition-all duration-300",
+                      "filter brightness-90 group-hover:brightness-100"
+                    )}
+                  />
+                </div>
+              </a>
+              <a
+                href={partner.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-yellow-500 hover:text-yellow-400 transition-colors"
+              >
+                canary.accountants
+              </a>
+            </div>
           ))}
         </div>
       </div>

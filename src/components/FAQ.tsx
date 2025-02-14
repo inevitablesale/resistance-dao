@@ -102,6 +102,10 @@ const faqCategories = [
         answer: "The presale launches in Q1 2025 with a soft cap of $250K. Early supporters can participate in the initial phase, followed by a hard cap target of $500K in Q2 2025.",
       },
       {
+        question: "How will the presale funds be used?",
+        answer: "Funds raised during the presale will be primarily allocated to platform development. The remaining funds will be held in our treasury to serve as the main DAO liquidity pool, funding ongoing operations and token buybacks.",
+      },
+      {
         question: "What are reflection rights?",
         answer: "Reflection rights entitle token holders to receive 10% of all future firm distributions through our liquidity pools, creating a passive income stream from the success of acquired practices.",
       },
