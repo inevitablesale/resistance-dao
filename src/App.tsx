@@ -1,6 +1,6 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
 import { Analytics } from '@vercel/analytics/react';
@@ -16,7 +16,6 @@ import ContentHub from "./pages/ContentHub";
 import { Marketplace } from "./pages/Marketplace";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
-import { useCallback } from "react";
 
 function App() {
   const { toast } = useToast();
@@ -26,15 +25,6 @@ function App() {
     bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
     paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
   };
-
-  // Simple handler for email verification completion
-  const handleEmailVerificationComplete = useCallback((args: any) => {
-    console.log("[Dynamic SDK] Email verification flow complete with args:", args);
-    toast({
-      title: "Email Verified",
-      description: "Your email has been successfully verified.",
-    });
-  }, [toast]);
 
   const dynamicSettings = {
     environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
@@ -62,11 +52,10 @@ function App() {
         console.log("[Dynamic SDK] Auth flow closed");
       },
       authFailure: (reason) => {
-        console.error("[Dynamic SDK] Auth failure:", reason);
+        console.log("[Dynamic SDK] Auth failure:", reason);
         toast({
           title: "Authentication Failed",
           description: "There was an error connecting your wallet.",
-          variant: "destructive"
         });
       },
       authSuccess: (args) => {
@@ -76,12 +65,15 @@ function App() {
           description: `Connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
         });
       },
-      emailVerificationStarted: () => {
-        console.log("[Dynamic SDK] Email verification started");
+      emailVerificationCompleted: () => {
+        console.log("[Dynamic SDK] Email verification completed");
+        toast({
+          title: "Email Verified",
+          description: "Your email has been successfully verified.",
+        });
       },
-      emailVerificationCompleted: handleEmailVerificationComplete,
-      emailVerificationSuccess: (args) => {
-        console.log("[Dynamic SDK] Email verification succeeded:", args);
+      emailVerificationSuccess: () => {
+        console.log("[Dynamic SDK] Email verification succeeded");
       },
       userCreated: (args) => {
         console.log("[Dynamic SDK] New user created:", args);
@@ -142,7 +134,13 @@ function App() {
             signInWithEmail: true,
             autoVerify: true,
             autoClose: true,
-            onComplete: handleEmailVerificationComplete
+            onComplete: (args) => {
+              console.log("[Dynamic SDK] Email Auth Complete:", args);
+              toast({
+                title: "Email Authentication Complete",
+                description: "You can now proceed with the token purchase.",
+              });
+            }
           }
         }
       },
@@ -198,4 +196,3 @@ function App() {
 }
 
 export default App;
-

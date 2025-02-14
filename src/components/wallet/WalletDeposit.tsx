@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 
 export const WalletDeposit = () => {
-  const { showBanxaDeposit, isConnected } = useCustomWallet();
+  const { showBanxaDeposit } = useCustomWallet();
   const [amount, setAmount] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
@@ -38,23 +38,12 @@ export const WalletDeposit = () => {
       return;
     }
 
-    if (parseFloat(amount) < 30) {
-      toast({
-        title: "Minimum Amount Required",
-        description: "Minimum deposit amount is $30 USD",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       setIsProcessing(true);
-      console.log("[Deposit] Opening Banxa deposit view with amount:", amount);
-      
-      // This will either open the deposit view or trigger wallet connection
+      console.log("Opening Banxa deposit view with amount:", amount);
       showBanxaDeposit();
     } catch (error) {
-      console.error("[Deposit] Error:", error);
+      console.error("Deposit error:", error);
       toast({
         title: "Deposit Error",
         description: "Failed to initiate deposit",
