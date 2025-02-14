@@ -1,5 +1,5 @@
 
-import { PartyPopper, Trophy, Gift, ShoppingBag, Medal, Star, BadgeDollarSign, Building2, BookOpen } from "lucide-react";
+import { PartyPopper, Trophy, Gift, ShoppingBag, Medal } from "lucide-react";
 
 export const LedgerFrens = () => {
   return (
@@ -30,7 +30,7 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <PartyPopper className="w-8 h-8 text-yellow-400 flex-shrink-0" />
+                <Trophy className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">Share Your Investment Thesis</h4>
                   <p className="text-gray-300">
@@ -43,7 +43,7 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <BadgeDollarSign className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">Create Liquidity from Traditional Illiquid Assets</h4>
                   <p className="text-gray-300">
@@ -58,7 +58,7 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <ShoppingBag className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Exclusive DAO Merch</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Early Minting Access</h4>
                   <p className="text-gray-300">
                     At $150K raised: 150 random stakers receive exclusive LedgerFund DAO merchandise pack including premium apparel and accessories.
                   </p>
@@ -71,7 +71,7 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">MSP Proposals Open</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Governance Board Election</h4>
                   <p className="text-gray-300">
                     At $250K raised: Proposals open for managed service providers, expanding our network's capabilities and reach.
                   </p>
@@ -82,9 +82,9 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <BookOpen className="w-8 h-8 text-yellow-400 flex-shrink-0" />
+                <Trophy className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Investment Thesis Voting</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">First Acquisition Vote</h4>
                   <p className="text-gray-300">
                     At $300K raised: Token holders submit and vote on investment theses with capital allocation pledging enabled.
                   </p>
@@ -95,9 +95,9 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <Star className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Deal Bounty Program</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Target Search Begins</h4>
                   <p className="text-gray-300">
                     At $400K raised: Token holders earn rewards for bringing successful investment opportunities to the network.
                   </p>
@@ -121,7 +121,7 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <Building2 className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">First Acquisition Made</h4>
                   <p className="text-gray-300">
