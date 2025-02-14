@@ -1,3 +1,4 @@
+
 import { PartyPopper, Trophy, Gift, ShoppingBag, Medal, Star } from "lucide-react";
 
 export const LedgerFrens = () => {
@@ -83,9 +84,9 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <Trophy className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">First Acquisition Vote</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Investment Thesis Proposals</h4>
                   <p className="text-gray-300">
-                    At $300K raised: LedgerFren NFT holders invited to vote on first acquisition proposals, marking a key milestone in our growth strategy.
+                    At $300K raised: LedgerFren NFT holders can submit investment thesis proposals and pledge LGR tokens to indicate interest in potential acquisitions.
                   </p>
                 </div>
               </div>
