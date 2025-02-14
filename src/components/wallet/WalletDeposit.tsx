@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { Button } from "@/components/ui/button";
@@ -22,7 +21,6 @@ export const WalletDeposit = () => {
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Only allow numbers and decimals
     if (value === "" || /^\d*\.?\d*$/.test(value)) {
       setAmount(value);
     }
@@ -139,4 +137,3 @@ export const WalletDeposit = () => {
     </Card>
   );
 };
-
