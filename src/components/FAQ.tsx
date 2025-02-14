@@ -8,6 +8,14 @@ const faqs = [
     answer: "LedgerFund DAO is a decentralized autonomous organization that will be formally established in Wyoming (Q2 2025). It enables accounting professionals to collectively acquire, govern, and transform accounting practices through blockchain technology and democratic decision-making.",
   },
   {
+    question: "What role does the platform play in operations?",
+    answer: "The platform is designed to operate in a fully decentralized manner, utilizing smart contracts, blockchain assets, and timestamps instead of traditional databases. While we enable the infrastructure, we do not participate in decision-making, voting, or capital raising after the pre-sale stage. The platform serves purely as an enabler for member-driven activities.",
+  },
+  {
+    question: "Is this an investment opportunity?",
+    answer: "No, this is not an investment opportunity. We are conducting an Initial Coin Offering (ICO) where participants are funding the creation of the platform's utility features. The funds raised during pre-sale will be used to develop the infrastructure and smart contracts that enable the platform's decentralized operations.",
+  },
+  {
     question: "When does the presale start and what are the caps?",
     answer: "The presale launches in Q1 2025 with a soft cap of $250K. Early supporters can participate in the initial phase, followed by a hard cap target of $500K in Q2 2025. The project aims for $5M AUM in Q3 2025 for infrastructure development.",
   },
