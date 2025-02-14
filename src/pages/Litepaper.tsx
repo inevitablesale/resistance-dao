@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 import Sidebar from "@/components/litepaper/Sidebar";
 import SectionContent from "@/components/litepaper/SectionContent";
 import { sections } from "@/data/litepaperSections";
+import { useCustomWallet } from "@/hooks/useCustomWallet";
+import { Coins } from "lucide-react";
 
 const Litepaper = () => {
   const [activeSection, setActiveSection] = useState("introduction");
   const [openSections, setOpenSections] = useState<string[]>([]);
+  const { showBanxaDeposit } = useCustomWallet();
 
   const getAllSectionsFlat = (): string[] => {
     const flatSections: string[] = [];
@@ -68,6 +71,15 @@ const Litepaper = () => {
     setActiveSection(subsectionId);
   };
 
+  const handleBuyToken = () => {
+    showBanxaDeposit();
+    // Scroll to the deposit section if it exists
+    const depositSection = document.getElementById('deposit-section');
+    if (depositSection) {
+      depositSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black">
       <Nav />
@@ -93,9 +105,29 @@ const Litepaper = () => {
                   <p className="text-lg text-gray-400">
                     Version 1.0 - February 2024
                   </p>
+                  <Button
+                    onClick={handleBuyToken}
+                    className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white mt-4"
+                  >
+                    <Coins className="mr-2 h-4 w-4" />
+                    Buy Token
+                  </Button>
                 </div>
 
                 <SectionContent sectionId={activeSection} />
+
+                {/* Add Buy Token button after key sections */}
+                {(activeSection === "tokenomics" || activeSection === "rewards" || activeSection === "conclusion") && (
+                  <div className="flex justify-center pt-8">
+                    <Button
+                      onClick={handleBuyToken}
+                      className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
+                    >
+                      <Coins className="mr-2 h-4 w-4" />
+                      Buy Token
+                    </Button>
+                  </div>
+                )}
 
                 <div className="flex justify-between items-center pt-8 mt-12 border-t border-white/10">
                   <Button 
