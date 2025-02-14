@@ -27,7 +27,7 @@ function App() {
     paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
   };
 
-  // Create a consolidated handler for email verification completion
+  // Simple handler for email verification completion
   const handleEmailVerificationComplete = useCallback((args: any) => {
     console.log("[Dynamic SDK] Email verification flow complete with args:", args);
     toast({
@@ -82,15 +82,6 @@ function App() {
       emailVerificationCompleted: handleEmailVerificationComplete,
       emailVerificationSuccess: (args) => {
         console.log("[Dynamic SDK] Email verification succeeded:", args);
-        // Force close the auth flow after successful verification
-        setTimeout(() => {
-          const modalElement = document.querySelector('[data-testid="dynamic-auth-modal"]');
-          if (modalElement) {
-            console.log("[Dynamic SDK] Found modal element, attempting to close");
-            // Attempt to trigger a close event
-            modalElement.dispatchEvent(new Event('close', { bubbles: true }));
-          }
-        }, 1000);
       },
       userCreated: (args) => {
         console.log("[Dynamic SDK] New user created:", args);
@@ -151,16 +142,7 @@ function App() {
             signInWithEmail: true,
             autoVerify: true,
             autoClose: true,
-            onComplete: handleEmailVerificationComplete,
-            onVerificationSuccess: (args) => {
-              console.log("[Dynamic SDK] Email verification success callback:", args);
-              // Attempt to force close the modal
-              const dynamicModal = document.querySelector('[data-testid="dynamic-auth-modal"]');
-              if (dynamicModal) {
-                console.log("[Dynamic SDK] Found modal, attempting programmatic close");
-                dynamicModal.dispatchEvent(new Event('close', { bubbles: true, cancelable: true }));
-              }
-            }
+            onComplete: handleEmailVerificationComplete
           }
         }
       },
