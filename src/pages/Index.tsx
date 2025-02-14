@@ -157,7 +157,7 @@ const IndexContent = () => {
   }, []);
 
   const handleBuyToken = () => {
-    if (!primaryWallet) {
+    if (!primaryWallet?.address) {
       setShowAuthFlow?.(true);
       return;
     }
