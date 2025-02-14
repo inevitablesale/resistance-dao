@@ -20,6 +20,14 @@ const faqs = [
     answer: "LGR tokens represent ownership rights in the LedgerFund protocol. Token holders earn reflections from accounting firm investments made through our liquidity pools and participate in governance decisions.",
   },
   {
+    question: "What are reflection rights?",
+    answer: "Reflection rights entitle token holders to receive 10% of all future firm distributions through our liquidity pools, creating a passive income stream from the success of acquired practices.",
+  },
+  {
+    question: "What's the difference between LGR reflections and LP investment returns?",
+    answer: "There are two distinct ways to earn with LedgerFund: 1) All LGR token holders automatically receive 10% of firm distributions as reflections, simply for holding the token. 2) LGR LP holders who actively invest in specific firm acquisitions through our liquidity pools receive 70% of net profits from those specific firms, represented by RWA tokens. This means you can earn both passive reflections as a token holder and direct profits as an LP investor.",
+  },
+  {
     question: "When can I participate in governance?",
     answer: "Community governance launches in Phase 3 (Q3 2025). As a token holder, you'll be able to vote on key protocol decisions, including firm acquisitions, operational changes, and future development initiatives through our DAO structure.",
   },
@@ -30,10 +38,6 @@ const faqs = [
   {
     question: "How are accounting firms managed post-acquisition?",
     answer: "Experienced MSP (Managed Service Provider) partners integrated into our ecosystem manage the firms. They present detailed proposals through our Deal Thesis Framework that are put on the blockchain for community voting.",
-  },
-  {
-    question: "What are reflection rights?",
-    answer: "Reflection rights entitle token holders to receive 10% of all future firm distributions through our liquidity pools, creating a passive income stream from the success of acquired practices.",
   }
 ];
 
