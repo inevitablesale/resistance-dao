@@ -38,12 +38,21 @@ export const WalletDeposit = () => {
       return;
     }
 
+    if (parseFloat(amount) < 30) {
+      toast({
+        title: "Minimum Amount Required",
+        description: "Minimum deposit amount is $30 USD",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsProcessing(true);
-      console.log("Opening Banxa deposit view with amount:", amount);
+      console.log("[Deposit] Opening Banxa deposit view with amount:", amount);
       showBanxaDeposit();
     } catch (error) {
-      console.error("Deposit error:", error);
+      console.error("[Deposit] Error:", error);
       toast({
         title: "Deposit Error",
         description: "Failed to initiate deposit",
