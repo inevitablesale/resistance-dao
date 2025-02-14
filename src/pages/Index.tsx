@@ -118,15 +118,15 @@ const boardMembers = [
 
 const processSteps = [
   {
-    title: "Build Your Investment Thesis",
-    description: "Join a community of like-minded investors to propose and develop investment strategies for accounting practices you want to acquire.",
+    title: "Submit Your Thesis",
+    description: "Share your vision for acquiring and scaling accounting practices. Connect with like-minded investors to form investment pools.",
     icon: Trophy,
     color: "yellow",
     className: "cosmic-box yellow-energy"
   },
   {
-    title: "Tokenize Acquired Practices",
-    description: "Convert illiquid practice assets into tradeable tokens on our decentralized exchange, unlocking new value from human capital, client relationships, and intellectual property.",
+    title: "Tokenize Firm Assets",
+    description: "Convert accounting practices into tradeable digital assets. Access the decentralized marketplace for seamless buying and selling.",
     icon: Crown,
     color: "yellow",
     className: "cosmic-box yellow-energy"
@@ -438,7 +438,7 @@ const IndexContent = () => {
         </div>
       </section>
 
-      {/* Step 1: Build Your Investment Thesis */}
+      {/* Step 1: Submit Your Thesis */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
@@ -448,7 +448,7 @@ const IndexContent = () => {
                 Build Your Investment Thesis
               </h2>
               <p className="text-xl text-white/80 mb-12 max-w-4xl mx-auto">
-                Join a community of like-minded investors to propose and develop investment strategies for accounting practices you want to acquire.
+                Share your vision for acquiring and scaling accounting practices. Connect with like-minded investors to form investment pools.
               </p>
             </div>
 
