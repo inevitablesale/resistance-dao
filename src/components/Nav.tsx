@@ -1,7 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
-import { UserProfile } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, DynamicWidget, DynamicUserProfile } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import Twitter from "./icons/Twitter";
 import Linked from "./icons/Linked";
@@ -68,7 +67,7 @@ const Nav = () => {
               <DynamicWidget />
               {primaryWallet?.address && (
                 <div className="absolute top-full right-0 mt-2">
-                  <UserProfile variant="modal" />
+                  <DynamicUserProfile />
                 </div>
               )}
             </div>
