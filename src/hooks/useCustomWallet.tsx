@@ -90,7 +90,6 @@ export const useCustomWallet = () => {
         onrampProvider: OnrampProviders.Banxa,
         token: 'MATIC',
         address: primaryWallet.address,
-        network: 'polygon',
         ...(amount && { fiatAmount: amount })
       }).then(() => {
         console.log("[Deposit] Banxa window opened successfully");
