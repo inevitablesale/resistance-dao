@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -117,64 +116,67 @@ export const LGRFloatingWidget = () => {
 
   return (
     <>
-      <Popover>
-        <PopoverTrigger asChild>
-          <button className="fixed bottom-4 right-4 z-50 w-12 h-12 rounded-full bg-yellow-500/20 hover:bg-yellow-500/30 transition-colors flex items-center justify-center">
-            <Coins className="w-6 h-6 text-yellow-500" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80 p-4 bg-black/90 backdrop-blur-lg border border-white/10">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                  <Coins className="w-5 h-5 text-yellow-500" />
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
+        <div className="mb-2 px-3 py-1 bg-black/90 rounded-lg backdrop-blur-sm border border-white/10">
+          <span className="text-yellow-500 text-sm font-medium">LGR Wallet</span>
+        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="w-12 h-12 rounded-full bg-yellow-500/20 hover:bg-yellow-500/30 transition-colors flex items-center justify-center">
+              <Coins className="w-6 h-6 text-yellow-500" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-4 bg-black/90 backdrop-blur-lg border border-white/10">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                    <Coins className="w-5 h-5 text-yellow-500" />
+                  </div>
+                  <span className="text-white">LGR Token</span>
                 </div>
-                <span className="text-white">LGR Token</span>
+                <div className="text-right">
+                  <div className="text-white font-medium">
+                    {Number(lgrBalance).toLocaleString(undefined, { 
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2 
+                    })} LGR
+                  </div>
+                  <div className="text-sm text-gray-400">
+                    Purchased: {Number(purchasedTokens).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })} LGR
+                  </div>
+                </div>
               </div>
-              <div className="text-right">
-                <div className="text-white font-medium">
-                  {Number(lgrBalance).toLocaleString(undefined, { 
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2 
-                  })} LGR
+
+              <div className="flex items-center justify-between py-2 border-t border-white/10">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
+                    <img 
+                      src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+                      alt="Polygon"
+                      className="w-5 h-5"
+                    />
+                  </div>
+                  <span className="text-white">MATIC Balance</span>
                 </div>
+                <div className="text-right">
+                  <div className="text-white font-medium">
+                    {Number(maticBalance).toLocaleString(undefined, {
+                      minimumFractionDigits: 4,
+                      maximumFractionDigits: 4
+                    })} MATIC
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
                 <div className="text-sm text-gray-400">
-                  Purchased: {Number(purchasedTokens).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })} LGR
+                  Current Price: {Number(maticPrice)} MATIC per LGR
                 </div>
-              </div>
-            </div>
 
-            <div className="flex items-center justify-between py-2 border-t border-white/10">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
-                  <img 
-                    src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-                    alt="Polygon"
-                    className="w-5 h-5"
-                  />
-                </div>
-                <span className="text-white">MATIC Balance</span>
-              </div>
-              <div className="text-right">
-                <div className="text-white font-medium">
-                  {Number(maticBalance).toLocaleString(undefined, {
-                    minimumFractionDigits: 4,
-                    maximumFractionDigits: 4
-                  })} MATIC
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="text-sm text-gray-400">
-                Current Price: {Number(maticPrice)} MATIC per LGR
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
                 <Button 
                   className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold"
                   onClick={handleBuyMatic}
@@ -182,19 +184,11 @@ export const LGRFloatingWidget = () => {
                   <Wallet className="w-4 h-4 mr-2" />
                   Buy MATIC
                 </Button>
-
-                <Button 
-                  className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold"
-                  onClick={handleBuyAction}
-                >
-                  <Coins className="w-4 h-4 mr-2" />
-                  Buy LGR
-                </Button>
               </div>
             </div>
-          </div>
-        </PopoverContent>
-      </Popover>
+          </PopoverContent>
+        </Popover>
+      </div>
 
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogContent className="bg-black/95 border border-yellow-500/20">
