@@ -109,9 +109,16 @@ export const FAQ = () => {
     setSelectedFaq(selectedFaq === index ? null : index);
   };
 
+  const handleKeyPress = (index: number, event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleFaqClick(index);
+    }
+  };
+
   return (
     <section className="py-16 relative overflow-hidden min-h-screen" id="faq">
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-black/90" />
         <div 
           className="absolute inset-0"
@@ -130,9 +137,11 @@ export const FAQ = () => {
         <div 
           ref={containerRef}
           className="relative max-w-6xl mx-auto min-h-[800px] perspective-3000"
+          role="region"
+          aria-label="FAQ Section"
         >
-          {/* Knowledge Core */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          {/* Knowledge Core - Make decorative */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
             <div className="relative w-24 h-24">
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-full blur-xl opacity-50 animate-pulse" />
               <div className="absolute inset-2 bg-black rounded-full" />
@@ -149,9 +158,9 @@ export const FAQ = () => {
                 const angleInDegrees = (index / faqs.length * 360 + rotation) % 360;
 
                 return (
-                  <motion.div
+                  <motion.button
                     key={index}
-                    className="absolute left-1/2 top-1/2 cursor-pointer"
+                    className="absolute left-1/2 top-1/2 focus:outline-none group"
                     animate={{
                       x: isSelected ? 0 : position.x,
                       y: isSelected ? 0 : position.y,
@@ -165,22 +174,27 @@ export const FAQ = () => {
                       duration: isSelected ? 1 : 0.3
                     }}
                     onClick={() => handleFaqClick(index)}
+                    onKeyDown={(e) => handleKeyPress(index, e)}
+                    aria-expanded={isSelected}
+                    aria-controls={`faq-answer-${index}`}
+                    role="button"
+                    tabIndex={0}
                   >
                     <motion.div
-                      className="relative -translate-x-1/2 -translate-y-1/2"
+                      className="relative -translate-x-1/2 -translate-y-1/2 select-none"
                       whileHover={{ scale: 1.1 }}
                       style={{ transform: `rotate(${angleInDegrees}deg)` }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-full blur-xl" />
-                      <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 p-4 rounded-full h-16 w-16 flex items-center justify-center group hover:border-yellow-500/60 transition-colors">
+                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-full blur-xl pointer-events-none" />
+                      <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 p-4 rounded-full h-16 w-16 flex items-center justify-center group-hover:border-yellow-500/60 group-focus:ring-2 group-focus:ring-yellow-500/50 transition-all">
                         <Icon className="w-8 h-8 text-yellow-500 group-hover:text-yellow-400 transition-colors" />
                       </div>
                       <div 
                         className="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap"
                         style={{ transform: `rotate(-${angleInDegrees}deg)` }}
                       >
-                        <span className="text-yellow-500 text-sm font-medium bg-black/80 px-2 py-1 rounded cursor-pointer hover:bg-black/90 transition-colors">
-                          {faq.question.split('?')[0]}?
+                        <span className="text-yellow-500 text-sm font-medium bg-black/80 px-3 py-1.5 rounded select-none group-hover:bg-black/90 group-focus:ring-2 group-focus:ring-yellow-500/50 transition-all">
+                          {faq.question}
                         </span>
                       </div>
                     </motion.div>
@@ -188,13 +202,14 @@ export const FAQ = () => {
                     <AnimatePresence>
                       {isSelected && (
                         <motion.div
+                          id={`faq-answer-${index}`}
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.8 }}
-                          className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-80"
+                          className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-80 z-20"
                         >
                           <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-lg blur-xl" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-lg blur-xl pointer-events-none" />
                             <div className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 p-6 rounded-lg">
                               <h3 className="text-lg font-semibold text-white mb-2">{faq.question}</h3>
                               <p className="text-gray-300 text-sm">{faq.answer}</p>
@@ -203,7 +218,7 @@ export const FAQ = () => {
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </motion.div>
+                  </motion.button>
                 );
               })}
             </div>
@@ -222,9 +237,12 @@ export const FAQ = () => {
                   >
                     <button
                       onClick={() => handleFaqClick(index)}
-                      className="w-full text-left"
+                      onKeyDown={(e) => handleKeyPress(index, e)}
+                      className="w-full text-left min-h-[60px] focus:outline-none group"
+                      aria-expanded={isSelected}
+                      aria-controls={`faq-answer-mobile-${index}`}
                     >
-                      <div className="relative bg-black/60 backdrop-blur-sm border border-yellow-500/30 p-4 rounded-lg group hover:border-yellow-500/60 transition-all">
+                      <div className="relative bg-black/60 backdrop-blur-sm border border-yellow-500/30 p-4 rounded-lg group-hover:border-yellow-500/60 group-focus:ring-2 group-focus:ring-yellow-500/50 transition-all">
                         <div className="flex items-center gap-3 mb-2">
                           <div className="p-2 bg-yellow-500/10 rounded-full">
                             <Icon className="w-5 h-5 text-yellow-500" />
@@ -236,6 +254,7 @@ export const FAQ = () => {
                         <AnimatePresence>
                           {isSelected && (
                             <motion.div
+                              id={`faq-answer-mobile-${index}`}
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: "auto", opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
