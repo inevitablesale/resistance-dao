@@ -63,12 +63,12 @@ function App() {
   };
 
   const lgrToken = {
-    networkId: 137,
+    chainId: 137,
     address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
     name: "LedgerFund Token",
     symbol: "LGR",
     decimals: 18,
-    logoURI: "/favicon.ico"
+    icon: "/favicon.ico"
   };
 
   const customTokenFilter = (tokens: any[]) => {
@@ -148,12 +148,12 @@ function App() {
       shadowDOMEnabled: false,
       tokens: [
         {
-          networkId: 137,
           address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
           symbol: "LGR",
           decimals: 18,
           name: "LedgerFund Token",
-          logoURI: "/favicon.ico"
+          icon: "/favicon.ico",
+          chainId: 137
         }
       ]
     }
