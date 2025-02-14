@@ -32,6 +32,15 @@ declare module "@dynamic-labs/sdk-react-core" {
       };
     } | null;
     setShowAuthFlow?: (show: boolean) => void;
+    setShowOnRamp?: (
+      show: boolean,
+      options?: {
+        defaultFiatAmount?: number;
+        defaultNetwork?: {
+          chainId: number;
+        };
+      }
+    ) => void;
   }
 
   export interface DynamicSettings {
