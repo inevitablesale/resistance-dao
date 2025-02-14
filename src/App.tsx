@@ -27,11 +27,13 @@ function Layout() {
     if (tokenBalances && !isLoading && !error) {
       console.log("Token balances updated:", tokenBalances);
       // Find LGR token balance
-      const lgrToken = tokenBalances.find(token => token.symbol === 'LGR');
+      const lgrToken = tokenBalances.find(token => 
+        token.address?.toLowerCase() === "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00".toLowerCase()
+      );
       if (lgrToken) {
         toast({
           title: "LGR Balance Updated",
-          description: `Your LGR balance: ${lgrToken.balance} LGR`,
+          description: `Your LGR balance: ${lgrToken.balance || '0'} LGR`,
         });
       }
     }
@@ -62,17 +64,18 @@ function App() {
     paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
   };
 
-  const lgrToken = {
-    chainId: 137,
-    address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
-    name: "LedgerFund Token",
-    symbol: "LGR",
-    decimals: 18,
-    icon: "/favicon.ico"
-  };
-
   const customTokenFilter = (tokens: any[]) => {
-    return [...tokens.filter(token => token.symbol === 'MATIC'), lgrToken];
+    const maticToken = tokens.find(token => token.symbol === 'MATIC' && token.chainId === 137);
+    const lgrToken = {
+      address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
+      symbol: "LGR",
+      decimals: 18,
+      name: "LedgerFund Token",
+      icon: "/favicon.ico",
+      chainId: 137
+    };
+    
+    return maticToken ? [maticToken, lgrToken] : [lgrToken];
   };
 
   const dynamicSettings = {
