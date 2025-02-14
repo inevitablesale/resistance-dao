@@ -73,13 +73,16 @@ export const useCustomWallet = () => {
     }
 
     try {
-      console.log("[Deposit] Opening onramp with amount:", amount);
-      setShowOnRamp?.(true, {
-        defaultFiatAmount: amount,
+      // Only include defaultFiatAmount if amount is a valid number
+      const options = {
         defaultNetwork: {
           chainId: 137
-        }
-      });
+        },
+        ...(typeof amount === 'number' && !isNaN(amount) && amount > 0 && { defaultFiatAmount: amount })
+      };
+
+      console.log("[Deposit] Opening onramp with options:", options);
+      setShowOnRamp?.(true, options);
     } catch (error) {
       console.error("[Deposit] Error showing deposit view:", error);
       toast({
