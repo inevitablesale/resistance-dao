@@ -98,3 +98,5 @@ export const WalletAssets = () => {
     </div>
   );
 };
+
+export default WalletAssets;
