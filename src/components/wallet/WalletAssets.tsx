@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { getWorkingProvider, getLgrTokenContract } from "@/services/presaleContractService";
+import { getWorkingProvider, getLgrTokenContract, getPresaleContract } from "@/services/presaleContractService";
 import { ethers } from "ethers";
 import { Coins } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -11,6 +11,7 @@ export const WalletAssets = () => {
   const { address } = useCustomWallet();
   const [maticBalance, setMaticBalance] = useState<string>("0");
   const [lgrBalance, setLgrBalance] = useState<string>("0");
+  const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
   const [maticPrice, setMaticPrice] = useState<number>(0);
   const { toast } = useToast();
 
@@ -36,15 +37,20 @@ export const WalletAssets = () => {
 
       try {
         const provider = await getWorkingProvider();
-        const [maticBal, lgrContract] = await Promise.all([
+        const [maticBal, lgrContract, presaleContract] = await Promise.all([
           provider.getBalance(address),
-          getLgrTokenContract(provider)
+          getLgrTokenContract(provider),
+          getPresaleContract(provider)
         ]);
         
-        const lgrBal = await lgrContract.balanceOf(address);
+        const [lgrBal, purchased] = await Promise.all([
+          lgrContract.balanceOf(address),
+          presaleContract.purchasedTokens(address)
+        ]);
         
         setMaticBalance(ethers.utils.formatEther(maticBal));
         setLgrBalance(ethers.utils.formatUnits(lgrBal, 18));
+        setPurchasedTokens(ethers.utils.formatUnits(purchased, 18));
       } catch (error) {
         console.error("Error fetching balances:", error);
       }
@@ -93,6 +99,12 @@ export const WalletAssets = () => {
               maximumFractionDigits: 2 
             })} LGR
           </div>
+          <div className="text-sm text-gray-400">
+            Purchased: {Number(purchasedTokens).toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })} LGR
+          </div>
         </div>
       </div>
     </div>
@@ -100,3 +112,4 @@ export const WalletAssets = () => {
 };
 
 export default WalletAssets;
+
