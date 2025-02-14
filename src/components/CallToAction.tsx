@@ -12,7 +12,7 @@ export const CallToAction = () => {
     <section className="py-16">
       <div className="container px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center relative z-20">
             <Button
               onClick={() => showBanxaDeposit()}
               className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
