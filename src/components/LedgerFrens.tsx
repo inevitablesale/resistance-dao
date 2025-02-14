@@ -32,7 +32,7 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <PartyPopper className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Early Minting Access</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Share Your Investment Thesis</h4>
                   <p className="text-gray-300">
                     At $50K raised: LedgerFrens NFTs are minted, giving early supporters exclusive access to our decentralized accounting ecosystem.
                   </p>
@@ -45,9 +45,9 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <Trophy className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Governance Board Election</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Create Liquidity from Practice Assets</h4>
                   <p className="text-gray-300">
-                    At $100K raised: Voting begins for governance board seats, empowering our community to shape the future of decentralized accounting.
+                    At $100K raised: Transform traditional accounting practices into tradeable digital assets through our decentralized marketplace.
                   </p>
                 </div>
               </div>
@@ -84,9 +84,9 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <Trophy className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">First Acquisition Vote</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Investment Thesis Voting</h4>
                   <p className="text-gray-300">
-                    At $300K raised: LedgerFren NFT holders invited to vote on first acquisition proposals, marking a key milestone in our growth strategy.
+                    At $300K raised: LedgerFren NFT holders can submit and vote on investment theses, with capital allocation pledging enabled.
                   </p>
                 </div>
               </div>
@@ -97,9 +97,9 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Target Search Begins</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Deal Bounty Program</h4>
                   <p className="text-gray-300">
-                    At $400K raised: Network begins active search for matching acquisition targets, expanding our decentralized accounting ecosystem.
+                    At $400K raised: Token holders can earn rewards for bringing successful investment opportunities to the network.
                   </p>
                 </div>
               </div>
@@ -136,4 +136,3 @@ export const LedgerFrens = () => {
     </section>
   );
 };
-
