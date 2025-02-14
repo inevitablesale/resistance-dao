@@ -16,9 +16,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2, Calculator, Clock, Calendar, DollarSign, BookOpen, BarChart2, Briefcase } from "lucide-react";
-import { ethers } from "ethers";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
-import { TokenPurchaseForm } from "@/components/TokenPurchaseForm";
 import { NewsletterSubscription } from "@/components/NewsletterSubscription";
 
 const presaleData = [
@@ -136,14 +134,12 @@ const processSteps = [
 
 const IndexContent = () => {
   const navigate = useNavigate();
-  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow, setShowOnRamp } = useDynamicContext();
   const { toast } = useToast();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const presaleRef = useRef<HTMLDivElement>(null);
-  const [showPurchaseForm, setShowPurchaseForm] = useState(false);
-  const [selectedAmount, setSelectedAmount] = useState("");
   const [maticPrice, setMaticPrice] = useState<string>("Loading...");
 
   useEffect(() => {
@@ -160,24 +156,12 @@ const IndexContent = () => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (primaryWallet?.isConnected?.() && selectedAmount) {
-      setShowPurchaseForm(true);
-    }
-  }, [primaryWallet, selectedAmount]);
-
-  const handleTierSelect = (amount: string) => {
+  const handleBuyToken = () => {
     if (!primaryWallet) {
       setShowAuthFlow?.(true);
-      toast({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to purchase tokens.",
-        duration: 5000,
-      });
       return;
     }
-    setSelectedAmount(amount);
-    setShowPurchaseForm(true);
+    setShowOnRamp?.(true);
   };
 
   const handleScroll = () => {
@@ -306,7 +290,7 @@ const IndexContent = () => {
           <div className="space-y-6">
             <div className="flex gap-4 justify-center">
               <button 
-                onClick={() => setShowPurchaseForm(!showPurchaseForm)}
+                onClick={handleBuyToken}
                 className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-lg font-bold text-lg hover:opacity-90 transition-all duration-300 transform hover:scale-105"
               >
                 Buy Token

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Nav from "@/components/Nav";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -7,12 +6,13 @@ import Sidebar from "@/components/litepaper/Sidebar";
 import SectionContent from "@/components/litepaper/SectionContent";
 import { sections } from "@/data/litepaperSections";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Coins } from "lucide-react";
 
 const Litepaper = () => {
   const [activeSection, setActiveSection] = useState("introduction");
   const [openSections, setOpenSections] = useState<string[]>([]);
-  const { showBanxaDeposit } = useCustomWallet();
+  const { setShowOnRamp } = useDynamicContext();
 
   const getAllSectionsFlat = (): string[] => {
     const flatSections: string[] = [];
@@ -72,12 +72,7 @@ const Litepaper = () => {
   };
 
   const handleBuyToken = () => {
-    showBanxaDeposit();
-    // Scroll to the deposit section if it exists
-    const depositSection = document.getElementById('deposit-section');
-    if (depositSection) {
-      depositSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    setShowOnRamp?.(true);
   };
 
   return (
