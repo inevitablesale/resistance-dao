@@ -1,3 +1,4 @@
+
 import { Card } from "./ui/card";
 import { Milestone, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,19 +15,16 @@ export const Roadmap = () => {
       const rect = sectionRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       
-      // Calculate visibility percentage as section enters viewport
       const visibilityPercent = Math.max(0, Math.min(1, 
         1 - (rect.top / windowHeight)
       ));
       
-      // When scrolling back up, scale back down
       const scrollUpAdjustment = Math.max(0, Math.min(1,
         1 - (Math.abs(rect.bottom) / windowHeight)
       ));
       
-      // Use the minimum of both values to ensure proper scaling in both directions
       const scale = Math.min(visibilityPercent, scrollUpAdjustment);
-      setBlackHoleScale(1 + (scale * 0.5)); // Scale from 1x to 1.5x
+      setBlackHoleScale(1 + (scale * 0.5));
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -37,6 +35,7 @@ export const Roadmap = () => {
     {
       title: "Phase 1: Foundation",
       subtitle: "Q1 2025",
+      targetAmount: "Soft Cap: $250K",
       items: [
         "Website Development",
         "Token Contract Development",
@@ -45,34 +44,33 @@ export const Roadmap = () => {
         "Applied for Polygon Community Grant",
         "Developed Litepaper",
         "Launched Presale",
-        "Onboard Partners into Ecosystem",
-        "Soft Cap: $250K"
+        "Onboard Partners into Ecosystem"
       ]
     },
     {
       title: "Phase 2: Growth & Integration",
       subtitle: "Q2 2025",
+      targetAmount: "Hard Cap: $500K",
       items: [
         "Apply for Direct Listing with Banxa",
         "Launch LedgerFren NFT Platform",
         "Form DAO in Wyoming",
         "Launch Community",
         "Apply to CoinGeko and CoinMarketCap for listings",
-        "Release Deal Thesis and Firm Bounties",
-        "Hard Cap: $500K"
+        "Release Deal Thesis and Firm Bounties"
       ]
     },
     {
       title: "Phase 3: Infrastructure & Deal Flow",
       subtitle: "Q3 2025",
+      targetAmount: "Targeted Raise: $5M",
       items: [
         "Integrate flowinc.com for SPV Management",
         "Deploy Deal Thesis Framework",
         "Deploy Liquidity Pool UI",
         "Launch Community Governance",
         "First Liquidity Pool Acquisitions Begin",
-        "Launch Decentralized Marketplace",
-        "Targeted Raise: $5M"
+        "Launch Decentralized Marketplace"
       ]
     }
   ];
@@ -156,8 +154,11 @@ export const Roadmap = () => {
                       </ul>
                     </div>
                     
-                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-                      <ChevronDown className="w-6 h-6 text-yellow-500/60 animate-bounce" />
+                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+                      <ChevronDown className="w-6 h-6 text-yellow-500/60 animate-bounce mb-1" />
+                      <span className="text-sm font-medium bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400">
+                        {phase.targetAmount}
+                      </span>
                     </div>
                   </Card>
                   
@@ -213,8 +214,11 @@ export const Roadmap = () => {
                     </ul>
                   </div>
                   
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-                    <ChevronDown className="w-6 h-6 text-yellow-500/60 animate-bounce" />
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+                    <ChevronDown className="w-6 h-6 text-yellow-500/60 animate-bounce mb-1" />
+                    <span className="text-sm font-medium bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400">
+                      {phase.targetAmount}
+                    </span>
                   </div>
                 </Card>
                 
