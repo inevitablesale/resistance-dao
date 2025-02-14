@@ -1,6 +1,5 @@
 
 import Image from "@/components/ui/image"
-import { cn } from "@/lib/utils"
 
 export const Partners = () => {
   const partners = [
@@ -25,21 +24,14 @@ export const Partners = () => {
                 href={partner.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group hover:scale-105 transition-transform duration-300"
               >
-                <div className="relative bg-black/30 backdrop-blur p-8 rounded-lg border border-yellow-500/20 group-hover:border-yellow-500/40 transition-all duration-300">
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 via-teal-500/20 to-yellow-500/20 rounded-lg blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                  <Image
-                    src={partner.logo}
-                    alt={partner.name}
-                    width={200}
-                    height={80}
-                    className={cn(
-                      "transition-all duration-300 relative z-10",
-                      "filter brightness-90 group-hover:brightness-100"
-                    )}
-                  />
-                </div>
+                <Image
+                  src={partner.logo}
+                  alt={partner.name}
+                  width={200}
+                  height={80}
+                  className="hover:opacity-80 transition-opacity duration-300"
+                />
               </a>
               <a
                 href={partner.url}
