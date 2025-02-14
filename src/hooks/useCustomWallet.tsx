@@ -1,12 +1,14 @@
 
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, useOnramp } from "@dynamic-labs/sdk-react-core";
+import { OnrampProviders } from "@dynamic-labs/sdk-api-core";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export type WalletView = 'assets' | 'actions' | 'buy' | 'send' | 'history';
 
 export const useCustomWallet = () => {
-  const { primaryWallet, setShowAuthFlow, user, setShowOnRamp } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow, user } = useDynamicContext();
+  const { open: openOnramp, enabled: onrampEnabled } = useOnramp();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [currentView, setCurrentView] = useState<WalletView>('assets');
@@ -72,16 +74,34 @@ export const useCustomWallet = () => {
       return;
     }
 
-    try {
-      // Only include defaultFiatAmount if amount is a valid number
-      const options = {
-        defaultNetwork: {
-          chainId: 137
-        }
-      };
+    if (!onrampEnabled) {
+      console.error("[Deposit] Onramp not enabled");
+      toast({
+        title: "Error",
+        description: "Onramp functionality is not available",
+        variant: "destructive",
+      });
+      return;
+    }
 
-      console.log("[Deposit] Opening onramp with options:", options);
-      setShowOnRamp?.(true, options);
+    try {
+      console.log("[Deposit] Opening Banxa onramp for address:", primaryWallet.address);
+      openOnramp({
+        onrampProvider: OnrampProviders.Banxa,
+        token: 'MATIC',
+        address: primaryWallet.address,
+        network: 'polygon',
+        ...(amount && { fiatAmount: amount })
+      }).then(() => {
+        console.log("[Deposit] Banxa window opened successfully");
+      }).catch((error) => {
+        console.error("[Deposit] Error opening Banxa:", error);
+        toast({
+          title: "Error",
+          description: "Failed to open deposit interface",
+          variant: "destructive",
+        });
+      });
     } catch (error) {
       console.error("[Deposit] Error showing deposit view:", error);
       toast({
