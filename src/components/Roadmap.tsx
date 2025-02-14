@@ -1,5 +1,5 @@
 import { Card } from "./ui/card";
-import { Milestone } from "lucide-react";
+import { Milestone, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useRef } from "react";
 
@@ -79,7 +79,6 @@ export const Roadmap = () => {
 
   return (
     <section ref={sectionRef} id="roadmap" className="py-16 relative overflow-hidden">
-      {/* Black Hole Effect Background */}
       <div className="absolute inset-0 opacity-90">
         <div 
           className="absolute inset-0 bg-[#000000e6] animate-singularity transition-transform duration-300"
@@ -88,7 +87,6 @@ export const Roadmap = () => {
             transform: `scale(${blackHoleScale})`
           }}
         />
-        {/* Event Horizon Glow */}
         <div 
           className="absolute inset-0 transition-transform duration-300"
           style={{
@@ -97,7 +95,6 @@ export const Roadmap = () => {
             transform: `scale(${blackHoleScale * 0.9})`
           }}
         />
-        {/* Accretion Disk */}
         <div 
           className="absolute inset-0 opacity-20 transition-transform duration-300"
           style={{
@@ -117,7 +114,6 @@ export const Roadmap = () => {
             Decentralized Accounting Firm Ownership
           </p>
 
-          {/* Desktop Timeline (Horizontal Scroll) */}
           <div className="hidden md:block overflow-x-auto pb-8">
             <div className="flex gap-6 min-w-max px-4">
               {phases.map((phase, index) => (
@@ -134,9 +130,9 @@ export const Roadmap = () => {
                     "hover:translate-y-[-4px] hover:rotate-y-[-5deg] animate-fade-in",
                     "border-yellow-500/20 hover:border-yellow-500/40",
                     "group-hover:shadow-[0_0_25px_rgba(234,179,8,0.2)]",
-                    "after:absolute after:inset-0 after:bg-gradient-to-r after:from-yellow-500/5 after:via-teal-400/5 after:to-yellow-500/5 after:opacity-0 after:transition-opacity after:duration-500 group-hover:after:opacity-100"
+                    "after:absolute after:inset-0 after:bg-gradient-to-r after:from-yellow-500/5 after:via-teal-400/5 after:to-yellow-500/5 after:opacity-0 after:transition-opacity after:duration-500 group-hover:after:opacity-100",
+                    "pb-12"
                   )}>
-                    {/* Gravitational Lensing Effect */}
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500/30 to-teal-400/30 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
                     
                     <div className="absolute -left-3 top-6 w-12 h-12 flex items-center justify-center bg-black/60 rounded-full border border-yellow-500/20 group-hover:scale-110 transition-transform duration-500">
@@ -159,9 +155,12 @@ export const Roadmap = () => {
                         ))}
                       </ul>
                     </div>
+                    
+                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                      <ChevronDown className="w-6 h-6 text-yellow-500/60 animate-bounce" />
+                    </div>
                   </Card>
                   
-                  {/* Curved Connection Line with Particle Effect */}
                   {index < phases.length - 1 && (
                     <div className="absolute top-1/2 -right-6 w-6">
                       <div className="h-0.5 w-full bg-gradient-to-r from-yellow-500/40 to-teal-400/40 relative overflow-hidden">
@@ -178,7 +177,6 @@ export const Roadmap = () => {
             </div>
           </div>
 
-          {/* Mobile Timeline (Vertical Stack) */}
           <div className="md:hidden space-y-6">
             {phases.map((phase, index) => (
               <div 
@@ -188,8 +186,10 @@ export const Roadmap = () => {
                   animationDelay: `${index * 200}ms`
                 }}
               >
-                <Card className="p-6 bg-black/40 backdrop-blur-xl border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-500 hover:translate-x-1">
-                  {/* Gravitational Lensing Effect */}
+                <Card className={cn(
+                  "p-6 bg-black/40 backdrop-blur-xl border border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-500 hover:translate-x-1",
+                  "pb-12"
+                )}>
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500/30 to-teal-400/30 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
                   
                   <div className="absolute -left-3 top-6 w-12 h-12 flex items-center justify-center bg-black/60 rounded-full border border-yellow-500/20 group-hover:scale-110 transition-transform duration-500">
@@ -212,9 +212,12 @@ export const Roadmap = () => {
                       ))}
                     </ul>
                   </div>
+                  
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                    <ChevronDown className="w-6 h-6 text-yellow-500/60 animate-bounce" />
+                  </div>
                 </Card>
                 
-                {/* Curved Connection Line with Particle Effect */}
                 {index < phases.length - 1 && (
                   <div className="absolute left-[21px] top-[72px] w-0.5 h-[calc(100%+24px)]">
                     <div className="h-full w-full bg-gradient-to-b from-yellow-500/40 to-teal-400/40 relative overflow-hidden">
