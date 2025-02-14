@@ -1,4 +1,3 @@
-
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
@@ -34,6 +33,14 @@ const faqs = [
   {
     question: "How does the Decentralized Marketplace work?",
     answer: "The Decentralized Marketplace enables the tokenization of accounting firms' intangible capital, including client relationships, intellectual property, and recurring revenue streams. Through smart contracts and RWA tokens, we unlock these traditionally illiquid assets, making them tradable and accessible to our community. This creates new opportunities for value creation and liquidity in professional services.",
+  },
+  {
+    question: "How are Blue Sky fees handled?",
+    answer: "The platform charges a flat fee, calculated at time of investment of the total investment raised per acquisition to cover blue sky fees at a flat rate for all members.",
+  },
+  {
+    question: "How will the Reg D paperwork be filed with the SEC?",
+    answer: "We will utilize flowinc as our backbone to act as a registered agent, establish SPV's, and file the necessary Reg D 506b safe harbor exemption paperwork.",
   },
   {
     question: "Is this an investment opportunity?",
