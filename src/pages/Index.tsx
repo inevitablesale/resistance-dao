@@ -1,4 +1,3 @@
-
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -439,14 +438,14 @@ const IndexContent = () => {
         </div>
       </section>
 
-      {/* Step 1: Submit Your Thesis */}
+      {/* Step 1: Submit Your Investment Thesis */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-6" />
               <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
-                Build Your Investment Thesis
+                Submit Your Investment Thesis
               </h2>
               <p className="text-xl text-white/80 mb-12 max-w-4xl mx-auto">
                 Join a community of like-minded investors to propose and develop investment strategies for accounting practices you want to acquire.
