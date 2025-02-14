@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -111,6 +112,8 @@ export const LGRFloatingWidget = () => {
 
   const expectedLGRAmount = purchaseAmount ? 
     Number(purchaseAmount) / Number(maticPrice) : 0;
+
+  if (!address) return null;
 
   return (
     <>
