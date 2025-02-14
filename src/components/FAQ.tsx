@@ -45,24 +45,24 @@ export const FAQ = () => {
   };
 
   return (
-    <section className="py-16 min-h-screen bg-black/90" id="faq">
-      <div className="container px-4">
+    <section className="relative z-50 py-16 min-h-screen bg-black/90" id="faq">
+      <div className="container relative z-50 px-4">
         <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12 text-center">
           Frequently Asked Questions
         </h2>
 
-        <div className="max-w-3xl mx-auto space-y-4">
+        <div className="relative z-50 max-w-3xl mx-auto space-y-4">
           {faqs.map((faq, index) => {
             const isSelected = selectedFaq === index;
             
             return (
               <div
                 key={index}
-                className="border border-yellow-500/30 rounded-lg overflow-hidden hover:border-yellow-500/60 transition-colors"
+                className="relative bg-black/80 backdrop-blur-sm border border-yellow-500/30 rounded-lg overflow-hidden hover:border-yellow-500/60 transition-colors"
               >
                 <button
                   onClick={() => handleFaqClick(index)}
-                  className="w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
+                  className="relative z-10 w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 hover:bg-yellow-500/10 transition-colors"
                   aria-expanded={isSelected}
                   aria-controls={`faq-answer-${index}`}
                 >
@@ -80,7 +80,7 @@ export const FAQ = () => {
                 
                 <div
                   id={`faq-answer-${index}`}
-                  className={`transition-all duration-200 ease-in-out ${
+                  className={`relative z-10 transition-all duration-200 ease-in-out ${
                     isSelected ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                   } overflow-hidden`}
                 >
