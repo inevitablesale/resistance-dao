@@ -45,7 +45,8 @@ export const Roadmap = () => {
         "Applied for Polygon Community Grant",
         "Developed Litepaper",
         "Launched Presale",
-        "Onboard Partners into Ecosystem"
+        "Onboard Partners into Ecosystem",
+        "Soft Cap: $250K"
       ]
     },
     {
@@ -57,8 +58,8 @@ export const Roadmap = () => {
         "Form DAO in Wyoming",
         "Launch Community",
         "Apply to CoinGeko and CoinMarketCap for listings",
-        "Build Deal Flow Bounties System",
-        "Release Deal Thesis and Firm Bounties"
+        "Release Deal Thesis and Firm Bounties",
+        "Hard Cap: $500K"
       ]
     },
     {
@@ -70,7 +71,8 @@ export const Roadmap = () => {
         "Deploy Liquidity Pool UI",
         "Launch Community Governance",
         "First Liquidity Pool Acquisitions Begin",
-        "Launch Decentralized Marketplace"
+        "Launch Decentralized Marketplace",
+        "Targeted Raise: $5M"
       ]
     }
   ];
