@@ -622,6 +622,11 @@ const IndexContent = () => {
 };
 
 const Index = () => {
+  useEffect(() => {
+    // Initialize the Now4real overlay test
+    initNow4realTest();
+  }, []);
+
   return (
     <div className="min-h-screen bg-black overflow-hidden relative">
       <IndexContent />
