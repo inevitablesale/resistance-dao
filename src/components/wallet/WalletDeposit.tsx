@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { Button } from "@/components/ui/button";
@@ -99,22 +100,6 @@ export const WalletDeposit = () => {
             <p>• Instant processing</p>
             <p>• Major cards accepted</p>
             <p>• Secure payment processing</p>
-          </div>
-        </div>
-
-        <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-4">
-          <div className="flex gap-2">
-            <AlertCircle className="h-5 w-5 shrink-0 text-yellow-500" />
-            <div className="text-sm">
-              <p className="font-medium text-yellow-500">How to Purchase</p>
-              <ol className="text-yellow-500/90 mt-2 space-y-2 list-decimal pl-4">
-                <li>Click 'Continue to Payment' below to access our payment partner Banxa</li>
-                <li>Keep USD as the Spend amount. Select POL as the Receive amount</li>
-                <li>Enter the amount you wish to purchase (minimum $30 USD)</li>
-                <li>Complete the payment process to receive Polygon in your wallet</li>
-                <li>Navigate to Pay with Polygon option in Choose Payment Method in wallet. Use your Polygo to purchase LGR tokens through the Polygon payment option</li>
-              </ol>
-            </div>
           </div>
         </div>
       </CardContent>

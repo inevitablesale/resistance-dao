@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Input } from "@/components/ui/input";
@@ -509,7 +508,7 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
               </li>
               <li className="flex gap-2">
                 <span className="font-bold text-yellow-500">2.</span>
-                <span>Select your preferred payment method (credit/debit card, bank transfer, etc.)</span>
+                <span>Keep USD as the Spend amount. Select POL as the Receive amount</span>
               </li>
               <li className="flex gap-2">
                 <span className="font-bold text-yellow-500">3.</span>
@@ -517,11 +516,11 @@ export const TokenPurchaseForm = ({ initialAmount }: TokenPurchaseFormProps) => 
               </li>
               <li className="flex gap-2">
                 <span className="font-bold text-yellow-500">4.</span>
-                <span>Complete the payment process to receive MATIC in your wallet</span>
+                <span>Complete the payment process to receive Polygon in your wallet</span>
               </li>
               <li className="flex gap-2">
                 <span className="font-bold text-yellow-500">5.</span>
-                <span>Use your MATIC to purchase LGR tokens through the Polygon payment option</span>
+                <span>Navigate to Pay with Polygon option in Choose Payment Method in wallet. Use your Polygo to purchase LGR tokens through the Polygon payment option</span>
               </li>
             </ol>
           </div>
