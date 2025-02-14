@@ -1,3 +1,4 @@
+
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -46,22 +47,24 @@ export const useCustomWallet = () => {
 
   const showBanxaDeposit = () => {
     if (!primaryWallet) {
-      toast({
-        title: "Wallet Required",
-        description: "Please connect your wallet first",
-        variant: "destructive",
-      });
+      console.log("[Deposit] No wallet connected, opening auth flow");
+      setShowAuthFlow?.(true);
       return;
     }
 
     try {
+      console.log("[Deposit] Attempting to show deposit view");
       if (primaryWallet.connector?.showWallet) {
         primaryWallet.connector.showWallet({ view: 'deposit' });
+      } else if (primaryWallet.connector?.openWallet) {
+        console.log("[Deposit] Using openWallet fallback");
+        primaryWallet.connector.openWallet({ view: 'deposit' });
       } else {
+        console.log("[Deposit] No direct wallet access, opening auth flow");
         setShowAuthFlow?.(true);
       }
     } catch (error) {
-      console.error("Error showing deposit view:", error);
+      console.error("[Deposit] Error showing deposit view:", error);
       toast({
         title: "Error",
         description: "Failed to open deposit interface",

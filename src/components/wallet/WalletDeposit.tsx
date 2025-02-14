@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 
 export const WalletDeposit = () => {
-  const { showBanxaDeposit } = useCustomWallet();
+  const { showBanxaDeposit, isConnected } = useCustomWallet();
   const [amount, setAmount] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
@@ -50,6 +50,8 @@ export const WalletDeposit = () => {
     try {
       setIsProcessing(true);
       console.log("[Deposit] Opening Banxa deposit view with amount:", amount);
+      
+      // This will either open the deposit view or trigger wallet connection
       showBanxaDeposit();
     } catch (error) {
       console.error("[Deposit] Error:", error);
