@@ -16,6 +16,7 @@ import ContentHub from "./pages/ContentHub";
 import { Marketplace } from "./pages/Marketplace";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
+import { useBalanceMonitor } from "./hooks/use-balance-monitor";
 
 function App() {
   const { toast } = useToast();
@@ -124,6 +125,7 @@ function App() {
           <Route path="/content" element={<ContentHub />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <useBalanceMonitor />
       </Router>
       <Toaster />
       <Analytics />
