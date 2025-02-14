@@ -55,15 +55,19 @@ const faqCategories = [
         question: "What are RWA tokens and LGR LP tokens?",
         answer: "Real World Asset (RWA) tokens are digital representations of ownership in physical accounting firms. When you invest in a specific firm through our liquidity pools, you receive LGR LP tokens, which are RWA tokens that represent your proportional ownership in that investment. These tokens are backed by real-world revenue streams and enable fractional ownership and automated distribution of profits.",
       },
+      {
+        question: "How do LedgerFund's liquidity pools work?",
+        answer: "Liquidity pools are launched in Phase 3 (Q3 2025) as part of our infrastructure development. These pools enable collective investment in accounting firm acquisitions, with the first acquisitions beginning after the deployment of our Deal Thesis Framework.",
+      },
+      {
+        question: "What's the difference between LGR reflections and LP investment returns?",
+        answer: "There are two distinct ways to earn with LedgerFund: 1) All LGR token holders automatically receive 10% of firm distributions as reflections, simply for holding the token. 2) LGR LP holders who actively invest in specific firm acquisitions through our liquidity pools receive 70% of net profits from those specific firms, represented by RWA tokens. This means you can earn both passive reflections as a token holder and direct profits as an LP investor.",
+      },
     ],
   },
   {
-    category: "Investment & Financial",
+    category: "Deal Paperwork",
     questions: [
-      {
-        question: "How does the Decentralized Marketplace work?",
-        answer: "The Decentralized Marketplace enables the tokenization of accounting firms' intangible capital, including client relationships, intellectual property, and recurring revenue streams. Through smart contracts and RWA tokens, we unlock these traditionally illiquid assets, making them tradable and accessible to our community. This creates new opportunities for value creation and liquidity in professional services.",
-      },
       {
         question: "How are Blue Sky fees handled?",
         answer: "The platform charges a flat fee, calculated at time of investment of the total investment raised per acquisition to cover blue sky fees at a flat rate for all members.",
@@ -97,10 +101,14 @@ const faqCategories = [
         question: "When does the presale start and what are the caps?",
         answer: "The presale launches in Q1 2025 with a soft cap of $250K. Early supporters can participate in the initial phase, followed by a hard cap target of $500K in Q2 2025. The project aims for $5M AUM in Q3 2025 for infrastructure development.",
       },
+      {
+        question: "What are reflection rights?",
+        answer: "Reflection rights entitle token holders to receive 10% of all future firm distributions through our liquidity pools, creating a passive income stream from the success of acquired practices.",
+      },
     ],
   },
   {
-    category: "Governance & Returns",
+    category: "Governance",
     questions: [
       {
         question: "How is governance power calculated?",
@@ -113,23 +121,6 @@ const faqCategories = [
       {
         question: "What is the Deal Thesis Framework?",
         answer: "The Deal Thesis Framework, launching in Phase 3, is a member-driven system where LGR token holders can submit and evaluate proposals for accounting firm acquisitions. Members create and submit detailed investment proposals to attract capital from fellow members, with clear criteria and transparent governance ensuring collective decision-making on all investments.",
-      },
-    ],
-  },
-  {
-    category: "Returns & Distributions",
-    questions: [
-      {
-        question: "How do LedgerFund's liquidity pools work?",
-        answer: "Liquidity pools are launched in Phase 3 (Q3 2025) as part of our infrastructure development. These pools enable collective investment in accounting firm acquisitions, with the first acquisitions beginning after the deployment of our Deal Thesis Framework.",
-      },
-      {
-        question: "What are reflection rights?",
-        answer: "Reflection rights entitle token holders to receive 10% of all future firm distributions through our liquidity pools, creating a passive income stream from the success of acquired practices.",
-      },
-      {
-        question: "What's the difference between LGR reflections and LP investment returns?",
-        answer: "There are two distinct ways to earn with LedgerFund: 1) All LGR token holders automatically receive 10% of firm distributions as reflections, simply for holding the token. 2) LGR LP holders who actively invest in specific firm acquisitions through our liquidity pools receive 70% of net profits from those specific firms, represented by RWA tokens. This means you can earn both passive reflections as a token holder and direct profits as an LP investor.",
       },
     ],
   },
