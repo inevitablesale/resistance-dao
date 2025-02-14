@@ -28,72 +28,31 @@ function App() {
 
   const dynamicSettings = {
     environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
-    walletConnectorOptions: {
-      zeroDevOptions: zeroDevConfig,
-      viewTypes: ['deposit', 'send'],
-      onramp: {
-        providers: ['banxa'],
-        defaultProvider: 'banxa',
-        defaultFiatAmount: 100,
-        defaultNetwork: {
-          chainId: 137
-        }
-      }
-    },
     walletConnectors: [
       EthereumWalletConnectors,
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
-    events: {
-      authFlowOpen: () => {
-        console.log("[Dynamic SDK] Auth flow opened");
-      },
-      authFlowClose: () => {
-        console.log("[Dynamic SDK] Auth flow closed");
-      },
-      authFailure: (reason) => {
-        console.log("[Dynamic SDK] Auth failure:", reason);
-        toast({
-          title: "Authentication Failed",
-          description: "There was an error connecting your wallet.",
-        });
-      },
-      authSuccess: (args) => {
+    eventsCallbacks: {
+      onAuthSuccess: (args: any) => {
         console.log("[Dynamic SDK] Auth Success:", args);
         toast({
           title: "Successfully Connected",
           description: `Connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
         });
       },
-      emailVerificationCompleted: () => {
-        console.log("[Dynamic SDK] Email verification completed");
+      onEmailVerificationSuccess: () => {
+        console.log("[Dynamic SDK] Email verification succeeded");
         toast({
           title: "Email Verified",
           description: "Your email has been successfully verified.",
         });
       },
-      emailVerificationSuccess: () => {
-        console.log("[Dynamic SDK] Email verification succeeded");
-      },
-      userCreated: (args) => {
-        console.log("[Dynamic SDK] New user created:", args);
-        toast({
-          title: "Account Created",
-          description: "Your account has been successfully created.",
-        });
-      },
-      logout: () => {
+      onLogout: () => {
         console.log("[Dynamic SDK] User logged out");
         toast({
           title: "Logged Out",
           description: "You've been successfully logged out.",
         });
-      },
-      userWalletsChanged: (params) => {
-        console.log("[Dynamic SDK] User wallets changed:", params);
-      },
-      primaryWalletChanged: (newPrimaryWallet) => {
-        console.log("[Dynamic SDK] Primary wallet changed:", newPrimaryWallet);
       }
     },
     settings: {
@@ -103,6 +62,14 @@ function App() {
       environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
       appName: "LedgerFund",
       appLogoUrl: "/favicon.ico",
+      onramp: {
+        providers: ['banxa'],
+        defaultProvider: 'banxa',
+        defaultFiatAmount: 100,
+        defaultNetwork: {
+          chainId: 137
+        }
+      },
       // Wallet settings
       enableEmbeddedWallets: true,
       enableVisitTrackingOnConnectOnly: true,
@@ -114,50 +81,19 @@ function App() {
       // Authentication settings
       enableAuthProviders: true,
       enablePasskeys: false,
-      // Wallet connector settings
-      walletConnectors: {
-        enableDirectNavigation: true,
-        views: {
-          deposit: {
-            enabled: true,
-            defaultProvider: 'banxa'
-          },
-          send: {
-            enabled: true
-          }
-        }
-      },
       // Email authentication settings
       evmWallets: {
         options: {
           emailAuth: {
             signInWithEmail: true,
             autoVerify: true,
-            autoClose: true,
-            onComplete: (args) => {
-              console.log("[Dynamic SDK] Email Auth Complete:", args);
-              toast({
-                title: "Email Authentication Complete",
-                description: "You can now proceed with the token purchase.",
-              });
-            }
+            autoClose: true
           }
         }
       },
       style: {
-        buttonClassName: "dynamic-button",
         theme: "dark",
-        displaySiweStatement: false,
-        buttonText: {
-          connectWallet: "Connect Wallet",
-          disconnect: "Disconnect",
-          signIn: "Connect Wallet",
-          signUp: "Connect Wallet",
-          connected: "Connected",
-          connecting: "Connecting...",
-          viewAccount: "View Account",
-          loggedOut: "Connect Wallet"
-        }
+        displaySiweStatement: false
       },
       shadowDOMEnabled: false,
       tokens: [

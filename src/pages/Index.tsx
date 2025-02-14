@@ -328,6 +328,11 @@ const IndexContent = () => {
         </div>
       </div>
 
+      {/* DynamicWidget will be positioned in the top right */}
+      <div className="fixed top-4 right-4 z-50">
+        <DynamicWidget />
+      </div>
+
       {/* Market Dynamics Section */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
