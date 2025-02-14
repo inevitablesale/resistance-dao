@@ -41,8 +41,7 @@ export const Roadmap = () => {
         "Website Development",
         "Token Contract Development",
         "Presale Contract Development",
-        "Listed on top100token.com",
-        "Listed on coinmooner.com",
+        "Listed on top100token.com and coinmooner.com",
         "Applied for Polygon Community Grant",
         "Developed Litepaper",
         "Launched Presale",
@@ -58,7 +57,8 @@ export const Roadmap = () => {
         "Form DAO in Wyoming",
         "Launch Community",
         "Apply to CoinGeko and CoinMarketCap for listings",
-        "Build Deal Flow Bounties System"
+        "Build Deal Flow Bounties System",
+        "Release Deal Thesis and Firm Bounties"
       ]
     },
     {
@@ -69,7 +69,8 @@ export const Roadmap = () => {
         "Deploy Deal Thesis Framework",
         "Deploy Liquidity Pool UI",
         "Launch Community Governance",
-        "First Acquisition"
+        "First Liquidity Pool Acquisitions Begin",
+        "Launch Decentralized Marketplace"
       ]
     }
   ];
