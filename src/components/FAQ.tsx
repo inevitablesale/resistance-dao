@@ -77,47 +77,57 @@ export const FAQ = () => {
             return (
               <div
                 key={index}
-                className="relative group"
+                className="relative group bg-black/60 backdrop-blur-sm border border-yellow-500/30 rounded-lg overflow-hidden transition-all hover:border-yellow-500/60"
               >
                 <button
                   onClick={() => handleFaqClick(index)}
                   onKeyDown={(e) => handleKeyPress(index, e)}
-                  className="w-full text-left focus:outline-none focus:ring-2 focus:ring-yellow-500/50 rounded-lg"
+                  className="w-full text-left focus:outline-none focus:ring-2 focus:ring-yellow-500/50 p-6"
                   aria-expanded={isSelected}
                   aria-controls={`faq-answer-${index}`}
                 >
-                  <div className="relative bg-black/60 backdrop-blur-sm border border-yellow-500/30 p-6 rounded-lg group-hover:border-yellow-500/60 transition-all">
-                    <div className="flex items-center justify-between gap-4">
-                      <h3 className="text-lg font-medium text-white group-hover:text-yellow-500 transition-colors pr-8">
-                        {faq.question}
-                      </h3>
-                      <motion.div
-                        animate={{ rotate: isSelected ? 180 : 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute right-6 top-6"
-                      >
-                        <ChevronDown className="w-5 h-5 text-yellow-500" />
-                      </motion.div>
-                    </div>
-                    
-                    <AnimatePresence>
-                      {isSelected && (
-                        <motion.div
-                          id={`faq-answer-${index}`}
-                          initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                          animate={{ height: "auto", opacity: 1, marginTop: 16 }}
-                          exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="border-t border-yellow-500/20 pt-4">
-                            <p className="text-gray-300 text-base">{faq.answer}</p>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                  <div className="flex items-center justify-between gap-4">
+                    <h3 className="text-lg font-medium text-white group-hover:text-yellow-500 transition-colors pr-8">
+                      {faq.question}
+                    </h3>
+                    <motion.div
+                      animate={{ rotate: isSelected ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-6 top-6"
+                    >
+                      <ChevronDown className="w-5 h-5 text-yellow-500" />
+                    </motion.div>
                   </div>
                 </button>
+                
+                <AnimatePresence initial={false}>
+                  {isSelected && (
+                    <motion.div
+                      id={`faq-answer-${index}`}
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ 
+                        height: "auto",
+                        opacity: 1,
+                        transition: {
+                          height: { duration: 0.3 },
+                          opacity: { duration: 0.2, delay: 0.1 }
+                        }
+                      }}
+                      exit={{ 
+                        height: 0,
+                        opacity: 0,
+                        transition: {
+                          height: { duration: 0.3 },
+                          opacity: { duration: 0.2 }
+                        }
+                      }}
+                    >
+                      <div className="px-6 pb-6 border-t border-yellow-500/20 pt-4">
+                        <p className="text-gray-300 text-base">{faq.answer}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}
