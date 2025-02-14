@@ -68,7 +68,7 @@ export const WalletDeposit = () => {
       <CardHeader>
         <CardTitle className="text-white">Deposit Funds</CardTitle>
         <CardDescription className="text-gray-400">
-          Purchase MATIC with your credit or debit card
+          Purchase Polygon (MATIC) with your credit or debit card
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -105,13 +105,17 @@ export const WalletDeposit = () => {
         </div>
 
         <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-4">
-          <div className="flex gap-2 text-yellow-500">
-            <AlertCircle className="h-5 w-5 shrink-0" />
+          <div className="flex gap-2">
+            <AlertCircle className="h-5 w-5 shrink-0 text-yellow-500" />
             <div className="text-sm">
-              <p className="font-medium">Important</p>
-              <p className="text-yellow-500/90 mt-1">
-                Minimum deposit amount is $30 USD. Fees will be displayed before confirming your purchase.
-              </p>
+              <p className="font-medium text-yellow-500">How to Purchase</p>
+              <ol className="text-yellow-500/90 mt-2 space-y-2 list-decimal pl-4">
+                <li>Click 'Continue to Payment' below to access our payment partner Banxa</li>
+                <li>Keep USD as the Spend amount. Select POL as the Receive amount</li>
+                <li>Enter the amount you wish to purchase (minimum $30 USD)</li>
+                <li>Complete the payment process to receive Polygon in your wallet</li>
+                <li>Navigate to Pay with Polygon option in Choose Payment Method in wallet. Use your Polygon to purchase LGR tokens through the Polygon payment option</li>
+              </ol>
             </div>
           </div>
         </div>
