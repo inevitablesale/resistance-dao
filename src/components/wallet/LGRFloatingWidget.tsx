@@ -3,15 +3,18 @@ import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getWorkingProvider, getLgrTokenContract, getPresaleContract } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Coins } from "lucide-react";
+import { Coins, Lock, Vote, ChevronRight } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -40,6 +43,23 @@ export const LGRFloatingWidget = () => {
     const interval = setInterval(fetchBalances, 30000);
     return () => clearInterval(interval);
   }, [address]);
+
+  const handleAction = (action: 'stake' | 'vote' | 'governance') => {
+    switch (action) {
+      case 'stake':
+        toast({
+          title: "Staking Coming Soon",
+          description: "LGR staking will be available after the presale period.",
+        });
+        break;
+      case 'vote':
+        navigate('/governance-voting');
+        break;
+      case 'governance':
+        navigate('/governance-voting');
+        break;
+    }
+  };
 
   if (!address) return null;
 
@@ -73,6 +93,44 @@ export const LGRFloatingWidget = () => {
                 })} LGR
               </div>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-between text-white hover:text-yellow-500 hover:bg-yellow-500/10"
+              onClick={() => handleAction('stake')}
+            >
+              <div className="flex items-center gap-2">
+                <Lock className="w-4 h-4" />
+                <span>Stake LGR</span>
+              </div>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+
+            <Button 
+              variant="ghost" 
+              className="w-full justify-between text-white hover:text-yellow-500 hover:bg-yellow-500/10"
+              onClick={() => handleAction('vote')}
+            >
+              <div className="flex items-center gap-2">
+                <Vote className="w-4 h-4" />
+                <span>Vote on Proposals</span>
+              </div>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+
+            <Button 
+              variant="ghost" 
+              className="w-full justify-between text-white hover:text-yellow-500 hover:bg-yellow-500/10"
+              onClick={() => handleAction('governance')}
+            >
+              <div className="flex items-center gap-2">
+                <Coins className="w-4 h-4" />
+                <span>Governance Dashboard</span>
+              </div>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </PopoverContent>
