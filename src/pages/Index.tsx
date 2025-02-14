@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2, Calculator, Clock, Calendar, DollarSign, BookOpen, BarChart2, Briefcase } from "lucide-react";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { NewsletterSubscription } from "@/components/NewsletterSubscription";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 const presaleData = [
   { 
@@ -134,7 +135,8 @@ const processSteps = [
 
 const IndexContent = () => {
   const navigate = useNavigate();
-  const { primaryWallet, setShowAuthFlow, setShowOnRamp } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
+  const { showWallet } = useWalletConnection();
   const { toast } = useToast();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -161,7 +163,7 @@ const IndexContent = () => {
       setShowAuthFlow?.(true);
       return;
     }
-    setShowOnRamp?.(true);
+    showWallet('deposit');
   };
 
   const handleScroll = () => {
