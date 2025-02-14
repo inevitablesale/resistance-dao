@@ -1,3 +1,4 @@
+
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -5,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 export type WalletView = 'assets' | 'actions' | 'buy' | 'send' | 'history';
 
 export const useCustomWallet = () => {
-  const { primaryWallet, setShowAuthFlow, user } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow, user, setShowOnRamp } = useDynamicContext();
   const [isConnecting, setIsConnecting] = useState(false);
   const [currentView, setCurrentView] = useState<WalletView>('assets');
   const { toast } = useToast();
@@ -44,24 +45,23 @@ export const useCustomWallet = () => {
     }
   };
 
-  const showBanxaDeposit = () => {
+  const showBanxaDeposit = (amount?: number) => {
     if (!primaryWallet) {
-      toast({
-        title: "Wallet Required",
-        description: "Please connect your wallet first",
-        variant: "destructive",
-      });
+      console.log("[Deposit] No wallet connected, opening auth flow");
+      setShowAuthFlow?.(true);
       return;
     }
 
     try {
-      if (primaryWallet.connector?.showWallet) {
-        primaryWallet.connector.showWallet({ view: 'deposit' });
-      } else {
-        setShowAuthFlow?.(true);
-      }
+      console.log("[Deposit] Opening onramp with amount:", amount);
+      setShowOnRamp?.(true, {
+        defaultFiatAmount: amount,
+        defaultNetwork: {
+          chainId: 137
+        }
+      });
     } catch (error) {
-      console.error("Error showing deposit view:", error);
+      console.error("[Deposit] Error showing deposit view:", error);
       toast({
         title: "Error",
         description: "Failed to open deposit interface",
