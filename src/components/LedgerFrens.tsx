@@ -1,5 +1,5 @@
 
-import { PartyPopper, Trophy, Gift, ShoppingBag, Medal, Star, BadgeDollarSign, Building2, BookOpen } from "lucide-react";
+import { PartyPopper, Trophy, Gift, ShoppingBag, Medal, Star } from "lucide-react";
 
 export const LedgerFrens = () => {
   return (
@@ -32,9 +32,9 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <PartyPopper className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Share Your Investment Strategy</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Early Minting Access</h4>
                   <p className="text-gray-300">
-                    At $50K raised: Submit your vision for identifying, evaluating, and acquiring high-potential accounting practices.
+                    At $50K raised: LedgerFrens NFTs are minted, giving early supporters exclusive access to our decentralized accounting ecosystem.
                   </p>
                 </div>
               </div>
@@ -43,11 +43,11 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <BadgeDollarSign className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <Trophy className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Create Liquidity from Traditional Assets</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Governance Board Election</h4>
                   <p className="text-gray-300">
-                    At $100K raised: Unlock value by converting accounting expertise, client relationships, and recurring revenue into tradeable assets.
+                    At $100K raised: Voting begins for governance board seats, empowering our community to shape the future of decentralized accounting.
                   </p>
                 </div>
               </div>
@@ -82,11 +82,11 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <BookOpen className="w-8 h-8 text-yellow-400 flex-shrink-0" />
+                <Trophy className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Investment Thesis Voting</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">First Acquisition Vote</h4>
                   <p className="text-gray-300">
-                    At $300K raised: LedgerFren NFT holders can submit and vote on investment theses, with capital allocation pledging enabled.
+                    At $300K raised: LedgerFren NFT holders invited to vote on first acquisition proposals, marking a key milestone in our growth strategy.
                   </p>
                 </div>
               </div>
@@ -95,11 +95,11 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <Trophy className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Deal Bounty Program</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Target Search Begins</h4>
                   <p className="text-gray-300">
-                    At $400K raised: Token holders can earn rewards for bringing successful investment opportunities to the network.
+                    At $400K raised: Network begins active search for matching acquisition targets, expanding our decentralized accounting ecosystem.
                   </p>
                 </div>
               </div>
@@ -121,7 +121,7 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <Building2 className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <Star className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">First Acquisition Made</h4>
                   <p className="text-gray-300">
@@ -136,3 +136,4 @@ export const LedgerFrens = () => {
     </section>
   );
 };
+
