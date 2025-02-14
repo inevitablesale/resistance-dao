@@ -315,6 +315,7 @@ const IndexContent = () => {
       <div className="fixed top-4 right-4 z-50">
         <DynamicWidget />
       </div>
+      <LGRFloatingWidget />
 
       {/* Market Dynamics Section */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
