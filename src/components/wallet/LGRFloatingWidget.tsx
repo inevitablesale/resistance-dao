@@ -71,7 +71,35 @@ export const LGRFloatingWidget = () => {
     showWallet('deposit');
   };
 
+  const handleConfirmPurchase = async () => {
+    if (!address || !purchaseAmount) return;
+
+    try {
+      const provider = await getWorkingProvider();
+      const signer = provider.getSigner(address);
+      
+      const result = await purchaseTokens(signer, purchaseAmount);
+      
+      toast({
+        title: "Purchase Successful",
+        description: `Successfully purchased ${result.amount} LGR tokens`,
+      });
+      
+      setIsConfirmOpen(false);
+      setPurchaseAmount("");
+    } catch (error: any) {
+      console.error("Purchase error:", error);
+      toast({
+        title: "Purchase Failed",
+        description: error.message || "Failed to purchase tokens",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!address) return null;
+
+  const hasMaticBalance = Number(maticBalance) > 0;
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
@@ -135,17 +163,83 @@ export const LGRFloatingWidget = () => {
                 Current Price: {Number(maticPrice)} MATIC per LGR
               </div>
 
-              <Button 
-                className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold"
-                onClick={handleBuyMatic}
-              >
-                <Wallet className="w-4 h-4 mr-2" />
-                Buy MATIC
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button 
+                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold"
+                  onClick={() => setIsConfirmOpen(true)}
+                  disabled={!hasMaticBalance}
+                >
+                  <Coins className="w-4 h-4 mr-2" />
+                  Buy LGR
+                </Button>
+
+                <Button 
+                  className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold"
+                  onClick={handleBuyMatic}
+                >
+                  <Wallet className="w-4 h-4 mr-2" />
+                  Buy MATIC
+                </Button>
+              </div>
             </div>
           </div>
         </PopoverContent>
       </Popover>
+
+      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <DialogContent className="bg-black/95 border border-yellow-500/20">
+          <DialogHeader>
+            <DialogTitle className="text-yellow-500">Confirm LGR Purchase</DialogTitle>
+            <DialogDescription>
+              Enter the amount of MATIC you want to spend
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm text-gray-400">Amount in MATIC</label>
+              <Input
+                type="number"
+                placeholder="Enter MATIC amount"
+                value={purchaseAmount}
+                onChange={(e) => setPurchaseAmount(e.target.value)}
+                className="bg-black/50 border border-yellow-500/20"
+              />
+            </div>
+            
+            <div className="space-y-1">
+              <p className="text-sm text-gray-400">You will receive approximately:</p>
+              <p className="text-lg font-bold text-yellow-500">
+                {(Number(purchaseAmount) / Number(maticPrice)).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })} LGR
+              </p>
+            </div>
+
+            <div className="text-sm text-gray-400">
+              Your MATIC Balance: {Number(maticBalance).toLocaleString()} MATIC
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsConfirmOpen(false)}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmPurchase}
+              className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black"
+              disabled={!purchaseAmount || Number(purchaseAmount) <= 0 || Number(purchaseAmount) > Number(maticBalance)}
+            >
+              Confirm Purchase
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
