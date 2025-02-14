@@ -118,15 +118,15 @@ const boardMembers = [
 
 const processSteps = [
   {
-    title: "Share Your Investment Thesis",
-    description: "At $50K raised: Submit your vision for identifying, evaluating, and acquiring high-potential accounting practices.",
+    title: "Submit Your Thesis",
+    description: "Share your vision for acquiring and scaling accounting practices. Connect with like-minded investors to form investment pools.",
     icon: Trophy,
     color: "yellow",
     className: "cosmic-box yellow-energy"
   },
   {
-    title: "Create Liquidity from Traditional Illiquid Assets",
-    description: "At $100K raised: Transform accounting practices into tradeable digital assets, unlocking value from expertise and client relationships.",
+    title: "Tokenize Firm Assets",
+    description: "Convert accounting practices into tradeable digital assets. Access the decentralized marketplace for seamless buying and selling.",
     icon: Crown,
     color: "yellow",
     className: "cosmic-box yellow-energy"
@@ -438,17 +438,17 @@ const IndexContent = () => {
         </div>
       </section>
 
-      {/* Step 1: Share Your Investment Thesis */}
+      {/* Step 1: Submit Your Thesis */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-6" />
               <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
-                Share Your Investment Thesis
+                Build Your Investment Thesis
               </h2>
               <p className="text-xl text-white/80 mb-12 max-w-4xl mx-auto">
-                At $50K raised: Submit your vision for identifying, evaluating, and acquiring high-potential accounting practices.
+                Join a community of like-minded investors to propose and develop investment strategies for accounting practices you want to acquire.
               </p>
             </div>
 

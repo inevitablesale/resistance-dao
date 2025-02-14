@@ -1,5 +1,5 @@
 
-import { PartyPopper, Trophy, Gift, ShoppingBag, Medal } from "lucide-react";
+import { PartyPopper, Trophy, Gift, ShoppingBag, Medal, Star } from "lucide-react";
 
 export const LedgerFrens = () => {
   return (
@@ -30,11 +30,11 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-yellow-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <Trophy className="w-8 h-8 text-yellow-400 flex-shrink-0" />
+                <PartyPopper className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Share Your Investment Thesis</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Early Minting Access</h4>
                   <p className="text-gray-300">
-                    At $50K raised: Submit your vision for identifying, evaluating, and acquiring high-potential accounting practices.
+                    At $50K raised: LedgerFrens NFTs are minted, giving early supporters exclusive access to our decentralized accounting ecosystem.
                   </p>
                 </div>
               </div>
@@ -43,11 +43,11 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <Trophy className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Create Liquidity from Traditional Illiquid Assets</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Governance Board Election</h4>
                   <p className="text-gray-300">
-                    At $100K raised: Transform accounting practices into tradeable digital assets, unlocking value from expertise and client relationships.
+                    At $100K raised: Voting begins for governance board seats, empowering our community to shape the future of decentralized accounting.
                   </p>
                 </div>
               </div>
@@ -58,7 +58,7 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <ShoppingBag className="w-8 h-8 text-yellow-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Early Minting Access</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Exclusive DAO Merch</h4>
                   <p className="text-gray-300">
                     At $150K raised: 150 random stakers receive exclusive LedgerFund DAO merchandise pack including premium apparel and accessories.
                   </p>
@@ -71,7 +71,7 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Governance Board Election</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">MSP Proposals Open</h4>
                   <p className="text-gray-300">
                     At $250K raised: Proposals open for managed service providers, expanding our network's capabilities and reach.
                   </p>
@@ -86,7 +86,7 @@ export const LedgerFrens = () => {
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">First Acquisition Vote</h4>
                   <p className="text-gray-300">
-                    At $300K raised: Token holders submit and vote on investment theses with capital allocation pledging enabled.
+                    At $300K raised: LedgerFren NFT holders invited to vote on first acquisition proposals, marking a key milestone in our growth strategy.
                   </p>
                 </div>
               </div>
@@ -99,7 +99,7 @@ export const LedgerFrens = () => {
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">Target Search Begins</h4>
                   <p className="text-gray-300">
-                    At $400K raised: Token holders earn rewards for bringing successful investment opportunities to the network.
+                    At $400K raised: Network begins active search for matching acquisition targets, expanding our decentralized accounting ecosystem.
                   </p>
                 </div>
               </div>
@@ -121,7 +121,7 @@ export const LedgerFrens = () => {
             <div className="group relative p-6 rounded-xl bg-black/30 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="flex items-start gap-4">
-                <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
+                <Star className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
                   <h4 className="text-lg font-semibold text-white mb-2">First Acquisition Made</h4>
                   <p className="text-gray-300">
@@ -136,3 +136,4 @@ export const LedgerFrens = () => {
     </section>
   );
 };
+
