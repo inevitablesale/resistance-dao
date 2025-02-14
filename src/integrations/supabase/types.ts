@@ -9,234 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      knowledge_article_votes: {
+      nft_generations: {
         Row: {
-          article_id: string | null
+          asset_urls: Json | null
           created_at: string | null
-          helpful: boolean
           id: string
+          linkedin_profile_url: string
+          metadata: Json | null
+          polygon_data: Json | null
+          status: string
           user_id: string | null
         }
         Insert: {
-          article_id?: string | null
+          asset_urls?: Json | null
           created_at?: string | null
-          helpful: boolean
           id?: string
+          linkedin_profile_url: string
+          metadata?: Json | null
+          polygon_data?: Json | null
+          status?: string
           user_id?: string | null
         }
         Update: {
-          article_id?: string | null
+          asset_urls?: Json | null
           created_at?: string | null
-          helpful?: boolean
           id?: string
+          linkedin_profile_url?: string
+          metadata?: Json | null
+          polygon_data?: Json | null
+          status?: string
           user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "knowledge_article_votes_article_id_fkey"
-            columns: ["article_id"]
-            isOneToOne: false
-            referencedRelation: "knowledge_articles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      knowledge_articles: {
-        Row: {
-          author_id: string | null
-          category: string
-          content: string
-          created_at: string | null
-          created_by: string | null
-          helpful_votes: number | null
-          id: string
-          last_updated: string | null
-          metadata: Json | null
-          order_index: number
-          parent_id: string | null
-          published_at: string | null
-          search_vector: unknown | null
-          slug: string
-          status: string
-          title: string
-          total_votes: number | null
-          updated_by: string | null
-          views: number | null
-        }
-        Insert: {
-          author_id?: string | null
-          category: string
-          content: string
-          created_at?: string | null
-          created_by?: string | null
-          helpful_votes?: number | null
-          id?: string
-          last_updated?: string | null
-          metadata?: Json | null
-          order_index?: number
-          parent_id?: string | null
-          published_at?: string | null
-          search_vector?: unknown | null
-          slug: string
-          status?: string
-          title: string
-          total_votes?: number | null
-          updated_by?: string | null
-          views?: number | null
-        }
-        Update: {
-          author_id?: string | null
-          category?: string
-          content?: string
-          created_at?: string | null
-          created_by?: string | null
-          helpful_votes?: number | null
-          id?: string
-          last_updated?: string | null
-          metadata?: Json | null
-          order_index?: number
-          parent_id?: string | null
-          published_at?: string | null
-          search_vector?: unknown | null
-          slug?: string
-          status?: string
-          title?: string
-          total_votes?: number | null
-          updated_by?: string | null
-          views?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "knowledge_articles_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "knowledge_articles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      litepaper_sections: {
-        Row: {
-          content: string
-          created_at: string | null
-          id: string
-          order_index: number
-          parent_section_id: string | null
-          title: string
-        }
-        Insert: {
-          content: string
-          created_at?: string | null
-          id: string
-          order_index: number
-          parent_section_id?: string | null
-          title: string
-        }
-        Update: {
-          content?: string
-          created_at?: string | null
-          id?: string
-          order_index?: number
-          parent_section_id?: string | null
-          title?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "litepaper_sections_parent_section_id_fkey"
-            columns: ["parent_section_id"]
-            isOneToOne: false
-            referencedRelation: "litepaper_sections"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      newsletter_subscriptions: {
-        Row: {
-          created_at: string
-          email: string
-          id: string
-          source: string | null
-          status: string | null
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          source?: string | null
-          status?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-          source?: string | null
-          status?: string | null
-        }
-        Relationships: []
-      }
-      project_features: {
-        Row: {
-          created_at: string | null
-          enabled: boolean | null
-          feature_name: string
-          id: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          enabled?: boolean | null
-          feature_name: string
-          id?: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          enabled?: boolean | null
-          feature_name?: string
-          id?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          created_at: string | null
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
-      wallets: {
-        Row: {
-          created_at: string
-          email: string
-          id: string
-          wallet_address: string
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          wallet_address: string
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-          wallet_address?: string
         }
         Relationships: []
       }
@@ -245,15 +47,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      is_admin: {
-        Args: {
-          user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "publisher" | "user"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
