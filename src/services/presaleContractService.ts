@@ -108,18 +108,19 @@ export const fetchPresaleMaticPrice = async () => {
     const provider = await getWorkingProvider();
     const contract = await getPresaleContract(provider);
     
-    // Get the latest MATIC price in USD from the contract
+    // Get the latest MATIC price in USD from the contract (assuming 8 decimals)
     const maticPriceInUsd = await contract.getLatestMaticPrice();
     
     // LGR price is fixed at $0.10
-    const lgrPriceUsd = ethers.utils.parseUnits("0.1", 18);
+    // Convert MATIC price to proper decimals (from 8 to 18)
+    const maticPriceIn18Decimals = maticPriceInUsd.mul(ethers.utils.parseUnits("1", 10));
+    const lgrPriceUsd = ethers.utils.parseUnits("0.1", 18); // $0.10 in 18 decimals
     
-    // Calculate how much MATIC is needed to buy 1 LGR token
-    // (LGR price in USD / MATIC price in USD)
-    const maticRequired = lgrPriceUsd.mul(ethers.utils.parseUnits("1", 18)).div(maticPriceInUsd);
+    // Calculate MATIC required for 1 LGR: ($0.10 / MATIC USD price)
+    const maticRequired = lgrPriceUsd.mul(ethers.utils.parseUnits("1", 18)).div(maticPriceIn18Decimals);
     
-    const formattedPrice = Number(ethers.utils.formatEther(maticRequired)).toFixed(4);
-    return formattedPrice;
+    // Format to 4 decimal places for display
+    return Number(ethers.utils.formatEther(maticRequired)).toFixed(4);
   } catch (error) {
     console.error("Error fetching MATIC price:", error);
     return "0";
