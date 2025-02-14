@@ -48,8 +48,8 @@ export const NewsletterSubscription = () => {
           <Users className="w-8 h-8 text-yellow-500" />
         </div>
         <div className="text-left">
-          <h3 className="text-2xl font-semibold text-white">Join 1,500+ Accountants</h3>
-          <p className="text-white/70">Building the future of practice ownership</p>
+          <h3 className="text-2xl font-semibold text-white">Subscribe to Our Newsletter</h3>
+          <p className="text-white/70">Join 1,500+ accountants building the future of practice ownership</p>
         </div>
       </div>
       
