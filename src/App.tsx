@@ -62,12 +62,20 @@ function App() {
     paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
   };
 
+  const customTokenFilter = (tokens: any[]) => {
+    return tokens.filter(token => 
+      token.symbol === 'MATIC' || 
+      token.symbol === 'LGR'
+    );
+  };
+
   const dynamicSettings = {
     environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
     walletConnectors: [
       EthereumWalletConnectors,
       ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
     ],
+    tokenFilter: customTokenFilter,
     eventsCallbacks: {
       onAuthSuccess: (args: any) => {
         console.log("[Dynamic SDK] Auth Success:", args);
@@ -157,3 +165,4 @@ function App() {
 }
 
 export default App;
+
