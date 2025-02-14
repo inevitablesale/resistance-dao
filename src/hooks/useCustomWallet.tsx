@@ -1,3 +1,4 @@
+
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -65,7 +66,28 @@ export const useCustomWallet = () => {
   };
 
   const showBanxaDeposit = (amount?: number) => {
-    console.log("Deposit functionality temporarily disabled");
+    if (!primaryWallet) {
+      console.log("[Deposit] No wallet connected, opening auth flow");
+      setShowAuthFlow?.(true);
+      return;
+    }
+
+    try {
+      console.log("[Deposit] Opening onramp with amount:", amount);
+      setShowOnRamp?.(true, {
+        defaultFiatAmount: amount,
+        defaultNetwork: {
+          chainId: 137
+        }
+      });
+    } catch (error) {
+      console.error("[Deposit] Error showing deposit view:", error);
+      toast({
+        title: "Error",
+        description: "Failed to open deposit interface",
+        variant: "destructive",
+      });
+    }
   };
 
   const sendTransaction = () => {
