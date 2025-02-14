@@ -111,10 +111,10 @@ export const WalletDeposit = () => {
               <p className="font-medium text-yellow-500">How to Purchase</p>
               <ol className="text-yellow-500/90 mt-2 space-y-2 list-decimal pl-4">
                 <li>Click 'Continue to Payment' below to access our payment partner Banxa</li>
-                <li>Select your preferred payment method (credit/debit card, bank transfer, etc.)</li>
+                <li>Keep USD as the Spend amount. Select POL as the Receive amount</li>
                 <li>Enter the amount you wish to purchase (minimum $30 USD)</li>
-                <li>Complete the payment process to receive MATIC in your wallet</li>
-                <li>Use your MATIC to purchase LGR tokens through the Polygon payment option</li>
+                <li>Complete the payment process to receive Polygon in your wallet</li>
+                <li>Navigate to Pay with Polygon option in Choose Payment Method in wallet. Use your Polygo to purchase LGR tokens through the Polygon payment option</li>
               </ol>
             </div>
           </div>
@@ -139,3 +139,4 @@ export const WalletDeposit = () => {
     </Card>
   );
 };
+
