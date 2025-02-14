@@ -1,4 +1,3 @@
-
 import { PartyPopper, Trophy, Gift, ShoppingBag, Medal, Star } from "lucide-react";
 
 export const LedgerFrens = () => {
@@ -97,9 +96,9 @@ export const LedgerFrens = () => {
               <div className="flex items-start gap-4">
                 <Medal className="w-8 h-8 text-teal-400 flex-shrink-0" />
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Target Search Begins</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2">Deal Bounty Program</h4>
                   <p className="text-gray-300">
-                    At $400K raised: Network begins active search for matching acquisition targets, expanding our decentralized accounting ecosystem.
+                    At $400K raised: Launch of our Deal Bounty Program, rewarding community members who identify and help acquire qualified accounting practices.
                   </p>
                 </div>
               </div>
@@ -136,4 +135,3 @@ export const LedgerFrens = () => {
     </section>
   );
 };
-
