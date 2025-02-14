@@ -24,6 +24,7 @@ export const Partners = () => {
                 href={partner.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="relative z-50"
               >
                 <Image
                   src={partner.logo}
