@@ -1,50 +1,55 @@
-
-import { HelpCircle, UserRound, Coins, Vote, Building2, Calendar, Users } from "lucide-react";
+import { HelpCircle, UserRound, Coins, Vote, Building2, Calendar, Users, Wallet, LineChart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 
 const faqs = [
   {
-    question: "Who manages the acquired accounting firms?",
-    answer: "Experienced MSP (Managed Service Provider) partners integrated into our ecosystem manage the firms. They present detailed proposals that are put on the blockchain for community voting, ensuring transparent governance on a firm-by-firm basis.",
-    icon: Building2,
-    orbitDuration: 20
-  },
-  {
     question: "What is LedgerFund DAO?",
-    answer: "LedgerFund DAO is a decentralized autonomous organization that enables accounting professionals to collectively acquire, govern, and transform accounting practices through blockchain technology and democratic decision-making.",
+    answer: "LedgerFund DAO is a decentralized autonomous organization that will be formally established in Wyoming (Q2 2025). It enables accounting professionals to collectively acquire, govern, and transform accounting practices through blockchain technology and democratic decision-making.",
     icon: HelpCircle,
     orbitDuration: 25
   },
   {
-    question: "How does tokenized ownership work?",
-    answer: "LGR tokens represent ownership rights in the LedgerFund protocol. Token holders earn reflections from accounting firm investments and participate in governance decisions.",
-    icon: Coins,
+    question: "When does the presale start and what are the caps?",
+    answer: "The presale launches in Q1 2025 with a soft cap of $250K. Early supporters can participate in the initial phase, followed by a hard cap target of $500K in Q2 2025. The project aims for a $5M targeted raise in Q3 2025 for infrastructure development.",
+    icon: Calendar,
+    orbitDuration: 20
+  },
+  {
+    question: "How do LedgerFund's liquidity pools work?",
+    answer: "Liquidity pools are launched in Phase 3 (Q3 2025) as part of our infrastructure development. These pools enable collective investment in accounting firm acquisitions, with the first acquisitions beginning after the deployment of our Deal Thesis Framework.",
+    icon: LineChart,
     orbitDuration: 30
   },
   {
-    question: "How can I participate in governance?",
-    answer: "As a token holder, you can vote on key protocol decisions, including firm acquisitions, operational changes, and future development initiatives.",
-    icon: Vote,
+    question: "How does tokenized ownership work?",
+    answer: "LGR tokens represent ownership rights in the LedgerFund protocol. Token holders earn reflections from accounting firm investments made through our liquidity pools and participate in governance decisions.",
+    icon: Coins,
     orbitDuration: 35
   },
   {
-    question: "What are reflection rights?",
-    answer: "Reflection rights entitle token holders to receive 10% of all future firm distributions, creating a passive income stream from the success of acquired practices.",
-    icon: UserRound,
+    question: "When can I participate in governance?",
+    answer: "Community governance launches in Phase 3 (Q3 2025). As a token holder, you'll be able to vote on key protocol decisions, including firm acquisitions, operational changes, and future development initiatives through our DAO structure.",
+    icon: Vote,
     orbitDuration: 40
   },
   {
-    question: "When does the presale start?",
-    answer: "The presale begins on February 10, 2025. Early supporters can purchase tokens at a 90% discount and receive a 25% bonus allocation.",
-    icon: Calendar,
+    question: "What is the Deal Thesis Framework?",
+    answer: "The Deal Thesis Framework, launching in Phase 3, is our systematic approach to evaluating and acquiring accounting firms. It establishes clear criteria for acquisitions and ensures transparent governance on investment decisions.",
+    icon: Building2,
     orbitDuration: 45
   },
   {
-    question: "How are accounting firms selected?",
-    answer: "Firms are identified and vetted by the DAO community. MSP partners conduct due diligence and present detailed proposals for community voting.",
+    question: "How are accounting firms managed post-acquisition?",
+    answer: "Experienced MSP (Managed Service Provider) partners integrated into our ecosystem manage the firms. They present detailed proposals through our Deal Thesis Framework that are put on the blockchain for community voting.",
     icon: Users,
     orbitDuration: 50
+  },
+  {
+    question: "What are reflection rights?",
+    answer: "Reflection rights entitle token holders to receive 10% of all future firm distributions through our liquidity pools, creating a passive income stream from the success of acquired practices.",
+    icon: Wallet,
+    orbitDuration: 55
   }
 ];
 
