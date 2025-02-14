@@ -8,6 +8,10 @@ const faqs = [
     answer: "LedgerFund DAO is a decentralized autonomous organization that will be formally established in Wyoming (Q2 2025). It enables accounting professionals to collectively acquire, govern, and transform accounting practices through blockchain technology and democratic decision-making.",
   },
   {
+    question: "Why establish the DAO in Wyoming?",
+    answer: "Wyoming is the first U.S. state to establish a comprehensive legal framework for DAOs, recognizing them as legal entities. This provides clear regulatory guidance, legal protection for members, and a structured framework for decentralized operations. The Wyoming DAO LLC structure also enables efficient creation of Series SPVs for individual investments.",
+  },
+  {
     question: "What role does the platform play in operations?",
     answer: "The platform is designed to operate in a fully decentralized manner, utilizing smart contracts, blockchain assets, and timestamps instead of traditional databases. While we enable the infrastructure, we do not participate in decision-making, voting, or capital raising after the pre-sale stage. The platform serves purely as an enabler for member-driven activities.",
   },
@@ -29,7 +33,7 @@ const faqs = [
   },
   {
     question: "What are Special Purpose Vehicles (SPVs)?",
-    answer: "Special Purpose Vehicles are LLCs structured specifically for investment purposes. These entities enable various types of investors - including individuals, trusts, and other entities - to participate in alternative investments like accounting firm acquisitions. SPVs provide a compliant and flexible structure for pooling capital while maintaining clear governance and distribution rights.",
+    answer: "Special Purpose Vehicles are structured as Series SPVs under the Wyoming DAO LLC, which acts as the SPV manager. This structure allows individuals, trusts, and other entities to participate in alternative investments like accounting firm acquisitions while maintaining clear governance and distribution rights. Each Series SPV operates as a separate legal entity with its own assets and liabilities, providing maximum protection and flexibility for investors.",
   },
   {
     question: "Can I participate if I am not an accredited investor?",
