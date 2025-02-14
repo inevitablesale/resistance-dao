@@ -1,6 +1,6 @@
-
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { DynamicContextProvider, useBalanceMonitor, useTokenBalances } from "@dynamic-labs/sdk-react-core";
+import { DynamicContextProvider, useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
 import { Analytics } from '@vercel/analytics/react';
@@ -19,13 +19,11 @@ import { Toaster } from "./components/ui/toaster";
 
 function Layout() {
   const { toast } = useToast();
-  // Use Dynamic's native hooks for balance monitoring
-  useBalanceMonitor();
-  const { data: tokenBalances } = useTokenBalances();
+  const { tokenBalances, isLoading, error } = useTokenBalances();
 
   // Log token balances when they change
   React.useEffect(() => {
-    if (tokenBalances) {
+    if (tokenBalances && !isLoading && !error) {
       console.log("Token balances updated:", tokenBalances);
       // Find LGR token balance
       const lgrToken = tokenBalances.find(token => token.symbol === 'LGR');
@@ -36,7 +34,7 @@ function Layout() {
         });
       }
     }
-  }, [tokenBalances, toast]);
+  }, [tokenBalances, isLoading, error, toast]);
   
   return (
     <Routes>
