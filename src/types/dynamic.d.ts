@@ -84,7 +84,6 @@ declare module "@dynamic-labs/sdk-react-core" {
             signInWithEmail: boolean;
             autoVerify: boolean;
             autoClose: boolean;
-            onComplete: (args: any) => void;
           };
         };
       };
