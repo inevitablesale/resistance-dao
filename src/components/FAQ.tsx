@@ -93,7 +93,11 @@ const faqs = [
   {
     question: "How are accounting firms managed post-acquisition?",
     answer: "Experienced MSP (Managed Service Provider) partners integrated into our ecosystem manage the firms. They present detailed proposals through our Deal Thesis Framework that are put on the blockchain for community voting.",
-  }
+  },
+  {
+    question: "How is governance power calculated?",
+    answer: "Our innovative governance system combines two key factors: your LGR token holdings and your professional experience 'node' generated from LinkedIn data. This dual approach ensures that both capital allocation and professional expertise contribute to governance power. The experience node analyzes factors like industry tenure, specializations, and relevant certifications, creating a comprehensive score that works alongside your token holdings to determine overall governance influence. More details about this system will be released as we approach the LedgerFren member NFT minting milestone.",
+  },
 ];
 
 export const FAQ = () => {
