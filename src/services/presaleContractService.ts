@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
@@ -106,8 +107,18 @@ export const fetchPresaleMaticPrice = async () => {
   try {
     const provider = await getWorkingProvider();
     const contract = await getPresaleContract(provider);
-    const maticPrice = await contract.getLGRPrice();
-    const formattedPrice = Number(ethers.utils.formatEther(maticPrice)).toFixed(4);
+    
+    // Get the latest MATIC price in USD from the contract
+    const maticPriceInUsd = await contract.getLatestMaticPrice();
+    
+    // LGR price is fixed at $0.10
+    const lgrPriceUsd = ethers.utils.parseUnits("0.1", 18);
+    
+    // Calculate how much MATIC is needed to buy 1 LGR token
+    // (LGR price in USD / MATIC price in USD)
+    const maticRequired = lgrPriceUsd.mul(ethers.utils.parseUnits("1", 18)).div(maticPriceInUsd);
+    
+    const formattedPrice = Number(ethers.utils.formatEther(maticRequired)).toFixed(4);
     return formattedPrice;
   } catch (error) {
     console.error("Error fetching MATIC price:", error);
@@ -126,7 +137,7 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
     const maticPrice = await contract.getLGRPrice();
     console.log('Current MATIC price per token:', ethers.utils.formatEther(maticPrice));
     
-    // Calculate expected number of tokens
+    // Calculate expected number of tokens based on $0.10 per token
     const maticAmountWei = ethers.utils.parseEther(maticAmount);
     const expectedTokens = maticAmountWei.mul(ethers.utils.parseEther("1")).div(maticPrice);
     console.log('Expected tokens:', ethers.utils.formatEther(expectedTokens));
