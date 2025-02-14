@@ -1,6 +1,5 @@
 
 import { ChevronDown } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
 const faqs = [
@@ -45,27 +44,9 @@ export const FAQ = () => {
     setSelectedFaq(selectedFaq === index ? null : index);
   };
 
-  const handleKeyPress = (index: number, event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleFaqClick(index);
-    }
-  };
-
   return (
-    <section className="py-16 relative overflow-hidden min-h-screen" id="faq">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-black/90" />
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(circle at center, rgba(234,179,8,0.1) 0%, rgba(45,212,191,0.05) 30%, transparent 70%)',
-            animation: 'cosmic-pulse 4s ease-in-out infinite'
-          }}
-        />
-      </div>
-
-      <div className="container px-4 relative">
+    <section className="py-16 min-h-screen bg-black/90" id="faq">
+      <div className="container px-4">
         <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12 text-center">
           Frequently Asked Questions
         </h2>
@@ -77,57 +58,36 @@ export const FAQ = () => {
             return (
               <div
                 key={index}
-                className="relative group bg-black/60 backdrop-blur-sm border border-yellow-500/30 rounded-lg overflow-hidden transition-all hover:border-yellow-500/60"
+                className="border border-yellow-500/30 rounded-lg overflow-hidden hover:border-yellow-500/60 transition-colors"
               >
                 <button
                   onClick={() => handleFaqClick(index)}
-                  onKeyDown={(e) => handleKeyPress(index, e)}
-                  className="w-full text-left focus:outline-none focus:ring-2 focus:ring-yellow-500/50 p-6"
+                  className="w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
                   aria-expanded={isSelected}
                   aria-controls={`faq-answer-${index}`}
                 >
-                  <div className="flex items-center justify-between gap-4">
-                    <h3 className="text-lg font-medium text-white group-hover:text-yellow-500 transition-colors pr-8">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-medium text-white">
                       {faq.question}
                     </h3>
-                    <motion.div
-                      animate={{ rotate: isSelected ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-6 top-6"
-                    >
-                      <ChevronDown className="w-5 h-5 text-yellow-500" />
-                    </motion.div>
+                    <ChevronDown 
+                      className={`w-5 h-5 text-yellow-500 transition-transform duration-200 ${
+                        isSelected ? 'rotate-180' : ''
+                      }`}
+                    />
                   </div>
                 </button>
                 
-                <AnimatePresence initial={false}>
-                  {isSelected && (
-                    <motion.div
-                      id={`faq-answer-${index}`}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ 
-                        height: "auto",
-                        opacity: 1,
-                        transition: {
-                          height: { duration: 0.3 },
-                          opacity: { duration: 0.2, delay: 0.1 }
-                        }
-                      }}
-                      exit={{ 
-                        height: 0,
-                        opacity: 0,
-                        transition: {
-                          height: { duration: 0.3 },
-                          opacity: { duration: 0.2 }
-                        }
-                      }}
-                    >
-                      <div className="px-6 pb-6 border-t border-yellow-500/20 pt-4">
-                        <p className="text-gray-300 text-base">{faq.answer}</p>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <div
+                  id={`faq-answer-${index}`}
+                  className={`transition-all duration-200 ease-in-out ${
+                    isSelected ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  } overflow-hidden`}
+                >
+                  <div className="px-6 pb-6 border-t border-yellow-500/20 pt-4">
+                    <p className="text-gray-300 text-base">{faq.answer}</p>
+                  </div>
+                </div>
               </div>
             );
           })}
