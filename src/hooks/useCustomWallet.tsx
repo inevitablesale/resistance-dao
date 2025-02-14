@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 export type WalletView = 'assets' | 'actions' | 'buy' | 'send' | 'history';
 
 export const useCustomWallet = () => {
-  const { primaryWallet, setShowAuthFlow, user, isAuthenticated } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow, user } = useDynamicContext();
   const { open: openOnramp, enabled: onrampEnabled } = useOnramp();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -67,31 +67,40 @@ export const useCustomWallet = () => {
     }
   };
 
-  const showBanxaDeposit = async (amount?: number) => {
-    if (!isAuthenticated || !primaryWallet) {
+  const showBanxaDeposit = (amount?: number) => {
+    if (!primaryWallet) {
       console.log("[Deposit] No wallet connected, opening auth flow");
       setShowAuthFlow?.(true);
       return;
     }
 
+    if (!onrampEnabled) {
+      console.error("[Deposit] Onramp not enabled");
+      toast({
+        title: "Error",
+        description: "Onramp functionality is not available",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      if (onrampEnabled) {
-        console.log("[Deposit] Opening Banxa onramp with amount:", amount);
-        await openOnramp({
-          provider: 'banxa',
-          defaultFiatAmount: amount || 100,
-          defaultNetwork: {
-            chainId: 137 // Polygon
-          }
-        });
-      } else {
-        console.log("[Deposit] Fallback: Opening wallet buy view");
+      console.log("[Deposit] Opening Banxa onramp for address:", primaryWallet.address);
+      openOnramp({
+        onrampProvider: OnrampProviders.Banxa,
+        token: 'MATIC',
+        address: primaryWallet.address,
+        ...(amount && { fiatAmount: amount })
+      }).then(() => {
+        console.log("[Deposit] Banxa window opened successfully");
+      }).catch((error) => {
+        console.error("[Deposit] Error opening Banxa:", error);
         toast({
-          title: "Onramp Not Available",
-          description: "The onramp service is currently not available",
+          title: "Error",
+          description: "Failed to open deposit interface",
           variant: "destructive",
         });
-      }
+      });
     } catch (error) {
       console.error("[Deposit] Error showing deposit view:", error);
       toast({
@@ -138,7 +147,6 @@ export const useCustomWallet = () => {
     showBanxaDeposit,
     sendTransaction,
     address: primaryWallet?.address,
-    user,
-    isAuthenticated
+    user
   };
 };

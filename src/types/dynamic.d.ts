@@ -41,11 +41,6 @@ declare module "@dynamic-labs/sdk-react-core" {
         };
       }
     ) => void;
-    openWallet?: (options: { view: 'buy' | 'send' }) => void;  // Added missing openWallet function type
-    useOnramp?: () => {
-      open: (options: any) => Promise<void>;
-      enabled: boolean;
-    };
   }
 
   export interface DynamicSettings {
