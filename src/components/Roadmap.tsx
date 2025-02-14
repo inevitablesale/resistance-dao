@@ -45,7 +45,8 @@ export const Roadmap = () => {
         "Listed on coinmooner.com",
         "Applied for Polygon Community Grant",
         "Developed Litepaper",
-        "Launched Presale"
+        "Launched Presale",
+        "Onboard Partners into Ecosystem"
       ]
     },
     {
@@ -53,12 +54,10 @@ export const Roadmap = () => {
       subtitle: "Q2 2025",
       items: [
         "Apply for Direct Listing with Banxa",
-        "Onboard Partners into Ecosystem",
         "Launch LedgerFren NFT Platform",
         "Form DAO in Wyoming",
         "Launch Community",
-        "Continue Marketing Campaign",
-        "Expand Strategic Partnerships"
+        "Apply to CoinGeko and CoinMarketCap for listings"
       ]
     },
     {
@@ -69,7 +68,8 @@ export const Roadmap = () => {
         "Build Deal Flow Bounties System",
         "Deploy Deal Thesis Framework",
         "Deploy Liquidity Pool UI and Allocation Voting",
-        "Launch Community Governance"
+        "Launch Community Governance",
+        "First Acquisition"
       ]
     }
   ];
