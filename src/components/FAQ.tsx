@@ -1,4 +1,3 @@
-
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
@@ -6,6 +5,10 @@ const faqCategories = [
   {
     category: "Platform Fundamentals",
     questions: [
+      {
+        question: "What is our vision for the future of accounting?",
+        answer: "We envision a protocol that puts accountants in charge of the industry's future. By leveraging decentralization, peer-to-peer DeFi, and creating entirely new asset classes, we're enabling unprecedented efficiency and revenue opportunities. Our framework serves a community of like-minded professionals who believe in the power of the invisible hand - where collective expertise and market forces naturally drive innovation and value creation. This protocol isn't just a platform; it's a movement to transform how accounting practices are acquired, managed, and evolved through the power of decentralized finance and community governance.",
+      },
       {
         question: "What is decentralization and why is it important?",
         answer: "Decentralization is a core principle of LedgerFund that ensures no single entity controls the platform. By distributing power across our community of token holders, we create a more transparent, fair, and resilient system for acquiring and managing accounting practices. This approach eliminates traditional intermediaries and enables direct member participation in governance and value creation.",
