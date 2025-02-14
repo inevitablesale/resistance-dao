@@ -1,3 +1,5 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
@@ -19,6 +21,7 @@ import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2, Cal
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { NewsletterSubscription } from "@/components/NewsletterSubscription";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 
 const presaleData = [
   { 
