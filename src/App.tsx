@@ -15,6 +15,7 @@ import GettingStarted from "./pages/GettingStarted";
 import KnowledgeArticle from "./pages/KnowledgeArticle";
 import ContentHub from "./pages/ContentHub";
 import { Marketplace } from "./pages/Marketplace";
+import ThesisSubmission from "./pages/ThesisSubmission";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
 
@@ -48,6 +49,7 @@ function Layout() {
       <Route path="/marketplace" element={<Marketplace />} />
       <Route path="/marketplace/:category/:slug" element={<KnowledgeArticle />} />
       <Route path="/content" element={<ContentHub />} />
+      <Route path="/submit-thesis" element={<ThesisSubmission />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
