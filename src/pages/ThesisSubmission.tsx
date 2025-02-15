@@ -109,34 +109,14 @@ const ThesisSubmission = () => {
                 
                 <div>
                   <Label className="text-gray-200 mb-2 block">Industry Focus</Label>
-                  <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="accounting" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                      />
-                      <label htmlFor="accounting" className="text-gray-200">
-                        Accounting
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="professional-services" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                      />
-                      <label htmlFor="professional-services" className="text-gray-200">
-                        Professional Services
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="other" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                      />
-                      <label htmlFor="other" className="text-gray-200">
-                        Other
-                      </label>
-                    </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="accounting" 
+                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                    />
+                    <label htmlFor="accounting" className="text-gray-200">
+                      Accounting
+                    </label>
                   </div>
                 </div>
 
@@ -182,6 +162,137 @@ const ThesisSubmission = () => {
                       <Label htmlFor="remote">Remote/Digital</Label>
                     </div>
                   </RadioGroup>
+                </div>
+              </div>
+
+              {/* Payment Terms */}
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-white">Payment Terms</h2>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="cash" 
+                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                    />
+                    <label htmlFor="cash" className="text-gray-200">Cash</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="seller-financing" 
+                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                    />
+                    <label htmlFor="seller-financing" className="text-gray-200">Seller Financing</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="earnout" 
+                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                    />
+                    <label htmlFor="earnout" className="text-gray-200">Earnout</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="equity-rollover" 
+                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                    />
+                    <label htmlFor="equity-rollover" className="text-gray-200">Equity Rollover</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="bank-financing" 
+                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                    />
+                    <label htmlFor="bank-financing" className="text-gray-200">Bank Financing</label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Post-Strategy */}
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-white">Post-Acquisition Strategy</h2>
+                
+                {/* Operational Strategies */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-white">Operational Strategies</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="tech-modernization" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
+                      <label htmlFor="tech-modernization" className="text-gray-200">Technology Modernization</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="process-standardization" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
+                      <label htmlFor="process-standardization" className="text-gray-200">Process Standardization</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="staff-retention" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
+                      <label htmlFor="staff-retention" className="text-gray-200">Staff Retention/Development</label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Growth Strategies */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-white">Growth Strategies</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="geographic-expansion" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
+                      <label htmlFor="geographic-expansion" className="text-gray-200">Geographic Expansion</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="service-expansion" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
+                      <label htmlFor="service-expansion" className="text-gray-200">Service Line Expansion</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="client-growth" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
+                      <label htmlFor="client-growth" className="text-gray-200">Client Base Growth</label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Integration Strategies */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-white">Integration Strategies</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="merging-operations" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
+                      <label htmlFor="merging-operations" className="text-gray-200">Merging Operations</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="culture-integration" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
+                      <label htmlFor="culture-integration" className="text-gray-200">Culture Integration</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="systems-consolidation" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
+                      <label htmlFor="systems-consolidation" className="text-gray-200">Systems Consolidation</label>
+                    </div>
+                  </div>
                 </div>
               </div>
 
