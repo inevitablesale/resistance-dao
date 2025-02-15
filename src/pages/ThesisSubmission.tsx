@@ -8,8 +8,10 @@ import { Card } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import Nav from "@/components/Nav";
-import { FileText, AlertTriangle } from "lucide-react";
+import { FileText, AlertTriangle, Info, Clock, CreditCard } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ThesisFormData {
   thesisTitle: string;
@@ -21,12 +23,17 @@ interface ThesisFormData {
   paymentTerms: string[];
   complexStructures: boolean;
   targetCapital: string;
-  timeline: string;
+  votingDuration: number;
   postStrategy: string[];
   investorRole: string;
   investmentDrivers: string;
   additionalCriteria: string;
 }
+
+const MIN_VOTING_DURATION = 7;
+const MAX_VOTING_DURATION = 90;
+const MAX_SUMMARY_LENGTH = 500;
+const SUBMISSION_FEE = 250;
 
 const ThesisSubmission = () => {
   const { toast } = useToast();
@@ -40,7 +47,7 @@ const ThesisSubmission = () => {
     paymentTerms: [],
     complexStructures: false,
     targetCapital: "",
-    timeline: "",
+    votingDuration: MIN_VOTING_DURATION,
     postStrategy: [],
     investorRole: "",
     investmentDrivers: "",
@@ -49,6 +56,36 @@ const ThesisSubmission = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate summary lengths
+    if (formData.investmentDrivers.length > MAX_SUMMARY_LENGTH) {
+      toast({
+        title: "Validation Error",
+        description: "Investment drivers summary must not exceed 500 characters",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (formData.additionalCriteria.length > MAX_SUMMARY_LENGTH) {
+      toast({
+        title: "Validation Error",
+        description: "Additional criteria summary must not exceed 500 characters",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate arrays
+    if (formData.paymentTerms.length === 0 || formData.paymentTerms.length > 5) {
+      toast({
+        title: "Validation Error",
+        description: "Please select between 1 and 5 payment terms",
+        variant: "destructive"
+      });
+      return;
+    }
+
     toast({
       title: "Coming Soon",
       description: "Thesis submission will be available soon!",
@@ -86,6 +123,19 @@ const ThesisSubmission = () => {
             </p>
           </div>
 
+          {/* Fee Information Card */}
+          <Card className="p-6 bg-black/50 border border-white/10 backdrop-blur-xl mb-8">
+            <div className="flex items-start space-x-4">
+              <CreditCard className="w-6 h-6 text-purple-400 mt-1" />
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-2">Submission Fee</h3>
+                <p className="text-gray-400">
+                  Submitting a thesis requires {SUBMISSION_FEE} LGR tokens. This fee helps ensure quality submissions and supports the DAO treasury.
+                </p>
+              </div>
+            </div>
+          </Card>
+
           <Card className="p-8 bg-black/50 border border-white/10 backdrop-blur-xl">
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Thesis Title */}
@@ -100,7 +150,35 @@ const ThesisSubmission = () => {
                   placeholder="Enter thesis title"
                   className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
                   required
+                  value={formData.thesisTitle}
+                  onChange={(e) => setFormData(prev => ({ ...prev, thesisTitle: e.target.value }))}
                 />
+              </div>
+
+              {/* Voting Duration */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-lg font-medium text-white">Voting Duration</Label>
+                    <p className="text-sm text-gray-400">Set how long the community can vote on your thesis</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-2xl font-bold text-white">{formData.votingDuration}</span>
+                    <span className="text-gray-400 ml-2">days</span>
+                  </div>
+                </div>
+                <Slider
+                  value={[formData.votingDuration]}
+                  min={MIN_VOTING_DURATION}
+                  max={MAX_VOTING_DURATION}
+                  step={1}
+                  className="w-full"
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, votingDuration: value[0] }))}
+                />
+                <div className="flex justify-between text-sm text-gray-400">
+                  <span>{MIN_VOTING_DURATION} days</span>
+                  <span>{MAX_VOTING_DURATION} days</span>
+                </div>
               </div>
 
               {/* Target Firm Criteria */}
@@ -167,12 +245,26 @@ const ThesisSubmission = () => {
 
               {/* Payment Terms */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-white">Payment Terms</h2>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-white">Payment Terms</h2>
+                  <span className="text-sm text-gray-400">
+                    Select 1-5 terms
+                  </span>
+                </div>
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
                     <Checkbox 
                       id="cash" 
                       className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      checked={formData.paymentTerms.includes('cash')}
+                      onCheckedChange={(checked) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          paymentTerms: checked 
+                            ? [...prev.paymentTerms, 'cash']
+                            : prev.paymentTerms.filter(term => term !== 'cash')
+                        }))
+                      }}
                     />
                     <label htmlFor="cash" className="text-gray-200">Cash</label>
                   </div>
@@ -326,9 +418,19 @@ const ThesisSubmission = () => {
 
               {/* Key Investment Drivers */}
               <div>
-                <label className="text-lg font-medium text-white mb-2 block">
-                  Key Investment Drivers
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-lg font-medium text-white">
+                    Key Investment Drivers
+                  </label>
+                  <span className={cn(
+                    "text-sm",
+                    formData.investmentDrivers.length > MAX_SUMMARY_LENGTH 
+                      ? "text-red-400" 
+                      : "text-gray-400"
+                  )}>
+                    {formData.investmentDrivers.length}/{MAX_SUMMARY_LENGTH}
+                  </span>
+                </div>
                 <p className="text-sm text-gray-400 mb-2">
                   📌 Outline the primary factors that make this acquisition compelling
                 </p>
@@ -336,20 +438,34 @@ const ThesisSubmission = () => {
                   placeholder="Describe earnings stability, strong client base, scalability, cultural fit, technology adoption, etc."
                   className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
                   required
+                  value={formData.investmentDrivers}
+                  onChange={(e) => setFormData(prev => ({ ...prev, investmentDrivers: e.target.value }))}
                 />
               </div>
 
               {/* Additional Investment Criteria */}
               <div>
-                <label className="text-lg font-medium text-white mb-2 block">
-                  Additional Investment Criteria or Notes
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-lg font-medium text-white">
+                    Additional Investment Criteria or Notes
+                  </label>
+                  <span className={cn(
+                    "text-sm",
+                    formData.additionalCriteria.length > MAX_SUMMARY_LENGTH 
+                      ? "text-red-400" 
+                      : "text-gray-400"
+                  )}>
+                    {formData.additionalCriteria.length}/{MAX_SUMMARY_LENGTH}
+                  </span>
+                </div>
                 <p className="text-sm text-gray-400 mb-2">
                   📌 Specify any must-have requirements or deal preferences
                 </p>
                 <Textarea
                   placeholder="EBITDA thresholds, firm specialization, geographic limitations, integration plans, etc."
                   className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
+                  value={formData.additionalCriteria}
+                  onChange={(e) => setFormData(prev => ({ ...prev, additionalCriteria: e.target.value }))}
                 />
               </div>
 
