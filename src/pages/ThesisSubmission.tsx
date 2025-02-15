@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -12,9 +13,6 @@ import { FileText, AlertTriangle } from "lucide-react";
 
 interface ThesisFormData {
   thesisTitle: string;
-  fullName: string;
-  companyName: string;
-  linkedinUrl: string;
   industryFocus: string;
   industryOther: string;
   firmSize: string;
@@ -34,9 +32,6 @@ const ThesisSubmission = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState<ThesisFormData>({
     thesisTitle: "",
-    fullName: "",
-    companyName: "",
-    linkedinUrl: "", // We'll keep this in the type but remove from UI
     industryFocus: "",
     industryOther: "",
     firmSize: "",
@@ -106,29 +101,6 @@ const ThesisSubmission = () => {
                   className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
                   required
                 />
-              </div>
-
-              {/* Investor Profile */}
-              <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-white">Investor Profile</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label className="text-gray-200">Full Name</Label>
-                    <Input
-                      placeholder="Your full name"
-                      className="bg-black/50 border-white/10 mt-1 text-white placeholder:text-gray-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-200">Company Name</Label>
-                    <Input
-                      placeholder="Your company name"
-                      className="bg-black/50 border-white/10 mt-1 text-white placeholder:text-gray-500"
-                      required
-                    />
-                  </div>
-                </div>
               </div>
 
               {/* Target Firm Criteria */}
@@ -293,3 +265,4 @@ const ThesisSubmission = () => {
 };
 
 export default ThesisSubmission;
+
