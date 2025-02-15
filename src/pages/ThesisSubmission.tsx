@@ -37,7 +37,7 @@ const ThesisSubmission = () => {
     thesisTitle: "",
     fullName: "",
     companyName: "",
-    linkedinUrl: "",
+    linkedinUrl: "", // We'll keep this in the type but remove from UI
     industryFocus: "",
     industryOther: "",
     firmSize: "",
@@ -117,7 +117,7 @@ const ThesisSubmission = () => {
                     <Label className="text-gray-200">Full Name</Label>
                     <Input
                       placeholder="Your full name"
-                      className="bg-black/50 border-white/10 mt-1"
+                      className="bg-black/50 border-white/10 mt-1 text-white placeholder:text-gray-500"
                       required
                     />
                   </div>
@@ -125,19 +125,10 @@ const ThesisSubmission = () => {
                     <Label className="text-gray-200">Company Name</Label>
                     <Input
                       placeholder="Your company name"
-                      className="bg-black/50 border-white/10 mt-1"
+                      className="bg-black/50 border-white/10 mt-1 text-white placeholder:text-gray-500"
                       required
                     />
                   </div>
-                </div>
-                <div>
-                  <Label className="text-gray-200">LinkedIn Profile URL</Label>
-                  <Input
-                    placeholder="https://linkedin.com/in/your-profile"
-                    className="bg-black/50 border-white/10 mt-1"
-                    type="url"
-                    required
-                  />
                 </div>
               </div>
 
@@ -149,19 +140,28 @@ const ThesisSubmission = () => {
                   <Label className="text-gray-200 mb-2 block">Industry Focus</Label>
                   <div className="flex flex-wrap gap-4">
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="accounting" />
+                      <Checkbox 
+                        id="accounting" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
                       <label htmlFor="accounting" className="text-gray-200">
                         Accounting
                       </label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="professional-services" />
+                      <Checkbox 
+                        id="professional-services" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
                       <label htmlFor="professional-services" className="text-gray-200">
                         Professional Services
                       </label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="other" />
+                      <Checkbox 
+                        id="other" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      />
                       <label htmlFor="other" className="text-gray-200">
                         Other
                       </label>
@@ -173,19 +173,19 @@ const ThesisSubmission = () => {
                   <Label className="text-gray-200 mb-2 block">Preferred Firm Size (Revenue)</Label>
                   <RadioGroup defaultValue="below-1m" className="flex flex-wrap gap-4">
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="below-1m" id="below-1m" />
+                      <RadioGroupItem value="below-1m" id="below-1m" className="border-white text-white" />
                       <Label htmlFor="below-1m">Below $1M</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="1m-5m" id="1m-5m" />
+                      <RadioGroupItem value="1m-5m" id="1m-5m" className="border-white text-white" />
                       <Label htmlFor="1m-5m">$1M–$5M</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="5m-10m" id="5m-10m" />
+                      <RadioGroupItem value="5m-10m" id="5m-10m" className="border-white text-white" />
                       <Label htmlFor="5m-10m">$5M–$10M</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="10m-plus" id="10m-plus" />
+                      <RadioGroupItem value="10m-plus" id="10m-plus" className="border-white text-white" />
                       <Label htmlFor="10m-plus">$10M+</Label>
                     </div>
                   </RadioGroup>
@@ -219,11 +219,11 @@ const ThesisSubmission = () => {
                 <h2 className="text-xl font-semibold text-white">Investment Structure</h2>
                 
                 <div>
-                  <Label className="text-gray-200 mb-2 block">Target Capital Raise ($LGR Tokens)</Label>
+                  <Label className="text-gray-200 mb-2 block">Target Capital Raise (USD)</Label>
                   <Input
                     type="number"
-                    placeholder="Enter amount"
-                    className="bg-black/50 border-white/10"
+                    placeholder="Enter amount in USD"
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
                     required
                   />
                 </div>
@@ -231,7 +231,10 @@ const ThesisSubmission = () => {
                 <div>
                   <Label className="text-gray-200 mb-2 block">Complex Deal Structures?</Label>
                   <div className="flex items-center space-x-2">
-                    <Checkbox id="complex-structures" />
+                    <Checkbox 
+                      id="complex-structures" 
+                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                    />
                     <label htmlFor="complex-structures" className="text-gray-200">
                       Willing to consider complex deal structures
                     </label>
@@ -249,7 +252,7 @@ const ThesisSubmission = () => {
                 </p>
                 <Textarea
                   placeholder="Describe earnings stability, strong client base, scalability, cultural fit, technology adoption, etc."
-                  className="bg-black/50 border-white/10 min-h-[150px]"
+                  className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
                   required
                 />
               </div>
@@ -264,7 +267,7 @@ const ThesisSubmission = () => {
                 </p>
                 <Textarea
                   placeholder="EBITDA thresholds, firm specialization, geographic limitations, integration plans, etc."
-                  className="bg-black/50 border-white/10 min-h-[150px]"
+                  className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
                 />
               </div>
 
@@ -276,7 +279,20 @@ const ThesisSubmission = () => {
                   <p className="text-sm text-gray-400">
                     Attach relevant financial models, due diligence reports, or supporting research
                   </p>
-                  <Button variant="outline" className="mt-4">
+                  <input 
+                    type="file" 
+                    className="hidden" 
+                    id="file-upload"
+                    multiple
+                  />
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById('file-upload')?.click();
+                    }}
+                  >
                     Choose Files
                   </Button>
                 </div>
