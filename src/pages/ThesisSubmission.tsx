@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Nav from "@/components/Nav";
-import { FileText, Upload, AlertTriangle } from "lucide-react";
+import { FileText, AlertTriangle } from "lucide-react";
 
 interface ThesisFormData {
   thesisTitle: string;
@@ -104,7 +103,7 @@ const ThesisSubmission = () => {
                 </p>
                 <Input
                   placeholder="Enter thesis title"
-                  className="bg-black/50 border-white/10"
+                  className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
                   required
                 />
               </div>
@@ -195,19 +194,19 @@ const ThesisSubmission = () => {
                   <Label className="text-gray-200 mb-2 block">Geographic Focus</Label>
                   <RadioGroup defaultValue="local" className="flex flex-wrap gap-4">
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="local" id="local" />
+                      <RadioGroupItem value="local" id="local" className="border-white text-white" />
                       <Label htmlFor="local">Local</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="regional" id="regional" />
+                      <RadioGroupItem value="regional" id="regional" className="border-white text-white" />
                       <Label htmlFor="regional">Regional</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="national" id="national" />
+                      <RadioGroupItem value="national" id="national" className="border-white text-white" />
                       <Label htmlFor="national">National</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="remote" id="remote" />
+                      <RadioGroupItem value="remote" id="remote" className="border-white text-white" />
                       <Label htmlFor="remote">Remote/Digital</Label>
                     </div>
                   </RadioGroup>
@@ -269,33 +268,6 @@ const ThesisSubmission = () => {
                   placeholder="EBITDA thresholds, firm specialization, geographic limitations, integration plans, etc."
                   className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
                 />
-              </div>
-
-              {/* File Upload */}
-              <div className="border border-dashed border-white/20 rounded-lg p-6">
-                <div className="flex flex-col items-center text-center">
-                  <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                  <h3 className="text-lg font-medium text-white">Supporting Documents</h3>
-                  <p className="text-sm text-gray-400">
-                    Attach relevant financial models, due diligence reports, or supporting research
-                  </p>
-                  <input 
-                    type="file" 
-                    className="hidden" 
-                    id="file-upload"
-                    multiple
-                  />
-                  <Button 
-                    variant="outline" 
-                    className="mt-4"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      document.getElementById('file-upload')?.click();
-                    }}
-                  >
-                    Choose Files
-                  </Button>
-                </div>
               </div>
 
               {/* Submit Section */}
