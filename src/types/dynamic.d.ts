@@ -1,3 +1,4 @@
+
 import { type EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { type ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum-aa";
 import { type OnrampProviders } from "@dynamic-labs/sdk-api-core";
@@ -23,13 +24,13 @@ declare module "@dynamic-labs/sdk-react-core" {
     primaryWallet: {
       address?: string;
       isConnected: () => Promise<boolean>;
-      getWalletClient: () => Promise<any>;
-      getNetwork?: () => Promise<{ chainId: number }>;
+      getEthersProvider?: () => Promise<any>;  // Updated to new method
+      getPublicClient?: () => Promise<any>;    // Added fallback method
       disconnect?: () => Promise<void>;
       connector?: {
         name?: string;
         showWallet?: (options: { view: 'send' | 'deposit' }) => void;
-        openWallet?: (options: { view: 'send' | 'deposit' }) => void;
+        openWallet?: (options: { view: 'send' | 'deposit' }) => void;  // Added for ZeroDev compatibility
       };
     } | null;
     setShowAuthFlow?: (show: boolean) => void;
