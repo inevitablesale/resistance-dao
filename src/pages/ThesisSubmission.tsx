@@ -716,41 +716,47 @@ const ThesisSubmission = () => {
                 <Card className="relative overflow-hidden bg-black/60 backdrop-blur-xl border-white/10">
                   <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
                   <div className="relative z-10 p-6">
-                    <div className="flex flex-col lg:flex-row justify-between gap-6">
-                      <div className="space-y-2">
-                        <p className="text-sm text-white/60">Premium Ad Space</p>
-                        <h3 className="text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
-                          Advertise Here
-                        </h3>
-                        <p className="text-sm text-white/60 max-w-md">
-                          Reach active investors and decision makers in the Web3 space.
-                        </p>
-                      </div>
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-4">
-                          <div>
-                            <p className="text-lg font-semibold">2.5k LGR/week</p>
-                            <p className="text-sm text-white/60">≈ $250</p>
-                          </div>
+                    <div className="text-center mb-4">
+                      <h3 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
+                        Advertise Your Project
+                      </h3>
+                      <p className="text-white/60 mt-2">
+                        Connect with Web3 investors and decision makers
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                      {/* Weekly Plan */}
+                      <div className="p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                        <div className="text-center">
+                          <div className="text-xl font-bold text-white mb-1">Weekly</div>
+                          <div className="text-3xl font-bold text-yellow-400 mb-2">2.5k LGR</div>
+                          <div className="text-white/60 text-sm">≈ $250</div>
                           <Button 
-                            variant="ghost" 
-                            className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                            className="w-full mt-4 bg-white/10 hover:bg-white/20 text-white"
                             onClick={() => handleRentAdSpace('week')}
                           >
-                            Rent Weekly
+                            Rent Now
                           </Button>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <div>
-                            <p className="text-lg font-semibold">9k LGR/month</p>
-                            <p className="text-sm text-white/60">≈ $900</p>
+                      </div>
+
+                      {/* Monthly Plan */}
+                      <div className="p-4 rounded-lg bg-gradient-to-b from-white/10 to-white/5 border border-white/10 hover:from-white/15 hover:to-white/10 transition-colors">
+                        <div className="text-center relative">
+                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                            <span className="px-3 py-1 bg-yellow-500/20 rounded-full text-yellow-400 text-xs">
+                              Best Value
+                            </span>
                           </div>
+                          <div className="text-xl font-bold text-white mb-1">Monthly</div>
+                          <div className="text-3xl font-bold text-yellow-400 mb-2">9k LGR</div>
+                          <div className="text-white/60 text-sm">≈ $900</div>
                           <Button 
-                            variant="ghost" 
-                            className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                            className="w-full mt-4 bg-yellow-500/20 hover:bg-yellow-500/30 text-white"
                             onClick={() => handleRentAdSpace('month')}
                           >
-                            Rent Monthly
+                            Rent Now
                           </Button>
                         </div>
                       </div>
