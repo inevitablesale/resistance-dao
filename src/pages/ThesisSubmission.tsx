@@ -1,3 +1,4 @@
+<lov-code>
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -725,7 +726,8 @@ const ThesisSubmission = () => {
                     formData.investment.drivers.length > MAX_SUMMARY_LENGTH 
                       ? "text-red-400" 
                       : "text-gray-400"
-                  )}>
+                  )}
+                  >
                     {formData.investment.drivers.length}/{MAX_SUMMARY_LENGTH}
                   </span>
                 </div>
@@ -751,8 +753,9 @@ const ThesisSubmission = () => {
                     formData.investment.additionalCriteria.length > MAX_SUMMARY_LENGTH 
                       ? "text-red-400" 
                       : "text-gray-400"
-                  )}>
-                    {formData.investment.additionalCriteria.length}/{MAX_SUMMARY_LENGTH
+                  )}
+                  >
+                    {formData.investment.additionalCriteria.length}/{MAX_SUMMARY_LENGTH}
                   </span>
                 </div>
                 <p className="text-sm text-gray-400 mb-2">
@@ -776,5 +779,3 @@ const ThesisSubmission = () => {
                   type="submit"
                   disabled={isSubmitting}
                   className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
-                >
-                  {isSubmitting ? "
