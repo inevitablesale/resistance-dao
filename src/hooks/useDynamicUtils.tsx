@@ -89,14 +89,64 @@ export const useDynamicUtils = () => {
       });
     }
 
+    // Check if we're on Polygon network
     if (state.chainId !== 137) {
-      throw new ProposalError({
-        category: 'network',
-        message: 'Wrong network',
-        recoverySteps: ['Please switch to the Polygon network']
-      });
+      try {
+        // Try to switch to Polygon network
+        await primaryWallet?.connector?.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x89' }], // 137 in hex
+        });
+        
+        // Verify the switch was successful
+        const newState = await getWalletState();
+        if (newState.chainId !== 137) {
+          throw new ProposalError({
+            category: 'network',
+            message: 'Failed to switch to Polygon network',
+            recoverySteps: ['Please manually switch to the Polygon network in your wallet']
+          });
+        }
+      } catch (switchError: any) {
+        // This error code indicates that the chain has not been added to MetaMask
+        if (switchError.code === 4902) {
+          try {
+            await primaryWallet?.connector?.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: '0x89',
+                chainName: 'Polygon Mainnet',
+                nativeCurrency: {
+                  name: 'MATIC',
+                  symbol: 'MATIC',
+                  decimals: 18
+                },
+                rpcUrls: ['https://polygon-rpc.com/'],
+                blockExplorerUrls: ['https://polygonscan.com/']
+              }]
+            });
+          } catch (addError) {
+            console.error('Add network error:', addError);
+            throw new ProposalError({
+              category: 'network',
+              message: 'Failed to add Polygon network',
+              recoverySteps: [
+                'Please add the Polygon network to your wallet manually',
+                'Then try again'
+              ]
+            });
+          }
+        } else {
+          console.error('Network switch error:', switchError);
+          throw new ProposalError({
+            category: 'network',
+            message: 'Failed to switch network',
+            recoverySteps: ['Please switch to the Polygon network manually']
+          });
+        }
+      }
     }
-  }, [getWalletState]);
+  }, [getWalletState, primaryWallet]);
 
   return {
     getWalletState,
