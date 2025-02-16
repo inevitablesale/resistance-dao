@@ -5,6 +5,7 @@ export type ErrorCategory =
   | 'network'
   | 'validation'
   | 'transaction'
+  | 'token'
   | 'unknown';
 
 export interface ErrorDetails {
@@ -107,6 +108,19 @@ export const categorizeError = (error: any): ErrorDetails => {
         'Check transaction status in your wallet',
         'Wait a few minutes and try again',
         'Verify the transaction details'
+      ]
+    };
+  }
+
+  // Token errors
+  if (error.message?.includes('allowance') || error.message?.includes('balance')) {
+    return {
+      category: 'token',
+      message: 'Token operation failed',
+      recoverySteps: [
+        'Check your token balance',
+        'Verify token approval status',
+        'Try the transaction again'
       ]
     };
   }
