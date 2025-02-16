@@ -3,8 +3,8 @@ import { ethers } from "ethers";
 import { PRESALE_ABI } from "./abis/presaleAbi";
 import { LGR_TOKEN_ABI } from "./abis/lgrTokenAbi";
 
-const PRESALE_CONTRACT_ADDRESS = "0x123..."; // Replace with actual address
-const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
+export const PRESALE_CONTRACT_ADDRESS = "0x123..."; // Replace with actual address
+export const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 export const getWorkingProvider = async () => {
   try {

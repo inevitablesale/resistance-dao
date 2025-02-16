@@ -9,9 +9,9 @@ export const useCustomWallet = () => {
 
   useEffect(() => {
     const setupProvider = async () => {
-      if (primaryWallet?.connector?.provider) {
+      if (primaryWallet?.connector?.walletConnector?.provider) {
         const newProvider = new ethers.providers.Web3Provider(
-          primaryWallet.connector.provider as any
+          primaryWallet.connector.walletConnector.provider as any
         );
         setProvider(newProvider);
       } else {
@@ -20,7 +20,7 @@ export const useCustomWallet = () => {
     };
 
     setupProvider();
-  }, [primaryWallet?.connector?.provider]);
+  }, [primaryWallet?.connector?.walletConnector?.provider]);
 
   return {
     isConnected: !!primaryWallet?.address && primaryWallet?.isConnected?.(),
