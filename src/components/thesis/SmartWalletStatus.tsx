@@ -28,7 +28,7 @@ export const SmartWalletStatus = () => {
 
       try {
         // Check if this is the first time user is creating a smart wallet
-        const hasExistingWallet = await primaryWallet.connector?.getWalletClient();
+        const hasExistingWallet = await primaryWallet.getWalletClient();
         
         if (!hasExistingWallet) {
           setState({
