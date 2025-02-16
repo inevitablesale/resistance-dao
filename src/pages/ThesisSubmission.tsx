@@ -167,6 +167,7 @@ const ThesisSubmission = () => {
   });
 
   const [isThesisOpen, setIsThesisOpen] = useState(true);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => 
@@ -483,6 +484,14 @@ const ThesisSubmission = () => {
     }
   };
 
+  const handleSectionComplete = () => {
+    setActiveSection(null);
+  };
+
+  const isThesisSectionComplete = () => {
+    return validateBasicsTab();
+  };
+
   return (
     <div className="min-h-screen bg-[#030712]">
       <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10" />
@@ -514,89 +523,153 @@ const ThesisSubmission = () => {
                 </div>
 
                 <div className="p-6 space-y-8">
-                  <Collapsible
-                    open={isThesisOpen}
-                    onOpenChange={setIsThesisOpen}
-                    className="space-y-4"
-                  >
-                    <CollapsibleTrigger className="flex items-center justify-between w-full text-left group">
-                      <div className="space-y-1">
-                        <h2 className="text-xl font-semibold text-white group-hover:text-white/90">
-                          Investment Thesis
-                        </h2>
-                        <p className="text-sm text-white/60">
-                          Fill out your investment thesis details
-                        </p>
-                      </div>
-                      {isThesisOpen ? (
-                        <ChevronUp className="w-5 h-5 text-white/60" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-white/60" />
-                      )}
-                    </CollapsibleTrigger>
+                  <AnimatePresence mode="wait">
+                    {activeSection === 'thesis' ? (
+                      <motion.div
+                        key="thesis-form"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="space-y-6"
+                      >
+                        <div className="space-y-4">
+                          <Label className="text-lg font-medium text-white">
+                            Thesis Title
+                          </Label>
+                          <Input
+                            placeholder="Enter a clear, descriptive title"
+                            className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                            value={formData.title}
+                            onChange={(e) => handleFormDataChange('title', e.target.value)}
+                          />
+                          {formErrors.title && (
+                            <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                          )}
+                        </div>
 
-                    <CollapsibleContent className="space-y-6">
-                      <div className="space-y-4">
-                        <Label className="text-lg font-medium text-white">
-                          Thesis Title
-                        </Label>
-                        <Input
-                          placeholder="Enter a clear, descriptive title"
-                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
-                          value={formData.title}
-                          onChange={(e) => handleFormDataChange('title', e.target.value)}
+                        <VotingDurationInput
+                          value={votingDuration}
+                          onChange={handleVotingDurationChange}
+                          error={formErrors.votingDuration}
                         />
-                        {formErrors.title && (
-                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                        )}
-                      </div>
 
-                      <VotingDurationInput
-                        value={votingDuration}
-                        onChange={handleVotingDurationChange}
-                        error={formErrors.votingDuration}
-                      />
+                        <TargetCapitalInput
+                          value={formData.investment.targetCapital}
+                          onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+                          error={formErrors['investment.targetCapital']}
+                        />
 
-                      <TargetCapitalInput
-                        value={formData.investment.targetCapital}
-                        onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
-                        error={formErrors['investment.targetCapital']}
-                      />
-                    </CollapsibleContent>
-                  </Collapsible>
+                        <div className="flex justify-end pt-4">
+                          <Button
+                            onClick={() => {
+                              if (isThesisSectionComplete()) {
+                                handleSectionComplete();
+                              } else {
+                                toast({
+                                  title: "Incomplete Section",
+                                  description: "Please fill in all required fields correctly.",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                            className="bg-gradient-to-r from-polygon-primary to-polygon-secondary hover:from-polygon-secondary hover:to-polygon-primary"
+                          >
+                            Done
+                          </Button>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="sections-list"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="space-y-6"
+                      >
+                        <button
+                          onClick={() => setActiveSection('thesis')}
+                          className="w-full text-left group space-y-1 p-4 rounded-lg hover:bg-white/5 transition-colors"
+                        >
+                          <h2 className="text-xl font-semibold text-white group-hover:text-white/90 flex items-center justify-between">
+                            Investment Thesis
+                            {isThesisSectionComplete() && (
+                              <span className="text-green-500">✓</span>
+                            )}
+                          </h2>
+                          <p className="text-sm text-white/60">
+                            Fill out your investment thesis details
+                          </p>
+                        </button>
 
-                  {/* ... keep existing code (other sections) */}
+                        {/* Other sections as buttons */}
+                        <button
+                          className="w-full text-left group space-y-1 p-4 rounded-lg hover:bg-white/5 transition-colors"
+                        >
+                          <h2 className="text-xl font-semibold text-white group-hover:text-white/90">
+                            Firm Details
+                          </h2>
+                          <p className="text-sm text-white/60">
+                            Specify your target firm criteria
+                          </p>
+                        </button>
+
+                        <button
+                          className="w-full text-left group space-y-1 p-4 rounded-lg hover:bg-white/5 transition-colors"
+                        >
+                          <h2 className="text-xl font-semibold text-white group-hover:text-white/90">
+                            Strategy Selection
+                          </h2>
+                          <p className="text-sm text-white/60">
+                            Select your post-acquisition strategies
+                          </p>
+                        </button>
+
+                        <button
+                          className="w-full text-left group space-y-1 p-4 rounded-lg hover:bg-white/5 transition-colors"
+                        >
+                          <h2 className="text-xl font-semibold text-white group-hover:text-white/90">
+                            Payment Terms
+                          </h2>
+                          <p className="text-sm text-white/60">
+                            Define your payment terms
+                          </p>
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </Card>
 
-              {/* Navigation */}
-              <div className="flex justify-end mt-6">
-                <Button
-                  onClick={handleContinue}
-                  disabled={isSubmitting}
-                  className={cn(
-                    "h-12 px-6 min-w-[200px]",
-                    "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
-                    "hover:from-polygon-secondary hover:to-polygon-primary",
-                    "text-white font-medium",
-                    "transition-all duration-300",
-                    "disabled:opacity-50",
-                    "flex items-center justify-center gap-2"
-                  )}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                      <span>Processing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Continue</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </Button>
-              </div>
+              {/* Navigation - only show when viewing all sections */}
+              {!activeSection && (
+                <div className="flex justify-end mt-6">
+                  <Button
+                    onClick={handleContinue}
+                    disabled={isSubmitting}
+                    className={cn(
+                      "h-12 px-6 min-w-[200px]",
+                      "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+                      "hover:from-polygon-secondary hover:to-polygon-primary",
+                      "text-white font-medium",
+                      "transition-all duration-300",
+                      "disabled:opacity-50",
+                      "flex items-center justify-center gap-2"
+                    )}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Continue</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Right Column - Wallet and Status */}
