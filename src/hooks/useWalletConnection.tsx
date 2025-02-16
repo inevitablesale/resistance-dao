@@ -1,5 +1,5 @@
 
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, useWalletConnectorEvent } from "@dynamic-labs/sdk-react-core";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ethers } from "ethers";
@@ -12,6 +12,37 @@ export const useWalletConnection = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
   const { toast } = useToast();
+  const walletConnectorEvent = useWalletConnectorEvent();
+
+  useEffect(() => {
+    const unsubscribe = walletConnectorEvent.subscribe((event) => {
+      console.log('Wallet event:', event);
+      switch (event.type) {
+        case 'connected':
+          toast({
+            title: "Wallet Connected",
+            description: "Your wallet has been successfully connected.",
+          });
+          break;
+        case 'disconnected':
+          toast({
+            title: "Wallet Disconnected",
+            description: "Your wallet has been disconnected.",
+          });
+          break;
+        case 'networkChanged':
+          toast({
+            title: "Network Changed",
+            description: "The network connection has been updated.",
+          });
+          break;
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [walletConnectorEvent, toast]);
 
   const connect = async () => {
     try {
@@ -19,6 +50,11 @@ export const useWalletConnection = () => {
       setShowAuthFlow?.(true);
     } catch (error) {
       console.error("Connection error:", error);
+      toast({
+        title: "Connection Failed",
+        description: error instanceof Error ? error.message : "Failed to connect wallet",
+        variant: "destructive"
+      });
     } finally {
       setIsConnecting(false);
     }
@@ -32,6 +68,11 @@ export const useWalletConnection = () => {
       }
     } catch (error) {
       console.error("Disconnect error:", error);
+      toast({
+        title: "Disconnect Failed",
+        description: error instanceof Error ? error.message : "Failed to disconnect wallet",
+        variant: "destructive"
+      });
     } finally {
       setIsConnecting(false);
     }
@@ -65,11 +106,18 @@ export const useWalletConnection = () => {
     return true;
   };
 
-  // Move the auth flow closing logic to useEffect
+  // Check wallet connection status
   useEffect(() => {
-    if (primaryWallet?.isConnected?.() && setShowAuthFlow) {
-      setShowAuthFlow(false);
-    }
+    const checkConnection = async () => {
+      if (primaryWallet?.isConnected) {
+        const isConnected = await primaryWallet.isConnected();
+        if (isConnected && setShowAuthFlow) {
+          setShowAuthFlow(false);
+        }
+      }
+    };
+
+    checkConnection();
   }, [primaryWallet, setShowAuthFlow]);
 
   return {
