@@ -660,7 +660,7 @@ const ThesisSubmission = () => {
                   size="sm"
                   className="bg-black/90 border-white/10 backdrop-blur-lg shadow-2xl text-white hover:bg-white/10 transition-colors"
                   onClick={() => {
-                    if (!primaryWallet?.address) {
+                    if (!isConnected) {
                       setShowAuthFlow?.(true);
                     } else {
                       setShowWalletOptions(true);
@@ -670,10 +670,10 @@ const ThesisSubmission = () => {
                   <div className="flex items-center gap-2">
                     <div className={cn(
                       "w-2 h-2 rounded-full",
-                      primaryWallet?.address ? "bg-green-500" : "bg-white/50"
+                      isConnected ? "bg-green-500" : "bg-white/50"
                     )} />
                     <span className="text-sm">
-                      {primaryWallet?.address ? 
+                      {isConnected ? 
                         `${tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR` : 
                         "Connect Wallet"
                       }
