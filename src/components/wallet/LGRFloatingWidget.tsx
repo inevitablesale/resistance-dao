@@ -173,7 +173,6 @@ export const LGRFloatingWidget = () => {
         </PopoverContent>
       </Popover>
 
-      {/* Purchase Confirmation Dialog */}
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogContent className="bg-black/95 border border-yellow-500/20">
           <DialogHeader>
@@ -191,7 +190,7 @@ export const LGRFloatingWidget = () => {
                 placeholder="Enter POLYGON amount"
                 value={purchaseAmount}
                 onChange={(e) => setPurchaseAmount(e.target.value)}
-                className="bg-black/50 border border-yellow-500/20"
+                className="bg-black/50 border border-yellow-500/20 text-white placeholder:text-gray-500"
               />
             </div>
             
