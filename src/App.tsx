@@ -50,6 +50,13 @@ const dynamicSettings = {
     EthereumWalletConnectors,
     ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
   ],
+  walletConnectorOptions: {
+    smartWallet: {
+      enableHD: true,
+      recoveryMethods: ['email', 'social', 'passkey'],
+      separateGenerationStep: true
+    }
+  },
   eventsCallbacks: {
     onAuthSuccess: (args: any) => {
       console.log("[Dynamic SDK] Auth Success:", args);
