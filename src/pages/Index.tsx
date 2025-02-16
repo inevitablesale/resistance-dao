@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
 import { ReclaimControl } from "@/components/ReclaimControl";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -11,7 +11,6 @@ import { Partners } from "@/components/Partners";
 import { FAQ } from "@/components/FAQ";
 import { useNavigate } from "react-router-dom";
 import { WalletInfo } from "@/components/WalletInfo";
-import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2, Calculator, Clock, Calendar, DollarSign, BookOpen, BarChart2, Briefcase } from "lucide-react";
@@ -145,17 +144,100 @@ const IndexContent = () => {
   const [maticPrice, setMaticPrice] = useState<string>("Loading...");
 
   useEffect(() => {
-    setTimeout(() => setIsLoaded(true), 100);
+    const timer = setTimeout(() => setIsLoaded(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    const fetchMaticPrice = async () => {
-      const price = await fetchPresaleMaticPrice();
-      setMaticPrice(price);
+    const fetchPrice = async () => {
+      try {
+        const price = await fetchPresaleMaticPrice();
+        setMaticPrice(price);
+      } catch (error) {
+        console.error('Error fetching MATIC price:', error);
+      }
     };
-    fetchMaticPrice();
-    const interval = setInterval(fetchMaticPrice, 30000);
+    
+    fetchPrice();
+    const interval = setInterval(fetchPrice, 30000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    let ticking = false;
+    
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (!heroRef.current || !presaleRef.current) return;
+          
+          const presaleRect = presaleRef.current.getBoundingClientRect();
+          const presaleVisibility = Math.max(0, Math.min(1, 
+            1 - (presaleRect.top / window.innerHeight)
+          ));
+          
+          const scrollingUpAdjustment = Math.max(0, Math.min(1,
+            1 - (Math.abs(presaleRect.bottom) / window.innerHeight)
+          ));
+          
+          setScrollProgress(Math.min(presaleVisibility, scrollingUpAdjustment));
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const circuitBoard = document.querySelector('.circuit-board');
+    if (!circuitBoard) return;
+
+    const nodes = Array.from({ length: 5 }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      type: Math.random() > 0.5 ? 'yellow' : 'teal'
+    }));
+
+    const dataPoints = Array.from({ length: 10 }, () => ({
+      startX: Math.random() * 100,
+      startY: Math.random() * 100,
+      endX: Math.random() * 100,
+      endY: Math.random() * 100,
+      type: Math.random() > 0.5 ? 'yellow' : 'teal',
+      delay: Math.random() * 2
+    }));
+
+    const fragment = document.createDocumentFragment();
+
+    nodes.forEach(node => {
+      const nodeElement = document.createElement('div');
+      nodeElement.className = `circuit-node ${node.type}`;
+      nodeElement.style.left = `${node.x}%`;
+      nodeElement.style.top = `${node.y}%`;
+      fragment.appendChild(nodeElement);
+    });
+
+    dataPoints.forEach(point => {
+      const pointElement = document.createElement('div');
+      pointElement.className = `data-point ${point.type}`;
+      pointElement.style.left = `${point.startX}%`;
+      pointElement.style.top = `${point.startY}%`;
+      pointElement.style.setProperty('--flow-x', `${point.endX - point.startX}%`);
+      pointElement.style.setProperty('--flow-y', `${point.endY - point.startY}%`);
+      pointElement.style.animationDelay = `${point.delay}s`;
+      fragment.appendChild(pointElement);
+    });
+
+    circuitBoard.appendChild(fragment);
+
+    return () => {
+      while (circuitBoard.firstChild) {
+        circuitBoard.removeChild(circuitBoard.firstChild);
+      }
+    };
   }, []);
 
   const handleBuyToken = () => {
@@ -171,88 +253,11 @@ const IndexContent = () => {
     setShowOnRamp?.(true);
   };
 
-  const handleScroll = () => {
-    if (!heroRef.current || !presaleRef.current) return;
-    
-    const presaleRect = presaleRef.current.getBoundingClientRect();
-    
-    const presaleVisibility = Math.max(0, Math.min(1, 
-      1 - (presaleRect.top / window.innerHeight)
-    ));
-    
-    const scrollingUpAdjustment = Math.max(0, Math.min(1,
-      1 - (Math.abs(presaleRect.bottom) / window.innerHeight)
-    ));
-    
-    setScrollProgress(Math.min(presaleVisibility, scrollingUpAdjustment));
-  };
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   const parallaxStyle = {
     '--scroll-progress': scrollProgress,
     transform: `scale(${1 + scrollProgress * 0.5})`,
     opacity: 1 - scrollProgress * 0.6
   } as React.CSSProperties;
-
-  useEffect(() => {
-    const createNodes = () => {
-      const nodes = [];
-      for (let i = 0; i < 5; i++) {
-        nodes.push({
-          x: Math.random() * 100,
-          y: Math.random() * 100,
-          type: Math.random() > 0.5 ? 'yellow' : 'teal'
-        });
-      }
-      return nodes;
-    };
-
-    const createDataPoints = () => {
-      const points = [];
-      for (let i = 0; i < 10; i++) {
-        points.push({
-          startX: Math.random() * 100,
-          startY: Math.random() * 100,
-          endX: Math.random() * 100,
-          endY: Math.random() * 100,
-          type: Math.random() > 0.5 ? 'yellow' : 'teal',
-          delay: Math.random() * 2
-        });
-      }
-      return points;
-    };
-
-    const nodes = createNodes();
-    const dataPoints = createDataPoints();
-
-    // Add nodes to the circuit board
-    const circuitBoard = document.querySelector('.circuit-board');
-    if (circuitBoard) {
-      nodes.forEach(node => {
-        const nodeElement = document.createElement('div');
-        nodeElement.className = `circuit-node ${node.type}`;
-        nodeElement.style.left = `${node.x}%`;
-        nodeElement.style.top = `${node.y}%`;
-        circuitBoard.appendChild(nodeElement);
-      });
-
-      // Add data points
-      dataPoints.forEach(point => {
-        const pointElement = document.createElement('div');
-        pointElement.className = `data-point ${point.type}`;
-        pointElement.style.left = `${point.startX}%`;
-        pointElement.style.top = `${point.startY}%`;
-        pointElement.style.setProperty('--flow-x', `${point.endX - point.startX}%`);
-        pointElement.style.setProperty('--flow-y', `${point.endY - point.startY}%`);
-        pointElement.style.animationDelay = `${point.delay}s`;
-        circuitBoard.appendChild(pointElement);
-      });
-    }
-  }, []);
 
   return (
     <>
