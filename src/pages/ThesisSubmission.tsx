@@ -25,12 +25,14 @@ import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTe
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+
 interface SubmissionStep {
   id: string;
   title: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   description: string;
 }
+
 interface StoredProposal {
   hash: string;
   ipfsHash: string;
@@ -39,6 +41,7 @@ interface StoredProposal {
   targetCapital: string;
   status: 'pending' | 'completed' | 'failed';
 }
+
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const FACTORY_ABI = ["function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)", "function submissionFee() public view returns (uint256)", "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"];
@@ -51,6 +54,7 @@ const VOTING_FEE = ethers.utils.parseEther("10");
 const MAX_STRATEGIES_PER_CATEGORY = 3;
 const MAX_SUMMARY_LENGTH = 500;
 const MAX_PAYMENT_TERMS = 5;
+
 interface ProposalMetadata {
   title: string;
   firmCriteria: {
@@ -71,12 +75,15 @@ interface ProposalMetadata {
     additionalCriteria: string;
   };
 }
+
 interface ProposalConfig {
   targetCapital: ethers.BigNumber;
   votingDuration: number;
   ipfsHash: string;
 }
+
 const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
+
 const SUBMISSION_STEPS: SubmissionStep[] = [{
   id: 'thesis',
   title: 'Investment Thesis',
@@ -98,6 +105,7 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
   status: 'pending',
   description: 'Submit your thesis to the blockchain'
 }];
+
 const ThesisSubmission = () => {
   const {
     toast
@@ -144,28 +152,33 @@ const ThesisSubmission = () => {
       additionalCriteria: ""
     }
   });
-  const [isThesisOpen, setIsThesisOpen] = useState(true);
+  const [isThesisOpen, setIsThesisOpen] = useState(false);
   const [isStrategyOpen, setIsStrategyOpen] = useState(false);
   const [isApprovalOpen, setIsApprovalOpen] = useState(false);
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
+
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => step.id === stepId ? {
       ...step,
       status
     } : step));
   };
+
   const validateStrategies = (category: keyof typeof formData.strategies) => {
     const strategies = formData.strategies[category];
     if (!Array.isArray(strategies)) return false;
     return strategies.length <= MAX_STRATEGIES_PER_CATEGORY;
   };
+
   const validatePaymentTerms = () => {
     if (!Array.isArray(formData.paymentTerms)) return false;
     return formData.paymentTerms.length <= 5;
   };
+
   const handleStrategyChange = (category: "operational" | "growth" | "integration", value: string[]) => {
     handleFormDataChange(`strategies.${category}`, value);
   };
+
   const handleFormDataChange = (field: string, value: any) => {
     setFormData(prev => {
       const newData = {
@@ -185,9 +198,11 @@ const ThesisSubmission = () => {
       return newData;
     });
   };
+
   const handleVotingDurationChange = (value: number[]) => {
     setVotingDuration(value[0]);
   };
+
   const getButtonText = () => {
     if (isSubmitting) {
       return <div className="flex items-center justify-center">
@@ -206,6 +221,7 @@ const ThesisSubmission = () => {
         return "Continue";
     }
   };
+
   const validateBasicsTab = (): boolean => {
     const errors: Record<string, string[]> = {};
     if (!formData.title || formData.title.trim().length < 10) {
@@ -235,6 +251,7 @@ const ThesisSubmission = () => {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
+
   const validateFirmTab = (): boolean => {
     const errors: Record<string, string[]> = {};
     if (!formData.firmCriteria.size) {
@@ -252,6 +269,7 @@ const ThesisSubmission = () => {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
+
   const validateStrategyTab = (): boolean => {
     const errors: Record<string, string[]> = {};
     if (!formData.strategies.operational.length) {
@@ -269,6 +287,7 @@ const ThesisSubmission = () => {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
+
   const validateTermsTab = (): boolean => {
     const errors: Record<string, string[]> = {};
     if (!formData.paymentTerms.length) {
@@ -280,6 +299,7 @@ const ThesisSubmission = () => {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
+
   const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
     let isValid = false;
     switch (activeStep) {
@@ -308,6 +328,7 @@ const ThesisSubmission = () => {
       });
     }
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isConnected) {
@@ -420,6 +441,7 @@ const ThesisSubmission = () => {
       setIsSubmitting(false);
     }
   };
+
   return <div className="min-h-screen bg-[#030712]">
       <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10" />
       <div className="fixed inset-0 bg-gradient-to-b from-[#030712] via-[#0F172A] to-[#030712]" />
@@ -652,4 +674,5 @@ const ThesisSubmission = () => {
       </main>
     </div>;
 };
+
 export default ThesisSubmission;
