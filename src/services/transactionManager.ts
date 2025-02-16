@@ -72,8 +72,13 @@ export const executeTransaction = async (
     }
   });
 
-  if (!result.success || !result.transaction) {
-    throw result.error || new Error('Transaction failed');
+  if (!result.success) {
+    throw new ProposalError({
+      category: 'transaction',
+      message: 'Transaction failed',
+      recoverySteps: ['Please try again', 'Check your wallet connection'],
+      technicalDetails: result.error.message
+    });
   }
 
   return result.transaction;

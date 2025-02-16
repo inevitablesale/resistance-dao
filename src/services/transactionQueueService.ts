@@ -22,7 +22,7 @@ interface TransactionSuccess {
 
 interface TransactionFailure {
   success: false;
-  error: Error;
+  error: ProposalError;
 }
 
 export type TransactionResult = TransactionSuccess | TransactionFailure;
@@ -85,9 +85,14 @@ class TransactionQueueService {
         tx.hash = result.transaction.hash;
         this.notifyUpdate(tx);
         return result;
-      } else {
-        throw result.error;
       }
+
+      // If we get here, it's a failure result
+      tx.status = 'failed';
+      tx.error = result.error.message;
+      this.notifyUpdate(tx);
+      return result;
+      
     } catch (error: any) {
       console.error(`Transaction ${id} failed:`, error);
       
