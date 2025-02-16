@@ -5,7 +5,7 @@ export const useCustomWallet = () => {
   const { primaryWallet, user } = useDynamicContext();
 
   return {
-    isConnected: !!primaryWallet?.address,
+    isConnected: !!primaryWallet?.address && primaryWallet?.isConnected?.(),
     address: primaryWallet?.address,
     user
   };

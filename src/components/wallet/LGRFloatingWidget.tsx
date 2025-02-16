@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -30,16 +31,32 @@ export const LGRFloatingWidget = () => {
 
       try {
         const provider = await getWorkingProvider();
-        const [lgrContract, presaleContract, maticBal] = await Promise.all([
+        if (!provider) {
+          console.error("No provider available");
+          return;
+        }
+
+        console.log("Provider obtained:", provider);
+
+        const [lgrContract, presaleContract] = await Promise.all([
           getLgrTokenContract(provider),
-          getPresaleContract(provider),
-          provider.getBalance(address)
+          getPresaleContract(provider)
         ]);
+
+        console.log("Contracts initialized");
+
+        // Get MATIC balance
+        const maticBal = await provider.getBalance(address);
+        console.log("MATIC balance fetched:", maticBal.toString());
         
+        // Get LGR balance and purchased tokens
         const [lgrBal, purchased] = await Promise.all([
           lgrContract.balanceOf(address),
           presaleContract.purchasedTokens(address)
         ]);
+        
+        console.log("LGR balance:", lgrBal.toString());
+        console.log("Purchased tokens:", purchased.toString());
         
         setLgrBalance(ethers.utils.formatUnits(lgrBal, 18));
         setPurchasedTokens(ethers.utils.formatUnits(purchased, 18));
@@ -53,9 +70,12 @@ export const LGRFloatingWidget = () => {
       }
     };
 
-    fetchBalances();
-    const interval = setInterval(fetchBalances, 30000);
-    return () => clearInterval(interval);
+    if (address) {
+      console.log("Fetching balances for address:", address);
+      fetchBalances();
+      const interval = setInterval(fetchBalances, 30000);
+      return () => clearInterval(interval);
+    }
   }, [address]);
 
   const handleBuyMatic = () => {
@@ -76,9 +96,11 @@ export const LGRFloatingWidget = () => {
 
     try {
       const provider = await getWorkingProvider();
-      const signer = provider.getSigner(address);
+      if (!provider) {
+        throw new Error("No provider available");
+      }
       
-      const result = await purchaseTokens(signer, purchaseAmount);
+      const result = await purchaseTokens(provider, purchaseAmount);
       
       toast({
         title: "Purchase Successful",
