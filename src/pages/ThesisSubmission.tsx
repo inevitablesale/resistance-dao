@@ -237,20 +237,106 @@ const ThesisSubmission = () => {
     }
   };
 
+  const validateBasicsTab = (): boolean => {
+    const errors: Record<string, string[]> = {};
+    
+    if (!formData.title || formData.title.trim().length < 10) {
+      errors.title = ['Title must be at least 10 characters long'];
+    }
+
+    if (!formData.investment.targetCapital || !/^\d+(\.\d{1,2})?$/.test(formData.investment.targetCapital)) {
+      errors['investment.targetCapital'] = ['Please enter a valid target capital amount'];
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateFirmTab = (): boolean => {
+    const errors: Record<string, string[]> = {};
+    
+    if (!formData.industry.focus) {
+      errors['industry.focus'] = ['Please select an industry focus'];
+    }
+    if (formData.industry.focus === 'other' && !formData.industry.other) {
+      errors['industry.other'] = ['Please specify the industry'];
+    }
+    if (!formData.firmCriteria.size) {
+      errors['firmCriteria.size'] = ['Please select a firm size'];
+    }
+    if (!formData.firmCriteria.location) {
+      errors['firmCriteria.location'] = ['Please select a location'];
+    }
+    if (!formData.firmCriteria.dealType) {
+      errors['firmCriteria.dealType'] = ['Please select a deal type'];
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateStrategyTab = (): boolean => {
+    const errors: Record<string, string[]> = {};
+    
+    if (!formData.strategies.operational.length) {
+      errors['strategies.operational'] = ['Please select at least one operational strategy'];
+    }
+    if (!formData.strategies.growth.length) {
+      errors['strategies.growth'] = ['Please select at least one growth strategy'];
+    }
+    if (!formData.strategies.integration.length) {
+      errors['strategies.integration'] = ['Please select at least one integration strategy'];
+    }
+    if (!formData.investment.drivers || formData.investment.drivers.trim().length < 50) {
+      errors['investment.drivers'] = ['Investment drivers must be at least 50 characters long'];
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateTermsTab = (): boolean => {
+    const errors: Record<string, string[]> = {};
+    
+    if (!formData.paymentTerms.length) {
+      errors.paymentTerms = ['Please select at least one payment term'];
+    }
+    if (formData.paymentTerms.length > MAX_PAYMENT_TERMS) {
+      errors.paymentTerms = [`Maximum of ${MAX_PAYMENT_TERMS} payment terms allowed`];
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
+    let isValid = false;
+
     switch (activeTab) {
       case 'basics':
-        setActiveTab('firm');
+        isValid = validateBasicsTab();
+        if (isValid) setActiveTab('firm');
         break;
       case 'firm':
-        setActiveTab('strategy');
+        isValid = validateFirmTab();
+        if (isValid) setActiveTab('strategy');
         break;
       case 'strategy':
-        setActiveTab('terms');
+        isValid = validateStrategyTab();
+        if (isValid) setActiveTab('terms');
         break;
       case 'terms':
-        handleSubmit(e);
+        isValid = validateTermsTab();
+        if (isValid) handleSubmit(e);
         break;
+    }
+
+    if (!isValid) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields correctly before proceeding.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -484,7 +570,7 @@ const ThesisSubmission = () => {
 
                 <div className="mt-6">
                   <TabsContent value="basics" className="m-0">
-                    <Card className="bg-black/40 border-white/10 text-white placeholder:text-gray-500">
+                    <Card className="bg-black/40 border-white/10 text-white">
                       <div className="p-6 space-y-6">
                         <div>
                           <label className="text-lg font-medium text-white mb-2 block">
