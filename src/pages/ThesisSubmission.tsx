@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
@@ -5,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useToast } from "@/hooks/use-toast";
 import { ethers } from "ethers";
-import { Form } from "@/components/ui/form";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
 import { LGRWalletDisplay } from "@/components/thesis/LGRWalletDisplay";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -16,12 +16,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import { executeTransaction } from "@/services/transactionManager";
 import { getThesisContract } from "@/services/thesisContractService";
 
@@ -35,7 +35,7 @@ const formSchema = z.object({
     message: "Description must be at least 10 characters.",
   }),
   link: z.string().url({ message: "Please enter a valid URL." }),
-})
+});
 
 export default function ThesisSubmission() {
   const { isConnected, approveLGR } = useWalletConnection();
@@ -51,7 +51,7 @@ export default function ThesisSubmission() {
       description: "",
       link: "",
     },
-  })
+  });
 
   const handleRentAdSpace = async (duration: 'week' | 'month') => {
     try {
@@ -97,6 +97,8 @@ export default function ThesisSubmission() {
           type: 'contract',
           description: 'Submitting Thesis',
           timeout: 300000,
+          maxRetries: 3,
+          backoffMs: 5000
         }
       );
 
@@ -207,7 +209,7 @@ export default function ThesisSubmission() {
 
               <LGRWalletDisplay
                 submissionFee={SUBMISSION_FEE.toString()}
-                currentBalance={primaryWallet?.balances?.LGR}
+                currentBalance={primaryWallet?.address ? "0" : undefined} // We'll fetch the actual balance in the component
                 walletAddress={primaryWallet?.address}
               />
 
