@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -7,30 +8,42 @@ import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import Nav from "@/components/Nav";
-import { ArrowRight, Wallet, Copy, Check, ExternalLink, Coins } from "lucide-react";
+import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useTokenBalances, useDynamicContext, useOnramp } from "@dynamic-labs/sdk-react-core";
-import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
+import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
 import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
-import { validateIPFSHash } from "@/services/proposalValidationService";
+import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
+import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
+import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
+import { LGRWalletDisplay } from "@/components/thesis/LGRWalletDisplay";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { motion } from "framer-motion";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { StoredProposal } from "@/types/proposals";
-import { AnimatePresence } from "framer-motion";
+import type { SubmissionStep } from "@/components/thesis/SubmissionProgress";
 
-interface SubmissionStep {
-  id: string;
-  title: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  description: string;
-}
+const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
+const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
+const FACTORY_ABI = [
+  "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
+  "function submissionFee() public view returns (uint256)",
+  "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"
+];
+
+const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
+const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
+const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
+const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
+const SUBMISSION_FEE = ethers.utils.parseEther("250");
+const VOTING_FEE = ethers.utils.parseEther("10");
+const MAX_STRATEGIES_PER_CATEGORY = 3;
+const MAX_SUMMARY_LENGTH = 500;
+const MAX_PAYMENT_TERMS = 5;
 
 interface ProposalMetadata {
   title: string;
@@ -59,24 +72,6 @@ interface ProposalConfig {
   ipfsHash: string;
 }
 
-const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
-const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
-const FACTORY_ABI = [
-  "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
-  "function submissionFee() public view returns (uint256)",
-  "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"
-];
-
-const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
-const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
-const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
-const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
-const SUBMISSION_FEE = ethers.utils.parseEther("250");
-const VOTING_FEE = ethers.utils.parseEther("10");
-const MAX_STRATEGIES_PER_CATEGORY = 3;
-const MAX_SUMMARY_LENGTH = 500;
-const MAX_PAYMENT_TERMS = 5;
-
 const US_STATES = [
   "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
   "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", 
@@ -96,12 +91,6 @@ const SUBMISSION_STEPS: SubmissionStep[] = [
     description: 'Fill out your investment thesis details'
   },
   {
-    id: 'firm',
-    title: 'Firm Details',
-    status: 'pending',
-    description: 'Select your firm criteria'
-  },
-  {
     id: 'strategy',
     title: 'Strategy Selection',
     status: 'pending',
@@ -112,11 +101,16 @@ const SUBMISSION_STEPS: SubmissionStep[] = [
     title: 'Token Approval',
     status: 'pending',
     description: 'Approve LGR tokens for submission'
+  },
+  {
+    id: 'submission',
+    title: 'Thesis Submission',
+    status: 'pending',
+    description: 'Submit your thesis to the blockchain'
   }
 ];
 
 const ThesisSubmission = () => {
-  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
   const { tokenBalances } = useTokenBalances({
@@ -153,10 +147,6 @@ const ThesisSubmission = () => {
       additionalCriteria: ""
     }
   });
-
-  const [showWalletOptions, setShowWalletOptions] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const { enabled, open } = useOnramp();
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => 
@@ -354,7 +344,7 @@ const ThesisSubmission = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!primaryWallet?.address) {
+    if (!isConnected) {
       toast({
         title: "Connect Wallet",
         description: "Please connect your wallet to submit a thesis",
@@ -473,129 +463,69 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleCopyAddress = async () => {
-    if (!primaryWallet?.address) return;
-    
-    try {
-      await navigator.clipboard.writeText(primaryWallet?.address);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      
-      toast({
-        title: "Address Copied",
-        description: "Wallet address copied to clipboard"
-      });
-    } catch (error) {
-      toast({
-        title: "Copy Failed",
-        description: "Failed to copy address to clipboard",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleBuyPolygon = async () => {
-    if (!primaryWallet?.address) {
-      setShowAuthFlow?.(true);
-      return;
-    }
-
-    if (!enabled) {
-      toast({
-        title: "Onramp Not Available",
-        description: "The onramp service is currently not available",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      await open({
-        onrampProvider: OnrampProviders.Banxa,
-        token: 'MATIC',
-        address: primaryWallet?.address,
-      });
-      
-      toast({
-        title: "Purchase Initiated",
-        description: "Your MATIC purchase has been initiated successfully",
-      });
-    } catch (error) {
-      console.error("Onramp error:", error);
-      toast({
-        title: "Purchase Failed",
-        description: error instanceof Error ? error.message : "Failed to initiate purchase",
-        variant: "destructive"
-      });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#030712]">
-      <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-5" />
+      <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10" />
       <div className="fixed inset-0 bg-gradient-to-b from-[#030712] via-[#0F172A] to-[#030712]" />
       
       <Nav />
       
       <main className="relative z-10 pt-28 pb-20 min-h-screen">
-        <div className="container px-4 mx-auto max-w-3xl">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12 text-center"
-          >
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
-              Submit Your Investment Thesis
-            </h1>
-            <p className="text-lg text-white/70 max-w-2xl mx-auto">
-              Share your strategy with the DAO and start earning returns
-            </p>
-          </motion.div>
-
+        <div className="container px-4 mx-auto max-w-[1200px]">
+          {/* Top Section with Progress */}
           <div className="mb-8">
-            <div className="flex justify-between items-center text-sm text-white/60 max-w-[600px] mx-auto">
-              {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
-                  <div className="flex items-center">
-                    <div className={cn(
-                      "w-2 h-2 rounded-full transition-all duration-300",
-                      step.id === activeStep ? "bg-yellow-500 w-4" : 
-                      steps.findIndex(s => s.id === activeStep) > index ? "bg-yellow-300" : 
-                      "bg-white/20"
-                    )} />
-                    <span className={cn(
-                      "ml-2 text-sm font-medium transition-colors whitespace-nowrap",
-                      step.id === activeStep ? "text-yellow-500" : "text-white/60"
-                    )}>
-                      {step.title}
-                    </span>
-                  </div>
-                  {index < steps.length - 1 && (
-                    <div className={cn(
-                      "h-[1px] w-12 mx-4",
-                      steps.findIndex(s => s.id === activeStep) > index ? "bg-yellow-300" : "bg-white/20"
-                    )} />
-                  )}
-                </div>
-              ))}
-            </div>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-2xl"
+            >
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+                Submit Your Investment Thesis
+              </h1>
+              <p className="text-lg text-white/70">
+                Share your strategy with the DAO and start earning returns
+              </p>
+            </motion.div>
           </div>
 
-          <div className="relative">
-            <Card className="bg-black/40 border-white/10 backdrop-blur-sm overflow-hidden">
-              <div className="p-6 lg:p-8">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeStep}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="space-y-8"
-                  >
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Main Form Column */}
+            <div className="lg:col-span-8 space-y-6">
+              {/* Progress Steps - Mobile Only */}
+              <div className="lg:hidden">
+                <Card className="bg-black/40 border-white/5 backdrop-blur-sm p-4">
+                  <SubmissionProgress 
+                    steps={steps}
+                    currentStepId={activeStep}
+                  />
+                </Card>
+              </div>
+
+              {/* Current Step Form */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
+                  {/* Step Header */}
+                  <div className="px-6 py-4 border-b border-white/5 bg-white/5">
+                    <h2 className="text-xl font-semibold text-white">
+                      {activeStep === 'thesis' && "Thesis Details"}
+                      {activeStep === 'strategy' && "Investment Strategy"}
+                      {activeStep === 'submission' && "Review & Submit"}
+                      {activeStep === 'approval' && "Final Approval"}
+                    </h2>
+                  </div>
+
+                  {/* Step Content */}
+                  <div className="p-6">
                     {activeStep === 'thesis' && (
                       <div className="space-y-8">
                         <div className="space-y-4">
-                          <Label className="text-lg font-medium text-white">Thesis Title</Label>
+                          <Label className="text-lg font-medium text-white">
+                            Thesis Title
+                          </Label>
                           <Input
                             placeholder="Enter a clear, descriptive title"
                             className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
@@ -621,7 +551,7 @@ const ThesisSubmission = () => {
                       </div>
                     )}
 
-                    {activeStep === 'firm' && (
+                    {activeStep === 'strategy' && (
                       <FirmCriteriaSection 
                         formData={formData}
                         formErrors={formErrors}
@@ -629,7 +559,7 @@ const ThesisSubmission = () => {
                       />
                     )}
 
-                    {activeStep === 'strategy' && (
+                    {activeStep === 'submission' && (
                       <StrategiesSection 
                         formData={formData}
                         formErrors={formErrors}
@@ -644,158 +574,81 @@ const ThesisSubmission = () => {
                         onChange={handleFormDataChange}
                       />
                     )}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </Card>
-
-            <div className="fixed bottom-6 right-6 z-50">
-              <motion.div
-                initial={{ y: 100, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-black/90 border-white/10 backdrop-blur-lg shadow-2xl text-white hover:bg-white/10 transition-colors"
-                  onClick={() => {
-                    if (!isConnected) {
-                      setShowAuthFlow?.(true);
-                    } else {
-                      setShowWalletOptions(true);
-                    }
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={cn(
-                      "w-2 h-2 rounded-full",
-                      isConnected ? "bg-green-500" : "bg-white/50"
-                    )} />
-                    <span className="text-sm">
-                      {isConnected ? 
-                        `${tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR` : 
-                        "Connect Wallet"
-                      }
-                    </span>
-                  </div>
-                </Button>
-              </motion.div>
-            </div>
-
-            <div className="mt-6 flex justify-end">
-              <Button
-                onClick={handleContinue}
-                disabled={isSubmitting}
-                className={cn(
-                  "h-12 px-6",
-                  "bg-gradient-to-r from-yellow-500 to-yellow-300",
-                  "hover:from-yellow-300 hover:to-yellow-500",
-                  "text-white font-medium",
-                  "transition-all duration-300",
-                  "disabled:opacity-50",
-                  "flex items-center justify-center gap-2"
-                )}
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>
-                      {activeStep === 'approval' ? "Submit Thesis" : "Continue"}
-                    </span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </Button>
-            </div>
-
-            {currentTxId && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="fixed bottom-20 right-6 z-50 w-full max-w-sm"
-              >
-                <Card className="bg-black/90 border-white/10 backdrop-blur-lg shadow-2xl">
-                  <div className="p-4">
-                    <TransactionStatus
-                      transactionId={currentTxId}
-                      onComplete={() => setCurrentTxId(null)}
-                      onError={(error) => {
-                        toast({
-                          title: "Transaction Failed",
-                          description: error,
-                          variant: "destructive"
-                        });
-                      }}
-                    />
                   </div>
                 </Card>
+
+                {/* Navigation Button */}
+                <div className="flex justify-end">
+                  <Button
+                    onClick={handleContinue}
+                    disabled={isSubmitting}
+                    className={cn(
+                      "h-12 px-6 min-w-[200px]",
+                      "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+                      "hover:from-polygon-secondary hover:to-polygon-primary",
+                      "text-white font-medium",
+                      "transition-all duration-300",
+                      "disabled:opacity-50",
+                      "flex items-center justify-center gap-2"
+                    )}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>
+                          {activeStep === 'approval' ? "Submit Thesis" : "Continue"}
+                        </span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </Button>
+                </div>
               </motion.div>
-            )}
+            </div>
+
+            {/* Side Column - Desktop Only */}
+            <div className="hidden lg:block lg:col-span-4 space-y-6">
+              {/* Progress Card */}
+              <Card className="bg-black/40 border-white/5 backdrop-blur-sm p-6">
+                <SubmissionProgress 
+                  steps={steps}
+                  currentStepId={activeStep}
+                />
+              </Card>
+
+              {/* Wallet Info */}
+              <Card className="bg-black/40 border-white/5 backdrop-blur-sm p-6">
+                <LGRWalletDisplay 
+                  submissionFee={SUBMISSION_FEE.toString()}
+                  currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
+                  walletAddress={address}
+                />
+              </Card>
+
+              {/* Transaction Status */}
+              {currentTxId && (
+                <Card className="bg-black/40 border-white/5 backdrop-blur-sm p-6">
+                  <TransactionStatus
+                    transactionId={currentTxId}
+                    onComplete={() => setCurrentTxId(null)}
+                    onError={(error) => {
+                      toast({
+                        title: "Transaction Failed",
+                        description: error,
+                        variant: "destructive"
+                      });
+                    }}
+                  />
+                </Card>
+              )}
+            </div>
           </div>
         </div>
       </main>
-
-      <Dialog open={showWalletOptions} onOpenChange={setShowWalletOptions}>
-        <DialogContent className="bg-black/95 border-white/10 backdrop-blur-lg">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-white">Wallet Options</DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="p-4 bg-white/5 rounded-lg space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-white/70">LGR Balance</span>
-                <span className="text-lg font-bold text-white">
-                  {tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-white/70">MATIC Balance</span>
-                <span className="text-lg font-bold text-white">
-                  {tokenBalances?.find(token => token.symbol === "MATIC")?.balance?.toString() || "0"} MATIC
-                </span>
-              </div>
-            </div>
-
-            <div className="grid gap-2">
-              <Button
-                variant="outline"
-                className="w-full bg-white/5 text-white hover:bg-white/10 flex items-center justify-between"
-                onClick={handleCopyAddress}
-              >
-                <span>Copy Address</span>
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 flex items-center justify-between"
-                onClick={handleBuyPolygon}
-              >
-                <span>Buy MATIC</span>
-                <ExternalLink className="w-4 h-4" />
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30 flex items-center justify-between"
-                onClick={() => {
-                  setShowWalletOptions(false);
-                  // Add LGR purchase logic here
-                }}
-              >
-                <span>Buy LGR</span>
-                <Coins className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
