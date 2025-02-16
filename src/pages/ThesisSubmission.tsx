@@ -244,8 +244,27 @@ const ThesisSubmission = () => {
       errors.title = ['Title must be at least 10 characters long'];
     }
 
-    if (!formData.investment.targetCapital || !/^\d+(\.\d{1,2})?$/.test(formData.investment.targetCapital)) {
-      errors['investment.targetCapital'] = ['Please enter a valid target capital amount'];
+    if (!formData.investment.targetCapital) {
+      errors['investment.targetCapital'] = ['Target capital is required'];
+    } else {
+      try {
+        const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
+        if (targetCapitalWei.lt(MIN_TARGET_CAPITAL)) {
+          errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} ETH`];
+        }
+        if (targetCapitalWei.gt(MAX_TARGET_CAPITAL)) {
+          errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} ETH`];
+        }
+      } catch (error) {
+        errors['investment.targetCapital'] = ['Invalid target capital amount'];
+      }
+    }
+
+    if (votingDuration < MIN_VOTING_DURATION) {
+      errors.votingDuration = ['Minimum voting duration is 7 days'];
+    }
+    if (votingDuration > MAX_VOTING_DURATION) {
+      errors.votingDuration = ['Maximum voting duration is 90 days'];
     }
 
     setFormErrors(errors);
@@ -384,41 +403,40 @@ const ThesisSubmission = () => {
       updateStepStatus('approval', 'processing');
       setCurrentStep('approval');
 
-      // Validate proposal metadata
-      const validationResult = validateProposalMetadata(formData);
-      if (!validationResult.isValid) {
-        setFormErrors(validationResult.errors);
-        toast({
-          title: "Validation Error",
-          description: "Please fix the highlighted fields",
-          variant: "destructive"
-        });
-        return;
-      }
-
       // Get contract status and validate
       if (!wallet) {
         throw new Error("No wallet connected");
       }
+
       const contractStatus = await getContractStatus(wallet);
       
       if (contractStatus.isPaused) {
         toast({
           title: "Contract Paused",
-          description: "The contract is currently paused for maintenance",
+          description: "The contract is currently paused for maintenance. Please try again later.",
           variant: "destructive"
         });
         return;
       }
 
-      // Approve LGR tokens
+      // Validate all form fields against contract requirements
+      const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
+      if (targetCapitalWei.lt(contractStatus.minTargetCapital) || targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
+        throw new Error("Target capital out of allowed range");
+      }
+
+      if (votingDuration < contractStatus.minVotingDuration || votingDuration > contractStatus.maxVotingDuration) {
+        throw new Error("Voting duration out of allowed range");
+      }
+
+      // Approve LGR tokens with exact amount from contract
       console.log('Approving LGR tokens for submission...');
       const submissionFeeApproval = await approveLGR(contractStatus.submissionFee.toString());
       if (!submissionFeeApproval) {
         updateStepStatus('approval', 'failed');
         toast({
           title: "Approval Failed",
-          description: "Failed to approve LGR tokens for submission",
+          description: "Failed to approve LGR tokens for submission. Please try again.",
           variant: "destructive"
         });
         return;
@@ -434,40 +452,20 @@ const ThesisSubmission = () => {
       const ipfsHash = ipfsUri.replace('ipfs://', '');
       
       if (!validateIPFSHash(ipfsHash)) {
-        updateStepStatus('submission', 'failed');
-        toast({
-          title: "IPFS Error",
-          description: "Failed to upload metadata to IPFS",
-          variant: "destructive"
-        });
-        return;
+        throw new Error("Invalid IPFS hash format");
       }
-      console.log('Metadata uploaded to IPFS:', ipfsHash);
 
-      // Convert targetCapital to BigNumber
-      const targetCapitalString = formData.investment.targetCapital;
-      const targetCapital = ethers.utils.parseEther(targetCapitalString);
-      
-      const paramValidation = validateContractParameters(
-        { targetCapital, votingDuration },
-        contractStatus
-      );
-
-      if (!paramValidation.isValid) {
-        setFormErrors(paramValidation.errors);
-        updateStepStatus('submission', 'failed');
-        toast({
-          title: "Contract Parameter Error",
-          description: Object.values(paramValidation.errors).flat().join(", "),
-          variant: "destructive"
-        });
-        return;
-      }
+      // Estimate gas before submission
+      const gasEstimate = await estimateProposalGas({
+        targetCapital: targetCapitalWei,
+        votingDuration,
+        ipfsHash
+      }, wallet);
 
       // Create proposal
       console.log('Creating proposal...');
       const result = await createProposal({
-        targetCapital,
+        targetCapital: targetCapitalWei,
         votingDuration,
         ipfsHash
       }, wallet);
@@ -488,7 +486,7 @@ const ThesisSubmission = () => {
       updateStepStatus('submission', 'completed');
       toast({
         title: "Success",
-        description: "Your investment thesis has been submitted successfully",
+        description: "Your investment thesis has been submitted successfully!",
       });
 
     } catch (error) {
@@ -573,9 +571,9 @@ const ThesisSubmission = () => {
                     <Card className="bg-black/40 border-white/10 text-white">
                       <div className="p-6 space-y-6">
                         <div>
-                          <label className="text-lg font-medium text-white mb-2 block">
+                          <Label className="text-lg font-medium text-white mb-2">
                             Thesis Title
-                          </label>
+                          </Label>
                           <p className="text-sm text-gray-400 mb-2">
                             📌 Provide a concise name for the investment strategy
                           </p>
@@ -594,50 +592,22 @@ const ThesisSubmission = () => {
                           )}
                         </div>
 
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <Label className="text-lg font-medium text-white">Voting Duration</Label>
-                              <p className="text-sm text-gray-400">Set how long the community can vote on your thesis</p>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-2xl font-bold text-white">
-                                {Math.floor(votingDuration / (24 * 60 * 60))}
-                              </span>
-                              <span className="text-gray-400 ml-2">days</span>
-                            </div>
-                          </div>
-                          <Slider
-                            value={[votingDuration]}
-                            min={MIN_VOTING_DURATION}
-                            max={MAX_VOTING_DURATION}
-                            step={24 * 60 * 60}
-                            className="w-full"
-                            onValueChange={handleVotingDurationChange}
-                          />
-                          <div className="flex justify-between text-sm text-gray-400">
-                            <span>7 days</span>
-                            <span>90 days</span>
-                          </div>
-                        </div>
+                        <VotingDurationInput
+                          value={votingDuration}
+                          onChange={handleVotingDurationChange}
+                          error={formErrors.votingDuration}
+                        />
 
-                        <div>
-                          <Label className="text-lg font-medium text-white mb-2 block">Target Capital Raise (USD)</Label>
-                          <div className="relative">
-                            <Input
-                              type="text"
-                              placeholder="Enter amount in USD"
-                              className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 pl-12"
-                              required
-                              value={formData.investment.targetCapital}
-                              onChange={(e) => {
-                                const value = e.target.value.replace(/[^0-9.]/g, '');
-                                handleFormDataChange('investment.targetCapital', value);
-                              }}
-                            />
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                          </div>
-                        </div>
+                        <TargetCapitalInput
+                          value={formData.investment.targetCapital}
+                          onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+                          error={formErrors['investment.targetCapital']}
+                        />
+
+                        <ContractApprovalStatus
+                          onApprovalComplete={() => updateStepStatus('approval', 'completed')}
+                          requiredAmount={SUBMISSION_FEE.toString()}
+                        />
                       </div>
                     </Card>
                   </TabsContent>
