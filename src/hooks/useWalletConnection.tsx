@@ -3,14 +3,15 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ethers } from "ethers";
+import { getContractStatus } from "@/services/proposalContractService";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
-const TREASURY_ADDRESS = "0x..."; // Add actual treasury address
 
 export const useWalletConnection = () => {
   const { primaryWallet, setShowAuthFlow, setShowOnRamp } = useDynamicContext();
   const [isConnecting, setIsConnecting] = useState(false);
   const { toast } = useToast();
+  const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
 
   const connect = async () => {
     try {
@@ -41,6 +42,12 @@ export const useWalletConnection = () => {
       throw new Error("No provider available");
     }
 
+    if (!treasuryAddress) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const status = await getContractStatus(provider);
+      setTreasuryAddress(status.treasuryAddress);
+    }
+
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     const lgrToken = new ethers.Contract(
@@ -49,7 +56,7 @@ export const useWalletConnection = () => {
       signer
     );
 
-    const tx = await lgrToken.approve(TREASURY_ADDRESS, amount);
+    const tx = await lgrToken.approve(treasuryAddress, amount);
     await tx.wait();
     return true;
   };
