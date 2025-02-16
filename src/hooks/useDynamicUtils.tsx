@@ -1,6 +1,5 @@
 
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { isEthereumWallet } from "@dynamic-labs/ethereum";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useCallback } from "react";
