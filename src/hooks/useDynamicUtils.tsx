@@ -57,8 +57,8 @@ export const useDynamicUtils = () => {
         
         console.log('Getting network from provider...');
         const network = await provider.getNetwork();
-        chainId = network.chainId;
-        console.log('Chain ID from provider:', chainId);
+        chainId = Number(network.chainId); // Ensure chainId is a number
+        console.log('Chain ID from provider:', chainId, typeof chainId);
       } catch (error) {
         console.error('Detailed error getting chainId from provider:', {
           error,
@@ -66,6 +66,10 @@ export const useDynamicUtils = () => {
           errorStack: error.stack
         });
       }
+    } else {
+      // Ensure chainId from connector is also a number
+      chainId = Number(chainId);
+      console.log('Converted connector chainId to number:', chainId, typeof chainId);
     }
 
     const finalState = {
@@ -136,12 +140,22 @@ export const useDynamicUtils = () => {
     }
 
     // Simple check if we're on Polygon network
-    console.log('Checking chain ID:', state.chainId, 'Expected: 137');
-    if (state.chainId !== 137) {
+    const targetChainId = 137;
+    const currentChainId = Number(state.chainId);
+    
+    console.log('Chain ID comparison:', {
+      current: currentChainId,
+      currentType: typeof currentChainId,
+      target: targetChainId,
+      targetType: typeof targetChainId,
+      isEqual: currentChainId === targetChainId
+    });
+
+    if (currentChainId !== targetChainId) {
       console.log('Network validation failed. Chain ID mismatch:', {
-        expected: 137,
-        got: state.chainId,
-        typeOf: typeof state.chainId
+        expected: targetChainId,
+        got: currentChainId,
+        typeOf: typeof currentChainId
       });
       throw new ProposalError({
         category: 'network',
