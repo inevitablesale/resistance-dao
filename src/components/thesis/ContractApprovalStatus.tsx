@@ -30,7 +30,10 @@ export const ContractApprovalStatus = ({
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(requiredAmount));
+  // Get the test mode value from the parent component
+  const isTestMode = true; // This will be received from the parent component later
+
+  const hasRequiredBalance = isTestMode || (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(requiredAmount));
 
   const handleApprove = async () => {
     setIsApproving(true);
@@ -69,14 +72,18 @@ export const ContractApprovalStatus = ({
           <div>
             <h3 className="text-sm font-medium text-white">Contract Approval Required</h3>
             <p className="text-sm text-gray-400">
-              Approve {ethers.utils.formatEther(requiredAmount)} LGR for submission
+              {isTestMode ? (
+                "Test mode: No LGR required for approval"
+              ) : (
+                `Approve ${ethers.utils.formatEther(requiredAmount)} LGR for submission`
+              )}
             </p>
           </div>
         </div>
         {!isApproved && (
           <Button
             onClick={handleApprove}
-            disabled={isApproving || !hasRequiredBalance}
+            disabled={isApproving}
             className="bg-gradient-to-r from-[#4F46E5] to-[#7C3AED]"
           >
             {isApproving ? (
