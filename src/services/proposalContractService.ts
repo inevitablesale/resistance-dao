@@ -2,8 +2,7 @@ import { ethers } from "ethers";
 
 // Simple interface that describes what we need from a wallet
 interface WalletInterface {
-  getEthersProvider?: () => Promise<any>;  // New Dynamic SDK method
-  getPublicClient?: () => Promise<any>;    // Fallback for newer versions
+  getWalletClient: () => Promise<any>;
   address?: string;
 }
 
@@ -46,30 +45,24 @@ export interface GasEstimate {
 
 async function getProvider(wallet: WalletInterface) {
   try {
-    console.log("Getting provider for wallet address:", wallet.address);
+    console.log("Getting wallet client...");
+    const provider = await wallet.getWalletClient();
+    console.log("Got wallet client:", provider);
     
-    // Try the ethers-specific method first
-    if (wallet.getEthersProvider) {
-      console.log("Using getEthersProvider...");
-      const provider = await wallet.getEthersProvider();
-      if (provider) {
-        console.log("Got ethers provider directly");
-        return provider;
-      }
+    if (!provider) {
+      console.error("No provider returned from wallet client");
+      throw new Error("No provider available");
     }
 
-    // Fallback to public client if ethers provider isn't available
-    if (wallet.getPublicClient) {
-      console.log("Falling back to public client...");
-      const publicClient = await wallet.getPublicClient();
-      if (publicClient) {
-        console.log("Creating Web3Provider from public client");
-        return new ethers.providers.Web3Provider(publicClient as any);
-      }
-    }
+    // Create ethers provider
+    const ethersProvider = new ethers.providers.Web3Provider(provider as any);
+    console.log("Created ethers provider");
 
-    console.error("No valid provider method available on wallet");
-    throw new Error("No provider available");
+    // Test provider with a simple call
+    const network = await ethersProvider.getNetwork();
+    console.log("Connected to network:", network);
+
+    return ethersProvider;
   } catch (error) {
     console.error("Detailed provider error:", error);
     if (error instanceof Error) {

@@ -1,3 +1,4 @@
+
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { WalletInfo } from "@/components/WalletInfo";
 import { PostOnboardingView } from "@/components/PostOnboardingView";
@@ -28,9 +29,8 @@ const MintNFTContent = () => {
         setIsChecking(true);
         try {
           console.log('Checking NFT ownership...');
-          const provider = await primaryWallet.getEthersProvider();
           const ownsNFT = await checkNFTOwnership(
-            provider,
+            await primaryWallet.getWalletClient(),
             primaryWallet.address
           );
           console.log('NFT ownership result:', ownsNFT);
