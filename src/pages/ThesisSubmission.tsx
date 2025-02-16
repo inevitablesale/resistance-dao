@@ -605,10 +605,6 @@ const ThesisSubmission = () => {
               </Tabs>
 
               <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-6">
-                <div className="flex items-center text-sm text-yellow-400 mb-6">
-                  <AlertTriangle className="w-4 h-4 mr-2" />
-                  All submissions will be reviewed by the LedgerFund DAO community
-                </div>
                 <Button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
