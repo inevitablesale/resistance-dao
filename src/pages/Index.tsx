@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
 import { ReclaimControl } from "@/components/ReclaimControl";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -132,85 +132,20 @@ const processSteps = [
   }
 ];
 
-const IndexContent = () => {
-  const navigate = useNavigate();
-  const { primaryWallet } = useDynamicContext();
-  const { setShowOnRamp, setShowAuthFlow } = useWalletConnection();
-  const { toast } = useToast();
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const presaleRef = useRef<HTMLDivElement>(null);
-  const [maticPrice, setMaticPrice] = useState<string>("Loading...");
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const fetchPrice = async () => {
-      try {
-        const price = await fetchPresaleMaticPrice();
-        setMaticPrice(price);
-      } catch (error) {
-        console.error('Error fetching MATIC price:', error);
-      }
-    };
-    
-    fetchPrice();
-    const interval = setInterval(fetchPrice, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    let ticking = false;
-    
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          if (!heroRef.current || !presaleRef.current) return;
-          
-          const presaleRect = presaleRef.current.getBoundingClientRect();
-          const presaleVisibility = Math.max(0, Math.min(1, 
-            1 - (presaleRect.top / window.innerHeight)
-          ));
-          
-          const scrollingUpAdjustment = Math.max(0, Math.min(1,
-            1 - (Math.abs(presaleRect.bottom) / window.innerHeight)
-          ));
-          
-          setScrollProgress(Math.min(presaleVisibility, scrollingUpAdjustment));
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
+const useCircuitBoard = () => {
   useEffect(() => {
     const circuitBoard = document.querySelector('.circuit-board');
     if (!circuitBoard) return;
 
-    const nodes = Array.from({ length: 5 }, () => ({
+    const fragment = document.createDocumentFragment();
+    const totalNodes = Math.min(5, window.innerWidth > 768 ? 5 : 3);
+    const totalPoints = Math.min(10, window.innerWidth > 768 ? 10 : 5);
+
+    const nodes = Array.from({ length: totalNodes }, () => ({
       x: Math.random() * 100,
       y: Math.random() * 100,
       type: Math.random() > 0.5 ? 'yellow' : 'teal'
     }));
-
-    const dataPoints = Array.from({ length: 10 }, () => ({
-      startX: Math.random() * 100,
-      startY: Math.random() * 100,
-      endX: Math.random() * 100,
-      endY: Math.random() * 100,
-      type: Math.random() > 0.5 ? 'yellow' : 'teal',
-      delay: Math.random() * 2
-    }));
-
-    const fragment = document.createDocumentFragment();
 
     nodes.forEach(node => {
       const nodeElement = document.createElement('div');
@@ -219,6 +154,15 @@ const IndexContent = () => {
       nodeElement.style.top = `${node.y}%`;
       fragment.appendChild(nodeElement);
     });
+
+    const dataPoints = Array.from({ length: totalPoints }, () => ({
+      startX: Math.random() * 100,
+      startY: Math.random() * 100,
+      endX: Math.random() * 100,
+      endY: Math.random() * 100,
+      type: Math.random() > 0.5 ? 'yellow' : 'teal',
+      delay: Math.random() * 2
+    }));
 
     dataPoints.forEach(point => {
       const pointElement = document.createElement('div');
@@ -234,13 +178,88 @@ const IndexContent = () => {
     circuitBoard.appendChild(fragment);
 
     return () => {
-      while (circuitBoard.firstChild) {
-        circuitBoard.removeChild(circuitBoard.firstChild);
+      if (circuitBoard && circuitBoard.firstChild) {
+        circuitBoard.innerHTML = '';
       }
     };
   }, []);
+};
 
-  const handleBuyToken = () => {
+const useScrollProgress = (heroRef: React.RefObject<HTMLDivElement>, presaleRef: React.RefObject<HTMLDivElement>) => {
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const ticking = useRef(false);
+
+  const handleScroll = useCallback(() => {
+    if (!ticking.current) {
+      window.requestAnimationFrame(() => {
+        if (!heroRef.current || !presaleRef.current) return;
+        
+        const presaleRect = presaleRef.current.getBoundingClientRect();
+        const presaleVisibility = Math.max(0, Math.min(1, 
+          1 - (presaleRect.top / window.innerHeight)
+        ));
+        
+        const scrollingUpAdjustment = Math.max(0, Math.min(1,
+          1 - (Math.abs(presaleRect.bottom) / window.innerHeight)
+        ));
+        
+        setScrollProgress(Math.min(presaleVisibility, scrollingUpAdjustment));
+        ticking.current = false;
+      });
+      ticking.current = true;
+    }
+  }, [heroRef, presaleRef]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  return scrollProgress;
+};
+
+const IndexContent = () => {
+  const navigate = useNavigate();
+  const { primaryWallet } = useDynamicContext();
+  const { setShowOnRamp, setShowAuthFlow } = useWalletConnection();
+  const { toast } = useToast();
+  const [isLoaded, setIsLoaded] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const presaleRef = useRef<HTMLDivElement>(null);
+  const [maticPrice, setMaticPrice] = useState<string>("Loading...");
+
+  const scrollProgress = useScrollProgress(heroRef, presaleRef);
+  useCircuitBoard();
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoaded(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    
+    const fetchPrice = async () => {
+      try {
+        const price = await fetchPresaleMaticPrice();
+        if (mounted) {
+          setMaticPrice(price);
+        }
+      } catch (error) {
+        console.error('Error fetching MATIC price:', error);
+      }
+    };
+    
+    fetchPrice();
+    const interval = setInterval(fetchPrice, 30000);
+    
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handleBuyToken = useCallback(() => {
     if (!primaryWallet?.address) {
       toast({
         title: "Wallet Required",
@@ -251,7 +270,7 @@ const IndexContent = () => {
       return;
     }
     setShowOnRamp?.(true);
-  };
+  }, [primaryWallet?.address, toast, setShowAuthFlow, setShowOnRamp]);
 
   const parallaxStyle = {
     '--scroll-progress': scrollProgress,
