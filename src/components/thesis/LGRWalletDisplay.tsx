@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -383,45 +382,25 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
           </DropdownMenu>
         </div>
 
-        <div className="space-y-4">
-          <h4 className="text-white font-medium">Promote Your Brand</h4>
-          <div className="grid grid-cols-2 gap-4">
-            <Button
-              variant="outline"
-              onClick={() => handlePromotionSelect('weekly')}
-              className="bg-white/5 border-white/10 hover:bg-white/10 text-white"
-            >
-              Weekly (5 LGR)
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handlePromotionSelect('monthly')}
-              className="bg-white/5 border-white/10 hover:bg-white/10 text-white"
-            >
-              Monthly (15 LGR)
-            </Button>
+        {showDeposit && walletAddress && (
+          <div className="p-3 bg-white/5 rounded-lg border border-white/10">
+            <div className="flex justify-between items-center mb-1">
+              <p className="text-xs text-white/60">Your Wallet Address</p>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 text-white/60 hover:text-white"
+                onClick={handleCopyAddress}
+              >
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              </Button>
+            </div>
+            <p className="text-sm text-white break-all font-mono">
+              {walletAddress}
+            </p>
           </div>
-        </div>
+        )}
       </div>
-
-      {showDeposit && walletAddress && (
-        <div className="p-3 bg-white/5 rounded-lg border border-white/10">
-          <div className="flex justify-between items-center mb-1">
-            <p className="text-xs text-white/60">Your Wallet Address</p>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 text-white/60 hover:text-white"
-              onClick={handleCopyAddress}
-            >
-              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            </Button>
-          </div>
-          <p className="text-sm text-white break-all font-mono">
-            {walletAddress}
-          </p>
-        </div>
-      )}
 
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogContent className="bg-black/95 border border-yellow-500/20">
