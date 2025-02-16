@@ -13,11 +13,13 @@ const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 interface ContractApprovalStatusProps {
   onApprovalComplete: () => void;
   requiredAmount: string;
+  isTestMode?: boolean;
 }
 
 export const ContractApprovalStatus = ({
   onApprovalComplete,
-  requiredAmount
+  requiredAmount,
+  isTestMode = false
 }: ContractApprovalStatusProps) => {
   const { approveLGR, address } = useWalletConnection();
   const [isApproving, setIsApproving] = useState(false);
@@ -30,15 +32,12 @@ export const ContractApprovalStatus = ({
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  // Get the test mode value from the parent component
-  const isTestMode = true; // This will be received from the parent component later
-
   const hasRequiredBalance = isTestMode || (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(requiredAmount));
 
   const handleApprove = async () => {
     setIsApproving(true);
     try {
-      const success = await approveLGR(requiredAmount);
+      const success = await approveLGR(requiredAmount, isTestMode);
       if (success) {
         setIsApproved(true);
         onApprovalComplete();
@@ -83,7 +82,7 @@ export const ContractApprovalStatus = ({
         {!isApproved && (
           <Button
             onClick={handleApprove}
-            disabled={isApproving}
+            disabled={isApproving || (!isTestMode && !hasRequiredBalance)}
             className="bg-gradient-to-r from-[#4F46E5] to-[#7C3AED]"
           >
             {isApproving ? (
@@ -92,7 +91,7 @@ export const ContractApprovalStatus = ({
                 Approving...
               </div>
             ) : (
-              hasRequiredBalance ? "Approve" : "Insufficient LGR Balance"
+              hasRequiredBalance || isTestMode ? "Approve" : "Insufficient LGR Balance"
             )}
           </Button>
         )}

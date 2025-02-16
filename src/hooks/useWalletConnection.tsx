@@ -52,9 +52,17 @@ export const useWalletConnection = () => {
     }
   };
 
-  const approveLGR = async (amount: string) => {
+  const approveLGR = async (amount: string, isTestMode: boolean = false) => {
     try {
-      await validateNetwork();
+      // Skip network validation in test mode
+      if (!isTestMode) {
+        await validateNetwork();
+      }
+
+      // In test mode, we can skip the actual contract interaction
+      if (isTestMode) {
+        return true;
+      }
 
       if (!treasuryAddress) {
         const status = await getContractStatus(primaryWallet!);
@@ -103,4 +111,3 @@ export const useWalletConnection = () => {
     wallet: primaryWallet
   };
 };
-

@@ -766,10 +766,14 @@ const ThesisSubmission = () => {
                 </Collapsible>
 
                 <div className="mt-8">
-                  <ContractApprovalStatus onApprovalComplete={() => {
-                    updateStepStatus('approval', 'completed');
-                    setActiveStep('submission');
-                  }} requiredAmount={SUBMISSION_FEE.toString()} />
+                  <ContractApprovalStatus 
+                    onApprovalComplete={() => {
+                      updateStepStatus('approval', 'completed');
+                      setActiveStep('submission');
+                    }} 
+                    requiredAmount={SUBMISSION_FEE.toString()} 
+                    isTestMode={isTestMode}
+                  />
                 </div>
               </div>
             </Card>
