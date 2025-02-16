@@ -57,7 +57,9 @@ const formSchema = z.object({
   thesis: z.string().min(10, {
     message: "Thesis must be at least 10 characters.",
   }),
-})
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 const SUBMISSION_FEE = ethers.utils.parseUnits("250", 18);
 
@@ -71,7 +73,7 @@ const ThesisSubmission = () => {
   const tokenContracts = [{ symbol: "LGR" }];
   const { tokenBalances } = useTokenBalances(tokenContracts);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       companyName: "",
@@ -82,10 +84,10 @@ const ThesisSubmission = () => {
       paymentTerms: [],
       thesis: "",
     },
-  })
+  });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+  function onSubmit(values: FormValues) {
+    console.log(values);
   }
 
   const handleRentAdSpace = async () => {
@@ -281,9 +283,19 @@ const ThesisSubmission = () => {
                   />
 
                   <PaymentTermsSection 
-                    formData={form.getValues()}
-                    formErrors={form.formState.errors}
-                    onChange={(field, value) => form.setValue(field as any, value)}
+                    formData={{
+                      paymentTerms: form.getValues().paymentTerms || []
+                    }}
+                    formErrors={{
+                      paymentTerms: form.formState.errors.paymentTerms
+                        ? [form.formState.errors.paymentTerms.message || '']
+                        : []
+                    }}
+                    onChange={(field, value) => {
+                      if (field === 'paymentTerms') {
+                        form.setValue('paymentTerms', value);
+                      }
+                    }}
                   />
 
                   <FormField
