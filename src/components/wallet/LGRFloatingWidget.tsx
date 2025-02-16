@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -11,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect as useEffectOnce } from "react";
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
@@ -23,6 +23,18 @@ export const LGRFloatingWidget = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const { toast } = useToast();
+
+  useEffectOnce(() => {
+    // Load Coinbase script
+    const script = document.createElement('script');
+    script.src = 'https://pay.coinbase.com/buy-button.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  });
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -58,21 +70,37 @@ export const LGRFloatingWidget = () => {
   }, [address]);
 
   const handleBuyPolygon = () => {
-    const exchanges = [
-      { name: "Binance", url: "https://www.binance.com/en/trade/MATIC_USDT" },
-      { name: "Coinbase", url: "https://www.coinbase.com/price/polygon" },
-      { name: "Kraken", url: "https://www.kraken.com/prices/matic-polygon-price-chart/usd-us-dollar" }
-    ];
+    if (!address) {
+      setShowAuthFlow?.(true);
+      return;
+    }
 
-    // Open exchange links in new tabs
-    exchanges.forEach(exchange => {
-      window.open(exchange.url, '_blank');
-    });
-
-    toast({
-      title: "Buy MATIC",
-      description: "Opening popular exchanges where you can buy MATIC tokens.",
-    });
+    // Create and show Coinbase Buy Widget
+    try {
+      const BuyButtonComponent = (window as any).CoinbaseBuyButton;
+      if (BuyButtonComponent) {
+        BuyButtonComponent.createButton({
+          cryptoCurrencyId: 'MATIC',
+          walletAddress: address,
+          width: '100%',
+          height: '45px',
+        });
+        BuyButtonComponent.showModal();
+      } else {
+        toast({
+          title: "Buy Widget Not Ready",
+          description: "Please try again in a moment.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Coinbase widget error:", error);
+      toast({
+        title: "Widget Error",
+        description: "Failed to load the buy widget. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleConfirmPurchase = async () => {
@@ -114,7 +142,6 @@ export const LGRFloatingWidget = () => {
         </PopoverTrigger>
         <PopoverContent className="w-80 p-4 bg-black/90 backdrop-blur-lg border border-white/10">
           <div className="space-y-4">
-            {/* Balance Display */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
@@ -138,7 +165,6 @@ export const LGRFloatingWidget = () => {
               </div>
             </div>
 
-            {/* MATIC Balance */}
             <div className="flex items-center justify-between py-2 border-t border-white/10">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
@@ -201,7 +227,6 @@ export const LGRFloatingWidget = () => {
         </PopoverContent>
       </Popover>
 
-      {/* Instructions Dialog */}
       <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
         <DialogContent className="bg-black/95 border border-yellow-500/20 max-w-2xl">
           <DialogHeader>
@@ -287,7 +312,6 @@ export const LGRFloatingWidget = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Purchase Confirmation Dialog */}
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogContent className="bg-black/95 border border-yellow-500/20">
           <DialogHeader>
@@ -347,4 +371,3 @@ export const LGRFloatingWidget = () => {
 };
 
 export default LGRFloatingWidget;
-
