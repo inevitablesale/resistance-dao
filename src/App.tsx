@@ -58,16 +58,13 @@ const dynamicSettings = {
       providers: ['banxa'],
       defaultProvider: 'banxa',
       defaultFiatAmount: 100,
+      defaultCrypto: 'MATIC',
+      defaultFiat: 'USD',
+      presetCrypto: 'MATIC',
+      presetFiat: 'USD',
       defaultNetwork: {
-        chainId: 137
-      },
-      customization: {
-        urlParameters: {
-          fiatAmount: 100,
-          blockchain: 'matic',
-          coinType: 'matic',
-          fiatType: 'USD'
-        }
+        chainId: 137,
+        name: 'Polygon'
       }
     },
     enableEmbeddedWallets: true,
