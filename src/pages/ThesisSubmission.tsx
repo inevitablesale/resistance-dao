@@ -468,6 +468,10 @@ const ThesisSubmission = () => {
     </Button>
   );
 
+  const handleRentAdSpace = (frequency: 'week' | 'month') => {
+    // Implement ad space rental logic here
+  };
+
   return (
     <div className="min-h-screen bg-black text-white pb-20">
       <div className="container mx-auto px-4 py-8">
@@ -711,24 +715,47 @@ const ThesisSubmission = () => {
               >
                 <Card className="relative overflow-hidden bg-black/60 backdrop-blur-xl border-white/10">
                   <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
-                  <div className="relative z-10 p-6 flex items-center justify-between">
-                    <div className="space-y-2">
-                      <p className="text-sm text-white/60">Promote Your Services</p>
-                      <h3 className="text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
-                        M&A Ecosystem Advertising
-                      </h3>
-                      <p className="text-sm text-white/60 max-w-md">
-                        Reach accounting firms, M&A advisors, and transaction service providers actively seeking solutions. 
-                        Perfect for software vendors, consultants, and service providers in the M&A ecosystem.
-                      </p>
+                  <div className="relative z-10 p-6">
+                    <div className="flex flex-col lg:flex-row justify-between gap-6">
+                      <div className="space-y-2">
+                        <p className="text-sm text-white/60">Premium Ad Space</p>
+                        <h3 className="text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
+                          Advertise Here
+                        </h3>
+                        <p className="text-sm text-white/60 max-w-md">
+                          Reach active investors and decision makers in the Web3 space. 
+                          Perfect for projects, products, and services targeting our ecosystem.
+                        </p>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-4">
+                          <div>
+                            <p className="text-lg font-semibold">2.5k LGR/week</p>
+                            <p className="text-sm text-white/60">≈ $250</p>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                            onClick={() => handleRentAdSpace('week')}
+                          >
+                            Rent Weekly
+                          </Button>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div>
+                            <p className="text-lg font-semibold">9k LGR/month</p>
+                            <p className="text-sm text-white/60">≈ $900</p>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                            onClick={() => handleRentAdSpace('month')}
+                          >
+                            Rent Monthly
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
-                      onClick={() => window.open('mailto:sales@example.com')}
-                    >
-                      Contact Sales
-                    </Button>
                   </div>
                 </Card>
               </motion.div>
