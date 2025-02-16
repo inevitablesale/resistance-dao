@@ -718,10 +718,10 @@ const ThesisSubmission = () => {
                   <div className="relative z-10 p-6">
                     <div className="text-center mb-6">
                       <h3 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
-                        Advertise Your Project
+                        Promote Your Investment Thesis
                       </h3>
                       <p className="text-white/60 mt-2">
-                        Connect with Web3 investors and decision makers
+                        Reach accounting firm owners and LedgerFund investors
                       </p>
                     </div>
                     
