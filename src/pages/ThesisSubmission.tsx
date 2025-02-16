@@ -481,61 +481,6 @@ const ThesisSubmission = () => {
               Submit Your Investment Thesis
             </motion.h1>
 
-            <div className="space-y-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1"
-              >
-                <Card className="relative overflow-hidden bg-black/60 backdrop-blur-xl border-white/10">
-                  <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
-                  <div className="absolute top-3 right-3 px-2 py-1 bg-yellow-500/20 rounded-full">
-                    <p className="text-xs text-yellow-500 font-medium">Premium Ad Space</p>
-                  </div>
-                  <div className="relative z-10 p-6">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                      <div className="space-y-2 flex-1">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                          <p className="text-sm text-white/60">Available for Booking</p>
-                        </div>
-                        <h3 className="text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
-                          Premium Billboard Space
-                        </h3>
-                        <p className="text-sm text-white/60 max-w-md">
-                          Reach M&A professionals, accountants, and deal-makers. 
-                          Prime advertising spot in the thesis submission flow.
-                        </p>
-                      </div>
-                      <div className="flex flex-col gap-2 items-start md:items-end">
-                        <p className="text-sm text-white/60">Starting from</p>
-                        <p className="text-2xl font-bold text-white">$999<span className="text-sm text-white/60">/month</span></p>
-                        <Button 
-                          variant="ghost" 
-                          className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
-                        >
-                          Advertise Here
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="px-6 py-3 border-t border-white/5 bg-white/5">
-                    <div className="flex items-center justify-between text-sm text-white/60">
-                      <p>100k+ Monthly Views</p>
-                      <p>Premium Placement</p>
-                      <p>Verified Audience</p>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-
-              <LGRWalletDisplay
-                submissionFee={SUBMISSION_FEE.toString()}
-                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
-                walletAddress={address}
-              />
-            </div>
-
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
               <div className="border-b border-white/5">
                 
@@ -766,42 +711,19 @@ const ThesisSubmission = () => {
               >
                 <Card className="relative overflow-hidden bg-black/60 backdrop-blur-xl border-white/10">
                   <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
-                  <div className="absolute top-3 right-3 px-2 py-1 bg-yellow-500/20 rounded-full">
-                    <p className="text-xs text-yellow-500 font-medium">Premium Ad Space</p>
-                  </div>
-                  <div className="relative z-10 p-6">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                      <div className="space-y-2 flex-1">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                          <p className="text-sm text-white/60">Available for Booking</p>
-                        </div>
-                        <h3 className="text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
-                          Premium Billboard Space
-                        </h3>
-                        <p className="text-sm text-white/60 max-w-md">
-                          Reach M&A professionals, accountants, and deal-makers. 
-                          Prime advertising spot in the thesis submission flow.
-                        </p>
-                      </div>
-                      <div className="flex flex-col gap-2 items-start md:items-end">
-                        <p className="text-sm text-white/60">Starting from</p>
-                        <p className="text-2xl font-bold text-white">$999<span className="text-sm text-white/60">/month</span></p>
-                        <Button 
-                          variant="ghost" 
-                          className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
-                        >
-                          Advertise Here
-                        </Button>
-                      </div>
+                  <div className="relative z-10 p-6 flex items-center justify-between">
+                    <div className="space-y-2">
+                      <p className="text-sm text-white/60">Advertisement</p>
+                      <h3 className="text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
+                        Explore Web3 Opportunities
+                      </h3>
                     </div>
-                  </div>
-                  <div className="px-6 py-3 border-t border-white/5 bg-white/5">
-                    <div className="flex items-center justify-between text-sm text-white/60">
-                      <p>100k+ Monthly Views</p>
-                      <p>Premium Placement</p>
-                      <p>Verified Audience</p>
-                    </div>
+                    <Button 
+                      variant="ghost" 
+                      className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                    >
+                      Learn More
+                    </Button>
                   </div>
                 </Card>
               </motion.div>
