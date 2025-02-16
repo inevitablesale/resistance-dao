@@ -14,33 +14,28 @@ const Nav = () => {
   const hasWallet = !!primaryWallet?.address;
   
   // Define routes where we don't want to show wallet assets
-  const hideWalletRoutes = ['/thesis'];
+  const hideWalletRoutes = ['/', '/thesis'];
   const shouldShowWalletAssets = hasWallet && !hideWalletRoutes.includes(location.pathname);
+  
+  // Define routes where we don't want to show the home link
+  const hideHomeRoutes = ['/', '/thesis'];
+  const shouldShowHomeLink = !hideHomeRoutes.includes(location.pathname);
+
+  const handleBuyPolygon = () => {
+    setShowOnRamp?.(true);
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100]">
       <div className="absolute inset-0 bg-black/10 backdrop-blur-lg border-b border-white/10" />
       <div className="container mx-auto px-4 relative">
         <div className="flex items-center justify-between py-4">
-          <div className="flex items-center gap-6">
-            <Link to="/" className="text-white hover:text-white/80 transition-colors font-semibold">
-              Home
-            </Link>
-            <Link to="/governance-voting" className="text-white/80 hover:text-white transition-colors">
-              Governance
-            </Link>
-            <Link to="/mint-nft" className="text-white/80 hover:text-white transition-colors">
-              Mint NFT
-            </Link>
-            <Link to="/marketplace" className="text-white/80 hover:text-white transition-colors">
-              Marketplace
-            </Link>
-            <Link to="/content" className="text-white/80 hover:text-white transition-colors">
-              Content
-            </Link>
-            <Link to="/litepaper" className="text-white/80 hover:text-white transition-colors">
-              Litepaper
-            </Link>
+          <div className="flex items-center gap-3">
+            {shouldShowHomeLink && (
+              <Link to="/" className="text-white hover:text-white/80 transition-colors">
+                Home
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center gap-6">
