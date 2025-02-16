@@ -71,6 +71,12 @@ interface ProposalMetadata {
   };
 }
 
+interface ProposalConfig {
+  targetCapital: ethers.BigNumber;
+  votingDuration: number;
+  ipfsHash: string;
+}
+
 const US_STATES = [
   "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
   "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", 
@@ -300,10 +306,9 @@ const ThesisSubmission = () => {
 
       // Validate contract parameters
       const targetCapital = ethers.utils.parseEther(formData.investment.targetCapital);
-      const votingDurationSeconds = votingDuration.toString(); // Convert to string here
-
+      
       const paramValidation = validateContractParameters(
-        { targetCapital, votingDuration: votingDurationSeconds },
+        { targetCapital, votingDuration },
         contractStatus
       );
 
@@ -322,7 +327,7 @@ const ThesisSubmission = () => {
       console.log('Creating proposal...');
       const result = await createProposal({
         targetCapital,
-        votingDuration: votingDurationSeconds,
+        votingDuration,
         ipfsHash
       }, wallet);
 
