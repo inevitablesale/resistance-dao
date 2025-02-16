@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTe
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Switch } from "@/components/ui/switch";
 
 interface SubmissionStep {
   id: string;
@@ -106,6 +107,40 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
   description: 'Submit your thesis to the blockchain'
 }];
 
+const TEST_FORM_DATA: ProposalMetadata = {
+  title: "Test Proposal - Automated Backend Services Firm",
+  firmCriteria: {
+    size: "Small (5-20 employees)",
+    location: "California",
+    dealType: "Full Acquisition",
+    geographicFocus: "West Coast"
+  },
+  paymentTerms: [
+    "Initial payment of 30% upon signing",
+    "Monthly installments over 24 months",
+    "Performance-based earnout over 3 years"
+  ],
+  strategies: {
+    operational: [
+      "Implement cloud-based workflow automation",
+      "Standardize service delivery processes"
+    ],
+    growth: [
+      "Expand service offerings to include AI solutions",
+      "Target enterprise clients"
+    ],
+    integration: [
+      "Retain key technical personnel",
+      "Gradual systems migration"
+    ]
+  },
+  investment: {
+    targetCapital: "2500000",
+    drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
+    additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
+  }
+};
+
 const ThesisSubmission = () => {
   const {
     toast
@@ -132,7 +167,7 @@ const ThesisSubmission = () => {
   const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
-  const [formData, setFormData] = useState<ProposalMetadata>({
+  const [formData, setFormData] = useState<ProposalMetadata>(isTestMode ? TEST_FORM_DATA : {
     title: "",
     firmCriteria: {
       size: "",
@@ -156,6 +191,30 @@ const ThesisSubmission = () => {
   const [isStrategyOpen, setIsStrategyOpen] = useState(false);
   const [isApprovalOpen, setIsApprovalOpen] = useState(false);
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
+  const [isTestMode, setIsTestMode] = useState(true);
+
+  useEffect(() => {
+    setFormData(isTestMode ? TEST_FORM_DATA : {
+      title: "",
+      firmCriteria: {
+        size: "",
+        location: "",
+        dealType: "",
+        geographicFocus: ""
+      },
+      paymentTerms: [],
+      strategies: {
+        operational: [],
+        growth: [],
+        integration: []
+      },
+      investment: {
+        targetCapital: "",
+        drivers: "",
+        additionalCriteria: ""
+      }
+    });
+  }, [isTestMode]);
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => step.id === stepId ? {
