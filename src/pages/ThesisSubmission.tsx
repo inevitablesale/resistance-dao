@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import Nav from "@/components/Nav";
 import { FileText, AlertTriangle, Info, Clock, CreditCard, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,7 @@ import { uploadMetadataToPinata } from "@/services/pinataService";
 import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
 import { validateProposalMetadata, validateIPFSHash, validateContractParameters } from "@/services/proposalValidationService";
 import { executeTransaction } from "@/services/transactionManager";
+import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 
 // Contract constants
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
@@ -76,6 +77,7 @@ const ThesisSubmission = () => {
   const { toast } = useToast();
   const { isConnected, address, connect, approveLGR } = useWalletConnection();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTestMode, setIsTestMode] = useState(false);
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     industry: {
@@ -295,10 +297,11 @@ const ThesisSubmission = () => {
       </div>
       
       <Nav />
+      <LGRFloatingWidget />
       
       <div className="container mx-auto px-4 py-24 relative z-10">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
               Investment Thesis Submission
             </h1>
@@ -308,24 +311,26 @@ const ThesisSubmission = () => {
           </div>
 
           <Card className="p-6 bg-black/50 border border-white/10 backdrop-blur-xl mb-8">
-            <div className="flex items-start space-x-4">
-              <CreditCard className="w-6 h-6 text-purple-400 mt-1" />
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-white">Submission Fee</h3>
-                <div className="space-y-1">
-                  <p className="text-gray-400">
-                    A submission fee of 250 LGR is required to create a proposal. This fee helps ensure high-quality submissions and prevents spam while contributing to the DAO treasury.
-                  </p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-start space-x-4">
+                <CreditCard className="w-6 h-6 text-purple-400 mt-1" />
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-white">Submission Fee</h3>
+                  <div className="space-y-1">
+                    <p className="text-gray-400">
+                      A submission fee of 250 LGR is required to create a proposal. This fee helps ensure high-quality submissions and prevents spam while contributing to the DAO treasury.
+                    </p>
+                  </div>
                 </div>
-                {!isConnected && (
-                  <Button 
-                    onClick={connect}
-                    className="mt-2 bg-purple-500 hover:bg-purple-600"
-                  >
-                    <Wallet className="w-4 h-4 mr-2" />
-                    Connect Wallet
-                  </Button>
-                )}
+              </div>
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="test-mode" className="text-sm text-gray-400">Test Mode</Label>
+                <Switch
+                  id="test-mode"
+                  checked={isTestMode}
+                  onCheckedChange={setIsTestMode}
+                  className="data-[state=checked]:bg-purple-500"
+                />
               </div>
             </div>
           </Card>
