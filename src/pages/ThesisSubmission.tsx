@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -299,7 +300,7 @@ const ThesisSubmission = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
-              LedgerFund DAO – Investment Thesis Submission
+              Investment Thesis Submission
             </h1>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               Present your accounting firm acquisition thesis to secure co-investment from the LedgerFund DAO community. Outline your target criteria, investment strategy, and align capital with promising opportunities in the accounting industry.
