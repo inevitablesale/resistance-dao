@@ -20,6 +20,10 @@ import { getContractStatus, estimateProposalGas, createProposal } from "@/servic
 import { validateProposalMetadata, validateIPFSHash, validateContractParameters } from "@/services/proposalValidationService";
 import { executeTransaction } from "@/services/transactionManager";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
+import { SubmissionProgress, SubmissionStep } from "@/components/thesis/SubmissionProgress";
+import { SubmissionFeeDisplay } from "@/components/thesis/SubmissionFeeDisplay";
+import { ProposalsHistory } from "@/components/thesis/ProposalsHistory";
+import { TransactionStatus } from "@/components/thesis/TransactionStatus";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -74,6 +78,33 @@ const US_STATES = [
   "Wisconsin", "Wyoming"
 ];
 
+const SUBMISSION_STEPS: SubmissionStep[] = [
+  {
+    id: 'thesis',
+    title: 'Investment Thesis',
+    status: 'pending',
+    description: 'Fill out your investment thesis details'
+  },
+  {
+    id: 'strategy',
+    title: 'Strategy Selection',
+    status: 'pending',
+    description: 'Select your post-acquisition strategies'
+  },
+  {
+    id: 'approval',
+    title: 'Token Approval',
+    status: 'pending',
+    description: 'Approve LGR tokens for submission'
+  },
+  {
+    id: 'submission',
+    title: 'Thesis Submission',
+    status: 'pending',
+    description: 'Submit your thesis to the blockchain'
+  }
+];
+
 const ThesisSubmission = () => {
   const { toast } = useToast();
   const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
@@ -113,27 +144,15 @@ const ThesisSubmission = () => {
 
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
   const [hasShownBalanceWarning, setHasShownBalanceWarning] = useState(false);
+  const [currentStep, setCurrentStep] = useState<string>('thesis');
+  const [currentTxId, setCurrentTxId] = useState<string | null>(null);
+  const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
 
-  useEffect(() => {
-    const checkLGRBalance = () => {
-      if (isConnected && address && !hasShownBalanceWarning && !isLoading && tokenBalances) {
-        const lgrBalance = tokenBalances.find(
-          token => token.symbol === "LGR"
-        );
-        
-        if (!lgrBalance || Number(lgrBalance.balance) < Number(ethers.utils.formatEther(SUBMISSION_FEE))) {
-          toast({
-            title: "Insufficient LGR Balance",
-            description: `You'll need ${ethers.utils.formatEther(SUBMISSION_FEE)} LGR tokens to submit a thesis. You can continue filling out the form and purchase tokens before submission.`,
-            variant: "destructive"
-          });
-          setHasShownBalanceWarning(true);
-        }
-      }
-    };
-
-    checkLGRBalance();
-  }, [isConnected, address, tokenBalances, isLoading, toast, hasShownBalanceWarning]);
+  const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
+    setSteps(prev => prev.map(step => 
+      step.id === stepId ? { ...step, status } : step
+    ));
+  };
 
   const validateStrategies = (category: keyof typeof formData.strategies) => {
     const strategies = formData.strategies[category];
@@ -189,6 +208,27 @@ const ThesisSubmission = () => {
     });
   };
 
+  useEffect(() => {
+    const checkLGRBalance = () => {
+      if (isConnected && address && !hasShownBalanceWarning && !isLoading && tokenBalances) {
+        const lgrBalance = tokenBalances.find(
+          token => token.symbol === "LGR"
+        );
+        
+        if (!lgrBalance || Number(lgrBalance.balance) < Number(ethers.utils.formatEther(SUBMISSION_FEE))) {
+          toast({
+            title: "Insufficient LGR Balance",
+            description: `You'll need ${ethers.utils.formatEther(SUBMISSION_FEE)} LGR tokens to submit a thesis. You can continue filling out the form and purchase tokens before submission.`,
+            variant: "destructive"
+          });
+          setHasShownBalanceWarning(true);
+        }
+      }
+    };
+
+    checkLGRBalance();
+  }, [isConnected, address, tokenBalances, isLoading, toast, hasShownBalanceWarning]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -206,7 +246,13 @@ const ThesisSubmission = () => {
       setIsSubmitting(true);
       setFormErrors({});
 
-      // 1. Validate proposal metadata
+      // Update step status
+      updateStepStatus('thesis', 'completed');
+      updateStepStatus('strategy', 'completed');
+      updateStepStatus('approval', 'processing');
+      setCurrentStep('approval');
+
+      // Validate proposal metadata
       const validationResult = validateProposalMetadata(formData);
       if (!validationResult.isValid) {
         setFormErrors(validationResult.errors);
@@ -218,7 +264,7 @@ const ThesisSubmission = () => {
         return;
       }
 
-      // 2. Get contract status and validate
+      // Get contract status and validate
       if (!wallet) {
         throw new Error("No wallet connected");
       }
@@ -233,10 +279,11 @@ const ThesisSubmission = () => {
         return;
       }
 
-      // 3. First approve LGR tokens for submission fee
+      // Approve LGR tokens
       console.log('Approving LGR tokens for submission...');
       const submissionFeeApproval = await approveLGR(contractStatus.submissionFee.toString());
       if (!submissionFeeApproval) {
+        updateStepStatus('approval', 'failed');
         toast({
           title: "Approval Failed",
           description: "Failed to approve LGR tokens for submission",
@@ -245,17 +292,17 @@ const ThesisSubmission = () => {
         return;
       }
 
-      toast({
-        title: "Tokens Approved",
-        description: "LGR tokens approved for submission",
-      });
+      updateStepStatus('approval', 'completed');
+      updateStepStatus('submission', 'processing');
+      setCurrentStep('submission');
 
-      // 4. Upload metadata to IPFS
+      // Upload metadata to IPFS
       console.log('Uploading metadata to IPFS...');
       const ipfsUri = await uploadMetadataToPinata(formData);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
       
       if (!validateIPFSHash(ipfsHash)) {
+        updateStepStatus('submission', 'failed');
         toast({
           title: "IPFS Error",
           description: "Failed to upload metadata to IPFS",
@@ -265,7 +312,7 @@ const ThesisSubmission = () => {
       }
       console.log('Metadata uploaded to IPFS:', ipfsHash);
 
-      // 5. Validate contract parameters
+      // Validate contract parameters
       const targetCapital = ethers.utils.parseEther(formData.investment.targetCapital);
       const votingDurationSeconds = votingDuration;
 
@@ -276,6 +323,7 @@ const ThesisSubmission = () => {
 
       if (!paramValidation.isValid) {
         setFormErrors(paramValidation.errors);
+        updateStepStatus('submission', 'failed');
         toast({
           title: "Contract Parameter Error",
           description: Object.values(paramValidation.errors).flat().join(", "),
@@ -284,7 +332,7 @@ const ThesisSubmission = () => {
         return;
       }
 
-      // 6. Create proposal with retry mechanism
+      // Create proposal
       console.log('Creating proposal...');
       const result = await createProposal({
         targetCapital,
@@ -292,15 +340,19 @@ const ThesisSubmission = () => {
         ipfsHash
       }, wallet);
 
-      // 8. Store proposal data in local storage for reference
+      // Store proposal data
       const userProposals = JSON.parse(localStorage.getItem('userProposals') || '[]');
       userProposals.push({
         hash: result.hash,
         ipfsHash,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        title: formData.title,
+        targetCapital: formData.investment.targetCapital,
+        status: 'pending'
       });
       localStorage.setItem('userProposals', JSON.stringify(userProposals));
 
+      updateStepStatus('submission', 'completed');
       toast({
         title: "Success",
         description: "Your investment thesis has been submitted successfully",
@@ -308,6 +360,7 @@ const ThesisSubmission = () => {
 
     } catch (error) {
       console.error("Submission error:", error);
+      updateStepStatus(currentStep, 'failed');
       toast({
         title: "Submission Failed",
         description: error instanceof Error ? error.message : "Failed to submit thesis",
@@ -340,7 +393,31 @@ const ThesisSubmission = () => {
       <LGRFloatingWidget />
       
       <div className="container mx-auto px-4 py-24 relative z-10">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <SubmissionFeeDisplay 
+            submissionFee={SUBMISSION_FEE.toString()}
+            currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance}
+          />
+
+          <SubmissionProgress 
+            steps={steps}
+            currentStepId={currentStep}
+          />
+
+          {currentTxId && (
+            <TransactionStatus
+              transactionId={currentTxId}
+              onComplete={() => setCurrentTxId(null)}
+              onError={(error) => {
+                toast({
+                  title: "Transaction Failed",
+                  description: error,
+                  variant: "destructive"
+                });
+              }}
+            />
+          )}
+
           <Card className="p-8 bg-black/50 border border-white/10 backdrop-blur-xl">
             <form onSubmit={handleSubmit} className="space-y-8">
               <div>
@@ -801,6 +878,8 @@ const ThesisSubmission = () => {
               </div>
             </form>
           </Card>
+
+          <ProposalsHistory />
         </div>
       </div>
     </div>
