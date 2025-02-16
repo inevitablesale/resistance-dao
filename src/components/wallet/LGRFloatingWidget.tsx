@@ -10,14 +10,11 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useOnramp } from "@dynamic-labs/sdk-react-core";
-import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
-  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
-  const { enabled, open } = useOnramp();
+  const { setShowAuthFlow } = useDynamicContext();
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
   const [maticBalance, setMaticBalance] = useState<string>("0");
@@ -60,40 +57,22 @@ export const LGRFloatingWidget = () => {
     return () => clearInterval(interval);
   }, [address]);
 
-  const handleBuyPolygon = async () => {
-    if (!primaryWallet?.address) {
-      setShowAuthFlow?.(true);
-      return;
-    }
+  const handleBuyPolygon = () => {
+    const exchanges = [
+      { name: "Binance", url: "https://www.binance.com/en/trade/MATIC_USDT" },
+      { name: "Coinbase", url: "https://www.coinbase.com/price/polygon" },
+      { name: "Kraken", url: "https://www.kraken.com/prices/matic-polygon-price-chart/usd-us-dollar" }
+    ];
 
-    if (!enabled) {
-      toast({
-        title: "Onramp Not Available",
-        description: "The onramp service is currently not available",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Open exchange links in new tabs
+    exchanges.forEach(exchange => {
+      window.open(exchange.url, '_blank');
+    });
 
-    try {
-      await open({
-        onrampProvider: OnrampProviders.Banxa,
-        token: 'MATIC',
-        address: primaryWallet.address,
-      });
-      
-      toast({
-        title: "Purchase Initiated",
-        description: "Your MATIC purchase has been initiated successfully",
-      });
-    } catch (error) {
-      console.error("Onramp error:", error);
-      toast({
-        title: "Purchase Failed",
-        description: error instanceof Error ? error.message : "Failed to initiate purchase",
-        variant: "destructive"
-      });
-    }
+    toast({
+      title: "Buy MATIC",
+      description: "Opening popular exchanges where you can buy MATIC tokens.",
+    });
   };
 
   const handleConfirmPurchase = async () => {
@@ -244,7 +223,7 @@ export const LGRFloatingWidget = () => {
                 <h3 className="font-semibold text-lg">Quick Start Guide</h3>
                 <ol className="list-decimal pl-5 space-y-2">
                   <li>Connect your wallet using the button in the top right</li>
-                  <li>Purchase MATIC (Polygon) tokens using our onramp service</li>
+                  <li>Purchase MATIC (Polygon) tokens from popular exchanges</li>
                   <li>Use your MATIC to buy LGR tokens</li>
                   <li>Pay a small gas fee in MATIC to complete the transaction</li>
                 </ol>
@@ -263,12 +242,12 @@ export const LGRFloatingWidget = () => {
                     <li>Purchase LGR tokens</li>
                     <li>Pay for transaction fees (gas)</li>
                   </ul>
-                  <p className="mt-4">To get MATIC:</p>
-                  <ol className="list-decimal pl-5 space-y-2">
-                    <li>Click the "Buy Polygon" button</li>
-                    <li>Enter the amount you wish to purchase</li>
-                    <li>Complete the payment through our secure partner</li>
-                  </ol>
+                  <p className="mt-4">Where to buy MATIC:</p>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li><a href="https://www.binance.com/en/trade/MATIC_USDT" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">Binance</a></li>
+                    <li><a href="https://www.coinbase.com/price/polygon" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">Coinbase</a></li>
+                    <li><a href="https://www.kraken.com/prices/matic-polygon-price-chart/usd-us-dollar" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">Kraken</a></li>
+                  </ul>
                 </div>
               </div>
             </TabsContent>
@@ -368,3 +347,4 @@ export const LGRFloatingWidget = () => {
 };
 
 export default LGRFloatingWidget;
+
