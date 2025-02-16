@@ -40,6 +40,12 @@ const dynamicSettings = {
     },
     onLogout: () => {
       console.log("[Dynamic SDK] User logged out");
+    },
+    onSessionConnect: () => {
+      console.log("[Dynamic SDK] Session connected");
+    },
+    onSessionRestore: () => {
+      console.log("[Dynamic SDK] Session restored");
     }
   },
   settings: {
@@ -55,6 +61,14 @@ const dynamicSettings = {
       defaultFiatAmount: 100,
       defaultNetwork: {
         chainId: 137
+      },
+      customization: {
+        urlParameters: {
+          fiatAmount: 100,
+          blockchain: 'matic',
+          coinType: 'matic',
+          fiatType: 'USD'
+        }
       }
     },
     enableEmbeddedWallets: true,

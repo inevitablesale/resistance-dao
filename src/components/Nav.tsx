@@ -14,11 +14,11 @@ const Nav = () => {
   const hasWallet = !!primaryWallet?.address;
   
   // Define routes where we don't want to show wallet assets
-  const hideWalletRoutes = ['/', '/submit-thesis'];
+  const hideWalletRoutes = ['/', '/thesis'];
   const shouldShowWalletAssets = hasWallet && !hideWalletRoutes.includes(location.pathname);
   
   // Define routes where we don't want to show the home link
-  const hideHomeRoutes = ['/', '/submit-thesis'];
+  const hideHomeRoutes = ['/', '/thesis'];
   const shouldShowHomeLink = !hideHomeRoutes.includes(location.pathname);
 
   const handleBuyPolygon = () => {
