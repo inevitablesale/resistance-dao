@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -339,7 +340,7 @@ const ThesisSubmission = () => {
         ipfsHash,
         timestamp: new Date().toISOString(),
         title: formData.title,
-        targetCapital: formData.investment.targetCapital,
+        targetCapital: formData.investment.targetCapital.toString(), // Convert to string explicitly
         status: 'pending'
       };
       userProposals.push(newProposal);
