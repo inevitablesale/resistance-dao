@@ -23,6 +23,7 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { motion } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { StoredProposal } from "@/types/proposals";
+import { AnimatePresence } from "framer-motion";
 
 interface SubmissionStep {
   id: string;
@@ -95,6 +96,12 @@ const SUBMISSION_STEPS: SubmissionStep[] = [
     description: 'Fill out your investment thesis details'
   },
   {
+    id: 'firm',
+    title: 'Firm Details',
+    status: 'pending',
+    description: 'Select your firm criteria'
+  },
+  {
     id: 'strategy',
     title: 'Strategy Selection',
     status: 'pending',
@@ -105,12 +112,6 @@ const SUBMISSION_STEPS: SubmissionStep[] = [
     title: 'Token Approval',
     status: 'pending',
     description: 'Approve LGR tokens for submission'
-  },
-  {
-    id: 'submission',
-    title: 'Thesis Submission',
-    status: 'pending',
-    description: 'Submit your thesis to the blockchain'
   }
 ];
 
@@ -551,7 +552,6 @@ const ThesisSubmission = () => {
             </p>
           </motion.div>
 
-          {/* Subtle Progress Indicator */}
           <div className="mb-8">
             <div className="flex justify-between items-center text-sm text-white/60">
               {steps.map((step, index) => (
@@ -577,86 +577,73 @@ const ThesisSubmission = () => {
           </div>
 
           <div className="relative">
-            {/* Main Form Card */}
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
               <div className="p-6 lg:p-8">
-                {activeStep === 'thesis' && (
-                  <motion.div 
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeStep}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
                     className="space-y-8"
                   >
-                    <div className="space-y-4">
-                      <Label className="text-lg font-medium text-white">
-                        Thesis Title
-                      </Label>
-                      <Input
-                        placeholder="Enter a clear, descriptive title"
-                        className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
-                        value={formData.title}
-                        onChange={(e) => handleFormDataChange('title', e.target.value)}
+                    {activeStep === 'thesis' && (
+                      <div className="space-y-8">
+                        <div className="space-y-4">
+                          <Label className="text-lg font-medium text-white">Thesis Title</Label>
+                          <Input
+                            placeholder="Enter a clear, descriptive title"
+                            className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                            value={formData.title}
+                            onChange={(e) => handleFormDataChange('title', e.target.value)}
+                          />
+                          {formErrors.title && (
+                            <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                          )}
+                        </div>
+
+                        <VotingDurationInput
+                          value={votingDuration}
+                          onChange={handleVotingDurationChange}
+                          error={formErrors.votingDuration}
+                        />
+
+                        <TargetCapitalInput
+                          value={formData.investment.targetCapital}
+                          onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+                          error={formErrors['investment.targetCapital']}
+                        />
+                      </div>
+                    )}
+
+                    {activeStep === 'firm' && (
+                      <FirmCriteriaSection 
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={handleFormDataChange}
                       />
-                      {formErrors.title && (
-                        <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                      )}
-                    </div>
+                    )}
 
-                    <VotingDurationInput
-                      value={votingDuration}
-                      onChange={handleVotingDurationChange}
-                      error={formErrors.votingDuration}
-                    />
+                    {activeStep === 'strategy' && (
+                      <StrategiesSection 
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={handleStrategyChange}
+                      />
+                    )}
 
-                    <TargetCapitalInput
-                      value={formData.investment.targetCapital}
-                      onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
-                      error={formErrors['investment.targetCapital']}
-                    />
+                    {activeStep === 'approval' && (
+                      <PaymentTermsSection 
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={handleFormDataChange}
+                      />
+                    )}
                   </motion.div>
-                )}
-
-                {activeStep === 'strategy' && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  >
-                    <FirmCriteriaSection 
-                      formData={formData}
-                      formErrors={formErrors}
-                      onChange={handleFormDataChange}
-                    />
-                  </motion.div>
-                )}
-
-                {activeStep === 'submission' && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  >
-                    <StrategiesSection 
-                      formData={formData}
-                      formErrors={formErrors}
-                      onChange={handleStrategyChange}
-                    />
-                  </motion.div>
-                )}
-
-                {activeStep === 'approval' && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  >
-                    <PaymentTermsSection 
-                      formData={formData}
-                      formErrors={formErrors}
-                      onChange={handleFormDataChange}
-                    />
-                  </motion.div>
-                )}
+                </AnimatePresence>
               </div>
             </Card>
 
-            {/* Minimalistic Floating Status */}
             <div className="fixed bottom-6 right-6 z-50">
               <motion.div
                 initial={{ y: 100, opacity: 0 }}
@@ -691,7 +678,6 @@ const ThesisSubmission = () => {
               </motion.div>
             </div>
 
-            {/* Action Button */}
             <div className="mt-6 flex justify-end">
               <Button
                 onClick={handleContinue}
@@ -722,7 +708,6 @@ const ThesisSubmission = () => {
               </Button>
             </div>
 
-            {/* Transaction Status - Only shows when active */}
             {currentTxId && (
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -750,7 +735,6 @@ const ThesisSubmission = () => {
         </div>
       </main>
 
-      {/* Wallet Options Dialog */}
       <Dialog open={showWalletOptions} onOpenChange={setShowWalletOptions}>
         <DialogContent className="bg-black/95 border-white/10 backdrop-blur-lg">
           <DialogHeader>
@@ -758,7 +742,6 @@ const ThesisSubmission = () => {
           </DialogHeader>
           
           <div className="space-y-4 py-4">
-            {/* Balance Display */}
             <div className="p-4 bg-white/5 rounded-lg space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-white/70">LGR Balance</span>
@@ -774,7 +757,6 @@ const ThesisSubmission = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="grid gap-2">
               <Button
                 variant="outline"
