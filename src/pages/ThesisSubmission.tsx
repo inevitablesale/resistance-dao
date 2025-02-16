@@ -142,25 +142,17 @@ const TEST_FORM_DATA: ProposalMetadata = {
 };
 
 const ThesisSubmission = () => {
-  const {
-    toast
-  } = useToast();
-  const {
-    isConnected,
-    address,
-    connect,
-    approveLGR,
-    wallet
-  } = useWalletConnection();
-  const {
-    tokenBalances
-  } = useTokenBalances({
+  const { toast } = useToast();
+  const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
+  const { tokenBalances } = useTokenBalances({
     networkId: 137,
     accountAddress: address,
     includeFiat: false,
     includeNativeBalance: false,
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
+
+  const [isTestMode, setIsTestMode] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
   const [activeStep, setActiveStep] = useState<string>('thesis');
@@ -191,7 +183,6 @@ const ThesisSubmission = () => {
   const [isStrategyOpen, setIsStrategyOpen] = useState(false);
   const [isApprovalOpen, setIsApprovalOpen] = useState(false);
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
-  const [isTestMode, setIsTestMode] = useState(true);
 
   useEffect(() => {
     setFormData(isTestMode ? TEST_FORM_DATA : {
