@@ -21,35 +21,7 @@ export const LGRFloatingWidget = () => {
   const [purchaseAmount, setPurchaseAmount] = useState<string>("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
-  const [isCoinbaseScriptLoaded, setIsCoinbaseScriptLoaded] = useState(false);
   const { toast } = useToast();
-
-  useEffect(() => {
-    // Load Coinbase script
-    const script = document.createElement('script');
-    script.src = 'https://pay.coinbase.com/buy-button.js';
-    script.async = true;
-    
-    script.onload = () => {
-      console.log('Coinbase script loaded successfully');
-      setIsCoinbaseScriptLoaded(true);
-    };
-    
-    script.onerror = () => {
-      console.error('Failed to load Coinbase script');
-      toast({
-        title: "Error",
-        description: "Failed to load payment system. Please try again later.",
-        variant: "destructive"
-      });
-    };
-    
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -85,39 +57,7 @@ export const LGRFloatingWidget = () => {
   }, [address]);
 
   const handleBuyPolygon = () => {
-    if (!address) {
-      setShowAuthFlow?.(true);
-      return;
-    }
-
-    if (!isCoinbaseScriptLoaded) {
-      toast({
-        title: "Please Wait",
-        description: "Payment system is still loading. Please try again in a moment.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const BuyButtonComponent = (window as any).CoinbaseBuyButton;
-      if (BuyButtonComponent) {
-        BuyButtonComponent.createButton({
-          cryptoCurrencyId: 'MATIC',
-          walletAddress: address,
-          width: '100%',
-          height: '45px',
-        });
-        BuyButtonComponent.showModal();
-      }
-    } catch (error) {
-      console.error("Coinbase widget error:", error);
-      toast({
-        title: "Widget Error",
-        description: "Failed to load the buy widget. Please refresh and try again.",
-        variant: "destructive"
-      });
-    }
+    window.open('https://www.binance.com/en/price/polygon', '_blank');
   };
 
   const handleConfirmPurchase = async () => {
