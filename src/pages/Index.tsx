@@ -310,11 +310,13 @@ const IndexContent = () => {
         </div>
       </div>
 
+      {/* DynamicWidget will be positioned in the top right */}
       <div className="fixed top-4 right-4 z-50">
         <DynamicWidget />
       </div>
       <LGRFloatingWidget />
 
+      {/* Market Dynamics Section */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
@@ -329,6 +331,7 @@ const IndexContent = () => {
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 mb-16">
+              {/* Market Challenge */}
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-orange-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
@@ -353,6 +356,7 @@ const IndexContent = () => {
                 </div>
               </div>
 
+              {/* Solution */}
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
@@ -378,6 +382,7 @@ const IndexContent = () => {
               </div>
             </div>
 
+            {/* Blockchain Benefits */}
             <div className="grid md:grid-cols-3 gap-8">
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
@@ -422,6 +427,7 @@ const IndexContent = () => {
         </div>
       </section>
 
+      {/* Social Proof Section */}
       <section className="py-12 relative z-10 bg-black/30 backdrop-blur-sm border-t border-white/5">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
@@ -430,6 +436,7 @@ const IndexContent = () => {
         </div>
       </section>
 
+      {/* Step 1: Submit Your Investment Thesis */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
@@ -444,6 +451,7 @@ const IndexContent = () => {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
+              {/* Create Thesis */}
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
@@ -457,6 +465,7 @@ const IndexContent = () => {
                 </div>
               </div>
 
+              {/* Token-Based Voting */}
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
@@ -470,6 +479,7 @@ const IndexContent = () => {
                 </div>
               </div>
 
+              {/* Pool Resources */}
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
@@ -487,6 +497,7 @@ const IndexContent = () => {
         </div>
       </section>
 
+      {/* Step 2: Tokenize Firm Assets */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
@@ -501,6 +512,7 @@ const IndexContent = () => {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
+              {/* Firm Valuation */}
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
@@ -522,6 +534,7 @@ const IndexContent = () => {
                 </div>
               </div>
 
+              {/* Client Portfolio */}
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
@@ -543,6 +556,7 @@ const IndexContent = () => {
                 </div>
               </div>
 
+              {/* Advisory Services */}
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
@@ -564,6 +578,7 @@ const IndexContent = () => {
                 </div>
               </div>
 
+              {/* Resources & IP */}
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
