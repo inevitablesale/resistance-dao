@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEffect as useEffectOnce } from "react";
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
@@ -22,19 +21,35 @@ export const LGRFloatingWidget = () => {
   const [purchaseAmount, setPurchaseAmount] = useState<string>("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [isCoinbaseScriptLoaded, setIsCoinbaseScriptLoaded] = useState(false);
   const { toast } = useToast();
 
-  useEffectOnce(() => {
+  useEffect(() => {
     // Load Coinbase script
     const script = document.createElement('script');
     script.src = 'https://pay.coinbase.com/buy-button.js';
     script.async = true;
+    
+    script.onload = () => {
+      console.log('Coinbase script loaded successfully');
+      setIsCoinbaseScriptLoaded(true);
+    };
+    
+    script.onerror = () => {
+      console.error('Failed to load Coinbase script');
+      toast({
+        title: "Error",
+        description: "Failed to load payment system. Please try again later.",
+        variant: "destructive"
+      });
+    };
+    
     document.body.appendChild(script);
 
     return () => {
       document.body.removeChild(script);
     };
-  });
+  }, []);
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -75,7 +90,15 @@ export const LGRFloatingWidget = () => {
       return;
     }
 
-    // Create and show Coinbase Buy Widget
+    if (!isCoinbaseScriptLoaded) {
+      toast({
+        title: "Please Wait",
+        description: "Payment system is still loading. Please try again in a moment.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const BuyButtonComponent = (window as any).CoinbaseBuyButton;
       if (BuyButtonComponent) {
@@ -86,18 +109,12 @@ export const LGRFloatingWidget = () => {
           height: '45px',
         });
         BuyButtonComponent.showModal();
-      } else {
-        toast({
-          title: "Buy Widget Not Ready",
-          description: "Please try again in a moment.",
-          variant: "destructive"
-        });
       }
     } catch (error) {
       console.error("Coinbase widget error:", error);
       toast({
         title: "Widget Error",
-        description: "Failed to load the buy widget. Please try again.",
+        description: "Failed to load the buy widget. Please refresh and try again.",
         variant: "destructive"
       });
     }
