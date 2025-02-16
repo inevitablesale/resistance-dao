@@ -32,7 +32,6 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
   const [copied, setCopied] = useState(false);
   const [maticBalance, setMaticBalance] = useState<string>("0");
   const [maticPrice, setMaticPrice] = useState<string>("0");
-  const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
   const [lgrBalance, setLgrBalance] = useState<string>("0");
 
   const hasInsufficientBalance = currentBalance && 
@@ -44,19 +43,13 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
 
       try {
         const provider = await getWorkingProvider();
-        const [lgrContract, presaleContract, maticBal] = await Promise.all([
+        const [lgrContract, maticBal] = await Promise.all([
           getLgrTokenContract(provider),
-          getPresaleContract(provider),
           provider.getBalance(walletAddress)
         ]);
         
-        const [balance, purchased] = await Promise.all([
-          lgrContract.balanceOf(walletAddress),
-          presaleContract.purchasedTokens(walletAddress)
-        ]);
-
+        const balance = await lgrContract.balanceOf(walletAddress);
         setLgrBalance(ethers.utils.formatUnits(balance, 18));
-        setPurchasedTokens(ethers.utils.formatUnits(purchased, 18));
         setMaticBalance(ethers.utils.formatEther(maticBal));
 
         const currentMaticPrice = await fetchPresaleMaticPrice();
@@ -253,9 +246,6 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
               <p className="text-2xl font-bold text-white">
                 {Number(lgrBalance).toFixed(2)} LGR
               </p>
-              <p className="text-lg text-gray-400">
-                Purchased: {Number(purchasedTokens).toFixed(2)} LGR
-              </p>
             </div>
           </div>
 
@@ -287,7 +277,6 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
         </div>
       )}
 
-      {/* Purchase Dialog */}
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogContent className="bg-black/95 border border-yellow-500/20">
           <DialogHeader>
@@ -343,7 +332,6 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
         </DialogContent>
       </Dialog>
 
-      {/* Instructions Dialog */}
       <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
         <DialogContent className="bg-black/95 border border-yellow-500/20">
           <DialogHeader>
