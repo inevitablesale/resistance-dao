@@ -455,6 +455,14 @@ const ThesisSubmission = () => {
     }
   };
 
+  const formatBalance = (balance: string | undefined): string => {
+    if (!balance) return "0";
+    const num = parseFloat(balance);
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toFixed(1);
+  };
+
   return (
     <div className="min-h-screen bg-[#0A0B0F]">
       <Nav />
@@ -556,7 +564,7 @@ const ThesisSubmission = () => {
             )} />
             <span>
               {isConnected ? 
-                `${tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR` : 
+                `${formatBalance(tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString())} LGR` : 
                 "Connect Wallet"
               }
             </span>
