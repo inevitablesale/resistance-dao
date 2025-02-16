@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -157,6 +157,27 @@ const ThesisSubmission = () => {
       };
     });
   };
+
+  useEffect(() => {
+    const checkLGRBalance = async () => {
+      if (isConnected && address) {
+        try {
+          const balance = await getTokenBalance(LGR_TOKEN_ADDRESS, address);
+          if (Number(balance) < Number(ethers.utils.formatEther(SUBMISSION_FEE))) {
+            toast({
+              title: "Insufficient LGR Balance",
+              description: `You'll need ${ethers.utils.formatEther(SUBMISSION_FEE)} LGR tokens to submit a thesis. You can continue filling out the form and purchase tokens before submission.`,
+              variant: "warning"
+            });
+          }
+        } catch (error) {
+          console.error("Error checking LGR balance:", error);
+        }
+      }
+    };
+
+    checkLGRBalance();
+  }, [isConnected, address, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
