@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
@@ -22,7 +23,16 @@ export const LGRFloatingWidget = () => {
       if (!primaryWallet?.address) return;
 
       try {
-        const provider = await primaryWallet.getEthersProvider();
+        // Try getEthersProvider first
+        let provider;
+        if (primaryWallet.getEthersProvider) {
+          provider = await primaryWallet.getEthersProvider();
+        } else if (primaryWallet.getWalletClient) {
+          // Fallback to getWalletClient if getEthersProvider is not available
+          const walletClient = await primaryWallet.getWalletClient();
+          provider = new ethers.providers.Web3Provider(walletClient);
+        }
+
         if (!provider) return;
 
         const signer = provider.getSigner();
@@ -36,8 +46,8 @@ export const LGRFloatingWidget = () => {
         const balance = await lgrToken.balanceOf(primaryWallet.address);
         setLgrBalance(ethers.utils.formatUnits(balance, 18));
 
-        // Get USD balance (assuming you have a price feed or calculation)
-        const price = await lgrToken.getPrice(); // This method name might be different based on your contract
+        // Get USD balance
+        const price = await lgrToken.getPrice();
         const usdValue = ethers.utils.formatUnits(price.mul(balance).div(ethers.constants.WeiPerEther), 18);
         setUsdBalance(usdValue);
         setLgrPrice(ethers.utils.formatUnits(price, 18));
