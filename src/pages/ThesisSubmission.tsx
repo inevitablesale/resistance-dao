@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -19,8 +20,10 @@ import { getContractStatus, estimateProposalGas, createProposal } from "@/servic
 import { validateProposalMetadata, validateIPFSHash, validateContractParameters } from "@/services/proposalValidationService";
 import { executeTransaction } from "@/services/transactionManager";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
+import { getTokenBalance } from "@/services/tokenService";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
+const LGR_TOKEN_ADDRESS = "0x6527b171AF1c61AE43bf405ABe53861b0487A369";
 const FACTORY_ABI = [
   "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
   "function submissionFee() public view returns (uint256)",
@@ -167,7 +170,7 @@ const ThesisSubmission = () => {
             toast({
               title: "Insufficient LGR Balance",
               description: `You'll need ${ethers.utils.formatEther(SUBMISSION_FEE)} LGR tokens to submit a thesis. You can continue filling out the form and purchase tokens before submission.`,
-              variant: "warning"
+              variant: "destructive"
             });
           }
         } catch (error) {
