@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,9 @@ import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
+import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
+import { validateProposalMetadata, validateIPFSHash, validateContractParameters } from "@/services/proposalValidationService";
+import { executeTransaction } from "@/services/transactionManager";
 
 // Contract constants
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
@@ -169,57 +171,88 @@ const ThesisSubmission = () => {
     try {
       setIsSubmitting(true);
 
-      // 1. First approve LGR tokens for submission fee
-      const submissionFeeApproval = await approveLGR(ethers.utils.parseEther("250").toString());
+      // 1. Validate proposal metadata
+      const validationResult = validateProposalMetadata(formData);
+      if (!validationResult.isValid) {
+        throw new Error(Object.values(validationResult.errors).flat().join(", "));
+      }
+
+      // 2. Get contract status and validate
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const contractStatus = await getContractStatus(provider);
+      
+      if (contractStatus.isPaused) {
+        throw new Error("Contract is currently paused for maintenance");
+      }
+
+      // 3. First approve LGR tokens for submission fee
+      console.log('Approving LGR tokens for submission...');
+      const submissionFeeApproval = await approveLGR(contractStatus.submissionFee.toString());
       if (!submissionFeeApproval) {
         throw new Error("Failed to approve LGR tokens for submission");
       }
 
-      // 2. Upload metadata to IPFS
+      // 4. Upload metadata to IPFS
       console.log('Uploading metadata to IPFS...');
       const ipfsUri = await uploadMetadataToPinata(formData);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
+      
+      if (!validateIPFSHash(ipfsHash)) {
+        throw new Error("Invalid IPFS hash format");
+      }
       console.log('Metadata uploaded to IPFS:', ipfsHash);
 
-      // 3. Create proposal through factory contract
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
-
-      console.log('Creating proposal...');
+      // 5. Validate contract parameters
       const targetCapital = ethers.utils.parseEther(formData.investment.targetCapital);
       const votingDurationSeconds = votingDuration;
 
-      const tx = await factory.createProposal(
-        ipfsHash,
-        targetCapital,
-        votingDurationSeconds
+      const paramValidation = validateContractParameters(
+        { targetCapital, votingDuration: votingDurationSeconds },
+        contractStatus
       );
 
-      console.log('Proposal creation transaction submitted:', tx.hash);
-
-      // 4. Listen for ProposalCreated event
-      const receipt = await tx.wait();
-      console.log('Transaction confirmed:', receipt);
-
-      const event = receipt.events?.find(e => e.event === 'ProposalCreated');
-      if (!event) {
-        throw new Error('ProposalCreated event not found in transaction receipt');
+      if (!paramValidation.isValid) {
+        throw new Error(Object.values(paramValidation.errors).flat().join(", "));
       }
 
-      const [tokenId, proposalContract, creator, isTest] = event.args;
-      console.log('Proposal created:', {
-        tokenId: tokenId.toString(),
-        proposalContract,
-        creator,
-        isTest
+      // 6. Estimate gas and validate
+      console.log('Estimating gas...');
+      const gasEstimate = await estimateProposalGas({
+        targetCapital,
+        votingDuration: votingDurationSeconds,
+        ipfsHash
+      }, provider);
+
+      console.log('Gas estimate:', {
+        gasLimit: gasEstimate.gasLimit.toString(),
+        gasPrice: gasEstimate.gasPrice.toString(),
+        totalCost: ethers.utils.formatEther(gasEstimate.totalCost)
       });
 
-      // Store proposal data in local storage for reference
+      // 7. Create proposal with retry mechanism
+      console.log('Creating proposal...');
+      const result = await executeTransaction(
+        () => createProposal({
+          targetCapital,
+          votingDuration: votingDurationSeconds,
+          ipfsHash
+        }, provider),
+        {
+          timeout: 120000, // 2 minutes
+          maxRetries: 3,
+          backoffMs: 5000
+        }
+      );
+
+      if (result.status === 'failed') {
+        throw result.error || new Error('Transaction failed');
+      }
+
+      // 8. Store proposal data in local storage for reference
       const userProposals = JSON.parse(localStorage.getItem('userProposals') || '[]');
       userProposals.push({
-        tokenId: tokenId.toString(),
-        contractAddress: proposalContract,
+        tokenId: result.receipt?.events?.find(e => e.event === 'ProposalCreated')?.args?.[0].toString(),
+        contractAddress: result.receipt?.events?.find(e => e.event === 'ProposalCreated')?.args?.[1],
         ipfsHash,
         timestamp: Date.now()
       });
@@ -442,6 +475,15 @@ const ThesisSubmission = () => {
                     <Checkbox 
                       id="seller-financing" 
                       className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      checked={formData.paymentTerms.includes('seller-financing')}
+                      onCheckedChange={(checked) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          paymentTerms: checked 
+                            ? [...prev.paymentTerms, 'seller-financing']
+                            : prev.paymentTerms.filter(term => term !== 'seller-financing')
+                        }))
+                      }}
                     />
                     <label htmlFor="seller-financing" className="text-gray-200">Seller Financing</label>
                   </div>
@@ -449,6 +491,15 @@ const ThesisSubmission = () => {
                     <Checkbox 
                       id="earnout" 
                       className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      checked={formData.paymentTerms.includes('earnout')}
+                      onCheckedChange={(checked) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          paymentTerms: checked 
+                            ? [...prev.paymentTerms, 'earnout']
+                            : prev.paymentTerms.filter(term => term !== 'earnout')
+                        }))
+                      }}
                     />
                     <label htmlFor="earnout" className="text-gray-200">Earnout</label>
                   </div>
@@ -456,6 +507,15 @@ const ThesisSubmission = () => {
                     <Checkbox 
                       id="equity-rollover" 
                       className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      checked={formData.paymentTerms.includes('equity-rollover')}
+                      onCheckedChange={(checked) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          paymentTerms: checked 
+                            ? [...prev.paymentTerms, 'equity-rollover']
+                            : prev.paymentTerms.filter(term => term !== 'equity-rollover')
+                        }))
+                      }}
                     />
                     <label htmlFor="equity-rollover" className="text-gray-200">Equity Rollover</label>
                   </div>
@@ -463,6 +523,15 @@ const ThesisSubmission = () => {
                     <Checkbox 
                       id="bank-financing" 
                       className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      checked={formData.paymentTerms.includes('bank-financing')}
+                      onCheckedChange={(checked) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          paymentTerms: checked 
+                            ? [...prev.paymentTerms, 'bank-financing']
+                            : prev.paymentTerms.filter(term => term !== 'bank-financing')
+                        }))
+                      }}
                     />
                     <label htmlFor="bank-financing" className="text-gray-200">Bank Financing</label>
                   </div>
@@ -479,6 +548,10 @@ const ThesisSubmission = () => {
                       <Checkbox 
                         id="tech-modernization" 
                         className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                        checked={formData.strategies.operational.includes('tech-modernization')}
+                        onCheckedChange={(checked) => {
+                          handleStrategyChange('operational', 'tech-modernization');
+                        }}
                       />
                       <label htmlFor="tech-modernization" className="text-gray-200">Technology Modernization</label>
                     </div>
@@ -486,6 +559,10 @@ const ThesisSubmission = () => {
                       <Checkbox 
                         id="process-standardization" 
                         className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                        checked={formData.strategies.operational.includes('process-standardization')}
+                        onCheckedChange={(checked) => {
+                          handleStrategyChange('operational', 'process-standardization');
+                        }}
                       />
                       <label htmlFor="process-standardization" className="text-gray-200">Process Standardization</label>
                     </div>
@@ -493,6 +570,10 @@ const ThesisSubmission = () => {
                       <Checkbox 
                         id="staff-retention" 
                         className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                        checked={formData.strategies.operational.includes('staff-retention')}
+                        onCheckedChange={(checked) => {
+                          handleStrategyChange('operational', 'staff-retention');
+                        }}
                       />
                       <label htmlFor="staff-retention" className="text-gray-200">Staff Retention/Development</label>
                     </div>
@@ -506,6 +587,10 @@ const ThesisSubmission = () => {
                       <Checkbox 
                         id="geographic-expansion" 
                         className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                        checked={formData.strategies.growth.includes('geographic-expansion')}
+                        onCheckedChange={(checked) => {
+                          handleStrategyChange('growth', 'geographic-expansion');
+                        }}
                       />
                       <label htmlFor="geographic-expansion" className="text-gray-200">Geographic Expansion</label>
                     </div>
@@ -513,6 +598,10 @@ const ThesisSubmission = () => {
                       <Checkbox 
                         id="service-expansion" 
                         className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                        checked={formData.strategies.growth.includes('service-expansion')}
+                        onCheckedChange={(checked) => {
+                          handleStrategyChange('growth', 'service-expansion');
+                        }}
                       />
                       <label htmlFor="service-expansion" className="text-gray-200">Service Line Expansion</label>
                     </div>
@@ -520,6 +609,10 @@ const ThesisSubmission = () => {
                       <Checkbox 
                         id="client-growth" 
                         className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                        checked={formData.strategies.growth.includes('client-growth')}
+                        onCheckedChange={(checked) => {
+                          handleStrategyChange('growth', 'client-growth');
+                        }}
                       />
                       <label htmlFor="client-growth" className="text-gray-200">Client Base Growth</label>
                     </div>
@@ -533,6 +626,10 @@ const ThesisSubmission = () => {
                       <Checkbox 
                         id="merging-operations" 
                         className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                        checked={formData.strategies.integration.includes('merging-operations')}
+                        onCheckedChange={(checked) => {
+                          handleStrategyChange('integration', 'merging-operations');
+                        }}
                       />
                       <label htmlFor="merging-operations" className="text-gray-200">Merging Operations</label>
                     </div>
@@ -540,6 +637,10 @@ const ThesisSubmission = () => {
                       <Checkbox 
                         id="culture-integration" 
                         className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                        checked={formData.strategies.integration.includes('culture-integration')}
+                        onCheckedChange={(checked) => {
+                          handleStrategyChange('integration', 'culture-integration');
+                        }}
                       />
                       <label htmlFor="culture-integration" className="text-gray-200">Culture Integration</label>
                     </div>
@@ -547,6 +648,10 @@ const ThesisSubmission = () => {
                       <Checkbox 
                         id="systems-consolidation" 
                         className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                        checked={formData.strategies.integration.includes('systems-consolidation')}
+                        onCheckedChange={(checked) => {
+                          handleStrategyChange('integration', 'systems-consolidation');
+                        }}
                       />
                       <label htmlFor="systems-consolidation" className="text-gray-200">Systems Consolidation</label>
                     </div>
