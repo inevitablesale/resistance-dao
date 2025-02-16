@@ -713,16 +713,21 @@ const ThesisSubmission = () => {
                   <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
                   <div className="relative z-10 p-6 flex items-center justify-between">
                     <div className="space-y-2">
-                      <p className="text-sm text-white/60">Advertisement</p>
+                      <p className="text-sm text-white/60">Promote Your Services</p>
                       <h3 className="text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
-                        Explore Web3 Opportunities
+                        M&A Ecosystem Advertising
                       </h3>
+                      <p className="text-sm text-white/60 max-w-md">
+                        Reach accounting firms, M&A advisors, and transaction service providers actively seeking solutions. 
+                        Perfect for software vendors, consultants, and service providers in the M&A ecosystem.
+                      </p>
                     </div>
                     <Button 
                       variant="ghost" 
                       className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                      onClick={() => window.open('mailto:sales@example.com')}
                     >
-                      Learn More
+                      Contact Sales
                     </Button>
                   </div>
                 </Card>
