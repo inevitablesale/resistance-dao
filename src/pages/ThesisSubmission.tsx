@@ -20,7 +20,6 @@ import { validateProposalMetadata, validateIPFSHash, validateContractParameters 
 import { executeTransaction } from "@/services/transactionManager";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 
-// Contract constants
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
   "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
