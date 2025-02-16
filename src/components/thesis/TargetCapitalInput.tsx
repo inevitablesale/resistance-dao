@@ -2,7 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { InfoCircled } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import { ethers } from "ethers";
 
 interface TargetCapitalInputProps {
@@ -50,7 +50,7 @@ export const TargetCapitalInput = ({
       <div className="flex items-center justify-between">
         <Label className="text-lg font-medium text-white mb-2 flex items-center gap-2">
           Target Capital
-          <InfoCircled className="h-4 w-4 text-gray-400" />
+          <HelpCircle className="h-4 w-4 text-gray-400" />
         </Label>
         <div className="text-sm text-gray-400">
           {value && `≈ ${ethers.utils.formatEther(ethers.utils.parseEther(value || "0"))} ETH`}

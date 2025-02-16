@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
+import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
+import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
 import Nav from "@/components/Nav";
 import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,19 +17,15 @@ import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
 import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
-import { validateProposalMetadata, validateIPFSHash, validateContractParameters } from "@/services/proposalValidationService";
-import { executeTransaction } from "@/services/transactionManager";
+import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
-import { SubmissionProgress, SubmissionStep } from "@/components/thesis/SubmissionProgress";
+import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
 import { SubmissionFeeDisplay } from "@/components/thesis/SubmissionFeeDisplay";
 import { ProposalsHistory } from "@/components/thesis/ProposalsHistory";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
-import { IndustrySection } from "@/components/thesis/form-sections/IndustrySection";
-import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
-import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
-import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { motion } from "framer-motion";
 import { StoredProposal } from "@/types/proposals";
+import type { SubmissionStep } from "@/components/thesis/SubmissionProgress";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -477,7 +473,7 @@ const ThesisSubmission = () => {
         ipfsHash,
         timestamp: new Date().toISOString(),
         title: formData.title,
-        targetCapital: formData.investment.targetCapital,
+        targetCapital: formData.investment.targetCapital.toString(),
         status: 'pending'
       };
       userProposals.push(newProposal);

@@ -2,7 +2,7 @@
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { motion } from "framer-motion";
-import { InfoCircled } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 
 interface VotingDurationInputProps {
   value: number;
@@ -34,7 +34,7 @@ export const VotingDurationInput = ({
         <div>
           <Label className="text-lg font-medium text-white flex items-center gap-2">
             Voting Duration
-            <InfoCircled className="h-4 w-4 text-gray-400" />
+            <HelpCircle className="h-4 w-4 text-gray-400" />
           </Label>
           <p className="text-sm text-gray-400">Set how long the community can vote on your thesis</p>
         </div>
