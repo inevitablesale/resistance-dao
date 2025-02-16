@@ -147,7 +147,7 @@ const ThesisSubmission = () => {
     }
   });
 
-  const [votingDuration, setVotingDuration] = useState<string>(MIN_VOTING_DURATION.toString());
+  const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
   const [hasShownBalanceWarning, setHasShownBalanceWarning] = useState(false);
   const [currentStep, setCurrentStep] = useState<string>('thesis');
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
@@ -203,7 +203,7 @@ const ThesisSubmission = () => {
   };
 
   const handleVotingDurationChange = (value: number[]) => {
-    setVotingDuration(value[0].toString());
+    setVotingDuration(value[0]);
   };
 
   const getButtonText = () => {
@@ -602,26 +602,19 @@ const ThesisSubmission = () => {
                     </Card>
                   </TabsContent>
 
-                  <TabsContent value="firm" className="m-0">
+                  <TabsContent value="firm">
                     <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
                       <div className="p-6">
-                        <IndustrySection 
+                        <FirmCriteriaSection 
                           formData={formData}
                           formErrors={formErrors}
                           onChange={handleFormDataChange}
                         />
-                        <div className="mt-8">
-                          <FirmCriteriaSection 
-                            formData={formData}
-                            formErrors={formErrors}
-                            onChange={handleFormDataChange}
-                          />
-                        </div>
                       </div>
                     </Card>
                   </TabsContent>
 
-                  <TabsContent value="strategy" className="m-0">
+                  <TabsContent value="strategy">
                     <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
                       <div className="p-6">
                         <StrategiesSection 
@@ -633,7 +626,7 @@ const ThesisSubmission = () => {
                     </Card>
                   </TabsContent>
 
-                  <TabsContent value="terms" className="m-0">
+                  <TabsContent value="terms">
                     <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
                       <div className="p-6">
                         <PaymentTermsSection 
