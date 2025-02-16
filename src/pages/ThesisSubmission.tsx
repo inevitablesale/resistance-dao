@@ -22,7 +22,7 @@ import { TransactionStatus } from "@/components/thesis/TransactionStatus";
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Collapsible,
   CollapsibleContent,
@@ -145,6 +145,7 @@ const ThesisSubmission = () => {
   const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
+  const [isThesisOpen, setIsThesisOpen] = useState(false);
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     firmCriteria: {
@@ -165,8 +166,6 @@ const ThesisSubmission = () => {
       additionalCriteria: ""
     }
   });
-
-  const [isThesisOpen, setIsThesisOpen] = useState(true);
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => 
@@ -517,25 +516,28 @@ const ThesisSubmission = () => {
                   <Collapsible
                     open={isThesisOpen}
                     onOpenChange={setIsThesisOpen}
-                    className="space-y-4"
+                    className="w-full"
                   >
-                    <CollapsibleTrigger className="flex items-center justify-between w-full text-left group">
-                      <div className="space-y-1">
-                        <h2 className="text-xl font-semibold text-white group-hover:text-white/90">
-                          Investment Thesis
-                        </h2>
-                        <p className="text-sm text-white/60">
-                          Fill out your investment thesis details
-                        </p>
+                    <CollapsibleTrigger className="w-full">
+                      <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
+                        <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
+                          1
+                        </div>
+                        <div className="flex-1 text-left">
+                          <h2 className="text-xl font-semibold text-purple-400 group-hover:text-purple-300 transition-colors">
+                            Investment Thesis
+                          </h2>
+                          <p className="text-sm text-white/60">
+                            Fill out your investment thesis details
+                          </p>
+                        </div>
+                        <ChevronDown className={cn(
+                          "w-5 h-5 text-white/60 transition-transform",
+                          isThesisOpen && "transform rotate-180"
+                        )} />
                       </div>
-                      {isThesisOpen ? (
-                        <ChevronUp className="w-5 h-5 text-white/60" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-white/60" />
-                      )}
                     </CollapsibleTrigger>
-
-                    <CollapsibleContent className="space-y-6">
+                    <CollapsibleContent className="space-y-6 px-4 pt-4 pb-6">
                       <div className="space-y-4">
                         <Label className="text-lg font-medium text-white">
                           Thesis Title
@@ -565,7 +567,25 @@ const ThesisSubmission = () => {
                     </CollapsibleContent>
                   </Collapsible>
 
-                  {/* ... keep existing code (other sections) */}
+                  <FirmCriteriaSection
+                    formData={formData}
+                    errors={formErrors}
+                    onChange={handleFormDataChange}
+                  />
+
+                  <StrategiesSection
+                    formData={formData}
+                    errors={formErrors}
+                    onChange={handleStrategyChange}
+                    validateStrategies={validateStrategies}
+                  />
+
+                  <PaymentTermsSection
+                    formData={formData}
+                    errors={formErrors}
+                    onChange={handleFormDataChange}
+                    validatePaymentTerms={validatePaymentTerms}
+                  />
                 </div>
               </Card>
 
