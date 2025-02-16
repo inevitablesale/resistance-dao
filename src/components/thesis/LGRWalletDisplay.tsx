@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -157,64 +156,7 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
       "bg-black border-white/10 overflow-hidden p-6 space-y-6",
       className
     )}>
-      <div className="space-y-3">
-        <div className="relative w-full">
-          <Button
-            variant="outline"
-            className={cn(
-              "w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium relative",
-              hasInsufficientBalance && "border-red-500/50"
-            )}
-            onClick={() => setShowBalances(!showBalances)}
-          >
-            {showBalances ? <EyeOff className="w-6 h-6 mr-2" /> : <Eye className="w-6 h-6 mr-2" />}
-            Balances
-            {hasInsufficientBalance && (
-              <div className="absolute -top-2 -right-2 z-10">
-                <AlertCircle className="w-4 h-4 text-red-500" />
-              </div>
-            )}
-          </Button>
-        </div>
-
-        <Button
-          variant="outline"
-          className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium"
-          onClick={() => setShowDeposit(!showDeposit)}
-        >
-          <Upload className="w-6 h-6 mr-2" />
-          Deposit
-        </Button>
-
-        <Button
-          onClick={handleBuyPolygon}
-          className="w-full h-14 bg-purple-500 hover:bg-purple-600 text-white font-semibold text-lg"
-        >
-          <img 
-            src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-            alt="Polygon"
-            className="w-6 h-6 mr-2"
-          />
-          Buy Polygon
-        </Button>
-
-        <Button
-          onClick={() => setIsConfirmOpen(true)}
-          className="w-full h-14 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold text-lg"
-        >
-          <Coins className="w-6 h-6 mr-2" />
-          Buy LGR
-        </Button>
-
-        <Button
-          variant="ghost"
-          onClick={() => setShowInstructions(true)}
-          className="w-full h-14 text-white hover:bg-white/10 font-semibold text-lg"
-        >
-          <Info className="w-6 h-6 mr-2" />
-          How to Buy
-        </Button>
-
+      <div className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-white">Submission Requirements</h3>
@@ -257,6 +199,98 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
             </div>
           </div>
         </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-white font-medium">Balances</h4>
+            <button 
+              onClick={() => setShowBalances(!showBalances)}
+              className="text-white/60 hover:text-white transition-colors"
+            >
+              {showBalances ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          </div>
+
+          {showBalances && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                    <Coins className="w-6 h-6 text-yellow-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-medium text-white">LGR Token</h3>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-white">
+                    {Number(lgrBalance).toFixed(2)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                    <img 
+                      src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+                      alt="Polygon"
+                      className="w-6 h-6"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-medium text-white">POLYGON</h3>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-white">
+                    {Number(maticBalance).toFixed(2)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-3">
+          <Button
+            variant="outline"
+            className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium"
+            onClick={() => setShowDeposit(!showDeposit)}
+          >
+            <Upload className="w-6 h-6 mr-2" />
+            Deposit
+          </Button>
+
+          <Button
+            onClick={handleBuyPolygon}
+            className="w-full h-14 bg-purple-500 hover:bg-purple-600 text-white font-semibold text-lg"
+          >
+            <img 
+              src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+              alt="Polygon"
+              className="w-6 h-6 mr-2"
+            />
+            Buy Polygon
+          </Button>
+
+          <Button
+            onClick={() => setIsConfirmOpen(true)}
+            className="w-full h-14 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold text-lg"
+          >
+            <Coins className="w-6 h-6 mr-2" />
+            Buy LGR
+          </Button>
+
+          <Button
+            variant="ghost"
+            onClick={() => setShowInstructions(true)}
+            className="w-full h-14 text-white hover:bg-white/10 font-semibold text-lg"
+          >
+            <Info className="w-6 h-6 mr-2" />
+            How to Buy
+          </Button>
+        </div>
       </div>
 
       {showDeposit && walletAddress && (
@@ -275,50 +309,6 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
           <p className="text-sm text-white break-all font-mono">
             {walletAddress}
           </p>
-        </div>
-      )}
-
-      {showBalances && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                <Coins className="w-6 h-6 text-yellow-500" />
-              </div>
-              <div>
-                <h3 className="text-xl font-medium text-white">LGR Token</h3>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-white">
-                {Number(lgrBalance).toFixed(2)}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-4 border-t border-white/10">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-                <img 
-                  src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-                  alt="Polygon"
-                  className="w-6 h-6"
-                />
-              </div>
-              <div>
-                <h3 className="text-xl font-medium text-white">POLYGON</h3>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-white">
-                {Number(maticBalance).toFixed(2)}
-              </p>
-            </div>
-          </div>
-
-          <div className="text-lg text-gray-400 pt-4">
-            Price: $0.10 USD per LGR
-          </div>
         </div>
       )}
 
