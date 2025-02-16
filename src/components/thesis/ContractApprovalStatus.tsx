@@ -2,10 +2,13 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { Check, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+
+const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 interface ContractApprovalStatusProps {
   onApprovalComplete: () => void;
