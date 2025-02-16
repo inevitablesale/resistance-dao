@@ -56,16 +56,7 @@ const dynamicSettings = {
     appLogoUrl: "/favicon.ico",
     onramp: {
       providers: ['banxa'],
-      defaultProvider: 'banxa',
-      defaultFiatAmount: 100,
-      defaultCrypto: 'MATIC',
-      defaultFiat: 'USD',
-      presetCrypto: 'MATIC',
-      presetFiat: 'USD',
-      defaultNetwork: {
-        chainId: 137,
-        name: 'Polygon'
-      }
+      defaultProvider: 'banxa'
     },
     enableEmbeddedWallets: true,
     enableVisitTrackingOnConnectOnly: true,
