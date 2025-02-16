@@ -260,12 +260,12 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
                 />
               </div>
               <div>
-                <h3 className="text-xl font-medium text-white">POLYGON</h3>
+                <h3 className="text-xl font-medium text-white">POLY</h3>
               </div>
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold text-white">
-                {Number(maticBalance).toFixed(2)} POLYGON
+                {Number(maticBalance).toFixed(2)} POLY
               </p>
             </div>
           </div>
