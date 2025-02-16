@@ -5,13 +5,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { getWorkingProvider, getLgrTokenContract, getPresaleContract, fetchPresaleMaticPrice, purchaseTokens } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Coins } from "lucide-react";
+import { Coins, Info } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useOnramp } from "@dynamic-labs/sdk-react-core";
 import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
@@ -23,6 +24,7 @@ export const LGRFloatingWidget = () => {
   const [maticPrice, setMaticPrice] = useState<string>("0");
   const [purchaseAmount, setPurchaseAmount] = useState<string>("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -133,6 +135,7 @@ export const LGRFloatingWidget = () => {
         </PopoverTrigger>
         <PopoverContent className="w-80 p-4 bg-black/90 backdrop-blur-lg border border-white/10">
           <div className="space-y-4">
+            {/* Balance Display */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
@@ -156,6 +159,7 @@ export const LGRFloatingWidget = () => {
               </div>
             </div>
 
+            {/* MATIC Balance */}
             <div className="flex items-center justify-between py-2 border-t border-white/10">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
@@ -186,7 +190,7 @@ export const LGRFloatingWidget = () => {
                 <Button 
                   className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold"
                   onClick={() => setIsConfirmOpen(true)}
-                  disabled={!address}
+                  disabled={!address || Number(maticBalance) <= 0}
                 >
                   <Coins className="w-4 h-4 mr-2" />
                   Buy LGR
@@ -203,12 +207,108 @@ export const LGRFloatingWidget = () => {
                   />
                   Buy Polygon
                 </Button>
+
+                <Button
+                  variant="ghost"
+                  className="w-full text-white hover:bg-white/10"
+                  onClick={() => setShowInstructions(true)}
+                >
+                  <Info className="w-4 h-4 mr-2" />
+                  How to Buy
+                </Button>
               </div>
             </div>
           </div>
         </PopoverContent>
       </Popover>
 
+      {/* Instructions Dialog */}
+      <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
+        <DialogContent className="bg-black/95 border border-yellow-500/20 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-yellow-500">How to Buy LGR Tokens</DialogTitle>
+            <DialogDescription>
+              Follow these steps to purchase LGR tokens
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="polygon">Get MATIC</TabsTrigger>
+              <TabsTrigger value="lgr">Buy LGR</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview">
+              <div className="space-y-4 text-white">
+                <h3 className="font-semibold text-lg">Quick Start Guide</h3>
+                <ol className="list-decimal pl-5 space-y-2">
+                  <li>Connect your wallet using the button in the top right</li>
+                  <li>Purchase MATIC (Polygon) tokens using our onramp service</li>
+                  <li>Use your MATIC to buy LGR tokens</li>
+                  <li>Pay a small gas fee in MATIC to complete the transaction</li>
+                </ol>
+                <p className="text-sm text-gray-400 mt-4">
+                  Note: Make sure to purchase enough MATIC to cover both your LGR purchase and the gas fees (approximately 0.001 MATIC)
+                </p>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="polygon">
+              <div className="space-y-4 text-white">
+                <h3 className="font-semibold text-lg">Getting MATIC (Polygon)</h3>
+                <div className="space-y-2">
+                  <p>MATIC is the native token of the Polygon network. You need it to:</p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Purchase LGR tokens</li>
+                    <li>Pay for transaction fees (gas)</li>
+                  </ul>
+                  <p className="mt-4">To get MATIC:</p>
+                  <ol className="list-decimal pl-5 space-y-2">
+                    <li>Click the "Buy Polygon" button</li>
+                    <li>Enter the amount you wish to purchase</li>
+                    <li>Complete the payment through our secure partner</li>
+                  </ol>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="lgr">
+              <div className="space-y-4 text-white">
+                <h3 className="font-semibold text-lg">Buying LGR Tokens</h3>
+                <div className="space-y-2">
+                  <p>Once you have MATIC in your wallet:</p>
+                  <ol className="list-decimal pl-5 space-y-2">
+                    <li>Click the "Buy LGR" button</li>
+                    <li>Enter the amount of MATIC you want to spend</li>
+                    <li>Review the number of LGR tokens you'll receive</li>
+                    <li>Confirm the transaction in your wallet</li>
+                  </ol>
+                  <div className="mt-4 p-4 bg-yellow-500/10 rounded-lg">
+                    <p className="text-yellow-500 font-semibold">Important:</p>
+                    <ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
+                      <li>Current price: $0.10 USD per LGR</li>
+                      <li>Minimum purchase: None</li>
+                      <li>Transaction fee: ~0.001 MATIC</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <DialogFooter>
+            <Button
+              onClick={() => setShowInstructions(false)}
+              className="w-full sm:w-auto"
+            >
+              Got it
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Purchase Confirmation Dialog */}
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogContent className="bg-black/95 border border-yellow-500/20">
           <DialogHeader>
