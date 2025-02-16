@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { getWorkingProvider, getLgrTokenContract, getPresaleContract, fetchPresaleMaticPrice, purchaseTokens } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Coins, Wallet, HelpCircle } from "lucide-react";
+import { Coins } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -152,15 +152,16 @@ export const LGRFloatingWidget = () => {
                   Buy LGR
                 </Button>
 
-                <DynamicWidget
-                  buttonClassName="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded flex items-center justify-center"
-                  buttonChildren={
-                    <>
-                      <Wallet className="w-4 h-4 mr-2" />
-                      Buy POLYGON
-                    </>
-                  }
-                />
+                <div className="flex items-center gap-2 px-3 py-2 bg-black/20 rounded-lg cursor-pointer hover:bg-black/30 transition-colors">
+                  <div className="flex items-center gap-2 w-full">
+                    <img 
+                      src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+                      alt="Polygon"
+                      className="w-6 h-6"
+                    />
+                    <DynamicWidget />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
