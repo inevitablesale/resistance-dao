@@ -167,7 +167,6 @@ const ThesisSubmission = () => {
   });
 
   const [isThesisOpen, setIsThesisOpen] = useState(true);
-  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => 
@@ -219,6 +218,28 @@ const ThesisSubmission = () => {
 
   const handleVotingDurationChange = (value: number[]) => {
     setVotingDuration(value[0]);
+  };
+
+  const getButtonText = () => {
+    if (isSubmitting) {
+      return (
+        <div className="flex items-center justify-center">
+          <span className="mr-2">Submitting...</span>
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+        </div>
+      );
+    }
+
+    switch (activeStep) {
+      case 'thesis':
+        return "Continue to Firm Details";
+      case 'strategy':
+        return "Continue to Terms";
+      case 'terms':
+        return "Submit Investment Thesis";
+      default:
+        return "Continue";
+    }
   };
 
   const validateBasicsTab = (): boolean => {
@@ -309,20 +330,157 @@ const ThesisSubmission = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleContinue = () => {
-    if (isThesisSectionComplete()) {
-      setActiveSection(null);
-    } else {
+  const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
+    let isValid = false;
+
+    switch (activeStep) {
+      case 'thesis':
+        isValid = validateBasicsTab();
+        if (isValid) setActiveStep('firm');
+        break;
+      case 'firm':
+        isValid = validateFirmTab();
+        if (isValid) setActiveStep('strategy');
+        break;
+      case 'strategy':
+        isValid = validateStrategyTab();
+        if (isValid) setActiveStep('terms');
+        break;
+      case 'terms':
+        isValid = validateTermsTab();
+        if (isValid) handleSubmit(e);
+        break;
+    }
+
+    if (!isValid) {
       toast({
-        title: "Incomplete Section",
-        description: "Please fill in all required fields correctly.",
+        title: "Validation Error",
+        description: "Please fill in all required fields correctly before proceeding.",
         variant: "destructive"
       });
     }
   };
 
-  const isThesisSectionComplete = () => {
-    return validateBasicsTab();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!isConnected) {
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your wallet to submit a thesis",
+        variant: "destructive"
+      });
+      connect();
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setFormErrors({});
+
+      // Update step status
+      updateStepStatus('thesis', 'completed');
+      updateStepStatus('strategy', 'completed');
+      updateStepStatus('approval', 'processing');
+      setActiveStep('approval');
+
+      // Get contract status and validate
+      if (!wallet) {
+        throw new Error("No wallet connected");
+      }
+
+      const contractStatus = await getContractStatus(wallet);
+      
+      if (contractStatus.isPaused) {
+        toast({
+          title: "Contract Paused",
+          description: "The contract is currently paused for maintenance. Please try again later.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Validate all form fields against contract requirements
+      const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
+      if (targetCapitalWei.lt(contractStatus.minTargetCapital) || targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
+        throw new Error("Target capital out of allowed range");
+      }
+
+      if (votingDuration < contractStatus.minVotingDuration || votingDuration > contractStatus.maxVotingDuration) {
+        throw new Error("Voting duration out of allowed range");
+      }
+
+      // Approve LGR tokens with exact amount from contract
+      console.log('Approving LGR tokens for submission...');
+      const submissionFeeApproval = await approveLGR(contractStatus.submissionFee.toString());
+      if (!submissionFeeApproval) {
+        updateStepStatus('approval', 'failed');
+        toast({
+          title: "Approval Failed",
+          description: "Failed to approve LGR tokens for submission. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      updateStepStatus('approval', 'completed');
+      updateStepStatus('submission', 'processing');
+      setActiveStep('submission');
+
+      // Upload metadata to IPFS
+      console.log('Uploading metadata to IPFS...');
+      const ipfsUri = await uploadMetadataToPinata(formData);
+      const ipfsHash = ipfsUri.replace('ipfs://', '');
+      
+      if (!validateIPFSHash(ipfsHash)) {
+        throw new Error("Invalid IPFS hash format");
+      }
+
+      // Estimate gas before submission
+      const gasEstimate = await estimateProposalGas({
+        targetCapital: targetCapitalWei,
+        votingDuration,
+        ipfsHash
+      }, wallet);
+
+      // Create proposal
+      console.log('Creating proposal...');
+      const result = await createProposal({
+        targetCapital: targetCapitalWei,
+        votingDuration,
+        ipfsHash
+      }, wallet);
+
+      // Store proposal data with correct type for targetCapital
+      const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
+      const newProposal: StoredProposal = {
+        hash: result.hash,
+        ipfsHash,
+        timestamp: new Date().toISOString(),
+        title: formData.title,
+        targetCapital: formData.investment.targetCapital.toString(),
+        status: 'pending'
+      };
+      userProposals.push(newProposal);
+      localStorage.setItem('userProposals', JSON.stringify(userProposals));
+
+      updateStepStatus('submission', 'completed');
+      toast({
+        title: "Success",
+        description: "Your investment thesis has been submitted successfully!",
+      });
+
+    } catch (error) {
+      console.error("Submission error:", error);
+      updateStepStatus(activeStep, 'failed');
+      toast({
+        title: "Submission Failed",
+        description: error instanceof Error ? error.message : "Failed to submit thesis",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -356,112 +514,89 @@ const ThesisSubmission = () => {
                 </div>
 
                 <div className="p-6 space-y-8">
-                  <AnimatePresence mode="wait">
-                    {activeSection === 'thesis' ? (
-                      <motion.div
-                        key="thesis-form"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="space-y-6"
-                      >
-                        <div className="space-y-4">
-                          <Label className="text-lg font-medium text-white">
-                            Thesis Title
-                          </Label>
-                          <Input
-                            placeholder="Enter a clear, descriptive title"
-                            className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
-                            value={formData.title}
-                            onChange={(e) => handleFormDataChange('title', e.target.value)}
-                          />
-                          {formErrors.title && (
-                            <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                          )}
-                        </div>
+                  <Collapsible
+                    open={isThesisOpen}
+                    onOpenChange={setIsThesisOpen}
+                    className="space-y-4"
+                  >
+                    <CollapsibleTrigger className="flex items-center justify-between w-full text-left group">
+                      <div className="space-y-1">
+                        <h2 className="text-xl font-semibold text-white group-hover:text-white/90">
+                          Investment Thesis
+                        </h2>
+                        <p className="text-sm text-white/60">
+                          Fill out your investment thesis details
+                        </p>
+                      </div>
+                      {isThesisOpen ? (
+                        <ChevronUp className="w-5 h-5 text-white/60" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-white/60" />
+                      )}
+                    </CollapsibleTrigger>
 
-                        <VotingDurationInput
-                          value={votingDuration}
-                          onChange={handleVotingDurationChange}
-                          error={formErrors.votingDuration}
+                    <CollapsibleContent className="space-y-6">
+                      <div className="space-y-4">
+                        <Label className="text-lg font-medium text-white">
+                          Thesis Title
+                        </Label>
+                        <Input
+                          placeholder="Enter a clear, descriptive title"
+                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                          value={formData.title}
+                          onChange={(e) => handleFormDataChange('title', e.target.value)}
                         />
+                        {formErrors.title && (
+                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                        )}
+                      </div>
 
-                        <TargetCapitalInput
-                          value={formData.investment.targetCapital}
-                          onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
-                          error={formErrors['investment.targetCapital']}
-                        />
+                      <VotingDurationInput
+                        value={votingDuration}
+                        onChange={handleVotingDurationChange}
+                        error={formErrors.votingDuration}
+                      />
 
-                        <div className="flex justify-end pt-4">
-                          <Button
-                            onClick={handleContinue}
-                            className="bg-gradient-to-r from-polygon-primary to-polygon-secondary hover:from-polygon-secondary hover:to-polygon-primary"
-                          >
-                            Done
-                          </Button>
-                        </div>
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="sections-list"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="space-y-6"
-                      >
-                        <button
-                          onClick={() => setActiveSection('thesis')}
-                          className="w-full text-left group space-y-1 p-4 rounded-lg hover:bg-white/5 transition-colors"
-                        >
-                          <h2 className="text-xl font-semibold text-white group-hover:text-white/90 flex items-center justify-between">
-                            Investment Thesis
-                            {isThesisSectionComplete() && (
-                              <span className="text-green-500">✓</span>
-                            )}
-                          </h2>
-                          <p className="text-sm text-white/60">
-                            Fill out your investment thesis details
-                          </p>
-                        </button>
+                      <TargetCapitalInput
+                        value={formData.investment.targetCapital}
+                        onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+                        error={formErrors['investment.targetCapital']}
+                      />
+                    </CollapsibleContent>
+                  </Collapsible>
 
-                        {/* Other sections as buttons */}
-                        <button
-                          className="w-full text-left group space-y-1 p-4 rounded-lg hover:bg-white/5 transition-colors"
-                        >
-                          <h2 className="text-xl font-semibold text-white group-hover:text-white/90">
-                            Firm Details
-                          </h2>
-                          <p className="text-sm text-white/60">
-                            Specify your target firm criteria
-                          </p>
-                        </button>
-
-                        <button
-                          className="w-full text-left group space-y-1 p-4 rounded-lg hover:bg-white/5 transition-colors"
-                        >
-                          <h2 className="text-xl font-semibold text-white group-hover:text-white/90">
-                            Strategy Selection
-                          </h2>
-                          <p className="text-sm text-white/60">
-                            Select your post-acquisition strategies
-                          </p>
-                        </button>
-
-                        <button
-                          className="w-full text-left group space-y-1 p-4 rounded-lg hover:bg-white/5 transition-colors"
-                        >
-                          <h2 className="text-xl font-semibold text-white group-hover:text-white/90">
-                            Payment Terms
-                          </h2>
-                          <p className="text-sm text-white/60">
-                            Define your payment terms
-                          </p>
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {/* ... keep existing code (other sections) */}
                 </div>
               </Card>
+
+              {/* Navigation */}
+              <div className="flex justify-end mt-6">
+                <Button
+                  onClick={handleContinue}
+                  disabled={isSubmitting}
+                  className={cn(
+                    "h-12 px-6 min-w-[200px]",
+                    "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+                    "hover:from-polygon-secondary hover:to-polygon-primary",
+                    "text-white font-medium",
+                    "transition-all duration-300",
+                    "disabled:opacity-50",
+                    "flex items-center justify-center gap-2"
+                  )}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Continue</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
 
             {/* Right Column - Wallet and Status */}
