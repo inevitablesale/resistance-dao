@@ -13,8 +13,16 @@ import { FileText, AlertTriangle, Info, Clock, CreditCard, Wallet } from "lucide
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { ethers } from "ethers";
+import { uploadMetadataToPinata } from "@/services/pinataService";
 
 // Contract constants
+const FACTORY_ADDRESS = "0x..."; // Add the deployed factory contract address
+const FACTORY_ABI = [
+  "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
+  "function submissionFee() public view returns (uint256)",
+  "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"
+];
+
 const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
 const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
 const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
@@ -62,7 +70,8 @@ const US_STATES = [
 
 const ThesisSubmission = () => {
   const { toast } = useToast();
-  const { isConnected, address, connect } = useWalletConnection();
+  const { isConnected, address, connect, approveLGR } = useWalletConnection();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     industry: {
@@ -156,48 +165,70 @@ const ThesisSubmission = () => {
       return;
     }
 
-    // Validate target capital
-    const targetCapital = ethers.utils.parseEther(formData.investment.targetCapital);
-    if (targetCapital.lt(MIN_TARGET_CAPITAL) || targetCapital.gt(MAX_TARGET_CAPITAL)) {
-      toast({
-        title: "Invalid Target Capital",
-        description: `Target capital must be between 1,000 and 25,000,000 LGR`,
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Validate strategies
-    if (!validateStrategies('operational') || !validateStrategies('growth') || !validateStrategies('integration')) {
-      toast({
-        title: "Too Many Strategies",
-        description: `Maximum ${MAX_STRATEGIES_PER_CATEGORY} strategies per category allowed`,
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Validate payment terms
-    if (!validatePaymentTerms()) {
-      toast({
-        title: "Too Many Payment Terms",
-        description: "Maximum 5 payment terms allowed",
-        variant: "destructive"
-      });
-      return;
-    }
-
     try {
-      // Upload metadata to IPFS (implementation needed)
-      const ipfsHash = "QmExample"; // Placeholder
+      setIsSubmitting(true);
 
-      // Create proposal
-      // Contract integration needed here
-      
+      // 1. First approve LGR tokens for submission fee
+      const submissionFeeApproval = await approveLGR(ethers.utils.parseEther("250").toString());
+      if (!submissionFeeApproval) {
+        throw new Error("Failed to approve LGR tokens for submission");
+      }
+
+      // 2. Upload metadata to IPFS
+      console.log('Uploading metadata to IPFS...');
+      const ipfsUri = await uploadMetadataToPinata(formData);
+      const ipfsHash = ipfsUri.replace('ipfs://', '');
+      console.log('Metadata uploaded to IPFS:', ipfsHash);
+
+      // 3. Create proposal through factory contract
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
+
+      console.log('Creating proposal...');
+      const targetCapital = ethers.utils.parseEther(formData.investment.targetCapital);
+      const votingDurationSeconds = votingDuration;
+
+      const tx = await factory.createProposal(
+        ipfsHash,
+        targetCapital,
+        votingDurationSeconds
+      );
+
+      console.log('Proposal creation transaction submitted:', tx.hash);
+
+      // 4. Listen for ProposalCreated event
+      const receipt = await tx.wait();
+      console.log('Transaction confirmed:', receipt);
+
+      const event = receipt.events?.find(e => e.event === 'ProposalCreated');
+      if (!event) {
+        throw new Error('ProposalCreated event not found in transaction receipt');
+      }
+
+      const [tokenId, proposalContract, creator, isTest] = event.args;
+      console.log('Proposal created:', {
+        tokenId: tokenId.toString(),
+        proposalContract,
+        creator,
+        isTest
+      });
+
+      // Store proposal data in local storage for reference
+      const userProposals = JSON.parse(localStorage.getItem('userProposals') || '[]');
+      userProposals.push({
+        tokenId: tokenId.toString(),
+        contractAddress: proposalContract,
+        ipfsHash,
+        timestamp: Date.now()
+      });
+      localStorage.setItem('userProposals', JSON.stringify(userProposals));
+
       toast({
         title: "Success",
         description: "Your investment thesis has been submitted",
       });
+
     } catch (error) {
       console.error("Submission error:", error);
       toast({
@@ -205,6 +236,8 @@ const ThesisSubmission = () => {
         description: error instanceof Error ? error.message : "Failed to submit thesis",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -595,9 +628,10 @@ const ThesisSubmission = () => {
 
                 <Button
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
                 >
-                  Submit Investment Thesis
+                  {isSubmitting ? "Submitting..." : "Submit Investment Thesis"}
                 </Button>
               </div>
             </form>
