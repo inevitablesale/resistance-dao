@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -26,6 +25,7 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { motion } from "framer-motion";
 import { StoredProposal } from "@/types/proposals";
 import type { SubmissionStep } from "@/components/thesis/SubmissionProgress";
+import { useDynamicContext } from "@/context/DynamicContext";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -111,6 +111,7 @@ const SUBMISSION_STEPS: SubmissionStep[] = [
 ];
 
 const ThesisSubmission = () => {
+  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
   const { tokenBalances } = useTokenBalances({
@@ -471,7 +472,7 @@ const ThesisSubmission = () => {
       <Nav />
       
       <main className="relative z-10 pt-28 pb-20 min-h-screen">
-        <div className="container px-4 mx-auto max-w-4xl">
+        <div className="container px-4 mx-auto max-w-3xl">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -485,17 +486,34 @@ const ThesisSubmission = () => {
             </p>
           </motion.div>
 
-          {/* Compact Progress Bar */}
+          {/* Subtle Progress Indicator */}
           <div className="mb-8">
-            <SubmissionProgress 
-              steps={steps}
-              currentStepId={activeStep}
-            />
+            <div className="flex justify-between items-center text-sm text-white/60">
+              {steps.map((step, index) => (
+                <div 
+                  key={step.id}
+                  className="flex items-center"
+                >
+                  <div className={cn(
+                    "w-2 h-2 rounded-full transition-all duration-300",
+                    step.id === activeStep ? "bg-polygon-primary w-4" : 
+                    steps.findIndex(s => s.id === activeStep) > index ? "bg-polygon-primary/50" : 
+                    "bg-white/20"
+                  )} />
+                  {index < steps.length - 1 && (
+                    <div className={cn(
+                      "h-[1px] w-24 mx-2",
+                      steps.findIndex(s => s.id === activeStep) > index ? "bg-polygon-primary/50" : "bg-white/10"
+                    )} />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="relative">
             {/* Main Form Card */}
-            <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden relative">
+            <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
               <div className="p-6 lg:p-8">
                 {activeStep === 'thesis' && (
                   <motion.div 
@@ -503,7 +521,7 @@ const ThesisSubmission = () => {
                     animate={{ opacity: 1 }}
                     className="space-y-8"
                   >
-                    <div className="space-y-4 max-w-2xl mx-auto">
+                    <div className="space-y-4">
                       <Label className="text-lg font-medium text-white">
                         Thesis Title
                       </Label>
@@ -573,60 +591,47 @@ const ThesisSubmission = () => {
               </div>
             </Card>
 
-            {/* Floating Wallet Info */}
-            <div className="fixed bottom-6 right-6 z-50 w-full max-w-sm">
+            {/* Minimalistic Floating Status */}
+            <div className="fixed bottom-6 right-6 z-50">
               <motion.div
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <Card className="bg-black/90 border-white/10 backdrop-blur-lg shadow-2xl">
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <Wallet className="w-5 h-5 text-white/70" />
-                        <h3 className="text-sm font-medium text-white">Submission Status</h3>
-                      </div>
-                      {!address && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="bg-white/5 border-white/10 text-white hover:bg-white/10"
-                          onClick={() => setShowAuthFlow?.(true)}
-                        >
-                          Connect Wallet
-                        </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-black/90 border-white/10 backdrop-blur-lg shadow-2xl text-white hover:bg-white/10 transition-colors"
+                  onClick={() => {
+                    if (!address) {
+                      setShowAuthFlow?.(true);
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={cn(
+                      "w-2 h-2 rounded-full",
+                      address ? "bg-green-500" : "bg-white/50"
+                    )} />
+                    <span className="text-sm">
+                      {address ? (
+                        `${tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR`
+                      ) : (
+                        "Connect Wallet"
                       )}
-                    </div>
-
-                    {address && (
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-white/70">Balance:</span>
-                          <span className="text-white font-medium">
-                            {tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-white/70">Required:</span>
-                          <span className="text-white font-medium">
-                            {ethers.utils.formatEther(SUBMISSION_FEE)} LGR
-                          </span>
-                        </div>
-                      </div>
-                    )}
+                    </span>
                   </div>
-                </Card>
+                </Button>
               </motion.div>
             </div>
 
-            {/* Navigation */}
+            {/* Action Button */}
             <div className="mt-6 flex justify-end">
               <Button
                 onClick={handleContinue}
                 disabled={isSubmitting}
                 className={cn(
-                  "h-12 px-6 min-w-[200px]",
+                  "h-12 px-6",
                   "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
                   "hover:from-polygon-secondary hover:to-polygon-primary",
                   "text-white font-medium",
@@ -651,14 +656,14 @@ const ThesisSubmission = () => {
               </Button>
             </div>
 
-            {/* Transaction Status - Only show when needed */}
+            {/* Transaction Status - Only shows when active */}
             {currentTxId && (
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4"
+                className="fixed bottom-20 right-6 z-50 w-full max-w-sm"
               >
-                <Card className="bg-black/40 border-white/5 backdrop-blur-sm">
+                <Card className="bg-black/90 border-white/10 backdrop-blur-lg shadow-2xl">
                   <div className="p-4">
                     <TransactionStatus
                       transactionId={currentTxId}
