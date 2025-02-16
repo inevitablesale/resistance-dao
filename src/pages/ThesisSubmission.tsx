@@ -8,9 +8,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Nav from "@/components/Nav";
-import { FileText, AlertTriangle, Info, Clock, CreditCard, Wallet } from "lucide-react";
+import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
@@ -28,6 +28,7 @@ import { IndustrySection } from "@/components/thesis/form-sections/IndustrySecti
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
+import { motion } from "framer-motion";
 import { StoredProposal } from "@/types/proposals";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
@@ -376,225 +377,265 @@ const ThesisSubmission = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black overflow-hidden relative">
+    <div className="min-h-screen bg-[#030712] overflow-hidden relative">
       <div className="absolute inset-0">
         <div 
-          className="absolute inset-0" 
+          className="absolute inset-0 bg-gradient-to-b from-[#0F172A] to-[#030712]"
           style={{ 
-            background: 'radial-gradient(circle at center, #000B2E 0%, #000000 100%)', 
-            opacity: 0.98 
+            maskImage: 'radial-gradient(circle at center, black, transparent)'
           }} 
         />
-        <div 
-          className="absolute inset-0" 
-          style={{ 
-            background: 'radial-gradient(circle at 30% 70%, rgba(64, 156, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(147, 51, 255, 0.1) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.05) 0%, transparent 55%)'
-          }} 
-        />
+        <div className="absolute inset-0 bg-grid-white/[0.02]" />
       </div>
       
       <Nav />
       <LGRFloatingWidget />
       
-      <div className="container mx-auto px-4 py-12 relative z-10">
-        <div className="max-w-4xl mx-auto space-y-8">
-          <div className="text-center space-y-4 mb-12">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-white/90 to-white/80 bg-clip-text text-transparent">
+      <div className="container mx-auto px-4 py-8 relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-7xl mx-auto space-y-8"
+        >
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white/80">
               Investment Thesis Submission
             </h1>
             <p className="text-lg text-white/60 max-w-2xl mx-auto">
-              Submit your investment thesis to the LedgerFund DAO community for review and voting.
+              Share your investment strategy with the LedgerFund DAO community
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
-              <SubmissionFeeDisplay 
-                submissionFee={SUBMISSION_FEE.toString()}
-                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance}
-                className="lg:hidden"
-              />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-8 space-y-6">
+              <Tabs defaultValue="basics" className="w-full">
+                <TabsList className="grid grid-cols-4 gap-4 bg-transparent">
+                  <TabsTrigger
+                    value="basics"
+                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Basics
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="firm"
+                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
+                  >
+                    <Building2 className="w-4 h-4 mr-2" />
+                    Firm
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="strategy"
+                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
+                  >
+                    <Target className="w-4 h-4 mr-2" />
+                    Strategy
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="terms"
+                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
+                  >
+                    <Briefcase className="w-4 h-4 mr-2" />
+                    Terms
+                  </TabsTrigger>
+                </TabsList>
 
-              <Card className="bg-black/50 border border-white/10 backdrop-blur-xl">
-                <form onSubmit={handleSubmit} className="space-y-8 p-6">
-                  <div>
-                    <label className="text-lg font-medium text-white mb-2 block">
-                      Thesis Title
-                    </label>
-                    <p className="text-sm text-gray-400 mb-2">
-                      📌 Provide a concise name for the investment strategy
-                    </p>
-                    <Input
-                      placeholder="Enter thesis title"
-                      className={cn(
-                        "bg-black/50 border-white/10 text-white placeholder:text-gray-500",
-                        formErrors.title ? "border-red-500" : ""
-                      )}
-                      required
-                      value={formData.title}
-                      onChange={(e) => handleFormDataChange('title', e.target.value)}
-                    />
-                    {formErrors.title && (
-                      <p className="mt-1 text-sm text-red-500">{formErrors.title[0]}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label className="text-lg font-medium text-white">Voting Duration</Label>
-                        <p className="text-sm text-gray-400">Set how long the community can vote on your thesis (7 to 90 days)</p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-2xl font-bold text-white">
-                          {Math.floor(votingDuration / (24 * 60 * 60))}
-                        </span>
-                        <span className="text-gray-400 ml-2">days</span>
-                      </div>
-                    </div>
-                    <Slider
-                      value={[votingDuration]}
-                      min={MIN_VOTING_DURATION}
-                      max={MAX_VOTING_DURATION}
-                      step={24 * 60 * 60}
-                      className="w-full"
-                      onValueChange={handleVotingDurationChange}
-                    />
-                    <div className="flex justify-between text-sm text-gray-400">
-                      <span>7 days</span>
-                      <span>90 days</span>
-                    </div>
-                  </div>
-
-                  <IndustrySection 
-                    formData={formData}
-                    formErrors={formErrors}
-                    onChange={handleFormDataChange}
-                  />
-
-                  <FirmCriteriaSection 
-                    formData={formData}
-                    formErrors={formErrors}
-                    onChange={handleFormDataChange}
-                  />
-
-                  <PaymentTermsSection 
-                    formData={formData}
-                    formErrors={formErrors}
-                    onChange={handleFormDataChange}
-                  />
-
-                  <StrategiesSection 
-                    formData={formData}
-                    formErrors={formErrors}
-                    onChange={handleStrategyChange}
-                  />
-
-                  <div className="space-y-6">
-                    <div>
-                      <Label className="text-gray-200 mb-2 block">Target Capital Raise (USD)</Label>
-                      <Input
-                        type="text"
-                        placeholder="Enter amount in USD"
-                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
-                        required
-                        value={formData.investment.targetCapital}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/[^0-9.]/g, '');
-                          handleFormDataChange('investment.targetCapital', value);
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-lg font-medium text-white">
-                        Key Investment Drivers
-                      </label>
-                      <span className={cn(
-                        "text-sm",
-                        formData.investment.drivers.length > MAX_SUMMARY_LENGTH 
-                          ? "text-red-400" 
-                          : "text-gray-400"
-                      )}
-                      >
-                        {formData.investment.drivers.length}/{MAX_SUMMARY_LENGTH}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-400 mb-2">
-                      📌 Outline the primary factors that make this acquisition compelling
-                    </p>
-                    <Textarea
-                      placeholder="Describe earnings stability, strong client base, scalability, cultural fit, technology adoption, etc."
-                      className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
-                      required
-                      value={formData.investment.drivers}
-                      onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-lg font-medium text-white">
-                        Additional Investment Criteria or Notes
-                      </label>
-                      <span className={cn(
-                        "text-sm",
-                        formData.investment.additionalCriteria.length > MAX_SUMMARY_LENGTH 
-                          ? "text-red-400" 
-                          : "text-gray-400"
-                      )}
-                      >
-                        {formData.investment.additionalCriteria.length}/{MAX_SUMMARY_LENGTH}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-400 mb-2">
-                      📌 Specify any must-have requirements or deal preferences
-                    </p>
-                    <Textarea
-                      placeholder="EBITDA thresholds, firm specialization, geographic limitations, integration plans, etc."
-                      className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
-                      value={formData.investment.additionalCriteria}
-                      onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
-                    />
-                  </div>
-
-                  <div className="border-t border-white/10 pt-6">
-                    <div className="flex items-center text-sm text-yellow-400 mb-6">
-                      <AlertTriangle className="w-4 h-4 mr-2" />
-                      All submissions will be reviewed by the LedgerFund DAO community
-                    </div>
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className={cn(
-                        "w-full bg-gradient-to-r from-polygon-primary to-polygon-secondary hover:from-polygon-secondary hover:to-polygon-primary transition-all duration-300",
-                        isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                      )}
-                    >
-                      {isSubmitting ? (
-                        <div className="flex items-center justify-center">
-                          <span className="mr-2">Submitting...</span>
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+                <div className="mt-6">
+                  <TabsContent value="basics" className="m-0">
+                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+                      <div className="p-6 space-y-6">
+                        <div>
+                          <label className="text-lg font-medium text-white mb-2 block">
+                            Thesis Title
+                          </label>
+                          <p className="text-sm text-gray-400 mb-2">
+                            📌 Provide a concise name for the investment strategy
+                          </p>
+                          <Input
+                            placeholder="Enter thesis title"
+                            className={cn(
+                              "bg-black/50 border-white/10 text-white placeholder:text-gray-500",
+                              formErrors.title ? "border-red-500" : ""
+                            )}
+                            required
+                            value={formData.title}
+                            onChange={(e) => handleFormDataChange('title', e.target.value)}
+                          />
+                          {formErrors.title && (
+                            <p className="mt-1 text-sm text-red-500">{formErrors.title[0]}</p>
+                          )}
                         </div>
-                      ) : (
-                        "Submit Investment Thesis"
-                      )}
-                    </Button>
-                  </div>
-                </form>
+
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <Label className="text-lg font-medium text-white">Voting Duration</Label>
+                              <p className="text-sm text-gray-400">Set how long the community can vote on your thesis</p>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-2xl font-bold text-white">
+                                {Math.floor(votingDuration / (24 * 60 * 60))}
+                              </span>
+                              <span className="text-gray-400 ml-2">days</span>
+                            </div>
+                          </div>
+                          <Slider
+                            value={[votingDuration]}
+                            min={MIN_VOTING_DURATION}
+                            max={MAX_VOTING_DURATION}
+                            step={24 * 60 * 60}
+                            className="w-full"
+                            onValueChange={handleVotingDurationChange}
+                          />
+                          <div className="flex justify-between text-sm text-gray-400">
+                            <span>7 days</span>
+                            <span>90 days</span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label className="text-lg font-medium text-white mb-2 block">Target Capital Raise (USD)</Label>
+                          <div className="relative">
+                            <Input
+                              type="text"
+                              placeholder="Enter amount in USD"
+                              className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 pl-12"
+                              required
+                              value={formData.investment.targetCapital}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/[^0-9.]/g, '');
+                                handleFormDataChange('investment.targetCapital', value);
+                              }}
+                            />
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="firm" className="m-0">
+                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+                      <div className="p-6">
+                        <IndustrySection 
+                          formData={formData}
+                          formErrors={formErrors}
+                          onChange={handleFormDataChange}
+                        />
+                        <div className="mt-8">
+                          <FirmCriteriaSection 
+                            formData={formData}
+                            formErrors={formErrors}
+                            onChange={handleFormDataChange}
+                          />
+                        </div>
+                      </div>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="strategy" className="m-0">
+                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+                      <div className="p-6">
+                        <StrategiesSection 
+                          formData={formData}
+                          formErrors={formErrors}
+                          onChange={handleStrategyChange}
+                        />
+                        <div className="mt-8 space-y-6">
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <label className="text-lg font-medium text-white">
+                                Key Investment Drivers
+                              </label>
+                              <span className={cn(
+                                "text-sm",
+                                formData.investment.drivers.length > MAX_SUMMARY_LENGTH 
+                                  ? "text-red-400" 
+                                  : "text-gray-400"
+                              )}>
+                                {formData.investment.drivers.length}/{MAX_SUMMARY_LENGTH}
+                              </span>
+                            </div>
+                            <Textarea
+                              placeholder="Describe earnings stability, strong client base, scalability, cultural fit, technology adoption, etc."
+                              className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
+                              required
+                              value={formData.investment.drivers}
+                              onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="terms" className="m-0">
+                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+                      <div className="p-6">
+                        <PaymentTermsSection 
+                          formData={formData}
+                          formErrors={formErrors}
+                          onChange={handleFormDataChange}
+                        />
+                        <div className="mt-8">
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="text-lg font-medium text-white">
+                              Additional Investment Criteria
+                            </label>
+                            <span className={cn(
+                              "text-sm",
+                              formData.investment.additionalCriteria.length > MAX_SUMMARY_LENGTH 
+                                ? "text-red-400" 
+                                : "text-gray-400"
+                            )}>
+                              {formData.investment.additionalCriteria.length}/{MAX_SUMMARY_LENGTH}
+                            </span>
+                          </div>
+                          <Textarea
+                            placeholder="EBITDA thresholds, firm specialization, geographic limitations, integration plans, etc."
+                            className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
+                            value={formData.investment.additionalCriteria}
+                            onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </Card>
+                  </TabsContent>
+                </div>
+              </Tabs>
+
+              <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-6">
+                <div className="flex items-center text-sm text-yellow-400 mb-6">
+                  <AlertTriangle className="w-4 h-4 mr-2" />
+                  All submissions will be reviewed by the LedgerFund DAO community
+                </div>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className={cn(
+                    "w-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#4F46E5] transition-all duration-300",
+                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                  )}
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center">
+                      <span className="mr-2">Submitting...</span>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+                    </div>
+                  ) : (
+                    "Submit Investment Thesis"
+                  )}
+                </Button>
               </Card>
             </div>
 
-            <div className="space-y-6">
+            <div className="lg:col-span-4 space-y-6">
               <SubmissionFeeDisplay 
                 submissionFee={SUBMISSION_FEE.toString()}
                 currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance}
-                className="hidden lg:block"
               />
 
-              <Card className="bg-black/50 border border-white/10 backdrop-blur-xl p-6">
+              <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-6">
                 <h2 className="text-lg font-semibold text-white mb-4">Submission Progress</h2>
                 <SubmissionProgress 
                   steps={steps}
@@ -619,7 +660,7 @@ const ThesisSubmission = () => {
               <ProposalsHistory />
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
