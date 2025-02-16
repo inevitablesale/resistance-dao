@@ -50,7 +50,13 @@ const dynamicSettings = {
   },
   settings: {
     network: {
-      chainId: 137, // Polygon Mainnet
+      chainId: 137,
+      name: 'Polygon',
+      displayName: 'Polygon',
+      config: {
+        chainId: '0x89',
+        chainName: 'Polygon Mainnet',
+      }
     },
     environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
     appName: "LedgerFund",

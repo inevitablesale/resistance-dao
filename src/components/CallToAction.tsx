@@ -3,10 +3,49 @@ import { useNavigate } from "react-router-dom";
 import { FileText, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
+import { useToast } from "@/hooks/use-toast";
 
 export const CallToAction = () => {
   const navigate = useNavigate();
-  const { setShowOnRamp } = useDynamicContext();
+  const { primaryWallet, walletConnector } = useDynamicContext();
+  const { toast } = useToast();
+
+  const handleBuyToken = async () => {
+    if (!primaryWallet?.address) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to buy tokens",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { open } = walletConnector?.onramp || {};
+      if (!open) {
+        throw new Error("Onramp not available");
+      }
+
+      await open({
+        onrampProvider: OnrampProviders.Banxa,
+        token: 'MATIC',
+        address: primaryWallet.address,
+      });
+      
+      toast({
+        title: "Purchase Initiated",
+        description: "Your MATIC purchase has been initiated successfully",
+      });
+    } catch (error) {
+      console.error("Onramp error:", error);
+      toast({
+        title: "Purchase Failed",
+        description: error instanceof Error ? error.message : "Failed to initiate purchase",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <section className="py-16">
@@ -14,7 +53,7 @@ export const CallToAction = () => {
         <div className="max-w-3xl mx-auto text-center">
           <div className="flex gap-4 justify-center relative z-20">
             <Button
-              onClick={() => setShowOnRamp?.(true)}
+              onClick={handleBuyToken}
               className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
             >
               <Coins className="mr-2 h-4 w-4" />

@@ -9,10 +9,11 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
-  const { setShowAuthFlow } = useDynamicContext();
+  const { setShowAuthFlow, primaryWallet, walletConnector } = useDynamicContext();
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
   const [maticBalance, setMaticBalance] = useState<string>("0");
@@ -54,8 +55,36 @@ export const LGRFloatingWidget = () => {
     return () => clearInterval(interval);
   }, [address]);
 
-  const handleBuyPolygon = () => {
-    setShowAuthFlow?.(true);
+  const handleBuyPolygon = async () => {
+    if (!primaryWallet?.address) {
+      setShowAuthFlow?.(true);
+      return;
+    }
+
+    try {
+      const { open } = walletConnector?.onramp || {};
+      if (!open) {
+        throw new Error("Onramp not available");
+      }
+
+      await open({
+        onrampProvider: OnrampProviders.Banxa,
+        token: 'MATIC',
+        address: primaryWallet.address,
+      });
+      
+      toast({
+        title: "Purchase Initiated",
+        description: "Your MATIC purchase has been initiated successfully",
+      });
+    } catch (error) {
+      console.error("Onramp error:", error);
+      toast({
+        title: "Purchase Failed",
+        description: error instanceof Error ? error.message : "Failed to initiate purchase",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleConfirmPurchase = async () => {
