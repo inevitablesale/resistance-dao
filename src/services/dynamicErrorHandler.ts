@@ -1,5 +1,5 @@
 
-import { DynamicError } from "@dynamic-labs/sdk-react-core";
+import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { ProposalError, ErrorCategory } from "./errorHandlingService";
 
 interface DynamicErrorMapping {
@@ -50,13 +50,15 @@ const ERROR_MAPPINGS: Record<string, DynamicErrorMapping> = {
 export const handleDynamicError = (error: unknown): ProposalError => {
   console.error('Dynamic error:', error);
 
-  if (error instanceof DynamicError) {
-    const mapping = ERROR_MAPPINGS[error.code] || ERROR_MAPPINGS.TRANSACTION_ERROR;
+  // Check if it's an error with a code property
+  if (typeof error === 'object' && error !== null && 'code' in error) {
+    const dynamicError = error as { code: string; message: string; stack?: string };
+    const mapping = ERROR_MAPPINGS[dynamicError.code] || ERROR_MAPPINGS.TRANSACTION_ERROR;
     return new ProposalError({
       category: mapping.category,
-      message: `${mapping.message}: ${error.message}`,
+      message: `${mapping.message}: ${dynamicError.message}`,
       recoverySteps: mapping.recoverySteps,
-      technicalDetails: error.stack
+      technicalDetails: dynamicError.stack
     });
   }
 
