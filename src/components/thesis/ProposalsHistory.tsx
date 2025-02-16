@@ -6,15 +6,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-
-export interface StoredProposal {
-  hash: string;
-  ipfsHash: string;
-  timestamp: number;
-  title: string;
-  targetCapital: string;
-  status: 'pending' | 'active' | 'completed';
-}
+import { StoredProposal } from "@/types/proposals";
 
 export const ProposalsHistory = () => {
   const [proposals, setProposals] = useState<StoredProposal[]>([]);
@@ -52,7 +44,7 @@ export const ProposalsHistory = () => {
                   <h3 className="font-medium text-white">{proposal.title}</h3>
                   <div className="flex items-center gap-2 text-sm text-white/60">
                     <Calendar className="w-4 h-4" />
-                    <span>{format(proposal.timestamp, 'PPP')}</span>
+                    <span>{format(parseInt(proposal.timestamp), 'PPP')}</span>
                   </div>
                 </div>
               </div>
