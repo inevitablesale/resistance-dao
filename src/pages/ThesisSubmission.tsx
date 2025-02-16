@@ -596,15 +596,7 @@ const ThesisSubmission = () => {
               </Card>
 
               <div className="flex justify-end mt-6">
-                <Button onClick={handleContinue} disabled={isSubmitting} className={cn("h-12 px-6 min-w-[200px]", "bg-gradient-to-r from-polygon-primary to-polygon-secondary", "hover:from-polygon-secondary hover:to-polygon-primary", "text-white font-medium", "transition-all duration-300", "disabled:opacity-50", "flex items-center justify-center gap-2")}>
-                  {isSubmitting ? <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                      <span>Processing...</span>
-                    </> : <>
-                      <span>Continue</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </>}
-                </Button>
+                
               </div>
             </div>
 
