@@ -29,7 +29,7 @@ interface FirmCriteriaSectionProps {
 
 export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCriteriaSectionProps) => {
   const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent click from bubbling up
+    e.stopPropagation();
   };
 
   return (
@@ -47,7 +47,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="below-1m" 
               id="below-1m" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="below-1m" className="text-white">Below $1M</Label>
           </div>
@@ -55,7 +55,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="1m-5m" 
               id="1m-5m" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="1m-5m" className="text-white">$1M–$5M</Label>
           </div>
@@ -63,7 +63,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="5m-10m" 
               id="5m-10m" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="5m-10m" className="text-white">$5M–$10M</Label>
           </div>
@@ -71,7 +71,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="10m-plus" 
               id="10m-plus" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="10m-plus" className="text-white">$10M+</Label>
           </div>
@@ -92,7 +92,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="local" 
               id="local" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="local" className="text-white">Local</Label>
           </div>
@@ -100,7 +100,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="regional" 
               id="regional" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="regional" className="text-white">Regional</Label>
           </div>
@@ -108,7 +108,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="national" 
               id="national" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="national" className="text-white">National</Label>
           </div>
@@ -116,7 +116,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="remote" 
               id="remote" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="remote" className="text-white">Remote</Label>
           </div>
@@ -157,7 +157,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="acquisition" 
               id="acquisition" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="acquisition" className="text-white">Acquisition</Label>
           </div>
@@ -165,7 +165,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="merger" 
               id="merger" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="merger" className="text-white">Merger</Label>
           </div>
@@ -173,7 +173,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="equity-buyout" 
               id="equity-buyout" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="equity-buyout" className="text-white">Equity Buyout</Label>
           </div>
@@ -181,7 +181,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="franchise" 
               id="franchise" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="franchise" className="text-white">Franchise</Label>
           </div>
@@ -189,7 +189,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <RadioGroupItem 
               value="succession" 
               id="succession" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="succession" className="text-white">Succession</Label>
           </div>
@@ -201,3 +201,4 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
     </div>
   );
 };
+

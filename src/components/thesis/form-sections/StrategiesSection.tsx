@@ -77,7 +77,7 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
                   >
                     <Checkbox 
                       id={id} 
-                      className="border-purple-400 data-[state=checked]:bg-purple-400 data-[state=checked]:text-black"
+                      className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
                       checked={formData.strategies[category as keyof typeof formData.strategies].includes(id)}
                       onCheckedChange={(checked) => {
                         handleStrategyChange(category as keyof typeof formData.strategies, id, checked as boolean);
@@ -108,3 +108,4 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
     </div>
   );
 };
+
