@@ -13,6 +13,7 @@ interface TargetCapitalInputProps {
 
 const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
 const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
+const LGR_PRICE_USD = 0.10; // $0.10 per LGR token
 
 export const TargetCapitalInput = ({
   value,
@@ -31,6 +32,13 @@ export const TargetCapitalInput = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatValue(e.target.value);
     onChange(formattedValue);
+  };
+
+  const calculateLGRAmount = (usdAmount: string): string => {
+    if (!usdAmount) return "0";
+    const usdValue = parseFloat(usdAmount);
+    const lgrAmount = usdValue / LGR_PRICE_USD;
+    return lgrAmount.toFixed(2);
   };
 
   const getHelperText = () => {
@@ -53,7 +61,7 @@ export const TargetCapitalInput = ({
           <HelpCircle className="h-4 w-4 text-gray-400" />
         </Label>
         <div className="text-sm text-gray-400">
-          {value && `≈ ${ethers.utils.formatEther(ethers.utils.parseEther(value || "0"))} LGR`}
+          {value && `≈ ${calculateLGRAmount(value)} LGR`}
         </div>
       </div>
       <div className="relative">
