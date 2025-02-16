@@ -244,7 +244,7 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold text-white">
-                {Number(lgrBalance).toFixed(2)} LGR
+                {Number(lgrBalance).toFixed(2)}
               </p>
             </div>
           </div>
@@ -265,7 +265,7 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold text-white">
-                {Number(maticBalance).toFixed(2)} POLY
+                {Number(maticBalance).toFixed(2)}
               </p>
             </div>
           </div>
