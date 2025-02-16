@@ -28,12 +28,34 @@ export const useDynamicUtils = () => {
     }
 
     const connected = await primaryWallet.isConnected();
+    
+    // Debug logging
+    console.log('Dynamic SDK Wallet State:', {
+      connector: primaryWallet.connector,
+      chainId: primaryWallet.connector?.chainId,
+      connected,
+      address: primaryWallet.address,
+      raw: primaryWallet
+    });
+
+    // Try getting chainId through provider if connector method fails
+    let chainId = primaryWallet.connector?.chainId;
+    if (!chainId && primaryWallet.provider) {
+      try {
+        const provider = new ethers.providers.Web3Provider(primaryWallet.provider as any);
+        const network = await provider.getNetwork();
+        chainId = network.chainId;
+        console.log('Chain ID from provider:', chainId);
+      } catch (error) {
+        console.error('Error getting chainId from provider:', error);
+      }
+    }
 
     return {
       isConnected: connected,
       isEthereumWallet: true, // Simplified for now since we're mainly using Ethereum wallets
       address: primaryWallet.address,
-      chainId: primaryWallet.connector?.chainId
+      chainId: chainId
     };
   }, [primaryWallet]);
 
@@ -81,6 +103,8 @@ export const useDynamicUtils = () => {
 
   const validateNetwork = useCallback(async () => {
     const state = await getWalletState();
+    console.log('Validating network state:', state);
+    
     if (!state.isConnected) {
       throw new ProposalError({
         category: 'wallet',
@@ -91,6 +115,7 @@ export const useDynamicUtils = () => {
 
     // Simple check if we're on Polygon network
     if (state.chainId !== 137) {
+      console.log('Network validation failed. Expected 137, got:', state.chainId);
       throw new ProposalError({
         category: 'network',
         message: 'Please connect to Polygon network',
