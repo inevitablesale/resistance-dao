@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -9,11 +10,13 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useOnramp } from "@dynamic-labs/sdk-react-core";
 import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
-  const { setShowAuthFlow, primaryWallet, walletConnector } = useDynamicContext();
+  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
+  const { enabled, open } = useOnramp();
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
   const [maticBalance, setMaticBalance] = useState<string>("0");
@@ -61,12 +64,16 @@ export const LGRFloatingWidget = () => {
       return;
     }
 
-    try {
-      const { open } = walletConnector?.onramp || {};
-      if (!open) {
-        throw new Error("Onramp not available");
-      }
+    if (!enabled) {
+      toast({
+        title: "Onramp Not Available",
+        description: "The onramp service is currently not available",
+        variant: "destructive"
+      });
+      return;
+    }
 
+    try {
       await open({
         onrampProvider: OnrampProviders.Banxa,
         token: 'MATIC',

@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { FileText, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useOnramp } from "@dynamic-labs/sdk-react-core";
 import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
 import { useToast } from "@/hooks/use-toast";
 
 export const CallToAction = () => {
   const navigate = useNavigate();
-  const { primaryWallet, walletConnector } = useDynamicContext();
+  const { primaryWallet } = useDynamicContext();
+  const { enabled, open } = useOnramp();
   const { toast } = useToast();
 
   const handleBuyToken = async () => {
@@ -21,12 +23,16 @@ export const CallToAction = () => {
       return;
     }
 
-    try {
-      const { open } = walletConnector?.onramp || {};
-      if (!open) {
-        throw new Error("Onramp not available");
-      }
+    if (!enabled) {
+      toast({
+        title: "Onramp Not Available",
+        description: "The onramp service is currently not available",
+        variant: "destructive"
+      });
+      return;
+    }
 
+    try {
       await open({
         onrampProvider: OnrampProviders.Banxa,
         token: 'MATIC',
@@ -55,6 +61,7 @@ export const CallToAction = () => {
             <Button
               onClick={handleBuyToken}
               className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
+              disabled={!enabled}
             >
               <Coins className="mr-2 h-4 w-4" />
               Join the Presale
