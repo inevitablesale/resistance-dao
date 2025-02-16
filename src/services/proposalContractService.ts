@@ -1,6 +1,6 @@
 
 import { ethers } from "ethers";
-import type { DynamicWallet } from "@dynamic-labs/sdk-react-core";
+import { DynamicWallet } from "@dynamic-labs/sdk-react-core";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
@@ -41,11 +41,11 @@ export interface GasEstimate {
 
 async function getProvider(wallet: DynamicWallet) {
   try {
-    const walletClient = await wallet.getWalletClient();
-    if (!walletClient) {
-      throw new Error("No wallet client available");
+    const provider = await wallet.getWalletClient();
+    if (!provider) {
+      throw new Error("No provider available");
     }
-    return new ethers.providers.Web3Provider(walletClient as any);
+    return new ethers.providers.Web3Provider(provider as any);
   } catch (error) {
     console.error("Error getting provider:", error);
     throw new Error("Failed to initialize provider");
@@ -130,3 +130,4 @@ export const createProposal = async (
     config.votingDuration
   );
 };
+
