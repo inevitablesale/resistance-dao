@@ -13,14 +13,8 @@ export const WalletConnectModal = () => {
 
   const handleConnect = async (method: 'wallet' | 'email' | 'smart') => {
     if (method === 'smart') {
-      // Configure smart wallet options before connecting
-      setShowAuthFlow?.(true, {
-        smartWallet: {
-          enableHD: true,
-          recoveryMethods: ['email', 'social', 'passkey'],
-          separateGenerationStep: true
-        }
-      });
+      // For smart wallet, we first show the auth flow
+      setShowAuthFlow?.(true);
     } else {
       await connect();
     }
