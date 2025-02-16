@@ -237,11 +237,10 @@ const ThesisSubmission = () => {
               LedgerFund DAO – Investment Thesis Submission
             </h1>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Share your investment analysis and insights with the community. Your thesis will help shape the future of accounting firm acquisitions and influence capital allocation decisions.
+              Present your accounting firm acquisition thesis to secure co-investment from the LedgerFund DAO community. Outline your target criteria, investment strategy, and potential returns to align capital with promising opportunities in the accounting industry.
             </p>
           </div>
 
-          {/* Updated Fee Information Card */}
           <Card className="p-6 bg-black/50 border border-white/10 backdrop-blur-xl mb-8">
             <div className="flex items-start space-x-4">
               <CreditCard className="w-6 h-6 text-purple-400 mt-1" />
@@ -267,7 +266,6 @@ const ThesisSubmission = () => {
 
           <Card className="p-8 bg-black/50 border border-white/10 backdrop-blur-xl">
             <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Thesis Title */}
               <div>
                 <label className="text-lg font-medium text-white mb-2 block">
                   Thesis Title
@@ -284,7 +282,6 @@ const ThesisSubmission = () => {
                 />
               </div>
 
-              {/* Updated Voting Duration */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -312,72 +309,58 @@ const ThesisSubmission = () => {
                 </div>
               </div>
 
-              {/* Target Firm Criteria */}
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-white">Target Firm Criteria</h2>
                 
                 <div>
-                  <Label className="text-gray-200 mb-2 block">Industry Focus</Label>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="accounting" 
-                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                    />
-                    <label htmlFor="accounting" className="text-gray-200">
-                      Accounting
-                    </label>
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-gray-200 mb-2 block">Preferred Firm Size (Revenue)</Label>
+                  <Label className="text-white mb-2 block">Preferred Firm Size (Revenue)</Label>
                   <RadioGroup defaultValue="below-1m" className="flex flex-wrap gap-4">
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="below-1m" id="below-1m" className="border-white text-white" />
-                      <Label htmlFor="below-1m">Below $1M</Label>
+                      <RadioGroupItem value="below-1m" id="below-1m" className="border-white" />
+                      <Label htmlFor="below-1m" className="text-white">Below $1M</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="1m-5m" id="1m-5m" className="border-white text-white" />
-                      <Label htmlFor="1m-5m">$1M–$5M</Label>
+                      <RadioGroupItem value="1m-5m" id="1m-5m" className="border-white" />
+                      <Label htmlFor="1m-5m" className="text-white">$1M–$5M</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="5m-10m" id="5m-10m" className="border-white text-white" />
-                      <Label htmlFor="5m-10m">$5M–$10M</Label>
+                      <RadioGroupItem value="5m-10m" id="5m-10m" className="border-white" />
+                      <Label htmlFor="5m-10m" className="text-white">$5M–$10M</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="10m-plus" id="10m-plus" className="border-white text-white" />
-                      <Label htmlFor="10m-plus">$10M+</Label>
+                      <RadioGroupItem value="10m-plus" id="10m-plus" className="border-white" />
+                      <Label htmlFor="10m-plus" className="text-white">$10M+</Label>
                     </div>
                   </RadioGroup>
                 </div>
 
                 <div>
-                  <Label className="text-gray-200 mb-2 block">Geographic Focus</Label>
+                  <Label className="text-white mb-2 block">Geographic Focus</Label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-gray-200 mb-2 block">Region Type</Label>
+                      <Label className="text-white mb-2 block">Region Type</Label>
                       <RadioGroup defaultValue="local" className="flex flex-col space-y-2">
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="local" id="local" className="border-white text-white" />
+                          <RadioGroupItem value="local" id="local" className="border-white" />
                           <Label htmlFor="local" className="text-white">Local</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="regional" id="regional" className="border-white text-white" />
+                          <RadioGroupItem value="regional" id="regional" className="border-white" />
                           <Label htmlFor="regional" className="text-white">Regional</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="national" id="national" className="border-white text-white" />
+                          <RadioGroupItem value="national" id="national" className="border-white" />
                           <Label htmlFor="national" className="text-white">National</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="remote" id="remote" className="border-white text-white" />
+                          <RadioGroupItem value="remote" id="remote" className="border-white" />
                           <Label htmlFor="remote" className="text-white">Remote/Digital</Label>
                         </div>
                       </RadioGroup>
                     </div>
                     
                     <div>
-                      <Label className="text-gray-200 mb-2 block">Primary State</Label>
+                      <Label className="text-white mb-2 block">Primary State (Optional)</Label>
                       <select 
                         className="w-full bg-black/50 border border-white/10 rounded-md p-2 text-white"
                         value={formData.firmCriteria.location}
@@ -389,7 +372,7 @@ const ThesisSubmission = () => {
                           }
                         }))}
                       >
-                        <option value="">Select a state</option>
+                        <option value="">Select a state (optional)</option>
                         {US_STATES.map(state => (
                           <option key={state} value={state}>{state}</option>
                         ))}
@@ -399,7 +382,6 @@ const ThesisSubmission = () => {
                 </div>
               </div>
 
-              {/* Payment Terms */}
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold text-white">Payment Terms</h2>
@@ -455,11 +437,9 @@ const ThesisSubmission = () => {
                 </div>
               </div>
 
-              {/* Post-Strategy */}
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-white">Post-Acquisition Strategy</h2>
                 
-                {/* Operational Strategies */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium text-white">Operational Strategies</h3>
                   <div className="space-y-3">
@@ -487,7 +467,6 @@ const ThesisSubmission = () => {
                   </div>
                 </div>
 
-                {/* Growth Strategies */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium text-white">Growth Strategies</h3>
                   <div className="space-y-3">
@@ -515,7 +494,6 @@ const ThesisSubmission = () => {
                   </div>
                 </div>
 
-                {/* Integration Strategies */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium text-white">Integration Strategies</h3>
                   <div className="space-y-3">
@@ -544,7 +522,6 @@ const ThesisSubmission = () => {
                 </div>
               </div>
 
-              {/* Investment Structure */}
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-white">Investment Structure</h2>
                 
@@ -576,7 +553,6 @@ const ThesisSubmission = () => {
                 </div>
               </div>
 
-              {/* Key Investment Drivers */}
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-lg font-medium text-white">
@@ -603,7 +579,6 @@ const ThesisSubmission = () => {
                 />
               </div>
 
-              {/* Additional Investment Criteria */}
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-lg font-medium text-white">
@@ -629,7 +604,6 @@ const ThesisSubmission = () => {
                 />
               </div>
 
-              {/* Submit Section */}
               <div className="border-t border-white/10 pt-6">
                 <div className="flex items-center text-sm text-yellow-400 mb-6">
                   <AlertTriangle className="w-4 h-4 mr-2" />

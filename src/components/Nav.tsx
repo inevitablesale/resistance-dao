@@ -36,18 +36,6 @@ const Nav = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-6">
-            <Link 
-              to="/buyers" 
-              className="text-white/80 hover:text-white transition-colors"
-            >
-              Buyers
-            </Link>
-            <Link 
-              to="/sellers" 
-              className="text-white/80 hover:text-white transition-colors"
-            >
-              Sellers
-            </Link>
             <a 
               href="https://x.com/LedgerFundDAO" 
               target="_blank" 
