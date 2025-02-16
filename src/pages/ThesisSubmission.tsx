@@ -14,6 +14,10 @@ import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { motion } from "framer-motion";
 import type { StoredProposal } from "@/types/proposals";
+import { SubmissionStep } from "@/components/thesis/SubmissionProgress";
+import { uploadMetadataToPinata } from "@/services/pinataService";
+import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
+import { validateIPFSHash } from "@/services/proposalValidationService";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -480,7 +484,7 @@ const ThesisSubmission = () => {
                     <span className={cn(
                       "text-sm transition-colors whitespace-nowrap",
                       step.id === activeStep ? "text-yellow-500" : 
-                      steps.findIndex(s => s.id === activeStep) > index ? "text-gray-400" : 
+                      steps.findIndex(s => s.id === activeStep) > index ? "bg-yellow-500/50" : 
                       "text-gray-600"
                     )}>
                       {step.title}
