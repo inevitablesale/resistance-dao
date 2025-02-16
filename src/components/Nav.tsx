@@ -1,5 +1,5 @@
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import WalletAssets from "./wallet/WalletAssets";
@@ -10,7 +10,16 @@ import Linked from "./icons/Linked";
 const Nav = () => {
   const { primaryWallet, setShowOnRamp } = useDynamicContext();
   const { toast } = useToast();
+  const location = useLocation();
   const hasWallet = !!primaryWallet?.address;
+  
+  // Define routes where we don't want to show wallet assets
+  const hideWalletRoutes = ['/', '/submit-thesis'];
+  const shouldShowWalletAssets = hasWallet && !hideWalletRoutes.includes(location.pathname);
+  
+  // Define routes where we don't want to show the home link
+  const hideHomeRoutes = ['/', '/submit-thesis'];
+  const shouldShowHomeLink = !hideHomeRoutes.includes(location.pathname);
 
   const handleBuyPolygon = () => {
     setShowOnRamp?.(true);
@@ -22,9 +31,11 @@ const Nav = () => {
       <div className="container mx-auto px-4 relative">
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center gap-3">
-            <Link to="/" className="text-white hover:text-white/80 transition-colors">
-              Home
-            </Link>
+            {shouldShowHomeLink && (
+              <Link to="/" className="text-white hover:text-white/80 transition-colors">
+                Home
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center gap-6">
@@ -46,7 +57,7 @@ const Nav = () => {
             </a>
             <div className="relative">
               <DynamicWidget />
-              {hasWallet && (
+              {shouldShowWalletAssets && (
                 <div className="absolute top-full right-0 mt-2 w-72 p-4 bg-black/90 backdrop-blur-lg border border-white/10 rounded-lg shadow-xl">
                   <WalletAssets />
                 </div>

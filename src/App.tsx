@@ -16,46 +16,7 @@ import KnowledgeArticle from "./pages/KnowledgeArticle";
 import ContentHub from "./pages/ContentHub";
 import { Marketplace } from "./pages/Marketplace";
 import ThesisSubmission from "./pages/ThesisSubmission";
-import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
-
-function Layout() {
-  const { toast } = useToast();
-  const { tokenBalances, isLoading, error } = useTokenBalances();
-
-  React.useEffect(() => {
-    if (tokenBalances && !isLoading && !error) {
-      console.log("Token balances updated:", tokenBalances);
-      // Find LGR token balance
-      const lgrToken = tokenBalances.find(token => token.symbol === 'LGR');
-      if (lgrToken) {
-        toast({
-          title: "LGR Balance Updated",
-          description: `Your LGR balance: ${lgrToken.balance} LGR`,
-        });
-      }
-    }
-  }, [tokenBalances, isLoading, error, toast]);
-  
-  return (
-    <>
-      <Nav />
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/governance-voting" element={<GovernanceVoting />} />
-        <Route path="/mint-nft" element={<MintNFT />} />
-        <Route path="/share-to-earn" element={<ShareToEarn />} />
-        <Route path="/litepaper" element={<Litepaper />} />
-        <Route path="/getting-started" element={<GettingStarted />} />
-        <Route path="/marketplace" element={<Marketplace />} />
-        <Route path="/marketplace/:category/:slug" element={<KnowledgeArticle />} />
-        <Route path="/content" element={<ContentHub />} />
-        <Route path="/submit-thesis" element={<ThesisSubmission />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </>
-  );
-}
 
 const zeroDevConfig = {
   projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -72,24 +33,12 @@ const dynamicSettings = {
   eventsCallbacks: {
     onAuthSuccess: (args: any) => {
       console.log("[Dynamic SDK] Auth Success:", args);
-      toast({
-        title: "Successfully Connected",
-        description: `Connected ${args?.wallet?.connector?.name || 'wallet'} (${args?.wallet?.address?.slice(0, 6)}...${args?.wallet?.address?.slice(-4)})`,
-      });
     },
     onEmailVerificationSuccess: () => {
       console.log("[Dynamic SDK] Email verification succeeded");
-      toast({
-        title: "Email Verified",
-        description: "Your email has been successfully verified.",
-      });
     },
     onLogout: () => {
       console.log("[Dynamic SDK] User logged out");
-      toast({
-        title: "Logged Out",
-        description: "You've been successfully logged out.",
-      });
     }
   },
   settings: {
@@ -145,6 +94,35 @@ const dynamicSettings = {
     ]
   }
 };
+
+function Layout() {
+  const { tokenBalances, isLoading, error } = useTokenBalances();
+
+  React.useEffect(() => {
+    if (tokenBalances && !isLoading && !error) {
+      console.log("Token balances updated:", tokenBalances);
+    }
+  }, [tokenBalances, isLoading, error]);
+  
+  return (
+    <>
+      <Nav />
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/governance-voting" element={<GovernanceVoting />} />
+        <Route path="/mint-nft" element={<MintNFT />} />
+        <Route path="/share-to-earn" element={<ShareToEarn />} />
+        <Route path="/litepaper" element={<Litepaper />} />
+        <Route path="/getting-started" element={<GettingStarted />} />
+        <Route path="/marketplace" element={<Marketplace />} />
+        <Route path="/marketplace/:category/:slug" element={<KnowledgeArticle />} />
+        <Route path="/content" element={<ContentHub />} />
+        <Route path="/submit-thesis" element={<ThesisSubmission />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
+  );
+}
 
 function App() {
   return (
