@@ -159,6 +159,7 @@ const ThesisSubmission = () => {
   const [currentStep, setCurrentStep] = useState<string>('thesis');
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
   const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
+  const [activeTab, setActiveTab] = useState("basics");
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => 
@@ -222,17 +223,34 @@ const ThesisSubmission = () => {
       );
     }
 
-    switch (currentStep) {
-      case 'thesis':
-        return "Continue to Strategy Selection";
+    switch (activeTab) {
+      case 'basics':
+        return "Continue to Firm Details";
+      case 'firm':
+        return "Continue to Strategy";
       case 'strategy':
-        return "Proceed to Token Approval";
-      case 'approval':
-        return "Approve LGR Tokens";
-      case 'submission':
+        return "Continue to Terms";
+      case 'terms':
         return "Submit Investment Thesis";
       default:
         return "Continue";
+    }
+  };
+
+  const handleContinue = () => {
+    switch (activeTab) {
+      case 'basics':
+        setActiveTab('firm');
+        break;
+      case 'firm':
+        setActiveTab('strategy');
+        break;
+      case 'strategy':
+        setActiveTab('terms');
+        break;
+      case 'terms':
+        handleSubmit();
+        break;
     }
   };
 
@@ -432,7 +450,7 @@ const ThesisSubmission = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8 space-y-6">
-              <Tabs defaultValue="basics" className="w-full">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid grid-cols-4 gap-4 bg-transparent">
                   <TabsTrigger
                     value="basics"
@@ -630,7 +648,7 @@ const ThesisSubmission = () => {
 
               <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-6">
                 <Button
-                  onClick={handleSubmit}
+                  onClick={handleContinue}
                   disabled={isSubmitting}
                   className="w-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#4F46E5] transition-all duration-300"
                 >
