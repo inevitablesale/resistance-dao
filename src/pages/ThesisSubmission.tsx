@@ -29,6 +29,7 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { motion } from "framer-motion";
 import { StoredProposal } from "@/types/proposals";
 import type { SubmissionStep } from "@/components/thesis/SubmissionProgress";
+import { LGRWalletDisplay } from "@/components/thesis/LGRWalletDisplay";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -671,9 +672,10 @@ const ThesisSubmission = () => {
             </div>
 
             <div className="lg:col-span-4 space-y-6">
-              <SubmissionFeeDisplay 
+              <LGRWalletDisplay 
                 submissionFee={SUBMISSION_FEE.toString()}
                 currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance}
+                walletAddress={address}
               />
 
               <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-6">
