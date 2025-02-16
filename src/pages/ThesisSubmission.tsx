@@ -465,193 +465,216 @@ const ThesisSubmission = () => {
 
   return (
     <div className="min-h-screen bg-[#030712]">
-      <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10" />
+      <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-5" />
       <div className="fixed inset-0 bg-gradient-to-b from-[#030712] via-[#0F172A] to-[#030712]" />
       
       <Nav />
       
       <main className="relative z-10 pt-28 pb-20 min-h-screen">
-        <div className="container px-4 mx-auto max-w-[1200px]">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Left Column - Progress and Form */}
-            <div className="lg:col-span-8">
+        <div className="container px-4 mx-auto max-w-4xl">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-12 text-center"
+          >
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+              Submit Your Investment Thesis
+            </h1>
+            <p className="text-lg text-white/70 max-w-2xl mx-auto">
+              Share your strategy with the DAO and start earning returns
+            </p>
+          </motion.div>
+
+          {/* Compact Progress Bar */}
+          <div className="mb-8">
+            <SubmissionProgress 
+              steps={steps}
+              currentStepId={activeStep}
+            />
+          </div>
+
+          <div className="relative">
+            {/* Main Form Card */}
+            <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden relative">
+              <div className="p-6 lg:p-8">
+                {activeStep === 'thesis' && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="space-y-8"
+                  >
+                    <div className="space-y-4 max-w-2xl mx-auto">
+                      <Label className="text-lg font-medium text-white">
+                        Thesis Title
+                      </Label>
+                      <Input
+                        placeholder="Enter a clear, descriptive title"
+                        className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                        value={formData.title}
+                        onChange={(e) => handleFormDataChange('title', e.target.value)}
+                      />
+                      {formErrors.title && (
+                        <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                      )}
+                    </div>
+
+                    <VotingDurationInput
+                      value={votingDuration}
+                      onChange={handleVotingDurationChange}
+                      error={formErrors.votingDuration}
+                    />
+
+                    <TargetCapitalInput
+                      value={formData.investment.targetCapital}
+                      onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+                      error={formErrors['investment.targetCapital']}
+                    />
+                  </motion.div>
+                )}
+
+                {activeStep === 'strategy' && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <FirmCriteriaSection 
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={handleFormDataChange}
+                    />
+                  </motion.div>
+                )}
+
+                {activeStep === 'submission' && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <StrategiesSection 
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={handleStrategyChange}
+                    />
+                  </motion.div>
+                )}
+
+                {activeStep === 'approval' && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <PaymentTermsSection 
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={handleFormDataChange}
+                    />
+                  </motion.div>
+                )}
+              </div>
+            </Card>
+
+            {/* Floating Wallet Info */}
+            <div className="fixed bottom-6 right-6 z-50 w-full max-w-sm">
+              <motion.div
+                initial={{ y: 100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Card className="bg-black/90 border-white/10 backdrop-blur-lg shadow-2xl">
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <Wallet className="w-5 h-5 text-white/70" />
+                        <h3 className="text-sm font-medium text-white">Submission Status</h3>
+                      </div>
+                      {!address && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                          onClick={() => setShowAuthFlow?.(true)}
+                        >
+                          Connect Wallet
+                        </Button>
+                      )}
+                    </div>
+
+                    {address && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-white/70">Balance:</span>
+                          <span className="text-white font-medium">
+                            {tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-white/70">Required:</span>
+                          <span className="text-white font-medium">
+                            {ethers.utils.formatEther(SUBMISSION_FEE)} LGR
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              </motion.div>
+            </div>
+
+            {/* Navigation */}
+            <div className="mt-6 flex justify-end">
+              <Button
+                onClick={handleContinue}
+                disabled={isSubmitting}
+                className={cn(
+                  "h-12 px-6 min-w-[200px]",
+                  "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+                  "hover:from-polygon-secondary hover:to-polygon-primary",
+                  "text-white font-medium",
+                  "transition-all duration-300",
+                  "disabled:opacity-50",
+                  "flex items-center justify-center gap-2"
+                )}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      {activeStep === 'approval' ? "Submit Thesis" : "Continue"}
+                    </span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Transaction Status - Only show when needed */}
+            {currentTxId && (
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-8"
+                className="mt-4"
               >
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                  Submit Your Investment Thesis
-                </h1>
-                <p className="text-lg text-white/70">
-                  Share your strategy with the DAO and start earning returns
-                </p>
-              </motion.div>
-
-              <div className="space-y-6">
-                {/* Form Content */}
-                <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
-                  <div className="border-b border-white/5">
-                    <div className="px-6 py-4">
-                      <SubmissionProgress 
-                        steps={steps}
-                        currentStepId={activeStep}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    {activeStep === 'thesis' && (
-                      <div className="space-y-8">
-                        <div className="space-y-4">
-                          <Label className="text-lg font-medium text-white">
-                            Thesis Title
-                          </Label>
-                          <Input
-                            placeholder="Enter a clear, descriptive title"
-                            className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
-                            value={formData.title}
-                            onChange={(e) => handleFormDataChange('title', e.target.value)}
-                          />
-                          {formErrors.title && (
-                            <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                          )}
-                        </div>
-
-                        <VotingDurationInput
-                          value={votingDuration}
-                          onChange={handleVotingDurationChange}
-                          error={formErrors.votingDuration}
-                        />
-
-                        <TargetCapitalInput
-                          value={formData.investment.targetCapital}
-                          onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
-                          error={formErrors['investment.targetCapital']}
-                        />
-                      </div>
-                    )}
-
-                    {activeStep === 'strategy' && (
-                      <FirmCriteriaSection 
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={handleFormDataChange}
-                      />
-                    )}
-
-                    {activeStep === 'submission' && (
-                      <StrategiesSection 
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={handleStrategyChange}
-                      />
-                    )}
-
-                    {activeStep === 'approval' && (
-                      <PaymentTermsSection 
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={handleFormDataChange}
-                      />
-                    )}
-                  </div>
-                </Card>
-
-                {/* Navigation */}
-                <div className="flex justify-end">
-                  <Button
-                    onClick={handleContinue}
-                    disabled={isSubmitting}
-                    className={cn(
-                      "h-12 px-6 min-w-[200px]",
-                      "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
-                      "hover:from-polygon-secondary hover:to-polygon-primary",
-                      "text-white font-medium",
-                      "transition-all duration-300",
-                      "disabled:opacity-50",
-                      "flex items-center justify-center gap-2"
-                    )}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                        <span>Processing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>
-                          {activeStep === 'approval' ? "Submit Thesis" : "Continue"}
-                        </span>
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column - Wallet and Status */}
-            <div className="lg:col-span-4">
-              <div className="lg:sticky lg:top-28 space-y-6">
-                {/* Wallet Status Card */}
                 <Card className="bg-black/40 border-white/5 backdrop-blur-sm">
-                  <div className="p-6 space-y-6">
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-semibold text-white">Submission Requirements</h3>
-                      <p className="text-sm text-white/70">Complete these steps to submit your thesis</p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3 text-white/80">
-                        <div className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center",
-                          address ? "bg-green-500/20 text-green-500" : "bg-white/10"
-                        )}>
-                          {address ? "✓" : "1"}
-                        </div>
-                        <span>Connect Wallet</span>
-                      </div>
-
-                      <div className="flex items-center gap-3 text-white/80">
-                        <div className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center",
-                          tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() ? "bg-green-500/20 text-green-500" : "bg-white/10"
-                        )}>
-                          {tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() ? "✓" : "2"}
-                        </div>
-                        <span>Hold LGR Tokens</span>
-                      </div>
-                    </div>
-
-                    <LGRWalletDisplay 
-                      submissionFee={SUBMISSION_FEE.toString()}
-                      currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
-                      walletAddress={address}
+                  <div className="p-4">
+                    <TransactionStatus
+                      transactionId={currentTxId}
+                      onComplete={() => setCurrentTxId(null)}
+                      onError={(error) => {
+                        toast({
+                          title: "Transaction Failed",
+                          description: error,
+                          variant: "destructive"
+                        });
+                      }}
                     />
                   </div>
                 </Card>
-
-                {/* Transaction Status */}
-                {currentTxId && (
-                  <Card className="bg-black/40 border-white/5 backdrop-blur-sm">
-                    <div className="p-6">
-                      <TransactionStatus
-                        transactionId={currentTxId}
-                        onComplete={() => setCurrentTxId(null)}
-                        onError={(error) => {
-                          toast({
-                            title: "Transaction Failed",
-                            description: error,
-                            variant: "destructive"
-                          });
-                        }}
-                      />
-                    </div>
-                  </Card>
-                )}
-              </div>
-            </div>
+              </motion.div>
+            )}
           </div>
         </div>
       </main>
