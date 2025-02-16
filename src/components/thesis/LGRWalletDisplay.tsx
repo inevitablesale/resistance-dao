@@ -12,6 +12,7 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useOnramp } from "@dynamic-labs/sdk-react-core";
 import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
+import { motion } from "framer-motion";
 
 interface LGRWalletDisplayProps {
   submissionFee: string;
@@ -158,25 +159,33 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
 
   return (
     <Card className={cn(
-      "bg-black border-white/10 overflow-hidden p-6 space-y-6",
+      "relative bg-black/80 border-white/10 overflow-hidden p-6 space-y-6 backdrop-blur-xl",
+      "before:absolute before:inset-0 before:bg-gradient-to-br before:from-purple-500/10 before:via-transparent before:to-yellow-500/10",
+      "after:absolute after:inset-0 after:bg-grid-white/[0.02] after:bg-[size:20px_20px]",
       className
     )}>
-      <div className="space-y-6">
+      <div className="space-y-6 relative z-10">
         <div className="flex items-center justify-between">
-          <h4 className="text-white font-medium">Balances</h4>
-          <button 
+          <h4 className="text-white font-medium bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">Balances</h4>
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setShowBalances(!showBalances)}
             className="text-white/60 hover:text-white transition-colors"
           >
             {showBalances ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-          </button>
+          </motion.button>
         </div>
 
         {showBalances && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-yellow-500/10 to-yellow-500/5 border border-yellow-500/20"
+            >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center backdrop-blur-xl">
                   <Coins className="w-6 h-6 text-yellow-500" />
                 </div>
                 <div>
@@ -184,15 +193,20 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-400">
                   {Number(lgrBalance).toFixed(2)}
                 </p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-white/10">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-purple-500/10 to-purple-500/5 border border-purple-500/20"
+            >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center backdrop-blur-xl">
                   <img 
                     src="https://cryptologos.cc/logos/polygon-matic-logo.png"
                     alt="Polygon"
@@ -204,22 +218,27 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-purple-400">
                   {Number(maticBalance).toFixed(2)}
                 </p>
               </div>
-            </div>
+            </motion.div>
           </div>
         )}
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-white">Submission Requirements</h3>
+            <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60">
+              Submission Requirements
+            </h3>
             <p className="text-sm text-white/70">Complete these steps to submit your thesis</p>
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-3 text-white/80">
+            <motion.div 
+              whileHover={{ x: 5 }}
+              className="flex items-center gap-3 text-white/80"
+            >
               <div className={cn(
                 "w-8 h-8 rounded-full flex items-center justify-center",
                 walletAddress ? "bg-green-500/20 text-green-500" : "bg-white/10"
@@ -227,16 +246,33 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
                 {walletAddress ? "✓" : "1"}
               </div>
               <span>Connect Wallet</span>
-            </div>
+            </motion.div>
 
-            <div className="flex items-center gap-3">
+            <motion.div 
+              whileHover={{ x: 5 }}
+              className="flex items-center gap-3"
+            >
               <div className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center",
+                "w-8 h-8 rounded-full flex items-center justify-center relative",
                 hasEnoughLGR ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500"
               )}>
                 {isCalculatingBalance ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : hasEnoughLGR ? "✓" : "2"}
+                {!hasEnoughLGR && !isCalculatingBalance && (
+                  <motion.div 
+                    animate={{ 
+                      scale: [1, 1, 1.2, 1],
+                      opacity: [1, 0.8, 1, 1] 
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="absolute inset-0 rounded-full bg-red-500/20"
+                  />
+                )}
               </div>
               <span className={cn(
                 "text-white/80",
@@ -250,48 +286,56 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
                   `Need ${tokensNeeded.toFixed(2)} more LGR (${REQUIRED_LGR} Required)`
                 )}
               </span>
-            </div>
+            </motion.div>
           </div>
         </div>
 
         <div className="space-y-3">
-          <Button
-            variant="outline"
-            className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium"
-            onClick={() => setShowDeposit(!showDeposit)}
-          >
-            <Upload className="w-6 h-6 mr-2" />
-            Deposit
-          </Button>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              variant="outline"
+              className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium backdrop-blur-xl"
+              onClick={() => setShowDeposit(!showDeposit)}
+            >
+              <Upload className="w-6 h-6 mr-2" />
+              Deposit
+            </Button>
+          </motion.div>
 
-          <Button
-            onClick={handleBuyPolygon}
-            className="w-full h-14 bg-purple-500 hover:bg-purple-600 text-white font-semibold text-lg"
-          >
-            <img 
-              src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-              alt="Polygon"
-              className="w-6 h-6 mr-2"
-            />
-            Buy Polygon
-          </Button>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              onClick={handleBuyPolygon}
+              className="w-full h-14 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold text-lg"
+            >
+              <img 
+                src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+                alt="Polygon"
+                className="w-6 h-6 mr-2"
+              />
+              Buy Polygon
+            </Button>
+          </motion.div>
 
-          <Button
-            onClick={() => setIsConfirmOpen(true)}
-            className="w-full h-14 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold text-lg"
-          >
-            <Coins className="w-6 h-6 mr-2" />
-            Buy LGR
-          </Button>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              onClick={() => setIsConfirmOpen(true)}
+              className="w-full h-14 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold text-lg"
+            >
+              <Coins className="w-6 h-6 mr-2" />
+              Buy LGR
+            </Button>
+          </motion.div>
 
-          <Button
-            variant="ghost"
-            onClick={() => setShowInstructions(true)}
-            className="w-full h-14 text-white hover:bg-white/10 font-semibold text-lg"
-          >
-            <Info className="w-6 h-6 mr-2" />
-            How to Buy
-          </Button>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              variant="ghost"
+              onClick={() => setShowInstructions(true)}
+              className="w-full h-14 text-white hover:bg-white/10 font-semibold text-lg backdrop-blur-xl"
+            >
+              <Info className="w-6 h-6 mr-2" />
+              How to Buy
+            </Button>
+          </motion.div>
         </div>
       </div>
 
