@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -55,8 +56,7 @@ const dynamicSettings = {
     appName: "LedgerFund",
     appLogoUrl: "/favicon.ico",
     onramp: {
-      providers: ['banxa'],
-      defaultProvider: 'banxa'
+      providers: ['banxa']
     },
     enableEmbeddedWallets: true,
     enableVisitTrackingOnConnectOnly: true,
