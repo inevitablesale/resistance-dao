@@ -117,12 +117,14 @@ const SUBMISSION_STEPS: SubmissionStep[] = [
 
 const ThesisSubmission = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
+  const { toast } = useToast();
+  const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
   const { tokenBalances } = useTokenBalances({
     networkId: 137,
-    accountAddress: primaryWallet?.address,
+    accountAddress: address,
     includeFiat: false,
     includeNativeBalance: false,
-    tokenAddresses: ["0xf12145c01e4b252677a91bbf81fa8f36deb5ae00"]
+    tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -551,9 +553,9 @@ const ThesisSubmission = () => {
           </motion.div>
 
           <div className="mb-8">
-            <div className="flex flex-col items-center text-sm text-white/60 space-y-8">
+            <div className="flex justify-between items-center text-sm text-white/60 max-w-[600px] mx-auto">
               {steps.map((step, index) => (
-                <div key={step.id} className="flex flex-col items-center">
+                <div key={step.id} className="flex items-center">
                   <div className="flex items-center">
                     <div className={cn(
                       "w-2 h-2 rounded-full transition-all duration-300",
@@ -562,7 +564,7 @@ const ThesisSubmission = () => {
                       "bg-white/20"
                     )} />
                     <span className={cn(
-                      "ml-2 text-lg font-medium transition-colors whitespace-nowrap",
+                      "ml-2 text-sm font-medium transition-colors whitespace-nowrap",
                       step.id === activeStep ? "text-yellow-500" : "text-white/60"
                     )}>
                       {step.title}
@@ -570,7 +572,7 @@ const ThesisSubmission = () => {
                   </div>
                   {index < steps.length - 1 && (
                     <div className={cn(
-                      "h-8 w-[1px] my-1",
+                      "h-[1px] w-12 mx-4",
                       steps.findIndex(s => s.id === activeStep) > index ? "bg-yellow-300" : "bg-white/20"
                     )} />
                   )}
