@@ -38,18 +38,22 @@ export const useWalletConnection = () => {
   };
 
   const approveLGR = async (amount: string) => {
-    if (!primaryWallet?.connector) {
-      throw new Error("No provider available");
+    if (!primaryWallet) {
+      throw new Error("No wallet connected");
     }
 
     if (!treasuryAddress) {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const status = await getContractStatus(provider);
+      const status = await getContractStatus(primaryWallet);
       setTreasuryAddress(status.treasuryAddress);
     }
 
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+    const provider = await primaryWallet.getWalletClient();
+    if (!provider) {
+      throw new Error("No provider available");
+    }
+
+    const ethersProvider = new ethers.providers.Web3Provider(provider as any);
+    const signer = ethersProvider.getSigner();
     const lgrToken = new ethers.Contract(
       LGR_TOKEN_ADDRESS,
       ["function approve(address spender, uint256 amount) returns (bool)"],
@@ -76,6 +80,8 @@ export const useWalletConnection = () => {
     address: primaryWallet?.address,
     approveLGR,
     setShowOnRamp,
-    setShowAuthFlow
+    setShowAuthFlow,
+    wallet: primaryWallet
   };
 };
+

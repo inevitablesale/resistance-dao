@@ -1,5 +1,6 @@
 
 import { ethers } from "ethers";
+import { DynamicWallet } from "@dynamic-labs/sdk-react-core";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
@@ -38,45 +39,66 @@ export interface GasEstimate {
   totalCost: ethers.BigNumber;
 }
 
-export const getContractStatus = async (provider: ethers.providers.Web3Provider): Promise<ContractStatus> => {
-  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
-  
-  const [
-    submissionFee,
-    isPaused,
-    isTestMode,
-    treasuryAddress,
-    minTargetCapital,
-    maxTargetCapital,
-    minVotingDuration,
-    maxVotingDuration
-  ] = await Promise.all([
-    factory.submissionFee(),
-    factory.paused(),
-    factory.testModeEnabled(),
-    factory.treasury(),
-    factory.minTargetCapital(),
-    factory.maxTargetCapital(),
-    factory.minVotingDuration(),
-    factory.maxVotingDuration()
-  ]);
+async function getProvider(wallet: DynamicWallet) {
+  try {
+    const provider = await wallet.getWalletClient();
+    if (!provider) {
+      throw new Error("No provider available");
+    }
+    return new ethers.providers.Web3Provider(provider as any);
+  } catch (error) {
+    console.error("Error getting provider:", error);
+    throw new Error("Failed to initialize provider");
+  }
+}
 
-  return {
-    submissionFee,
-    isPaused,
-    isTestMode,
-    treasuryAddress,
-    minTargetCapital,
-    maxTargetCapital,
-    minVotingDuration: Number(minVotingDuration),
-    maxVotingDuration: Number(maxVotingDuration)
-  };
+export const getContractStatus = async (wallet: DynamicWallet): Promise<ContractStatus> => {
+  console.log("Getting contract status with wallet:", wallet);
+  const provider = await getProvider(wallet);
+  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+
+  try {
+    const [
+      submissionFee,
+      isPaused,
+      isTestMode,
+      treasuryAddress,
+      minTargetCapital,
+      maxTargetCapital,
+      minVotingDuration,
+      maxVotingDuration
+    ] = await Promise.all([
+      factory.submissionFee(),
+      factory.paused(),
+      factory.testModeEnabled(),
+      factory.treasury(),
+      factory.minTargetCapital(),
+      factory.maxTargetCapital(),
+      factory.minVotingDuration(),
+      factory.maxVotingDuration()
+    ]);
+
+    return {
+      submissionFee,
+      isPaused,
+      isTestMode,
+      treasuryAddress,
+      minTargetCapital,
+      maxTargetCapital,
+      minVotingDuration: Number(minVotingDuration),
+      maxVotingDuration: Number(maxVotingDuration)
+    };
+  } catch (error) {
+    console.error("Error getting contract status:", error);
+    throw new Error("Failed to get contract status. Please ensure you're connected to the correct network.");
+  }
 };
 
 export const estimateProposalGas = async (
   config: ProposalConfig,
-  provider: ethers.providers.Web3Provider
+  wallet: DynamicWallet
 ): Promise<GasEstimate> => {
+  const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
   
   const gasEstimate = await factory.estimateGas.createProposal(
@@ -97,8 +119,9 @@ export const estimateProposalGas = async (
 
 export const createProposal = async (
   config: ProposalConfig,
-  provider: ethers.providers.Web3Provider
+  wallet: DynamicWallet
 ): Promise<ethers.ContractTransaction> => {
+  const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
   return await factory.createProposal(
@@ -107,3 +130,4 @@ export const createProposal = async (
     config.votingDuration
   );
 };
+
