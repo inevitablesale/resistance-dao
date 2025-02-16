@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -22,7 +23,7 @@ export const LGRFloatingWidget = () => {
   const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
   const { toast } = useToast();
   const { setShowOnRamp, setShowAuthFlow } = useDynamicContext();
-  const { showWallet } = useWalletConnection();
+  const { isConnected } = useWalletConnection();
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -68,7 +69,7 @@ export const LGRFloatingWidget = () => {
       setShowAuthFlow?.(true);
       return;
     }
-    showWallet('deposit');
+    setShowOnRamp?.(true);
   };
 
   const handleConfirmPurchase = async () => {
