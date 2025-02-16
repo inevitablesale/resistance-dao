@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import Nav from "@/components/Nav";
-import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight } from "lucide-react";
+import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
@@ -22,7 +22,28 @@ import { TransactionStatus } from "@/components/thesis/TransactionStatus";
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+
+interface SubmissionStep {
+  id: string;
+  title: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  description: string;
+}
+
+interface StoredProposal {
+  hash: string;
+  ipfsHash: string;
+  timestamp: string;
+  title: string;
+  targetCapital: string;
+  status: 'pending' | 'completed' | 'failed';
+}
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -144,6 +165,8 @@ const ThesisSubmission = () => {
       additionalCriteria: ""
     }
   });
+
+  const [isOpen, setIsOpen] = useState(true);
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => 
@@ -472,117 +495,127 @@ const ThesisSubmission = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left Column - Progress and Form */}
             <div className="lg:col-span-8">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-8"
+              <Collapsible
+                open={isOpen}
+                onOpenChange={setIsOpen}
+                className="space-y-6"
               >
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                  Submit Your Investment Thesis
-                </h1>
-              </motion.div>
+                <CollapsibleTrigger className="flex items-center justify-between w-full text-left">
+                  <motion.h1 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-3xl md:text-4xl font-bold text-white"
+                  >
+                    Submit Your Investment Thesis
+                  </motion.h1>
+                  {isOpen ? (
+                    <ChevronUp className="w-6 h-6 text-white/60" />
+                  ) : (
+                    <ChevronDown className="w-6 h-6 text-white/60" />
+                  )}
+                </CollapsibleTrigger>
 
-              <div className="space-y-6">
-                {/* Form Content */}
-                <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
-                  <div className="border-b border-white/5">
-                    <div className="px-6 py-4">
-                      <SubmissionProgress 
-                        steps={steps}
-                        currentStepId={activeStep}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    {activeStep === 'thesis' && (
-                      <div className="space-y-8">
-                        <div className="space-y-4">
-                          <Label className="text-lg font-medium text-white">
-                            Thesis Title
-                          </Label>
-                          <Input
-                            placeholder="Enter a clear, descriptive title"
-                            className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
-                            value={formData.title}
-                            onChange={(e) => handleFormDataChange('title', e.target.value)}
-                          />
-                          {formErrors.title && (
-                            <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                          )}
-                        </div>
-
-                        <VotingDurationInput
-                          value={votingDuration}
-                          onChange={handleVotingDurationChange}
-                          error={formErrors.votingDuration}
-                        />
-
-                        <TargetCapitalInput
-                          value={formData.investment.targetCapital}
-                          onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
-                          error={formErrors['investment.targetCapital']}
+                <CollapsibleContent className="space-y-6">
+                  <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
+                    <div className="border-b border-white/5">
+                      <div className="px-6 py-4">
+                        <SubmissionProgress 
+                          steps={steps}
+                          currentStepId={activeStep}
                         />
                       </div>
-                    )}
+                    </div>
 
-                    {activeStep === 'strategy' && (
-                      <FirmCriteriaSection 
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={handleFormDataChange}
-                      />
-                    )}
+                    <div className="p-6">
+                      {activeStep === 'thesis' && (
+                        <div className="space-y-8">
+                          <div className="space-y-4">
+                            <Label className="text-lg font-medium text-white">
+                              Thesis Title
+                            </Label>
+                            <Input
+                              placeholder="Enter a clear, descriptive title"
+                              className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                              value={formData.title}
+                              onChange={(e) => handleFormDataChange('title', e.target.value)}
+                            />
+                            {formErrors.title && (
+                              <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                            )}
+                          </div>
 
-                    {activeStep === 'submission' && (
-                      <StrategiesSection 
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={handleStrategyChange}
-                      />
-                    )}
+                          <VotingDurationInput
+                            value={votingDuration}
+                            onChange={handleVotingDurationChange}
+                            error={formErrors.votingDuration}
+                          />
 
-                    {activeStep === 'approval' && (
-                      <PaymentTermsSection 
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={handleFormDataChange}
-                      />
-                    )}
+                          <TargetCapitalInput
+                            value={formData.investment.targetCapital}
+                            onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+                            error={formErrors['investment.targetCapital']}
+                          />
+                        </div>
+                      )}
+
+                      {activeStep === 'strategy' && (
+                        <FirmCriteriaSection 
+                          formData={formData}
+                          formErrors={formErrors}
+                          onChange={handleFormDataChange}
+                        />
+                      )}
+
+                      {activeStep === 'submission' && (
+                        <StrategiesSection 
+                          formData={formData}
+                          formErrors={formErrors}
+                          onChange={handleStrategyChange}
+                        />
+                      )}
+
+                      {activeStep === 'approval' && (
+                        <PaymentTermsSection 
+                          formData={formData}
+                          formErrors={formErrors}
+                          onChange={handleFormDataChange}
+                        />
+                      )}
+                    </div>
+                  </Card>
+
+                  {/* Navigation */}
+                  <div className="flex justify-end">
+                    <Button
+                      onClick={handleContinue}
+                      disabled={isSubmitting}
+                      className={cn(
+                        "h-12 px-6 min-w-[200px]",
+                        "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+                        "hover:from-polygon-secondary hover:to-polygon-primary",
+                        "text-white font-medium",
+                        "transition-all duration-300",
+                        "disabled:opacity-50",
+                        "flex items-center justify-center gap-2"
+                      )}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                          <span>Processing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>
+                            {activeStep === 'approval' ? "Submit Thesis" : "Continue"}
+                          </span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </Button>
                   </div>
-                </Card>
-
-                {/* Navigation */}
-                <div className="flex justify-end">
-                  <Button
-                    onClick={handleContinue}
-                    disabled={isSubmitting}
-                    className={cn(
-                      "h-12 px-6 min-w-[200px]",
-                      "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
-                      "hover:from-polygon-secondary hover:to-polygon-primary",
-                      "text-white font-medium",
-                      "transition-all duration-300",
-                      "disabled:opacity-50",
-                      "flex items-center justify-center gap-2"
-                    )}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                        <span>Processing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>
-                          {activeStep === 'approval' ? "Submit Thesis" : "Continue"}
-                        </span>
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
+                </CollapsibleContent>
+              </Collapsible>
             </div>
 
             {/* Right Column - Wallet and Status */}
