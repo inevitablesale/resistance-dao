@@ -34,7 +34,7 @@ export const CallToAction = () => {
 
     try {
       await open({
-        onrampProvider: OnrampProviders.Banxa,
+        onrampProvider: OnrampProviders.Coinbase,  // Changed from Banxa to Coinbase
         address: primaryWallet.address,
       });
       
@@ -79,4 +79,3 @@ export const CallToAction = () => {
     </section>
   );
 };
-

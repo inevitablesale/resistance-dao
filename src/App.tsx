@@ -75,7 +75,7 @@ const dynamicSettings = {
     appName: "LedgerFund",
     appLogoUrl: "/favicon.ico",
     onramp: {
-      providers: ['banxa']
+      providers: ['coinbase']  // Changed from 'banxa' to 'coinbase'
     },
     enableEmbeddedWallets: true,
     enableVisitTrackingOnConnectOnly: true,
@@ -146,4 +146,3 @@ function App() {
 }
 
 export default App;
-
