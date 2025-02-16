@@ -9,8 +9,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import Nav from "@/components/Nav";
-import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase } from "lucide-react";
+import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
@@ -539,7 +544,7 @@ const ThesisSubmission = () => {
             <div className="lg:col-span-8 space-y-4 md:space-y-6">
               <div className="block lg:hidden mb-4 px-4">
                 <div className="flex items-center justify-between text-sm text-white/60">
-                  <span>Step {['basics', 'firm', 'strategy', 'terms'].indexOf(activeTab) + 1} of 4</span>
+                  <span>Step {(['basics', 'firm', 'strategy', 'terms'].indexOf(activeTab) + 1).toString()} of 4</span>
                   <span className="text-white font-medium">
                     {activeTab === 'basics' ? 'Basic Details' :
                      activeTab === 'firm' ? 'Firm Details' :
@@ -550,7 +555,7 @@ const ThesisSubmission = () => {
                   <div 
                     className="h-full bg-polygon-primary rounded-full transition-all duration-300"
                     style={{ 
-                      width: `${((['basics', 'firm', 'strategy', 'terms'].indexOf(activeTab) + 1) / 4) * 100}%` 
+                      width: `${((['basics', 'firm', 'strategy', 'terms'].indexOf(activeTab) + 1) / 4 * 100).toString()}%` 
                     }}
                   />
                 </div>
