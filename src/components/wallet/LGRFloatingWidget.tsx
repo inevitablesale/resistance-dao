@@ -77,7 +77,7 @@ export const LGRFloatingWidget = () => {
 
     try {
       await open({
-        onrampProvider: 'coinbase',  // Use string literal instead of enum
+        onrampProvider: OnrampProviders.COINBASE_PAY,  // Using the correct enum value
         token: 'MATIC',
         address: primaryWallet.address,
       });
