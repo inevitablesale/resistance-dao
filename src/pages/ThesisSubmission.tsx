@@ -529,13 +529,27 @@ const ThesisSubmission = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-16">
           <div className="lg:col-span-8">
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              className="text-3xl md:text-4xl font-bold text-white mb-8"
-            >
-              Transform Accounting Firm Ownership
-            </motion.h1>
+            <div className="flex items-center justify-between mb-8">
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                className="text-3xl md:text-4xl font-bold text-white"
+              >
+                Transform Accounting Firm Ownership
+              </motion.h1>
+              
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="test-mode" className="text-sm text-white/60">
+                  Test Mode
+                </Label>
+                <Switch
+                  id="test-mode"
+                  checked={isTestMode}
+                  onCheckedChange={setIsTestMode}
+                  className="data-[state=checked]:bg-yellow-500"
+                />
+              </div>
+            </div>
 
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
               <div className="border-b border-white/5">
