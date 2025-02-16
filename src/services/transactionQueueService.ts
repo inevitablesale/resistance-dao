@@ -14,12 +14,18 @@ export interface QueuedTransaction {
   retryCount: number;
 }
 
-export interface TransactionResult {
-  success: boolean;
-  hash?: string;
-  error?: Error;
-  receipt?: ethers.ContractReceipt;
+interface TransactionSuccess {
+  success: true;
+  transaction: ethers.ContractTransaction;
+  receipt: ethers.ContractReceipt;
 }
+
+interface TransactionFailure {
+  success: false;
+  error: Error;
+}
+
+export type TransactionResult = TransactionSuccess | TransactionFailure;
 
 class TransactionQueueService {
   private queue: Map<string, QueuedTransaction> = new Map();
@@ -76,11 +82,11 @@ class TransactionQueueService {
       
       if (result.success) {
         tx.status = 'completed';
-        tx.hash = result.hash;
+        tx.hash = result.transaction.hash;
         this.notifyUpdate(tx);
         return result;
       } else {
-        throw result.error || new Error('Transaction failed');
+        throw result.error;
       }
     } catch (error: any) {
       console.error(`Transaction ${id} failed:`, error);
@@ -99,16 +105,19 @@ class TransactionQueueService {
       tx.error = error.message;
       this.notifyUpdate(tx);
       
-      throw new ProposalError({
-        category: 'transaction',
-        message: `Transaction failed after ${this.maxRetries} attempts`,
-        recoverySteps: [
-          'Check your wallet connection',
-          'Verify you have enough funds',
-          'Try increasing the gas price'
-        ],
-        technicalDetails: error.message
-      });
+      return {
+        success: false,
+        error: new ProposalError({
+          category: 'transaction',
+          message: `Transaction failed after ${this.maxRetries} attempts`,
+          recoverySteps: [
+            'Check your wallet connection',
+            'Verify you have enough funds',
+            'Try increasing the gas price'
+          ],
+          technicalDetails: error.message
+        })
+      };
     }
   }
 

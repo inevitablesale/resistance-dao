@@ -20,7 +20,6 @@ import { validateProposalMetadata, validateIPFSHash, validateContractParameters 
 import { executeTransaction } from "@/services/transactionManager";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 
-// Contract constants
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
   "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
@@ -220,44 +219,18 @@ const ThesisSubmission = () => {
         throw new Error(Object.values(paramValidation.errors).flat().join(", "));
       }
 
-      // 6. Estimate gas and validate
-      console.log('Estimating gas...');
-      const gasEstimate = await estimateProposalGas({
+      // 6. Create proposal with retry mechanism
+      console.log('Creating proposal...');
+      const result = await createProposal({
         targetCapital,
         votingDuration: votingDurationSeconds,
         ipfsHash
       }, wallet);
 
-      console.log('Gas estimate:', {
-        gasLimit: gasEstimate.gasLimit.toString(),
-        gasPrice: gasEstimate.gasPrice.toString(),
-        totalCost: ethers.utils.formatEther(gasEstimate.totalCost)
-      });
-
-      // 7. Create proposal with retry mechanism
-      console.log('Creating proposal...');
-      const result = await executeTransaction(
-        () => createProposal({
-          targetCapital,
-          votingDuration: votingDurationSeconds,
-          ipfsHash
-        }, wallet),
-        {
-          timeout: 120000, // 2 minutes
-          maxRetries: 3,
-          backoffMs: 5000
-        }
-      );
-
-      if (result.status === 'failed') {
-        throw result.error || new Error('Transaction failed');
-      }
-
       // 8. Store proposal data in local storage for reference
       const userProposals = JSON.parse(localStorage.getItem('userProposals') || '[]');
       userProposals.push({
-        tokenId: result.receipt?.events?.find(e => e.event === 'ProposalCreated')?.args?.[0].toString(),
-        contractAddress: result.receipt?.events?.find(e => e.event === 'ProposalCreated')?.args?.[1],
+        hash: result.hash,
         ipfsHash,
         timestamp: Date.now()
       });

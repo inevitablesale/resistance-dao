@@ -2,7 +2,7 @@
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation, ProposalEvent } from "./eventListenerService";
-import { transactionQueue, type TransactionResult } from "./transactionQueueService";
+import { transactionQueue } from "./transactionQueueService";
 
 export interface TransactionConfig {
   timeout: number;
@@ -22,14 +22,14 @@ const DEFAULT_CONFIG: Omit<TransactionConfig, 'description' | 'type'> = {
 export const executeTransaction = async (
   transaction: () => Promise<ethers.ContractTransaction>,
   config: TransactionConfig
-): Promise<TransactionResult> => {
+): Promise<ethers.ContractTransaction> => {
   // Add to queue first
   const txId = await transactionQueue.addTransaction({
     type: config.type,
     description: config.description
   });
   
-  return await transactionQueue.processTransaction(txId, async () => {
+  const result = await transactionQueue.processTransaction(txId, async () => {
     try {
       const tx = await transaction();
       console.log('Transaction submitted:', tx.hash);
@@ -47,10 +47,9 @@ export const executeTransaction = async (
       const receipt = await Promise.race([receiptPromise, timeoutPromise]);
       
       // If event config is provided, wait for the event
-      let event: ProposalEvent | undefined;
       if (config.eventConfig) {
         try {
-          event = await waitForProposalCreation(config.eventConfig, tx.hash);
+          const event = await waitForProposalCreation(config.eventConfig, tx.hash);
           console.log('Proposal creation event received:', event);
         } catch (error) {
           console.warn('Failed to capture proposal event:', error);
@@ -59,9 +58,8 @@ export const executeTransaction = async (
       
       return {
         success: true,
-        hash: tx.hash,
-        receipt,
-        event
+        transaction: tx,
+        receipt
       };
     } catch (error: any) {
       console.error('Transaction execution failed:', error);
@@ -73,4 +71,10 @@ export const executeTransaction = async (
       };
     }
   });
+
+  if (!result.success || !result.transaction) {
+    throw result.error || new Error('Transaction failed');
+  }
+
+  return result.transaction;
 };
