@@ -553,29 +553,29 @@ const ThesisSubmission = () => {
           </motion.div>
 
           <div className="mb-8">
-            <div className="flex justify-between items-start text-sm text-white/60 max-w-[600px] mx-auto">
+            <div className="flex justify-between items-center text-sm text-white/60 max-w-[600px] mx-auto">
               {steps.map((step, index) => (
-                <div key={step.id} className="flex flex-col items-center space-y-2 flex-1">
-                  <div className="flex items-center w-full">
+                <div key={step.id} className="flex items-center">
+                  <div className="flex items-center">
                     <div className={cn(
                       "w-2 h-2 rounded-full transition-all duration-300",
-                      step.id === activeStep ? "bg-polygon-primary w-4" : 
-                      steps.findIndex(s => s.id === activeStep) > index ? "bg-polygon-primary/50" : 
-                      "bg-white/20"
+                      step.id === activeStep ? "bg-[#F6F6F7] w-4" : 
+                      steps.findIndex(s => s.id === activeStep) > index ? "bg-[#8E9196]" : 
+                      "bg-[#222222]"
                     )} />
-                    {index < steps.length - 1 && (
-                      <div className={cn(
-                        "h-[1px] flex-1 mx-2",
-                        steps.findIndex(s => s.id === activeStep) > index ? "bg-polygon-primary/50" : "bg-white/10"
-                      )} />
-                    )}
+                    <span className={cn(
+                      "ml-2 text-xs font-medium transition-colors whitespace-nowrap",
+                      step.id === activeStep ? "text-white" : "text-[#8E9196]"
+                    )}>
+                      {step.title}
+                    </span>
                   </div>
-                  <span className={cn(
-                    "text-xs font-medium transition-colors text-center",
-                    step.id === activeStep ? "text-white" : "text-white/40"
-                  )}>
-                    {step.title}
-                  </span>
+                  {index < steps.length - 1 && (
+                    <div className={cn(
+                      "h-[1px] w-12 mx-4",
+                      steps.findIndex(s => s.id === activeStep) > index ? "bg-[#8E9196]" : "bg-[#222222]"
+                    )} />
+                  )}
                 </div>
               ))}
             </div>
@@ -689,9 +689,9 @@ const ThesisSubmission = () => {
                 disabled={isSubmitting}
                 className={cn(
                   "h-12 px-6",
-                  "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
-                  "hover:from-polygon-secondary hover:to-polygon-primary",
-                  "text-white font-medium",
+                  "bg-gradient-to-r from-[#F6F6F7] to-[#8E9196]",
+                  "hover:from-[#8E9196] hover:to-[#F6F6F7]",
+                  "text-[#030712] font-medium",
                   "transition-all duration-300",
                   "disabled:opacity-50",
                   "flex items-center justify-center gap-2"
