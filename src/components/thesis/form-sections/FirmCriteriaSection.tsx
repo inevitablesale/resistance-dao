@@ -28,8 +28,12 @@ interface FirmCriteriaSectionProps {
 }
 
 export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCriteriaSectionProps) => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent click from bubbling up
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" onClick={handleClick}>
       <h2 className="text-xl font-semibold text-white">Target Firm Criteria</h2>
       
       <div>

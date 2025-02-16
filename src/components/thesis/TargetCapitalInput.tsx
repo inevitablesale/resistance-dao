@@ -37,10 +37,10 @@ export const TargetCapitalInput = ({
     if (!value) return "";
     const numValue = ethers.utils.parseEther(value || "0");
     if (numValue.lt(MIN_TARGET_CAPITAL)) {
-      return `Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} ETH`;
+      return `Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} LGR`;
     }
     if (numValue.gt(MAX_TARGET_CAPITAL)) {
-      return `Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} ETH`;
+      return `Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} LGR`;
     }
     return "";
   };
@@ -53,7 +53,7 @@ export const TargetCapitalInput = ({
           <HelpCircle className="h-4 w-4 text-gray-400" />
         </Label>
         <div className="text-sm text-gray-400">
-          {value && `≈ ${ethers.utils.formatEther(ethers.utils.parseEther(value || "0"))} ETH`}
+          {value && `≈ ${ethers.utils.formatEther(ethers.utils.parseEther(value || "0"))} LGR`}
         </div>
       </div>
       <div className="relative">
