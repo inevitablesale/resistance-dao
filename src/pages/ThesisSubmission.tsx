@@ -77,6 +77,15 @@ interface ProposalConfig {
   ipfsHash: string;
 }
 
+interface StoredProposal {
+  hash: string;
+  ipfsHash: string;
+  timestamp: number;
+  title: string;
+  targetCapital: string;
+  status: string;
+}
+
 const US_STATES = [
   "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
   "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", 
@@ -332,15 +341,16 @@ const ThesisSubmission = () => {
       }, wallet);
 
       // Store proposal data
-      const userProposals = JSON.parse(localStorage.getItem('userProposals') || '[]');
-      userProposals.push({
+      const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
+      const newProposal: StoredProposal = {
         hash: result.hash,
         ipfsHash,
         timestamp: Date.now(),
         title: formData.title,
-        targetCapital: formData.investment.targetCapital.toString(),
+        targetCapital: formData.investment.targetCapital,
         status: 'pending'
-      });
+      };
+      userProposals.push(newProposal);
       localStorage.setItem('userProposals', JSON.stringify(userProposals));
 
       updateStepStatus('submission', 'completed');
