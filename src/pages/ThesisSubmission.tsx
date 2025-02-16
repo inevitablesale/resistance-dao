@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,6 +113,22 @@ const ThesisSubmission = () => {
     includeNativeBalance: false,
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
+
+  const [submissionFee, setSubmissionFee] = useState<string>("0");
+
+  useEffect(() => {
+    const fetchSubmissionFee = async () => {
+      if (!wallet) return;
+      try {
+        const status = await getContractStatus(wallet);
+        setSubmissionFee(status.submissionFee.toString());
+      } catch (error) {
+        console.error("Error fetching submission fee:", error);
+      }
+    };
+
+    fetchSubmissionFee();
+  }, [wallet]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
@@ -553,7 +569,7 @@ const ThesisSubmission = () => {
 
       <div className="fixed bottom-6 right-6">
         <LGRWalletDisplay 
-          submissionFee={ethers.utils.parseEther("250").toString()}
+          submissionFee={submissionFee}
           currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
           walletAddress={address}
           className="w-[300px]"
