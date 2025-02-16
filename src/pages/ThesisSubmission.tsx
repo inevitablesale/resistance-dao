@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,7 @@ import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
 
 // Contract constants
-const FACTORY_ADDRESS = "0x..."; // Add the deployed factory contract address
+const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
   "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
   "function submissionFee() public view returns (uint256)",
@@ -268,7 +269,7 @@ const ThesisSubmission = () => {
               LedgerFund DAO – Investment Thesis Submission
             </h1>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Present your accounting firm acquisition thesis to secure co-investment from the LedgerFund DAO community. Outline your target criteria, investment strategy, and potential returns to align capital with promising opportunities in the accounting industry.
+              Present your accounting firm acquisition thesis to secure co-investment from the LedgerFund DAO community. Outline your target criteria, investment strategy, and align capital with promising opportunities in the accounting industry.
             </p>
           </div>
 
