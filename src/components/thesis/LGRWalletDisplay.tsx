@@ -4,6 +4,10 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Eye, Upload, Coins, Info } from "lucide-react";
 import { ethers } from "ethers";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
+import { useCustomWallet } from "@/hooks/useCustomWallet";
+
+const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 interface LGRWalletDisplayProps {
   submissionFee: string;
@@ -15,20 +19,27 @@ interface LGRWalletDisplayProps {
 export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress, className }: LGRWalletDisplayProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [usdValue, setUsdValue] = useState("0.00");
+  const { address } = useCustomWallet();
+  const { tokenBalances } = useTokenBalances({
+    networkId: 137,
+    accountAddress: address,
+    tokenAddresses: [LGR_TOKEN_ADDRESS]
+  });
   
-  // Format token balance
-  const formattedBalance = currentBalance ? 
-    Number(ethers.utils.formatEther(currentBalance)).toFixed(0) : 
+  // Format token balance from tokenBalances
+  const lgrBalance = tokenBalances?.find(token => token.address.toLowerCase() === LGR_TOKEN_ADDRESS.toLowerCase())?.balance?.toString();
+  const formattedBalance = lgrBalance ? 
+    Number(ethers.utils.formatEther(lgrBalance)).toFixed(0) : 
     "0";
 
   // Calculate USD value (assuming $0.10 per token as per presale price)
   useEffect(() => {
-    if (currentBalance) {
-      const tokenAmount = Number(ethers.utils.formatEther(currentBalance));
+    if (lgrBalance) {
+      const tokenAmount = Number(ethers.utils.formatEther(lgrBalance));
       const usdAmount = (tokenAmount * 0.10).toFixed(2); // $0.10 per token
       setUsdValue(usdAmount);
     }
-  }, [currentBalance]);
+  }, [lgrBalance]);
 
   return (
     <div className={className}>
