@@ -1,8 +1,4 @@
-
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
-import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
 import { ReclaimControl } from "@/components/ReclaimControl";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -139,8 +135,8 @@ const processSteps = [
 
 const IndexContent = () => {
   const navigate = useNavigate();
-  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
-  const { showWallet } = useWalletConnection();
+  const { primaryWallet } = useDynamicContext();
+  const { setShowOnRamp, setShowAuthFlow } = useWalletConnection();
   const { toast } = useToast();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -164,10 +160,15 @@ const IndexContent = () => {
 
   const handleBuyToken = () => {
     if (!primaryWallet?.address) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet first.",
+        variant: "destructive",
+      });
       setShowAuthFlow?.(true);
       return;
     }
-    showWallet('deposit');
+    setShowOnRamp?.(true);
   };
 
   const handleScroll = () => {
@@ -306,10 +307,6 @@ const IndexContent = () => {
         </div>
       </div>
 
-      {/* DynamicWidget will be positioned in the top right */}
-      <div className="fixed top-4 right-4 z-50">
-        <DynamicWidget />
-      </div>
       <LGRFloatingWidget />
 
       {/* Market Dynamics Section */}

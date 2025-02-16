@@ -1,6 +1,6 @@
-
 import { type EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { type ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum-aa";
+import { type OnrampProviders } from "@dynamic-labs/sdk-api-core";
 
 declare module "@dynamic-labs/sdk-react-core" {
   export interface UserProfile {
@@ -41,6 +41,14 @@ declare module "@dynamic-labs/sdk-react-core" {
         };
       }
     ) => void;
+    useOnramp?: () => {
+      enabled: boolean;
+      open: (options: {
+        onrampProvider: OnrampProviders;
+        token: string;
+        address: string;
+      }) => Promise<void>;
+    };
   }
 
   export interface DynamicSettings {

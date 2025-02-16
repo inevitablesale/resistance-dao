@@ -1,97 +1,86 @@
 
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useState, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { ethers } from "ethers";
+import { getContractStatus } from "@/services/proposalContractService";
+
+const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 export const useWalletConnection = () => {
   const { primaryWallet, setShowAuthFlow, setShowOnRamp } = useDynamicContext();
   const [isConnecting, setIsConnecting] = useState(false);
+  const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const connect = useCallback(async () => {
+  const connect = async () => {
     try {
       setIsConnecting(true);
       setShowAuthFlow?.(true);
     } catch (error) {
       console.error("Connection error:", error);
-      toast({
-        title: "Connection Error",
-        description: "Failed to connect wallet. Please try again.",
-        variant: "destructive"
-      });
     } finally {
       setIsConnecting(false);
     }
-  }, [setShowAuthFlow, toast]);
+  };
 
-  const disconnect = useCallback(async () => {
+  const disconnect = async () => {
     try {
       setIsConnecting(true);
       if (primaryWallet?.disconnect) {
         await primaryWallet.disconnect();
-        toast({
-          title: "Wallet Disconnected",
-          description: "Your wallet has been disconnected successfully."
-        });
       }
     } catch (error) {
       console.error("Disconnect error:", error);
-      toast({
-        title: "Disconnect Error",
-        description: "Failed to disconnect wallet. Please try again.",
-        variant: "destructive"
-      });
     } finally {
       setIsConnecting(false);
     }
-  }, [primaryWallet, toast]);
+  };
 
-  const showWallet = useCallback((view: 'send' | 'deposit') => {
+  const approveLGR = async (amount: string) => {
     if (!primaryWallet) {
-      console.warn("No wallet available");
-      toast({
-        title: "Wallet Required",
-        description: "Please connect your wallet first",
-        variant: "destructive"
-      });
-      setShowAuthFlow?.(true);
-      return;
+      throw new Error("No wallet connected");
     }
 
-    try {
-      if (view === 'deposit') {
-        setShowOnRamp?.(true, {
-          defaultFiatAmount: 100,
-          defaultNetwork: { chainId: 137 }
-        });
-        return;
-      }
-
-      // For send view or other actions, try using native wallet methods
-      if (primaryWallet.connector?.showWallet) {
-        primaryWallet.connector.showWallet({ view });
-      } else if (primaryWallet.connector?.openWallet) {
-        primaryWallet.connector.openWallet({ view });
-      } else {
-        console.warn("Direct wallet navigation not available");
-        setShowAuthFlow?.(true);
-      }
-    } catch (error) {
-      console.error("Error showing wallet:", error);
-      toast({
-        title: "Wallet Error",
-        description: "Unable to open wallet interface",
-        variant: "destructive"
-      });
+    if (!treasuryAddress) {
+      const status = await getContractStatus(primaryWallet);
+      setTreasuryAddress(status.treasuryAddress);
     }
-  }, [primaryWallet, setShowAuthFlow, setShowOnRamp, toast]);
+
+    const walletClient = await primaryWallet.getWalletClient();
+    if (!walletClient) {
+      throw new Error("No wallet client available");
+    }
+
+    const provider = new ethers.providers.Web3Provider(walletClient as any);
+    const signer = provider.getSigner();
+    const lgrToken = new ethers.Contract(
+      LGR_TOKEN_ADDRESS,
+      ["function approve(address spender, uint256 amount) returns (bool)"],
+      signer
+    );
+
+    const tx = await lgrToken.approve(treasuryAddress, amount);
+    await tx.wait();
+    return true;
+  };
+
+  // Move the auth flow closing logic to useEffect
+  useEffect(() => {
+    if (primaryWallet?.isConnected?.() && setShowAuthFlow) {
+      setShowAuthFlow(false);
+    }
+  }, [primaryWallet, setShowAuthFlow]);
 
   return {
-    isConnected: primaryWallet?.isConnected?.() || false,
+    isConnected: !!primaryWallet?.isConnected?.(),
     isConnecting,
     connect,
     disconnect,
     address: primaryWallet?.address,
-    showWallet
+    approveLGR,
+    setShowOnRamp,
+    setShowAuthFlow,
+    wallet: primaryWallet
   };
 };
