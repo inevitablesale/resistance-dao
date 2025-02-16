@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
@@ -139,8 +138,8 @@ const processSteps = [
 
 const IndexContent = () => {
   const navigate = useNavigate();
-  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
-  const { showWallet } = useWalletConnection();
+  const { primaryWallet } = useDynamicContext();
+  const { setShowOnRamp, setShowAuthFlow } = useWalletConnection();
   const { toast } = useToast();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -164,10 +163,15 @@ const IndexContent = () => {
 
   const handleBuyToken = () => {
     if (!primaryWallet?.address) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet first.",
+        variant: "destructive",
+      });
       setShowAuthFlow?.(true);
       return;
     }
-    showWallet('deposit');
+    setShowOnRamp?.(true);
   };
 
   const handleScroll = () => {
