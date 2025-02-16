@@ -34,7 +34,7 @@ export const CallToAction = () => {
 
     try {
       await open({
-        onrampProvider: OnrampProviders.COINBASE_PAY,  // Using the correct enum value
+        onrampProvider: OnrampProviders.Banxa,
         address: primaryWallet.address,
       });
       
@@ -79,3 +79,4 @@ export const CallToAction = () => {
     </section>
   );
 };
+

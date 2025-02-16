@@ -1,15 +1,30 @@
 
 import { ethers } from "ethers";
-import { toast } from "@/hooks/use-toast";
-import type { WalletClient } from "viem";
 
-// Constants for the contract
-const GOVERNOR_CONTRACT_ADDRESS = "0x123..."; // Replace with actual address
-const GOVERNOR_ABI = [/* Add ABI here */];
+// Simple interface that describes what we need from a wallet
+interface WalletInterface {
+  getWalletClient: () => Promise<any>;
+  address?: string;
+}
+
+const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
+const FACTORY_ABI = [
+  "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
+  "function submissionFee() public view returns (uint256)",
+  "function paused() public view returns (bool)",
+  "function testModeEnabled() public view returns (bool)",
+  "function treasury() public view returns (address)",
+  "function minTargetCapital() public view returns (uint256)",
+  "function maxTargetCapital() public view returns (uint256)",
+  "function minVotingDuration() public view returns (uint256)",
+  "function maxVotingDuration() public view returns (uint256)",
+  "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"
+];
 
 export interface ContractStatus {
-  isPaused: boolean;
   submissionFee: ethers.BigNumber;
+  isPaused: boolean;
+  isTestMode: boolean;
   treasuryAddress: string;
   minTargetCapital: ethers.BigNumber;
   maxTargetCapital: ethers.BigNumber;
@@ -17,169 +32,106 @@ export interface ContractStatus {
   maxVotingDuration: number;
 }
 
-export const getContractStatus = async (walletClient: WalletClient): Promise<ContractStatus> => {
-  const provider = new ethers.providers.Web3Provider(walletClient as any);
-  const contract = new ethers.Contract(GOVERNOR_CONTRACT_ADDRESS, GOVERNOR_ABI, provider);
+export interface ProposalConfig {
+  targetCapital: ethers.BigNumber;
+  votingDuration: number;
+  ipfsHash: string;
+}
 
-  const [
-    isPaused,
-    submissionFee,
-    treasuryAddress,
-    minTargetCapital,
-    maxTargetCapital,
-    minVotingDuration,
-    maxVotingDuration
-  ] = await Promise.all([
-    contract.paused(),
-    contract.submissionFee(),
-    contract.treasury(),
-    contract.minTargetCapital(),
-    contract.maxTargetCapital(),
-    contract.minVotingDuration(),
-    contract.maxVotingDuration()
-  ]);
+export interface GasEstimate {
+  gasLimit: ethers.BigNumber;
+  gasPrice: ethers.BigNumber;
+  totalCost: ethers.BigNumber;
+}
 
-  return {
-    isPaused,
-    submissionFee,
-    treasuryAddress,
-    minTargetCapital,
-    maxTargetCapital,
-    minVotingDuration,
-    maxVotingDuration
-  };
+async function getProvider(wallet: WalletInterface) {
+  try {
+    const provider = await wallet.getWalletClient();
+    if (!provider) {
+      throw new Error("No provider available");
+    }
+    return new ethers.providers.Web3Provider(provider as any);
+  } catch (error) {
+    console.error("Error getting provider:", error);
+    throw new Error("Failed to initialize provider");
+  }
+}
+
+export const getContractStatus = async (wallet: WalletInterface): Promise<ContractStatus> => {
+  console.log("Getting contract status with wallet:", wallet);
+  const provider = await getProvider(wallet);
+  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+
+  try {
+    const [
+      submissionFee,
+      isPaused,
+      isTestMode,
+      treasuryAddress,
+      minTargetCapital,
+      maxTargetCapital,
+      minVotingDuration,
+      maxVotingDuration
+    ] = await Promise.all([
+      factory.submissionFee(),
+      factory.paused(),
+      factory.testModeEnabled(),
+      factory.treasury(),
+      factory.minTargetCapital(),
+      factory.maxTargetCapital(),
+      factory.minVotingDuration(),
+      factory.maxVotingDuration()
+    ]);
+
+    return {
+      submissionFee,
+      isPaused,
+      isTestMode,
+      treasuryAddress,
+      minTargetCapital,
+      maxTargetCapital,
+      minVotingDuration: Number(minVotingDuration),
+      maxVotingDuration: Number(maxVotingDuration)
+    };
+  } catch (error) {
+    console.error("Error getting contract status:", error);
+    throw new Error("Failed to get contract status. Please ensure you're connected to the correct network.");
+  }
 };
 
 export const estimateProposalGas = async (
-  params: {
-    targetCapital: ethers.BigNumber;
-    votingDuration: number;
-    ipfsHash: string;
-  },
-  walletClient: WalletClient
-) => {
-  const provider = new ethers.providers.Web3Provider(walletClient as any);
-  const contract = new ethers.Contract(GOVERNOR_CONTRACT_ADDRESS, GOVERNOR_ABI, provider);
-
-  const gasLimit = await contract.estimateGas.createProposal(
-    params.ipfsHash,
-    params.targetCapital,
-    params.votingDuration
+  config: ProposalConfig,
+  wallet: WalletInterface
+): Promise<GasEstimate> => {
+  const provider = await getProvider(wallet);
+  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+  
+  const gasEstimate = await factory.estimateGas.createProposal(
+    config.ipfsHash,
+    config.targetCapital,
+    config.votingDuration
   );
 
   const gasPrice = await provider.getGasPrice();
-  const totalCost = gasLimit.mul(gasPrice);
-
+  const gasLimit = gasEstimate.mul(120).div(100); // Add 20% buffer
+  
   return {
     gasLimit,
     gasPrice,
-    totalCost
+    totalCost: gasLimit.mul(gasPrice)
   };
 };
 
-export const checkNFTOwnership = async (walletClient: WalletClient, address: string): Promise<boolean> => {
-  try {
-    // Implementation
-    return false;
-  } catch (error) {
-    console.error("Error checking NFT ownership:", error);
-    return false;
-  }
-};
-
 export const createProposal = async (
-  walletClient: WalletClient,
-  title: string,
-  description: string,
-  options: string[]
-) => {
-  try {
-    const provider = new ethers.providers.Web3Provider(walletClient as any);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(GOVERNOR_CONTRACT_ADDRESS, GOVERNOR_ABI, signer);
-
-    const tx = await contract.createProposal(title, description, options);
-    await tx.wait();
-
-    toast({
-      title: "Success",
-      description: "Proposal created successfully",
-    });
-
-    return tx.hash;
-  } catch (error) {
-    console.error("Error creating proposal:", error);
-    toast({
-      title: "Error",
-      description: "Failed to create proposal",
-      variant: "destructive",
-    });
-    throw error;
-  }
-};
-
-export const castVote = async (
-  walletClient: WalletClient,
-  proposalId: string,
-  optionIndex: number
-) => {
-  try {
-    const provider = new ethers.providers.Web3Provider(walletClient as any);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(GOVERNOR_CONTRACT_ADDRESS, GOVERNOR_ABI, signer);
-
-    const tx = await contract.castVote(proposalId, optionIndex);
-    await tx.wait();
-
-    toast({
-      title: "Success",
-      description: "Vote cast successfully",
-    });
-
-    return tx.hash;
-  } catch (error) {
-    console.error("Error casting vote:", error);
-    toast({
-      title: "Error",
-      description: "Failed to cast vote",
-      variant: "destructive",
-    });
-    throw error;
-  }
-};
-
-export const getProposals = async (walletClient: WalletClient) => {
-  try {
-    const provider = new ethers.providers.Web3Provider(walletClient as any);
-    const contract = new ethers.Contract(GOVERNOR_CONTRACT_ADDRESS, GOVERNOR_ABI, provider);
-
-    const proposals = await contract.getProposals();
-    return proposals;
-  } catch (error) {
-    console.error("Error fetching proposals:", error);
-    toast({
-      title: "Error",
-      description: "Failed to fetch proposals",
-      variant: "destructive",
-    });
-    throw error;
-  }
-};
-
-export const getProposalDetails = async (walletClient: WalletClient, proposalId: string) => {
-  try {
-    const provider = new ethers.providers.Web3Provider(walletClient as any);
-    const contract = new ethers.Contract(GOVERNOR_CONTRACT_ADDRESS, GOVERNOR_ABI, provider);
-
-    const details = await contract.getProposalDetails(proposalId);
-    return details;
-  } catch (error) {
-    console.error("Error fetching proposal details:", error);
-    toast({
-      title: "Error",
-      description: "Failed to fetch proposal details",
-      variant: "destructive",
-    });
-    throw error;
-  }
+  config: ProposalConfig,
+  wallet: WalletInterface
+): Promise<ethers.ContractTransaction> => {
+  const provider = await getProvider(wallet);
+  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
+  
+  return await factory.createProposal(
+    config.ipfsHash,
+    config.targetCapital,
+    config.votingDuration
+  );
 };

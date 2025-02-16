@@ -77,7 +77,7 @@ export const LGRFloatingWidget = () => {
 
     try {
       await open({
-        onrampProvider: OnrampProviders.COINBASE_PAY,  // Using the correct enum value
+        onrampProvider: OnrampProviders.Banxa,
         token: 'MATIC',
         address: primaryWallet.address,
       });
