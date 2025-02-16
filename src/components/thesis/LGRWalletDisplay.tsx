@@ -1,10 +1,9 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Eye, Upload, Coins, Info } from "lucide-react";
 import { ethers } from "ethers";
-import { useOnramp } from "@dynamic-labs/sdk-react-core";
-import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 
 interface LGRWalletDisplayProps {
   submissionFee: string;
@@ -15,17 +14,21 @@ interface LGRWalletDisplayProps {
 
 export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress, className }: LGRWalletDisplayProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { openOnramp } = useOnramp();
+  const [usdValue, setUsdValue] = useState("0.00");
   
+  // Format token balance
   const formattedBalance = currentBalance ? 
     Number(ethers.utils.formatEther(currentBalance)).toFixed(0) : 
     "0";
 
-  const handleBuyPolygon = () => {
-    openOnramp({
-      providerId: OnrampProviders.Transak
-    });
-  };
+  // Calculate USD value (assuming $0.10 per token as per presale price)
+  useEffect(() => {
+    if (currentBalance) {
+      const tokenAmount = Number(ethers.utils.formatEther(currentBalance));
+      const usdAmount = (tokenAmount * 0.10).toFixed(2); // $0.10 per token
+      setUsdValue(usdAmount);
+    }
+  }, [currentBalance]);
 
   return (
     <div className={className}>
@@ -34,7 +37,10 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
         onClick={() => setIsOpen(true)}
       >
         <div className="w-2 h-2 rounded-full bg-green-500" />
-        <span className="text-white text-sm font-medium">{formattedBalance} LGR</span>
+        <div className="flex flex-col">
+          <span className="text-white text-sm font-medium">{formattedBalance} LGR</span>
+          <span className="text-gray-400 text-xs">${usdValue}</span>
+        </div>
       </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -58,10 +64,8 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
             
             <button 
               className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-[#7C3AED] hover:bg-[#6D28D9] transition-colors text-white mt-1"
-              onClick={handleBuyPolygon}
             >
-              <img src="/lovable-uploads/5f7ffc1b-d71d-49ec-bcde-00544abe7041.png" alt="Polygon" className="w-5 h-5" />
-              <span className="text-base font-normal">Buy Polygon</span>
+              <DynamicWidget />
             </button>
             
             <button 
