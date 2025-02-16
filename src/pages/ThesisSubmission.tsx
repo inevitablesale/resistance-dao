@@ -147,11 +147,11 @@ const ThesisSubmission = () => {
       additionalCriteria: ""
     }
   });
-
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
   const [hasShownBalanceWarning, setHasShownBalanceWarning] = useState(false);
   const [activeStep, setActiveStep] = useState<string>('thesis');
   const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
+  const [currentTxId, setCurrentTxId] = useState<string | null>(null);
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => 
@@ -367,7 +367,7 @@ const ThesisSubmission = () => {
       updateStepStatus('thesis', 'completed');
       updateStepStatus('strategy', 'completed');
       updateStepStatus('approval', 'processing');
-      setCurrentStep('approval');
+      setActiveStep('approval');
 
       // Get contract status and validate
       if (!wallet) {
@@ -410,7 +410,7 @@ const ThesisSubmission = () => {
 
       updateStepStatus('approval', 'completed');
       updateStepStatus('submission', 'processing');
-      setCurrentStep('submission');
+      setActiveStep('submission');
 
       // Upload metadata to IPFS
       console.log('Uploading metadata to IPFS...');
@@ -457,7 +457,7 @@ const ThesisSubmission = () => {
 
     } catch (error) {
       console.error("Submission error:", error);
-      updateStepStatus(currentStep, 'failed');
+      updateStepStatus(activeStep, 'failed');
       toast({
         title: "Submission Failed",
         description: error instanceof Error ? error.message : "Failed to submit thesis",
