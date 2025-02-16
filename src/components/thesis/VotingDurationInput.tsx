@@ -31,12 +31,14 @@ export const VotingDurationInput = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="space-y-1">
           <Label className="text-lg font-medium text-white flex items-center gap-2">
             Voting Duration
-            <HelpCircle className="h-4 w-4 text-gray-400" />
+            <HelpCircle className="h-4 w-4 text-gray-500" />
           </Label>
-          <p className="text-sm text-gray-400">Set how long the community can vote on your thesis</p>
+          <p className="text-sm text-gray-400">
+            Set how long the community can vote on your thesis
+          </p>
         </div>
         <motion.div 
           className="text-right"
@@ -49,6 +51,7 @@ export const VotingDurationInput = ({
           </span>
         </motion.div>
       </div>
+
       <Slider
         value={[value]}
         min={MIN_VOTING_DURATION}
@@ -57,10 +60,12 @@ export const VotingDurationInput = ({
         className="w-full"
         onValueChange={onChange}
       />
-      <div className="flex justify-between text-sm text-gray-400">
+      
+      <div className="flex justify-between text-sm text-gray-500">
         <span>7 days (min)</span>
         <span>90 days (max)</span>
       </div>
+
       {error && (
         <p className="text-sm text-red-500">{error[0]}</p>
       )}
