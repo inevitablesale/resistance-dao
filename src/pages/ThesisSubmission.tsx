@@ -196,10 +196,11 @@ const ThesisSubmission = () => {
         current = current[fields[i]];
       }
       
-      if (fields[fields.length - 1] === 'targetCapital') {
-        current[fields[fields.length - 1]] = value.toString();
+      const lastField = fields[fields.length - 1];
+      if (lastField === 'targetCapital') {
+        current[lastField] = value.toString();
       } else {
-        current[fields[fields.length - 1]] = value;
+        current[lastField] = value;
       }
       
       return newData;
