@@ -338,7 +338,7 @@ const ThesisSubmission = () => {
         ipfsHash,
         timestamp: Date.now(),
         title: formData.title,
-        targetCapital: formData.investment.targetCapital,
+        targetCapital: formData.investment.targetCapital.toString(),
         status: 'pending'
       });
       localStorage.setItem('userProposals', JSON.stringify(userProposals));
