@@ -185,14 +185,8 @@ const ThesisSubmission = () => {
     return formData.paymentTerms.length <= 5;
   };
 
-  const handleStrategyChange = (category: keyof typeof formData.strategies, value: string[]) => {
-    setFormData(prev => ({
-      ...prev,
-      strategies: {
-        ...prev.strategies,
-        [category]: value
-      }
-    }));
+  const handleStrategyChange = (category: "operational" | "growth" | "integration", value: string[]) => {
+    handleFormDataChange(`strategies.${category}`, value);
   };
 
   const handleFormDataChange = (field: string, value: any) => {
@@ -581,17 +575,20 @@ const ThesisSubmission = () => {
                   </Collapsible>
 
                   <FirmCriteriaSection 
-                    formData={formData.firmCriteria}
+                    formData={{ firmCriteria: formData.firmCriteria }}
+                    formErrors={formErrors}
                     onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
                   />
 
                   <StrategiesSection 
-                    formData={formData.strategies}
+                    formData={{ strategies: formData.strategies }}
+                    formErrors={formErrors}
                     onChange={handleStrategyChange}
                   />
 
                   <PaymentTermsSection 
-                    formData={formData.paymentTerms}
+                    formData={{ paymentTerms: formData.paymentTerms }}
+                    formErrors={formErrors}
                     onChange={(value) => handleFormDataChange('paymentTerms', value)}
                   />
                 </div>
