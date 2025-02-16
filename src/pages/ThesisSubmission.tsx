@@ -518,24 +518,29 @@ const ThesisSubmission = () => {
                     onOpenChange={setIsThesisOpen}
                     className="w-full"
                   >
-                    <CollapsibleTrigger className="w-full">
-                      <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                        <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
-                          1
+                    <CollapsibleTrigger asChild>
+                      <button 
+                        type="button"
+                        className="w-full"
+                      >
+                        <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
+                          <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
+                            1
+                          </div>
+                          <div className="flex-1 text-left">
+                            <h2 className="text-xl font-semibold text-purple-400 group-hover:text-purple-300 transition-colors">
+                              Investment Thesis
+                            </h2>
+                            <p className="text-sm text-white/60">
+                              Fill out your investment thesis details
+                            </p>
+                          </div>
+                          <ChevronDown className={cn(
+                            "w-5 h-5 text-white/60 transition-transform",
+                            isThesisOpen && "transform rotate-180"
+                          )} />
                         </div>
-                        <div className="flex-1 text-left">
-                          <h2 className="text-xl font-semibold text-purple-400 group-hover:text-purple-300 transition-colors">
-                            Investment Thesis
-                          </h2>
-                          <p className="text-sm text-white/60">
-                            Fill out your investment thesis details
-                          </p>
-                        </div>
-                        <ChevronDown className={cn(
-                          "w-5 h-5 text-white/60 transition-transform",
-                          isThesisOpen && "transform rotate-180"
-                        )} />
-                      </div>
+                      </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="space-y-6 px-4 pt-4 pb-6">
                       <div className="space-y-4">
