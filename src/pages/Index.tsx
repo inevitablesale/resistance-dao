@@ -1,6 +1,4 @@
-
 import React from 'react';
-import Nav from "@/components/Nav";
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
 import { ReclaimControl } from "@/components/ReclaimControl";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -14,7 +12,7 @@ import { FAQ } from "@/components/FAQ";
 import { useNavigate } from "react-router-dom";
 import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
-import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2, Calculator, Clock, Calendar, DollarSign, BookOpen, BarChart2, Briefcase } from "lucide-react";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
@@ -309,10 +307,6 @@ const IndexContent = () => {
         </div>
       </div>
 
-      {/* DynamicWidget will be positioned in the top right */}
-      <div className="fixed top-4 right-4 z-50">
-        <DynamicWidget />
-      </div>
       <LGRFloatingWidget />
 
       {/* Market Dynamics Section */}
