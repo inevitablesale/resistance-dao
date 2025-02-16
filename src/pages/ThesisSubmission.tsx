@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,8 @@ import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCrite
 import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { motion } from "framer-motion";
+import { StoredProposal } from "@/types/proposals";
+import type { SubmissionStep } from "@/components/thesis/SubmissionProgress";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -480,6 +483,9 @@ const ThesisSubmission = () => {
                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
                   Submit Your Investment Thesis
                 </h1>
+                <p className="text-lg text-white/70">
+                  Share your strategy with the DAO and start earning returns
+                </p>
               </motion.div>
 
               <div className="space-y-6">
@@ -588,11 +594,43 @@ const ThesisSubmission = () => {
             {/* Right Column - Wallet and Status */}
             <div className="lg:col-span-4">
               <div className="lg:sticky lg:top-28 space-y-6">
-                <LGRWalletDisplay 
-                  submissionFee={SUBMISSION_FEE.toString()}
-                  currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
-                  walletAddress={address}
-                />
+                {/* Wallet Status Card */}
+                <Card className="bg-black/40 border-white/5 backdrop-blur-sm">
+                  <div className="p-6 space-y-6">
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold text-white">Submission Requirements</h3>
+                      <p className="text-sm text-white/70">Complete these steps to submit your thesis</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 text-white/80">
+                        <div className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center",
+                          address ? "bg-green-500/20 text-green-500" : "bg-white/10"
+                        )}>
+                          {address ? "✓" : "1"}
+                        </div>
+                        <span>Connect Wallet</span>
+                      </div>
+
+                      <div className="flex items-center gap-3 text-white/80">
+                        <div className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center",
+                          tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() ? "bg-green-500/20 text-green-500" : "bg-white/10"
+                        )}>
+                          {tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() ? "✓" : "2"}
+                        </div>
+                        <span>Hold LGR Tokens</span>
+                      </div>
+                    </div>
+
+                    <LGRWalletDisplay 
+                      submissionFee={SUBMISSION_FEE.toString()}
+                      currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
+                      walletAddress={address}
+                    />
+                  </div>
+                </Card>
 
                 {/* Transaction Status */}
                 {currentTxId && (
