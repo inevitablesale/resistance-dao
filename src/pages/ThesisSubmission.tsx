@@ -300,7 +300,7 @@ const ThesisSubmission = () => {
 
       // Validate contract parameters
       const targetCapital = ethers.utils.parseEther(formData.investment.targetCapital);
-      const votingDurationSeconds = votingDuration;
+      const votingDurationSeconds = votingDuration.toString(); // Convert to string here
 
       const paramValidation = validateContractParameters(
         { targetCapital, votingDuration: votingDurationSeconds },

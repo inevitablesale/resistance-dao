@@ -11,7 +11,7 @@ interface StrategiesSectionProps {
     };
   };
   formErrors: Record<string, string[]>;
-  onChange: (category: keyof typeof formData.strategies, value: string[]) => void;
+  onChange: (category: "operational" | "growth" | "integration", value: string[]) => void;
 }
 
 export const StrategiesSection = ({ formData, formErrors, onChange }: StrategiesSectionProps) => {
