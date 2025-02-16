@@ -151,6 +151,11 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
     }
   };
 
+  const REQUIRED_LGR = 250;
+  const lgrBalanceNum = Number(lgrBalance);
+  const tokensNeeded = Math.max(0, REQUIRED_LGR - lgrBalanceNum);
+  const hasEnoughLGR = lgrBalanceNum >= REQUIRED_LGR;
+
   return (
     <Card className={cn(
       "bg-black border-white/10 overflow-hidden p-6 space-y-6",
@@ -227,23 +232,22 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
             <div className="flex items-center gap-3">
               <div className={cn(
                 "w-8 h-8 rounded-full flex items-center justify-center",
-                isCalculatingBalance ? "bg-white/10" : 
-                Number(lgrBalance) >= 250 ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500"
+                hasEnoughLGR ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500"
               )}>
                 {isCalculatingBalance ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
-                ) : Number(lgrBalance) >= 250 ? "✓" : "2"}
+                ) : hasEnoughLGR ? "✓" : "2"}
               </div>
               <span className={cn(
                 "text-white/80",
-                !isCalculatingBalance && Number(lgrBalance) < 250 && "text-red-500"
+                !hasEnoughLGR && "text-red-500"
               )}>
                 {isCalculatingBalance ? (
                   "Checking LGR Balance..."
-                ) : Number(lgrBalance) < 250 ? (
-                  "Insufficient LGR Balance (250 Required)"
+                ) : hasEnoughLGR ? (
+                  "Hold LGR Tokens ✓"
                 ) : (
-                  "Hold LGR Tokens"
+                  `Need ${tokensNeeded.toFixed(2)} more LGR (${REQUIRED_LGR} Required)`
                 )}
               </span>
             </div>
