@@ -442,7 +442,8 @@ const ThesisSubmission = () => {
     }
   };
 
-  return <div className="min-h-screen bg-[#030712]">
+  return (
+    <div className="min-h-screen bg-[#030712]">
       <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10" />
       <div className="fixed inset-0 bg-gradient-to-b from-[#030712] via-[#0F172A] to-[#030712]" />
       
@@ -451,21 +452,23 @@ const ThesisSubmission = () => {
       <main className="relative z-10 pt-28 pb-20 min-h-screen">
         <div className="container px-4 mx-auto max-w-[1200px]">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Left Column - Progress and Form */}
             <div className="lg:col-span-8">
-              <motion.h1 initial={{
-              opacity: 0,
-              y: 20
-            }} animate={{
-              opacity: 1,
-              y: 0
-            }} className="text-3xl md:text-4xl font-bold text-white mb-8">
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-3xl md:text-4xl font-bold text-white mb-8"
+              >
                 Submit Your Investment Thesis
               </motion.h1>
 
               <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
                 <div className="border-b border-white/5">
-                  
+                  <div className="px-6 py-4">
+                    <SubmissionProgress 
+                      steps={steps}
+                      currentStepId={activeStep}
+                    />
+                  </div>
                 </div>
 
                 <div className="p-6 space-y-8">
@@ -478,10 +481,10 @@ const ThesisSubmission = () => {
                           </div>
                           <div className="flex-1">
                             <h2 className="text-xl font-semibold text-purple-400 group-hover:text-purple-300 transition-colors">
-                              Investment Thesis
+                              Basic Thesis Information
                             </h2>
                             <p className="text-sm text-white/60">
-                              Fill out your investment thesis details
+                              Title and investment details
                             </p>
                           </div>
                           <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isThesisOpen && "transform rotate-180")} />
@@ -489,27 +492,43 @@ const ThesisSubmission = () => {
                       </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <motion.div initial={{
-                      opacity: 0,
-                      y: -10
-                    }} animate={{
-                      opacity: 1,
-                      y: 0
-                    }} transition={{
-                      duration: 0.2
-                    }} className="space-y-6">
+                      <div className="space-y-6">
                         <div className="space-y-4">
                           <Label className="text-lg font-medium text-white">
                             Thesis Title
                           </Label>
-                          <Input placeholder="Enter a clear, descriptive title" className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12" value={formData.title} onChange={e => handleFormDataChange('title', e.target.value)} />
-                          {formErrors.title && <p className="text-red-400 text-sm">{formErrors.title[0]}</p>}
+                          <Input
+                            placeholder="Enter a clear, descriptive title"
+                            className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                            value={formData.title}
+                            onChange={(e) => handleFormDataChange('title', e.target.value)}
+                          />
+                          {formErrors.title && (
+                            <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                          )}
                         </div>
 
-                        <VotingDurationInput value={votingDuration} onChange={handleVotingDurationChange} error={formErrors.votingDuration} />
+                        <TargetCapitalInput
+                          value={formData.investment.targetCapital}
+                          onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+                          error={formErrors['investment.targetCapital']}
+                        />
 
-                        <TargetCapitalInput value={formData.investment.targetCapital} onChange={value => handleFormDataChange('investment.targetCapital', value)} error={formErrors['investment.targetCapital']} />
-                      </motion.div>
+                        <div className="space-y-4">
+                          <Label className="text-lg font-medium text-white">
+                            Investment Drivers
+                          </Label>
+                          <textarea
+                            placeholder="Describe the key drivers behind this investment thesis..."
+                            className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3"
+                            value={formData.investment.drivers}
+                            onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
+                          />
+                          {formErrors['investment.drivers'] && (
+                            <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
+                          )}
+                        </div>
+                      </div>
                     </CollapsibleContent>
                   </Collapsible>
 
@@ -522,10 +541,10 @@ const ThesisSubmission = () => {
                           </div>
                           <div className="flex-1">
                             <h2 className="text-xl font-semibold text-blue-400 group-hover:text-blue-300 transition-colors">
-                              Strategy Selection
+                              Target Company Profile
                             </h2>
                             <p className="text-sm text-white/60">
-                              Select your post-acquisition strategies
+                              Size, location, and deal structure
                             </p>
                           </div>
                           <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isStrategyOpen && "transform rotate-180")} />
@@ -533,23 +552,18 @@ const ThesisSubmission = () => {
                       </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <motion.div initial={{
-                      opacity: 0,
-                      y: -10
-                    }} animate={{
-                      opacity: 1,
-                      y: 0
-                    }} transition={{
-                      duration: 0.2
-                    }}>
-                        <StrategiesSection formData={{
-                        strategies: {
-                          operational: formData.strategies.operational,
-                          growth: formData.strategies.growth,
-                          integration: formData.strategies.integration
-                        }
-                      }} formErrors={formErrors} onChange={handleStrategyChange} />
-                      </motion.div>
+                      <FirmCriteriaSection 
+                        formData={{
+                          firmCriteria: {
+                            size: formData.firmCriteria.size,
+                            location: formData.firmCriteria.location,
+                            dealType: formData.firmCriteria.dealType,
+                            geographicFocus: formData.firmCriteria.geographicFocus
+                          }
+                        }}
+                        formErrors={formErrors}
+                        onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
+                      />
                     </CollapsibleContent>
                   </Collapsible>
 
@@ -562,10 +576,10 @@ const ThesisSubmission = () => {
                           </div>
                           <div className="flex-1">
                             <h2 className="text-xl font-semibold text-green-400 group-hover:text-green-300 transition-colors">
-                              Token Approval
+                              Deal Structure
                             </h2>
                             <p className="text-sm text-white/60">
-                              Approve LGR tokens for submission
+                              Payment terms and voting duration
                             </p>
                           </div>
                           <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isApprovalOpen && "transform rotate-180")} />
@@ -573,20 +587,21 @@ const ThesisSubmission = () => {
                       </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <motion.div initial={{
-                      opacity: 0,
-                      y: -10
-                    }} animate={{
-                      opacity: 1,
-                      y: 0
-                    }} transition={{
-                      duration: 0.2
-                    }}>
-                        <ContractApprovalStatus onApprovalComplete={() => {
-                        setIsApprovalOpen(false);
-                        setIsSubmissionOpen(true);
-                      }} requiredAmount={SUBMISSION_FEE.toString()} />
-                      </motion.div>
+                      <div className="space-y-6">
+                        <PaymentTermsSection 
+                          formData={{
+                            paymentTerms: formData.paymentTerms
+                          }}
+                          formErrors={formErrors}
+                          onChange={(value) => handleFormDataChange('paymentTerms', value)}
+                        />
+
+                        <VotingDurationInput
+                          value={votingDuration}
+                          onChange={handleVotingDurationChange}
+                          error={formErrors.votingDuration}
+                        />
+                      </div>
                     </CollapsibleContent>
                   </Collapsible>
 
@@ -599,10 +614,10 @@ const ThesisSubmission = () => {
                           </div>
                           <div className="flex-1">
                             <h2 className="text-xl font-semibold text-orange-400 group-hover:text-orange-300 transition-colors">
-                              Thesis Submission
+                              Post-Acquisition Strategy
                             </h2>
                             <p className="text-sm text-white/60">
-                              Submit your thesis to the blockchain
+                              Growth and integration plans
                             </p>
                           </div>
                           <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isSubmissionOpen && "transform rotate-180")} />
@@ -610,34 +625,44 @@ const ThesisSubmission = () => {
                       </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <motion.div initial={{
-                      opacity: 0,
-                      y: -10
-                    }} animate={{
-                      opacity: 1,
-                      y: 0
-                    }} transition={{
-                      duration: 0.2
-                    }}>
-                        <FirmCriteriaSection formData={{
-                        firmCriteria: {
-                          size: formData.firmCriteria.size,
-                          location: formData.firmCriteria.location,
-                          dealType: formData.firmCriteria.dealType,
-                          geographicFocus: formData.firmCriteria.geographicFocus
-                        }
-                      }} formErrors={formErrors} onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)} />
+                      <StrategiesSection 
+                        formData={{
+                          strategies: {
+                            operational: formData.strategies.operational,
+                            growth: formData.strategies.growth,
+                            integration: formData.strategies.integration
+                          }
+                        }}
+                        formErrors={formErrors}
+                        onChange={handleStrategyChange}
+                      />
 
-                        <PaymentTermsSection formData={{
-                        paymentTerms: formData.paymentTerms
-                      }} formErrors={formErrors} onChange={value => handleFormDataChange('paymentTerms', value)} />
-                      </motion.div>
+                      <div className="mt-6 space-y-4">
+                        <Label className="text-lg font-medium text-white">
+                          Additional Criteria (Optional)
+                        </Label>
+                        <textarea
+                          placeholder="Any additional criteria or notes..."
+                          className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3"
+                          value={formData.investment.additionalCriteria}
+                          onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
+                        />
+                      </div>
                     </CollapsibleContent>
                   </Collapsible>
+
+                  <div className="mt-8">
+                    <ContractApprovalStatus
+                      onApprovalComplete={() => {
+                        updateStepStatus('approval', 'completed');
+                        setActiveStep('submission');
+                      }}
+                      requiredAmount={SUBMISSION_FEE.toString()}
+                    />
+                  </div>
                 </div>
               </Card>
 
-              {/* Navigation */}
               <div className="flex justify-end mt-6">
                 <Button onClick={handleContinue} disabled={isSubmitting} className={cn("h-12 px-6 min-w-[200px]", "bg-gradient-to-r from-polygon-primary to-polygon-secondary", "hover:from-polygon-secondary hover:to-polygon-primary", "text-white font-medium", "transition-all duration-300", "disabled:opacity-50", "flex items-center justify-center gap-2")}>
                   {isSubmitting ? <>
@@ -651,7 +676,6 @@ const ThesisSubmission = () => {
               </div>
             </div>
 
-            {/* Right Column - Wallet and Status */}
             <div className="lg:col-span-4">
               <div className="lg:sticky lg:top-28 space-y-6">
                 <LGRWalletDisplay submissionFee={SUBMISSION_FEE.toString()} currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()} walletAddress={address} />
@@ -672,7 +696,8 @@ const ThesisSubmission = () => {
           </div>
         </div>
       </main>
-    </div>;
+    </div>
+  );
 };
 
 export default ThesisSubmission;
