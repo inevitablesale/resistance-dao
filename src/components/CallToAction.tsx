@@ -35,13 +35,12 @@ export const CallToAction = () => {
     try {
       await open({
         onrampProvider: OnrampProviders.Banxa,
-        token: 'MATIC',
         address: primaryWallet.address,
       });
       
       toast({
         title: "Purchase Initiated",
-        description: "Your MATIC purchase has been initiated successfully",
+        description: "Your crypto purchase has been initiated successfully",
       });
     } catch (error) {
       console.error("Onramp error:", error);
@@ -80,3 +79,4 @@ export const CallToAction = () => {
     </section>
   );
 };
+
