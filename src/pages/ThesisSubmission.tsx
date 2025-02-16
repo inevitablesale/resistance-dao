@@ -484,7 +484,7 @@ const ThesisSubmission = () => {
                     <span className={cn(
                       "text-sm transition-colors whitespace-nowrap",
                       step.id === activeStep ? "text-yellow-500" : 
-                      steps.findIndex(s => s.id === activeStep) > index ? "bg-yellow-500/50" : 
+                      steps.findIndex(s => s.id === activeStep) > index ? "text-gray-400" : 
                       "text-gray-600"
                     )}>
                       {step.title}
