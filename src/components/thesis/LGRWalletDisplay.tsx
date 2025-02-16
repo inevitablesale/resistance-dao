@@ -157,12 +157,16 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
         <Button
           variant="outline"
           className={cn(
-            "w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium",
+            "w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium relative",
             hasInsufficientBalance && "border-red-500/50"
           )}
           onClick={() => setShowBalances(!showBalances)}
         >
-          {hasInsufficientBalance && <AlertCircle className="w-6 h-6 mr-2 text-red-500" />}
+          {hasInsufficientBalance && (
+            <div className="absolute -top-1.5 -right-1.5">
+              <AlertCircle className="w-4 h-4 text-red-500" />
+            </div>
+          )}
           {showBalances ? <EyeOff className="w-6 h-6 mr-2" /> : <Eye className="w-6 h-6 mr-2" />}
           Balances
         </Button>
