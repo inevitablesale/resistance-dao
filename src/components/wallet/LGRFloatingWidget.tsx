@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -294,31 +295,19 @@ export const LGRFloatingWidget = () => {
                 Note: Processing times may vary depending on your payment method and network conditions. Credit card purchases are usually the fastest.
               </p>
             </div>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  onClick={() => {
-                    setIsInstructionsOpen(false);
-                    showWallet('deposit');
-                  }}
-                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
-                >
-                  Buy POLYGON
-                </Button>
-                <Button
-                  onClick={() => {
-                    setIsInstructionsOpen(false);
-                    showWallet('send');
-                  }}
-                  variant="outline"
-                  className="w-full border-purple-500/50 text-purple-500 hover:bg-purple-500/10"
-                >
-                  Send POLYGON
-                </Button>
-              </div>
-            </div>
           </div>
+
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                setIsInstructionsOpen(false);
+                handleBuyMatic();
+              }}
+              className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+            >
+              Buy POLYGON Now
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
