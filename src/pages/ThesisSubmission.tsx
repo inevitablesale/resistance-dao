@@ -471,15 +471,13 @@ const ThesisSubmission = () => {
   return (
     <div className="min-h-screen bg-black text-white pb-20">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-16">
           <div className="lg:col-span-8">
-            <motion.h1 initial={{
-              opacity: 0,
-              y: 20
-            }} animate={{
-              opacity: 1,
-              y: 0
-            }} className="text-3xl md:text-4xl font-bold text-white mb-8">
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              className="text-3xl md:text-4xl font-bold text-white mb-8"
+            >
               Submit Your Investment Thesis
             </motion.h1>
 
@@ -735,18 +733,6 @@ const ThesisSubmission = () => {
                 currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
                 walletAddress={address}
               />
-
-              {currentTxId && <Card className="bg-black/40 border-white/5 backdrop-blur-sm">
-                <div className="p-6">
-                  <TransactionStatus transactionId={currentTxId} onComplete={() => setCurrentTxId(null)} onError={error => {
-                    toast({
-                      title: "Transaction Failed",
-                      description: error,
-                      variant: "destructive"
-                    });
-                  }} />
-                </div>
-              </Card>}
             </div>
           </div>
         </div>

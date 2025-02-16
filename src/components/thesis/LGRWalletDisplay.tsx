@@ -256,36 +256,31 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
                 "w-8 h-8 rounded-full flex items-center justify-center relative",
                 hasEnoughLGR ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500"
               )}>
-                {isCalculatingBalance ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : hasEnoughLGR ? "✓" : "2"}
-                {!hasEnoughLGR && !isCalculatingBalance && (
-                  <motion.div 
-                    animate={{ 
-                      scale: [1, 1, 1.2, 1],
-                      opacity: [1, 0.8, 1, 1] 
-                    }}
-                    transition={{ 
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                    className="absolute inset-0 rounded-full bg-red-500/20"
-                  />
-                )}
+                {hasEnoughLGR ? "✓" : "2"}
               </div>
               <span className={cn(
                 "text-white/80",
                 !hasEnoughLGR && "text-red-500"
               )}>
-                {isCalculatingBalance ? (
-                  "Checking LGR Balance..."
-                ) : hasEnoughLGR ? (
+                {hasEnoughLGR ? (
                   "Hold LGR Tokens ✓"
                 ) : (
                   `Need ${tokensNeeded.toFixed(2)} more LGR (${REQUIRED_LGR} Required)`
                 )}
               </span>
+            </motion.div>
+
+            <motion.div 
+              whileHover={{ x: 5 }}
+              className="flex items-center gap-3 text-white/80"
+            >
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center",
+                "bg-white/10"
+              )}>
+                3
+              </div>
+              <span>Submit Proposal</span>
             </motion.div>
           </div>
         </div>
