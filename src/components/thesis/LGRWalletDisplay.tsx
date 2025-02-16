@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Coins, Info } from "lucide-react";
+import { Coins, Info, Eye, EyeOff, Copy, Check, Upload, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
@@ -28,9 +28,15 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
   const [purchaseAmount, setPurchaseAmount] = useState<string>("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showBalances, setShowBalances] = useState(false);
+  const [showDeposit, setShowDeposit] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [maticBalance, setMaticBalance] = useState<string>("0");
   const [maticPrice, setMaticPrice] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
+
+  const hasInsufficientBalance = currentBalance && 
+    Number(currentBalance) < Number(ethers.utils.formatEther(submissionFee));
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -58,6 +64,27 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
     const interval = setInterval(fetchBalances, 30000);
     return () => clearInterval(interval);
   }, [walletAddress]);
+
+  const handleCopyAddress = async () => {
+    if (!walletAddress) return;
+    
+    try {
+      await navigator.clipboard.writeText(walletAddress);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      
+      toast({
+        title: "Address Copied",
+        description: "Wallet address copied to clipboard"
+      });
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Failed to copy address to clipboard",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleBuyPolygon = async () => {
     if (!primaryWallet?.address) {
@@ -126,83 +153,130 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
       "bg-black border-white/10 overflow-hidden p-6 space-y-6",
       className
     )}>
-      {/* LGR Token Balance */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-            <Coins className="w-6 h-6 text-yellow-500" />
-          </div>
-          <div>
-            <h3 className="text-xl font-medium text-white">LGR Token</h3>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-2xl font-bold text-white">
-            {Number(currentBalance || 0).toFixed(2)} LGR
-          </p>
-          <p className="text-lg text-gray-400">
-            Purchased: {Number(purchasedTokens).toFixed(2)} LGR
-          </p>
-        </div>
-      </div>
-
-      {/* POLYGON Balance */}
-      <div className="flex items-center justify-between pt-4 border-t border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-            <img 
-              src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-              alt="Polygon"
-              className="w-6 h-6"
-            />
-          </div>
-          <div>
-            <h3 className="text-xl font-medium text-white">POLYGON Balance</h3>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-2xl font-bold text-white">
-            {Number(maticBalance).toFixed(4)} POLYGON
-          </p>
-        </div>
-      </div>
-
-      {/* Price Display */}
-      <div className="text-lg text-gray-400 pt-4">
-        Price: $0.10 USD per LGR
-      </div>
-
-      {/* Action Buttons */}
-      <div className="space-y-3">
+      <div className="flex gap-2">
         <Button
-          onClick={() => setIsConfirmOpen(true)}
-          className="w-full h-14 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold text-lg"
+          variant="outline"
+          className={cn(
+            "flex-1 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium",
+            hasInsufficientBalance && "border-red-500/50"
+          )}
+          onClick={() => setShowBalances(!showBalances)}
         >
-          <Coins className="w-6 h-6 mr-2" />
-          Buy LGR
+          {hasInsufficientBalance && <AlertCircle className="w-4 h-4 mr-2 text-red-500" />}
+          {showBalances ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+          Balances
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="flex-1 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+          onClick={() => setShowDeposit(!showDeposit)}
+        >
+          <Upload className="w-4 h-4 mr-2" />
+          Deposit
         </Button>
 
-        <Button
-          onClick={handleBuyPolygon}
-          className="w-full h-14 bg-purple-500 hover:bg-purple-600 text-white font-semibold text-lg"
-        >
-          <img 
-            src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-            alt="Polygon"
-            className="w-6 h-6 mr-2"
-          />
-          Buy Polygon
-        </Button>
-
-        <Button
-          variant="ghost"
-          onClick={() => setShowInstructions(true)}
-          className="w-full h-14 text-white hover:bg-white/10 font-semibold text-lg"
-        >
-          <Info className="w-6 h-6 mr-2" />
-          How to Buy
-        </Button>
+        {walletAddress && (
+          <Button
+            variant="outline"
+            className="bg-white/5 border-white/10 hover:bg-white/10 text-white px-4"
+            onClick={handleCopyAddress}
+          >
+            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+          </Button>
+        )}
       </div>
+
+      {showDeposit && walletAddress && (
+        <div className="p-3 bg-white/5 rounded-lg border border-white/10">
+          <p className="text-xs text-white/60 mb-1">Your Wallet Address</p>
+          <p className="text-sm text-white break-all font-mono">
+            {walletAddress}
+          </p>
+        </div>
+      )}
+
+      {showBalances && (
+        <div className="space-y-6">
+          {/* LGR Token Balance */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                <Coins className="w-6 h-6 text-yellow-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-medium text-white">LGR Token</h3>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-white">
+                {Number(currentBalance || 0).toFixed(2)} LGR
+              </p>
+              <p className="text-lg text-gray-400">
+                Purchased: {Number(purchasedTokens).toFixed(2)} LGR
+              </p>
+            </div>
+          </div>
+
+          {/* POLYGON Balance */}
+          <div className="flex items-center justify-between pt-4 border-t border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                <img 
+                  src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+                  alt="Polygon"
+                  className="w-6 h-6"
+                />
+              </div>
+              <div>
+                <h3 className="text-xl font-medium text-white">POLYGON Balance</h3>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-white">
+                {Number(maticBalance).toFixed(4)} POLYGON
+              </p>
+            </div>
+          </div>
+
+          {/* Price Display */}
+          <div className="text-lg text-gray-400 pt-4">
+            Price: $0.10 USD per LGR
+          </div>
+
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <Button
+              onClick={() => setIsConfirmOpen(true)}
+              className="w-full h-14 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold text-lg"
+            >
+              <Coins className="w-6 h-6 mr-2" />
+              Buy LGR
+            </Button>
+
+            <Button
+              onClick={handleBuyPolygon}
+              className="w-full h-14 bg-purple-500 hover:bg-purple-600 text-white font-semibold text-lg"
+            >
+              <img 
+                src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+                alt="Polygon"
+                className="w-6 h-6 mr-2"
+              />
+              Buy Polygon
+            </Button>
+
+            <Button
+              variant="ghost"
+              onClick={() => setShowInstructions(true)}
+              className="w-full h-14 text-white hover:bg-white/10 font-semibold text-lg"
+            >
+              <Info className="w-6 h-6 mr-2" />
+              How to Buy
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Purchase Dialog */}
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
