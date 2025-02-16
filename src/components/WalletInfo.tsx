@@ -1,6 +1,7 @@
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { ethers } from "ethers";
 import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight, Eye, Save, RefreshCw } from "lucide-react";
 import { analyzeLinkedInProfile } from "@/services/linkedinService";
@@ -11,7 +12,6 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { LoadingSlides } from "./LoadingSlides";
 import { motion } from "framer-motion";
-import { MarketplaceMetadata } from "@/types/marketplace";
 
 interface NFTPreview {
   name: string;
@@ -121,10 +121,12 @@ export const WalletInfo = () => {
         throw new Error('Wallet address not found');
       }
 
-      const provider = await primaryWallet.getEthersProvider();
-      if (!provider) {
-        throw new Error('No provider available');
+      const walletClient = await primaryWallet.getWalletClient();
+      if (!walletClient) {
+        throw new Error('No wallet client available');
       }
+
+      const provider = new ethers.providers.Web3Provider(walletClient);
 
       const result = await mintNFT(
         provider,
