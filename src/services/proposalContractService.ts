@@ -1,6 +1,6 @@
 
 import { ethers } from "ethers";
-import { DynamicContextType } from "@dynamic-labs/sdk-react-core";
+import { DynamicWallet } from "@dynamic-labs/sdk-react-core";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
@@ -39,7 +39,7 @@ export interface GasEstimate {
   totalCost: ethers.BigNumber;
 }
 
-async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet']>) {
+async function getProvider(wallet: DynamicWallet) {
   try {
     const provider = await wallet.getWalletClient();
     if (!provider) {
@@ -52,7 +52,7 @@ async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet
   }
 }
 
-export const getContractStatus = async (wallet: NonNullable<DynamicContextType['primaryWallet']>): Promise<ContractStatus> => {
+export const getContractStatus = async (wallet: DynamicWallet): Promise<ContractStatus> => {
   console.log("Getting contract status with wallet:", wallet);
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
@@ -96,7 +96,7 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
 
 export const estimateProposalGas = async (
   config: ProposalConfig,
-  wallet: NonNullable<DynamicContextType['primaryWallet']>
+  wallet: DynamicWallet
 ): Promise<GasEstimate> => {
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
@@ -119,7 +119,7 @@ export const estimateProposalGas = async (
 
 export const createProposal = async (
   config: ProposalConfig,
-  wallet: NonNullable<DynamicContextType['primaryWallet']>
+  wallet: DynamicWallet
 ): Promise<ethers.ContractTransaction> => {
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
