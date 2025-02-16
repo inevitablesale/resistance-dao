@@ -221,28 +221,6 @@ const ThesisSubmission = () => {
     setVotingDuration(value[0]);
   };
 
-  const getButtonText = () => {
-    if (isSubmitting) {
-      return (
-        <div className="flex items-center justify-center">
-          <span className="mr-2">Submitting...</span>
-          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
-        </div>
-      );
-    }
-
-    switch (activeStep) {
-      case 'thesis':
-        return "Continue to Firm Details";
-      case 'strategy':
-        return "Continue to Terms";
-      case 'terms':
-        return "Submit Investment Thesis";
-      default:
-        return "Continue";
-    }
-  };
-
   const validateBasicsTab = (): boolean => {
     const errors: Record<string, string[]> = {};
     
@@ -331,161 +309,16 @@ const ThesisSubmission = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
-    let isValid = false;
-
-    switch (activeStep) {
-      case 'thesis':
-        isValid = validateBasicsTab();
-        if (isValid) setActiveStep('firm');
-        break;
-      case 'firm':
-        isValid = validateFirmTab();
-        if (isValid) setActiveStep('strategy');
-        break;
-      case 'strategy':
-        isValid = validateStrategyTab();
-        if (isValid) setActiveStep('terms');
-        break;
-      case 'terms':
-        isValid = validateTermsTab();
-        if (isValid) handleSubmit(e);
-        break;
-    }
-
-    if (!isValid) {
+  const handleContinue = () => {
+    if (isThesisSectionComplete()) {
+      setActiveSection(null);
+    } else {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields correctly before proceeding.",
+        title: "Incomplete Section",
+        description: "Please fill in all required fields correctly.",
         variant: "destructive"
       });
     }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!isConnected) {
-      toast({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to submit a thesis",
-        variant: "destructive"
-      });
-      connect();
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      setFormErrors({});
-
-      // Update step status
-      updateStepStatus('thesis', 'completed');
-      updateStepStatus('strategy', 'completed');
-      updateStepStatus('approval', 'processing');
-      setActiveStep('approval');
-
-      // Get contract status and validate
-      if (!wallet) {
-        throw new Error("No wallet connected");
-      }
-
-      const contractStatus = await getContractStatus(wallet);
-      
-      if (contractStatus.isPaused) {
-        toast({
-          title: "Contract Paused",
-          description: "The contract is currently paused for maintenance. Please try again later.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Validate all form fields against contract requirements
-      const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
-      if (targetCapitalWei.lt(contractStatus.minTargetCapital) || targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
-        throw new Error("Target capital out of allowed range");
-      }
-
-      if (votingDuration < contractStatus.minVotingDuration || votingDuration > contractStatus.maxVotingDuration) {
-        throw new Error("Voting duration out of allowed range");
-      }
-
-      // Approve LGR tokens with exact amount from contract
-      console.log('Approving LGR tokens for submission...');
-      const submissionFeeApproval = await approveLGR(contractStatus.submissionFee.toString());
-      if (!submissionFeeApproval) {
-        updateStepStatus('approval', 'failed');
-        toast({
-          title: "Approval Failed",
-          description: "Failed to approve LGR tokens for submission. Please try again.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      updateStepStatus('approval', 'completed');
-      updateStepStatus('submission', 'processing');
-      setActiveStep('submission');
-
-      // Upload metadata to IPFS
-      console.log('Uploading metadata to IPFS...');
-      const ipfsUri = await uploadMetadataToPinata(formData);
-      const ipfsHash = ipfsUri.replace('ipfs://', '');
-      
-      if (!validateIPFSHash(ipfsHash)) {
-        throw new Error("Invalid IPFS hash format");
-      }
-
-      // Estimate gas before submission
-      const gasEstimate = await estimateProposalGas({
-        targetCapital: targetCapitalWei,
-        votingDuration,
-        ipfsHash
-      }, wallet);
-
-      // Create proposal
-      console.log('Creating proposal...');
-      const result = await createProposal({
-        targetCapital: targetCapitalWei,
-        votingDuration,
-        ipfsHash
-      }, wallet);
-
-      // Store proposal data with correct type for targetCapital
-      const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
-      const newProposal: StoredProposal = {
-        hash: result.hash,
-        ipfsHash,
-        timestamp: new Date().toISOString(),
-        title: formData.title,
-        targetCapital: formData.investment.targetCapital.toString(),
-        status: 'pending'
-      };
-      userProposals.push(newProposal);
-      localStorage.setItem('userProposals', JSON.stringify(userProposals));
-
-      updateStepStatus('submission', 'completed');
-      toast({
-        title: "Success",
-        description: "Your investment thesis has been submitted successfully!",
-      });
-
-    } catch (error) {
-      console.error("Submission error:", error);
-      updateStepStatus(activeStep, 'failed');
-      toast({
-        title: "Submission Failed",
-        description: error instanceof Error ? error.message : "Failed to submit thesis",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleSectionComplete = () => {
-    setActiveSection(null);
   };
 
   const isThesisSectionComplete = () => {
@@ -561,17 +394,7 @@ const ThesisSubmission = () => {
 
                         <div className="flex justify-end pt-4">
                           <Button
-                            onClick={() => {
-                              if (isThesisSectionComplete()) {
-                                handleSectionComplete();
-                              } else {
-                                toast({
-                                  title: "Incomplete Section",
-                                  description: "Please fill in all required fields correctly.",
-                                  variant: "destructive"
-                                });
-                              }
-                            }}
+                            onClick={handleContinue}
                             className="bg-gradient-to-r from-polygon-primary to-polygon-secondary hover:from-polygon-secondary hover:to-polygon-primary"
                           >
                             Done
@@ -639,37 +462,6 @@ const ThesisSubmission = () => {
                   </AnimatePresence>
                 </div>
               </Card>
-
-              {/* Navigation - only show when viewing all sections */}
-              {!activeSection && (
-                <div className="flex justify-end mt-6">
-                  <Button
-                    onClick={handleContinue}
-                    disabled={isSubmitting}
-                    className={cn(
-                      "h-12 px-6 min-w-[200px]",
-                      "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
-                      "hover:from-polygon-secondary hover:to-polygon-primary",
-                      "text-white font-medium",
-                      "transition-all duration-300",
-                      "disabled:opacity-50",
-                      "flex items-center justify-center gap-2"
-                    )}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                        <span>Processing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Continue</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
             </div>
 
             {/* Right Column - Wallet and Status */}
