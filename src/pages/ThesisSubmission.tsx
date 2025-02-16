@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -82,7 +81,8 @@ const ThesisSubmission = () => {
     networkId: 137, // Polygon mainnet
     accountAddress: address,
     includeFiat: false,
-    includeNativeBalance: false
+    includeNativeBalance: false,
+    tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTestMode, setIsTestMode] = useState(false);
@@ -117,11 +117,8 @@ const ThesisSubmission = () => {
   useEffect(() => {
     const checkLGRBalance = () => {
       if (isConnected && address && !hasShownBalanceWarning && !isLoading && tokenBalances) {
-        // Find LGR token by both symbol and contract address
         const lgrBalance = tokenBalances.find(
-          token => 
-            token.symbol === "LGR" && 
-            token.contractAddress?.toLowerCase() === LGR_TOKEN_ADDRESS.toLowerCase()
+          token => token.symbol === "LGR"
         );
         
         if (!lgrBalance || Number(lgrBalance.balance) < Number(ethers.utils.formatEther(SUBMISSION_FEE))) {
