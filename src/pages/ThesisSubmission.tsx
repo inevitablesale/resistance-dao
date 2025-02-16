@@ -10,7 +10,7 @@ import Nav from "@/components/Nav";
 import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
+import { useTokenBalances, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
 import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
@@ -25,7 +25,6 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { motion } from "framer-motion";
 import { StoredProposal } from "@/types/proposals";
 import type { SubmissionStep } from "@/components/thesis/SubmissionProgress";
-import { useDynamicContext } from "@/context/DynamicContext";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -614,12 +613,7 @@ const ThesisSubmission = () => {
                       address ? "bg-green-500" : "bg-white/50"
                     )} />
                     <span className="text-sm">
-                      {address ? (
-                        `${tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR`
-                      ) : (
-                        "Connect Wallet"
-                      )}
-                    </span>
+                      {tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR</span>
                   </div>
                 </Button>
               </motion.div>
