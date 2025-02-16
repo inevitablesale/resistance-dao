@@ -1,12 +1,12 @@
 
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useRpcProviders } from "@dynamic-labs/sdk-react-core";
+import { useRpcProviders, EvmNetwork } from "@dynamic-labs/sdk-react-core";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 
 export const useCustomWallet = () => {
   const { primaryWallet, user } = useDynamicContext();
-  const { defaultProvider } = useRpcProviders('evm');
+  const { defaultProvider } = useRpcProviders({ evmNetworks: [EvmNetwork.MAINNET] });
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
 
   useEffect(() => {
