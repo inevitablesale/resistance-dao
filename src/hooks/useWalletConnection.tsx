@@ -47,7 +47,7 @@ export const useWalletConnection = () => {
       setTreasuryAddress(status.treasuryAddress);
     }
 
-    const provider = await primaryWallet.getWalletClient();
+    const provider = await primaryWallet.connector?.getProvider();
     if (!provider) {
       throw new Error("No provider available");
     }
@@ -84,4 +84,3 @@ export const useWalletConnection = () => {
     wallet: primaryWallet
   };
 };
-
