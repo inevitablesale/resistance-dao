@@ -7,24 +7,21 @@ import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import Nav from "@/components/Nav";
-import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight } from "lucide-react";
+import { ArrowRight, Wallet, Copy, Check, ExternalLink, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useTokenBalances, useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useTokenBalances, useDynamicContext, useOnramp } from "@dynamic-labs/sdk-react-core";
+import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
 import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
-import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
-import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
-import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
-import { LGRWalletDisplay } from "@/components/thesis/LGRWalletDisplay";
+import { validateIPFSHash } from "@/services/proposalValidationService";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { motion } from "framer-motion";
-import { StoredProposal } from "@/types/proposals";
-import type { SubmissionStep } from "@/components/thesis/SubmissionProgress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -147,6 +144,10 @@ const ThesisSubmission = () => {
       additionalCriteria: ""
     }
   });
+
+  const [showWalletOptions, setShowWalletOptions] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const { enabled, open } = useOnramp();
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => 
@@ -463,6 +464,63 @@ const ThesisSubmission = () => {
     }
   };
 
+  const handleCopyAddress = async () => {
+    if (!address) return;
+    
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      
+      toast({
+        title: "Address Copied",
+        description: "Wallet address copied to clipboard"
+      });
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Failed to copy address to clipboard",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleBuyPolygon = async () => {
+    if (!address) {
+      setShowAuthFlow?.(true);
+      return;
+    }
+
+    if (!enabled) {
+      toast({
+        title: "Onramp Not Available",
+        description: "The onramp service is currently not available",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await open({
+        onrampProvider: OnrampProviders.Banxa,
+        token: 'MATIC',
+        address: address,
+      });
+      
+      toast({
+        title: "Purchase Initiated",
+        description: "Your MATIC purchase has been initiated successfully",
+      });
+    } catch (error) {
+      console.error("Onramp error:", error);
+      toast({
+        title: "Purchase Failed",
+        description: error instanceof Error ? error.message : "Failed to initiate purchase",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#030712]">
       <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-5" />
@@ -604,6 +662,8 @@ const ThesisSubmission = () => {
                   onClick={() => {
                     if (!address) {
                       setShowAuthFlow?.(true);
+                    } else {
+                      setShowWalletOptions(true);
                     }
                   }}
                 >
@@ -613,7 +673,11 @@ const ThesisSubmission = () => {
                       address ? "bg-green-500" : "bg-white/50"
                     )} />
                     <span className="text-sm">
-                      {tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR</span>
+                      {address ? 
+                        `${tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR` : 
+                        "Connect Wallet"
+                      }
+                    </span>
                   </div>
                 </Button>
               </motion.div>
@@ -677,6 +741,66 @@ const ThesisSubmission = () => {
           </div>
         </div>
       </main>
+
+      {/* Wallet Options Dialog */}
+      <Dialog open={showWalletOptions} onOpenChange={setShowWalletOptions}>
+        <DialogContent className="bg-black/95 border-white/10 backdrop-blur-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-white">Wallet Options</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {/* Balance Display */}
+            <div className="p-4 bg-white/5 rounded-lg space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/70">LGR Balance</span>
+                <span className="text-lg font-bold text-white">
+                  {tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white/70">MATIC Balance</span>
+                <span className="text-lg font-bold text-white">
+                  {tokenBalances?.find(token => token.symbol === "MATIC")?.balance?.toString() || "0"} MATIC
+                </span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid gap-2">
+              <Button
+                variant="outline"
+                className="w-full bg-white/5 text-white hover:bg-white/10 flex items-center justify-between"
+                onClick={handleCopyAddress}
+              >
+                <span>Copy Address</span>
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 flex items-center justify-between"
+                onClick={handleBuyPolygon}
+              >
+                <span>Buy MATIC</span>
+                <ExternalLink className="w-4 h-4" />
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30 flex items-center justify-between"
+                onClick={() => {
+                  setShowWalletOptions(false);
+                  // Add LGR purchase logic here
+                }}
+              >
+                <span>Buy LGR</span>
+                <Coins className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
