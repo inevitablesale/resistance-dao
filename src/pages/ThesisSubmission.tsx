@@ -237,7 +237,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
     switch (activeTab) {
       case 'basics':
         setActiveTab('firm');
@@ -249,7 +249,7 @@ const ThesisSubmission = () => {
         setActiveTab('terms');
         break;
       case 'terms':
-        handleSubmit();
+        handleSubmit(e);
         break;
     }
   };
@@ -628,7 +628,7 @@ const ThesisSubmission = () => {
                               "text-sm",
                               formData.investment.additionalCriteria.length > MAX_SUMMARY_LENGTH 
                                 ? "text-red-400" 
-                                : "text-gray-400"
+                                  : "text-gray-400"
                             )}>
                               {formData.investment.additionalCriteria.length}/{MAX_SUMMARY_LENGTH}
                             </span>
