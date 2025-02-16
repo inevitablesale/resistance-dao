@@ -1,3 +1,4 @@
+<lov-code>
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -387,19 +388,35 @@ const ThesisSubmission = () => {
                   <Label className="text-white mb-2 block">Preferred Firm Size (Revenue)</Label>
                   <RadioGroup defaultValue="below-1m" className="flex flex-wrap gap-4">
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="below-1m" id="below-1m" className="border-white" />
+                      <RadioGroupItem 
+                        value="below-1m" 
+                        id="below-1m" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+                      />
                       <Label htmlFor="below-1m" className="text-white">Below $1M</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="1m-5m" id="1m-5m" className="border-white" />
+                      <RadioGroupItem 
+                        value="1m-5m" 
+                        id="1m-5m" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+                      />
                       <Label htmlFor="1m-5m" className="text-white">$1M–$5M</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="5m-10m" id="5m-10m" className="border-white" />
+                      <RadioGroupItem 
+                        value="5m-10m" 
+                        id="5m-10m" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+                      />
                       <Label htmlFor="5m-10m" className="text-white">$5M–$10M</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="10m-plus" id="10m-plus" className="border-white" />
+                      <RadioGroupItem 
+                        value="10m-plus" 
+                        id="10m-plus" 
+                        className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+                      />
                       <Label htmlFor="10m-plus" className="text-white">$10M+</Label>
                     </div>
                   </RadioGroup>
@@ -412,19 +429,35 @@ const ThesisSubmission = () => {
                       <Label className="text-white mb-2 block">Region Type</Label>
                       <RadioGroup defaultValue="local" className="flex flex-col space-y-2">
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="local" id="local" className="border-white" />
+                          <RadioGroupItem 
+                            value="local" 
+                            id="local" 
+                            className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+                          />
                           <Label htmlFor="local" className="text-white">Local</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="regional" id="regional" className="border-white" />
+                          <RadioGroupItem 
+                            value="regional" 
+                            id="regional" 
+                            className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+                          />
                           <Label htmlFor="regional" className="text-white">Regional</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="national" id="national" className="border-white" />
+                          <RadioGroupItem 
+                            value="national" 
+                            id="national" 
+                            className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+                          />
                           <Label htmlFor="national" className="text-white">National</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="remote" id="remote" className="border-white" />
+                          <RadioGroupItem 
+                            value="remote" 
+                            id="remote" 
+                            className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+                          />
                           <Label htmlFor="remote" className="text-white">Remote/Digital</Label>
                         </div>
                       </RadioGroup>
@@ -743,15 +776,4 @@ const ThesisSubmission = () => {
                   disabled={isSubmitting}
                   className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
                 >
-                  {isSubmitting ? "Submitting..." : "Submit Investment Thesis"}
-                </Button>
-              </div>
-            </form>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+                  {isSubmitting ? "
