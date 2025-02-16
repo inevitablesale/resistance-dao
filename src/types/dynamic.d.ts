@@ -1,3 +1,4 @@
+
 import { type EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { type ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum-aa";
 import { type OnrampProviders } from "@dynamic-labs/sdk-api-core";
@@ -23,7 +24,8 @@ declare module "@dynamic-labs/sdk-react-core" {
     primaryWallet: {
       address?: string;
       isConnected: () => Promise<boolean>;
-      getWalletClient: () => Promise<any>;
+      getEthersProvider?: () => Promise<any>;  // Updated to new method
+      getPublicClient?: () => Promise<any>;    // Added fallback method
       disconnect?: () => Promise<void>;
       connector?: {
         name?: string;
