@@ -38,11 +38,12 @@ export const useDynamicUtils = () => {
       raw: primaryWallet
     });
 
-    // Try getting chainId through provider if connector method fails
+    // Try getting chainId through connector first, then through provider
     let chainId = primaryWallet.connector?.chainId;
-    if (!chainId && primaryWallet.provider) {
+    if (!chainId) {
       try {
-        const provider = new ethers.providers.Web3Provider(primaryWallet.provider as any);
+        const walletClient = await primaryWallet.getWalletClient();
+        const provider = new ethers.providers.Web3Provider(walletClient as any);
         const network = await provider.getNetwork();
         chainId = network.chainId;
         console.log('Chain ID from provider:', chainId);
