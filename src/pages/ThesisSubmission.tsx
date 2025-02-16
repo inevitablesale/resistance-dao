@@ -9,13 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import Nav from "@/components/Nav";
-import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, Info } from "lucide-react";
+import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
@@ -332,7 +327,7 @@ const ThesisSubmission = () => {
         break;
       case 'terms':
         isValid = validateTermsTab();
-        handleSubmit(e);
+        if (isValid) handleSubmit(e);
         break;
     }
 
@@ -522,52 +517,27 @@ const ThesisSubmission = () => {
       </div>
       
       <Nav />
+      <LGRFloatingWidget />
       
-      <div className="container mx-auto px-4 py-8 md:py-16 relative z-10">
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-7xl mx-auto space-y-8 md:space-y-12"
+          className="max-w-7xl mx-auto space-y-8"
         >
           <div className="text-center space-y-4">
-            <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white/80">
+            <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white/80">
               Investment Thesis Submission
             </h1>
-            <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto px-4">
+            <p className="text-lg text-white/60 max-w-2xl mx-auto">
               Share your investment strategy with the LedgerFund DAO community
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
-            {/* Left Column */}
-            <div className="lg:col-span-8 space-y-4 md:space-y-6">
-              {/* Mobile Progress Bar */}
-              <div className="block lg:hidden mb-4 px-4">
-                <div className="flex items-center justify-between text-sm text-white/60">
-                  <span>Step {(['basics', 'firm', 'strategy', 'terms'].indexOf(activeTab) + 1).toString()} of 4</span>
-                  <span className="text-white font-medium">
-                    {activeTab === 'basics' ? 'Basic Details' :
-                     activeTab === 'firm' ? 'Firm Details' :
-                     activeTab === 'strategy' ? 'Strategy' : 'Terms'}
-                  </span>
-                </div>
-                <div className="h-1 bg-white/10 rounded-full mt-2">
-                  <div 
-                    className="h-full bg-polygon-primary rounded-full transition-all duration-300"
-                    style={{ 
-                      width: `${((['basics', 'firm', 'strategy', 'terms'].indexOf(activeTab) + 1) / 4 * 100).toString()}%` 
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Main Tabs Section */}
-              <Tabs 
-                value={activeTab} 
-                onValueChange={setActiveTab} 
-                className="w-full"
-              >
-                <TabsList className="hidden lg:grid grid-cols-4 gap-4 bg-transparent">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-8 space-y-6">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid grid-cols-4 gap-4 bg-transparent">
                   <TabsTrigger
                     value="basics"
                     className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
@@ -598,10 +568,10 @@ const ThesisSubmission = () => {
                   </TabsTrigger>
                 </TabsList>
 
-                <div className="mt-4 md:mt-6">
+                <div className="mt-6">
                   <TabsContent value="basics" className="m-0">
                     <Card className="bg-black/40 border-white/10 text-white">
-                      <div className="p-4 md:p-6 space-y-4 md:space-y-6">
+                      <div className="p-6 space-y-6">
                         <div>
                           <label className="text-lg font-medium text-white mb-2 block">
                             Thesis Title
@@ -674,7 +644,7 @@ const ThesisSubmission = () => {
 
                   <TabsContent value="firm" className="m-0">
                     <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-4 md:p-6">
+                      <div className="p-6">
                         <IndustrySection 
                           formData={formData}
                           formErrors={formErrors}
@@ -693,7 +663,7 @@ const ThesisSubmission = () => {
 
                   <TabsContent value="strategy" className="m-0">
                     <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-4 md:p-6">
+                      <div className="p-6">
                         <StrategiesSection 
                           formData={formData}
                           formErrors={formErrors}
@@ -729,7 +699,7 @@ const ThesisSubmission = () => {
 
                   <TabsContent value="terms" className="m-0">
                     <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-4 md:p-6">
+                      <div className="p-6">
                         <PaymentTermsSection 
                           formData={formData}
                           formErrors={formErrors}
@@ -762,34 +732,7 @@ const ThesisSubmission = () => {
                 </div>
               </Tabs>
 
-              {/* Mobile Navigation */}
-              <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/80 backdrop-blur-md border-t border-white/10 lg:hidden">
-                <div className="flex gap-4 max-w-md mx-auto">
-                  {activeTab !== 'basics' && (
-                    <Button
-                      onClick={() => {
-                        const tabs = ['basics', 'firm', 'strategy', 'terms'];
-                        const currentIndex = tabs.indexOf(activeTab);
-                        setActiveTab(tabs[currentIndex - 1]);
-                      }}
-                      variant="outline"
-                      className="flex-1"
-                    >
-                      Back
-                    </Button>
-                  )}
-                  <Button
-                    onClick={handleContinue}
-                    disabled={isSubmitting}
-                    className="flex-1 bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#4F46E5] transition-all duration-300"
-                  >
-                    {getButtonText()}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Desktop Continue Button */}
-              <Card className="hidden lg:block bg-black/40 border-white/10 backdrop-blur-sm p-6">
+              <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-6">
                 <Button
                   onClick={handleContinue}
                   disabled={isSubmitting}
@@ -800,8 +743,7 @@ const ThesisSubmission = () => {
               </Card>
             </div>
 
-            {/* Right Column - Desktop */}
-            <div className="hidden lg:block lg:col-span-4 space-y-6">
+            <div className="lg:col-span-4 space-y-6">
               <SubmissionFeeDisplay 
                 submissionFee={SUBMISSION_FEE.toString()}
                 currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance}
@@ -831,35 +773,11 @@ const ThesisSubmission = () => {
 
               <ProposalsHistory />
             </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
 
-            {/* Mobile Sheet */}
-            <div className="lg:hidden">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    className="fixed bottom-24 right-4 rounded-full w-12 h-12 p-0 bg-black/80 backdrop-blur-md border-white/10"
-                  >
-                    <Info className="w-5 h-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="bottom" className="h-[80vh] bg-black/95 border-white/10">
-                  <div className="h-full overflow-auto space-y-6 pb-24">
-                    <SubmissionFeeDisplay 
-                      submissionFee={SUBMISSION_FEE.toString()}
-                      currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance}
-                    />
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-4">
-                      <h2 className="text-lg font-semibold text-white mb-4">Submission Progress</h2>
-                      <SubmissionProgress 
-                        steps={steps}
-                        currentStepId={currentStep}
-                      />
-                    </Card>
-                    {currentTxId && (
-                      <TransactionStatus
-                        transactionId={currentTxId}
-                        onComplete={() => setCurrentTxId(null)}
-                        onError={(error) => {
-                          toast({
-                            title: "Transaction
+export default ThesisSubmission;
