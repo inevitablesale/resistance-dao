@@ -212,6 +212,30 @@ const ThesisSubmission = () => {
     setVotingDuration(value[0]);
   };
 
+  const getButtonText = () => {
+    if (isSubmitting) {
+      return (
+        <div className="flex items-center justify-center">
+          <span className="mr-2">Submitting...</span>
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+        </div>
+      );
+    }
+
+    switch (currentStep) {
+      case 'thesis':
+        return "Continue to Strategy Selection";
+      case 'strategy':
+        return "Proceed to Token Approval";
+      case 'approval':
+        return "Approve LGR Tokens";
+      case 'submission':
+        return "Submit Investment Thesis";
+      default:
+        return "Continue";
+    }
+  };
+
   useEffect(() => {
     const checkLGRBalance = () => {
       if (isConnected && address && !hasShownBalanceWarning && !isLoading && tokenBalances) {
@@ -442,7 +466,7 @@ const ThesisSubmission = () => {
 
                 <div className="mt-6">
                   <TabsContent value="basics" className="m-0">
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+                    <Card className="bg-black/40 border-white/10 text-white placeholder:text-gray-500">
                       <div className="p-6 space-y-6">
                         <div>
                           <label className="text-lg font-medium text-white mb-2 block">
@@ -608,19 +632,9 @@ const ThesisSubmission = () => {
                 <Button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className={cn(
-                    "w-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#4F46E5] transition-all duration-300",
-                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                  )}
+                  className="w-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#4F46E5] transition-all duration-300"
                 >
-                  {isSubmitting ? (
-                    <div className="flex items-center justify-center">
-                      <span className="mr-2">Submitting...</span>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
-                    </div>
-                  ) : (
-                    "Submit Investment Thesis"
-                  )}
+                  {getButtonText()}
                 </Button>
               </Card>
             </div>
