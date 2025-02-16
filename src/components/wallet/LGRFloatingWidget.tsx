@@ -9,19 +9,16 @@ import { Coins, Wallet, HelpCircle } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
-  const { setShowOnRamp } = useDynamicContext();
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
   const [maticBalance, setMaticBalance] = useState<string>("0");
   const [maticPrice, setMaticPrice] = useState<string>("0");
   const [purchaseAmount, setPurchaseAmount] = useState<string>("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -45,7 +42,6 @@ export const LGRFloatingWidget = () => {
         setPurchasedTokens(ethers.utils.formatUnits(purchased, 18));
         setMaticBalance(ethers.utils.formatEther(maticBal));
 
-        // Fetch current MATIC price
         const currentMaticPrice = await fetchPresaleMaticPrice();
         setMaticPrice(currentMaticPrice);
       } catch (error) {
@@ -57,10 +53,6 @@ export const LGRFloatingWidget = () => {
     const interval = setInterval(fetchBalances, 30000);
     return () => clearInterval(interval);
   }, [address]);
-
-  const handleBuyMatic = () => {
-    setShowOnRamp?.(true);
-  };
 
   const handleConfirmPurchase = async () => {
     if (!address || !purchaseAmount) return;
@@ -160,22 +152,15 @@ export const LGRFloatingWidget = () => {
                   Buy LGR
                 </Button>
 
-                <Button 
-                  className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold"
-                  onClick={handleBuyMatic}
-                >
-                  <Wallet className="w-4 h-4 mr-2" />
-                  Buy POLYGON
-                </Button>
-
-                <Button 
-                  variant="outline"
-                  className="w-full border-purple-500/50 text-purple-500 hover:bg-purple-500/10"
-                  onClick={() => setIsInstructionsOpen(true)}
-                >
-                  <HelpCircle className="w-4 h-4 mr-2" />
-                  Instructions
-                </Button>
+                <DynamicWidget
+                  buttonClassName="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded flex items-center justify-center"
+                  buttonChildren={
+                    <>
+                      <Wallet className="w-4 h-4 mr-2" />
+                      Buy POLYGON
+                    </>
+                  }
+                />
               </div>
             </div>
           </div>
@@ -235,74 +220,6 @@ export const LGRFloatingWidget = () => {
               Confirm Purchase
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Instructions Dialog */}
-      <Dialog open={isInstructionsOpen} onOpenChange={setIsInstructionsOpen}>
-        <DialogContent className="bg-black/95 border border-purple-500/20 max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-purple-500">How to Buy POLYGON</DialogTitle>
-            <DialogDescription>
-              Follow these steps to purchase POLYGON for your wallet
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-6 py-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-white">Step 1: Access the Buy Feature</h3>
-                <p className="text-gray-400">Click the "Buy POLYGON" button in your wallet widget. This will open our integrated POLYGON purchase system.</p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-white">Step 2: Choose Your Payment Method</h3>
-                <p className="text-gray-400">Select your preferred payment method (credit card, debit card, or bank transfer). We support multiple payment providers for your convenience.</p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-white">Step 3: Enter Purchase Amount</h3>
-                <p className="text-gray-400">Specify how much POLYGON you want to buy. The minimum purchase amount is typically around $30 worth of POLYGON.</p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-white">Step 4: Complete the Purchase</h3>
-                <p className="text-gray-400">Follow the payment provider's instructions to complete your purchase. This usually involves entering your payment details and confirming the transaction.</p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-white">Step 5: Wait for Confirmation</h3>
-                <p className="text-gray-400">Once your payment is processed, the POLYGON will be automatically sent to your wallet. This typically takes a few minutes.</p>
-              </div>
-            </div>
-
-            <div className="bg-purple-500/10 p-4 rounded-lg border border-purple-500/20">
-              <p className="text-sm text-purple-300">
-                Note: Processing times may vary depending on your payment method and network conditions. Credit card purchases are usually the fastest.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  onClick={() => {
-                    setIsInstructionsOpen(false);
-                    handleBuyMatic();
-                  }}
-                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
-                >
-                  Buy POLYGON
-                </Button>
-                <Button
-                  onClick={() => setIsInstructionsOpen(false)}
-                  variant="outline"
-                  className="w-full border-purple-500/50 text-purple-500 hover:bg-purple-500/10"
-                >
-                  Close
-                </Button>
-              </div>
-            </div>
-          </div>
         </DialogContent>
       </Dialog>
     </div>

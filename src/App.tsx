@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { DynamicContextProvider, useTokenBalances } from "@dynamic-labs/sdk-react-core";
+import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
 import { Analytics } from '@vercel/analytics/react';
@@ -56,18 +57,14 @@ const dynamicSettings = {
         chainId: 137
       }
     },
-    // Wallet settings
     enableEmbeddedWallets: true,
     enableVisitTrackingOnConnectOnly: true,
     enableWalletConnectV1: false,
     enableWalletConnectV2: true,
-    // Session settings
     persistWalletSession: true,
     enableSessionRestoration: true,
-    // Authentication settings
     enableAuthProviders: true,
     enablePasskeys: false,
-    // Email authentication settings
     evmWallets: {
       options: {
         emailAuth: {
@@ -96,14 +93,6 @@ const dynamicSettings = {
 };
 
 function Layout() {
-  const { tokenBalances, isLoading, error } = useTokenBalances();
-
-  React.useEffect(() => {
-    if (tokenBalances && !isLoading && !error) {
-      console.log("Token balances updated:", tokenBalances);
-    }
-  }, [tokenBalances, isLoading, error]);
-  
   return (
     <>
       <Nav />
