@@ -544,7 +544,7 @@ const ThesisSubmission = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-12 text-center"
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
               Submit Your Investment Thesis
             </h1>
             <p className="text-lg text-white/70 max-w-2xl mx-auto">
@@ -559,13 +559,13 @@ const ThesisSubmission = () => {
                   <div className="flex items-center">
                     <div className={cn(
                       "w-2 h-2 rounded-full transition-all duration-300",
-                      step.id === activeStep ? "bg-[#F6F6F7] w-4" : 
-                      steps.findIndex(s => s.id === activeStep) > index ? "bg-[#8E9196]" : 
-                      "bg-[#222222]"
+                      step.id === activeStep ? "bg-yellow-500 w-4" : 
+                      steps.findIndex(s => s.id === activeStep) > index ? "bg-yellow-300" : 
+                      "bg-white/20"
                     )} />
                     <span className={cn(
                       "ml-2 text-xs font-medium transition-colors whitespace-nowrap",
-                      step.id === activeStep ? "text-white" : "text-[#8E9196]"
+                      step.id === activeStep ? "text-yellow-500" : "text-white/60"
                     )}>
                       {step.title}
                     </span>
@@ -573,7 +573,7 @@ const ThesisSubmission = () => {
                   {index < steps.length - 1 && (
                     <div className={cn(
                       "h-[1px] w-12 mx-4",
-                      steps.findIndex(s => s.id === activeStep) > index ? "bg-[#8E9196]" : "bg-[#222222]"
+                      steps.findIndex(s => s.id === activeStep) > index ? "bg-yellow-300" : "bg-white/20"
                     )} />
                   )}
                 </div>
@@ -582,7 +582,7 @@ const ThesisSubmission = () => {
           </div>
 
           <div className="relative">
-            <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
+            <Card className="bg-black/40 border-white/10 backdrop-blur-sm overflow-hidden">
               <div className="p-6 lg:p-8">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -689,9 +689,9 @@ const ThesisSubmission = () => {
                 disabled={isSubmitting}
                 className={cn(
                   "h-12 px-6",
-                  "bg-gradient-to-r from-[#F6F6F7] to-[#8E9196]",
-                  "hover:from-[#8E9196] hover:to-[#F6F6F7]",
-                  "text-[#030712] font-medium",
+                  "bg-gradient-to-r from-yellow-500 to-yellow-300",
+                  "hover:from-yellow-300 hover:to-yellow-500",
+                  "text-white font-medium",
                   "transition-all duration-300",
                   "disabled:opacity-50",
                   "flex items-center justify-center gap-2"
