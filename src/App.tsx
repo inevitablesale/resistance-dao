@@ -53,7 +53,7 @@ const dynamicSettings = {
   walletConnectorOptions: {
     smartWallet: {
       enableHD: true,
-      recoveryMethods: ['email', 'social', 'passkey'],
+      recoveryMethods: ['email', 'social', 'passkey'] as ('email' | 'social' | 'passkey')[],
       separateGenerationStep: true
     }
   },
