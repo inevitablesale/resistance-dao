@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -158,57 +157,55 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
       className
     )}>
       <div className="space-y-6">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="text-white font-medium">Balances</h4>
-            <button 
-              onClick={() => setShowBalances(!showBalances)}
-              className="text-white/60 hover:text-white transition-colors"
-            >
-              {showBalances ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-            </button>
-          </div>
+        <div className="flex items-center justify-between">
+          <h4 className="text-white font-medium">Balances</h4>
+          <button 
+            onClick={() => setShowBalances(!showBalances)}
+            className="text-white/60 hover:text-white transition-colors"
+          >
+            {showBalances ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          </button>
+        </div>
 
-          {showBalances && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                    <Coins className="w-6 h-6 text-yellow-500" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-medium text-white">LGR Token</h3>
-                  </div>
+        {showBalances && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                  <Coins className="w-6 h-6 text-yellow-500" />
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-white">
-                    {Number(lgrBalance).toFixed(2)}
-                  </p>
+                <div>
+                  <h3 className="text-xl font-medium text-white">LGR Token</h3>
                 </div>
               </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-                    <img 
-                      src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-                      alt="Polygon"
-                      className="w-6 h-6"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-medium text-white">POLYGON</h3>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-white">
-                    {Number(maticBalance).toFixed(2)}
-                  </p>
-                </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-white">
+                  {Number(lgrBalance).toFixed(2)}
+                </p>
               </div>
             </div>
-          )}
-        </div>
+
+            <div className="flex items-center justify-between pt-4 border-t border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                  <img 
+                    src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+                    alt="Polygon"
+                    className="w-6 h-6"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-xl font-medium text-white">POLYGON</h3>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-white">
+                  {Number(maticBalance).toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-4">
           <div className="space-y-2">
