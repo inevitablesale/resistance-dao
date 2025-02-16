@@ -13,47 +13,41 @@ const Nav = () => {
   const location = useLocation();
   const hasWallet = !!primaryWallet?.address;
   
-  // Define routes where we don't want to show wallet assets
   const hideWalletRoutes = ['/', '/thesis'];
   const shouldShowWalletAssets = hasWallet && !hideWalletRoutes.includes(location.pathname);
   
-  // Define routes where we don't want to show the home link
   const hideHomeRoutes = ['/', '/thesis'];
   const shouldShowHomeLink = !hideHomeRoutes.includes(location.pathname);
 
-  const handleBuyPolygon = () => {
-    setShowOnRamp?.(true);
-  };
-
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100]">
-      <div className="absolute inset-0 bg-black/10 backdrop-blur-lg border-b border-white/10" />
-      <div className="container mx-auto px-4 relative">
-        <div className="flex items-center justify-between py-4">
+    <nav className="fixed top-0 left-0 right-0 z-[100] h-16">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-md border-b border-white/5" />
+      <div className="container h-full mx-auto px-4 relative">
+        <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-3">
             {shouldShowHomeLink && (
-              <Link to="/" className="text-white hover:text-white/80 transition-colors">
+              <Link to="/" className="text-white/80 hover:text-white transition-colors">
                 Home
               </Link>
             )}
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <a 
               href="https://x.com/LedgerFundDAO" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-white/80 hover:text-white transition-colors transform transition-all duration-300 hover:scale-105 hover:rotate-3"
+              className="text-white/60 hover:text-white transition-colors transform hover:scale-105 duration-200"
             >
-              <Twitter className="w-6 h-6" />
+              <Twitter className="w-5 h-5" />
             </a>
             <a 
               href="https://www.linkedin.com/company/ledgerfund-dao/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-white/80 hover:text-white transition-colors transform transition-all duration-300 hover:scale-105 hover:rotate-3"
+              className="text-white/60 hover:text-white transition-colors transform hover:scale-105 duration-200"
             >
-              <Linked className="w-6 h-6" />
+              <Linked className="w-5 h-5" />
             </a>
             <div className="relative">
               <DynamicWidget />
