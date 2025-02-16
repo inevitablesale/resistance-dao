@@ -24,6 +24,10 @@ import { SubmissionProgress, SubmissionStep } from "@/components/thesis/Submissi
 import { SubmissionFeeDisplay } from "@/components/thesis/SubmissionFeeDisplay";
 import { ProposalsHistory } from "@/components/thesis/ProposalsHistory";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
+import { IndustrySection } from "@/components/thesis/form-sections/IndustrySection";
+import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
+import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
+import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -165,46 +169,28 @@ const ThesisSubmission = () => {
     return formData.paymentTerms.length <= 5;
   };
 
-  const handleStrategyChange = (category: keyof typeof formData.strategies, value: string) => {
-    setFormData(prev => {
-      const currentStrategies = [...(prev.strategies[category] || [])];
-      const index = currentStrategies.indexOf(value);
-      
-      if (index === -1) {
-        if (currentStrategies.length < MAX_STRATEGIES_PER_CATEGORY) {
-          currentStrategies.push(value);
-        }
-      } else {
-        currentStrategies.splice(index, 1);
+  const handleStrategyChange = (category: keyof typeof formData.strategies, value: string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      strategies: {
+        ...prev.strategies,
+        [category]: value
       }
-
-      return {
-        ...prev,
-        strategies: {
-          ...prev.strategies,
-          [category]: currentStrategies
-        }
-      };
-    });
+    }));
   };
 
-  const handlePaymentTermChange = (value: string) => {
+  const handleFormDataChange = (field: string, value: any) => {
     setFormData(prev => {
-      const currentTerms = [...prev.paymentTerms];
-      const index = currentTerms.indexOf(value);
+      const newData = { ...prev };
+      const fields = field.split('.');
+      let current: any = newData;
       
-      if (index === -1) {
-        if (currentTerms.length < MAX_PAYMENT_TERMS) {
-          currentTerms.push(value);
-        }
-      } else {
-        currentTerms.splice(index, 1);
+      for (let i = 0; i < fields.length - 1; i++) {
+        current = current[fields[i]];
       }
-
-      return {
-        ...prev,
-        paymentTerms: currentTerms
-      };
+      
+      current[fields[fields.length - 1]] = value;
+      return newData;
     });
   };
 
@@ -435,7 +421,7 @@ const ThesisSubmission = () => {
                   )}
                   required
                   value={formData.title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  onChange={(e) => handleFormDataChange('title', e.target.value)}
                 />
                 {formErrors.title && (
                   <p className="mt-1 text-sm text-red-500">{formErrors.title[0]}</p>
@@ -459,7 +445,7 @@ const ThesisSubmission = () => {
                   value={[votingDuration]}
                   min={MIN_VOTING_DURATION}
                   max={MAX_VOTING_DURATION}
-                  step={24 * 60 * 60} // One day in seconds
+                  step={24 * 60 * 60}
                   className="w-full"
                   onValueChange={(value) => setVotingDuration(value[0])}
                 />
@@ -469,322 +455,29 @@ const ThesisSubmission = () => {
                 </div>
               </div>
 
-              <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-white">Target Firm Criteria</h2>
-                
-                <div>
-                  <Label className="text-white mb-2 block">Preferred Firm Size (Revenue)</Label>
-                  <RadioGroup defaultValue="below-1m" className="flex flex-wrap gap-4">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem 
-                        value="below-1m" 
-                        id="below-1m" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
-                      />
-                      <Label htmlFor="below-1m" className="text-white">Below $1M</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem 
-                        value="1m-5m" 
-                        id="1m-5m" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
-                      />
-                      <Label htmlFor="1m-5m" className="text-white">$1M–$5M</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem 
-                        value="5m-10m" 
-                        id="5m-10m" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
-                      />
-                      <Label htmlFor="5m-10m" className="text-white">$5M–$10M</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem 
-                        value="10m-plus" 
-                        id="10m-plus" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
-                      />
-                      <Label htmlFor="10m-plus" className="text-white">$10M+</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
+              <IndustrySection 
+                formData={formData}
+                formErrors={formErrors}
+                onChange={handleFormDataChange}
+              />
 
-                <div>
-                  <Label className="text-white mb-2 block">Geographic Focus</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-white mb-2 block">Region Type</Label>
-                      <RadioGroup defaultValue="local" className="flex flex-col space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem 
-                            value="local" 
-                            id="local" 
-                            className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
-                          />
-                          <Label htmlFor="local" className="text-white">Local</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem 
-                            value="regional" 
-                            id="regional" 
-                            className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
-                          />
-                          <Label htmlFor="regional" className="text-white">Regional</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem 
-                            value="national" 
-                            id="national" 
-                            className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
-                          />
-                          <Label htmlFor="national" className="text-white">National</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem 
-                            value="remote" 
-                            id="remote" 
-                            className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
-                          />
-                          <Label htmlFor="remote" className="text-white">Remote/Digital</Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                    
-                    <div>
-                      <Label className="text-white mb-2 block">Primary State (Optional)</Label>
-                      <select 
-                        className="w-full bg-black/50 border border-white/10 rounded-md p-2 text-white"
-                        value={formData.firmCriteria.location}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          firmCriteria: {
-                            ...prev.firmCriteria,
-                            location: e.target.value
-                          }
-                        }))}
-                      >
-                        <option value="">Select a state (optional)</option>
-                        {US_STATES.map(state => (
-                          <option key={state} value={state}>{state}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <FirmCriteriaSection 
+                formData={formData}
+                formErrors={formErrors}
+                onChange={handleFormDataChange}
+              />
 
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-white">Payment Terms</h2>
-                  <span className="text-sm text-gray-400">
-                    Select 1-5 terms
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="cash" 
-                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                      checked={formData.paymentTerms.includes('cash')}
-                      onCheckedChange={(checked) => {
-                        setFormData(prev => ({
-                          ...prev,
-                          paymentTerms: checked 
-                            ? [...prev.paymentTerms, 'cash']
-                            : prev.paymentTerms.filter(term => term !== 'cash')
-                        }))
-                      }}
-                    />
-                    <label htmlFor="cash" className="text-gray-200">Cash</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="seller-financing" 
-                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                      checked={formData.paymentTerms.includes('seller-financing')}
-                      onCheckedChange={(checked) => {
-                        setFormData(prev => ({
-                          ...prev,
-                          paymentTerms: checked 
-                            ? [...prev.paymentTerms, 'seller-financing']
-                            : prev.paymentTerms.filter(term => term !== 'seller-financing')
-                        }))
-                      }}
-                    />
-                    <label htmlFor="seller-financing" className="text-gray-200">Seller Financing</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="earnout" 
-                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                      checked={formData.paymentTerms.includes('earnout')}
-                      onCheckedChange={(checked) => {
-                        setFormData(prev => ({
-                          ...prev,
-                          paymentTerms: checked 
-                            ? [...prev.paymentTerms, 'earnout']
-                            : prev.paymentTerms.filter(term => term !== 'earnout')
-                        }))
-                      }}
-                    />
-                    <label htmlFor="earnout" className="text-gray-200">Earnout</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="equity-rollover" 
-                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                      checked={formData.paymentTerms.includes('equity-rollover')}
-                      onCheckedChange={(checked) => {
-                        setFormData(prev => ({
-                          ...prev,
-                          paymentTerms: checked 
-                            ? [...prev.paymentTerms, 'equity-rollover']
-                            : prev.paymentTerms.filter(term => term !== 'equity-rollover')
-                        }))
-                      }}
-                    />
-                    <label htmlFor="equity-rollover" className="text-gray-200">Equity Rollover</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="bank-financing" 
-                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                      checked={formData.paymentTerms.includes('bank-financing')}
-                      onCheckedChange={(checked) => {
-                        setFormData(prev => ({
-                          ...prev,
-                          paymentTerms: checked 
-                            ? [...prev.paymentTerms, 'bank-financing']
-                            : prev.paymentTerms.filter(term => term !== 'bank-financing')
-                        }))
-                      }}
-                    />
-                    <label htmlFor="bank-financing" className="text-gray-200">Bank Financing</label>
-                  </div>
-                </div>
-              </div>
+              <PaymentTermsSection 
+                formData={formData}
+                formErrors={formErrors}
+                onChange={handleFormDataChange}
+              />
 
-              <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-white">Post-Acquisition Strategy</h2>
-                
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium text-white">Operational Strategies</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="tech-modernization" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                        checked={formData.strategies.operational.includes('tech-modernization')}
-                        onCheckedChange={(checked) => {
-                          handleStrategyChange('operational', 'tech-modernization');
-                        }}
-                      />
-                      <label htmlFor="tech-modernization" className="text-gray-200">Technology Modernization</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="process-standardization" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                        checked={formData.strategies.operational.includes('process-standardization')}
-                        onCheckedChange={(checked) => {
-                          handleStrategyChange('operational', 'process-standardization');
-                        }}
-                      />
-                      <label htmlFor="process-standardization" className="text-gray-200">Process Standardization</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="staff-retention" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                        checked={formData.strategies.operational.includes('staff-retention')}
-                        onCheckedChange={(checked) => {
-                          handleStrategyChange('operational', 'staff-retention');
-                        }}
-                      />
-                      <label htmlFor="staff-retention" className="text-gray-200">Staff Retention/Development</label>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium text-white">Growth Strategies</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="geographic-expansion" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                        checked={formData.strategies.growth.includes('geographic-expansion')}
-                        onCheckedChange={(checked) => {
-                          handleStrategyChange('growth', 'geographic-expansion');
-                        }}
-                      />
-                      <label htmlFor="geographic-expansion" className="text-gray-200">Geographic Expansion</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="service-expansion" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                        checked={formData.strategies.growth.includes('service-expansion')}
-                        onCheckedChange={(checked) => {
-                          handleStrategyChange('growth', 'service-expansion');
-                        }}
-                      />
-                      <label htmlFor="service-expansion" className="text-gray-200">Service Line Expansion</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="client-growth" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                        checked={formData.strategies.growth.includes('client-growth')}
-                        onCheckedChange={(checked) => {
-                          handleStrategyChange('growth', 'client-growth');
-                        }}
-                      />
-                      <label htmlFor="client-growth" className="text-gray-200">Client Base Growth</label>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium text-white">Integration Strategies</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="merging-operations" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                        checked={formData.strategies.integration.includes('merging-operations')}
-                        onCheckedChange={(checked) => {
-                          handleStrategyChange('integration', 'merging-operations');
-                        }}
-                      />
-                      <label htmlFor="merging-operations" className="text-gray-200">Merging Operations</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="culture-integration" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                        checked={formData.strategies.integration.includes('culture-integration')}
-                        onCheckedChange={(checked) => {
-                          handleStrategyChange('integration', 'culture-integration');
-                        }}
-                      />
-                      <label htmlFor="culture-integration" className="text-gray-200">Culture Integration</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="systems-consolidation" 
-                        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                        checked={formData.strategies.integration.includes('systems-consolidation')}
-                        onCheckedChange={(checked) => {
-                          handleStrategyChange('integration', 'systems-consolidation');
-                        }}
-                      />
-                      <label htmlFor="systems-consolidation" className="text-gray-200">Systems Consolidation</label>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <StrategiesSection 
+                formData={formData}
+                formErrors={formErrors}
+                onChange={handleStrategyChange}
+              />
 
               <div className="space-y-6">
                 <div>
@@ -795,7 +488,7 @@ const ThesisSubmission = () => {
                     className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
                     required
                     value={formData.investment.targetCapital}
-                    onChange={(e) => setFormData(prev => ({ ...prev, investment: { ...prev.investment, targetCapital: e.target.value } }))}
+                    onChange={(e) => handleFormDataChange('investment.targetCapital', e.target.value)}
                   />
                 </div>
               </div>
@@ -823,7 +516,7 @@ const ThesisSubmission = () => {
                   className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
                   required
                   value={formData.investment.drivers}
-                  onChange={(e) => setFormData(prev => ({ ...prev, investment: { ...prev.investment, drivers: e.target.value } }))}
+                  onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
                 />
               </div>
 
@@ -849,7 +542,7 @@ const ThesisSubmission = () => {
                   placeholder="EBITDA thresholds, firm specialization, geographic limitations, integration plans, etc."
                   className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
                   value={formData.investment.additionalCriteria}
-                  onChange={(e) => setFormData(prev => ({ ...prev, investment: { ...prev.investment, additionalCriteria: e.target.value } }))}
+                  onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
                 />
               </div>
 
