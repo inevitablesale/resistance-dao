@@ -20,6 +20,7 @@ interface FirmCriteriaSectionProps {
       size: string;
       location: string;
       dealType: string;
+      geographicFocus: string;
     };
   };
   formErrors: Record<string, string[]>;
@@ -71,10 +72,58 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             <Label htmlFor="10m-plus" className="text-white">$10M+</Label>
           </div>
         </RadioGroup>
+        {formErrors['firmCriteria.size'] && (
+          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.size'][0]}</p>
+        )}
       </div>
 
       <div>
-        <Label className="text-white mb-2 block">Primary State</Label>
+        <Label className="text-white mb-2 block">Geographic Focus</Label>
+        <RadioGroup 
+          value={formData.firmCriteria.geographicFocus}
+          onValueChange={(value) => onChange('firmCriteria.geographicFocus', value)}
+          className="flex flex-wrap gap-4"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem 
+              value="local" 
+              id="local" 
+              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+            />
+            <Label htmlFor="local" className="text-white">Local</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem 
+              value="regional" 
+              id="regional" 
+              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+            />
+            <Label htmlFor="regional" className="text-white">Regional</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem 
+              value="national" 
+              id="national" 
+              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+            />
+            <Label htmlFor="national" className="text-white">National</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem 
+              value="remote" 
+              id="remote" 
+              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+            />
+            <Label htmlFor="remote" className="text-white">Remote</Label>
+          </div>
+        </RadioGroup>
+        {formErrors['firmCriteria.geographicFocus'] && (
+          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.geographicFocus'][0]}</p>
+        )}
+      </div>
+
+      <div>
+        <Label className="text-white mb-2 block">Primary State (Optional)</Label>
         <Select 
           value={formData.firmCriteria.location}
           onValueChange={(value) => onChange('firmCriteria.location', value)}
@@ -102,19 +151,11 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="full-acquisition" 
-              id="full-acquisition" 
+              value="acquisition" 
+              id="acquisition" 
               className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
-            <Label htmlFor="full-acquisition" className="text-white">Full Acquisition</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value="partial-acquisition" 
-              id="partial-acquisition" 
-              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="partial-acquisition" className="text-white">Partial Acquisition</Label>
+            <Label htmlFor="acquisition" className="text-white">Acquisition</Label>
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
@@ -123,6 +164,30 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
               className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="merger" className="text-white">Merger</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem 
+              value="equity-buyout" 
+              id="equity-buyout" 
+              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+            />
+            <Label htmlFor="equity-buyout" className="text-white">Equity Buyout</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem 
+              value="franchise" 
+              id="franchise" 
+              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+            />
+            <Label htmlFor="franchise" className="text-white">Franchise</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem 
+              value="succession" 
+              id="succession" 
+              className="border-white data-[state=checked]:bg-white data-[state=checked]:border-white" 
+            />
+            <Label htmlFor="succession" className="text-white">Succession</Label>
           </div>
         </RadioGroup>
         {formErrors['firmCriteria.dealType'] && (
