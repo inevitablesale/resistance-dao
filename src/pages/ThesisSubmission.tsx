@@ -350,27 +350,6 @@ const ThesisSubmission = () => {
     }
   };
 
-  useEffect(() => {
-    const checkLGRBalance = () => {
-      if (isConnected && address && !hasShownBalanceWarning && !isLoading && tokenBalances) {
-        const lgrBalance = tokenBalances.find(
-          token => token.symbol === "LGR"
-        );
-        
-        if (!lgrBalance || Number(lgrBalance.balance) < Number(ethers.utils.formatEther(SUBMISSION_FEE))) {
-          toast({
-            title: "Insufficient LGR Balance",
-            description: `You'll need ${ethers.utils.formatEther(SUBMISSION_FEE)} LGR tokens to submit a thesis. You can continue filling out the form and purchase tokens before submission.`,
-            variant: "destructive"
-          });
-          setHasShownBalanceWarning(true);
-        }
-      }
-    };
-
-    checkLGRBalance();
-  }, [isConnected, address, tokenBalances, isLoading, toast, hasShownBalanceWarning]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
