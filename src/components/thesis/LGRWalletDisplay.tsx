@@ -260,7 +260,7 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
                 />
               </div>
               <div>
-                <h3 className="text-xl font-medium text-white">POLY</h3>
+                <h3 className="text-xl font-medium text-white">POLYGON</h3>
               </div>
             </div>
             <div className="text-right">
