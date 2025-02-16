@@ -49,32 +49,31 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
   };
 
   return (
-    <div className="space-y-8">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Network className="w-6 h-6 text-purple-400" />
-          Post-Acquisition Strategy
-        </h2>
-        <p className="text-gray-400">Select the strategies you plan to implement post-acquisition</p>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between border-b border-white/10 pb-2">
+        <div className="flex items-center gap-2">
+          <Network className="w-5 h-5 text-purple-400" />
+          <h2 className="text-lg font-semibold text-white">Post-Acquisition Strategy</h2>
+        </div>
       </div>
       
-      <div className="grid gap-8">
+      <div className="grid gap-4">
         {Object.entries(strategies).map(([category, items]) => {
           const CategoryIcon = categoryIcons[category as keyof typeof categoryIcons];
           return (
-            <div key={category} className="space-y-4">
-              <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-                <CategoryIcon className="w-5 h-5 text-purple-400" />
-                <h3 className="text-lg font-semibold text-white capitalize">
+            <div key={category}>
+              <div className="flex items-center gap-2 mb-2">
+                <CategoryIcon className="w-4 h-4 text-purple-400" />
+                <h3 className="text-sm font-medium text-gray-200 capitalize">
                   {category} Strategies
                 </h3>
               </div>
               
-              <div className="grid gap-4 pl-2">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 {items.map(({ id, label, icon: Icon }) => (
                   <div 
                     key={id}
-                    className="flex items-center space-x-3 p-3 rounded-lg transition-colors hover:bg-white/5"
+                    className="flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-white/5"
                   >
                     <Checkbox 
                       id={id} 
@@ -84,11 +83,11 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
                         handleStrategyChange(category as keyof typeof formData.strategies, id, checked as boolean);
                       }}
                     />
-                    <div className="flex items-center gap-2">
-                      <Icon className="w-4 h-4 text-purple-400/70" />
+                    <div className="flex items-center gap-1.5">
+                      <Icon className="w-3.5 h-3.5 text-purple-400/70" />
                       <Label 
                         htmlFor={id} 
-                        className="text-gray-200 cursor-pointer hover:text-white transition-colors"
+                        className="text-sm text-gray-200 cursor-pointer hover:text-white transition-colors"
                       >
                         {label}
                       </Label>
@@ -98,7 +97,7 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
               </div>
 
               {formErrors[`strategies.${category}`] && (
-                <p className="text-sm text-red-500 mt-2">
+                <p className="text-xs text-red-500 mt-1">
                   {formErrors[`strategies.${category}`][0]}
                 </p>
               )}
