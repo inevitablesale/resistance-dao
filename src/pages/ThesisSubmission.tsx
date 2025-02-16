@@ -468,268 +468,291 @@ const ThesisSubmission = () => {
     </Button>
   );
 
-  return <div className="min-h-screen bg-[#030712]">
-      <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10" />
-      <div className="fixed inset-0 bg-gradient-to-b from-[#030712] via-[#0F172A] to-[#030712]" />
-      
-      <Nav />
-      
-      <main className="relative z-10 pt-28 pb-20 min-h-screen">
-        <div className="container px-4 mx-auto max-w-[1200px]">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-8">
-              <motion.h1 initial={{
+  return (
+    <div className="min-h-screen bg-black text-white pb-20">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8">
+            <motion.h1 initial={{
               opacity: 0,
               y: 20
             }} animate={{
               opacity: 1,
               y: 0
             }} className="text-3xl md:text-4xl font-bold text-white mb-8">
-                Submit Your Investment Thesis
-              </motion.h1>
+              Submit Your Investment Thesis
+            </motion.h1>
 
-              <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
-                <div className="border-b border-white/5">
-                  
-                </div>
+            <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
+              <div className="border-b border-white/5">
+                
+              </div>
 
-                <div className="p-6 space-y-8">
-                  <Collapsible open={isThesisOpen} onOpenChange={setIsThesisOpen} className="w-full">
-                    <CollapsibleTrigger asChild>
-                      <button type="button" className="w-full text-left">
-                        <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                          <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
-                            1
-                          </div>
-                          <div className="flex-1">
-                            <h2 className="text-xl font-semibold text-purple-400 group-hover:text-purple-300 transition-colors">
-                              Basic Thesis Information
-                            </h2>
-                            <p className="text-sm text-white/60">
-                              Title and investment details
-                            </p>
-                          </div>
-                          <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isThesisOpen && "transform rotate-180")} />
+              <div className="p-6 space-y-8">
+                <Collapsible open={isThesisOpen} onOpenChange={setIsThesisOpen} className="w-full">
+                  <CollapsibleTrigger asChild>
+                    <button type="button" className="w-full text-left">
+                      <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
+                        <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
+                          1
                         </div>
-                      </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <div className="space-y-6">
-                        <div className="space-y-4">
-                          <Label className="text-lg font-medium text-white">
-                            Thesis Title
-                          </Label>
-                          <Input placeholder="Enter a clear, descriptive title" className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12" value={formData.title} onChange={e => handleFormDataChange('title', e.target.value)} />
-                          {formErrors.title && <p className="text-red-400 text-sm">{formErrors.title[0]}</p>}
+                        <div className="flex-1">
+                          <h2 className="text-xl font-semibold text-purple-400 group-hover:text-purple-300 transition-colors">
+                            Basic Thesis Information
+                          </h2>
+                          <p className="text-sm text-white/60">
+                            Title and investment details
+                          </p>
                         </div>
-
-                        <TargetCapitalInput value={formData.investment.targetCapital} onChange={value => handleFormDataChange('investment.targetCapital', value)} error={formErrors['investment.targetCapital']} />
-
-                        <div className="space-y-4">
-                          <Label className="text-lg font-medium text-white">
-                            Investment Drivers
-                          </Label>
-                          <textarea placeholder="Describe the key drivers behind this investment thesis..." className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3" value={formData.investment.drivers} onChange={e => handleFormDataChange('investment.drivers', e.target.value)} />
-                          {formErrors['investment.drivers'] && <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>}
-                        </div>
+                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isThesisOpen && "transform rotate-180")} />
                       </div>
-                      {isThesisOpen && renderContinueButton(() => {
-                        if (validateBasicsTab()) {
-                          setIsThesisOpen(false);
-                          setIsStrategyOpen(true);
-                        }
-                      })}
-                    </CollapsibleContent>
-                  </Collapsible>
-
-                  <Collapsible open={isStrategyOpen} onOpenChange={setIsStrategyOpen} className="w-full">
-                    <CollapsibleTrigger asChild>
-                      <button type="button" className="w-full text-left">
-                        <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                          <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-semibold">
-                            2
-                          </div>
-                          <div className="flex-1">
-                            <h2 className="text-xl font-semibold text-blue-400 group-hover:text-blue-300 transition-colors">
-                              Target Company Profile
-                            </h2>
-                            <p className="text-sm text-white/60">
-                              Size, location, and deal structure
-                            </p>
-                          </div>
-                          <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isStrategyOpen && "transform rotate-180")} />
-                        </div>
-                      </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <FirmCriteriaSection 
-                        formData={{
-                          firmCriteria: {
-                            size: formData.firmCriteria.size,
-                            location: formData.firmCriteria.location,
-                            dealType: formData.firmCriteria.dealType,
-                            geographicFocus: formData.firmCriteria.geographicFocus
-                          }
-                        }}
-                        formErrors={formErrors}
-                        onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
-                      />
-                      {isStrategyOpen && renderContinueButton(() => {
-                        if (validateFirmTab()) {
-                          setIsStrategyOpen(false);
-                          setIsApprovalOpen(true);
-                        }
-                      })}
-                    </CollapsibleContent>
-                  </Collapsible>
-
-                  <Collapsible open={isApprovalOpen} onOpenChange={setIsApprovalOpen} className="w-full">
-                    <CollapsibleTrigger asChild>
-                      <button type="button" className="w-full text-left">
-                        <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                          <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 font-semibold">
-                            3
-                          </div>
-                          <div className="flex-1">
-                            <h2 className="text-xl font-semibold text-green-400 group-hover:text-green-300 transition-colors">
-                              Deal Structure
-                            </h2>
-                            <p className="text-sm text-white/60">
-                              Payment terms and voting duration
-                            </p>
-                          </div>
-                          <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isApprovalOpen && "transform rotate-180")} />
-                        </div>
-                      </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <div className="space-y-6">
-                        <PaymentTermsSection 
-                          formData={{
-                            paymentTerms: formData.paymentTerms
-                          }}
-                          formErrors={formErrors}
-                          onChange={(value) => handleFormDataChange('paymentTerms', value)}
-                        />
-
-                        <VotingDurationInput
-                          value={votingDuration}
-                          onChange={handleVotingDurationChange}
-                          error={formErrors.votingDuration}
-                        />
-                      </div>
-                      {isApprovalOpen && renderContinueButton(() => {
-                        if (validateTermsTab()) {
-                          setIsApprovalOpen(false);
-                          setIsSubmissionOpen(true);
-                        }
-                      })}
-                    </CollapsibleContent>
-                  </Collapsible>
-
-                  <Collapsible open={isSubmissionOpen} onOpenChange={setIsSubmissionOpen} className="w-full">
-                    <CollapsibleTrigger asChild>
-                      <button type="button" className="w-full text-left">
-                        <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                          <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 font-semibold">
-                            4
-                          </div>
-                          <div className="flex-1">
-                            <h2 className="text-xl font-semibold text-orange-400 group-hover:text-orange-300 transition-colors">
-                              Post-Acquisition Strategy
-                            </h2>
-                            <p className="text-sm text-white/60">
-                              Growth and integration plans
-                            </p>
-                          </div>
-                          <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isSubmissionOpen && "transform rotate-180")} />
-                        </div>
-                      </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <StrategiesSection 
-                        formData={{
-                          strategies: {
-                            operational: formData.strategies.operational,
-                            growth: formData.strategies.growth,
-                            integration: formData.strategies.integration
-                          }
-                        }}
-                        formErrors={formErrors}
-                        onChange={handleStrategyChange}
-                      />
-
-                      <div className="mt-6 space-y-4">
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-4 px-4 pb-6">
+                    <div className="space-y-6">
+                      <div className="space-y-4">
                         <Label className="text-lg font-medium text-white">
-                          Additional Criteria (Optional)
+                          Thesis Title
                         </Label>
-                        <textarea
-                          placeholder="Any additional criteria or notes..."
-                          className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3"
-                          value={formData.investment.additionalCriteria}
-                          onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
-                        />
+                        <Input placeholder="Enter a clear, descriptive title" className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12" value={formData.title} onChange={e => handleFormDataChange('title', e.target.value)} />
+                        {formErrors.title && <p className="text-red-400 text-sm">{formErrors.title[0]}</p>}
                       </div>
-                      {isSubmissionOpen && renderContinueButton(() => {
-                        if (validateStrategyTab()) {
-                          const syntheticEvent = {
-                            preventDefault: () => {},
-                            target: null,
-                            currentTarget: null,
-                            bubbles: false,
-                            cancelable: false,
-                            defaultPrevented: false,
-                            eventPhase: 0,
-                            isTrusted: true,
-                            nativeEvent: new Event('submit'),
-                            stopPropagation: () => {},
-                            isPropagationStopped: () => false,
-                            persist: () => {},
-                            isDefaultPrevented: () => false,
-                            type: 'submit'
-                          } as React.FormEvent<HTMLFormElement>;
-                          
-                          handleSubmit(syntheticEvent);
-                        }
-                      }, true)}
-                    </CollapsibleContent>
-                  </Collapsible>
 
-                  <div className="mt-8">
-                    <ContractApprovalStatus onApprovalComplete={() => {
+                      <TargetCapitalInput value={formData.investment.targetCapital} onChange={value => handleFormDataChange('investment.targetCapital', value)} error={formErrors['investment.targetCapital']} />
+
+                      <div className="space-y-4">
+                        <Label className="text-lg font-medium text-white">
+                          Investment Drivers
+                        </Label>
+                        <textarea placeholder="Describe the key drivers behind this investment thesis..." className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3" value={formData.investment.drivers} onChange={e => handleFormDataChange('investment.drivers', e.target.value)} />
+                        {formErrors['investment.drivers'] && <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>}
+                      </div>
+                    </div>
+                    {isThesisOpen && renderContinueButton(() => {
+                      if (validateBasicsTab()) {
+                        setIsThesisOpen(false);
+                        setIsStrategyOpen(true);
+                      }
+                    })}
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <Collapsible open={isStrategyOpen} onOpenChange={setIsStrategyOpen} className="w-full">
+                  <CollapsibleTrigger asChild>
+                    <button type="button" className="w-full text-left">
+                      <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
+                        <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-semibold">
+                          2
+                        </div>
+                        <div className="flex-1">
+                          <h2 className="text-xl font-semibold text-blue-400 group-hover:text-blue-300 transition-colors">
+                            Target Company Profile
+                          </h2>
+                          <p className="text-sm text-white/60">
+                            Size, location, and deal structure
+                          </p>
+                        </div>
+                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isStrategyOpen && "transform rotate-180")} />
+                      </div>
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-4 px-4 pb-6">
+                    <FirmCriteriaSection 
+                      formData={{
+                        firmCriteria: {
+                          size: formData.firmCriteria.size,
+                          location: formData.firmCriteria.location,
+                          dealType: formData.firmCriteria.dealType,
+                          geographicFocus: formData.firmCriteria.geographicFocus
+                        }
+                      }}
+                      formErrors={formErrors}
+                      onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
+                    />
+                    {isStrategyOpen && renderContinueButton(() => {
+                      if (validateFirmTab()) {
+                        setIsStrategyOpen(false);
+                        setIsApprovalOpen(true);
+                      }
+                    })}
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <Collapsible open={isApprovalOpen} onOpenChange={setIsApprovalOpen} className="w-full">
+                  <CollapsibleTrigger asChild>
+                    <button type="button" className="w-full text-left">
+                      <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
+                        <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 font-semibold">
+                          3
+                        </div>
+                        <div className="flex-1">
+                          <h2 className="text-xl font-semibold text-green-400 group-hover:text-green-300 transition-colors">
+                            Deal Structure
+                          </h2>
+                          <p className="text-sm text-white/60">
+                            Payment terms and voting duration
+                          </p>
+                        </div>
+                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isApprovalOpen && "transform rotate-180")} />
+                      </div>
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-4 px-4 pb-6">
+                    <div className="space-y-6">
+                      <PaymentTermsSection 
+                        formData={{
+                          paymentTerms: formData.paymentTerms
+                        }}
+                        formErrors={formErrors}
+                        onChange={(value) => handleFormDataChange('paymentTerms', value)}
+                      />
+
+                      <VotingDurationInput
+                        value={votingDuration}
+                        onChange={handleVotingDurationChange}
+                        error={formErrors.votingDuration}
+                      />
+                    </div>
+                    {isApprovalOpen && renderContinueButton(() => {
+                      if (validateTermsTab()) {
+                        setIsApprovalOpen(false);
+                        setIsSubmissionOpen(true);
+                      }
+                    })}
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <Collapsible open={isSubmissionOpen} onOpenChange={setIsSubmissionOpen} className="w-full">
+                  <CollapsibleTrigger asChild>
+                    <button type="button" className="w-full text-left">
+                      <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
+                        <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 font-semibold">
+                          4
+                        </div>
+                        <div className="flex-1">
+                          <h2 className="text-xl font-semibold text-orange-400 group-hover:text-orange-300 transition-colors">
+                            Post-Acquisition Strategy
+                          </h2>
+                          <p className="text-sm text-white/60">
+                            Growth and integration plans
+                          </p>
+                        </div>
+                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isSubmissionOpen && "transform rotate-180")} />
+                      </div>
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-4 px-4 pb-6">
+                    <StrategiesSection 
+                      formData={{
+                        strategies: {
+                          operational: formData.strategies.operational,
+                          growth: formData.strategies.growth,
+                          integration: formData.strategies.integration
+                        }
+                      }}
+                      formErrors={formErrors}
+                      onChange={handleStrategyChange}
+                    />
+
+                    <div className="mt-6 space-y-4">
+                      <Label className="text-lg font-medium text-white">
+                        Additional Criteria (Optional)
+                      </Label>
+                      <textarea
+                        placeholder="Any additional criteria or notes..."
+                        className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3"
+                        value={formData.investment.additionalCriteria}
+                        onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
+                      />
+                    </div>
+                    {isSubmissionOpen && renderContinueButton(() => {
+                      if (validateStrategyTab()) {
+                        const syntheticEvent = {
+                          preventDefault: () => {},
+                          target: null,
+                          currentTarget: null,
+                          bubbles: false,
+                          cancelable: false,
+                          defaultPrevented: false,
+                          eventPhase: 0,
+                          isTrusted: true,
+                          nativeEvent: new Event('submit'),
+                          stopPropagation: () => {},
+                          isPropagationStopped: () => false,
+                          persist: () => {},
+                          isDefaultPrevented: () => false,
+                          type: 'submit'
+                        } as React.FormEvent<HTMLFormElement>;
+                        
+                        handleSubmit(syntheticEvent);
+                      }
+                    }, true)}
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <div className="mt-8">
+                  <ContractApprovalStatus onApprovalComplete={() => {
                     updateStepStatus('approval', 'completed');
                     setActiveStep('submission');
                   }} requiredAmount={SUBMISSION_FEE.toString()} />
-                  </div>
                 </div>
-              </Card>
-
-              <div className="flex justify-end mt-6">
-                
               </div>
+            </Card>
+
+            <div className="flex justify-end mt-6">
+              
             </div>
+          </div>
 
-            <div className="lg:col-span-4">
-              <div className="lg:sticky lg:top-28 space-y-6">
-                <LGRWalletDisplay submissionFee={SUBMISSION_FEE.toString()} currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()} walletAddress={address} />
+          <div className="lg:col-span-4">
+            <div className="lg:sticky lg:top-28 space-y-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1"
+              >
+                <Card className="relative overflow-hidden bg-black/60 backdrop-blur-xl border-white/10">
+                  <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
+                  <div className="relative z-10 p-6 flex items-center justify-between">
+                    <div className="space-y-2">
+                      <p className="text-sm text-white/60">Advertisement</p>
+                      <h3 className="text-xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
+                        Explore Web3 Opportunities
+                      </h3>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                    >
+                      Learn More
+                    </Button>
+                  </div>
+                </Card>
+              </motion.div>
 
-                {currentTxId && <Card className="bg-black/40 border-white/5 backdrop-blur-sm">
-                    <div className="p-6">
-                      <TransactionStatus transactionId={currentTxId} onComplete={() => setCurrentTxId(null)} onError={error => {
+              <LGRWalletDisplay
+                submissionFee={SUBMISSION_FEE.toString()}
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
+                walletAddress={address}
+              />
+
+              {currentTxId && <Card className="bg-black/40 border-white/5 backdrop-blur-sm">
+                <div className="p-6">
+                  <TransactionStatus transactionId={currentTxId} onComplete={() => setCurrentTxId(null)} onError={error => {
                     toast({
                       title: "Transaction Failed",
                       description: error,
                       variant: "destructive"
                     });
                   }} />
-                    </div>
-                  </Card>}
-              </div>
+                </div>
+              </Card>}
             </div>
           </div>
         </div>
-      </main>
-    </div>;
+      </div>
+    </div>
+  );
 };
 
 export default ThesisSubmission;
