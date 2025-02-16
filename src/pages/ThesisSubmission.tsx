@@ -23,6 +23,7 @@ const SUBMISSION_FEE = ethers.utils.parseEther("250");
 const VOTING_FEE = ethers.utils.parseEther("10");
 const MAX_STRATEGIES_PER_CATEGORY = 3;
 const MAX_SUMMARY_LENGTH = 500;
+const MAX_PAYMENT_TERMS = 5;
 
 interface ProposalMetadata {
   title: string;
@@ -63,11 +64,11 @@ const ThesisSubmission = () => {
       location: "",
       dealType: ""
     },
-    paymentTerms: [],
+    paymentTerms: [], // Initialize as empty array
     strategies: {
-      operational: [],
-      growth: [],
-      integration: []
+      operational: [], // Initialize as empty array
+      growth: [], // Initialize as empty array
+      integration: [] // Initialize as empty array
     },
     investment: {
       targetCapital: "",
@@ -77,14 +78,60 @@ const ThesisSubmission = () => {
     }
   });
 
-  const [votingDuration, setVotingDuration] = useState(MIN_VOTING_DURATION);
+  const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
 
   const validateStrategies = (category: keyof typeof formData.strategies) => {
-    return formData.strategies[category].length <= MAX_STRATEGIES_PER_CATEGORY;
+    const strategies = formData.strategies[category];
+    if (!Array.isArray(strategies)) return false;
+    return strategies.length <= MAX_STRATEGIES_PER_CATEGORY;
   };
 
   const validatePaymentTerms = () => {
+    if (!Array.isArray(formData.paymentTerms)) return false;
     return formData.paymentTerms.length <= 5;
+  };
+
+  const handleStrategyChange = (category: keyof typeof formData.strategies, value: string) => {
+    setFormData(prev => {
+      const currentStrategies = [...(prev.strategies[category] || [])];
+      const index = currentStrategies.indexOf(value);
+      
+      if (index === -1) {
+        if (currentStrategies.length < MAX_STRATEGIES_PER_CATEGORY) {
+          currentStrategies.push(value);
+        }
+      } else {
+        currentStrategies.splice(index, 1);
+      }
+
+      return {
+        ...prev,
+        strategies: {
+          ...prev.strategies,
+          [category]: currentStrategies
+        }
+      };
+    });
+  };
+
+  const handlePaymentTermChange = (value: string) => {
+    setFormData(prev => {
+      const currentTerms = [...prev.paymentTerms];
+      const index = currentTerms.indexOf(value);
+      
+      if (index === -1) {
+        if (currentTerms.length < MAX_PAYMENT_TERMS) {
+          currentTerms.push(value);
+        }
+      } else {
+        currentTerms.splice(index, 1);
+      }
+
+      return {
+        ...prev,
+        paymentTerms: currentTerms
+      };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -224,8 +271,8 @@ const ThesisSubmission = () => {
                   placeholder="Enter thesis title"
                   className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
                   required
-                  value={formData.thesisTitle}
-                  onChange={(e) => setFormData(prev => ({ ...prev, thesisTitle: e.target.value }))}
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 />
               </div>
 
@@ -237,17 +284,17 @@ const ThesisSubmission = () => {
                     <p className="text-sm text-gray-400">Set how long the community can vote on your thesis</p>
                   </div>
                   <div className="text-right">
-                    <span className="text-2xl font-bold text-white">{formData.votingDuration}</span>
+                    <span className="text-2xl font-bold text-white">{votingDuration}</span>
                     <span className="text-gray-400 ml-2">days</span>
                   </div>
                 </div>
                 <Slider
-                  value={[formData.votingDuration]}
+                  value={[votingDuration]}
                   min={MIN_VOTING_DURATION}
                   max={MAX_VOTING_DURATION}
                   step={1}
                   className="w-full"
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, votingDuration: value[0] }))}
+                  onValueChange={(value) => setVotingDuration(value[0])}
                 />
                 <div className="flex justify-between text-sm text-gray-400">
                   <span>{MIN_VOTING_DURATION} days</span>
@@ -473,6 +520,8 @@ const ThesisSubmission = () => {
                     placeholder="Enter amount in USD"
                     className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
                     required
+                    value={formData.investment.targetCapital}
+                    onChange={(e) => setFormData(prev => ({ ...prev, investment: { ...prev.investment, targetCapital: e.target.value } }))}
                   />
                 </div>
 
@@ -482,6 +531,8 @@ const ThesisSubmission = () => {
                     <Checkbox 
                       id="complex-structures" 
                       className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+                      checked={formData.investment.complexStructures}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, investment: { ...prev.investment, complexStructures: !!checked } }))}
                     />
                     <label htmlFor="complex-structures" className="text-gray-200">
                       Willing to consider complex deal structures
@@ -498,11 +549,11 @@ const ThesisSubmission = () => {
                   </label>
                   <span className={cn(
                     "text-sm",
-                    formData.investmentDrivers.length > MAX_SUMMARY_LENGTH 
+                    formData.investment.drivers.length > MAX_SUMMARY_LENGTH 
                       ? "text-red-400" 
                       : "text-gray-400"
                   )}>
-                    {formData.investmentDrivers.length}/{MAX_SUMMARY_LENGTH}
+                    {formData.investment.drivers.length}/{MAX_SUMMARY_LENGTH}
                   </span>
                 </div>
                 <p className="text-sm text-gray-400 mb-2">
@@ -512,8 +563,8 @@ const ThesisSubmission = () => {
                   placeholder="Describe earnings stability, strong client base, scalability, cultural fit, technology adoption, etc."
                   className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
                   required
-                  value={formData.investmentDrivers}
-                  onChange={(e) => setFormData(prev => ({ ...prev, investmentDrivers: e.target.value }))}
+                  value={formData.investment.drivers}
+                  onChange={(e) => setFormData(prev => ({ ...prev, investment: { ...prev.investment, drivers: e.target.value } }))}
                 />
               </div>
 
@@ -525,11 +576,11 @@ const ThesisSubmission = () => {
                   </label>
                   <span className={cn(
                     "text-sm",
-                    formData.additionalCriteria.length > MAX_SUMMARY_LENGTH 
+                    formData.investment.additionalCriteria.length > MAX_SUMMARY_LENGTH 
                       ? "text-red-400" 
                       : "text-gray-400"
                   )}>
-                    {formData.additionalCriteria.length}/{MAX_SUMMARY_LENGTH}
+                    {formData.investment.additionalCriteria.length}/{MAX_SUMMARY_LENGTH}
                   </span>
                 </div>
                 <p className="text-sm text-gray-400 mb-2">
@@ -538,8 +589,8 @@ const ThesisSubmission = () => {
                 <Textarea
                   placeholder="EBITDA thresholds, firm specialization, geographic limitations, integration plans, etc."
                   className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
-                  value={formData.additionalCriteria}
-                  onChange={(e) => setFormData(prev => ({ ...prev, additionalCriteria: e.target.value }))}
+                  value={formData.investment.additionalCriteria}
+                  onChange={(e) => setFormData(prev => ({ ...prev, investment: { ...prev.investment, additionalCriteria: e.target.value } }))}
                 />
               </div>
 
