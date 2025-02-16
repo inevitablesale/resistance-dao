@@ -33,6 +33,7 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
   const [maticBalance, setMaticBalance] = useState<string>("0");
   const [maticPrice, setMaticPrice] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
+  const [lgrBalance, setLgrBalance] = useState<string>("0");
 
   const hasInsufficientBalance = currentBalance && 
     Number(ethers.utils.formatEther(submissionFee)) > Number(currentBalance);
@@ -43,12 +44,18 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
 
       try {
         const provider = await getWorkingProvider();
-        const [presaleContract, maticBal] = await Promise.all([
+        const [lgrContract, presaleContract, maticBal] = await Promise.all([
+          getLgrTokenContract(provider),
           getPresaleContract(provider),
           provider.getBalance(walletAddress)
         ]);
         
-        const purchased = await presaleContract.purchasedTokens(walletAddress);
+        const [balance, purchased] = await Promise.all([
+          lgrContract.balanceOf(walletAddress),
+          presaleContract.purchasedTokens(walletAddress)
+        ]);
+
+        setLgrBalance(ethers.utils.formatUnits(balance, 18));
         setPurchasedTokens(ethers.utils.formatUnits(purchased, 18));
         setMaticBalance(ethers.utils.formatEther(maticBal));
 
@@ -244,7 +251,7 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold text-white">
-                {Number(currentBalance || 0).toFixed(2)} LGR
+                {Number(lgrBalance).toFixed(2)} LGR
               </p>
               <p className="text-lg text-gray-400">
                 Purchased: {Number(purchasedTokens).toFixed(2)} LGR
