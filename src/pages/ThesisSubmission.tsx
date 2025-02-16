@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,6 @@ import { getContractStatus, estimateProposalGas, createProposal } from "@/servic
 import { validateProposalMetadata, validateIPFSHash, validateContractParameters } from "@/services/proposalValidationService";
 import { executeTransaction } from "@/services/transactionManager";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
-import { getTokenBalance } from "@/services/tokenService";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -341,15 +341,6 @@ const ThesisSubmission = () => {
       
       <div className="container mx-auto px-4 py-24 relative z-10">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
-              Investment Thesis Submission
-            </h1>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Present your accounting firm acquisition thesis to secure co-investment from the LedgerFund DAO community. Outline your target criteria, investment strategy, and align capital with promising opportunities in the accounting industry.
-            </p>
-          </div>
-
           <Card className="p-8 bg-black/50 border border-white/10 backdrop-blur-xl">
             <form onSubmit={handleSubmit} className="space-y-8">
               <div>
@@ -790,9 +781,30 @@ const ThesisSubmission = () => {
                   <AlertTriangle className="w-4 h-4 mr-2" />
                   All submissions will be reviewed by the LedgerFund DAO community
                 </div>
-
                 <Button
                   type="submit"
                   disabled={isSubmitting}
                   className={cn(
-                    "w-full bg-gradient-to-r from-purple-
+                    "w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700",
+                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                  )}
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center">
+                      <span className="mr-2">Submitting...</span>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+                    </div>
+                  ) : (
+                    "Submit Investment Thesis"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
