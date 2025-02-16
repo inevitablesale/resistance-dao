@@ -83,7 +83,7 @@ interface StoredProposal {
   timestamp: number;
   title: string;
   targetCapital: string;
-  status: string;
+  status: 'pending' | 'active' | 'completed';
 }
 
 const US_STATES = [
