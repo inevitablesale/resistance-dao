@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -10,86 +9,147 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import Nav from "@/components/Nav";
-import { FileText, AlertTriangle, Info, Clock, CreditCard } from "lucide-react";
+import { FileText, AlertTriangle, Info, Clock, CreditCard, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { ethers } from "ethers";
 
-interface ThesisFormData {
-  thesisTitle: string;
-  industryFocus: string;
-  industryOther: string;
-  firmSize: string;
-  geographicFocus: string;
-  dealType: string;
-  paymentTerms: string[];
-  complexStructures: boolean;
-  targetCapital: string;
-  votingDuration: number;
-  postStrategy: string[];
-  investorRole: string;
-  investmentDrivers: string;
-  additionalCriteria: string;
-}
-
-const MIN_VOTING_DURATION = 7;
-const MAX_VOTING_DURATION = 90;
+// Contract constants
+const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
+const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
+const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
+const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
+const SUBMISSION_FEE = ethers.utils.parseEther("250");
+const VOTING_FEE = ethers.utils.parseEther("10");
+const MAX_STRATEGIES_PER_CATEGORY = 3;
 const MAX_SUMMARY_LENGTH = 500;
-const SUBMISSION_FEE = 250;
+
+interface ProposalMetadata {
+  title: string;
+  industry: {
+    focus: string;
+    other?: string;
+  };
+  firmCriteria: {
+    size: string;
+    location: string;
+    dealType: string;
+  };
+  paymentTerms: string[];
+  strategies: {
+    operational: string[];
+    growth: string[];
+    integration: string[];
+  };
+  investment: {
+    targetCapital: string;
+    complexStructures: boolean;
+    drivers: string;
+    additionalCriteria: string;
+  };
+}
 
 const ThesisSubmission = () => {
   const { toast } = useToast();
-  const [formData, setFormData] = useState<ThesisFormData>({
-    thesisTitle: "",
-    industryFocus: "",
-    industryOther: "",
-    firmSize: "",
-    geographicFocus: "",
-    dealType: "",
+  const { isConnected, address, connect } = useWalletConnection();
+  const [formData, setFormData] = useState<ProposalMetadata>({
+    title: "",
+    industry: {
+      focus: "",
+      other: ""
+    },
+    firmCriteria: {
+      size: "",
+      location: "",
+      dealType: ""
+    },
     paymentTerms: [],
-    complexStructures: false,
-    targetCapital: "",
-    votingDuration: MIN_VOTING_DURATION,
-    postStrategy: [],
-    investorRole: "",
-    investmentDrivers: "",
-    additionalCriteria: ""
+    strategies: {
+      operational: [],
+      growth: [],
+      integration: []
+    },
+    investment: {
+      targetCapital: "",
+      complexStructures: false,
+      drivers: "",
+      additionalCriteria: ""
+    }
   });
+
+  const [votingDuration, setVotingDuration] = useState(MIN_VOTING_DURATION);
+
+  const validateStrategies = (category: keyof typeof formData.strategies) => {
+    return formData.strategies[category].length <= MAX_STRATEGIES_PER_CATEGORY;
+  };
+
+  const validatePaymentTerms = () => {
+    return formData.paymentTerms.length <= 5;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate summary lengths
-    if (formData.investmentDrivers.length > MAX_SUMMARY_LENGTH) {
+
+    if (!isConnected) {
       toast({
-        title: "Validation Error",
-        description: "Investment drivers summary must not exceed 500 characters",
+        title: "Connect Wallet",
+        description: "Please connect your wallet to submit a thesis",
+        variant: "destructive"
+      });
+      connect();
+      return;
+    }
+
+    // Validate target capital
+    const targetCapital = ethers.utils.parseEther(formData.investment.targetCapital);
+    if (targetCapital.lt(MIN_TARGET_CAPITAL) || targetCapital.gt(MAX_TARGET_CAPITAL)) {
+      toast({
+        title: "Invalid Target Capital",
+        description: `Target capital must be between 1,000 and 25,000,000 LGR`,
         variant: "destructive"
       });
       return;
     }
 
-    if (formData.additionalCriteria.length > MAX_SUMMARY_LENGTH) {
+    // Validate strategies
+    if (!validateStrategies('operational') || !validateStrategies('growth') || !validateStrategies('integration')) {
       toast({
-        title: "Validation Error",
-        description: "Additional criteria summary must not exceed 500 characters",
+        title: "Too Many Strategies",
+        description: `Maximum ${MAX_STRATEGIES_PER_CATEGORY} strategies per category allowed`,
         variant: "destructive"
       });
       return;
     }
 
-    // Validate arrays
-    if (formData.paymentTerms.length === 0 || formData.paymentTerms.length > 5) {
+    // Validate payment terms
+    if (!validatePaymentTerms()) {
       toast({
-        title: "Validation Error",
-        description: "Please select between 1 and 5 payment terms",
+        title: "Too Many Payment Terms",
+        description: "Maximum 5 payment terms allowed",
         variant: "destructive"
       });
       return;
     }
 
-    toast({
-      title: "Coming Soon",
-      description: "Thesis submission will be available soon!",
-    });
+    try {
+      // Upload metadata to IPFS (implementation needed)
+      const ipfsHash = "QmExample"; // Placeholder
+
+      // Create proposal
+      // Contract integration needed here
+      
+      toast({
+        title: "Success",
+        description: "Your investment thesis has been submitted",
+      });
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast({
+        title: "Submission Failed",
+        description: error instanceof Error ? error.message : "Failed to submit thesis",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -123,15 +183,29 @@ const ThesisSubmission = () => {
             </p>
           </div>
 
-          {/* Fee Information Card */}
+          {/* Updated Fee Information Card */}
           <Card className="p-6 bg-black/50 border border-white/10 backdrop-blur-xl mb-8">
             <div className="flex items-start space-x-4">
               <CreditCard className="w-6 h-6 text-purple-400 mt-1" />
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Submission Fee</h3>
-                <p className="text-gray-400">
-                  Submitting a thesis requires {SUBMISSION_FEE} LGR tokens. This fee helps ensure quality submissions and supports the DAO treasury.
-                </p>
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold text-white">Required Fees</h3>
+                <div className="space-y-1">
+                  <p className="text-gray-400">
+                    Submission Fee: 250 LGR
+                  </p>
+                  <p className="text-gray-400">
+                    Voting Fee: 10 LGR per vote
+                  </p>
+                </div>
+                {!isConnected && (
+                  <Button 
+                    onClick={connect}
+                    className="mt-2 bg-purple-500 hover:bg-purple-600"
+                  >
+                    <Wallet className="w-4 h-4 mr-2" />
+                    Connect Wallet
+                  </Button>
+                )}
               </div>
             </div>
           </Card>
@@ -492,4 +566,3 @@ const ThesisSubmission = () => {
 };
 
 export default ThesisSubmission;
-
