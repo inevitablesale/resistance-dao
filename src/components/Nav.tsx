@@ -7,9 +7,13 @@ import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { Twitter, Linkedin } from 'lucide-react';
 
 const Nav = () => {
-  const { primaryWallet } = useDynamicContext();
+  const { primaryWallet, setShowOnRamp } = useDynamicContext();
   const { toast } = useToast();
   const hasWallet = !!primaryWallet?.address;
+
+  const handleBuyPolygon = () => {
+    setShowOnRamp?.(true);
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
