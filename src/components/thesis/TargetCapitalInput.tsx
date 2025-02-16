@@ -11,13 +11,18 @@ interface TargetCapitalInputProps {
   error?: string[];
 }
 
+const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
+const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
+
 export const TargetCapitalInput = ({
   value,
   onChange,
   error
 }: TargetCapitalInputProps) => {
   const formatValue = (val: string) => {
+    // Remove all non-numeric characters except decimal point
     const numericValue = val.replace(/[^0-9.]/g, '');
+    // Ensure only one decimal point
     const parts = numericValue.split('.');
     if (parts.length > 2) return value;
     return numericValue;
@@ -28,31 +33,35 @@ export const TargetCapitalInput = ({
     onChange(formattedValue);
   };
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <Label className="text-lg font-medium text-white flex items-center gap-2">
-            Target Capital
-            <HelpCircle className="h-4 w-4 text-gray-500" />
-          </Label>
-          <p className="text-sm text-gray-400">
-            Set the target capital for your investment thesis
-          </p>
-        </div>
-        {value && (
-          <div className="text-sm text-gray-400">
-            ≈ {ethers.utils.formatEther(ethers.utils.parseEther(value || "0"))} ETH
-          </div>
-        )}
-      </div>
+  const getHelperText = () => {
+    if (!value) return "Required";
+    const numValue = ethers.utils.parseEther(value || "0");
+    if (numValue.lt(MIN_TARGET_CAPITAL)) {
+      return `Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} ETH`;
+    }
+    if (numValue.gt(MAX_TARGET_CAPITAL)) {
+      return `Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} ETH`;
+    }
+    return "";
+  };
 
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <Label className="text-lg font-medium text-white mb-2 flex items-center gap-2">
+          Target Capital
+          <HelpCircle className="h-4 w-4 text-gray-400" />
+        </Label>
+        <div className="text-sm text-gray-400">
+          {value && `≈ ${ethers.utils.formatEther(ethers.utils.parseEther(value || "0"))} ETH`}
+        </div>
+      </div>
       <div className="relative">
         <Input
           type="text"
           placeholder="Enter amount in USD"
           className={cn(
-            "bg-[#161920] border-gray-800 text-white h-12 pl-8",
+            "bg-black/50 border-white/10 text-white placeholder:text-gray-500 pl-12",
             error ? "border-red-500" : ""
           )}
           value={value}
@@ -60,9 +69,10 @@ export const TargetCapitalInput = ({
         />
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
       </div>
-
-      {error && (
-        <p className="text-sm text-red-500">{error[0]}</p>
+      {(error || getHelperText()) && (
+        <p className="text-sm text-red-500">
+          {error?.[0] || getHelperText()}
+        </p>
       )}
     </div>
   );
