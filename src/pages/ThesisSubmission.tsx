@@ -464,8 +464,8 @@ const ThesisSubmission = () => {
 
   return (
     <div className="min-h-screen bg-[#030712]">
-      <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-      <div className="fixed inset-0 bg-gradient-to-t from-background to-background/0 pt-16" />
+      <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-20" />
+      <div className="fixed inset-0 bg-gradient-to-b from-[#030712] via-[#0F172A] to-[#030712]" />
       
       <Nav />
       <LGRFloatingWidget />
@@ -477,25 +477,27 @@ const ThesisSubmission = () => {
           className="max-w-7xl mx-auto"
         >
           <div className="grid grid-cols-12 gap-6">
-            <div className="col-span-12 lg:col-span-8 space-y-6">
-              <div className="space-y-2">
+            <div className="col-span-12 lg:col-span-8 space-y-8">
+              <div className="space-y-3">
                 <motion.h1 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-4xl font-bold tracking-tight text-gradient"
+                  className="text-4xl font-bold text-white tracking-tight"
                 >
                   Submit Investment Thesis
                 </motion.h1>
-                <p className="text-lg text-white/60">
+                <p className="text-lg text-white/80">
                   Share your investment strategy with the LedgerFund DAO community
                 </p>
               </div>
 
-              <Card className="neo-blur p-6">
-                <SubmissionProgress 
-                  steps={steps}
-                  currentStepId={activeStep}
-                />
+              <Card className="border border-white/10 bg-black/40 backdrop-blur-xl">
+                <div className="p-6">
+                  <SubmissionProgress 
+                    steps={steps}
+                    currentStepId={activeStep}
+                  />
+                </div>
               </Card>
 
               <motion.div 
@@ -504,25 +506,30 @@ const ThesisSubmission = () => {
                 className="space-y-6"
               >
                 {activeStep === 'thesis' && (
-                  <Card className="neo-blur">
-                    <div className="p-6 space-y-6">
-                      <div className="space-y-4">
+                  <Card className="border border-white/10 bg-black/40 backdrop-blur-xl">
+                    <div className="p-8 space-y-8">
+                      <div className="space-y-6">
                         <div>
-                          <Label className="text-lg font-medium text-white">Thesis Title</Label>
-                          <p className="text-sm text-white/60 mt-1">
+                          <Label className="text-xl font-semibold text-white">
+                            Thesis Title
+                          </Label>
+                          <p className="text-base text-white/80 mt-2">
                             Provide a concise name for your investment strategy
                           </p>
                           <Input
                             placeholder="Enter thesis title"
                             className={cn(
-                              "mt-2 bg-black/50 border-white/10 text-white placeholder:text-white/30",
-                              formErrors.title ? "border-red-500/50" : ""
+                              "mt-3 bg-black/50 border-white/20 text-white placeholder:text-white/40 h-12 text-lg",
+                              "focus:border-polygon-primary focus:ring-1 focus:ring-polygon-primary",
+                              formErrors.title ? "border-red-500" : ""
                             )}
                             value={formData.title}
                             onChange={(e) => handleFormDataChange('title', e.target.value)}
                           />
                           {formErrors.title && (
-                            <p className="mt-1 text-sm text-red-500">{formErrors.title[0]}</p>
+                            <p className="mt-2 text-sm font-medium text-red-500">
+                              {formErrors.title[0]}
+                            </p>
                           )}
                         </div>
 
@@ -543,8 +550,8 @@ const ThesisSubmission = () => {
                 )}
 
                 {activeStep === 'strategy' && (
-                  <Card className="neo-blur">
-                    <div className="p-6">
+                  <Card className="border border-white/10 bg-black/40 backdrop-blur-xl">
+                    <div className="p-8">
                       <FirmCriteriaSection 
                         formData={formData}
                         formErrors={formErrors}
@@ -555,8 +562,8 @@ const ThesisSubmission = () => {
                 )}
 
                 {activeStep === 'submission' && (
-                  <Card className="neo-blur">
-                    <div className="p-6">
+                  <Card className="border border-white/10 bg-black/40 backdrop-blur-xl">
+                    <div className="p-8">
                       <StrategiesSection 
                         formData={formData}
                         formErrors={formErrors}
@@ -567,8 +574,8 @@ const ThesisSubmission = () => {
                 )}
 
                 {activeStep === 'approval' && (
-                  <Card className="neo-blur">
-                    <div className="p-6">
+                  <Card className="border border-white/10 bg-black/40 backdrop-blur-xl">
+                    <div className="p-8">
                       <PaymentTermsSection 
                         formData={formData}
                         formErrors={formErrors}
@@ -578,15 +585,21 @@ const ThesisSubmission = () => {
                   </Card>
                 )}
 
-                <Card className="neo-blur p-4">
+                <Card className="border border-white/10 bg-black/40 backdrop-blur-xl p-6">
                   <Button
                     onClick={handleContinue}
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#4F46E5] transition-all duration-300 h-12 text-lg font-medium"
+                    className={cn(
+                      "w-full h-14 text-lg font-medium transition-all duration-300",
+                      "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+                      "hover:from-polygon-secondary hover:to-polygon-primary",
+                      "disabled:opacity-50 disabled:cursor-not-allowed",
+                      "focus:ring-2 focus:ring-polygon-primary focus:ring-offset-2 focus:ring-offset-black"
+                    )}
                   >
                     {isSubmitting ? (
-                      <div className="flex items-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
                         <span>Processing...</span>
                       </div>
                     ) : (
@@ -600,24 +613,32 @@ const ThesisSubmission = () => {
             </div>
 
             <div className="col-span-12 lg:col-span-4 space-y-6">
-              <LGRWalletDisplay 
-                submissionFee={SUBMISSION_FEE.toString()}
-                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
-                walletAddress={address}
-              />
+              <Card className="border border-white/10 bg-black/40 backdrop-blur-xl">
+                <div className="p-6">
+                  <LGRWalletDisplay 
+                    submissionFee={SUBMISSION_FEE.toString()}
+                    currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
+                    walletAddress={address}
+                  />
+                </div>
+              </Card>
 
               {currentTxId && (
-                <TransactionStatus
-                  transactionId={currentTxId}
-                  onComplete={() => setCurrentTxId(null)}
-                  onError={(error) => {
-                    toast({
-                      title: "Transaction Failed",
-                      description: error,
-                      variant: "destructive"
-                    });
-                  }}
-                />
+                <Card className="border border-white/10 bg-black/40 backdrop-blur-xl">
+                  <div className="p-6">
+                    <TransactionStatus
+                      transactionId={currentTxId}
+                      onComplete={() => setCurrentTxId(null)}
+                      onError={(error) => {
+                        toast({
+                          title: "Transaction Failed",
+                          description: error,
+                          variant: "destructive"
+                        });
+                      }}
+                    />
+                  </div>
+                </Card>
               )}
             </div>
           </div>
