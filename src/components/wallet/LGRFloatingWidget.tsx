@@ -77,7 +77,7 @@ export const LGRFloatingWidget = () => {
 
     try {
       await open({
-        onrampProvider: OnrampProviders.Coinbase,  // Changed from Banxa to Coinbase
+        onrampProvider: 'coinbase',  // Use string literal instead of enum
         token: 'MATIC',
         address: primaryWallet.address,
       });

@@ -34,7 +34,7 @@ export const CallToAction = () => {
 
     try {
       await open({
-        onrampProvider: OnrampProviders.Coinbase,  // Changed from Banxa to Coinbase
+        onrampProvider: 'coinbase',  // Use string literal instead of enum
         address: primaryWallet.address,
       });
       
