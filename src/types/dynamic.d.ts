@@ -1,8 +1,11 @@
+
 import { type EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { type ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum-aa";
 import { type OnrampProviders } from "@dynamic-labs/sdk-api-core";
 
 declare module "@dynamic-labs/sdk-react-core" {
+  export type DynamicChain = 'ALGO' | 'BTC' | 'COSMOS' | 'EVM' | 'FLOW' | 'SOL' | 'STARK';
+  
   export interface UserProfile {
     alias?: string;
     email?: string;
@@ -18,19 +21,19 @@ declare module "@dynamic-labs/sdk-react-core" {
     };
   }
 
+  export interface DynamicWallet {
+    address?: string;
+    isAuthenticated: boolean;
+    isConnected: () => Promise<boolean>;
+    getNetwork: () => Promise<{ chainId: number; name: string }>;
+    getPublicClient: () => Promise<any>;
+    getWalletClient: () => Promise<any>;
+    disconnect?: () => Promise<void>;
+  }
+
   export interface DynamicContextType {
     user: UserProfile | null;
-    primaryWallet: {
-      address?: string;
-      isConnected: () => Promise<boolean>;
-      getWalletClient: () => Promise<any>;
-      disconnect?: () => Promise<void>;
-      connector?: {
-        name?: string;
-        showWallet?: (options: { view: 'send' | 'deposit' }) => void;
-        openWallet?: (options: { view: 'send' | 'deposit' }) => void;  // Added for ZeroDev compatibility
-      };
-    } | null;
+    primaryWallet: DynamicWallet | null;
     setShowAuthFlow?: (show: boolean) => void;
     setShowOnRamp?: (
       show: boolean,
@@ -51,19 +54,43 @@ declare module "@dynamic-labs/sdk-react-core" {
     };
   }
 
+  export interface SmartWalletOptions {
+    enableHD?: boolean;
+    recoveryMethods?: ('email' | 'social' | 'passkey')[];
+    separateGenerationStep?: boolean;
+  }
+
+  export interface WalletConnectorEvent {
+    type: 'connected' | 'disconnected' | 'networkChanged';
+    data?: any;
+  }
+
+  export interface WebhookConfig {
+    url: string;
+    events: ('wallet.created' | 'wallet.connected' | 'user.verified')[];
+    secret?: string;
+  }
+
   export interface DynamicSettings {
     environmentId: string;
     walletConnectors: (typeof EthereumWalletConnectors | typeof ZeroDevSmartWalletConnectors)[];
     walletConnectorOptions?: {
-      zeroDevOptions: {
-        projectId: string;
-        bundlerRpc: string;
-        paymasterRpc: string;
-      };
+      smartWallet: SmartWalletOptions;
     };
     eventsCallbacks?: {
-      onVerificationSuccess?: (args: any) => void;
-      onVerificationComplete?: () => void;
+      onVerificationSuccess?: (data: {
+        userId: string;
+        verificationType: string;
+        timestamp: number;
+      }) => void;
+      onWalletGenerated?: (data: {
+        walletAddress: string;
+        type: 'hd' | 'smart-contract';
+      }) => void;
+      onAccountRecoveryStarted?: () => void;
+      onAccountRecoveryCompleted?: (data: { 
+        recoveryMethod: 'email' | 'social' | 'passkey' 
+      }) => void;
       onAuthSuccess?: (args: any) => void;
       onLogout?: () => void;
       onEmailVerificationStart?: () => void;
@@ -73,6 +100,7 @@ declare module "@dynamic-labs/sdk-react-core" {
     };
     settings?: {
       network?: {
+        chain: DynamicChain;
         chainId: number;
       };
       environmentId: string;
@@ -86,6 +114,7 @@ declare module "@dynamic-labs/sdk-react-core" {
       enableSessionRestoration?: boolean;
       enableAuthProviders?: boolean;
       enablePasskeys?: boolean;
+      webhooks?: WebhookConfig[];
       evmWallets?: {
         options: {
           emailAuth: {
@@ -115,4 +144,17 @@ declare module "@dynamic-labs/sdk-react-core" {
   }>;
 
   export const DynamicWidget: React.FC;
+
+  export function useWalletConnectorEvent(): {
+    subscribe: (callback: (event: WalletConnectorEvent) => void) => () => void;
+  };
+
+  export function useFunding(): {
+    startFunding: (options: {
+      amount?: number;
+      token?: string;
+      provider?: OnrampProviders;
+    }) => Promise<void>;
+    isAvailable: boolean;
+  };
 }
