@@ -310,8 +310,9 @@ const ThesisSubmission = () => {
       }
       console.log('Metadata uploaded to IPFS:', ipfsHash);
 
-      // Validate contract parameters
-      const targetCapital = ethers.utils.parseEther(formData.investment.targetCapital);
+      // Convert targetCapital to BigNumber
+      const targetCapitalString = formData.investment.targetCapital;
+      const targetCapital = ethers.utils.parseEther(targetCapitalString);
       
       const paramValidation = validateContractParameters(
         { targetCapital, votingDuration },
@@ -337,14 +338,14 @@ const ThesisSubmission = () => {
         ipfsHash
       }, wallet);
 
-      // Store proposal data
+      // Store proposal data - using the original string value
       const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
       const newProposal: StoredProposal = {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
         title: formData.title,
-        targetCapital: ethers.utils.formatEther(targetCapital),
+        targetCapital: targetCapitalString, // Use the original string value
         status: 'pending'
       };
       userProposals.push(newProposal);
