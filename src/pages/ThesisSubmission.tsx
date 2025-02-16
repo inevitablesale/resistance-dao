@@ -339,14 +339,14 @@ const ThesisSubmission = () => {
         ipfsHash
       }, wallet);
 
-      // Store proposal data - using the original string value
+      // Store proposal data
       const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
       const newProposal: StoredProposal = {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
         title: formData.title,
-        targetCapital: targetCapitalString, // Use the original string value
+        targetCapital: formData.investment.targetCapital,
         status: 'pending'
       };
       userProposals.push(newProposal);
