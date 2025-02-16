@@ -150,10 +150,8 @@ const ThesisSubmission = () => {
 
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
   const [hasShownBalanceWarning, setHasShownBalanceWarning] = useState(false);
-  const [currentStep, setCurrentStep] = useState<string>('thesis');
-  const [currentTxId, setCurrentTxId] = useState<string | null>(null);
+  const [activeStep, setActiveStep] = useState<string>('thesis');
   const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
-  const [activeTab, setActiveTab] = useState("basics");
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => 
@@ -217,11 +215,9 @@ const ThesisSubmission = () => {
       );
     }
 
-    switch (activeTab) {
-      case 'basics':
+    switch (activeStep) {
+      case 'thesis':
         return "Continue to Firm Details";
-      case 'firm':
-        return "Continue to Strategy";
       case 'strategy':
         return "Continue to Terms";
       case 'terms':
@@ -322,18 +318,18 @@ const ThesisSubmission = () => {
   const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
     let isValid = false;
 
-    switch (activeTab) {
-      case 'basics':
+    switch (activeStep) {
+      case 'thesis':
         isValid = validateBasicsTab();
-        if (isValid) setActiveTab('firm');
+        if (isValid) setActiveStep('firm');
         break;
       case 'firm':
         isValid = validateFirmTab();
-        if (isValid) setActiveTab('strategy');
+        if (isValid) setActiveStep('strategy');
         break;
       case 'strategy':
         isValid = validateStrategyTab();
-        if (isValid) setActiveTab('terms');
+        if (isValid) setActiveStep('terms');
         break;
       case 'terms':
         isValid = validateTermsTab();
@@ -504,140 +500,90 @@ const ThesisSubmission = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8 space-y-6">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid grid-cols-5 gap-4 bg-transparent">
-                  <TabsTrigger
-                    value="basics"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    Basics
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="firm"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
-                  >
-                    <Building2 className="w-4 h-4 mr-2" />
-                    Firm
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="strategy"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
-                  >
-                    <Target className="w-4 h-4 mr-2" />
-                    Strategy
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="terms"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
-                  >
-                    <Briefcase className="w-4 h-4 mr-2" />
-                    Terms
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="approval"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
-                  >
-                    <Wallet className="w-4 h-4 mr-2" />
-                    Approve
-                  </TabsTrigger>
-                </TabsList>
+              <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-6">
+                <SubmissionProgress 
+                  steps={steps}
+                  currentStepId={activeStep}
+                />
+              </Card>
 
-                <div className="mt-6">
-                  <TabsContent value="basics">
-                    <Card className="bg-black/40 border-white/10 text-white">
-                      <div className="p-6 space-y-6">
-                        <div>
-                          <Label className="text-lg font-medium text-white mb-2">
-                            Thesis Title
-                          </Label>
-                          <p className="text-sm text-gray-400 mb-2">
-                            📌 Provide a concise name for the investment strategy
-                          </p>
-                          <Input
-                            placeholder="Enter thesis title"
-                            className={cn(
-                              "bg-black/50 border-white/10 text-white placeholder:text-gray-500",
-                              formErrors.title ? "border-red-500" : ""
-                            )}
-                            required
-                            value={formData.title}
-                            onChange={(e) => handleFormDataChange('title', e.target.value)}
-                          />
-                          {formErrors.title && (
-                            <p className="mt-1 text-sm text-red-500">{formErrors.title[0]}</p>
+              <div className="space-y-6">
+                {activeStep === 'thesis' && (
+                  <Card className="bg-black/40 border-white/10 text-white">
+                    <div className="p-6 space-y-6">
+                      <div>
+                        <Label className="text-lg font-medium text-white mb-2">
+                          Thesis Title
+                        </Label>
+                        <p className="text-sm text-gray-400 mb-2">
+                          📌 Provide a concise name for the investment strategy
+                        </p>
+                        <Input
+                          placeholder="Enter thesis title"
+                          className={cn(
+                            "bg-black/50 border-white/10 text-white placeholder:text-gray-500",
+                            formErrors.title ? "border-red-500" : ""
                           )}
-                        </div>
-
-                        <VotingDurationInput
-                          value={votingDuration}
-                          onChange={handleVotingDurationChange}
-                          error={formErrors.votingDuration}
+                          required
+                          value={formData.title}
+                          onChange={(e) => handleFormDataChange('title', e.target.value)}
                         />
-
-                        <TargetCapitalInput
-                          value={formData.investment.targetCapital}
-                          onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
-                          error={formErrors['investment.targetCapital']}
-                        />
+                        {formErrors.title && (
+                          <p className="mt-1 text-sm text-red-500">{formErrors.title[0]}</p>
+                        )}
                       </div>
-                    </Card>
-                  </TabsContent>
 
-                  <TabsContent value="firm">
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-6">
-                        <FirmCriteriaSection 
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={handleFormDataChange}
-                        />
-                      </div>
-                    </Card>
-                  </TabsContent>
+                      <VotingDurationInput
+                        value={votingDuration}
+                        onChange={handleVotingDurationChange}
+                        error={formErrors.votingDuration}
+                      />
 
-                  <TabsContent value="strategy">
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-6">
-                        <StrategiesSection 
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={handleStrategyChange}
-                        />
-                      </div>
-                    </Card>
-                  </TabsContent>
+                      <TargetCapitalInput
+                        value={formData.investment.targetCapital}
+                        onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+                        error={formErrors['investment.targetCapital']}
+                      />
+                    </div>
+                  </Card>
+                )}
 
-                  <TabsContent value="terms">
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-6">
-                        <PaymentTermsSection 
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={handleFormDataChange}
-                        />
-                      </div>
-                    </Card>
-                  </TabsContent>
+                {activeStep === 'strategy' && (
+                  <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+                    <div className="p-6">
+                      <FirmCriteriaSection 
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={handleFormDataChange}
+                      />
+                    </div>
+                  </Card>
+                )}
 
-                  <TabsContent value="approval">
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-6">
-                        <div className="space-y-4">
-                          <h3 className="text-xl font-semibold text-white">Token Approval</h3>
-                          <p className="text-gray-400">
-                            Before submitting your thesis, you need to approve the contract to use your LGR tokens.
-                          </p>
-                          <ContractApprovalStatus
-                            onApprovalComplete={() => updateStepStatus('approval', 'completed')}
-                            requiredAmount={SUBMISSION_FEE.toString()}
-                          />
-                        </div>
-                      </div>
-                    </Card>
-                  </TabsContent>
-                </div>
-              </Tabs>
+                {activeStep === 'submission' && (
+                  <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+                    <div className="p-6">
+                      <StrategiesSection 
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={handleStrategyChange}
+                      />
+                    </div>
+                  </Card>
+                )}
+
+                {activeStep === 'approval' && (
+                  <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+                    <div className="p-6">
+                      <PaymentTermsSection 
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={handleFormDataChange}
+                      />
+                    </div>
+                  </Card>
+                )}
+              </div>
 
               <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-6">
                 <Button
@@ -645,7 +591,14 @@ const ThesisSubmission = () => {
                   disabled={isSubmitting}
                   className="w-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#4F46E5] transition-all duration-300"
                 >
-                  {getButtonText()}
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+                      Submitting...
+                    </div>
+                  ) : (
+                    activeStep === 'approval' ? "Submit Investment Thesis" : "Continue"
+                  )}
                 </Button>
               </Card>
             </div>
@@ -661,7 +614,7 @@ const ThesisSubmission = () => {
                 <h2 className="text-lg font-semibold text-white mb-4">Submission Progress</h2>
                 <SubmissionProgress 
                   steps={steps}
-                  currentStepId={currentStep}
+                  currentStepId={activeStep}
                 />
               </Card>
 
