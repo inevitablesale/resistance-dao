@@ -718,7 +718,7 @@ const ThesisSubmission = () => {
                   <div className="relative z-10 p-4 sm:p-6 md:p-8">
                     <div className="text-center mb-4 sm:mb-6 md:mb-8">
                       <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
-                        Promote Your Investment Thesis
+                        Promote Your Brand
                       </h3>
                       <p className="text-sm sm:text-base text-white/60 mt-2">
                         Reach accounting firm owners and LedgerFund investors
@@ -730,10 +730,7 @@ const ThesisSubmission = () => {
                       <div className="p-3 sm:p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
                         <div className="flex items-center justify-between gap-4">
                           <span className="text-base sm:text-lg text-white/80">Weekly</span>
-                          <div className="text-right">
-                            <div className="text-base sm:text-lg font-semibold text-yellow-400">2.5k LGR</div>
-                            <div className="text-xs sm:text-sm text-white/60">≈ $250</div>
-                          </div>
+                          <div className="text-base sm:text-lg font-semibold text-yellow-400">2.5k LGR</div>
                         </div>
                       </div>
 
@@ -746,10 +743,7 @@ const ThesisSubmission = () => {
                         </div>
                         <div className="flex items-center justify-between gap-4">
                           <span className="text-base sm:text-lg text-white/80">Monthly</span>
-                          <div className="text-right">
-                            <div className="text-base sm:text-lg font-semibold text-yellow-400">9k LGR</div>
-                            <div className="text-xs sm:text-sm text-white/60">≈ $900</div>
-                          </div>
+                          <div className="text-base sm:text-lg font-semibold text-yellow-400">9k LGR</div>
                         </div>
                       </div>
                     </div>
