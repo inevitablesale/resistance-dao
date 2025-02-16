@@ -41,11 +41,11 @@ export interface GasEstimate {
 
 async function getProvider(wallet: DynamicWallet) {
   try {
-    const provider = await wallet.connector?.getProvider();
-    if (!provider) {
-      throw new Error("No provider available");
+    const walletClient = await wallet.getWalletClient();
+    if (!walletClient) {
+      throw new Error("No wallet client available");
     }
-    return new ethers.providers.Web3Provider(provider as any);
+    return new ethers.providers.Web3Provider(walletClient as any);
   } catch (error) {
     console.error("Error getting provider:", error);
     throw new Error("Failed to initialize provider");
