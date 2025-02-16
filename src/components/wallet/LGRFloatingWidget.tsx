@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -9,9 +10,11 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
+  const { setShowOnRamp } = useDynamicContext();
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
   const [maticBalance, setMaticBalance] = useState<string>("0");
@@ -20,7 +23,6 @@ export const LGRFloatingWidget = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
   const { toast } = useToast();
-  const { isConnected, setShowOnRamp, setShowAuthFlow } = useWalletConnection();
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -57,15 +59,6 @@ export const LGRFloatingWidget = () => {
   }, [address]);
 
   const handleBuyMatic = () => {
-    if (!address) {
-      toast({
-        title: "Wallet Required",
-        description: "Please connect your wallet first.",
-        variant: "destructive",
-      });
-      setShowAuthFlow?.(true);
-      return;
-    }
     setShowOnRamp?.(true);
   };
 
@@ -94,10 +87,6 @@ export const LGRFloatingWidget = () => {
       });
     }
   };
-
-  if (!address) return null;
-
-  const hasMaticBalance = Number(maticBalance) > 0;
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
@@ -165,7 +154,7 @@ export const LGRFloatingWidget = () => {
                 <Button 
                   className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold"
                   onClick={() => setIsConfirmOpen(true)}
-                  disabled={!hasMaticBalance}
+                  disabled={!address}
                 >
                   <Coins className="w-4 h-4 mr-2" />
                   Buy LGR
