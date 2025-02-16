@@ -153,43 +153,72 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
       "bg-black border-white/10 overflow-hidden p-6 space-y-6",
       className
     )}>
-      <div className="flex gap-2">
+      <div className="space-y-3">
         <Button
           variant="outline"
           className={cn(
-            "flex-1 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium",
+            "w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium",
             hasInsufficientBalance && "border-red-500/50"
           )}
           onClick={() => setShowBalances(!showBalances)}
         >
-          {hasInsufficientBalance && <AlertCircle className="w-4 h-4 mr-2 text-red-500" />}
-          {showBalances ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+          {hasInsufficientBalance && <AlertCircle className="w-6 h-6 mr-2 text-red-500" />}
+          {showBalances ? <EyeOff className="w-6 h-6 mr-2" /> : <Eye className="w-6 h-6 mr-2" />}
           Balances
         </Button>
-        
+
         <Button
           variant="outline"
-          className="flex-1 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+          className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium"
           onClick={() => setShowDeposit(!showDeposit)}
         >
-          <Upload className="w-4 h-4 mr-2" />
+          <Upload className="w-6 h-6 mr-2" />
           Deposit
         </Button>
 
-        {walletAddress && (
-          <Button
-            variant="outline"
-            className="bg-white/5 border-white/10 hover:bg-white/10 text-white px-4"
-            onClick={handleCopyAddress}
-          >
-            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-          </Button>
-        )}
+        <Button
+          onClick={handleBuyPolygon}
+          className="w-full h-14 bg-purple-500 hover:bg-purple-600 text-white font-semibold text-lg"
+        >
+          <img 
+            src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+            alt="Polygon"
+            className="w-6 h-6 mr-2"
+          />
+          Buy Polygon
+        </Button>
+
+        <Button
+          onClick={() => setIsConfirmOpen(true)}
+          className="w-full h-14 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold text-lg"
+        >
+          <Coins className="w-6 h-6 mr-2" />
+          Buy LGR
+        </Button>
+
+        <Button
+          variant="ghost"
+          onClick={() => setShowInstructions(true)}
+          className="w-full h-14 text-white hover:bg-white/10 font-semibold text-lg"
+        >
+          <Info className="w-6 h-6 mr-2" />
+          How to Buy
+        </Button>
       </div>
 
       {showDeposit && walletAddress && (
         <div className="p-3 bg-white/5 rounded-lg border border-white/10">
-          <p className="text-xs text-white/60 mb-1">Your Wallet Address</p>
+          <div className="flex justify-between items-center mb-1">
+            <p className="text-xs text-white/60">Your Wallet Address</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 text-white/60 hover:text-white"
+              onClick={handleCopyAddress}
+            >
+              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            </Button>
+          </div>
           <p className="text-sm text-white break-all font-mono">
             {walletAddress}
           </p>
@@ -242,38 +271,6 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
           {/* Price Display */}
           <div className="text-lg text-gray-400 pt-4">
             Price: $0.10 USD per LGR
-          </div>
-
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <Button
-              onClick={() => setIsConfirmOpen(true)}
-              className="w-full h-14 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold text-lg"
-            >
-              <Coins className="w-6 h-6 mr-2" />
-              Buy LGR
-            </Button>
-
-            <Button
-              onClick={handleBuyPolygon}
-              className="w-full h-14 bg-purple-500 hover:bg-purple-600 text-white font-semibold text-lg"
-            >
-              <img 
-                src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-                alt="Polygon"
-                className="w-6 h-6 mr-2"
-              />
-              Buy Polygon
-            </Button>
-
-            <Button
-              variant="ghost"
-              onClick={() => setShowInstructions(true)}
-              className="w-full h-14 text-white hover:bg-white/10 font-semibold text-lg"
-            >
-              <Info className="w-6 h-6 mr-2" />
-              How to Buy
-            </Button>
           </div>
         </div>
       )}
