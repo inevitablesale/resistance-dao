@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ContractStatus } from "./proposalContractService";
 
@@ -6,6 +5,8 @@ export interface ValidationConfig {
   maxPaymentTerms: number;
   maxStrategiesPerCategory: number;
   maxSummaryLength: number;
+  minTitleLength: number;
+  minDriversLength: number;
 }
 
 export interface ValidationResult {
@@ -13,14 +14,48 @@ export interface ValidationResult {
   errors: Record<string, string[]>;
 }
 
+export interface Industry {
+  focus: string;
+  other?: string;
+}
+
+export interface FirmCriteria {
+  size: string;
+  location: string;
+  dealType: string;
+}
+
+export interface Investment {
+  targetCapital: string;
+  drivers: string;
+  additionalCriteria: string;
+}
+
+export interface Strategies {
+  operational: string[];
+  growth: string[];
+  integration: string[];
+}
+
+export interface ProposalMetadata {
+  title: string;
+  industry: Industry;
+  firmCriteria: FirmCriteria;
+  paymentTerms: string[];
+  strategies: Strategies;
+  investment: Investment;
+}
+
 const DEFAULT_CONFIG: ValidationConfig = {
   maxPaymentTerms: 5,
   maxStrategiesPerCategory: 3,
-  maxSummaryLength: 500
+  maxSummaryLength: 500,
+  minTitleLength: 10,
+  minDriversLength: 50
 };
 
 export const validateProposalMetadata = (
-  metadata: any,
+  metadata: ProposalMetadata,
   config: ValidationConfig = DEFAULT_CONFIG
 ): ValidationResult => {
   const errors: Record<string, string[]> = {};
@@ -28,17 +63,43 @@ export const validateProposalMetadata = (
   // Title validation
   if (!metadata.title || metadata.title.trim().length === 0) {
     errors.title = ['Title is required'];
+  } else if (metadata.title.trim().length < config.minTitleLength) {
+    errors.title = [`Title must be at least ${config.minTitleLength} characters long`];
+  }
+
+  // Industry validation
+  if (!metadata.industry.focus || metadata.industry.focus.trim().length === 0) {
+    errors['industry.focus'] = ['Industry focus is required'];
+  }
+
+  // Firm criteria validation
+  if (!metadata.firmCriteria.size || metadata.firmCriteria.size.trim().length === 0) {
+    errors['firmCriteria.size'] = ['Firm size is required'];
+  }
+  if (!metadata.firmCriteria.location || metadata.firmCriteria.location.trim().length === 0) {
+    errors['firmCriteria.location'] = ['Location is required'];
+  }
+  if (!metadata.firmCriteria.dealType || metadata.firmCriteria.dealType.trim().length === 0) {
+    errors['firmCriteria.dealType'] = ['Deal type is required'];
   }
 
   // Payment terms validation
-  if (metadata.paymentTerms && metadata.paymentTerms.length > config.maxPaymentTerms) {
+  if (!Array.isArray(metadata.paymentTerms)) {
+    errors.paymentTerms = ['Invalid payment terms format'];
+  } else if (metadata.paymentTerms.length === 0) {
+    errors.paymentTerms = ['At least one payment term is required'];
+  } else if (metadata.paymentTerms.length > config.maxPaymentTerms) {
     errors.paymentTerms = [`Maximum of ${config.maxPaymentTerms} payment terms allowed`];
   }
 
   // Strategies validation
   if (metadata.strategies) {
-    Object.entries(metadata.strategies).forEach(([category, strategies]: [string, any]) => {
-      if (Array.isArray(strategies) && strategies.length > config.maxStrategiesPerCategory) {
+    Object.entries(metadata.strategies).forEach(([category, strategies]: [string, string[]]) => {
+      if (!Array.isArray(strategies)) {
+        errors[`strategies.${category}`] = ['Invalid strategy format'];
+      } else if (strategies.length === 0) {
+        errors[`strategies.${category}`] = ['At least one strategy is required'];
+      } else if (strategies.length > config.maxStrategiesPerCategory) {
         errors[`strategies.${category}`] = [
           `Maximum of ${config.maxStrategiesPerCategory} strategies allowed per category`
         ];
@@ -47,16 +108,27 @@ export const validateProposalMetadata = (
   }
 
   // Investment validation
-  if (metadata.investment) {
-    if (!metadata.investment.targetCapital) {
-      errors['investment.targetCapital'] = ['Target capital is required'];
-    }
-    if (metadata.investment.drivers && 
-        metadata.investment.drivers.length > config.maxSummaryLength) {
-      errors['investment.drivers'] = [
-        `Maximum length of ${config.maxSummaryLength} characters exceeded`
-      ];
-    }
+  if (!metadata.investment.targetCapital) {
+    errors['investment.targetCapital'] = ['Target capital is required'];
+  } else if (!/^\d+(\.\d{1,2})?$/.test(metadata.investment.targetCapital)) {
+    errors['investment.targetCapital'] = ['Target capital must be a valid number with up to 2 decimal places'];
+  }
+
+  if (!metadata.investment.drivers || metadata.investment.drivers.trim().length === 0) {
+    errors['investment.drivers'] = ['Investment drivers are required'];
+  } else if (metadata.investment.drivers.trim().length < config.minDriversLength) {
+    errors['investment.drivers'] = [`Investment drivers must be at least ${config.minDriversLength} characters long`];
+  } else if (metadata.investment.drivers.length > config.maxSummaryLength) {
+    errors['investment.drivers'] = [
+      `Maximum length of ${config.maxSummaryLength} characters exceeded`
+    ];
+  }
+
+  if (metadata.investment.additionalCriteria && 
+      metadata.investment.additionalCriteria.length > config.maxSummaryLength) {
+    errors['investment.additionalCriteria'] = [
+      `Maximum length of ${config.maxSummaryLength} characters exceeded`
+    ];
   }
 
   return {
