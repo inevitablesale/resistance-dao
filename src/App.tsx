@@ -25,24 +25,25 @@ const zeroDevConfig = {
   paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
 };
 
-const evmNetwork = {
-  chain: 'EVM' as const,
-  chainId: 137,
-  chainName: 'Matic Mainnet',
-  blockExplorerUrls: ['https://polygonscan.com/'],
-  iconUrls: ["https://app.dynamic.xyz/assets/networks/polygon.svg"],
-  name: 'Polygon',
-  displayName: 'Polygon',
-  nativeCurrency: {
-    decimals: 18,
-    name: 'MATIC',
-    symbol: 'MATIC',
-    iconUrl: 'https://app.dynamic.xyz/assets/networks/polygon.svg',
-  },
-  networkId: 137,
-  rpcUrls: ['https://polygon-rpc.com'],
-  vanityName: 'Polygon',
-};
+const evmNetworks = [
+  {
+    blockExplorerUrls: ['https://polygonscan.com/'],
+    chainId: 137,
+    chainName: 'Matic Mainnet',
+    iconUrls: ["https://app.dynamic.xyz/assets/networks/polygon.svg"],
+    name: 'Polygon',
+    displayName: 'Polygon',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'MATIC',
+      symbol: 'MATIC',
+      iconUrl: 'https://app.dynamic.xyz/assets/networks/polygon.svg',
+    },
+    networkId: 137,
+    rpcUrls: ['https://polygon-rpc.com'],
+    vanityName: 'Polygon',
+  }
+];
 
 const dynamicSettings = {
   environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
@@ -50,13 +51,6 @@ const dynamicSettings = {
     EthereumWalletConnectors,
     ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
   ],
-  walletConnectorOptions: {
-    smartWallet: {
-      enableHD: true,
-      recoveryMethods: ['email', 'social', 'passkey'] as ('email' | 'social' | 'passkey')[],
-      separateGenerationStep: true
-    }
-  },
   eventsCallbacks: {
     onAuthSuccess: (args: any) => {
       console.log("[Dynamic SDK] Auth Success:", args);
@@ -75,7 +69,8 @@ const dynamicSettings = {
     }
   },
   settings: {
-    network: evmNetwork,
+    evmNetworks,
+    network: evmNetworks[0],
     environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
     appName: "LedgerFund",
     appLogoUrl: "/favicon.ico",
@@ -151,3 +146,4 @@ function App() {
 }
 
 export default App;
+
