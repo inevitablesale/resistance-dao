@@ -54,12 +54,10 @@ export const useWalletConnection = () => {
 
   const approveLGR = async (amount: string, isTestMode: boolean = false) => {
     try {
-      // Skip network validation in test mode
-      if (!isTestMode) {
-        await validateNetwork();
-      }
+      // Always validate network
+      await validateNetwork();
 
-      // In test mode, we can skip the actual contract interaction
+      // In test mode, skip the actual contract interaction but still require network validation
       if (isTestMode) {
         return true;
       }
