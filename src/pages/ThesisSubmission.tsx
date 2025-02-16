@@ -55,8 +55,8 @@ export default function ThesisSubmission() {
 
   const handleRentAdSpace = async (duration: 'week' | 'month') => {
     try {
-      // 10 LGR per week, 35 LGR per month
-      const amount = ethers.utils.parseUnits(duration === 'week' ? "10" : "35", 18);
+      // 2.5k LGR per week ($250), 9k LGR per month ($900)
+      const amount = ethers.utils.parseUnits(duration === 'week' ? "2500" : "9000", 18);
       await approveLGR(amount.toString());
       
       toast({
@@ -158,7 +158,8 @@ export default function ThesisSubmission() {
                         <div>
                           <p className="text-sm text-white/60 mb-1">Weekly rate</p>
                           <div className="flex items-baseline gap-2">
-                            <p className="text-2xl font-bold text-white">10 LGR</p>
+                            <p className="text-2xl font-bold text-white">2.5k LGR</p>
+                            <p className="text-sm text-white/60">≈ $250</p>
                             <Button 
                               variant="ghost" 
                               size="sm"
@@ -173,7 +174,8 @@ export default function ThesisSubmission() {
                         <div>
                           <p className="text-sm text-white/60 mb-1">Monthly rate</p>
                           <div className="flex items-baseline gap-2">
-                            <p className="text-2xl font-bold text-white">35 LGR</p>
+                            <p className="text-2xl font-bold text-white">9k LGR</p>
+                            <p className="text-sm text-white/60">≈ $900</p>
                             <Button 
                               variant="ghost" 
                               size="sm"
@@ -209,7 +211,7 @@ export default function ThesisSubmission() {
 
               <LGRWalletDisplay
                 submissionFee={SUBMISSION_FEE.toString()}
-                currentBalance={primaryWallet?.address ? "0" : undefined} // We'll fetch the actual balance in the component
+                currentBalance={primaryWallet?.address ? "0" : undefined}
                 walletAddress={primaryWallet?.address}
               />
 
