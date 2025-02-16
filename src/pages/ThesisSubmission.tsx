@@ -420,6 +420,40 @@ const ThesisSubmission = () => {
       setIsSubmitting(false);
     }
   };
+
+  const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(SUBMISSION_FEE));
+
+  const renderContinueButton = (
+    onClick: () => void,
+    isLastSection: boolean = false
+  ) => (
+    <Button 
+      onClick={onClick} 
+      disabled={isSubmitting || !hasRequiredBalance}
+      className={cn(
+        "h-12 px-6 min-w-[200px] mt-6",
+        "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+        "hover:from-polygon-secondary hover:to-polygon-primary",
+        "text-white font-medium",
+        "transition-all duration-300",
+        "disabled:opacity-50",
+        "flex items-center justify-center gap-2"
+      )}
+    >
+      {isSubmitting ? (
+        <>
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+          <span>Processing...</span>
+        </>
+      ) : (
+        <>
+          <span>{isLastSection ? 'Submit Thesis' : 'Continue'}</span>
+          <ArrowRight className="w-4 h-4" />
+        </>
+      )}
+    </Button>
+  );
+
   return <div className="min-h-screen bg-[#030712]">
       <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10" />
       <div className="fixed inset-0 bg-gradient-to-b from-[#030712] via-[#0F172A] to-[#030712]" />
@@ -485,6 +519,12 @@ const ThesisSubmission = () => {
                           {formErrors['investment.drivers'] && <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>}
                         </div>
                       </div>
+                      {isThesisOpen && renderContinueButton(() => {
+                        if (validateBasicsTab()) {
+                          setIsThesisOpen(false);
+                          setIsStrategyOpen(true);
+                        }
+                      })}
                     </CollapsibleContent>
                   </Collapsible>
 
@@ -508,14 +548,24 @@ const ThesisSubmission = () => {
                       </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <FirmCriteriaSection formData={{
-                      firmCriteria: {
-                        size: formData.firmCriteria.size,
-                        location: formData.firmCriteria.location,
-                        dealType: formData.firmCriteria.dealType,
-                        geographicFocus: formData.firmCriteria.geographicFocus
-                      }
-                    }} formErrors={formErrors} onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)} />
+                      <FirmCriteriaSection 
+                        formData={{
+                          firmCriteria: {
+                            size: formData.firmCriteria.size,
+                            location: formData.firmCriteria.location,
+                            dealType: formData.firmCriteria.dealType,
+                            geographicFocus: formData.firmCriteria.geographicFocus
+                          }
+                        }}
+                        formErrors={formErrors}
+                        onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
+                      />
+                      {isStrategyOpen && renderContinueButton(() => {
+                        if (validateFirmTab()) {
+                          setIsStrategyOpen(false);
+                          setIsApprovalOpen(true);
+                        }
+                      })}
                     </CollapsibleContent>
                   </Collapsible>
 
@@ -540,12 +590,26 @@ const ThesisSubmission = () => {
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pt-4 px-4 pb-6">
                       <div className="space-y-6">
-                        <PaymentTermsSection formData={{
-                        paymentTerms: formData.paymentTerms
-                      }} formErrors={formErrors} onChange={value => handleFormDataChange('paymentTerms', value)} />
+                        <PaymentTermsSection 
+                          formData={{
+                            paymentTerms: formData.paymentTerms
+                          }}
+                          formErrors={formErrors}
+                          onChange={(value) => handleFormDataChange('paymentTerms', value)}
+                        />
 
-                        <VotingDurationInput value={votingDuration} onChange={handleVotingDurationChange} error={formErrors.votingDuration} />
+                        <VotingDurationInput
+                          value={votingDuration}
+                          onChange={handleVotingDurationChange}
+                          error={formErrors.votingDuration}
+                        />
                       </div>
+                      {isApprovalOpen && renderContinueButton(() => {
+                        if (validateTermsTab()) {
+                          setIsApprovalOpen(false);
+                          setIsSubmissionOpen(true);
+                        }
+                      })}
                     </CollapsibleContent>
                   </Collapsible>
 
@@ -569,21 +633,36 @@ const ThesisSubmission = () => {
                       </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <StrategiesSection formData={{
-                      strategies: {
-                        operational: formData.strategies.operational,
-                        growth: formData.strategies.growth,
-                        integration: formData.strategies.integration
-                      }
-                    }} formErrors={formErrors} onChange={handleStrategyChange} />
+                      <StrategiesSection 
+                        formData={{
+                          strategies: {
+                            operational: formData.strategies.operational,
+                            growth: formData.strategies.growth,
+                            integration: formData.strategies.integration
+                          }
+                        }}
+                        formErrors={formErrors}
+                        onChange={handleStrategyChange}
+                      />
 
                       <div className="mt-6 space-y-4">
                         <Label className="text-lg font-medium text-white">
                           Additional Criteria (Optional)
                         </Label>
-                        <textarea placeholder="Any additional criteria or notes..." className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3" value={formData.investment.additionalCriteria} onChange={e => handleFormDataChange('investment.additionalCriteria', e.target.value)} />
+                        <textarea
+                          placeholder="Any additional criteria or notes..."
+                          className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3"
+                          value={formData.investment.additionalCriteria}
+                          onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
+                        />
                       </div>
+                      {isSubmissionOpen && renderContinueButton(() => {
+                        if (validateStrategyTab()) {
+                          handleSubmit(new Event('submit'));
+                        }
+                      }, true)}
                     </CollapsibleContent>
+
                   </Collapsible>
 
                   <div className="mt-8">
