@@ -1,9 +1,27 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Coins, Info, Eye, EyeOff, Copy, Check, Upload, AlertCircle, Loader2 } from "lucide-react";
+import { 
+  Coins, 
+  Info, 
+  Eye, 
+  EyeOff, 
+  Copy, 
+  Check, 
+  Upload, 
+  AlertCircle, 
+  Loader2,
+  WalletCards 
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
@@ -286,51 +304,53 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
         </div>
 
         <div className="space-y-3">
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button
-              variant="outline"
-              className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium backdrop-blur-xl"
-              onClick={() => setShowDeposit(!showDeposit)}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  variant="outline"
+                  className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium backdrop-blur-xl"
+                >
+                  <WalletCards className="w-6 h-6 mr-2" />
+                  Wallet Options
+                </Button>
+              </motion.div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              className="w-64 bg-black/95 border border-white/10 backdrop-blur-xl"
+              align="end"
             >
-              <Upload className="w-6 h-6 mr-2" />
-              Deposit
-            </Button>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button
-              onClick={handleBuyPolygon}
-              className="w-full h-14 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold text-lg"
-            >
-              <img 
-                src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-                alt="Polygon"
-                className="w-6 h-6 mr-2"
-              />
-              Buy Polygon
-            </Button>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button
-              onClick={() => setIsConfirmOpen(true)}
-              className="w-full h-14 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold text-lg"
-            >
-              <Coins className="w-6 h-6 mr-2" />
-              Buy LGR
-            </Button>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button
-              variant="ghost"
-              onClick={() => setShowInstructions(true)}
-              className="w-full h-14 text-white hover:bg-white/10 font-semibold text-lg backdrop-blur-xl"
-            >
-              <Info className="w-6 h-6 mr-2" />
-              How to Buy
-            </Button>
-          </motion.div>
+              <DropdownMenuItem 
+                className="text-white hover:bg-white/10 cursor-pointer"
+                onClick={() => setShowDeposit(!showDeposit)}
+              >
+                <Upload className="w-5 h-5 mr-2" /> Deposit
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-white hover:bg-white/10 cursor-pointer"
+                onClick={handleBuyPolygon}
+              >
+                <img 
+                  src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+                  alt="Polygon"
+                  className="w-5 h-5 mr-2"
+                />
+                Buy Polygon
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-white hover:bg-white/10 cursor-pointer"
+                onClick={() => setIsConfirmOpen(true)}
+              >
+                <Coins className="w-5 h-5 mr-2" /> Buy LGR
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-white hover:bg-white/10 cursor-pointer"
+                onClick={() => setShowInstructions(true)}
+              >
+                <Info className="w-5 h-5 mr-2" /> How to Buy
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -443,3 +463,4 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
     </Card>
   );
 };
+
