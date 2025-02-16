@@ -723,8 +723,7 @@ const ThesisSubmission = () => {
                           Advertise Here
                         </h3>
                         <p className="text-sm text-white/60 max-w-md">
-                          Reach active investors and decision makers in the Web3 space. 
-                          Perfect for projects, products, and services targeting our ecosystem.
+                          Reach active investors and decision makers in the Web3 space.
                         </p>
                       </div>
                       <div className="space-y-4">
