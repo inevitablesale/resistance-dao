@@ -117,14 +117,12 @@ const SUBMISSION_STEPS: SubmissionStep[] = [
 
 const ThesisSubmission = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
-  const { toast } = useToast();
-  const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
   const { tokenBalances } = useTokenBalances({
     networkId: 137,
-    accountAddress: address,
+    accountAddress: primaryWallet?.address,
     includeFiat: false,
     includeNativeBalance: false,
-    tokenAddresses: [LGR_TOKEN_ADDRESS]
+    tokenAddresses: ["0xf12145c01e4b252677a91bbf81fa8f36deb5ae00"]
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -354,7 +352,7 @@ const ThesisSubmission = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isConnected) {
+    if (!primaryWallet?.address) {
       toast({
         title: "Connect Wallet",
         description: "Please connect your wallet to submit a thesis",
@@ -474,10 +472,10 @@ const ThesisSubmission = () => {
   };
 
   const handleCopyAddress = async () => {
-    if (!address) return;
+    if (!primaryWallet?.address) return;
     
     try {
-      await navigator.clipboard.writeText(address);
+      await navigator.clipboard.writeText(primaryWallet?.address);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       
@@ -495,7 +493,7 @@ const ThesisSubmission = () => {
   };
 
   const handleBuyPolygon = async () => {
-    if (!address) {
+    if (!primaryWallet?.address) {
       setShowAuthFlow?.(true);
       return;
     }
@@ -513,7 +511,7 @@ const ThesisSubmission = () => {
       await open({
         onrampProvider: OnrampProviders.Banxa,
         token: 'MATIC',
-        address: address,
+        address: primaryWallet?.address,
       });
       
       toast({
@@ -553,9 +551,9 @@ const ThesisSubmission = () => {
           </motion.div>
 
           <div className="mb-8">
-            <div className="flex justify-between items-center text-sm text-white/60 max-w-[600px] mx-auto">
+            <div className="flex flex-col items-center text-sm text-white/60 space-y-8">
               {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
+                <div key={step.id} className="flex flex-col items-center">
                   <div className="flex items-center">
                     <div className={cn(
                       "w-2 h-2 rounded-full transition-all duration-300",
@@ -564,7 +562,7 @@ const ThesisSubmission = () => {
                       "bg-white/20"
                     )} />
                     <span className={cn(
-                      "ml-2 text-xs font-medium transition-colors whitespace-nowrap",
+                      "ml-2 text-lg font-medium transition-colors whitespace-nowrap",
                       step.id === activeStep ? "text-yellow-500" : "text-white/60"
                     )}>
                       {step.title}
@@ -572,7 +570,7 @@ const ThesisSubmission = () => {
                   </div>
                   {index < steps.length - 1 && (
                     <div className={cn(
-                      "h-[1px] w-12 mx-4",
+                      "h-8 w-[1px] my-1",
                       steps.findIndex(s => s.id === activeStep) > index ? "bg-yellow-300" : "bg-white/20"
                     )} />
                   )}
@@ -660,7 +658,7 @@ const ThesisSubmission = () => {
                   size="sm"
                   className="bg-black/90 border-white/10 backdrop-blur-lg shadow-2xl text-white hover:bg-white/10 transition-colors"
                   onClick={() => {
-                    if (!address) {
+                    if (!primaryWallet?.address) {
                       setShowAuthFlow?.(true);
                     } else {
                       setShowWalletOptions(true);
@@ -670,10 +668,10 @@ const ThesisSubmission = () => {
                   <div className="flex items-center gap-2">
                     <div className={cn(
                       "w-2 h-2 rounded-full",
-                      address ? "bg-green-500" : "bg-white/50"
+                      primaryWallet?.address ? "bg-green-500" : "bg-white/50"
                     )} />
                     <span className="text-sm">
-                      {address ? 
+                      {primaryWallet?.address ? 
                         `${tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"} LGR` : 
                         "Connect Wallet"
                       }
