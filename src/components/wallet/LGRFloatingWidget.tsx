@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -9,10 +8,11 @@ import { Coins } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
+  const { setShowAuthFlow } = useDynamicContext();
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
   const [maticBalance, setMaticBalance] = useState<string>("0");
@@ -53,6 +53,10 @@ export const LGRFloatingWidget = () => {
     const interval = setInterval(fetchBalances, 30000);
     return () => clearInterval(interval);
   }, [address]);
+
+  const handleBuyPolygon = () => {
+    setShowAuthFlow?.(true);
+  };
 
   const handleConfirmPurchase = async () => {
     if (!address || !purchaseAmount) return;
@@ -139,7 +143,7 @@ export const LGRFloatingWidget = () => {
 
             <div className="space-y-3">
               <div className="text-sm text-gray-400">
-                Current Price: {Number(maticPrice)} POLYGON per LGR
+                Price: $0.10 USD per LGR
               </div>
 
               <div className="flex flex-col gap-2">
@@ -152,16 +156,17 @@ export const LGRFloatingWidget = () => {
                   Buy LGR
                 </Button>
 
-                <div className="flex items-center gap-2 px-3 py-2 bg-black/20 rounded-lg cursor-pointer hover:bg-black/30 transition-colors">
-                  <div className="flex items-center gap-2 w-full">
-                    <img 
-                      src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-                      alt="Polygon"
-                      className="w-6 h-6"
-                    />
-                    <DynamicWidget />
-                  </div>
-                </div>
+                <Button
+                  onClick={handleBuyPolygon}
+                  className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold flex items-center justify-center gap-2"
+                >
+                  <img 
+                    src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+                    alt="Polygon"
+                    className="w-5 h-5"
+                  />
+                  Buy Polygon
+                </Button>
               </div>
             </div>
           </div>

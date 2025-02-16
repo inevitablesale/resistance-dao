@@ -106,7 +106,7 @@ function Layout() {
         <Route path="/marketplace" element={<Marketplace />} />
         <Route path="/marketplace/:category/:slug" element={<KnowledgeArticle />} />
         <Route path="/content" element={<ContentHub />} />
-        <Route path="/submit-thesis" element={<ThesisSubmission />} />
+        <Route path="/thesis" element={<ThesisSubmission />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
