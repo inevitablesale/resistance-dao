@@ -120,7 +120,7 @@ const ThesisSubmission = () => {
   const { toast } = useToast();
   const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
   const { tokenBalances, isLoading } = useTokenBalances({
-    networkId: 137, // Polygon mainnet
+    networkId: 137,
     accountAddress: address,
     includeFiat: false,
     includeNativeBalance: false,
@@ -339,7 +339,7 @@ const ThesisSubmission = () => {
         ipfsHash,
         timestamp: new Date().toISOString(),
         title: formData.title,
-        targetCapital: String(formData.investment.targetCapital), // Using String() for explicit conversion
+        targetCapital: formData.investment.targetCapital,
         status: 'pending'
       };
       userProposals.push(newProposal);
