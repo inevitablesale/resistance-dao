@@ -711,44 +711,44 @@ const ThesisSubmission = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1"
+                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1 w-full max-w-3xl mx-auto"
               >
                 <Card className="relative overflow-hidden bg-black/60 backdrop-blur-xl border-white/10">
                   <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
-                  <div className="relative z-10 p-6">
-                    <div className="text-center mb-6">
-                      <h3 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
+                  <div className="relative z-10 p-4 sm:p-6 md:p-8">
+                    <div className="text-center mb-4 sm:mb-6 md:mb-8">
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
                         Promote Your Investment Thesis
                       </h3>
-                      <p className="text-white/60 mt-2">
+                      <p className="text-sm sm:text-base text-white/60 mt-2">
                         Reach accounting firm owners and LedgerFund investors
                       </p>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-2xl mx-auto">
                       {/* Weekly Plan */}
-                      <div className="p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                        <div className="flex items-center justify-between">
-                          <span className="text-white/80">Weekly</span>
+                      <div className="p-3 sm:p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                        <div className="flex items-center justify-between gap-4">
+                          <span className="text-base sm:text-lg text-white/80">Weekly</span>
                           <div className="text-right">
-                            <div className="text-lg font-semibold text-yellow-400">2.5k LGR</div>
-                            <div className="text-sm text-white/60">≈ $250</div>
+                            <div className="text-base sm:text-lg font-semibold text-yellow-400">2.5k LGR</div>
+                            <div className="text-xs sm:text-sm text-white/60">≈ $250</div>
                           </div>
                         </div>
                       </div>
 
                       {/* Monthly Plan */}
-                      <div className="relative p-4 rounded-lg bg-gradient-to-b from-white/10 to-white/5 border border-white/10 hover:from-white/15 hover:to-white/10 transition-colors">
+                      <div className="relative p-3 sm:p-4 rounded-lg bg-gradient-to-b from-white/10 to-white/5 border border-white/10 hover:from-white/15 hover:to-white/10 transition-colors">
                         <div className="absolute -top-2.5 right-2">
                           <span className="px-2 py-0.5 bg-yellow-500/20 rounded-full text-yellow-400 text-xs">
                             Best Value
                           </span>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-white/80">Monthly</span>
+                        <div className="flex items-center justify-between gap-4">
+                          <span className="text-base sm:text-lg text-white/80">Monthly</span>
                           <div className="text-right">
-                            <div className="text-lg font-semibold text-yellow-400">9k LGR</div>
-                            <div className="text-sm text-white/60">≈ $900</div>
+                            <div className="text-base sm:text-lg font-semibold text-yellow-400">9k LGR</div>
+                            <div className="text-xs sm:text-sm text-white/60">≈ $900</div>
                           </div>
                         </div>
                       </div>
