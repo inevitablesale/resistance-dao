@@ -196,7 +196,12 @@ const ThesisSubmission = () => {
         current = current[fields[i]];
       }
       
-      current[fields[fields.length - 1]] = value;
+      if (fields[fields.length - 1] === 'targetCapital') {
+        current[fields[fields.length - 1]] = value.toString();
+      } else {
+        current[fields[fields.length - 1]] = value;
+      }
+      
       return newData;
     });
   };
