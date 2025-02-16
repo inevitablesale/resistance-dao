@@ -1,7 +1,6 @@
 
 import { type EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { type ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum-aa";
-import { type OnrampProviders } from "@dynamic-labs/sdk-api-core";
 
 declare module "@dynamic-labs/sdk-react-core" {
   export interface UserProfile {
@@ -24,8 +23,7 @@ declare module "@dynamic-labs/sdk-react-core" {
     primaryWallet: {
       address?: string;
       isConnected: () => Promise<boolean>;
-      getEthersProvider?: () => Promise<any>;  // Updated to new method
-      getPublicClient?: () => Promise<any>;    // Added fallback method
+      getWalletClient: () => Promise<any>;
       disconnect?: () => Promise<void>;
       connector?: {
         name?: string;
@@ -43,14 +41,6 @@ declare module "@dynamic-labs/sdk-react-core" {
         };
       }
     ) => void;
-    useOnramp?: () => {
-      enabled: boolean;
-      open: (options: {
-        onrampProvider: OnrampProviders;
-        token: string;
-        address: string;
-      }) => Promise<void>;
-    };
   }
 
   export interface DynamicSettings {

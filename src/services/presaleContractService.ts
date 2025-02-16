@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
@@ -109,16 +110,17 @@ export const fetchPresaleMaticPrice = async () => {
     
     // Get the latest MATIC price in USD from the contract (assuming 8 decimals)
     const maticPriceInUsd = await contract.getLatestMaticPrice();
-    const maticPriceUsd = ethers.utils.formatUnits(maticPriceInUsd, 8); // Convert to USD value
     
     // LGR price is fixed at $0.10
-    const lgrPriceUsd = 0.10;
+    // Convert MATIC price to proper decimals (from 8 to 18)
+    const maticPriceIn18Decimals = maticPriceInUsd.mul(ethers.utils.parseUnits("1", 10));
+    const lgrPriceUsd = ethers.utils.parseUnits("0.1", 18); // $0.10 in 18 decimals
     
     // Calculate MATIC required for 1 LGR: ($0.10 / MATIC USD price)
-    const maticRequired = lgrPriceUsd / Number(maticPriceUsd);
+    const maticRequired = lgrPriceUsd.mul(ethers.utils.parseUnits("1", 18)).div(maticPriceIn18Decimals);
     
     // Format to 4 decimal places for display
-    return maticRequired.toFixed(4);
+    return Number(ethers.utils.formatEther(maticRequired)).toFixed(4);
   } catch (error) {
     console.error("Error fetching MATIC price:", error);
     return "0";

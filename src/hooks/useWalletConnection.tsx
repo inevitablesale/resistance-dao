@@ -1,16 +1,11 @@
 
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { ethers } from "ethers";
-import { getContractStatus } from "@/services/proposalContractService";
-
-const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 export const useWalletConnection = () => {
-  const { primaryWallet, setShowAuthFlow, setShowOnRamp } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const [isConnecting, setIsConnecting] = useState(false);
-  const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
   const { toast } = useToast();
 
   const connect = async () => {
@@ -37,51 +32,53 @@ export const useWalletConnection = () => {
     }
   };
 
-  const approveLGR = async (amount: string) => {
+  // Monitor connection state and close auth flow when connected
+  if (primaryWallet?.isConnected?.() && setShowAuthFlow) {
+    setShowAuthFlow(false);
+  }
+
+  const showWallet = (view: 'send' | 'deposit') => {
+    console.log("Attempting to show wallet view:", view);
+    console.log("Wallet connector details:", primaryWallet?.connector);
+    
     if (!primaryWallet) {
-      throw new Error("No wallet connected");
+      console.warn("No wallet available");
+      toast({
+        title: "Wallet Error",
+        description: "Please connect your wallet first",
+        variant: "destructive"
+      });
+      return;
     }
 
-    if (!treasuryAddress) {
-      const status = await getContractStatus(primaryWallet);
-      setTreasuryAddress(status.treasuryAddress);
+    try {
+      // Try using showWallet first, then openWallet as fallback
+      if (primaryWallet.connector?.showWallet) {
+        primaryWallet.connector.showWallet({ view });
+      } else if (primaryWallet.connector?.openWallet) {
+        primaryWallet.connector.openWallet({ view });
+      } else {
+        // Fallback to showing auth flow if direct navigation isn't available
+        console.warn("Direct wallet navigation not available, falling back to auth flow");
+        setShowAuthFlow?.(true);
+      }
+    } catch (error) {
+      console.error("Error showing wallet:", error);
+      toast({
+        title: "Wallet Error",
+        description: "Unable to open wallet interface",
+        variant: "destructive"
+      });
     }
-
-    const provider = await primaryWallet.getWalletClient();
-    if (!provider) {
-      throw new Error("No provider available");
-    }
-
-    const ethersProvider = new ethers.providers.Web3Provider(provider as any);
-    const signer = ethersProvider.getSigner();
-    const lgrToken = new ethers.Contract(
-      LGR_TOKEN_ADDRESS,
-      ["function approve(address spender, uint256 amount) returns (bool)"],
-      signer
-    );
-
-    const tx = await lgrToken.approve(treasuryAddress, amount);
-    await tx.wait();
-    return true;
   };
 
-  // Move the auth flow closing logic to useEffect
-  useEffect(() => {
-    if (primaryWallet?.isConnected?.() && setShowAuthFlow) {
-      setShowAuthFlow(false);
-    }
-  }, [primaryWallet, setShowAuthFlow]);
-
   return {
-    isConnected: !!primaryWallet?.isConnected?.(),
+    isConnected: primaryWallet?.isConnected?.() || false,
     isConnecting,
     connect,
     disconnect,
     address: primaryWallet?.address,
-    approveLGR,
-    setShowOnRamp,
-    setShowAuthFlow,
-    wallet: primaryWallet
+    showWallet
   };
 };
 
