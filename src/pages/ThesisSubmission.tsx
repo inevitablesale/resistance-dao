@@ -1,4 +1,3 @@
-<lov-code>
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -701,8 +700,6 @@ const ThesisSubmission = () => {
               </div>
 
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-white">Investment Structure</h2>
-                
                 <div>
                   <Label className="text-gray-200 mb-2 block">Target Capital Raise (USD)</Label>
                   <Input
@@ -779,3 +776,16 @@ const ThesisSubmission = () => {
                   type="submit"
                   disabled={isSubmitting}
                   className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Investment Thesis"}
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
