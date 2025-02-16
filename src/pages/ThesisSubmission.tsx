@@ -166,7 +166,7 @@ const ThesisSubmission = () => {
     }
   });
 
-  const [isOpen, setIsOpen] = useState(true);
+  const [isThesisOpen, setIsThesisOpen] = useState(true);
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => 
@@ -495,127 +495,136 @@ const ThesisSubmission = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left Column - Progress and Form */}
             <div className="lg:col-span-8">
-              <Collapsible
-                open={isOpen}
-                onOpenChange={setIsOpen}
-                className="space-y-6"
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-3xl md:text-4xl font-bold text-white mb-8"
               >
-                <CollapsibleTrigger className="flex items-center justify-between w-full text-left">
-                  <motion.h1 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-3xl md:text-4xl font-bold text-white"
-                  >
-                    Submit Your Investment Thesis
-                  </motion.h1>
-                  {isOpen ? (
-                    <ChevronUp className="w-6 h-6 text-white/60" />
-                  ) : (
-                    <ChevronDown className="w-6 h-6 text-white/60" />
-                  )}
-                </CollapsibleTrigger>
+                Submit Your Investment Thesis
+              </motion.h1>
 
-                <CollapsibleContent className="space-y-6">
-                  <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
-                    <div className="border-b border-white/5">
-                      <div className="px-6 py-4">
-                        <SubmissionProgress 
-                          steps={steps}
-                          currentStepId={activeStep}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="p-6">
-                      {activeStep === 'thesis' && (
-                        <div className="space-y-8">
-                          <div className="space-y-4">
-                            <Label className="text-lg font-medium text-white">
-                              Thesis Title
-                            </Label>
-                            <Input
-                              placeholder="Enter a clear, descriptive title"
-                              className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
-                              value={formData.title}
-                              onChange={(e) => handleFormDataChange('title', e.target.value)}
-                            />
-                            {formErrors.title && (
-                              <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                            )}
-                          </div>
-
-                          <VotingDurationInput
-                            value={votingDuration}
-                            onChange={handleVotingDurationChange}
-                            error={formErrors.votingDuration}
-                          />
-
-                          <TargetCapitalInput
-                            value={formData.investment.targetCapital}
-                            onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
-                            error={formErrors['investment.targetCapital']}
-                          />
-                        </div>
-                      )}
-
-                      {activeStep === 'strategy' && (
-                        <FirmCriteriaSection 
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={handleFormDataChange}
-                        />
-                      )}
-
-                      {activeStep === 'submission' && (
-                        <StrategiesSection 
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={handleStrategyChange}
-                        />
-                      )}
-
-                      {activeStep === 'approval' && (
-                        <PaymentTermsSection 
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={handleFormDataChange}
-                        />
-                      )}
-                    </div>
-                  </Card>
-
-                  {/* Navigation */}
-                  <div className="flex justify-end">
-                    <Button
-                      onClick={handleContinue}
-                      disabled={isSubmitting}
-                      className={cn(
-                        "h-12 px-6 min-w-[200px]",
-                        "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
-                        "hover:from-polygon-secondary hover:to-polygon-primary",
-                        "text-white font-medium",
-                        "transition-all duration-300",
-                        "disabled:opacity-50",
-                        "flex items-center justify-center gap-2"
-                      )}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                          <span>Processing...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>
-                            {activeStep === 'approval' ? "Submit Thesis" : "Continue"}
-                          </span>
-                          <ArrowRight className="w-4 h-4" />
-                        </>
-                      )}
-                    </Button>
+              <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
+                <div className="border-b border-white/5">
+                  <div className="px-6 py-4">
+                    <SubmissionProgress 
+                      steps={steps}
+                      currentStepId={activeStep}
+                    />
                   </div>
-                </CollapsibleContent>
-              </Collapsible>
+                </div>
+
+                <div className="p-6 space-y-8">
+                  <Collapsible
+                    open={isThesisOpen}
+                    onOpenChange={setIsThesisOpen}
+                    className="w-full"
+                  >
+                    <CollapsibleTrigger asChild>
+                      <button 
+                        type="button"
+                        className="w-full text-left"
+                      >
+                        <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
+                          <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
+                            1
+                          </div>
+                          <div className="flex-1">
+                            <h2 className="text-xl font-semibold text-purple-400 group-hover:text-purple-300 transition-colors">
+                              Investment Thesis
+                            </h2>
+                            <p className="text-sm text-white/60">
+                              Fill out your investment thesis details
+                            </p>
+                          </div>
+                          <ChevronDown className={cn(
+                            "w-5 h-5 text-white/60 transition-transform duration-200",
+                            isThesisOpen && "transform rotate-180"
+                          )} />
+                        </div>
+                      </button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pt-4 px-4 pb-6 space-y-6">
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="space-y-6"
+                      >
+                        <div className="space-y-4">
+                          <Label className="text-lg font-medium text-white">
+                            Thesis Title
+                          </Label>
+                          <Input
+                            placeholder="Enter a clear, descriptive title"
+                            className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                            value={formData.title}
+                            onChange={(e) => handleFormDataChange('title', e.target.value)}
+                          />
+                          {formErrors.title && (
+                            <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                          )}
+                        </div>
+
+                        <VotingDurationInput
+                          value={votingDuration}
+                          onChange={handleVotingDurationChange}
+                          error={formErrors.votingDuration}
+                        />
+
+                        <TargetCapitalInput
+                          value={formData.investment.targetCapital}
+                          onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+                          error={formErrors['investment.targetCapital']}
+                        />
+                      </motion.div>
+                    </CollapsibleContent>
+                  </Collapsible>
+
+                  <FirmCriteriaSection 
+                    formData={formData.firmCriteria}
+                    onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
+                  />
+
+                  <StrategiesSection 
+                    formData={formData.strategies}
+                    onChange={handleStrategyChange}
+                  />
+
+                  <PaymentTermsSection 
+                    formData={formData.paymentTerms}
+                    onChange={(value) => handleFormDataChange('paymentTerms', value)}
+                  />
+                </div>
+              </Card>
+
+              {/* Navigation */}
+              <div className="flex justify-end mt-6">
+                <Button
+                  onClick={handleContinue}
+                  disabled={isSubmitting}
+                  className={cn(
+                    "h-12 px-6 min-w-[200px]",
+                    "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+                    "hover:from-polygon-secondary hover:to-polygon-primary",
+                    "text-white font-medium",
+                    "transition-all duration-300",
+                    "disabled:opacity-50",
+                    "flex items-center justify-center gap-2"
+                  )}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Continue</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
 
             {/* Right Column - Wallet and Status */}
@@ -627,7 +636,6 @@ const ThesisSubmission = () => {
                   walletAddress={address}
                 />
 
-                {/* Transaction Status */}
                 {currentTxId && (
                   <Card className="bg-black/40 border-white/5 backdrop-blur-sm">
                     <div className="p-6">
