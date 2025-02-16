@@ -5,12 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Nav from "@/components/Nav";
-import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase } from "lucide-react";
+import { AlertTriangle, ArrowRight, CreditCard, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
@@ -117,6 +115,24 @@ const SUBMISSION_STEPS: SubmissionStep[] = [
   }
 ];
 
+const CHECKOUT_STEPS = [
+  {
+    id: 'investment-details',
+    title: 'Investment Details',
+    description: 'Basic information about your investment thesis'
+  },
+  {
+    id: 'strategy',
+    title: 'Strategy',
+    description: 'Define your investment approach'
+  },
+  {
+    id: 'payment',
+    title: 'Payment',
+    description: 'Review and submit'
+  }
+];
+
 const ThesisSubmission = () => {
   const { toast } = useToast();
   const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
@@ -127,9 +143,12 @@ const ThesisSubmission = () => {
     includeNativeBalance: false,
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
+
+  const [activeStep, setActiveStep] = useState('investment-details');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTestMode, setIsTestMode] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
+  const [votingDuration, setVotingDuration] = useState(MIN_VOTING_DURATION);
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     industry: {
@@ -154,7 +173,6 @@ const ThesisSubmission = () => {
     }
   });
 
-  const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
   const [hasShownBalanceWarning, setHasShownBalanceWarning] = useState(false);
   const [currentStep, setCurrentStep] = useState<string>('thesis');
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
@@ -208,6 +226,7 @@ const ThesisSubmission = () => {
     });
   };
 
+  // Fix TypeScript error by ensuring votingDuration is treated as a number
   const handleVotingDurationChange = (value: number[]) => {
     setVotingDuration(value[0]);
   };
@@ -376,272 +395,230 @@ const ThesisSubmission = () => {
     }
   };
 
+  const nextStep = () => {
+    if (activeStep === 'investment-details') setActiveStep('strategy');
+    else if (activeStep === 'strategy') setActiveStep('payment');
+  };
+
+  const prevStep = () => {
+    if (activeStep === 'payment') setActiveStep('strategy');
+    else if (activeStep === 'strategy') setActiveStep('investment-details');
+  };
+
   return (
-    <div className="min-h-screen bg-[#030712] overflow-hidden relative">
-      <div className="absolute inset-0">
-        <div 
-          className="absolute inset-0 bg-gradient-to-b from-[#0F172A] to-[#030712]"
-          style={{ 
-            maskImage: 'radial-gradient(circle at center, black, transparent)'
-          }} 
-        />
-        <div className="absolute inset-0 bg-grid-white/[0.02]" />
-      </div>
-      
+    <div className="min-h-screen bg-[#F8FAFC]">
       <Nav />
       <LGRFloatingWidget />
       
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-7xl mx-auto space-y-8"
-        >
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white/80">
-              Investment Thesis Submission
-            </h1>
-            <p className="text-lg text-white/60 max-w-2xl mx-auto">
-              Share your investment strategy with the LedgerFund DAO community
-            </p>
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <div className="flex justify-between items-center gap-4 mb-8">
+              {CHECKOUT_STEPS.map((step, index) => (
+                <div 
+                  key={step.id}
+                  className="flex-1"
+                >
+                  <div className="flex items-center">
+                    <div className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mr-3",
+                      activeStep === step.id ? "bg-polygon-primary text-white" :
+                      index < CHECKOUT_STEPS.findIndex(s => s.id === activeStep) ? 
+                        "bg-green-500 text-white" : "bg-gray-200 text-gray-500"
+                    )}>
+                      {index < CHECKOUT_STEPS.findIndex(s => s.id === activeStep) ? 
+                        "✓" : index + 1}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{step.title}</p>
+                      <p className="text-sm text-gray-500">{step.description}</p>
+                    </div>
+                    {index < CHECKOUT_STEPS.length - 1 && (
+                      <div className="flex-1 h-px bg-gray-200 mx-4 mt-4" />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-8 space-y-6">
-              <Tabs defaultValue="basics" className="w-full">
-                <TabsList className="grid grid-cols-4 gap-4 bg-transparent">
-                  <TabsTrigger
-                    value="basics"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <Card className="bg-white shadow-lg border-0 p-6">
+                {activeStep === 'investment-details' && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="space-y-6"
                   >
-                    <FileText className="w-4 h-4 mr-2" />
-                    Basics
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="firm"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
-                  >
-                    <Building2 className="w-4 h-4 mr-2" />
-                    Firm
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="strategy"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
-                  >
-                    <Target className="w-4 h-4 mr-2" />
-                    Strategy
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="terms"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
-                  >
-                    <Briefcase className="w-4 h-4 mr-2" />
-                    Terms
-                  </TabsTrigger>
-                </TabsList>
+                    <div>
+                      <label className="text-lg font-medium text-gray-900 mb-2 block">
+                        Thesis Title
+                      </label>
+                      <Input
+                        placeholder="Enter thesis title"
+                        className={cn(
+                          "border-gray-200",
+                          formErrors.title ? "border-red-500" : ""
+                        )}
+                        required
+                        value={formData.title}
+                        onChange={(e) => handleFormDataChange('title', e.target.value)}
+                      />
+                    </div>
 
-                <div className="mt-6">
-                  <TabsContent value="basics" className="m-0">
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-6 space-y-6">
-                        <div>
-                          <label className="text-lg font-medium text-white mb-2 block">
-                            Thesis Title
-                          </label>
-                          <p className="text-sm text-gray-400 mb-2">
-                            📌 Provide a concise name for the investment strategy
-                          </p>
-                          <Input
-                            placeholder="Enter thesis title"
-                            className={cn(
-                              "bg-black/50 border-white/10 text-white placeholder:text-gray-500",
-                              formErrors.title ? "border-red-500" : ""
-                            )}
-                            required
-                            value={formData.title}
-                            onChange={(e) => handleFormDataChange('title', e.target.value)}
-                          />
-                          {formErrors.title && (
-                            <p className="mt-1 text-sm text-red-500">{formErrors.title[0]}</p>
-                          )}
-                        </div>
-
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <Label className="text-lg font-medium text-white">Voting Duration</Label>
-                              <p className="text-sm text-gray-400">Set how long the community can vote on your thesis</p>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-2xl font-bold text-white">
-                                {Math.floor(votingDuration / (24 * 60 * 60))}
-                              </span>
-                              <span className="text-gray-400 ml-2">days</span>
-                            </div>
-                          </div>
-                          <Slider
-                            value={[votingDuration]}
-                            min={MIN_VOTING_DURATION}
-                            max={MAX_VOTING_DURATION}
-                            step={24 * 60 * 60}
-                            className="w-full"
-                            onValueChange={handleVotingDurationChange}
-                          />
-                          <div className="flex justify-between text-sm text-gray-400">
-                            <span>7 days</span>
-                            <span>90 days</span>
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label className="text-lg font-medium text-white mb-2 block">Target Capital Raise (USD)</Label>
-                          <div className="relative">
-                            <Input
-                              type="text"
-                              placeholder="Enter amount in USD"
-                              className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 pl-12"
-                              required
-                              value={formData.investment.targetCapital}
-                              onChange={(e) => {
-                                const value = e.target.value.replace(/[^0-9.]/g, '');
-                                handleFormDataChange('investment.targetCapital', value);
-                              }}
-                            />
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </TabsContent>
-
-                  <TabsContent value="firm" className="m-0">
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-6">
-                        <IndustrySection 
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={handleFormDataChange}
+                    <div>
+                      <Label className="text-lg font-medium text-gray-900 mb-2 block">
+                        Target Capital Raise (USD)
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          type="text"
+                          placeholder="Enter amount"
+                          className="pl-8 border-gray-200"
+                          required
+                          value={formData.investment.targetCapital}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9.]/g, '');
+                            handleFormDataChange('investment.targetCapital', value);
+                          }}
                         />
-                        <div className="mt-8">
-                          <FirmCriteriaSection 
-                            formData={formData}
-                            formErrors={formErrors}
-                            onChange={handleFormDataChange}
-                          />
-                        </div>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                       </div>
-                    </Card>
-                  </TabsContent>
+                    </div>
 
-                  <TabsContent value="strategy" className="m-0">
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-6">
-                        <StrategiesSection 
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={handleStrategyChange}
-                        />
-                        <div className="mt-8 space-y-6">
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <label className="text-lg font-medium text-white">
-                                Key Investment Drivers
-                              </label>
-                              <span className={cn(
-                                "text-sm",
-                                formData.investment.drivers.length > MAX_SUMMARY_LENGTH 
-                                  ? "text-red-400" 
-                                  : "text-gray-400"
-                              )}>
-                                {formData.investment.drivers.length}/{MAX_SUMMARY_LENGTH}
-                              </span>
-                            </div>
-                            <Textarea
-                              placeholder="Describe earnings stability, strong client base, scalability, cultural fit, technology adoption, etc."
-                              className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
-                              required
-                              value={formData.investment.drivers}
-                              onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
-                            />
-                          </div>
-                        </div>
+                    <IndustrySection 
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={handleFormDataChange}
+                    />
+
+                    <FirmCriteriaSection 
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={handleFormDataChange}
+                    />
+                  </motion.div>
+                )}
+
+                {activeStep === 'strategy' && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="space-y-6"
+                  >
+                    <StrategiesSection 
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={handleStrategyChange}
+                    />
+
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-lg font-medium text-gray-900">
+                          Key Investment Drivers
+                        </label>
+                        <span className="text-sm text-gray-500">
+                          {formData.investment.drivers.length}/{MAX_SUMMARY_LENGTH}
+                        </span>
                       </div>
-                    </Card>
-                  </TabsContent>
+                      <Textarea
+                        placeholder="Describe earnings stability, strong client base, scalability..."
+                        className="border-gray-200"
+                        required
+                        value={formData.investment.drivers}
+                        onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
+                      />
+                    </div>
+                  </motion.div>
+                )}
 
-                  <TabsContent value="terms" className="m-0">
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-6">
-                        <PaymentTermsSection 
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={handleFormDataChange}
-                        />
-                        <div className="mt-8">
-                          <div className="flex items-center justify-between mb-2">
-                            <label className="text-lg font-medium text-white">
-                              Additional Investment Criteria
-                            </label>
-                            <span className={cn(
-                              "text-sm",
-                              formData.investment.additionalCriteria.length > MAX_SUMMARY_LENGTH 
-                                ? "text-red-400" 
-                                : "text-gray-400"
-                            )}>
-                              {formData.investment.additionalCriteria.length}/{MAX_SUMMARY_LENGTH}
+                {activeStep === 'payment' && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-4">Review & Submit</h3>
+                      <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Submission Fee</span>
+                          <span className="font-medium">{ethers.utils.formatEther(SUBMISSION_FEE)} LGR</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Target Capital</span>
+                          <span className="font-medium">${formData.investment.targetCapital}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Voting Duration</span>
+                          <span className="font-medium">{Math.floor(votingDuration / (24 * 60 * 60))} days</span>
+                        </div>
+                        <div className="pt-4 border-t border-gray-200">
+                          <div className="flex items-center justify-between font-medium">
+                            <span>Your LGR Balance</span>
+                            <span className="text-polygon-primary">
+                              {tokenBalances?.find(token => token.symbol === "LGR")?.balance || "0"} LGR
                             </span>
                           </div>
-                          <Textarea
-                            placeholder="EBITDA thresholds, firm specialization, geographic limitations, integration plans, etc."
-                            className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
-                            value={formData.investment.additionalCriteria}
-                            onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
-                          />
                         </div>
                       </div>
-                    </Card>
-                  </TabsContent>
-                </div>
-              </Tabs>
-
-              <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-6">
-                <div className="flex items-center text-sm text-yellow-400 mb-6">
-                  <AlertTriangle className="w-4 h-4 mr-2" />
-                  All submissions will be reviewed by the LedgerFund DAO community
-                </div>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className={cn(
-                    "w-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#4F46E5] transition-all duration-300",
-                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                  )}
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center justify-center">
-                      <span className="mr-2">Submitting...</span>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
                     </div>
-                  ) : (
-                    "Submit Investment Thesis"
+
+                    <div className="flex items-center p-4 bg-yellow-50 rounded-lg">
+                      <AlertTriangle className="w-5 h-5 text-yellow-500 mr-3" />
+                      <p className="text-sm text-yellow-700">
+                        All submissions will be reviewed by the LedgerFund DAO community
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+
+                <div className="mt-8 flex justify-between">
+                  {activeStep !== 'investment-details' && (
+                    <Button
+                      variant="outline"
+                      onClick={prevStep}
+                    >
+                      Back
+                    </Button>
                   )}
-                </Button>
+                  {activeStep !== 'payment' ? (
+                    <Button
+                      className="ml-auto bg-polygon-primary hover:bg-polygon-primary/90"
+                      onClick={nextStep}
+                    >
+                      Continue
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  ) : (
+                    <Button
+                      className="ml-auto bg-polygon-primary hover:bg-polygon-primary/90"
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <div className="flex items-center">
+                          <span className="mr-2">Submitting...</span>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+                        </div>
+                      ) : (
+                        <>
+                          Submit Thesis
+                          <CreditCard className="w-4 h-4 ml-2" />
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
               </Card>
             </div>
 
-            <div className="lg:col-span-4 space-y-6">
+            <div className="space-y-6">
               <SubmissionFeeDisplay 
                 submissionFee={SUBMISSION_FEE.toString()}
                 currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance}
               />
-
-              <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-6">
-                <h2 className="text-lg font-semibold text-white mb-4">Submission Progress</h2>
-                <SubmissionProgress 
-                  steps={steps}
-                  currentStepId={currentStep}
-                />
-              </Card>
 
               {currentTxId && (
                 <TransactionStatus
@@ -660,7 +637,7 @@ const ThesisSubmission = () => {
               <ProposalsHistory />
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
