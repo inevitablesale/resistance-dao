@@ -725,15 +725,18 @@ const ThesisSubmission = () => {
                       </p>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Weekly Plan */}
-                      <div className="p-6 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                        <div className="text-center">
-                          <div className="text-xl font-bold text-white mb-2">Weekly</div>
-                          <div className="text-3xl font-bold text-yellow-400 mb-3">2.5k LGR</div>
-                          <div className="text-white/60 text-sm mb-6">≈ $250</div>
+                      <div className="flex flex-col h-full p-8 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                        <div className="text-center flex-1">
+                          <h4 className="text-lg font-medium text-white/80 mb-6">Weekly</h4>
+                          <div className="space-y-1 mb-8">
+                            <div className="text-5xl font-bold text-yellow-400">2.5k</div>
+                            <div className="text-xl font-semibold text-yellow-400/80">LGR</div>
+                            <div className="text-sm text-white/60 mt-2">≈ $250</div>
+                          </div>
                           <Button 
-                            className="w-full mt-4 bg-white/10 hover:bg-white/20 text-white"
+                            className="w-full bg-white/10 hover:bg-white/20 text-white font-medium py-6"
                             onClick={() => handleRentAdSpace('week')}
                           >
                             Rent Now
@@ -742,18 +745,21 @@ const ThesisSubmission = () => {
                       </div>
 
                       {/* Monthly Plan */}
-                      <div className="relative p-6 rounded-lg bg-gradient-to-b from-white/10 to-white/5 border border-white/10 hover:from-white/15 hover:to-white/10 transition-colors">
+                      <div className="relative flex flex-col h-full p-8 rounded-xl bg-gradient-to-b from-white/10 to-white/5 border border-white/10 hover:from-white/15 hover:to-white/10 transition-colors">
                         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                          <span className="px-4 py-1 bg-yellow-500/20 rounded-full text-yellow-400 text-xs">
+                          <span className="px-6 py-1.5 bg-yellow-500/20 rounded-full text-yellow-400 text-sm font-medium">
                             Best Value
                           </span>
                         </div>
-                        <div className="text-center pt-3">
-                          <div className="text-xl font-bold text-white mb-2">Monthly</div>
-                          <div className="text-3xl font-bold text-yellow-400 mb-3">9k LGR</div>
-                          <div className="text-white/60 text-sm mb-6">≈ $900</div>
+                        <div className="text-center flex-1 pt-4">
+                          <h4 className="text-lg font-medium text-white/80 mb-6">Monthly</h4>
+                          <div className="space-y-1 mb-8">
+                            <div className="text-5xl font-bold text-yellow-400">9k</div>
+                            <div className="text-xl font-semibold text-yellow-400/80">LGR</div>
+                            <div className="text-sm text-white/60 mt-2">≈ $900</div>
+                          </div>
                           <Button 
-                            className="w-full mt-4 bg-yellow-500/20 hover:bg-yellow-500/30 text-white"
+                            className="w-full bg-yellow-500/20 hover:bg-yellow-500/30 text-white font-medium py-6"
                             onClick={() => handleRentAdSpace('month')}
                           >
                             Rent Now
