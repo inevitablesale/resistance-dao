@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -158,76 +157,55 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
       className
     )}>
       <div className="space-y-6">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="text-white font-medium">Balances</h4>
-            <button 
-              onClick={() => setShowBalances(!showBalances)}
-              className="text-white/60 hover:text-white transition-colors"
-            >
-              {showBalances ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-            </button>
-          </div>
-
-          {showBalances && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                    <Coins className="w-6 h-6 text-yellow-500" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-medium text-white">LGR Token</h3>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-white">
-                    {Number(lgrBalance).toFixed(2)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-                    <img 
-                      src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-                      alt="Polygon"
-                      className="w-6 h-6"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-medium text-white">POLYGON</h3>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-white">
-                    {Number(maticBalance).toFixed(2)}
-                  </p>
-                </div>
-              </div>
-
-              {walletAddress && (
-                <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <div className="flex justify-between items-center mb-1">
-                    <p className="text-xs text-white/60">Your Wallet Address</p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 text-white/60 hover:text-white"
-                      onClick={handleCopyAddress}
-                    >
-                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    </Button>
-                  </div>
-                  <p className="text-sm text-white break-all font-mono">
-                    {walletAddress}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
+        <div className="flex items-center justify-between">
+          <h4 className="text-white font-medium">Balances</h4>
+          <button 
+            onClick={() => setShowBalances(!showBalances)}
+            className="text-white/60 hover:text-white transition-colors"
+          >
+            {showBalances ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          </button>
         </div>
+
+        {showBalances && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                  <Coins className="w-6 h-6 text-yellow-500" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-medium text-white">LGR Token</h3>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-white">
+                  {Number(lgrBalance).toFixed(2)}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                  <img 
+                    src="https://cryptologos.cc/logos/polygon-matic-logo.png"
+                    alt="Polygon"
+                    className="w-6 h-6"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-xl font-medium text-white">POLYGON</h3>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-white">
+                  {Number(maticBalance).toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-4">
           <div className="space-y-2">
