@@ -2,10 +2,9 @@
 import { Link } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import Twitter from "./icons/Twitter";
-import Linked from "./icons/Linked";
 import WalletAssets from "./wallet/WalletAssets";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { Twitter, Linkedin } from 'lucide-react';
 
 const Nav = () => {
   const { primaryWallet } = useDynamicContext();
@@ -38,7 +37,7 @@ const Nav = () => {
               rel="noopener noreferrer"
               className="text-white/80 hover:text-white transition-colors transform transition-all duration-300 hover:scale-105 hover:rotate-3"
             >
-              <Linked className="w-6 h-6" />
+              <Linkedin className="w-6 h-6" />
             </a>
             <div className="relative">
               <DynamicWidget />
