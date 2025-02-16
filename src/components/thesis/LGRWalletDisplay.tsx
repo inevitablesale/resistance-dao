@@ -1,9 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 import { 
   Coins, 
   Info, 
@@ -53,6 +54,11 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
   const [maticPrice, setMaticPrice] = useState<string>("0");
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [isCalculatingBalance, setIsCalculatingBalance] = useState(true);
+  const [showPromotionDialog, setShowPromotionDialog] = useState(false);
+  const [promotionType, setPromotionType] = useState<'weekly' | 'monthly' | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isPromotionPending, setIsPromotionPending] = useState(false);
 
   const hasInsufficientBalance = currentBalance && 
     Number(ethers.utils.formatEther(submissionFee)) > Number(currentBalance);
@@ -174,6 +180,29 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
   const lgrBalanceNum = Number(lgrBalance);
   const tokensNeeded = Math.max(0, REQUIRED_LGR - lgrBalanceNum);
   const hasEnoughLGR = lgrBalanceNum >= REQUIRED_LGR;
+
+  const handlePromotionSelect = (type: 'weekly' | 'monthly') => {
+    setPromotionType(type);
+    setShowPromotionDialog(true);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleCompletePromotion = () => {
+    setIsPromotionPending(true);
+    setTimeout(() => {
+      setIsPromotionPending(false);
+      setShowPromotionDialog(false);
+      toast({
+        title: "Promotion Scheduled",
+        description: "Your promotion has been successfully scheduled",
+      });
+    }, 2000);
+  };
 
   return (
     <Card className={cn(
@@ -352,6 +381,26 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
+        <div className="space-y-4">
+          <h4 className="text-white font-medium">Promote Your Brand</h4>
+          <div className="grid grid-cols-2 gap-4">
+            <Button
+              variant="outline"
+              onClick={() => handlePromotionSelect('weekly')}
+              className="bg-white/5 border-white/10 hover:bg-white/10 text-white"
+            >
+              Weekly (5 LGR)
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handlePromotionSelect('monthly')}
+              className="bg-white/5 border-white/10 hover:bg-white/10 text-white"
+            >
+              Monthly (15 LGR)
+            </Button>
+          </div>
+        </div>
       </div>
 
       {showDeposit && walletAddress && (
@@ -460,7 +509,79 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={showPromotionDialog} onOpenChange={setShowPromotionDialog}>
+        <DialogContent className="bg-black/95 border border-white/10 sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-white">
+              Schedule {promotionType === 'weekly' ? 'Weekly' : 'Monthly'} Promotion
+            </DialogTitle>
+            <DialogDescription>
+              Cost: {promotionType === 'weekly' ? '5' : '15'} LGR
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label className="text-white">Select Start Date</Label>
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                className="rounded-md border border-white/10 bg-black/50"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white">Upload Creative</Label>
+              <div className="flex items-center justify-center w-full">
+                <label className="w-full flex flex-col items-center px-4 py-6 bg-black/50 text-white rounded-lg border border-white/10 cursor-pointer hover:bg-white/5 transition-colors">
+                  <Upload className="w-8 h-8 mb-2" />
+                  <span className="text-sm">
+                    {selectedFile ? selectedFile.name : "Select promotion creative"}
+                  </span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                  />
+                </label>
+              </div>
+            </div>
+
+            {selectedFile && (
+              <p className="text-sm text-white/60">
+                Selected file: {selectedFile.name}
+              </p>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowPromotionDialog(false)}
+              className="bg-white/5 border-white/10 hover:bg-white/10 text-white"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCompletePromotion}
+              disabled={!selectedDate || !selectedFile || isPromotionPending}
+              className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+            >
+              {isPromotionPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing
+                </>
+              ) : (
+                `Pay ${promotionType === 'weekly' ? '5' : '15'} LGR`
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
-
