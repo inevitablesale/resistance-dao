@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -29,13 +30,19 @@ export const LGRFloatingWidget = () => {
 
   const checkNetwork = async () => {
     try {
-      if (!primaryWallet) return false;
+      if (!primaryWallet?.isConnected?.()) {
+        console.log("Wallet not connected");
+        return false;
+      }
       
-      const provider = await primaryWallet.getWalletClient();
-      if (!provider) return false;
+      const walletClient = await primaryWallet.getWalletClient();
+      if (!walletClient) {
+        console.log("No wallet client available");
+        return false;
+      }
 
-      const ethersProvider = new ethers.providers.Web3Provider(provider as any);
-      const network = await ethersProvider.getNetwork();
+      const provider = new ethers.providers.Web3Provider(walletClient as any);
+      const network = await provider.getNetwork();
       
       if (network.chainId !== POLYGON_CHAIN_ID) {
         setNetworkError("Please connect to the Polygon network to use this feature.");
@@ -53,19 +60,29 @@ export const LGRFloatingWidget = () => {
 
   useEffect(() => {
     const fetchBalances = async () => {
-      if (!address) return;
+      if (!address || !primaryWallet?.isConnected?.()) {
+        console.log("No address or wallet not connected");
+        return;
+      }
 
       const isCorrectNetwork = await checkNetwork();
-      if (!isCorrectNetwork) return;
+      if (!isCorrectNetwork) {
+        console.log("Incorrect network");
+        return;
+      }
 
       try {
+        console.log("Fetching provider...");
         const provider = await getWorkingProvider();
+        console.log("Provider fetched, getting contracts...");
+        
         const [lgrContract, presaleContract, maticBal] = await Promise.all([
           getLgrTokenContract(provider),
           getPresaleContract(provider),
           provider.getBalance(address)
         ]);
         
+        console.log("Contracts obtained, fetching balances...");
         const [lgrBal, purchased] = await Promise.all([
           lgrContract.balanceOf(address),
           presaleContract.purchasedTokens(address)
@@ -77,15 +94,21 @@ export const LGRFloatingWidget = () => {
 
         const currentMaticPrice = await fetchPresaleMaticPrice();
         setMaticPrice(currentMaticPrice);
+        console.log("All balances fetched successfully");
       } catch (error) {
         console.error("Error fetching balances:", error);
         setNetworkError("Failed to get contract status. Please ensure you're connected to the Polygon network.");
       }
     };
 
-    fetchBalances();
-    const interval = setInterval(fetchBalances, 30000);
-    return () => clearInterval(interval);
+    if (primaryWallet?.isConnected?.()) {
+      console.log("Wallet connected, fetching balances...");
+      fetchBalances();
+      const interval = setInterval(fetchBalances, 30000);
+      return () => clearInterval(interval);
+    } else {
+      console.log("Wallet not connected");
+    }
   }, [address, primaryWallet]);
 
   const handleBuyPolygon = () => {
