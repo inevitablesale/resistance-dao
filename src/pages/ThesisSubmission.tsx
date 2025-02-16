@@ -553,9 +553,12 @@ const ThesisSubmission = () => {
           </motion.div>
 
           <div className="mb-8">
-            <div className="flex justify-between items-center text-sm text-white/60 max-w-[400px] mx-auto">
+            <div className="flex justify-between items-center text-sm text-white/60">
               {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
+                <div 
+                  key={step.id}
+                  className="flex items-center"
+                >
                   <div className={cn(
                     "w-2 h-2 rounded-full transition-all duration-300",
                     step.id === activeStep ? "bg-polygon-primary w-4" : 
@@ -564,7 +567,7 @@ const ThesisSubmission = () => {
                   )} />
                   {index < steps.length - 1 && (
                     <div className={cn(
-                      "h-[1px] w-12 mx-2",
+                      "h-[1px] w-24 mx-2",
                       steps.findIndex(s => s.id === activeStep) > index ? "bg-polygon-primary/50" : "bg-white/10"
                     )} />
                   )}
@@ -587,7 +590,7 @@ const ThesisSubmission = () => {
                     {activeStep === 'thesis' && (
                       <div className="space-y-8">
                         <div className="space-y-4">
-                          <Label className="text-sm font-medium text-white/70">Thesis Title</Label>
+                          <Label className="text-lg font-medium text-white">Thesis Title</Label>
                           <Input
                             placeholder="Enter a clear, descriptive title"
                             className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
