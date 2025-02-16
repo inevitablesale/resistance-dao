@@ -34,7 +34,7 @@ export const TargetCapitalInput = ({
   };
 
   const getHelperText = () => {
-    if (!value) return "Required";
+    if (!value) return "";
     const numValue = ethers.utils.parseEther(value || "0");
     if (numValue.lt(MIN_TARGET_CAPITAL)) {
       return `Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} ETH`;
