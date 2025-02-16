@@ -1,6 +1,6 @@
 
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ethers } from "ethers";
 import { getContractStatus } from "@/services/proposalContractService";
@@ -10,8 +10,8 @@ const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 export const useWalletConnection = () => {
   const { primaryWallet, setShowAuthFlow, setShowOnRamp } = useDynamicContext();
   const [isConnecting, setIsConnecting] = useState(false);
-  const { toast } = useToast();
   const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const connect = async () => {
     try {
@@ -61,13 +61,15 @@ export const useWalletConnection = () => {
     return true;
   };
 
-  // Monitor connection state and close auth flow when connected
-  if (primaryWallet?.isConnected?.() && setShowAuthFlow) {
-    setShowAuthFlow(false);
-  }
+  // Move the auth flow closing logic to useEffect
+  useEffect(() => {
+    if (primaryWallet?.isConnected?.() && setShowAuthFlow) {
+      setShowAuthFlow(false);
+    }
+  }, [primaryWallet, setShowAuthFlow]);
 
   return {
-    isConnected: primaryWallet?.isConnected?.() || false,
+    isConnected: !!primaryWallet?.isConnected?.(),
     isConnecting,
     connect,
     disconnect,
