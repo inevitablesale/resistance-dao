@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Coins, Info, Eye, EyeOff, Copy, Check, Upload, AlertCircle } from "lucide-react";
+import { Coins, Info, Eye, EyeOff, Copy, Check, Upload, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
@@ -33,12 +33,14 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
   const [maticBalance, setMaticBalance] = useState<string>("0");
   const [maticPrice, setMaticPrice] = useState<string>("0");
   const [lgrBalance, setLgrBalance] = useState<string>("0");
+  const [isCalculatingBalance, setIsCalculatingBalance] = useState(true);
 
   const hasInsufficientBalance = currentBalance && 
     Number(ethers.utils.formatEther(submissionFee)) > Number(currentBalance);
 
   useEffect(() => {
     const fetchBalances = async () => {
+      setIsCalculatingBalance(true);
       if (!walletAddress) return;
 
       try {
@@ -56,6 +58,8 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
         setMaticPrice(currentMaticPrice);
       } catch (error) {
         console.error("Error fetching balances:", error);
+      } finally {
+        setIsCalculatingBalance(false);
       }
     };
 
@@ -209,6 +213,49 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
           <Info className="w-6 h-6 mr-2" />
           How to Buy
         </Button>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-white">Submission Requirements</h3>
+            <p className="text-sm text-white/70">Complete these steps to submit your thesis</p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 text-white/80">
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center",
+                address ? "bg-green-500/20 text-green-500" : "bg-white/10"
+              )}>
+                {address ? "✓" : "1"}
+              </div>
+              <span>Connect Wallet</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center",
+                isCalculatingBalance ? "bg-white/10" : 
+                Number(lgrBalance) >= 250 ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500"
+              )}>
+                {isCalculatingBalance ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : Number(lgrBalance) >= 250 ? "✓" : "2"}
+              </div>
+              <span className={cn(
+                "text-white/80",
+                !isCalculatingBalance && Number(lgrBalance) < 250 && "text-red-500"
+              )}>
+                {isCalculatingBalance ? (
+                  "Checking LGR Balance..."
+                ) : Number(lgrBalance) < 250 ? (
+                  "Insufficient LGR Balance (250 Required)"
+                ) : (
+                  "Hold LGR Tokens"
+                )}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {showDeposit && walletAddress && (
@@ -232,7 +279,6 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
 
       {showBalances && (
         <div className="space-y-6">
-          {/* LGR Token Balance */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
@@ -249,7 +295,6 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
             </div>
           </div>
 
-          {/* POLYGON Balance */}
           <div className="flex items-center justify-between pt-4 border-t border-white/10">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
@@ -270,7 +315,6 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
             </div>
           </div>
 
-          {/* Price Display */}
           <div className="text-lg text-gray-400 pt-4">
             Price: $0.10 USD per LGR
           </div>
