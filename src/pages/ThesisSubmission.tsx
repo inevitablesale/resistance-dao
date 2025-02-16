@@ -1,4 +1,3 @@
-<lov-code>
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -76,7 +75,7 @@ const US_STATES = [
 
 const ThesisSubmission = () => {
   const { toast } = useToast();
-  const { isConnected, address, connect, approveLGR } = useWalletConnection();
+  const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTestMode, setIsTestMode] = useState(false);
   const [formData, setFormData] = useState<ProposalMetadata>({
@@ -182,8 +181,10 @@ const ThesisSubmission = () => {
       }
 
       // 2. Get contract status and validate
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const contractStatus = await getContractStatus(provider);
+      if (!wallet) {
+        throw new Error("No wallet connected");
+      }
+      const contractStatus = await getContractStatus(wallet);
       
       if (contractStatus.isPaused) {
         throw new Error("Contract is currently paused for maintenance");
@@ -225,7 +226,7 @@ const ThesisSubmission = () => {
         targetCapital,
         votingDuration: votingDurationSeconds,
         ipfsHash
-      }, provider);
+      }, wallet);
 
       console.log('Gas estimate:', {
         gasLimit: gasEstimate.gasLimit.toString(),
@@ -240,7 +241,7 @@ const ThesisSubmission = () => {
           targetCapital,
           votingDuration: votingDurationSeconds,
           ipfsHash
-        }, provider),
+        }, wallet),
         {
           timeout: 120000, // 2 minutes
           maxRetries: 3,
@@ -751,7 +752,7 @@ const ThesisSubmission = () => {
                       ? "text-red-400" 
                       : "text-gray-400"
                   )}>
-                    {formData.investment.additionalCriteria.length}/{MAX_SUMMARY_LENGTH}
+                    {formData.investment.additionalCriteria.length}/{MAX_SUMMARY_LENGTH
                   </span>
                 </div>
                 <p className="text-sm text-gray-400 mb-2">
