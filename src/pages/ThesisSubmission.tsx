@@ -484,12 +484,14 @@ const ThesisSubmission = () => {
               animate={{ opacity: 1, y: 0 }} 
               className="text-3xl md:text-4xl font-bold text-white mb-8"
             >
-              Submit Your Investment Thesis
+              Submit Your Investment Proposal
             </motion.h1>
 
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
               <div className="border-b border-white/5">
-                
+                <p className="text-gray-400 p-6">
+                  Complete these steps to submit your proposal
+                </p>
               </div>
 
               <div className="p-6 space-y-8">
