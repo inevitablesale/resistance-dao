@@ -28,7 +28,7 @@ const zeroDevConfig = {
 const evmNetworks = [
   {
     blockExplorerUrls: ['https://polygonscan.com/'],
-    chainId: '0x89',
+    chainId: 137,
     chainName: 'Matic Mainnet',
     iconUrls: ["https://app.dynamic.xyz/assets/networks/polygon.svg"],
     name: 'Polygon',
@@ -70,10 +70,7 @@ const dynamicSettings = {
   },
   settings: {
     evmNetworks,
-    network: {
-      chainId: 137, // Using decimal format as required by DynamicSettings
-      ...evmNetworks[0]
-    },
+    network: evmNetworks[0],
     environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
     appName: "LedgerFund",
     appLogoUrl: "/favicon.ico",
