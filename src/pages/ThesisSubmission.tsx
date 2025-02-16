@@ -181,20 +181,22 @@ const ThesisSubmission = () => {
 
   const handleFormDataChange = (field: string, value: any) => {
     setFormData(prev => {
-      const newData = {
-        ...prev
-      };
+      const newData = { ...prev };
+      
       const fields = field.split('.');
+      
       let current: any = newData;
+      
       for (let i = 0; i < fields.length - 1; i++) {
+        if (!current[fields[i]]) {
+          current[fields[i]] = {};
+        }
         current = current[fields[i]];
       }
+      
       const lastField = fields[fields.length - 1];
-      if (lastField === 'targetCapital') {
-        current[lastField] = value.toString();
-      } else {
-        current[lastField] = value;
-      }
+      current[lastField] = value;
+      
       return newData;
     });
   };
