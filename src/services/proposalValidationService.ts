@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ContractStatus } from "./proposalContractService";
 
@@ -14,15 +15,11 @@ export interface ValidationResult {
   errors: Record<string, string[]>;
 }
 
-export interface Industry {
-  focus: string;
-  other?: string;
-}
-
 export interface FirmCriteria {
   size: string;
   location: string;
   dealType: string;
+  geographicFocus: string;
 }
 
 export interface Investment {
@@ -39,7 +36,6 @@ export interface Strategies {
 
 export interface ProposalMetadata {
   title: string;
-  industry: Industry;
   firmCriteria: FirmCriteria;
   paymentTerms: string[];
   strategies: Strategies;
@@ -67,53 +63,60 @@ export const validateProposalMetadata = (
     errors.title = [`Title must be at least ${config.minTitleLength} characters long`];
   }
 
-  // Industry validation
-  if (!metadata.industry.focus || metadata.industry.focus.trim().length === 0) {
-    errors['industry.focus'] = ['Industry focus is required'];
+  // Firm criteria validation
+  if (!metadata.firmCriteria.size || !['below-1m', '1m-5m', '5m-10m', '10m-plus'].includes(metadata.firmCriteria.size)) {
+    errors['firmCriteria.size'] = ['Invalid firm size selected'];
   }
 
-  // Firm criteria validation
-  if (!metadata.firmCriteria.size || metadata.firmCriteria.size.trim().length === 0) {
-    errors['firmCriteria.size'] = ['Firm size is required'];
+  if (!metadata.firmCriteria.geographicFocus || 
+      !['local', 'regional', 'national', 'remote'].includes(metadata.firmCriteria.geographicFocus)) {
+    errors['firmCriteria.geographicFocus'] = ['Invalid geographic focus selected'];
   }
-  if (!metadata.firmCriteria.location || metadata.firmCriteria.location.trim().length === 0) {
-    errors['firmCriteria.location'] = ['Location is required'];
-  }
-  if (!metadata.firmCriteria.dealType || metadata.firmCriteria.dealType.trim().length === 0) {
-    errors['firmCriteria.dealType'] = ['Deal type is required'];
+
+  if (!metadata.firmCriteria.dealType || 
+      !['acquisition', 'merger', 'equity-buyout', 'franchise', 'succession'].includes(metadata.firmCriteria.dealType)) {
+    errors['firmCriteria.dealType'] = ['Invalid deal type selected'];
   }
 
   // Payment terms validation
+  const validPaymentTerms = ['cash', 'seller-financing', 'earnout', 'equity-rollover', 'bank-financing'];
   if (!Array.isArray(metadata.paymentTerms)) {
     errors.paymentTerms = ['Invalid payment terms format'];
   } else if (metadata.paymentTerms.length === 0) {
     errors.paymentTerms = ['At least one payment term is required'];
   } else if (metadata.paymentTerms.length > config.maxPaymentTerms) {
     errors.paymentTerms = [`Maximum of ${config.maxPaymentTerms} payment terms allowed`];
+  } else if (!metadata.paymentTerms.every(term => validPaymentTerms.includes(term))) {
+    errors.paymentTerms = ['Invalid payment term selected'];
   }
 
   // Strategies validation
-  if (metadata.strategies) {
-    Object.entries(metadata.strategies).forEach(([category, strategies]: [string, string[]]) => {
-      if (!Array.isArray(strategies)) {
-        errors[`strategies.${category}`] = ['Invalid strategy format'];
-      } else if (strategies.length === 0) {
-        errors[`strategies.${category}`] = ['At least one strategy is required'];
-      } else if (strategies.length > config.maxStrategiesPerCategory) {
-        errors[`strategies.${category}`] = [
-          `Maximum of ${config.maxStrategiesPerCategory} strategies allowed per category`
-        ];
-      }
-    });
-  }
+  const validateStrategyCategory = (
+    category: keyof Strategies,
+    strategies: string[],
+    validOptions: string[]
+  ) => {
+    if (!Array.isArray(strategies)) {
+      errors[`strategies.${category}`] = ['Invalid strategy format'];
+    } else if (strategies.length === 0) {
+      errors[`strategies.${category}`] = ['At least one strategy is required'];
+    } else if (strategies.length > config.maxStrategiesPerCategory) {
+      errors[`strategies.${category}`] = [
+        `Maximum of ${config.maxStrategiesPerCategory} strategies allowed`
+      ];
+    } else if (!strategies.every(strategy => validOptions.includes(strategy))) {
+      errors[`strategies.${category}`] = ['Invalid strategy selected'];
+    }
+  };
 
-  // Investment validation
-  if (!metadata.investment.targetCapital) {
-    errors['investment.targetCapital'] = ['Target capital is required'];
-  } else if (!/^\d+(\.\d{1,2})?$/.test(metadata.investment.targetCapital)) {
-    errors['investment.targetCapital'] = ['Target capital must be a valid number with up to 2 decimal places'];
-  }
+  validateStrategyCategory('operational', metadata.strategies.operational, 
+    ['tech-modernization', 'process-standardization', 'staff-retention']);
+  validateStrategyCategory('growth', metadata.strategies.growth,
+    ['geographic-expansion', 'service-expansion', 'client-growth']);
+  validateStrategyCategory('integration', metadata.strategies.integration,
+    ['merging-operations', 'culture-integration', 'systems-consolidation']);
 
+  // Investment drivers validation
   if (!metadata.investment.drivers || metadata.investment.drivers.trim().length === 0) {
     errors['investment.drivers'] = ['Investment drivers are required'];
   } else if (metadata.investment.drivers.trim().length < config.minDriversLength) {
