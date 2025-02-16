@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -224,9 +225,9 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
             <div className="flex items-center gap-3 text-white/80">
               <div className={cn(
                 "w-8 h-8 rounded-full flex items-center justify-center",
-                address ? "bg-green-500/20 text-green-500" : "bg-white/10"
+                walletAddress ? "bg-green-500/20 text-green-500" : "bg-white/10"
               )}>
-                {address ? "✓" : "1"}
+                {walletAddress ? "✓" : "1"}
               </div>
               <span>Connect Wallet</span>
             </div>
