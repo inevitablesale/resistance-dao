@@ -1,8 +1,9 @@
 
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
-import { EventConfig, waitForProposalCreation, ProposalEvent } from "./eventListenerService";
+import { EventConfig, waitForProposalCreation } from "./eventListenerService";
 import { transactionQueue } from "./transactionQueueService";
+import { checkTokenAllowance } from "./tokenService";
 
 export interface TransactionConfig {
   timeout: number;
@@ -11,6 +12,11 @@ export interface TransactionConfig {
   eventConfig?: EventConfig;
   description: string;
   type: 'proposal' | 'token' | 'contract';
+  tokenConfig?: {
+    tokenAddress: string;
+    spenderAddress: string;
+    amount: string;
+  };
 }
 
 const DEFAULT_CONFIG: Omit<TransactionConfig, 'description' | 'type'> = {
@@ -23,6 +29,26 @@ export const executeTransaction = async (
   transaction: () => Promise<ethers.ContractTransaction>,
   config: TransactionConfig
 ): Promise<ethers.ContractTransaction> => {
+  // Check allowance if it's a token transaction
+  if (config.type === 'token' && config.tokenConfig) {
+    const hasAllowance = await checkTokenAllowance(
+      config.tokenConfig.tokenAddress,
+      config.tokenConfig.spenderAddress,
+      config.tokenConfig.amount
+    );
+
+    if (!hasAllowance) {
+      throw new ProposalError({
+        category: 'token',
+        message: 'Insufficient token allowance',
+        recoverySteps: [
+          'Approve the token spending',
+          'Try the transaction again after approval'
+        ]
+      });
+    }
+  }
+
   // Add to queue first
   const txId = await transactionQueue.addTransaction({
     type: config.type,
@@ -46,7 +72,6 @@ export const executeTransaction = async (
       
       const receipt = await Promise.race([receiptPromise, timeoutPromise]);
       
-      // If event config is provided, wait for the event
       if (config.eventConfig) {
         try {
           const event = await waitForProposalCreation(config.eventConfig, tx.hash);
