@@ -344,7 +344,7 @@ const ThesisSubmission = () => {
         ipfsHash,
         timestamp: new Date().toISOString(),
         title: formData.title,
-        targetCapital: formData.investment.targetCapital,
+        targetCapital: ethers.utils.formatEther(targetCapital),
         status: 'pending'
       };
       userProposals.push(newProposal);
