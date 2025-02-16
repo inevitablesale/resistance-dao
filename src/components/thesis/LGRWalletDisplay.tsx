@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -158,49 +159,6 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
     )}>
       <div className="space-y-6">
         <div className="space-y-4">
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-white">Submission Requirements</h3>
-            <p className="text-sm text-white/70">Complete these steps to submit your thesis</p>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 text-white/80">
-              <div className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center",
-                walletAddress ? "bg-green-500/20 text-green-500" : "bg-white/10"
-              )}>
-                {walletAddress ? "✓" : "1"}
-              </div>
-              <span>Connect Wallet</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center",
-                isCalculatingBalance ? "bg-white/10" : 
-                Number(lgrBalance) >= 250 ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500"
-              )}>
-                {isCalculatingBalance ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : Number(lgrBalance) >= 250 ? "✓" : "2"}
-              </div>
-              <span className={cn(
-                "text-white/80",
-                !isCalculatingBalance && Number(lgrBalance) < 250 && "text-red-500"
-              )}>
-                {isCalculatingBalance ? (
-                  "Checking LGR Balance..."
-                ) : Number(lgrBalance) < 250 ? (
-                  "Insufficient LGR Balance (250 Required)"
-                ) : (
-                  "Hold LGR Tokens"
-                )}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-white font-medium">Balances</h4>
             <button 
@@ -250,6 +208,49 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
               </div>
             </div>
           )}
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-white">Submission Requirements</h3>
+            <p className="text-sm text-white/70">Complete these steps to submit your thesis</p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 text-white/80">
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center",
+                walletAddress ? "bg-green-500/20 text-green-500" : "bg-white/10"
+              )}>
+                {walletAddress ? "✓" : "1"}
+              </div>
+              <span>Connect Wallet</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center",
+                isCalculatingBalance ? "bg-white/10" : 
+                Number(lgrBalance) >= 250 ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500"
+              )}>
+                {isCalculatingBalance ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : Number(lgrBalance) >= 250 ? "✓" : "2"}
+              </div>
+              <span className={cn(
+                "text-white/80",
+                !isCalculatingBalance && Number(lgrBalance) < 250 && "text-red-500"
+              )}>
+                {isCalculatingBalance ? (
+                  "Checking LGR Balance..."
+                ) : Number(lgrBalance) < 250 ? (
+                  "Insufficient LGR Balance (250 Required)"
+                ) : (
+                  "Hold LGR Tokens"
+                )}
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-3">
