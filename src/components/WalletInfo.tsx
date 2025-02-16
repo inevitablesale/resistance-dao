@@ -121,8 +121,13 @@ export const WalletInfo = () => {
         throw new Error('Wallet address not found');
       }
 
+      const provider = await primaryWallet.getEthersProvider();
+      if (!provider) {
+        throw new Error('No provider available');
+      }
+
       const result = await mintNFT(
-        await primaryWallet.getWalletClient(),
+        provider,
         primaryWallet.address,
         nftPreview
       );
