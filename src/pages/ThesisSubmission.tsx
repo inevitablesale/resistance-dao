@@ -674,7 +674,7 @@ const ThesisSubmission = () => {
             <div className="lg:col-span-4 space-y-6">
               <LGRWalletDisplay 
                 submissionFee={SUBMISSION_FEE.toString()}
-                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance}
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
                 walletAddress={address}
               />
 
