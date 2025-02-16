@@ -429,7 +429,7 @@ const ThesisSubmission = () => {
   ) => (
     <Button 
       onClick={onClick} 
-      disabled={isSubmitting || !hasRequiredBalance}
+      disabled={isSubmitting}
       className={cn(
         "h-12 px-6 min-w-[200px] mt-6",
         "bg-gradient-to-r from-polygon-primary to-polygon-secondary",

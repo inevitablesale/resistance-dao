@@ -16,9 +16,18 @@ export const ContractApprovalStatus = ({
   onApprovalComplete,
   requiredAmount
 }: ContractApprovalStatusProps) => {
-  const { approveLGR } = useWalletConnection();
+  const { approveLGR, address } = useWalletConnection();
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
+  const { tokenBalances } = useTokenBalances({
+    networkId: 137,
+    accountAddress: address,
+    includeFiat: false,
+    includeNativeBalance: false,
+    tokenAddresses: [LGR_TOKEN_ADDRESS]
+  });
+
+  const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(requiredAmount));
 
   const handleApprove = async () => {
     setIsApproving(true);
@@ -64,7 +73,7 @@ export const ContractApprovalStatus = ({
         {!isApproved && (
           <Button
             onClick={handleApprove}
-            disabled={isApproving}
+            disabled={isApproving || !hasRequiredBalance}
             className="bg-gradient-to-r from-[#4F46E5] to-[#7C3AED]"
           >
             {isApproving ? (
@@ -73,7 +82,7 @@ export const ContractApprovalStatus = ({
                 Approving...
               </div>
             ) : (
-              "Approve"
+              hasRequiredBalance ? "Approve" : "Insufficient LGR Balance"
             )}
           </Button>
         )}
