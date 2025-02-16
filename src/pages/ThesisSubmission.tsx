@@ -25,14 +25,12 @@ import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTe
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-
 interface SubmissionStep {
   id: string;
   title: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   description: string;
 }
-
 interface StoredProposal {
   hash: string;
   ipfsHash: string;
@@ -41,7 +39,6 @@ interface StoredProposal {
   targetCapital: string;
   status: 'pending' | 'completed' | 'failed';
 }
-
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const FACTORY_ABI = ["function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)", "function submissionFee() public view returns (uint256)", "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"];
@@ -54,7 +51,6 @@ const VOTING_FEE = ethers.utils.parseEther("10");
 const MAX_STRATEGIES_PER_CATEGORY = 3;
 const MAX_SUMMARY_LENGTH = 500;
 const MAX_PAYMENT_TERMS = 5;
-
 interface ProposalMetadata {
   title: string;
   firmCriteria: {
@@ -75,15 +71,12 @@ interface ProposalMetadata {
     additionalCriteria: string;
   };
 }
-
 interface ProposalConfig {
   targetCapital: ethers.BigNumber;
   votingDuration: number;
   ipfsHash: string;
 }
-
 const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
-
 const SUBMISSION_STEPS: SubmissionStep[] = [{
   id: 'thesis',
   title: 'Investment Thesis',
@@ -105,7 +98,6 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
   status: 'pending',
   description: 'Submit your thesis to the blockchain'
 }];
-
 const ThesisSubmission = () => {
   const {
     toast
@@ -156,29 +148,24 @@ const ThesisSubmission = () => {
   const [isStrategyOpen, setIsStrategyOpen] = useState(false);
   const [isApprovalOpen, setIsApprovalOpen] = useState(false);
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
-
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => step.id === stepId ? {
       ...step,
       status
     } : step));
   };
-
   const validateStrategies = (category: keyof typeof formData.strategies) => {
     const strategies = formData.strategies[category];
     if (!Array.isArray(strategies)) return false;
     return strategies.length <= MAX_STRATEGIES_PER_CATEGORY;
   };
-
   const validatePaymentTerms = () => {
     if (!Array.isArray(formData.paymentTerms)) return false;
     return formData.paymentTerms.length <= 5;
   };
-
   const handleStrategyChange = (category: "operational" | "growth" | "integration", value: string[]) => {
     handleFormDataChange(`strategies.${category}`, value);
   };
-
   const handleFormDataChange = (field: string, value: any) => {
     setFormData(prev => {
       const newData = {
@@ -198,11 +185,9 @@ const ThesisSubmission = () => {
       return newData;
     });
   };
-
   const handleVotingDurationChange = (value: number[]) => {
     setVotingDuration(value[0]);
   };
-
   const getButtonText = () => {
     if (isSubmitting) {
       return <div className="flex items-center justify-center">
@@ -221,7 +206,6 @@ const ThesisSubmission = () => {
         return "Continue";
     }
   };
-
   const validateBasicsTab = (): boolean => {
     const errors: Record<string, string[]> = {};
     if (!formData.title || formData.title.trim().length < 10) {
@@ -251,7 +235,6 @@ const ThesisSubmission = () => {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
   const validateFirmTab = (): boolean => {
     const errors: Record<string, string[]> = {};
     if (!formData.firmCriteria.size) {
@@ -269,7 +252,6 @@ const ThesisSubmission = () => {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
   const validateStrategyTab = (): boolean => {
     const errors: Record<string, string[]> = {};
     if (!formData.strategies.operational.length) {
@@ -287,7 +269,6 @@ const ThesisSubmission = () => {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
   const validateTermsTab = (): boolean => {
     const errors: Record<string, string[]> = {};
     if (!formData.paymentTerms.length) {
@@ -299,7 +280,6 @@ const ThesisSubmission = () => {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
   const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
     let isValid = false;
     switch (activeStep) {
@@ -328,7 +308,6 @@ const ThesisSubmission = () => {
       });
     }
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isConnected) {
@@ -441,9 +420,7 @@ const ThesisSubmission = () => {
       setIsSubmitting(false);
     }
   };
-
-  return (
-    <div className="min-h-screen bg-[#030712]">
+  return <div className="min-h-screen bg-[#030712]">
       <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10" />
       <div className="fixed inset-0 bg-gradient-to-b from-[#030712] via-[#0F172A] to-[#030712]" />
       
@@ -453,22 +430,19 @@ const ThesisSubmission = () => {
         <div className="container px-4 mx-auto max-w-[1200px]">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8">
-              <motion.h1 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-3xl md:text-4xl font-bold text-white mb-8"
-              >
+              <motion.h1 initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} className="text-3xl md:text-4xl font-bold text-white mb-8">
                 Submit Your Investment Thesis
               </motion.h1>
 
               <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
                 <div className="border-b border-white/5">
-                  <div className="px-6 py-4">
-                    <SubmissionProgress 
-                      steps={steps}
-                      currentStepId={activeStep}
-                    />
-                  </div>
+                  
                 </div>
 
                 <div className="p-6 space-y-8">
@@ -497,36 +471,18 @@ const ThesisSubmission = () => {
                           <Label className="text-lg font-medium text-white">
                             Thesis Title
                           </Label>
-                          <Input
-                            placeholder="Enter a clear, descriptive title"
-                            className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
-                            value={formData.title}
-                            onChange={(e) => handleFormDataChange('title', e.target.value)}
-                          />
-                          {formErrors.title && (
-                            <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                          )}
+                          <Input placeholder="Enter a clear, descriptive title" className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12" value={formData.title} onChange={e => handleFormDataChange('title', e.target.value)} />
+                          {formErrors.title && <p className="text-red-400 text-sm">{formErrors.title[0]}</p>}
                         </div>
 
-                        <TargetCapitalInput
-                          value={formData.investment.targetCapital}
-                          onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
-                          error={formErrors['investment.targetCapital']}
-                        />
+                        <TargetCapitalInput value={formData.investment.targetCapital} onChange={value => handleFormDataChange('investment.targetCapital', value)} error={formErrors['investment.targetCapital']} />
 
                         <div className="space-y-4">
                           <Label className="text-lg font-medium text-white">
                             Investment Drivers
                           </Label>
-                          <textarea
-                            placeholder="Describe the key drivers behind this investment thesis..."
-                            className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3"
-                            value={formData.investment.drivers}
-                            onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
-                          />
-                          {formErrors['investment.drivers'] && (
-                            <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
-                          )}
+                          <textarea placeholder="Describe the key drivers behind this investment thesis..." className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3" value={formData.investment.drivers} onChange={e => handleFormDataChange('investment.drivers', e.target.value)} />
+                          {formErrors['investment.drivers'] && <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>}
                         </div>
                       </div>
                     </CollapsibleContent>
@@ -552,18 +508,14 @@ const ThesisSubmission = () => {
                       </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <FirmCriteriaSection 
-                        formData={{
-                          firmCriteria: {
-                            size: formData.firmCriteria.size,
-                            location: formData.firmCriteria.location,
-                            dealType: formData.firmCriteria.dealType,
-                            geographicFocus: formData.firmCriteria.geographicFocus
-                          }
-                        }}
-                        formErrors={formErrors}
-                        onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
-                      />
+                      <FirmCriteriaSection formData={{
+                      firmCriteria: {
+                        size: formData.firmCriteria.size,
+                        location: formData.firmCriteria.location,
+                        dealType: formData.firmCriteria.dealType,
+                        geographicFocus: formData.firmCriteria.geographicFocus
+                      }
+                    }} formErrors={formErrors} onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)} />
                     </CollapsibleContent>
                   </Collapsible>
 
@@ -588,19 +540,11 @@ const ThesisSubmission = () => {
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pt-4 px-4 pb-6">
                       <div className="space-y-6">
-                        <PaymentTermsSection 
-                          formData={{
-                            paymentTerms: formData.paymentTerms
-                          }}
-                          formErrors={formErrors}
-                          onChange={(value) => handleFormDataChange('paymentTerms', value)}
-                        />
+                        <PaymentTermsSection formData={{
+                        paymentTerms: formData.paymentTerms
+                      }} formErrors={formErrors} onChange={value => handleFormDataChange('paymentTerms', value)} />
 
-                        <VotingDurationInput
-                          value={votingDuration}
-                          onChange={handleVotingDurationChange}
-                          error={formErrors.votingDuration}
-                        />
+                        <VotingDurationInput value={votingDuration} onChange={handleVotingDurationChange} error={formErrors.votingDuration} />
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
@@ -625,40 +569,28 @@ const ThesisSubmission = () => {
                       </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <StrategiesSection 
-                        formData={{
-                          strategies: {
-                            operational: formData.strategies.operational,
-                            growth: formData.strategies.growth,
-                            integration: formData.strategies.integration
-                          }
-                        }}
-                        formErrors={formErrors}
-                        onChange={handleStrategyChange}
-                      />
+                      <StrategiesSection formData={{
+                      strategies: {
+                        operational: formData.strategies.operational,
+                        growth: formData.strategies.growth,
+                        integration: formData.strategies.integration
+                      }
+                    }} formErrors={formErrors} onChange={handleStrategyChange} />
 
                       <div className="mt-6 space-y-4">
                         <Label className="text-lg font-medium text-white">
                           Additional Criteria (Optional)
                         </Label>
-                        <textarea
-                          placeholder="Any additional criteria or notes..."
-                          className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3"
-                          value={formData.investment.additionalCriteria}
-                          onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
-                        />
+                        <textarea placeholder="Any additional criteria or notes..." className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3" value={formData.investment.additionalCriteria} onChange={e => handleFormDataChange('investment.additionalCriteria', e.target.value)} />
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
 
                   <div className="mt-8">
-                    <ContractApprovalStatus
-                      onApprovalComplete={() => {
-                        updateStepStatus('approval', 'completed');
-                        setActiveStep('submission');
-                      }}
-                      requiredAmount={SUBMISSION_FEE.toString()}
-                    />
+                    <ContractApprovalStatus onApprovalComplete={() => {
+                    updateStepStatus('approval', 'completed');
+                    setActiveStep('submission');
+                  }} requiredAmount={SUBMISSION_FEE.toString()} />
                   </div>
                 </div>
               </Card>
@@ -696,8 +628,6 @@ const ThesisSubmission = () => {
           </div>
         </div>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default ThesisSubmission;
