@@ -472,53 +472,34 @@ const ThesisSubmission = () => {
       
       <main className="relative z-10 pt-28 pb-20 min-h-screen">
         <div className="container px-4 mx-auto max-w-[1200px]">
-          {/* Top Section with Progress */}
-          <div className="mb-8">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="max-w-2xl"
-            >
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                Submit Your Investment Thesis
-              </h1>
-              <p className="text-lg text-white/70">
-                Share your strategy with the DAO and start earning returns
-              </p>
-            </motion.div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Main Form Column */}
-            <div className="lg:col-span-8 space-y-6">
-              {/* Progress Steps - Mobile Only */}
-              <div className="lg:hidden">
-                <Card className="bg-black/40 border-white/5 backdrop-blur-sm p-4">
-                  <SubmissionProgress 
-                    steps={steps}
-                    currentStepId={activeStep}
-                  />
-                </Card>
-              </div>
-
-              {/* Current Step Form */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left Column - Progress and Form */}
+            <div className="lg:col-span-8">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="space-y-6"
+                className="mb-8"
               >
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+                  Submit Your Investment Thesis
+                </h1>
+                <p className="text-lg text-white/70">
+                  Share your strategy with the DAO and start earning returns
+                </p>
+              </motion.div>
+
+              <div className="space-y-6">
+                {/* Form Content */}
                 <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
-                  {/* Step Header */}
-                  <div className="px-6 py-4 border-b border-white/5 bg-white/5">
-                    <h2 className="text-xl font-semibold text-white">
-                      {activeStep === 'thesis' && "Thesis Details"}
-                      {activeStep === 'strategy' && "Investment Strategy"}
-                      {activeStep === 'submission' && "Review & Submit"}
-                      {activeStep === 'approval' && "Final Approval"}
-                    </h2>
+                  <div className="border-b border-white/5">
+                    <div className="px-6 py-4">
+                      <SubmissionProgress 
+                        steps={steps}
+                        currentStepId={activeStep}
+                      />
+                    </div>
                   </div>
 
-                  {/* Step Content */}
                   <div className="p-6">
                     {activeStep === 'thesis' && (
                       <div className="space-y-8">
@@ -577,7 +558,7 @@ const ThesisSubmission = () => {
                   </div>
                 </Card>
 
-                {/* Navigation Button */}
+                {/* Navigation */}
                 <div className="flex justify-end">
                   <Button
                     onClick={handleContinue}
@@ -607,44 +588,69 @@ const ThesisSubmission = () => {
                     )}
                   </Button>
                 </div>
-              </motion.div>
+              </div>
             </div>
 
-            {/* Side Column - Desktop Only */}
-            <div className="hidden lg:block lg:col-span-4 space-y-6">
-              {/* Progress Card */}
-              <Card className="bg-black/40 border-white/5 backdrop-blur-sm p-6">
-                <SubmissionProgress 
-                  steps={steps}
-                  currentStepId={activeStep}
-                />
-              </Card>
+            {/* Right Column - Wallet and Status */}
+            <div className="lg:col-span-4">
+              <div className="lg:sticky lg:top-28 space-y-6">
+                {/* Wallet Status Card */}
+                <Card className="bg-black/40 border-white/5 backdrop-blur-sm">
+                  <div className="p-6 space-y-6">
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold text-white">Submission Requirements</h3>
+                      <p className="text-sm text-white/70">Complete these steps to submit your thesis</p>
+                    </div>
 
-              {/* Wallet Info */}
-              <Card className="bg-black/40 border-white/5 backdrop-blur-sm p-6">
-                <LGRWalletDisplay 
-                  submissionFee={SUBMISSION_FEE.toString()}
-                  currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
-                  walletAddress={address}
-                />
-              </Card>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 text-white/80">
+                        <div className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center",
+                          address ? "bg-green-500/20 text-green-500" : "bg-white/10"
+                        )}>
+                          {address ? "✓" : "1"}
+                        </div>
+                        <span>Connect Wallet</span>
+                      </div>
 
-              {/* Transaction Status */}
-              {currentTxId && (
-                <Card className="bg-black/40 border-white/5 backdrop-blur-sm p-6">
-                  <TransactionStatus
-                    transactionId={currentTxId}
-                    onComplete={() => setCurrentTxId(null)}
-                    onError={(error) => {
-                      toast({
-                        title: "Transaction Failed",
-                        description: error,
-                        variant: "destructive"
-                      });
-                    }}
-                  />
+                      <div className="flex items-center gap-3 text-white/80">
+                        <div className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center",
+                          tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() ? "bg-green-500/20 text-green-500" : "bg-white/10"
+                        )}>
+                          {tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() ? "✓" : "2"}
+                        </div>
+                        <span>Hold LGR Tokens</span>
+                      </div>
+                    </div>
+
+                    <LGRWalletDisplay 
+                      submissionFee={SUBMISSION_FEE.toString()}
+                      currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
+                      walletAddress={address}
+                    />
+                  </div>
                 </Card>
-              )}
+
+                {/* Transaction Status */}
+                {currentTxId && (
+                  <Card className="bg-black/40 border-white/5 backdrop-blur-sm">
+                    <div className="p-6">
+                      <TransactionStatus
+                        transactionId={currentTxId}
+                        onComplete={() => setCurrentTxId(null)}
+                        onError={(error) => {
+                          toast({
+                            title: "Transaction Failed",
+                            description: error,
+                            variant: "destructive"
+                          });
+                        }}
+                      />
+                    </div>
+                  </Card>
+                )}
+              </div>
             </div>
           </div>
         </div>
