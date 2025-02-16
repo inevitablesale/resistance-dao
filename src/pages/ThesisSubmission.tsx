@@ -715,55 +715,41 @@ const ThesisSubmission = () => {
               >
                 <Card className="relative overflow-hidden bg-black/60 backdrop-blur-xl border-white/10">
                   <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
-                  <div className="relative z-10 p-8">
-                    <div className="text-center mb-8">
+                  <div className="relative z-10 p-6">
+                    <div className="text-center mb-6">
                       <h3 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
                         Advertise Your Project
                       </h3>
-                      <p className="text-white/60 mt-3">
+                      <p className="text-white/60 mt-2">
                         Connect with Web3 investors and decision makers
                       </p>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Weekly Plan */}
-                      <div className="flex flex-col h-full p-8 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                        <div className="text-center flex-1">
-                          <h4 className="text-lg font-medium text-white/80 mb-6">Weekly</h4>
-                          <div className="space-y-1 mb-8">
-                            <div className="text-5xl font-bold text-yellow-400">2.5k</div>
-                            <div className="text-xl font-semibold text-yellow-400/80">LGR</div>
-                            <div className="text-sm text-white/60 mt-2">≈ $250</div>
+                      <div className="p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <span className="text-white/80">Weekly</span>
+                          <div className="text-right">
+                            <div className="text-lg font-semibold text-yellow-400">2.5k LGR</div>
+                            <div className="text-sm text-white/60">≈ $250</div>
                           </div>
-                          <Button 
-                            className="w-full bg-white/10 hover:bg-white/20 text-white font-medium py-6"
-                            onClick={() => handleRentAdSpace('week')}
-                          >
-                            Rent Now
-                          </Button>
                         </div>
                       </div>
 
                       {/* Monthly Plan */}
-                      <div className="relative flex flex-col h-full p-8 rounded-xl bg-gradient-to-b from-white/10 to-white/5 border border-white/10 hover:from-white/15 hover:to-white/10 transition-colors">
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                          <span className="px-6 py-1.5 bg-yellow-500/20 rounded-full text-yellow-400 text-sm font-medium">
+                      <div className="relative p-4 rounded-lg bg-gradient-to-b from-white/10 to-white/5 border border-white/10 hover:from-white/15 hover:to-white/10 transition-colors">
+                        <div className="absolute -top-2.5 right-2">
+                          <span className="px-2 py-0.5 bg-yellow-500/20 rounded-full text-yellow-400 text-xs">
                             Best Value
                           </span>
                         </div>
-                        <div className="text-center flex-1 pt-4">
-                          <h4 className="text-lg font-medium text-white/80 mb-6">Monthly</h4>
-                          <div className="space-y-1 mb-8">
-                            <div className="text-5xl font-bold text-yellow-400">9k</div>
-                            <div className="text-xl font-semibold text-yellow-400/80">LGR</div>
-                            <div className="text-sm text-white/60 mt-2">≈ $900</div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-white/80">Monthly</span>
+                          <div className="text-right">
+                            <div className="text-lg font-semibold text-yellow-400">9k LGR</div>
+                            <div className="text-sm text-white/60">≈ $900</div>
                           </div>
-                          <Button 
-                            className="w-full bg-yellow-500/20 hover:bg-yellow-500/30 text-white font-medium py-6"
-                            onClick={() => handleRentAdSpace('month')}
-                          >
-                            Rent Now
-                          </Button>
                         </div>
                       </div>
                     </div>
