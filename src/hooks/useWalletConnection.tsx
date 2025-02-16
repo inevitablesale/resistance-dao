@@ -47,13 +47,12 @@ export const useWalletConnection = () => {
       setTreasuryAddress(status.treasuryAddress);
     }
 
-    const provider = await primaryWallet.getWalletClient();
+    const provider = await primaryWallet.getEthersProvider();
     if (!provider) {
       throw new Error("No provider available");
     }
 
-    const ethersProvider = new ethers.providers.Web3Provider(provider as any);
-    const signer = ethersProvider.getSigner();
+    const signer = provider.getSigner();
     const lgrToken = new ethers.Contract(
       LGR_TOKEN_ADDRESS,
       ["function approve(address spender, uint256 amount) returns (bool)"],
@@ -84,4 +83,3 @@ export const useWalletConnection = () => {
     wallet: primaryWallet
   };
 };
-

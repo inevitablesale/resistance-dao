@@ -29,8 +29,8 @@ const GovernanceVoting = () => {
       
       try {
         setIsLoading(true);
-        const walletClient = await primaryWallet.getWalletClient();
-        const mintedNFTs = await getAllMintedNFTs(walletClient);
+        const provider = await primaryWallet.getEthersProvider();
+        const mintedNFTs = await getAllMintedNFTs(provider);
         setNfts(mintedNFTs);
       } catch (error) {
         console.error('Error fetching NFTs:', error);
