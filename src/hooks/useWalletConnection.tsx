@@ -8,7 +8,7 @@ const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const TREASURY_ADDRESS = "0x..."; // Add actual treasury address
 
 export const useWalletConnection = () => {
-  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow, showWallet } = useDynamicContext();
   const [isConnecting, setIsConnecting] = useState(false);
   const { toast } = useToast();
 
@@ -37,11 +37,11 @@ export const useWalletConnection = () => {
   };
 
   const approveLGR = async (amount: string) => {
-    if (!primaryWallet?.connector?.provider) {
+    if (!primaryWallet?.connector) {
       throw new Error("No provider available");
     }
 
-    const provider = new ethers.providers.Web3Provider(primaryWallet.connector.provider);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     const lgrToken = new ethers.Contract(
       LGR_TOKEN_ADDRESS,
@@ -65,6 +65,7 @@ export const useWalletConnection = () => {
     connect,
     disconnect,
     address: primaryWallet?.address,
-    approveLGR
+    approveLGR,
+    showWallet
   };
 };

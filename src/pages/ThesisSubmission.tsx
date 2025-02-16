@@ -50,6 +50,17 @@ interface ProposalMetadata {
   };
 }
 
+const US_STATES = [
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
+  "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", 
+  "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", 
+  "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", 
+  "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
+  "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", 
+  "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", 
+  "Wisconsin", "Wyoming"
+];
+
 const ThesisSubmission = () => {
   const { toast } = useToast();
   const { isConnected, address, connect } = useWalletConnection();
@@ -226,7 +237,7 @@ const ThesisSubmission = () => {
               LedgerFund DAO – Investment Thesis Submission
             </h1>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Share your investment analysis and insights with the community
+              Share your investment analysis and insights with the community. Your thesis will help shape the future of accounting firm acquisitions and influence capital allocation decisions.
             </p>
           </div>
 
@@ -235,13 +246,10 @@ const ThesisSubmission = () => {
             <div className="flex items-start space-x-4">
               <CreditCard className="w-6 h-6 text-purple-400 mt-1" />
               <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-white">Required Fees</h3>
+                <h3 className="text-lg font-semibold text-white">Submission Fee</h3>
                 <div className="space-y-1">
                   <p className="text-gray-400">
-                    Submission Fee: 250 LGR
-                  </p>
-                  <p className="text-gray-400">
-                    Voting Fee: 10 LGR per vote
+                    A submission fee of 250 LGR is required to create a proposal. This fee helps ensure high-quality submissions and prevents spam while contributing to the DAO treasury.
                   </p>
                 </div>
                 {!isConnected && (
@@ -276,15 +284,17 @@ const ThesisSubmission = () => {
                 />
               </div>
 
-              {/* Voting Duration */}
+              {/* Updated Voting Duration */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label className="text-lg font-medium text-white">Voting Duration</Label>
-                    <p className="text-sm text-gray-400">Set how long the community can vote on your thesis</p>
+                    <p className="text-sm text-gray-400">Set how long the community can vote on your thesis (7 to 90 days)</p>
                   </div>
                   <div className="text-right">
-                    <span className="text-2xl font-bold text-white">{votingDuration}</span>
+                    <span className="text-2xl font-bold text-white">
+                      {Math.floor(votingDuration / (24 * 60 * 60))}
+                    </span>
                     <span className="text-gray-400 ml-2">days</span>
                   </div>
                 </div>
@@ -292,13 +302,13 @@ const ThesisSubmission = () => {
                   value={[votingDuration]}
                   min={MIN_VOTING_DURATION}
                   max={MAX_VOTING_DURATION}
-                  step={1}
+                  step={24 * 60 * 60} // One day in seconds
                   className="w-full"
                   onValueChange={(value) => setVotingDuration(value[0])}
                 />
                 <div className="flex justify-between text-sm text-gray-400">
-                  <span>{MIN_VOTING_DURATION} days</span>
-                  <span>{MAX_VOTING_DURATION} days</span>
+                  <span>7 days</span>
+                  <span>90 days</span>
                 </div>
               </div>
 
@@ -343,24 +353,49 @@ const ThesisSubmission = () => {
 
                 <div>
                   <Label className="text-gray-200 mb-2 block">Geographic Focus</Label>
-                  <RadioGroup defaultValue="local" className="flex flex-wrap gap-4">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="local" id="local" className="border-white text-white" />
-                      <Label htmlFor="local">Local</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-gray-200 mb-2 block">Region Type</Label>
+                      <RadioGroup defaultValue="local" className="flex flex-col space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="local" id="local" className="border-white text-white" />
+                          <Label htmlFor="local" className="text-white">Local</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="regional" id="regional" className="border-white text-white" />
+                          <Label htmlFor="regional" className="text-white">Regional</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="national" id="national" className="border-white text-white" />
+                          <Label htmlFor="national" className="text-white">National</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="remote" id="remote" className="border-white text-white" />
+                          <Label htmlFor="remote" className="text-white">Remote/Digital</Label>
+                        </div>
+                      </RadioGroup>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="regional" id="regional" className="border-white text-white" />
-                      <Label htmlFor="regional">Regional</Label>
+                    
+                    <div>
+                      <Label className="text-gray-200 mb-2 block">Primary State</Label>
+                      <select 
+                        className="w-full bg-black/50 border border-white/10 rounded-md p-2 text-white"
+                        value={formData.firmCriteria.location}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          firmCriteria: {
+                            ...prev.firmCriteria,
+                            location: e.target.value
+                          }
+                        }))}
+                      >
+                        <option value="">Select a state</option>
+                        {US_STATES.map(state => (
+                          <option key={state} value={state}>{state}</option>
+                        ))}
+                      </select>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="national" id="national" className="border-white text-white" />
-                      <Label htmlFor="national">National</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="remote" id="remote" className="border-white text-white" />
-                      <Label htmlFor="remote">Remote/Digital</Label>
-                    </div>
-                  </RadioGroup>
+                  </div>
                 </div>
               </div>
 
