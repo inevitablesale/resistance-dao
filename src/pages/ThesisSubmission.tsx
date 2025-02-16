@@ -377,7 +377,7 @@ const ThesisSubmission = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#030712] overflow-hidden relative">
+    <div className="min-h-screen bg-[#030712] overflow-hidden">
       <div className="absolute inset-0">
         <div 
           className="absolute inset-0 bg-gradient-to-b from-[#0F172A] to-[#030712]"
