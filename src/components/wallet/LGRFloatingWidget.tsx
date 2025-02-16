@@ -4,16 +4,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { getWorkingProvider, getLgrTokenContract, getPresaleContract, fetchPresaleMaticPrice, purchaseTokens } from "@/services/presaleContractService";
 import { ethers } from "ethers";
-import { Coins, Info } from "lucide-react";
+import { Coins, Info, AlertCircle } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+const POLYGON_CHAIN_ID = 137; // Polygon Mainnet
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
-  const { setShowAuthFlow } = useDynamicContext();
+  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
   const [maticBalance, setMaticBalance] = useState<string>("0");
@@ -21,11 +24,39 @@ export const LGRFloatingWidget = () => {
   const [purchaseAmount, setPurchaseAmount] = useState<string>("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [networkError, setNetworkError] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const checkNetwork = async () => {
+    try {
+      if (!primaryWallet) return false;
+      
+      const provider = await primaryWallet.getWalletClient();
+      if (!provider) return false;
+
+      const ethersProvider = new ethers.providers.Web3Provider(provider as any);
+      const network = await ethersProvider.getNetwork();
+      
+      if (network.chainId !== POLYGON_CHAIN_ID) {
+        setNetworkError("Please connect to the Polygon network to use this feature.");
+        return false;
+      }
+      
+      setNetworkError(null);
+      return true;
+    } catch (error) {
+      console.error("Network check error:", error);
+      setNetworkError("Failed to verify network. Please ensure you're connected to Polygon.");
+      return false;
+    }
+  };
 
   useEffect(() => {
     const fetchBalances = async () => {
       if (!address) return;
+
+      const isCorrectNetwork = await checkNetwork();
+      if (!isCorrectNetwork) return;
 
       try {
         const provider = await getWorkingProvider();
@@ -48,13 +79,14 @@ export const LGRFloatingWidget = () => {
         setMaticPrice(currentMaticPrice);
       } catch (error) {
         console.error("Error fetching balances:", error);
+        setNetworkError("Failed to get contract status. Please ensure you're connected to the Polygon network.");
       }
     };
 
     fetchBalances();
     const interval = setInterval(fetchBalances, 30000);
     return () => clearInterval(interval);
-  }, [address]);
+  }, [address, primaryWallet]);
 
   const handleBuyPolygon = () => {
     window.open('https://www.binance.com/en/price/polygon', '_blank');
@@ -62,6 +94,16 @@ export const LGRFloatingWidget = () => {
 
   const handleConfirmPurchase = async () => {
     if (!address || !purchaseAmount) return;
+
+    const isCorrectNetwork = await checkNetwork();
+    if (!isCorrectNetwork) {
+      toast({
+        title: "Network Error",
+        description: "Please connect to the Polygon network to purchase tokens.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const provider = await getWorkingProvider();
@@ -98,6 +140,15 @@ export const LGRFloatingWidget = () => {
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-80 p-4 bg-black/90 backdrop-blur-lg border border-white/10">
+          {networkError && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {networkError}
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
