@@ -78,15 +78,6 @@ interface ProposalConfig {
   ipfsHash: string;
 }
 
-interface StoredProposal {
-  hash: string;
-  ipfsHash: string;
-  timestamp: string;
-  title: string;
-  targetCapital: string;
-  status: 'pending' | 'active' | 'completed';
-}
-
 const US_STATES = [
   "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
   "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", 
@@ -346,7 +337,7 @@ const ThesisSubmission = () => {
       const newProposal: StoredProposal = {
         hash: result.hash,
         ipfsHash,
-        timestamp: Date.now().toString(),
+        timestamp: new Date().toISOString(),
         title: formData.title,
         targetCapital: formData.investment.targetCapital,
         status: 'pending'
