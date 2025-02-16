@@ -117,8 +117,11 @@ const ThesisSubmission = () => {
   useEffect(() => {
     const checkLGRBalance = () => {
       if (isConnected && address && !hasShownBalanceWarning && !isLoading && tokenBalances) {
+        // Find LGR token by both symbol and contract address
         const lgrBalance = tokenBalances.find(
-          token => token.symbol === "LGR"
+          token => 
+            token.symbol === "LGR" && 
+            token.contractAddress?.toLowerCase() === LGR_TOKEN_ADDRESS.toLowerCase()
         );
         
         if (!lgrBalance || Number(lgrBalance.balance) < Number(ethers.utils.formatEther(SUBMISSION_FEE))) {
