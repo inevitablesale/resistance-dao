@@ -13,6 +13,7 @@ import Nav from "@/components/Nav";
 import { FileText, AlertTriangle, Info, Clock, CreditCard, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
 import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
@@ -77,6 +78,12 @@ const US_STATES = [
 const ThesisSubmission = () => {
   const { toast } = useToast();
   const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
+  const { tokenBalances, isLoading } = useTokenBalances({
+    networkId: 137, // Polygon mainnet
+    accountAddress: address,
+    includeFiat: false,
+    includeNativeBalance: false
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTestMode, setIsTestMode] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
@@ -108,26 +115,25 @@ const ThesisSubmission = () => {
   const [hasShownBalanceWarning, setHasShownBalanceWarning] = useState(false);
 
   useEffect(() => {
-    const checkLGRBalance = async () => {
-      if (isConnected && address && !hasShownBalanceWarning) {
-        try {
-          const balance = await getTokenBalance(LGR_TOKEN_ADDRESS, address);
-          if (Number(balance) < Number(ethers.utils.formatEther(SUBMISSION_FEE))) {
-            toast({
-              title: "Insufficient LGR Balance",
-              description: `You'll need ${ethers.utils.formatEther(SUBMISSION_FEE)} LGR tokens to submit a thesis. You can continue filling out the form and purchase tokens before submission.`,
-              variant: "destructive"
-            });
-            setHasShownBalanceWarning(true);
-          }
-        } catch (error) {
-          console.error("Error checking LGR balance:", error);
+    const checkLGRBalance = () => {
+      if (isConnected && address && !hasShownBalanceWarning && !isLoading && tokenBalances) {
+        const lgrBalance = tokenBalances.find(
+          token => token.tokenAddress?.toLowerCase() === LGR_TOKEN_ADDRESS.toLowerCase()
+        );
+        
+        if (!lgrBalance || Number(lgrBalance.balance) < Number(ethers.utils.formatEther(SUBMISSION_FEE))) {
+          toast({
+            title: "Insufficient LGR Balance",
+            description: `You'll need ${ethers.utils.formatEther(SUBMISSION_FEE)} LGR tokens to submit a thesis. You can continue filling out the form and purchase tokens before submission.`,
+            variant: "destructive"
+          });
+          setHasShownBalanceWarning(true);
         }
       }
     };
 
     checkLGRBalance();
-  }, [isConnected, address, toast, hasShownBalanceWarning]);
+  }, [isConnected, address, tokenBalances, isLoading, toast, hasShownBalanceWarning]);
 
   const validateStrategies = (category: keyof typeof formData.strategies) => {
     const strategies = formData.strategies[category];
@@ -789,26 +795,4 @@ const ThesisSubmission = () => {
                   type="submit"
                   disabled={isSubmitting}
                   className={cn(
-                    "w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700",
-                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                  )}
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center justify-center">
-                      <span className="mr-2">Submitting...</span>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
-                    </div>
-                  ) : (
-                    "Submit Investment Thesis"
-                  )}
-                </Button>
-              </div>
-            </form>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+                    "w-full bg-gradient-to-r from-purple-
