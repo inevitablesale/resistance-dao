@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,7 @@ import { SubmissionStep } from "@/components/thesis/SubmissionProgress";
 import { uploadMetadataToPinata } from "@/services/pinataService";
 import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
 import { validateIPFSHash } from "@/services/proposalValidationService";
+import { LGRWalletDisplay } from "@/components/thesis/LGRWalletDisplay";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -552,25 +552,12 @@ const ThesisSubmission = () => {
       </main>
 
       <div className="fixed bottom-6 right-6">
-        <Button
-          variant="outline"
-          size="sm"
-          className="bg-[#161920] border-gray-800 text-white"
-          onClick={() => !isConnected && connect()}
-        >
-          <div className="flex items-center gap-2">
-            <div className={cn(
-              "w-2 h-2 rounded-full",
-              isConnected ? "bg-green-500" : "bg-gray-600"
-            )} />
-            <span>
-              {isConnected ? 
-                `${formatBalance(tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString())} LGR` : 
-                "Connect Wallet"
-              }
-            </span>
-          </div>
-        </Button>
+        <LGRWalletDisplay 
+          submissionFee={ethers.utils.parseEther("250").toString()}
+          currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
+          walletAddress={address}
+          className="w-[300px]"
+        />
       </div>
     </div>
   );
