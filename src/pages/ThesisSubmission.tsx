@@ -80,7 +80,7 @@ interface ProposalConfig {
 interface StoredProposal {
   hash: string;
   ipfsHash: string;
-  timestamp: number;
+  timestamp: string;
   title: string;
   targetCapital: string;
   status: 'pending' | 'active' | 'completed';
@@ -345,7 +345,7 @@ const ThesisSubmission = () => {
       const newProposal: StoredProposal = {
         hash: result.hash,
         ipfsHash,
-        timestamp: Date.now(),
+        timestamp: Date.now().toString(),
         title: formData.title,
         targetCapital: formData.investment.targetCapital,
         status: 'pending'
