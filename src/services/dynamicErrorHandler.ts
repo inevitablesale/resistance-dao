@@ -72,4 +72,3 @@ export const handleDynamicError = (error: unknown): ProposalError => {
     technicalDetails: error instanceof Error ? error.stack : undefined
   });
 };
-

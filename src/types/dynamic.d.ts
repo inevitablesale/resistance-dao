@@ -1,3 +1,4 @@
+
 import { type EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { type ZeroDevSmartWalletConnectors } from "@dynamic-labs/ethereum-aa";
 import { type OnrampProviders } from "@dynamic-labs/sdk-api-core";
@@ -27,6 +28,7 @@ declare module "@dynamic-labs/sdk-react-core" {
       disconnect?: () => Promise<void>;
       connector?: {
         name?: string;
+        chainId?: number;
         showWallet?: (options: { view: 'send' | 'deposit' }) => void;
         openWallet?: (options: { view: 'send' | 'deposit' }) => void;  // Added for ZeroDev compatibility
       };
@@ -115,4 +117,11 @@ declare module "@dynamic-labs/sdk-react-core" {
   }>;
 
   export const DynamicWidget: React.FC;
+
+  export class DynamicError extends Error {
+    code: string;
+    message: string;
+    stack?: string;
+  }
 }
+

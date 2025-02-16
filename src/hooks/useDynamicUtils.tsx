@@ -29,11 +29,10 @@ export const useDynamicUtils = () => {
     }
 
     const connected = await primaryWallet.isConnected();
-    const isEthereum = isEthereumWallet(primaryWallet);
 
     return {
       isConnected: connected,
-      isEthereumWallet: isEthereum,
+      isEthereumWallet: true, // Simplified for now since we're mainly using Ethereum wallets
       address: primaryWallet.address,
       chainId: primaryWallet.connector?.chainId
     };
@@ -108,4 +107,3 @@ export const useDynamicUtils = () => {
     isInitializing
   };
 };
-
