@@ -525,7 +525,7 @@ const ThesisSubmission = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8 space-y-6">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid grid-cols-4 gap-4 bg-transparent">
+                <TabsList className="grid grid-cols-5 gap-4 bg-transparent">
                   <TabsTrigger
                     value="basics"
                     className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
@@ -553,6 +553,13 @@ const ThesisSubmission = () => {
                   >
                     <Briefcase className="w-4 h-4 mr-2" />
                     Terms
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="approval"
+                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
+                  >
+                    <Wallet className="w-4 h-4 mr-2" />
+                    Approve
                   </TabsTrigger>
                 </TabsList>
 
@@ -593,11 +600,6 @@ const ThesisSubmission = () => {
                           onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
                           error={formErrors['investment.targetCapital']}
                         />
-
-                        <ContractApprovalStatus
-                          onApprovalComplete={() => updateStepStatus('approval', 'completed')}
-                          requiredAmount={SUBMISSION_FEE.toString()}
-                        />
                       </div>
                     </Card>
                   </TabsContent>
@@ -634,6 +636,23 @@ const ThesisSubmission = () => {
                           formErrors={formErrors}
                           onChange={handleFormDataChange}
                         />
+                      </div>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="approval">
+                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+                      <div className="p-6">
+                        <div className="space-y-4">
+                          <h3 className="text-xl font-semibold text-white">Token Approval</h3>
+                          <p className="text-gray-400">
+                            Before submitting your thesis, you need to approve the contract to use your LGR tokens.
+                          </p>
+                          <ContractApprovalStatus
+                            onApprovalComplete={() => updateStepStatus('approval', 'completed')}
+                            requiredAmount={SUBMISSION_FEE.toString()}
+                          />
+                        </div>
                       </div>
                     </Card>
                   </TabsContent>
