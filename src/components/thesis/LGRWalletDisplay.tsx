@@ -36,7 +36,7 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
 
   const hasInsufficientBalance = currentBalance && 
-    Number(currentBalance) < Number(ethers.utils.formatEther(submissionFee));
+    Number(ethers.utils.formatEther(submissionFee)) > Number(currentBalance);
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -154,22 +154,24 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
       className
     )}>
       <div className="space-y-3">
-        <Button
-          variant="outline"
-          className={cn(
-            "w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium relative",
-            hasInsufficientBalance && "border-red-500/50"
-          )}
-          onClick={() => setShowBalances(!showBalances)}
-        >
+        <div className="relative w-full">
+          <Button
+            variant="outline"
+            className={cn(
+              "w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white font-medium",
+              hasInsufficientBalance && "border-red-500/50"
+            )}
+            onClick={() => setShowBalances(!showBalances)}
+          >
+            {showBalances ? <EyeOff className="w-6 h-6 mr-2" /> : <Eye className="w-6 h-6 mr-2" />}
+            Balances
+          </Button>
           {hasInsufficientBalance && (
-            <div className="absolute -top-1.5 -right-1.5">
-              <AlertCircle className="w-4 h-4 text-red-500" />
+            <div className="absolute -top-2 -right-2">
+              <AlertCircle className="w-5 h-5 text-red-500" />
             </div>
           )}
-          {showBalances ? <EyeOff className="w-6 h-6 mr-2" /> : <Eye className="w-6 h-6 mr-2" />}
-          Balances
-        </Button>
+        </div>
 
         <Button
           variant="outline"
