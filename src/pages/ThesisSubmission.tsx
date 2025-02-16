@@ -77,6 +77,7 @@ const ThesisSubmission = () => {
   const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTestMode, setIsTestMode] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     industry: {
@@ -88,11 +89,11 @@ const ThesisSubmission = () => {
       location: "",
       dealType: ""
     },
-    paymentTerms: [], // Initialize as empty array
+    paymentTerms: [],
     strategies: {
-      operational: [], // Initialize as empty array
-      growth: [], // Initialize as empty array
-      integration: [] // Initialize as empty array
+      operational: [],
+      growth: [],
+      integration: []
     },
     investment: {
       targetCapital: "",
@@ -172,11 +173,18 @@ const ThesisSubmission = () => {
 
     try {
       setIsSubmitting(true);
+      setFormErrors({});
 
       // 1. Validate proposal metadata
       const validationResult = validateProposalMetadata(formData);
       if (!validationResult.isValid) {
-        throw new Error(Object.values(validationResult.errors).flat().join(", "));
+        setFormErrors(validationResult.errors);
+        toast({
+          title: "Validation Error",
+          description: "Please fix the highlighted fields",
+          variant: "destructive"
+        });
+        return;
       }
 
       // 2. Get contract status and validate
@@ -186,15 +194,30 @@ const ThesisSubmission = () => {
       const contractStatus = await getContractStatus(wallet);
       
       if (contractStatus.isPaused) {
-        throw new Error("Contract is currently paused for maintenance");
+        toast({
+          title: "Contract Paused",
+          description: "The contract is currently paused for maintenance",
+          variant: "destructive"
+        });
+        return;
       }
 
       // 3. First approve LGR tokens for submission fee
       console.log('Approving LGR tokens for submission...');
       const submissionFeeApproval = await approveLGR(contractStatus.submissionFee.toString());
       if (!submissionFeeApproval) {
-        throw new Error("Failed to approve LGR tokens for submission");
+        toast({
+          title: "Approval Failed",
+          description: "Failed to approve LGR tokens for submission",
+          variant: "destructive"
+        });
+        return;
       }
+
+      toast({
+        title: "Tokens Approved",
+        description: "LGR tokens approved for submission",
+      });
 
       // 4. Upload metadata to IPFS
       console.log('Uploading metadata to IPFS...');
@@ -202,7 +225,12 @@ const ThesisSubmission = () => {
       const ipfsHash = ipfsUri.replace('ipfs://', '');
       
       if (!validateIPFSHash(ipfsHash)) {
-        throw new Error("Invalid IPFS hash format");
+        toast({
+          title: "IPFS Error",
+          description: "Failed to upload metadata to IPFS",
+          variant: "destructive"
+        });
+        return;
       }
       console.log('Metadata uploaded to IPFS:', ipfsHash);
 
@@ -216,7 +244,13 @@ const ThesisSubmission = () => {
       );
 
       if (!paramValidation.isValid) {
-        throw new Error(Object.values(paramValidation.errors).flat().join(", "));
+        setFormErrors(paramValidation.errors);
+        toast({
+          title: "Contract Parameter Error",
+          description: Object.values(paramValidation.errors).flat().join(", "),
+          variant: "destructive"
+        });
+        return;
       }
 
       // 6. Create proposal with retry mechanism
@@ -238,7 +272,7 @@ const ThesisSubmission = () => {
 
       toast({
         title: "Success",
-        description: "Your investment thesis has been submitted",
+        description: "Your investment thesis has been submitted successfully",
       });
 
     } catch (error) {
@@ -285,31 +319,6 @@ const ThesisSubmission = () => {
             </p>
           </div>
 
-          <Card className="p-6 bg-black/50 border border-white/10 backdrop-blur-xl mb-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-start space-x-4">
-                <CreditCard className="w-6 h-6 text-purple-400 mt-1" />
-                <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-white">Submission Fee</h3>
-                  <div className="space-y-1">
-                    <p className="text-gray-400">
-                      A submission fee of 250 LGR is required to create a proposal. This fee helps ensure high-quality submissions and prevents spam while contributing to the DAO treasury.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Label htmlFor="test-mode" className="text-sm text-gray-400">Test Mode</Label>
-                <Switch
-                  id="test-mode"
-                  checked={isTestMode}
-                  onCheckedChange={setIsTestMode}
-                  className="data-[state=checked]:bg-purple-500"
-                />
-              </div>
-            </div>
-          </Card>
-
           <Card className="p-8 bg-black/50 border border-white/10 backdrop-blur-xl">
             <form onSubmit={handleSubmit} className="space-y-8">
               <div>
@@ -317,15 +326,21 @@ const ThesisSubmission = () => {
                   Thesis Title
                 </label>
                 <p className="text-sm text-gray-400 mb-2">
-                  📌 Provide a concise name for the investment strategy (e.g., "Regional CPA Roll-Up Strategy" or "Boutique Tax Firm Acquisition")
+                  📌 Provide a concise name for the investment strategy
                 </p>
                 <Input
                   placeholder="Enter thesis title"
-                  className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
+                  className={cn(
+                    "bg-black/50 border-white/10 text-white placeholder:text-gray-500",
+                    formErrors.title ? "border-red-500" : ""
+                  )}
                   required
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 />
+                {formErrors.title && (
+                  <p className="mt-1 text-sm text-red-500">{formErrors.title[0]}</p>
+                )}
               </div>
 
               <div className="space-y-4">
@@ -742,15 +757,25 @@ const ThesisSubmission = () => {
               <div className="border-t border-white/10 pt-6">
                 <div className="flex items-center text-sm text-yellow-400 mb-6">
                   <AlertTriangle className="w-4 h-4 mr-2" />
-                  All submissions will be reviewed by the LedgerFund DAO community, with investment allocations determined by LGR token holders
+                  All submissions will be reviewed by the LedgerFund DAO community
                 </div>
 
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
+                  className={cn(
+                    "w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700",
+                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                  )}
                 >
-                  {isSubmitting ? "Submitting..." : "Submit Investment Thesis"}
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center">
+                      <span className="mr-2">Submitting...</span>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+                    </div>
+                  ) : (
+                    "Submit Investment Thesis"
+                  )}
                 </Button>
               </div>
             </form>
