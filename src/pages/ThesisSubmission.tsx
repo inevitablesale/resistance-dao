@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -513,226 +512,75 @@ const ThesisSubmission = () => {
                 </div>
 
                 <div className="p-6 space-y-8">
-                  <Collapsible
-                    open={isThesisOpen}
-                    onOpenChange={setIsThesisOpen}
-                    className="w-full"
-                  >
-                    <CollapsibleTrigger asChild>
-                      <button 
-                        type="button"
-                        className="w-full text-left"
-                      >
-                        <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                          <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
-                            1
-                          </div>
-                          <div className="flex-1">
-                            <h2 className="text-xl font-semibold text-purple-400 group-hover:text-purple-300 transition-colors">
-                              Investment Thesis
-                            </h2>
-                            <p className="text-sm text-white/60">
-                              Fill out your investment thesis details
-                            </p>
-                          </div>
-                          <ChevronDown className={cn(
-                            "w-5 h-5 text-white/60 transition-transform duration-200",
-                            isThesisOpen && "transform rotate-180"
-                          )} />
-                        </div>
-                      </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="space-y-6"
-                      >
-                        <div className="space-y-4">
-                          <Label className="text-lg font-medium text-white">
-                            Thesis Title
-                          </Label>
-                          <Input
-                            placeholder="Enter a clear, descriptive title"
-                            className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
-                            value={formData.title}
-                            onChange={(e) => handleFormDataChange('title', e.target.value)}
-                          />
-                          {formErrors.title && (
-                            <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                          )}
-                        </div>
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <Label className="text-lg font-medium text-white">
+                        Thesis Title
+                      </Label>
+                      <Input
+                        placeholder="Enter a clear, descriptive title"
+                        className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                        value={formData.title}
+                        onChange={(e) => handleFormDataChange('title', e.target.value)}
+                      />
+                      {formErrors.title && (
+                        <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                      )}
+                    </div>
 
-                        <VotingDurationInput
-                          value={votingDuration}
-                          onChange={handleVotingDurationChange}
-                          error={formErrors.votingDuration}
-                        />
+                    <VotingDurationInput
+                      value={votingDuration}
+                      onChange={handleVotingDurationChange}
+                      error={formErrors.votingDuration}
+                    />
 
-                        <TargetCapitalInput
-                          value={formData.investment.targetCapital}
-                          onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
-                          error={formErrors['investment.targetCapital']}
-                        />
-                      </motion.div>
-                    </CollapsibleContent>
-                  </Collapsible>
+                    <TargetCapitalInput
+                      value={formData.investment.targetCapital}
+                      onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+                      error={formErrors['investment.targetCapital']}
+                    />
 
-                  <Collapsible
-                    open={isStrategyOpen}
-                    onOpenChange={setIsStrategyOpen}
-                    className="w-full"
-                  >
-                    <CollapsibleTrigger asChild>
-                      <button 
-                        type="button"
-                        className="w-full text-left"
-                      >
-                        <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                          <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-semibold">
-                            2
-                          </div>
-                          <div className="flex-1">
-                            <h2 className="text-xl font-semibold text-blue-400 group-hover:text-blue-300 transition-colors">
-                              Strategy Selection
-                            </h2>
-                            <p className="text-sm text-white/60">
-                              Select your post-acquisition strategies
-                            </p>
-                          </div>
-                          <ChevronDown className={cn(
-                            "w-5 h-5 text-white/60 transition-transform duration-200",
-                            isStrategyOpen && "transform rotate-180"
-                          )} />
-                        </div>
-                      </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <StrategiesSection 
-                          formData={{
-                            strategies: {
-                              operational: formData.strategies.operational,
-                              growth: formData.strategies.growth,
-                              integration: formData.strategies.integration
-                            }
-                          }}
-                          formErrors={formErrors}
-                          onChange={handleStrategyChange}
-                        />
-                      </motion.div>
-                    </CollapsibleContent>
-                  </Collapsible>
+                    <StrategiesSection 
+                      formData={{
+                        strategies: {
+                          operational: formData.strategies.operational,
+                          growth: formData.strategies.growth,
+                          integration: formData.strategies.integration
+                        }
+                      }}
+                      formErrors={formErrors}
+                      onChange={handleStrategyChange}
+                    />
 
-                  <Collapsible
-                    open={isApprovalOpen}
-                    onOpenChange={setIsApprovalOpen}
-                    className="w-full"
-                  >
-                    <CollapsibleTrigger asChild>
-                      <button 
-                        type="button"
-                        className="w-full text-left"
-                      >
-                        <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                          <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 font-semibold">
-                            3
-                          </div>
-                          <div className="flex-1">
-                            <h2 className="text-xl font-semibold text-green-400 group-hover:text-green-300 transition-colors">
-                              Token Approval
-                            </h2>
-                            <p className="text-sm text-white/60">
-                              Approve LGR tokens for submission
-                            </p>
-                          </div>
-                          <ChevronDown className={cn(
-                            "w-5 h-5 text-white/60 transition-transform duration-200",
-                            isApprovalOpen && "transform rotate-180"
-                          )} />
-                        </div>
-                      </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <ContractApprovalStatus
-                          onApprovalComplete={() => {
-                            setIsApprovalOpen(false);
-                            setIsSubmissionOpen(true);
-                          }}
-                          requiredAmount={SUBMISSION_FEE.toString()}
-                        />
-                      </motion.div>
-                    </CollapsibleContent>
-                  </Collapsible>
+                    <FirmCriteriaSection 
+                      formData={{
+                        firmCriteria: {
+                          size: formData.firmCriteria.size,
+                          location: formData.firmCriteria.location,
+                          dealType: formData.firmCriteria.dealType,
+                          geographicFocus: formData.firmCriteria.geographicFocus
+                        }
+                      }}
+                      formErrors={formErrors}
+                      onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
+                    />
 
-                  <Collapsible
-                    open={isSubmissionOpen}
-                    onOpenChange={setIsSubmissionOpen}
-                    className="w-full"
-                  >
-                    <CollapsibleTrigger asChild>
-                      <button 
-                        type="button"
-                        className="w-full text-left"
-                      >
-                        <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                          <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 font-semibold">
-                            4
-                          </div>
-                          <div className="flex-1">
-                            <h2 className="text-xl font-semibold text-orange-400 group-hover:text-orange-300 transition-colors">
-                              Thesis Submission
-                            </h2>
-                            <p className="text-sm text-white/60">
-                              Submit your thesis to the blockchain
-                            </p>
-                          </div>
-                          <ChevronDown className={cn(
-                            "w-5 h-5 text-white/60 transition-transform duration-200",
-                            isSubmissionOpen && "transform rotate-180"
-                          )} />
-                        </div>
-                      </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-4 px-4 pb-6">
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <FirmCriteriaSection 
-                          formData={{
-                            firmCriteria: {
-                              size: formData.firmCriteria.size,
-                              location: formData.firmCriteria.location,
-                              dealType: formData.firmCriteria.dealType,
-                              geographicFocus: formData.firmCriteria.geographicFocus
-                            }
-                          }}
-                          formErrors={formErrors}
-                          onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
-                        />
+                    <PaymentTermsSection 
+                      formData={{
+                        paymentTerms: formData.paymentTerms
+                      }}
+                      formErrors={formErrors}
+                      onChange={(value) => handleFormDataChange('paymentTerms', value)}
+                    />
 
-                        <PaymentTermsSection 
-                          formData={{
-                            paymentTerms: formData.paymentTerms
-                          }}
-                          formErrors={formErrors}
-                          onChange={(value) => handleFormDataChange('paymentTerms', value)}
-                        />
-                      </motion.div>
-                    </CollapsibleContent>
-                  </Collapsible>
+                    <ContractApprovalStatus
+                      onApprovalComplete={() => {
+                        updateStepStatus('approval', 'completed');
+                        setActiveStep('submission');
+                      }}
+                      requiredAmount={SUBMISSION_FEE.toString()}
+                    />
+                  </div>
                 </div>
               </Card>
 
