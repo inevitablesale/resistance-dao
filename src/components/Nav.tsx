@@ -8,9 +8,9 @@ import WalletAssets from "./wallet/WalletAssets";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 
 const Nav = () => {
-  const { showAuthFlow, user } = useDynamicContext();
+  const { primaryWallet, user } = useDynamicContext();
   const { toast } = useToast();
-  const hasWallet = !!user?.verifiedCredentials?.[0]?.address;
+  const hasWallet = !!primaryWallet?.address;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
