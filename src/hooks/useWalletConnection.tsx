@@ -66,6 +66,7 @@ export const useWalletConnection = () => {
     disconnect,
     address: primaryWallet?.address,
     approveLGR,
-    setShowOnRamp
+    setShowOnRamp,
+    setShowAuthFlow
   };
 };

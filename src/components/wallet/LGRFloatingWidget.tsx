@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -9,7 +8,6 @@ import { Coins, Wallet, HelpCircle } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 export const LGRFloatingWidget = () => {
@@ -22,8 +20,7 @@ export const LGRFloatingWidget = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
   const { toast } = useToast();
-  const { setShowOnRamp, setShowAuthFlow } = useDynamicContext();
-  const { isConnected } = useWalletConnection();
+  const { isConnected, setShowOnRamp, setShowAuthFlow } = useWalletConnection();
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -301,21 +298,18 @@ export const LGRFloatingWidget = () => {
                 <Button
                   onClick={() => {
                     setIsInstructionsOpen(false);
-                    showWallet('deposit');
+                    handleBuyMatic();
                   }}
                   className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
                 >
                   Buy POLYGON
                 </Button>
                 <Button
-                  onClick={() => {
-                    setIsInstructionsOpen(false);
-                    showWallet('send');
-                  }}
+                  onClick={() => setIsInstructionsOpen(false)}
                   variant="outline"
                   className="w-full border-purple-500/50 text-purple-500 hover:bg-purple-500/10"
                 >
-                  Send POLYGON
+                  Close
                 </Button>
               </div>
             </div>
