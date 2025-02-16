@@ -23,7 +23,6 @@ import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
 import { SubmissionFeeDisplay } from "@/components/thesis/SubmissionFeeDisplay";
 import { ProposalsHistory } from "@/components/thesis/ProposalsHistory";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
-import { IndustrySection } from "@/components/thesis/form-sections/IndustrySection";
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
@@ -51,14 +50,11 @@ const MAX_PAYMENT_TERMS = 5;
 
 interface ProposalMetadata {
   title: string;
-  industry: {
-    focus: string;
-    other?: string;
-  };
   firmCriteria: {
     size: string;
     location: string;
     dealType: string;
+    geographicFocus: string;
   };
   paymentTerms: string[];
   strategies: {
@@ -132,14 +128,11 @@ const ThesisSubmission = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
-    industry: {
-      focus: "",
-      other: ""
-    },
     firmCriteria: {
       size: "",
       location: "",
-      dealType: ""
+      dealType: "",
+      geographicFocus: ""
     },
     paymentTerms: [],
     strategies: {
@@ -154,7 +147,7 @@ const ThesisSubmission = () => {
     }
   });
 
-  const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
+  const [votingDuration, setVotingDuration] = useState<string>(MIN_VOTING_DURATION.toString());
   const [hasShownBalanceWarning, setHasShownBalanceWarning] = useState(false);
   const [currentStep, setCurrentStep] = useState<string>('thesis');
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
@@ -210,7 +203,7 @@ const ThesisSubmission = () => {
   };
 
   const handleVotingDurationChange = (value: number[]) => {
-    setVotingDuration(value[0]);
+    setVotingDuration(value[0].toString());
   };
 
   const getButtonText = () => {
@@ -274,12 +267,6 @@ const ThesisSubmission = () => {
   const validateFirmTab = (): boolean => {
     const errors: Record<string, string[]> = {};
     
-    if (!formData.industry.focus) {
-      errors['industry.focus'] = ['Please select an industry focus'];
-    }
-    if (formData.industry.focus === 'other' && !formData.industry.other) {
-      errors['industry.other'] = ['Please specify the industry'];
-    }
     if (!formData.firmCriteria.size) {
       errors['firmCriteria.size'] = ['Please select a firm size'];
     }
@@ -288,6 +275,9 @@ const ThesisSubmission = () => {
     }
     if (!formData.firmCriteria.dealType) {
       errors['firmCriteria.dealType'] = ['Please select a deal type'];
+    }
+    if (!formData.firmCriteria.geographicFocus) {
+      errors['firmCriteria.geographicFocus'] = ['Please select a geographic focus'];
     }
 
     setFormErrors(errors);
