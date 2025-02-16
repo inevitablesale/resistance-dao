@@ -3,14 +3,14 @@ import { useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2, Wallet, Mail } from "lucide-react";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 
 export const WalletConnectModal = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { connect, isConnecting, isConnected } = useWalletConnection();
+  const { connectWallet, isInitializing } = useDynamicUtils();
 
   const handleConnect = async (method: 'wallet' | 'email') => {
-    await connect();
+    await connectWallet();
     setIsOpen(false);
   };
 
@@ -21,7 +21,7 @@ export const WalletConnectModal = () => {
         variant="outline"
         className="bg-white/5 border-white/10 hover:bg-white/10 text-white"
       >
-        {isConnecting ? (
+        {isInitializing ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Connecting...
@@ -74,3 +74,4 @@ export const WalletConnectModal = () => {
     </>
   );
 };
+

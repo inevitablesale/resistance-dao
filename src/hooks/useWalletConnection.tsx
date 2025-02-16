@@ -4,11 +4,14 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ethers } from "ethers";
 import { getContractStatus } from "@/services/proposalContractService";
+import { useDynamicUtils } from "./useDynamicUtils";
+import { handleDynamicError } from "@/services/dynamicErrorHandler";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 export const useWalletConnection = () => {
   const { primaryWallet, setShowAuthFlow, setShowOnRamp } = useDynamicContext();
+  const { getWalletState, getProvider, connectWallet, validateNetwork } = useDynamicUtils();
   const [isConnecting, setIsConnecting] = useState(false);
   const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
   const { toast } = useToast();
@@ -16,9 +19,15 @@ export const useWalletConnection = () => {
   const connect = async () => {
     try {
       setIsConnecting(true);
-      setShowAuthFlow?.(true);
+      await connectWallet();
     } catch (error) {
       console.error("Connection error:", error);
+      const proposalError = handleDynamicError(error);
+      toast({
+        title: "Connection Failed",
+        description: proposalError.message,
+        variant: "destructive"
+      });
     } finally {
       setIsConnecting(false);
     }
@@ -32,37 +41,47 @@ export const useWalletConnection = () => {
       }
     } catch (error) {
       console.error("Disconnect error:", error);
+      const proposalError = handleDynamicError(error);
+      toast({
+        title: "Disconnect Failed",
+        description: proposalError.message,
+        variant: "destructive"
+      });
     } finally {
       setIsConnecting(false);
     }
   };
 
   const approveLGR = async (amount: string) => {
-    if (!primaryWallet) {
-      throw new Error("No wallet connected");
+    try {
+      await validateNetwork();
+
+      if (!treasuryAddress) {
+        const status = await getContractStatus(primaryWallet!);
+        setTreasuryAddress(status.treasuryAddress);
+      }
+
+      const provider = await getProvider();
+      const signer = provider.getSigner();
+      const lgrToken = new ethers.Contract(
+        LGR_TOKEN_ADDRESS,
+        ["function approve(address spender, uint256 amount) returns (bool)"],
+        signer
+      );
+
+      const tx = await lgrToken.approve(treasuryAddress, amount);
+      await tx.wait();
+      return true;
+    } catch (error) {
+      console.error("Approval error:", error);
+      const proposalError = handleDynamicError(error);
+      toast({
+        title: "Approval Failed",
+        description: proposalError.message,
+        variant: "destructive"
+      });
+      throw proposalError;
     }
-
-    if (!treasuryAddress) {
-      const status = await getContractStatus(primaryWallet);
-      setTreasuryAddress(status.treasuryAddress);
-    }
-
-    const walletClient = await primaryWallet.getWalletClient();
-    if (!walletClient) {
-      throw new Error("No wallet client available");
-    }
-
-    const provider = new ethers.providers.Web3Provider(walletClient as any);
-    const signer = provider.getSigner();
-    const lgrToken = new ethers.Contract(
-      LGR_TOKEN_ADDRESS,
-      ["function approve(address spender, uint256 amount) returns (bool)"],
-      signer
-    );
-
-    const tx = await lgrToken.approve(treasuryAddress, amount);
-    await tx.wait();
-    return true;
   };
 
   // Move the auth flow closing logic to useEffect
@@ -84,3 +103,4 @@ export const useWalletConnection = () => {
     wallet: primaryWallet
   };
 };
+
