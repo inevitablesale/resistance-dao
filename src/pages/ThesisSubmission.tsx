@@ -22,24 +22,14 @@ import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTe
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { motion } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { StoredProposal } from "@/types/proposals";
 
-const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
-const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
-const FACTORY_ABI = [
-  "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
-  "function submissionFee() public view returns (uint256)",
-  "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"
-];
-
-const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
-const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
-const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
-const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
-const SUBMISSION_FEE = ethers.utils.parseEther("250");
-const VOTING_FEE = ethers.utils.parseEther("10");
-const MAX_STRATEGIES_PER_CATEGORY = 3;
-const MAX_SUMMARY_LENGTH = 500;
-const MAX_PAYMENT_TERMS = 5;
+interface SubmissionStep {
+  id: string;
+  title: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  description: string;
+}
 
 interface ProposalMetadata {
   title: string;
@@ -67,6 +57,24 @@ interface ProposalConfig {
   votingDuration: number;
   ipfsHash: string;
 }
+
+const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
+const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
+const FACTORY_ABI = [
+  "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
+  "function submissionFee() public view returns (uint256)",
+  "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"
+];
+
+const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
+const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
+const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
+const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
+const SUBMISSION_FEE = ethers.utils.parseEther("250");
+const VOTING_FEE = ethers.utils.parseEther("10");
+const MAX_STRATEGIES_PER_CATEGORY = 3;
+const MAX_SUMMARY_LENGTH = 500;
+const MAX_PAYMENT_TERMS = 5;
 
 const US_STATES = [
   "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
