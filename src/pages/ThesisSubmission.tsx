@@ -575,19 +575,34 @@ const ThesisSubmission = () => {
                   </Collapsible>
 
                   <FirmCriteriaSection 
-                    formData={{ firmCriteria: formData.firmCriteria }}
+                    formData={{
+                      firmCriteria: {
+                        size: formData.firmCriteria.size,
+                        location: formData.firmCriteria.location,
+                        dealType: formData.firmCriteria.dealType,
+                        geographicFocus: formData.firmCriteria.geographicFocus
+                      }
+                    }}
                     formErrors={formErrors}
                     onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
                   />
 
                   <StrategiesSection 
-                    formData={{ strategies: formData.strategies }}
+                    formData={{
+                      strategies: {
+                        operational: formData.strategies.operational,
+                        growth: formData.strategies.growth,
+                        integration: formData.strategies.integration
+                      }
+                    }}
                     formErrors={formErrors}
                     onChange={handleStrategyChange}
                   />
 
                   <PaymentTermsSection 
-                    formData={{ paymentTerms: formData.paymentTerms }}
+                    formData={{
+                      paymentTerms: formData.paymentTerms
+                    }}
                     formErrors={formErrors}
                     onChange={(value) => handleFormDataChange('paymentTerms', value)}
                   />
