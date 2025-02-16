@@ -34,8 +34,6 @@ import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCrite
 import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { motion } from "framer-motion";
-import { Sheet, SheetTrigger, SheetContent } from "@radix-ui/react-dialog";
-import { Info } from "lucide-react";
 import { StoredProposal } from "@/types/proposals";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
@@ -334,7 +332,7 @@ const ThesisSubmission = () => {
         break;
       case 'terms':
         isValid = validateTermsTab();
-        if (isValid) handleSubmit(e);
+        handleSubmit(e);
         break;
     }
 
@@ -540,277 +538,325 @@ const ThesisSubmission = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
-            <div className="lg:col-span-8 space-y-4 md:space-y-6">
-              <div className="block lg:hidden mb-4 px-4">
-                <div className="flex items-center justify-between text-sm text-white/60">
-                  <span>Step {(['basics', 'firm', 'strategy', 'terms'].indexOf(activeTab) + 1).toString()} of 4</span>
-                  <span className="text-white font-medium">
-                    {activeTab === 'basics' ? 'Basic Details' :
-                     activeTab === 'firm' ? 'Firm Details' :
-                     activeTab === 'strategy' ? 'Strategy' : 'Terms'}
-                  </span>
-                </div>
-                <div className="h-1 bg-white/10 rounded-full mt-2">
-                  <div 
-                    className="h-full bg-polygon-primary rounded-full transition-all duration-300"
-                    style={{ 
-                      width: `${((['basics', 'firm', 'strategy', 'terms'].indexOf(activeTab) + 1) / 4 * 100).toString()}%` 
-                    }}
-                  />
-                </div>
-              </div>
-
-              <Tabs 
-                value={activeTab} 
-                onValueChange={setActiveTab} 
-                className="w-full"
-              >
-                <TabsList className="hidden lg:grid grid-cols-4 gap-4 bg-transparent">
-                  <TabsTrigger
-                    value="basics"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    Basics
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="firm"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
-                  >
-                    <Building2 className="w-4 h-4 mr-2" />
-                    Firm
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="strategy"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
-                  >
-                    <Target className="w-4 h-4 mr-2" />
-                    Strategy
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="terms"
-                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
-                  >
-                    <Briefcase className="w-4 h-4 mr-2" />
-                    Terms
-                  </TabsTrigger>
-                </TabsList>
-
-                <div className="mt-4 md:mt-6">
-                  <TabsContent value="basics" className="m-0">
-                    <Card className="bg-black/40 border-white/10 text-white">
-                      <div className="p-4 md:p-6 space-y-4 md:space-y-6">
-                        <div>
-                          <label className="text-lg font-medium text-white mb-2 block">
-                            Thesis Title
-                          </label>
-                          <p className="text-sm text-gray-400 mb-2">
-                            📌 Provide a concise name for the investment strategy
-                          </p>
-                          <Input
-                            placeholder="Enter thesis title"
-                            className={cn(
-                              "bg-black/50 border-white/10 text-white placeholder:text-gray-500",
-                              formErrors.title ? "border-red-500" : ""
-                            )}
-                            required
-                            value={formData.title}
-                            onChange={(e) => handleFormDataChange('title', e.target.value)}
-                          />
-                          {formErrors.title && (
-                            <p className="mt-1 text-sm text-red-500">{formErrors.title[0]}</p>
-                          )}
-                        </div>
-
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <Label className="text-lg font-medium text-white">Voting Duration</Label>
-                              <p className="text-sm text-gray-400">Set how long the community can vote on your thesis</p>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-2xl font-bold text-white">
-                                {Math.floor(votingDuration / (24 * 60 * 60))}
-                              </span>
-                              <span className="text-gray-400 ml-2">days</span>
-                            </div>
-                          </div>
-                          <Slider
-                            value={[votingDuration]}
-                            min={MIN_VOTING_DURATION}
-                            max={MAX_VOTING_DURATION}
-                            step={24 * 60 * 60}
-                            className="w-full"
-                            onValueChange={handleVotingDurationChange}
-                          />
-                          <div className="flex justify-between text-sm text-gray-400">
-                            <span>7 days</span>
-                            <span>90 days</span>
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label className="text-lg font-medium text-white mb-2 block">Target Capital Raise (USD)</Label>
-                          <div className="relative">
-                            <Input
-                              type="text"
-                              placeholder="Enter amount in USD"
-                              className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 pl-12"
-                              required
-                              value={formData.investment.targetCapital}
-                              onChange={(e) => {
-                                const value = e.target.value.replace(/[^0-9.]/g, '');
-                                handleFormDataChange('investment.targetCapital', value);
-                              }}
-                            />
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </TabsContent>
-
-                  <TabsContent value="firm" className="m-0">
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-4 md:p-6">
-                        <IndustrySection 
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={handleFormDataChange}
-                        />
-                        <div className="mt-8">
-                          <FirmCriteriaSection 
-                            formData={formData}
-                            formErrors={formErrors}
-                            onChange={handleFormDataChange}
-                          />
-                        </div>
-                      </div>
-                    </Card>
-                  </TabsContent>
-
-                  <TabsContent value="strategy" className="m-0">
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-4 md:p-6">
-                        <StrategiesSection 
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={handleStrategyChange}
-                        />
-                        <div className="mt-8 space-y-6">
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <label className="text-lg font-medium text-white">
-                                Key Investment Drivers
-                              </label>
-                              <span className={cn(
-                                "text-sm",
-                                formData.investment.drivers.length > MAX_SUMMARY_LENGTH 
-                                  ? "text-red-400" 
-                                  : "text-gray-400"
-                              )}>
-                                {formData.investment.drivers.length}/{MAX_SUMMARY_LENGTH}
-                              </span>
-                            </div>
-                            <Textarea
-                              placeholder="Describe earnings stability, strong client base, scalability, cultural fit, technology adoption, etc."
-                              className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
-                              required
-                              value={formData.investment.drivers}
-                              onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </TabsContent>
-
-                  <TabsContent value="terms" className="m-0">
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-                      <div className="p-4 md:p-6">
-                        <PaymentTermsSection 
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={handleFormDataChange}
-                        />
-                        <div className="mt-8">
-                          <div className="flex items-center justify-between mb-2">
-                            <label className="text-lg font-medium text-white">
-                              Additional Investment Criteria
-                            </label>
-                            <span className={cn(
-                              "text-sm",
-                              formData.investment.additionalCriteria.length > MAX_SUMMARY_LENGTH 
-                                ? "text-red-400" 
-                                  : "text-gray-400"
-                            )}>
-                              {formData.investment.additionalCriteria.length}/{MAX_SUMMARY_LENGTH}
-                            </span>
-                          </div>
-                          <Textarea
-                            placeholder="EBITDA thresholds, firm specialization, geographic limitations, integration plans, etc."
-                            className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
-                            value={formData.investment.additionalCriteria}
-                            onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </Card>
-                  </TabsContent>
-                </div>
-              </Tabs>
-
-              <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/80 backdrop-blur-md border-t border-white/10 lg:hidden">
-                <div className="flex gap-4 max-w-md mx-auto">
-                  {activeTab !== 'basics' && (
-                    <Button
-                      onClick={() => {
-                        const tabs = ['basics', 'firm', 'strategy', 'terms'];
-                        const currentIndex = tabs.indexOf(activeTab);
-                        setActiveTab(tabs[currentIndex - 1]);
-                      }}
-                      variant="outline"
-                      className="flex-1"
-                    >
-                      Back
-                    </Button>
-                  )}
-                  <Button
-                    onClick={handleContinue}
-                    disabled={isSubmitting}
-                    className="flex-1 bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#4F46E5] transition-all duration-300"
-                  >
-                    {getButtonText()}
-                  </Button>
-                </div>
-              </div>
-
-              <Card className="hidden lg:block bg-black/40 border-white/10 backdrop-blur-sm p-6">
-                <Button
-                  onClick={handleContinue}
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#4F46E5] transition-all duration-300"
-                >
-                  {getButtonText()}
-                </Button>
-              </Card>
+          
+      
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
+        <div className="lg:col-span-8 space-y-4 md:space-y-6">
+          <div className="block lg:hidden mb-4 px-4">
+            <div className="flex items-center justify-between text-sm text-white/60">
+              <span>Step {(['basics', 'firm', 'strategy', 'terms'].indexOf(activeTab) + 1).toString()} of 4</span>
+              <span className="text-white font-medium">
+                {activeTab === 'basics' ? 'Basic Details' :
+                 activeTab === 'firm' ? 'Firm Details' :
+                 activeTab === 'strategy' ? 'Strategy' : 'Terms'}
+              </span>
             </div>
+            <div className="h-1 bg-white/10 rounded-full mt-2">
+              <div 
+                className="h-full bg-polygon-primary rounded-full transition-all duration-300"
+                style={{ 
+                  width: `${((['basics', 'firm', 'strategy', 'terms'].indexOf(activeTab) + 1) / 4 * 100).toString()}%` 
+                }}
+              />
+            </div>
+          </div>
 
-            <div className="hidden lg:block lg:col-span-4 space-y-6">
+          
+        
+        <Tabs 
+          value={activeTab} 
+          onValueChange={setActiveTab} 
+          className="w-full"
+        >
+          <TabsList className="hidden lg:grid grid-cols-4 gap-4 bg-transparent">
+            <TabsTrigger
+              value="basics"
+              className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Basics
+            </TabsTrigger>
+            <TabsTrigger
+              value="firm"
+              className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
+            >
+              <Building2 className="w-4 h-4 mr-2" />
+              Firm
+            </TabsTrigger>
+            <TabsTrigger
+              value="strategy"
+              className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
+            >
+              <Target className="w-4 h-4 mr-2" />
+              Strategy
+            </TabsTrigger>
+            <TabsTrigger
+              value="terms"
+              className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
+            >
+              <Briefcase className="w-4 h-4 mr-2" />
+              Terms
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="mt-4 md:mt-6">
+            <TabsContent value="basics" className="m-0">
+              <Card className="bg-black/40 border-white/10 text-white">
+                <div className="p-4 md:p-6 space-y-4 md:space-y-6">
+                  <div>
+                    <label className="text-lg font-medium text-white mb-2 block">
+                      Thesis Title
+                    </label>
+                    <p className="text-sm text-gray-400 mb-2">
+                      📌 Provide a concise name for the investment strategy
+                    </p>
+                    <Input
+                      placeholder="Enter thesis title"
+                      className={cn(
+                        "bg-black/50 border-white/10 text-white placeholder:text-gray-500",
+                        formErrors.title ? "border-red-500" : ""
+                      )}
+                      required
+                      value={formData.title}
+                      onChange={(e) => handleFormDataChange('title', e.target.value)}
+                    />
+                    {formErrors.title && (
+                      <p className="mt-1 text-sm text-red-500">{formErrors.title[0]}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-lg font-medium text-white">Voting Duration</Label>
+                        <p className="text-sm text-gray-400">Set how long the community can vote on your thesis</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-2xl font-bold text-white">
+                          {Math.floor(votingDuration / (24 * 60 * 60))}
+                        </span>
+                        <span className="text-gray-400 ml-2">days</span>
+                      </div>
+                    </div>
+                    <Slider
+                      value={[votingDuration]}
+                      min={MIN_VOTING_DURATION}
+                      max={MAX_VOTING_DURATION}
+                      step={24 * 60 * 60}
+                      className="w-full"
+                      onValueChange={handleVotingDurationChange}
+                    />
+                    <div className="flex justify-between text-sm text-gray-400">
+                      <span>7 days</span>
+                      <span>90 days</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-lg font-medium text-white mb-2 block">Target Capital Raise (USD)</Label>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        placeholder="Enter amount in USD"
+                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 pl-12"
+                        required
+                        value={formData.investment.targetCapital}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9.]/g, '');
+                          handleFormDataChange('investment.targetCapital', value);
+                        }}
+                      />
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="firm" className="m-0">
+              <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+                <div className="p-4 md:p-6">
+                  <IndustrySection 
+                    formData={formData}
+                    formErrors={formErrors}
+                    onChange={handleFormDataChange}
+                  />
+                  <div className="mt-8">
+                    <FirmCriteriaSection 
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={handleFormDataChange}
+                    />
+                  </div>
+                </div>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="strategy" className="m-0">
+              <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+                <div className="p-4 md:p-6">
+                  <StrategiesSection 
+                    formData={formData}
+                    formErrors={formErrors}
+                    onChange={handleStrategyChange}
+                  />
+                  <div className="mt-8 space-y-6">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-lg font-medium text-white">
+                          Key Investment Drivers
+                        </label>
+                        <span className={cn(
+                          "text-sm",
+                          formData.investment.drivers.length > MAX_SUMMARY_LENGTH 
+                            ? "text-red-400" 
+                            : "text-gray-400"
+                        )}>
+                          {formData.investment.drivers.length}/{MAX_SUMMARY_LENGTH}
+                        </span>
+                      </div>
+                      <Textarea
+                        placeholder="Describe earnings stability, strong client base, scalability, cultural fit, technology adoption, etc."
+                        className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
+                        required
+                        value={formData.investment.drivers}
+                        onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="terms" className="m-0">
+              <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+                <div className="p-4 md:p-6">
+                  <PaymentTermsSection 
+                    formData={formData}
+                    formErrors={formErrors}
+                    onChange={handleFormDataChange}
+                  />
+                  <div className="mt-8">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-lg font-medium text-white">
+                        Additional Investment Criteria
+                      </label>
+                      <span className={cn(
+                        "text-sm",
+                        formData.investment.additionalCriteria.length > MAX_SUMMARY_LENGTH 
+                          ? "text-red-400" 
+                            : "text-gray-400"
+                      )}>
+                        {formData.investment.additionalCriteria.length}/{MAX_SUMMARY_LENGTH}
+                      </span>
+                    </div>
+                    <Textarea
+                      placeholder="EBITDA thresholds, firm specialization, geographic limitations, integration plans, etc."
+                      className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
+                      value={formData.investment.additionalCriteria}
+                      onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
+                    />
+                  </div>
+                </div>
+              </Card>
+            </TabsContent>
+          </div>
+        </Tabs>
+
+        
+      
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/80 backdrop-blur-md border-t border-white/10 lg:hidden">
+        <div className="flex gap-4 max-w-md mx-auto">
+          {activeTab !== 'basics' && (
+            <Button
+              onClick={() => {
+                const tabs = ['basics', 'firm', 'strategy', 'terms'];
+                const currentIndex = tabs.indexOf(activeTab);
+                setActiveTab(tabs[currentIndex - 1]);
+              }}
+              variant="outline"
+              className="flex-1"
+            >
+              Back
+            </Button>
+          )}
+          <Button
+            onClick={handleContinue}
+            disabled={isSubmitting}
+            className="flex-1 bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#4F46E5] transition-all duration-300"
+          >
+            {getButtonText()}
+          </Button>
+        </div>
+      </div>
+
+      <Card className="hidden lg:block bg-black/40 border-white/10 backdrop-blur-sm p-6">
+        <Button
+          onClick={handleContinue}
+          disabled={isSubmitting}
+          className="w-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#4F46E5] transition-all duration-300"
+        >
+          {getButtonText()}
+        </Button>
+      </Card>
+    </div>
+
+    <div className="hidden lg:block lg:col-span-4 space-y-6">
+      <SubmissionFeeDisplay 
+        submissionFee={SUBMISSION_FEE.toString()}
+        currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance}
+      />
+
+      <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-6">
+        <h2 className="text-lg font-semibold text-white mb-4">Submission Progress</h2>
+        <SubmissionProgress 
+          steps={steps}
+          currentStepId={currentStep}
+        />
+      </Card>
+
+      {currentTxId && (
+        <TransactionStatus
+          transactionId={currentTxId}
+          onComplete={() => setCurrentTxId(null)}
+          onError={(error) => {
+            toast({
+              title: "Transaction Failed",
+              description: error,
+              variant: "destructive"
+            });
+          }}
+        />
+      )}
+
+      <ProposalsHistory />
+    </div>
+
+    
+      
+      <div className="lg:hidden">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button 
+              variant="outline" 
+              className="fixed bottom-24 right-4 rounded-full w-12 h-12 p-0 bg-black/80 backdrop-blur-md border-white/10"
+            >
+              <Info className="w-5 h-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="h-[80vh] bg-black/95 border-white/10">
+            <div className="h-full overflow-auto space-y-6 pb-24">
               <SubmissionFeeDisplay 
                 submissionFee={SUBMISSION_FEE.toString()}
                 currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance}
               />
-
-              <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-6">
+              <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-4">
                 <h2 className="text-lg font-semibold text-white mb-4">Submission Progress</h2>
                 <SubmissionProgress 
                   steps={steps}
                   currentStepId={currentStep}
                 />
               </Card>
-
               {currentTxId && (
                 <TransactionStatus
                   transactionId={currentTxId}
@@ -824,58 +870,6 @@ const ThesisSubmission = () => {
                   }}
                 />
               )}
-
               <ProposalsHistory />
             </div>
-
-            <div className="lg:hidden">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    className="fixed bottom-24 right-4 rounded-full w-12 h-12 p-0 bg-black/80 backdrop-blur-md border-white/10"
-                  >
-                    <Info className="w-5 h-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="bottom" className="h-[80vh] bg-black/95 border-white/10">
-                  <div className="h-full overflow-auto space-y-6 pb-24">
-                    <SubmissionFeeDisplay 
-                      submissionFee={SUBMISSION_FEE.toString()}
-                      currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance}
-                    />
-                    <Card className="bg-black/40 border-white/10 backdrop-blur-sm p-4">
-                      <h2 className="text-lg font-semibold text-white mb-4">Submission Progress</h2>
-                      <SubmissionProgress 
-                        steps={steps}
-                        currentStepId={currentStep}
-                      />
-                    </Card>
-                    {currentTxId && (
-                      <TransactionStatus
-                        transactionId={currentTxId}
-                        onComplete={() => setCurrentTxId(null)}
-                        onError={(error) => {
-                          toast({
-                            title: "Transaction Failed",
-                            description: error,
-                            variant: "destructive"
-                          });
-                        }}
-                      />
-                    )}
-                    <ProposalsHistory />
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-      
-      <LGRFloatingWidget />
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+          </Sheet
