@@ -23,6 +23,10 @@ import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
 import { SubmissionFeeDisplay } from "@/components/thesis/SubmissionFeeDisplay";
 import { ProposalsHistory } from "@/components/thesis/ProposalsHistory";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
+import { IndustrySection } from "@/components/thesis/form-sections/IndustrySection";
+import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
+import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
+import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { motion } from "framer-motion";
 import { StoredProposal } from "@/types/proposals";
 import type { SubmissionStep } from "@/components/thesis/SubmissionProgress";
@@ -466,7 +470,7 @@ const ThesisSubmission = () => {
         ipfsHash
       }, wallet);
 
-      // Store proposal data
+      // Store proposal data with correct type for targetCapital
       const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
       const newProposal: StoredProposal = {
         hash: result.hash,
@@ -563,7 +567,7 @@ const ThesisSubmission = () => {
                 </TabsList>
 
                 <div className="mt-6">
-                  <TabsContent value="basics" className="m-0">
+                  <TabsContent value="basics">
                     <Card className="bg-black/40 border-white/10 text-white">
                       <div className="p-6 space-y-6">
                         <div>
@@ -635,30 +639,6 @@ const ThesisSubmission = () => {
                           formErrors={formErrors}
                           onChange={handleStrategyChange}
                         />
-                        <div className="mt-8 space-y-6">
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <label className="text-lg font-medium text-white">
-                                Key Investment Drivers
-                              </label>
-                              <span className={cn(
-                                "text-sm",
-                                formData.investment.drivers.length > MAX_SUMMARY_LENGTH 
-                                  ? "text-red-400" 
-                                  : "text-gray-400"
-                              )}>
-                                {formData.investment.drivers.length}/{MAX_SUMMARY_LENGTH}
-                              </span>
-                            </div>
-                            <Textarea
-                              placeholder="Describe earnings stability, strong client base, scalability, cultural fit, technology adoption, etc."
-                              className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
-                              required
-                              value={formData.investment.drivers}
-                              onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
-                            />
-                          </div>
-                        </div>
                       </div>
                     </Card>
                   </TabsContent>
@@ -671,27 +651,6 @@ const ThesisSubmission = () => {
                           formErrors={formErrors}
                           onChange={handleFormDataChange}
                         />
-                        <div className="mt-8">
-                          <div className="flex items-center justify-between mb-2">
-                            <label className="text-lg font-medium text-white">
-                              Additional Investment Criteria
-                            </label>
-                            <span className={cn(
-                              "text-sm",
-                              formData.investment.additionalCriteria.length > MAX_SUMMARY_LENGTH 
-                                ? "text-red-400" 
-                                  : "text-gray-400"
-                            )}>
-                              {formData.investment.additionalCriteria.length}/{MAX_SUMMARY_LENGTH}
-                            </span>
-                          </div>
-                          <Textarea
-                            placeholder="EBITDA thresholds, firm specialization, geographic limitations, integration plans, etc."
-                            className="bg-black/50 border-white/10 min-h-[150px] text-white placeholder:text-gray-500"
-                            value={formData.investment.additionalCriteria}
-                            onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
-                          />
-                        </div>
                       </div>
                     </Card>
                   </TabsContent>
