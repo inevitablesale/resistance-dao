@@ -44,7 +44,6 @@ interface ProposalMetadata {
   };
   investment: {
     targetCapital: string;
-    complexStructures: boolean;
     drivers: string;
     additionalCriteria: string;
   };
@@ -83,7 +82,6 @@ const ThesisSubmission = () => {
     },
     investment: {
       targetCapital: "",
-      complexStructures: false,
       drivers: "",
       additionalCriteria: ""
     }
@@ -535,21 +533,6 @@ const ThesisSubmission = () => {
                     value={formData.investment.targetCapital}
                     onChange={(e) => setFormData(prev => ({ ...prev, investment: { ...prev.investment, targetCapital: e.target.value } }))}
                   />
-                </div>
-
-                <div>
-                  <Label className="text-gray-200 mb-2 block">Complex Deal Structures?</Label>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="complex-structures" 
-                      className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                      checked={formData.investment.complexStructures}
-                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, investment: { ...prev.investment, complexStructures: !!checked } }))}
-                    />
-                    <label htmlFor="complex-structures" className="text-gray-200">
-                      Willing to consider complex deal structures
-                    </label>
-                  </div>
                 </div>
               </div>
 

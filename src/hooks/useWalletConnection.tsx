@@ -8,7 +8,7 @@ const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const TREASURY_ADDRESS = "0x..."; // Add actual treasury address
 
 export const useWalletConnection = () => {
-  const { primaryWallet, setShowAuthFlow, showWallet } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const [isConnecting, setIsConnecting] = useState(false);
   const { toast } = useToast();
 
@@ -65,7 +65,6 @@ export const useWalletConnection = () => {
     connect,
     disconnect,
     address: primaryWallet?.address,
-    approveLGR,
-    showWallet
+    approveLGR
   };
 };
