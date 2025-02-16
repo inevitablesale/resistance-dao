@@ -727,24 +727,90 @@ const ThesisSubmission = () => {
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-2xl mx-auto">
                       {/* Weekly Plan */}
-                      <div className="p-3 sm:p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                      <div 
+                        onClick={() => address ? handleRentAdSpace('week') : connect()}
+                        className={cn(
+                          "p-3 sm:p-4 rounded-lg border transition-all duration-300 cursor-pointer group",
+                          address 
+                            ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-yellow-500/50" 
+                            : "bg-black/40 border-white/5 hover:bg-black/50"
+                        )}
+                      >
                         <div className="flex items-center justify-between gap-4">
-                          <span className="text-base sm:text-lg text-white/80">Weekly</span>
-                          <div className="text-base sm:text-lg font-semibold text-yellow-400">2.5k LGR</div>
+                          <div className="space-y-1">
+                            <span className="text-base sm:text-lg text-white/80">Weekly</span>
+                            {!address && (
+                              <div className="text-xs text-white/40">Connect wallet to rent</div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-base sm:text-lg font-semibold text-yellow-400">2.5k LGR</div>
+                            {address && (
+                              <div className={cn(
+                                "w-2 h-2 rounded-full transition-colors",
+                                hasRequiredBalance ? "bg-green-500" : "bg-red-500"
+                              )} />
+                            )}
+                          </div>
                         </div>
+                        
+                        {address && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="mt-2 text-xs text-white/40"
+                          >
+                            {hasRequiredBalance 
+                              ? "Click to rent ad space" 
+                              : "Insufficient LGR balance"}
+                          </motion.div>
+                        )}
                       </div>
 
                       {/* Monthly Plan */}
-                      <div className="relative p-3 sm:p-4 rounded-lg bg-gradient-to-b from-white/10 to-white/5 border border-white/10 hover:from-white/15 hover:to-white/10 transition-colors">
+                      <div 
+                        onClick={() => address ? handleRentAdSpace('month') : connect()}
+                        className={cn(
+                          "relative p-3 sm:p-4 rounded-lg border transition-all duration-300 cursor-pointer group",
+                          address 
+                            ? "bg-gradient-to-b from-white/10 to-white/5 border-white/10 hover:from-white/15 hover:to-white/10 hover:border-yellow-500/50" 
+                            : "bg-black/40 border-white/5 hover:bg-black/50"
+                        )}
+                      >
                         <div className="absolute -top-2.5 right-2">
                           <span className="px-2 py-0.5 bg-yellow-500/20 rounded-full text-yellow-400 text-xs">
                             Best Value
                           </span>
                         </div>
                         <div className="flex items-center justify-between gap-4">
-                          <span className="text-base sm:text-lg text-white/80">Monthly</span>
-                          <div className="text-base sm:text-lg font-semibold text-yellow-400">9k LGR</div>
+                          <div className="space-y-1">
+                            <span className="text-base sm:text-lg text-white/80">Monthly</span>
+                            {!address && (
+                              <div className="text-xs text-white/40">Connect wallet to rent</div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-base sm:text-lg font-semibold text-yellow-400">9k LGR</div>
+                            {address && (
+                              <div className={cn(
+                                "w-2 h-2 rounded-full transition-colors",
+                                hasRequiredBalance ? "bg-green-500" : "bg-red-500"
+                              )} />
+                            )}
+                          </div>
                         </div>
+                        
+                        {address && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="mt-2 text-xs text-white/40"
+                          >
+                            {hasRequiredBalance 
+                              ? "Click to rent ad space" 
+                              : "Insufficient LGR balance"}
+                          </motion.div>
+                        )}
                       </div>
                     </div>
                   </div>
