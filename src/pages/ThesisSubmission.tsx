@@ -484,14 +484,19 @@ const ThesisSubmission = () => {
               animate={{ opacity: 1, y: 0 }} 
               className="text-3xl md:text-4xl font-bold text-white mb-8"
             >
-              Submit Your Investment Proposal
+              Transform Accounting Firm Ownership
             </motion.h1>
 
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
               <div className="border-b border-white/5">
-                <p className="text-gray-400 p-6">
-                  Complete these steps to submit your proposal
-                </p>
+                <div className="p-6 space-y-3">
+                  <p className="text-gray-200 text-lg">
+                    Ready to revolutionize how accounting practices are acquired? Your investment proposal could be the key to unlocking collaborative firm ownership.
+                  </p>
+                  <p className="text-gray-400">
+                    Follow these steps to present your vision to our community of forward-thinking investors.
+                  </p>
+                </div>
               </div>
 
               <div className="p-6 space-y-8">
