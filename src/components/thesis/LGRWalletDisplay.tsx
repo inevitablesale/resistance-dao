@@ -167,7 +167,7 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
             Balances
           </Button>
           {hasInsufficientBalance && (
-            <div className="absolute -top-2 -right-2">
+            <div className="absolute -top-2.5 -right-2.5 z-10 bg-black rounded-full p-0.5">
               <AlertCircle className="w-5 h-5 text-red-500" />
             </div>
           )}
