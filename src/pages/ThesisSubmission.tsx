@@ -553,24 +553,29 @@ const ThesisSubmission = () => {
           </motion.div>
 
           <div className="mb-8">
-            <div className="flex justify-between items-center text-sm text-white/60">
+            <div className="flex justify-between items-start text-sm text-white/60 max-w-[600px] mx-auto">
               {steps.map((step, index) => (
-                <div 
-                  key={step.id}
-                  className="flex items-center"
-                >
-                  <div className={cn(
-                    "w-2 h-2 rounded-full transition-all duration-300",
-                    step.id === activeStep ? "bg-polygon-primary w-4" : 
-                    steps.findIndex(s => s.id === activeStep) > index ? "bg-polygon-primary/50" : 
-                    "bg-white/20"
-                  )} />
-                  {index < steps.length - 1 && (
+                <div key={step.id} className="flex flex-col items-center space-y-2 flex-1">
+                  <div className="flex items-center w-full">
                     <div className={cn(
-                      "h-[1px] w-24 mx-2",
-                      steps.findIndex(s => s.id === activeStep) > index ? "bg-polygon-primary/50" : "bg-white/10"
+                      "w-2 h-2 rounded-full transition-all duration-300",
+                      step.id === activeStep ? "bg-polygon-primary w-4" : 
+                      steps.findIndex(s => s.id === activeStep) > index ? "bg-polygon-primary/50" : 
+                      "bg-white/20"
                     )} />
-                  )}
+                    {index < steps.length - 1 && (
+                      <div className={cn(
+                        "h-[1px] flex-1 mx-2",
+                        steps.findIndex(s => s.id === activeStep) > index ? "bg-polygon-primary/50" : "bg-white/10"
+                      )} />
+                    )}
+                  </div>
+                  <span className={cn(
+                    "text-xs font-medium transition-colors text-center",
+                    step.id === activeStep ? "text-white" : "text-white/40"
+                  )}>
+                    {step.title}
+                  </span>
                 </div>
               ))}
             </div>
