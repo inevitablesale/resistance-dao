@@ -23,18 +23,10 @@ export const LGRFloatingWidget = () => {
       if (!primaryWallet?.address) return;
 
       try {
-        // Try getEthersProvider first
-        let provider;
-        if (primaryWallet.getEthersProvider) {
-          provider = await primaryWallet.getEthersProvider();
-        } else if (primaryWallet.getWalletClient) {
-          // Fallback to getWalletClient if getEthersProvider is not available
-          const walletClient = await primaryWallet.getWalletClient();
-          provider = new ethers.providers.Web3Provider(walletClient);
-        }
+        const walletClient = await primaryWallet.getWalletClient();
+        if (!walletClient) return;
 
-        if (!provider) return;
-
+        const provider = new ethers.providers.Web3Provider(walletClient);
         const signer = provider.getSigner();
         const lgrToken = new ethers.Contract(
           LGR_TOKEN_ADDRESS,
