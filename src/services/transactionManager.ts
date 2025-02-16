@@ -77,7 +77,7 @@ export const executeTransaction = async (
       category: 'transaction',
       message: 'Transaction failed',
       recoverySteps: ['Please try again', 'Check your wallet connection'],
-      technicalDetails: result.error.message
+      technicalDetails: 'Transaction execution failed'
     });
   }
 

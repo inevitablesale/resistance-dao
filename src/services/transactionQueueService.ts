@@ -89,7 +89,7 @@ class TransactionQueueService {
 
       // If we get here, it's a failure result
       tx.status = 'failed';
-      tx.error = result.error.message;
+      tx.error = 'Transaction execution failed';
       this.notifyUpdate(tx);
       return result;
       
