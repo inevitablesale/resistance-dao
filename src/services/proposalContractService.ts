@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 
 // Simple interface that describes what we need from a wallet
@@ -46,23 +45,43 @@ export interface GasEstimate {
 
 async function getProvider(wallet: WalletInterface) {
   try {
+    console.log("Getting wallet client...");
     const provider = await wallet.getWalletClient();
+    console.log("Got wallet client:", provider);
+    
     if (!provider) {
+      console.error("No provider returned from wallet client");
       throw new Error("No provider available");
     }
-    return new ethers.providers.Web3Provider(provider as any);
+
+    // Create ethers provider
+    const ethersProvider = new ethers.providers.Web3Provider(provider as any);
+    console.log("Created ethers provider");
+
+    // Test provider with a simple call
+    const network = await ethersProvider.getNetwork();
+    console.log("Connected to network:", network);
+
+    return ethersProvider;
   } catch (error) {
-    console.error("Error getting provider:", error);
+    console.error("Detailed provider error:", error);
+    if (error instanceof Error) {
+      throw new Error(`Provider initialization failed: ${error.message}`);
+    }
     throw new Error("Failed to initialize provider");
   }
 }
 
 export const getContractStatus = async (wallet: WalletInterface): Promise<ContractStatus> => {
-  console.log("Getting contract status with wallet:", wallet);
-  const provider = await getProvider(wallet);
-  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
-
+  console.log("Getting contract status with wallet address:", wallet.address);
+  
   try {
+    const provider = await getProvider(wallet);
+    console.log("Got provider, creating contract instance");
+    
+    const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+    console.log("Contract instance created, fetching status");
+
     const [
       submissionFee,
       isPaused,
@@ -83,6 +102,13 @@ export const getContractStatus = async (wallet: WalletInterface): Promise<Contra
       factory.maxVotingDuration()
     ]);
 
+    console.log("Contract status fetched successfully:", {
+      submissionFee: submissionFee.toString(),
+      isPaused,
+      isTestMode,
+      treasuryAddress
+    });
+
     return {
       submissionFee,
       isPaused,
@@ -94,7 +120,10 @@ export const getContractStatus = async (wallet: WalletInterface): Promise<Contra
       maxVotingDuration: Number(maxVotingDuration)
     };
   } catch (error) {
-    console.error("Error getting contract status:", error);
+    console.error("Detailed contract status error:", error);
+    if (error instanceof Error) {
+      throw new Error(`Failed to get contract status: ${error.message}`);
+    }
     throw new Error("Failed to get contract status. Please ensure you're connected to the correct network.");
   }
 };
