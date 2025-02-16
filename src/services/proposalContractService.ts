@@ -1,6 +1,7 @@
 
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
+import { executeTransaction } from "./transactionManager";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
@@ -124,9 +125,18 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  return await factory.createProposal(
-    config.ipfsHash,
-    config.targetCapital,
-    config.votingDuration
+  return await executeTransaction(
+    () => factory.createProposal(
+      config.ipfsHash,
+      config.targetCapital,
+      config.votingDuration
+    ),
+    {
+      type: 'proposal',
+      description: `Creating proposal with target capital ${ethers.utils.formatEther(config.targetCapital)} ETH`,
+      timeout: 180000, // 3 minutes for proposal creation
+      maxRetries: 3,
+      backoffMs: 5000
+    }
   );
 };
