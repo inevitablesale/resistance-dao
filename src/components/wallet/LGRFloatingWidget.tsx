@@ -13,7 +13,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 export const LGRFloatingWidget = () => {
-  const { address } = useCustomWallet();
+  const { address, provider: walletProvider } = useCustomWallet();
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
   const [maticBalance, setMaticBalance] = useState<string>("0");
@@ -27,26 +27,22 @@ export const LGRFloatingWidget = () => {
 
   useEffect(() => {
     const fetchBalances = async () => {
-      if (!address) return;
+      if (!address || !walletProvider) {
+        console.log("No address or provider available");
+        return;
+      }
 
       try {
-        const provider = await getWorkingProvider();
-        if (!provider) {
-          console.error("No provider available");
-          return;
-        }
-
-        console.log("Provider obtained:", provider);
-
+        console.log("Using wallet provider to fetch balances");
         const [lgrContract, presaleContract] = await Promise.all([
-          getLgrTokenContract(provider),
-          getPresaleContract(provider)
+          getLgrTokenContract(walletProvider),
+          getPresaleContract(walletProvider)
         ]);
 
         console.log("Contracts initialized");
 
         // Get MATIC balance
-        const maticBal = await provider.getBalance(address);
+        const maticBal = await walletProvider.getBalance(address);
         console.log("MATIC balance fetched:", maticBal.toString());
         
         // Get LGR balance and purchased tokens
@@ -67,16 +63,21 @@ export const LGRFloatingWidget = () => {
         setMaticPrice(currentMaticPrice);
       } catch (error) {
         console.error("Error fetching balances:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch wallet balances. Please try again.",
+          variant: "destructive"
+        });
       }
     };
 
-    if (address) {
+    if (address && walletProvider) {
       console.log("Fetching balances for address:", address);
       fetchBalances();
       const interval = setInterval(fetchBalances, 30000);
       return () => clearInterval(interval);
     }
-  }, [address]);
+  }, [address, walletProvider, toast]);
 
   const handleBuyMatic = () => {
     if (!address) {
@@ -92,15 +93,17 @@ export const LGRFloatingWidget = () => {
   };
 
   const handleConfirmPurchase = async () => {
-    if (!address || !purchaseAmount) return;
+    if (!address || !purchaseAmount || !walletProvider) {
+      toast({
+        title: "Error",
+        description: "Please connect your wallet and enter an amount.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     try {
-      const provider = await getWorkingProvider();
-      if (!provider) {
-        throw new Error("No provider available");
-      }
-      
-      const result = await purchaseTokens(provider, purchaseAmount);
+      const result = await purchaseTokens(walletProvider as ethers.providers.Web3Provider, purchaseAmount);
       
       toast({
         title: "Purchase Successful",
