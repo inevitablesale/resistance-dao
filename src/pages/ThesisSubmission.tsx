@@ -496,12 +496,15 @@ const ThesisSubmission = () => {
                 <div>
                   <Label className="text-gray-200 mb-2 block">Target Capital Raise (USD)</Label>
                   <Input
-                    type="number"
+                    type="text"
                     placeholder="Enter amount in USD"
                     className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
                     required
                     value={formData.investment.targetCapital}
-                    onChange={(e) => handleFormDataChange('investment.targetCapital', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9.]/g, '');
+                      handleFormDataChange('investment.targetCapital', value);
+                    }}
                   />
                 </div>
               </div>
