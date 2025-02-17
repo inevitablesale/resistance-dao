@@ -6,11 +6,11 @@ export class GasOptimizationService {
     estimatedGas: ethers.BigNumber,
     methodComplexity: 'low' | 'medium' | 'high' = 'medium'
   ): Promise<ethers.BigNumber> {
-    // Dynamic buffer based on method complexity
+    // Much more reasonable buffers
     const bufferMultipliers = {
-      low: 110, // 10% buffer
-      medium: 120, // 20% buffer
-      high: 130, // 30% buffer
+      low: 102, // 2% buffer
+      medium: 105, // 5% buffer
+      high: 110, // 10% buffer
     };
 
     const multiplier = bufferMultipliers[methodComplexity];
@@ -23,12 +23,12 @@ export class GasOptimizationService {
   ): Promise<{ maxFeePerGas: ethers.BigNumber; maxPriorityFeePerGas: ethers.BigNumber }> {
     const feeData = await provider.getFeeData();
     
-    // Calculate optimal max fee based on urgency
+    // Use network-suggested values with minimal adjustment
     const baseFee = feeData.lastBaseFeePerGas || ethers.utils.parseUnits('30', 'gwei');
     const urgencyMultipliers = {
-      low: 110, // Base fee + 10%
-      medium: 120, // Base fee + 20%
-      high: 150, // Base fee + 50%
+      low: 100, // Use base fee as is
+      medium: 102, // Base fee + 2%
+      high: 105, // Base fee + 5%
     };
 
     const maxFeePerGas = baseFee.mul(urgencyMultipliers[urgency]).div(100);
