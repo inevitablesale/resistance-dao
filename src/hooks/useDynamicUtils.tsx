@@ -2,7 +2,7 @@
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useCallback, useEffect } from "react";
+import { useState } from "react";
 import { ProposalError } from "@/services/errorHandlingService";
 
 export interface WalletState {
@@ -16,39 +16,23 @@ export const useDynamicUtils = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   const [isInitializing, setIsInitializing] = useState(false);
-  const [cachedChainId, setCachedChainId] = useState<number | undefined>();
 
-  const getChainId = useCallback(async (): Promise<number> => {
-    if (cachedChainId) {
-      return cachedChainId;
-    }
-
-    try {
-      // Try to get wallet client first as it's the most direct method
-      const walletClient = await primaryWallet?.getWalletClient();
-      if (walletClient?.chain?.id) {
-        const chainId = Number(walletClient.chain.id);
-        setCachedChainId(chainId);
-        return chainId;
-      }
-
-      // Fallback to provider if needed
-      const provider = new ethers.providers.Web3Provider(walletClient as any);
-      const network = await provider.getNetwork();
-      const chainId = Number(network.chainId);
-      setCachedChainId(chainId);
-      return chainId;
-    } catch (error) {
-      console.error('Error getting chain ID:', error);
+  const getChainId = async (): Promise<number> => {
+    if (!primaryWallet) {
       throw new ProposalError({
-        category: 'network',
-        message: 'Failed to get network chain ID',
-        recoverySteps: ['Check wallet connection', 'Try refreshing the page']
+        category: 'wallet',
+        message: 'No wallet connected',
+        recoverySteps: ['Please connect your wallet to continue']
       });
     }
-  }, [primaryWallet, cachedChainId]);
 
-  const getWalletState = useCallback(async (): Promise<WalletState> => {
+    const walletClient = await primaryWallet.getWalletClient();
+    const provider = new ethers.providers.Web3Provider(walletClient as any);
+    const network = await provider.getNetwork();
+    return network.chainId;
+  };
+
+  const getWalletState = async (): Promise<WalletState> => {
     if (!primaryWallet) {
       return {
         isConnected: false,
@@ -67,9 +51,9 @@ export const useDynamicUtils = () => {
       address: primaryWallet.address,
       chainId
     };
-  }, [primaryWallet, getChainId]);
+  };
 
-  const getProvider = useCallback(async () => {
+  const getProvider = async () => {
     if (!primaryWallet) {
       throw new ProposalError({
         category: 'wallet',
@@ -93,10 +77,12 @@ export const useDynamicUtils = () => {
         ]
       });
     }
-  }, [primaryWallet]);
+  };
 
-  const validateNetwork = useCallback(async () => {
+  const validateNetwork = async () => {
+    console.log('Starting network validation...');
     const chainId = await getChainId();
+    console.log('Current chain ID:', chainId);
     const targetChainId = 137; // Polygon Mainnet
     
     if (chainId !== targetChainId) {
@@ -106,9 +92,9 @@ export const useDynamicUtils = () => {
         recoverySteps: ['Switch to Polygon Mainnet in your wallet']
       });
     }
-  }, [getChainId]);
+  };
 
-  const connectWallet = useCallback(async () => {
+  const connectWallet = async () => {
     try {
       setIsInitializing(true);
       setShowAuthFlow?.(true);
@@ -122,14 +108,7 @@ export const useDynamicUtils = () => {
     } finally {
       setIsInitializing(false);
     }
-  }, [setShowAuthFlow, toast]);
-
-  // Clear cached chainId when wallet changes
-  useEffect(() => {
-    if (!primaryWallet?.address) {
-      setCachedChainId(undefined);
-    }
-  }, [primaryWallet?.address]);
+  };
 
   return {
     getWalletState,
@@ -140,3 +119,4 @@ export const useDynamicUtils = () => {
     getChainId
   };
 };
+
