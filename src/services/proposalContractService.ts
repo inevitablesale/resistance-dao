@@ -51,12 +51,6 @@ export interface GasEstimate {
   totalCost: ethers.BigNumber;
 }
 
-const convertUSDtoLGR = (usdAmount: string): ethers.BigNumber => {
-  const usdValue = parseFloat(usdAmount);
-  const lgrAmount = usdValue / LGR_PRICE_USD;
-  return ethers.utils.parseEther(lgrAmount.toString());
-};
-
 async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet']>) {
   try {
     const walletClient = await wallet.getWalletClient();
@@ -162,18 +156,15 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  // Convert USD amount to LGR tokens
-  const targetCapitalInLGR = convertUSDtoLGR(config.targetCapital.toString());
-  
   return await executeTransaction(
     () => factory.createProposal(
       config.ipfsHash,
-      targetCapitalInLGR,
+      config.targetCapital,
       config.votingDuration
     ),
     {
       type: 'proposal',
-      description: `Creating proposal with target capital ${ethers.utils.formatEther(targetCapitalInLGR)} LGR`,
+      description: `Creating proposal with target capital $${ethers.utils.formatEther(config.targetCapital)} USD`,
       timeout: 180000, // 3 minutes for proposal creation
       maxRetries: 3,
       backoffMs: 5000
