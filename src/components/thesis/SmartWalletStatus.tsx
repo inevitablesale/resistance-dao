@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { Wallet, Check, AlertCircle, Loader } from "lucide-react";
 import { motion } from "framer-motion";
@@ -7,9 +6,10 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ethers } from "ethers";
-import { transactionQueue } from "@/services/transactionQueueService";
+import { transactionQueue, TransactionResult } from "@/services/transactionQueueService";
 import { toast } from "@/hooks/use-toast";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
+import { ProposalError } from "@/services/errorHandlingService";
 
 export interface SmartWalletState {
   status: 'checking' | 'creating' | 'ready' | 'error';
@@ -54,14 +54,22 @@ export const SmartWalletStatus = () => {
       const result = await transactionQueue.processTransaction(txId, async () => {
         const walletClient = await primaryWallet?.getWalletClient();
         if (!walletClient) {
-          throw new Error('Failed to initialize wallet client');
+          throw new ProposalError({
+            category: 'wallet',
+            message: 'Failed to initialize wallet client',
+            recoverySteps: ['Please refresh and try again', 'Check wallet connection']
+          });
         }
 
         const provider = new ethers.providers.Web3Provider(walletClient as any);
         const network = await provider.getNetwork();
         
         if (network.chainId !== 137) {
-          throw new Error('Please switch to Polygon network');
+          throw new ProposalError({
+            category: 'network',
+            message: 'Please switch to Polygon network',
+            recoverySteps: ['Switch to Polygon Mainnet in your wallet']
+          });
         }
 
         const factory = new ethers.Contract(
@@ -72,26 +80,31 @@ export const SmartWalletStatus = () => {
 
         const existingWalletAddress = await factory.getWalletAddress(ownerAddress);
         if (existingWalletAddress !== ethers.constants.AddressZero) {
-          // Store the existing wallet address
+          console.log('Existing wallet found:', existingWalletAddress);
           localStorage.setItem('zeroDevWalletAddress', existingWalletAddress);
+          
+          // Create a mock transaction for existing wallet case
+          const mockTx: ethers.ContractTransaction = {
+            wait: async () => ({} as ethers.ContractReceipt),
+            hash: '',
+            confirmations: 0,
+            from: ownerAddress,
+            nonce: 0,
+            gasLimit: ethers.BigNumber.from(0),
+            gasPrice: ethers.BigNumber.from(0),
+            data: '',
+            value: ethers.BigNumber.from(0),
+            chainId: 137
+          };
+
           return {
-            success: true,
-            transaction: {
-              wait: async () => null,
-              hash: '',
-              confirmations: 0,
-              from: ownerAddress,
-              nonce: 0,
-              gasLimit: ethers.BigNumber.from(0),
-              gasPrice: ethers.BigNumber.from(0),
-              data: '',
-              value: ethers.BigNumber.from(0),
-              chainId: 137
-            } as ethers.ContractTransaction,
-            receipt: null
+            success: true as const,
+            transaction: mockTx,
+            receipt: {} as ethers.ContractReceipt
           };
         }
 
+        console.log('No existing wallet found, deploying new one...');
         const gasEstimate = await factory.estimateGas.createWallet(ownerAddress);
         console.log('Estimated gas for deployment:', gasEstimate.toString());
 
@@ -101,20 +114,21 @@ export const SmartWalletStatus = () => {
         });
 
         console.log('Deployment transaction sent:', tx.hash);
-
         const receipt = await tx.wait();
         console.log('Deployment confirmed:', receipt);
 
         const deployedAddress = receipt.events?.[0]?.args?.wallet;
         if (!deployedAddress) {
-          throw new Error('Failed to get deployed wallet address');
+          throw new ProposalError({
+            category: 'contract',
+            message: 'Failed to get deployed wallet address',
+            recoverySteps: ['Please try again', 'Check transaction on explorer']
+          });
         }
 
-        // Store the newly deployed wallet address
         localStorage.setItem('zeroDevWalletAddress', deployedAddress);
-
         return {
-          success: true,
+          success: true as const,
           transaction: tx,
           receipt: receipt
         };
@@ -126,7 +140,11 @@ export const SmartWalletStatus = () => {
 
       const storedWalletAddress = localStorage.getItem('zeroDevWalletAddress');
       if (!storedWalletAddress) {
-        throw new Error('Failed to retrieve wallet address');
+        throw new ProposalError({
+          category: 'validation',
+          message: 'Failed to retrieve wallet address',
+          recoverySteps: ['Clear browser cache', 'Try deploying again']
+        });
       }
 
       return {
@@ -137,14 +155,21 @@ export const SmartWalletStatus = () => {
 
     } catch (error: any) {
       console.error('Smart wallet deployment error:', error);
+      const proposalError = error instanceof ProposalError ? error : new ProposalError({
+        category: 'unknown',
+        message: error.message || 'Failed to deploy smart wallet',
+        recoverySteps: ['Please try again', 'Check wallet connection']
+      });
+
       toast({
         title: "Deployment Failed",
-        description: error.message || 'Failed to deploy smart wallet',
+        description: proposalError.message,
         variant: "destructive"
       });
+
       return {
         success: false,
-        error: error.message || 'Failed to deploy smart wallet'
+        error: proposalError.message
       };
     }
   };
@@ -167,7 +192,11 @@ export const SmartWalletStatus = () => {
           console.log('Connected to network:', network.name);
 
           if (network.chainId !== 137) {
-            throw new Error('Please switch to Polygon network');
+            throw new ProposalError({
+              category: 'network',
+              message: 'Please switch to Polygon network',
+              recoverySteps: ['Switch to Polygon Mainnet in your wallet']
+            });
           }
         } catch (error) {
           console.error('Error getting wallet client:', error);
