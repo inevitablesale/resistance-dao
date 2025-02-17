@@ -185,10 +185,10 @@ const ThesisSubmission = () => {
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
 
   const [contractStatus, setContractStatus] = useState({
-    minTargetCapital: ethers.utils.parseEther(MIN_TARGET_CAPITAL),
-    maxTargetCapital: ethers.utils.parseEther(MAX_TARGET_CAPITAL),
-    submissionFee: SUBMISSION_FEE,
-    votingFee: VOTING_FEE
+    minTargetCapital: MIN_TARGET_CAPITAL,
+    maxTargetCapital: MAX_TARGET_CAPITAL,
+    submissionFee: SUBMISSION_FEE.toString(),
+    votingFee: VOTING_FEE.toString()
   });
 
   useEffect(() => {
@@ -197,10 +197,10 @@ const ThesisSubmission = () => {
       try {
         const status = await getContractStatus(wallet);
         setContractStatus({
-          minTargetCapital: status.minTargetCapital,
-          maxTargetCapital: status.maxTargetCapital,
-          submissionFee: status.submissionFee,
-          votingFee: status.votingFee
+          minTargetCapital: ethers.utils.formatEther(status.minTargetCapital),
+          maxTargetCapital: ethers.utils.formatEther(status.maxTargetCapital),
+          submissionFee: ethers.utils.formatEther(status.submissionFee),
+          votingFee: ethers.utils.formatEther(status.votingFee)
         });
       } catch (error) {
         console.error("Error getting contract status:", error);
@@ -217,10 +217,10 @@ const ThesisSubmission = () => {
     }
   }, [isConnected, wallet, toast]);
 
-  const displayMinTargetCapital = ethers.utils.formatEther(contractStatus.minTargetCapital);
-  const displayMaxTargetCapital = ethers.utils.formatEther(contractStatus.maxTargetCapital);
-  const displaySubmissionFee = ethers.utils.formatEther(contractStatus.submissionFee);
-  const displayVotingFee = ethers.utils.formatEther(contractStatus.votingFee);
+  const displayMinTargetCapital = contractStatus.minTargetCapital;
+  const displayMaxTargetCapital = contractStatus.maxTargetCapital;
+  const displaySubmissionFee = contractStatus.submissionFee;
+  const displayVotingFee = contractStatus.votingFee;
 
   useEffect(() => {
     setFormData(isTestMode ? TEST_FORM_DATA : {
