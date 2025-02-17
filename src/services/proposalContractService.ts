@@ -41,7 +41,7 @@ export interface ContractStatus {
 }
 
 export interface ProposalConfig {
-  targetCapital: string; // In LGR (not wei)
+  targetCapital: string | ethers.BigNumber; // Can be either LGR string or wei BigNumber
   votingDuration: number;
   ipfsHash: string;
 }
@@ -157,8 +157,10 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  // Convert LGR amount to wei format (18 decimals)
-  const targetCapitalWei = ethers.utils.parseEther(config.targetCapital);
+  // Convert targetCapital to BigNumber if it's a string
+  const targetCapitalWei = typeof config.targetCapital === 'string'
+    ? ethers.utils.parseEther(config.targetCapital)
+    : config.targetCapital;
   
   return await executeTransaction(
     () => factory.createProposal(
@@ -168,7 +170,7 @@ export const createProposal = async (
     ),
     {
       type: 'proposal',
-      description: `Creating proposal with target capital ${config.targetCapital.toLocaleString()} LGR`,
+      description: `Creating proposal with target capital ${ethers.utils.formatEther(targetCapitalWei).toLocaleString()} LGR`,
       timeout: 180000, // 3 minutes
       maxRetries: 3,
       backoffMs: 5000
