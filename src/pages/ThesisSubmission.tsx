@@ -168,19 +168,56 @@ const ThesisSubmission = () => {
 
   useEffect(() => {
     const initializeTestMode = async () => {
-      if (!wallet) return;
+      console.log("Initializing test mode...");
+      console.log("Current wallet state:", wallet);
+      
+      if (!wallet) {
+        console.log("No wallet available, skipping initialization");
+        return;
+      }
       
       try {
+        console.log("Getting contract status...");
         const contractStatus = await getContractStatus(wallet);
+        console.log("Contract status received:", contractStatus);
         setIsTestMode(contractStatus.isTestMode);
+        console.log("Test mode set to:", contractStatus.isTestMode);
         
         const currentAddress = wallet.address;
+        console.log("Current wallet address:", currentAddress);
+        
         if (currentAddress) {
-          setIsContractOwner(currentAddress.toLowerCase() === contractStatus.owner.toLowerCase());
-          setIsAuthorizedAddress(currentAddress.toLowerCase() === "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2".toLowerCase());
+          const isOwner = currentAddress.toLowerCase() === contractStatus.owner.toLowerCase();
+          const isAuthorized = currentAddress.toLowerCase() === "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2".toLowerCase();
+          
+          console.log("Address comparison:", {
+            currentAddress: currentAddress.toLowerCase(),
+            contractOwner: contractStatus.owner.toLowerCase(),
+            authorizedAddress: "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2".toLowerCase(),
+            isOwner,
+            isAuthorized
+          });
+          
+          setIsContractOwner(isOwner);
+          setIsAuthorizedAddress(isAuthorized);
+          
+          console.log("Authorization states updated:", {
+            isContractOwner: isOwner,
+            isAuthorizedAddress: isAuthorized
+          });
+        } else {
+          console.log("No current address available");
         }
       } catch (error) {
         console.error("Error initializing test mode:", error);
+        console.log("Error details:", {
+          error,
+          walletState: wallet,
+          errorName: error.name,
+          errorMessage: error.message,
+          errorStack: error.stack
+        });
+        
         toast({
           title: "Error",
           description: "Failed to initialize test mode status",
