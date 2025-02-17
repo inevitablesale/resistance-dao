@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
-import Nav from "@/components/Nav";
 import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -26,7 +26,6 @@ import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTe
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Switch } from "@/components/ui/switch";
 
 interface SubmissionStep {
   id: string;
@@ -163,27 +162,8 @@ const ThesisSubmission = () => {
   const [isTestMode, setIsTestMode] = useState(false);
   const [isContractOwner, setIsContractOwner] = useState(false);
   const [isAuthorizedAddress, setIsAuthorizedAddress] = useState(false);
-  const [formData, setFormData] = useState<ProposalMetadata>(isTestMode ? TEST_FORM_DATA : {
-    title: "",
-    firmCriteria: {
-      size: "",
-      location: "",
-      dealType: "",
-      geographicFocus: ""
-    },
-    paymentTerms: [],
-    strategies: {
-      operational: [],
-      growth: [],
-      integration: []
-    },
-    investment: {
-      targetCapital: "",
-      drivers: "",
-      additionalCriteria: ""
-    }
-  });
-  const [isThesisOpen, setIsThesisOpen] = useState(false);
+  const [formData, setFormData] = useState<ProposalMetadata>(TEST_FORM_DATA);
+  const [isThesisOpen, setIsThesisOpen] = useState(true);
   const [isStrategyOpen, setIsStrategyOpen] = useState(false);
   const [isApprovalOpen, setIsApprovalOpen] = useState(false);
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
@@ -256,29 +236,6 @@ const ThesisSubmission = () => {
       });
     }
   };
-
-  useEffect(() => {
-    setFormData(isTestMode ? TEST_FORM_DATA : {
-      title: "",
-      firmCriteria: {
-        size: "",
-        location: "",
-        dealType: "",
-        geographicFocus: ""
-      },
-      paymentTerms: [],
-      strategies: {
-        operational: [],
-        growth: [],
-        integration: []
-      },
-      investment: {
-        targetCapital: "",
-        drivers: "",
-        additionalCriteria: ""
-      }
-    });
-  }, [isTestMode]);
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => step.id === stepId ? {
@@ -790,7 +747,7 @@ const ThesisSubmission = () => {
                         setIsSubmissionOpen(true);
                       }
                     })}
-                  </CollapsibleContent>
+                  CollapsibleContent>
                 </Collapsible>
 
                 <Collapsible open={isSubmissionOpen} onOpenChange={setIsSubmissionOpen} className="w-full">
@@ -817,3 +774,33 @@ const ThesisSubmission = () => {
                       formData={{
                         strategies: {
                           operational: formData.strategies.operational,
+                          growth: formData.strategies.growth,
+                          integration: formData.strategies.integration
+                        },
+                        investment: {
+                          additionalCriteria: formData.investment.additionalCriteria
+                        }
+                      }}
+                      formErrors={formErrors}
+                      onChange={(field, value) => handleFormDataChange(field, value)}
+                    />
+                    {isSubmissionOpen && renderContinueButton(() => {
+                      if (validateStrategyTab()) {
+                        setIsSubmissionOpen(false);
+                      }
+                    }, true)}
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            </Card>
+          </div>
+
+          <div className="lg:col-span-4">
+            <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-2xl font-bold">
+                  Wallet Overview
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                
