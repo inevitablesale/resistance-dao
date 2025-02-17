@@ -13,7 +13,6 @@ export const useWalletConnection = () => {
   const { primaryWallet, setShowAuthFlow, setShowOnRamp } = useDynamicContext();
   const { getWalletState, getProvider, connectWallet, validateNetwork } = useDynamicUtils();
   const [isConnecting, setIsConnecting] = useState(false);
-  const [treasury, setTreasury] = useState<string | null>(null);
   const { toast } = useToast();
 
   const connect = async () => {
@@ -57,18 +56,15 @@ export const useWalletConnection = () => {
       // Always validate network
       await validateNetwork();
 
-      if (!treasury) {
-        console.log("Fetching contract status to get treasury address...");
-        const status = await getContractStatus(primaryWallet!);
-        console.log("Contract status received:", status);
-        setTreasury(status.treasury);
+      console.log("Fetching contract status to get treasury address...");
+      const status = await getContractStatus(primaryWallet!);
+      console.log("Contract status received:", status);
+      
+      if (!status.treasury) {
+        throw new Error("Treasury address not available in contract status");
       }
 
-      if (!treasury) {
-        throw new Error("Treasury address not available");
-      }
-
-      console.log("Approving LGR tokens for treasury:", treasury);
+      console.log("Approving LGR tokens for treasury:", status.treasury);
       const provider = await getProvider();
       const signer = provider.getSigner();
       const lgrToken = new ethers.Contract(
@@ -77,9 +73,8 @@ export const useWalletConnection = () => {
         signer
       );
 
-      console.log("Calling approve with amount:", amount);
-      // Always make real contract call - the contract handles test mode
-      return await lgrToken.approve(treasury, amount);
+      console.log("Calling approve with amount:", amount, "isTestMode:", isTestMode);
+      return await lgrToken.approve(status.treasury, amount);
     } catch (error) {
       console.error("Approval error in useWalletConnection:", error);
       throw error; // Let the component handle the error display
