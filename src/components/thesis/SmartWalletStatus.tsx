@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { Wallet, Check, AlertCircle, Loader } from "lucide-react";
 import { motion } from "framer-motion";
@@ -7,7 +6,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ethers } from "ethers";
-import { transactionQueue, TransactionResult, TransactionFailure, TransactionSuccess } from "@/services/transactionQueueService";
+import { transactionQueue } from "@/services/transactionQueueService";
 import { toast } from "@/hooks/use-toast";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
 import { ProposalError } from "@/services/errorHandlingService";
@@ -64,9 +63,9 @@ export const SmartWalletStatus = () => {
         }
 
         const provider = new ethers.providers.Web3Provider(walletClient as any);
-        const network = await provider.getNetwork();
+        const chainId = walletClient.chain?.id;
         
-        if (network.chainId !== 137) {
+        if (chainId !== 137) {
           throw new ProposalError({
             category: 'network',
             message: 'Please switch to Polygon network',
@@ -84,24 +83,9 @@ export const SmartWalletStatus = () => {
         if (existingWalletAddress !== ethers.constants.AddressZero) {
           console.log('Existing wallet found:', existingWalletAddress);
           localStorage.setItem('zeroDevWalletAddress', existingWalletAddress);
-          
-          const mockTx: ethers.ContractTransaction = {
-            wait: async () => ({} as ethers.ContractReceipt),
-            hash: '',
-            confirmations: 0,
-            from: ownerAddress,
-            nonce: 0,
-            gasLimit: ethers.BigNumber.from(0),
-            gasPrice: ethers.BigNumber.from(0),
-            data: '',
-            value: ethers.BigNumber.from(0),
-            chainId: 137
-          };
-
           return {
-            success: true as const,
-            transaction: mockTx,
-            receipt: {} as ethers.ContractReceipt
+            success: true,
+            walletAddress: existingWalletAddress
           };
         }
 
@@ -134,7 +118,7 @@ export const SmartWalletStatus = () => {
 
         localStorage.setItem('zeroDevWalletAddress', deployedAddress);
         return {
-          success: true as const,
+          success: true,
           transaction: tx,
           receipt: receipt
         };

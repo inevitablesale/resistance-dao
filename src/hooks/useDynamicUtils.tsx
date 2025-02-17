@@ -2,7 +2,7 @@
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ProposalError } from "@/services/errorHandlingService";
 
 export interface WalletState {
@@ -16,10 +16,40 @@ export const useDynamicUtils = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   const [isInitializing, setIsInitializing] = useState(false);
+  const [cachedChainId, setCachedChainId] = useState<number | undefined>();
+
+  const getChainId = useCallback(async (): Promise<number> => {
+    if (cachedChainId) {
+      return cachedChainId;
+    }
+
+    try {
+      // Try to get wallet client first as it's the most direct method
+      const walletClient = await primaryWallet?.getWalletClient();
+      if (walletClient?.chain?.id) {
+        const chainId = Number(walletClient.chain.id);
+        setCachedChainId(chainId);
+        return chainId;
+      }
+
+      // Fallback to provider if needed
+      const provider = new ethers.providers.Web3Provider(walletClient as any);
+      const network = await provider.getNetwork();
+      const chainId = Number(network.chainId);
+      setCachedChainId(chainId);
+      return chainId;
+    } catch (error) {
+      console.error('Error getting chain ID:', error);
+      throw new ProposalError({
+        category: 'network',
+        message: 'Failed to get network chain ID',
+        recoverySteps: ['Check wallet connection', 'Try refreshing the page']
+      });
+    }
+  }, [primaryWallet, cachedChainId]);
 
   const getWalletState = useCallback(async (): Promise<WalletState> => {
     if (!primaryWallet) {
-      console.log('No primary wallet found');
       return {
         isConnected: false,
         isEthereumWallet: false,
@@ -29,59 +59,15 @@ export const useDynamicUtils = () => {
     }
 
     const connected = await primaryWallet.isConnected();
-    console.log('Wallet connected status:', connected);
+    const chainId = await getChainId();
     
-    // Debug logging for initial state
-    console.log('Initial Dynamic SDK Wallet State:', {
-      connector: primaryWallet.connector,
-      chainId: primaryWallet.connector?.chainId,
-      connected,
-      address: primaryWallet.address,
-      raw: primaryWallet
-    });
-
-    // Try getting chainId through connector first
-    let chainId = primaryWallet.connector?.chainId;
-    console.log('Chain ID from connector:', chainId);
-
-    // If no chainId from connector, try through provider
-    if (!chainId) {
-      console.log('No chainId from connector, attempting to get from provider...');
-      try {
-        console.log('Getting wallet client...');
-        const walletClient = await primaryWallet.getWalletClient();
-        console.log('Wallet client obtained:', walletClient);
-        
-        console.log('Initializing Web3Provider...');
-        const provider = new ethers.providers.Web3Provider(walletClient as any);
-        
-        console.log('Getting network from provider...');
-        const network = await provider.getNetwork();
-        chainId = Number(network.chainId); // Ensure chainId is a number
-        console.log('Chain ID from provider:', chainId, typeof chainId);
-      } catch (error) {
-        console.error('Detailed error getting chainId from provider:', {
-          error,
-          errorMessage: error.message,
-          errorStack: error.stack
-        });
-      }
-    } else {
-      // Ensure chainId from connector is also a number
-      chainId = Number(chainId);
-      console.log('Converted connector chainId to number:', chainId, typeof chainId);
-    }
-
-    const finalState = {
+    return {
       isConnected: connected,
       isEthereumWallet: true,
       address: primaryWallet.address,
-      chainId: chainId
+      chainId
     };
-
-    console.log('Final wallet state:', finalState);
-    return finalState;
-  }, [primaryWallet]);
+  }, [primaryWallet, getChainId]);
 
   const getProvider = useCallback(async () => {
     if (!primaryWallet) {
@@ -109,6 +95,19 @@ export const useDynamicUtils = () => {
     }
   }, [primaryWallet]);
 
+  const validateNetwork = useCallback(async () => {
+    const chainId = await getChainId();
+    const targetChainId = 137; // Polygon Mainnet
+    
+    if (chainId !== targetChainId) {
+      throw new ProposalError({
+        category: 'network',
+        message: 'Please connect to Polygon network',
+        recoverySteps: ['Switch to Polygon Mainnet in your wallet']
+      });
+    }
+  }, [getChainId]);
+
   const connectWallet = useCallback(async () => {
     try {
       setIsInitializing(true);
@@ -125,53 +124,19 @@ export const useDynamicUtils = () => {
     }
   }, [setShowAuthFlow, toast]);
 
-  const validateNetwork = useCallback(async () => {
-    console.log('Starting network validation...');
-    const state = await getWalletState();
-    console.log('Network validation state:', state);
-    
-    if (!state.isConnected) {
-      console.log('Wallet not connected during validation');
-      throw new ProposalError({
-        category: 'wallet',
-        message: 'Wallet not connected',
-        recoverySteps: ['Connect your wallet to continue']
-      });
+  // Clear cached chainId when wallet changes
+  useEffect(() => {
+    if (!primaryWallet?.address) {
+      setCachedChainId(undefined);
     }
-
-    // Simple check if we're on Polygon network
-    const targetChainId = 137;
-    const currentChainId = Number(state.chainId);
-    
-    console.log('Chain ID comparison:', {
-      current: currentChainId,
-      currentType: typeof currentChainId,
-      target: targetChainId,
-      targetType: typeof targetChainId,
-      isEqual: currentChainId === targetChainId
-    });
-
-    if (currentChainId !== targetChainId) {
-      console.log('Network validation failed. Chain ID mismatch:', {
-        expected: targetChainId,
-        got: currentChainId,
-        typeOf: typeof currentChainId
-      });
-      throw new ProposalError({
-        category: 'network',
-        message: 'Please connect to Polygon network',
-        recoverySteps: ['Your wallet must be connected to the Polygon network']
-      });
-    }
-
-    console.log('Network validation successful');
-  }, [getWalletState]);
+  }, [primaryWallet?.address]);
 
   return {
     getWalletState,
     getProvider,
     connectWallet,
     validateNetwork,
-    isInitializing
+    isInitializing,
+    getChainId
   };
 };
