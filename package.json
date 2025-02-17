@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@dynamic-labs/ethereum": "^4.6.3",
+    "@dynamic-labs/ethereum-aa": "^4.6.3",
     "@dynamic-labs/sdk-react-core": "^4.6.3",
     "@google/generative-ai": "^0.21.0",
     "@hookform/resolvers": "^3.9.0",
