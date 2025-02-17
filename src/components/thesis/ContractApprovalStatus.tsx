@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { executeTransaction } from "@/services/transactionManager";
 import { TransactionStatus } from "./TransactionStatus";
+import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
@@ -27,6 +28,7 @@ export const ContractApprovalStatus = ({
   currentFormData
 }: ContractApprovalStatusProps) => {
   const { approveLGR, address } = useWalletConnection();
+  const { getProvider } = useDynamicUtils();
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
@@ -45,6 +47,7 @@ export const ContractApprovalStatus = ({
     setIsApproving(true);
     try {
       console.log("Starting approval process...");
+      const provider = await getProvider();
       
       const transaction = await executeTransaction(
         async () => {
@@ -62,7 +65,8 @@ export const ContractApprovalStatus = ({
             spenderAddress: address!,
             amount: requiredAmount
           }
-        }
+        },
+        provider
       );
 
       console.log("Transaction executed:", transaction);

@@ -1,6 +1,5 @@
 
 import { ethers } from "ethers";
-import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 
 const ERC20_ABI = [
   "function allowance(address owner, address spender) view returns (uint256)",
@@ -8,16 +7,13 @@ const ERC20_ABI = [
 ];
 
 export const checkTokenAllowance = async (
+  provider: ethers.providers.Provider,
   tokenAddress: string,
+  ownerAddress: string,
   spenderAddress: string,
   requiredAmount: string
 ): Promise<boolean> => {
   try {
-    const { getProvider } = useDynamicUtils();
-    const provider = await getProvider();
-    const signer = provider.getSigner();
-    const signerAddress = await signer.getAddress();
-
     const tokenContract = new ethers.Contract(
       tokenAddress,
       ERC20_ABI,
@@ -25,8 +21,8 @@ export const checkTokenAllowance = async (
     );
 
     const [allowance, balance] = await Promise.all([
-      tokenContract.allowance(signerAddress, spenderAddress),
-      tokenContract.balanceOf(signerAddress)
+      tokenContract.allowance(ownerAddress, spenderAddress),
+      tokenContract.balanceOf(ownerAddress)
     ]);
 
     const requiredAmountBN = ethers.utils.parseUnits(requiredAmount, 18);
@@ -40,14 +36,12 @@ export const checkTokenAllowance = async (
 };
 
 export const getTokenAllowance = async (
+  provider: ethers.providers.Provider,
   tokenAddress: string,
   ownerAddress: string,
   spenderAddress: string
 ): Promise<string> => {
   try {
-    const { getProvider } = useDynamicUtils();
-    const provider = await getProvider();
-    
     const tokenContract = new ethers.Contract(
       tokenAddress,
       ERC20_ABI,
@@ -63,13 +57,11 @@ export const getTokenAllowance = async (
 };
 
 export const getTokenBalance = async (
+  provider: ethers.providers.Provider,
   tokenAddress: string,
   ownerAddress: string
 ): Promise<string> => {
   try {
-    const { getProvider } = useDynamicUtils();
-    const provider = await getProvider();
-    
     const tokenContract = new ethers.Contract(
       tokenAddress,
       ERC20_ABI,

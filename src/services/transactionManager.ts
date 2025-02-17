@@ -27,12 +27,16 @@ const DEFAULT_CONFIG: Omit<TransactionConfig, 'description' | 'type'> = {
 
 export const executeTransaction = async (
   transaction: () => Promise<ethers.ContractTransaction>,
-  config: TransactionConfig
+  config: TransactionConfig,
+  provider?: ethers.providers.Provider
 ): Promise<ethers.ContractTransaction> => {
   // Check allowance if it's a token transaction
-  if (config.type === 'token' && config.tokenConfig) {
+  if (config.type === 'token' && config.tokenConfig && provider) {
+    const signerAddress = await provider.getSigner().getAddress();
     const hasAllowance = await checkTokenAllowance(
+      provider,
       config.tokenConfig.tokenAddress,
+      signerAddress,
       config.tokenConfig.spenderAddress,
       config.tokenConfig.amount
     );
