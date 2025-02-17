@@ -1,33 +1,26 @@
+
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
+  // Core proposal creation
   "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
+  // Read-only getters
   "function LGR_TOKEN() public view returns (address)",
   "function MAX_TARGET_CAPITAL() public view returns (uint256)",
-  "function MAX_VOTING_DURATION() public view returns (uint256)",
   "function MIN_TARGET_CAPITAL() public view returns (uint256)",
   "function MIN_VOTING_DURATION() public view returns (uint256)",
+  "function MAX_VOTING_DURATION() public view returns (uint256)",
   "function VOTING_FEE() public view returns (uint256)",
   "function owner() public view returns (address)",
   "function paused() public view returns (bool)",
-  "function proposalContracts(uint256) public view returns (address)",
-  "function submissionFee() public view returns (uint256)",
   "function testModeEnabled() public view returns (bool)",
   "function treasury() public view returns (address)",
-  "function userProposals(address,uint256) public view returns (uint256)",
-  "function setTreasury(address newTreasury) external",
-  "function setSubmissionFee(uint256 newFee) external",
-  "function setTestMode(bool newStatus) external",
-  "function pause() external",
-  "function unpause() external",
-  "function withdrawStuckTokens(address token, uint256 amount) external",
-  "function renounceOwnership() external",
-  "function transferOwnership(address newOwner) external",
+  "function submissionFee() public view returns (uint256)",
+  // Events
   "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)",
-  "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
   "event Paused(address account)",
   "event Unpaused(address account)"
 ];
@@ -215,3 +208,4 @@ export const createProposal = async (
     }
   );
 };
+
