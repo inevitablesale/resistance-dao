@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
