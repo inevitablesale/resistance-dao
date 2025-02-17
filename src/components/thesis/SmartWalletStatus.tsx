@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { Wallet, Check, AlertCircle, Loader } from "lucide-react";
 import { motion } from "framer-motion";
@@ -85,43 +84,15 @@ export const SmartWalletStatus = () => {
           console.log('Existing wallet found:', existingWalletAddress);
           localStorage.setItem('zeroDevWalletAddress', existingWalletAddress);
           
-          // Create a mock transaction and receipt for existing wallet case
-          const mockTx: ethers.ContractTransaction = {
-            wait: async () => ({} as ethers.ContractReceipt),
-            hash: 'existing-wallet',
-            confirmations: 0,
-            from: ownerAddress,
-            nonce: 0,
-            gasLimit: ethers.BigNumber.from(0),
-            gasPrice: ethers.BigNumber.from(0),
-            data: '',
-            value: ethers.BigNumber.from(0),
-            chainId: 137
-          };
-
-          const mockReceipt: ethers.ContractReceipt = {
-            to: existingWalletAddress,
-            from: ownerAddress,
-            contractAddress: existingWalletAddress,
-            transactionIndex: 0,
-            gasUsed: ethers.BigNumber.from(0),
-            logsBloom: '',
-            blockHash: '',
-            transactionHash: 'existing-wallet',
-            logs: [],
-            blockNumber: 0,
-            confirmations: 0,
-            cumulativeGasUsed: ethers.BigNumber.from(0),
-            effectiveGasPrice: ethers.BigNumber.from(0),
-            byzantium: true,
-            type: 0,
-            events: []
-          };
+          // For existing wallets, we'll create a real transaction to check the wallet status
+          const factoryWithSigner = factory.connect(signer);
+          const tx = await factoryWithSigner.getWalletAddress(ownerAddress);
+          const receipt = await tx.wait();
 
           return {
             success: true,
-            transaction: mockTx,
-            receipt: mockReceipt
+            transaction: tx,
+            receipt: receipt
           };
         }
 
