@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ethers } from "ethers";
@@ -7,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 
-export function ProposalDetails() {
+const ProposalDetails = () => {
   const { proposalId } = useParams<{ proposalId: string }>();
   const [proposalDetails, setProposalDetails] = useState<any>(null);
   const { getProvider } = useWalletProvider();
@@ -79,4 +80,6 @@ export function ProposalDetails() {
       </Card>
     </div>
   );
-}
+};
+
+export default ProposalDetails;
