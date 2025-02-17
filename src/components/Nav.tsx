@@ -18,6 +18,7 @@ const Nav = () => {
   
   const hideHomeRoutes = ['/', '/thesis'];
   const shouldShowHomeLink = !hideHomeRoutes.includes(location.pathname);
+  const shouldShowProposals = location.pathname !== '/';
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100] h-16">
@@ -30,7 +31,7 @@ const Nav = () => {
                 Home
               </Link>
             )}
-            {hasWallet && (
+            {hasWallet && shouldShowProposals && (
               <Link to="/proposals" className="text-white/80 hover:text-white transition-colors">
                 Proposals
               </Link>
@@ -70,3 +71,4 @@ const Nav = () => {
 };
 
 export default Nav;
+
