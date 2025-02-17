@@ -1,3 +1,4 @@
+<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
-import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
+import { getContractStatus, estimateProposalGas, createProposal, setTestMode } from "@/services/proposalContractService";
 import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
@@ -43,7 +44,8 @@ interface StoredProposal {
   status: 'pending' | 'completed' | 'failed';
 }
 
-const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
+// Update the factory address to match proposalContractService.ts
+const FACTORY_ADDRESS = "0xD00655Ce27387b8B1EE7759b1f44De5748916Ba5";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const FACTORY_ABI = ["function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)", "function submissionFee() public view returns (uint256)", "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"];
 const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
@@ -152,13 +154,15 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const [isTestMode, setIsTestMode] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
   const [activeStep, setActiveStep] = useState<string>('thesis');
   const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
+  const [isTestMode, setIsTestMode] = useState(false);
+  const [isContractOwner, setIsContractOwner] = useState(false);
+  const [isAuthorizedAddress, setIsAuthorizedAddress] = useState(false);
   const [formData, setFormData] = useState<ProposalMetadata>(isTestMode ? TEST_FORM_DATA : {
     title: "",
     firmCriteria: {
@@ -183,6 +187,75 @@ const ThesisSubmission = () => {
   const [isStrategyOpen, setIsStrategyOpen] = useState(false);
   const [isApprovalOpen, setIsApprovalOpen] = useState(false);
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
+
+  // Initialize test mode and authorization status
+  useEffect(() => {
+    const initializeTestMode = async () => {
+      if (!wallet) return;
+      
+      try {
+        const contractStatus = await getContractStatus(wallet);
+        setIsTestMode(contractStatus.isTestMode);
+        
+        // Check if current address is contract owner or authorized address
+        const currentAddress = await wallet.getAddress();
+        setIsContractOwner(currentAddress.toLowerCase() === contractStatus.owner.toLowerCase());
+        setIsAuthorizedAddress(currentAddress.toLowerCase() === "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2".toLowerCase());
+      } catch (error) {
+        console.error("Error initializing test mode:", error);
+        toast({
+          title: "Error",
+          description: "Failed to initialize test mode status",
+          variant: "destructive"
+        });
+      }
+    };
+
+    initializeTestMode();
+  }, [wallet, toast]);
+
+  const handleTestModeToggle = async (enabled: boolean) => {
+    if (!wallet) {
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your wallet to toggle test mode",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!isContractOwner && !isAuthorizedAddress) {
+      toast({
+        title: "Unauthorized",
+        description: "You are not authorized to toggle test mode",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const tx = await setTestMode(enabled, wallet);
+      toast({
+        title: "Transaction Submitted",
+        description: `Setting test mode to ${enabled}. Please wait for confirmation.`,
+      });
+
+      await tx.wait();
+      setIsTestMode(enabled);
+      
+      toast({
+        title: "Test Mode Updated",
+        description: `Test mode has been ${enabled ? 'enabled' : 'disabled'}`,
+      });
+    } catch (error) {
+      console.error("Error toggling test mode:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to toggle test mode",
+        variant: "destructive"
+      });
+    }
+  };
 
   useEffect(() => {
     setFormData(isTestMode ? TEST_FORM_DATA : {
@@ -559,17 +632,19 @@ const ThesisSubmission = () => {
                 Transform Accounting Firm Ownership
               </motion.h1>
               
-              <div className="flex items-center space-x-2">
-                <Label htmlFor="test-mode" className="text-sm text-white/60">
-                  Test Mode
-                </Label>
-                <Switch
-                  id="test-mode"
-                  checked={isTestMode}
-                  onCheckedChange={setIsTestMode}
-                  className="data-[state=checked]:bg-yellow-500"
-                />
-              </div>
+              {(isContractOwner || isAuthorizedAddress) && (
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="test-mode" className="text-sm text-white/60">
+                    Test Mode
+                  </Label>
+                  <Switch
+                    id="test-mode"
+                    checked={isTestMode}
+                    onCheckedChange={handleTestModeToggle}
+                    className="data-[state=checked]:bg-yellow-500"
+                  />
+                </div>
+              )}
             </div>
 
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
@@ -742,188 +817,3 @@ const ThesisSubmission = () => {
                       formData={{
                         strategies: {
                           operational: formData.strategies.operational,
-                          growth: formData.strategies.growth,
-                          integration: formData.strategies.integration
-                        }
-                      }}
-                      formErrors={formErrors}
-                      onChange={handleStrategyChange}
-                    />
-
-                    <div className="mt-6 space-y-4">
-                      <Label className="text-lg font-medium text-white">
-                        Additional Criteria (Optional)
-                      </Label>
-                      <textarea
-                        placeholder="Any additional criteria or notes..."
-                        className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3"
-                        value={formData.investment.additionalCriteria}
-                        onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
-                      />
-                    </div>
-                    {isSubmissionOpen && renderContinueButton(() => {
-                      if (validateStrategyTab()) {
-                        const syntheticEvent = {
-                          preventDefault: () => {},
-                          target: null,
-                          currentTarget: null,
-                          bubbles: false,
-                          cancelable: false,
-                          defaultPrevented: false,
-                          eventPhase: 0,
-                          isTrusted: true,
-                          nativeEvent: new Event('submit'),
-                          stopPropagation: () => {},
-                          isPropagationStopped: () => false,
-                          persist: () => {},
-                          isDefaultPrevented: () => false,
-                          type: 'submit'
-                        } as React.FormEvent<HTMLFormElement>;
-                        
-                        handleSubmit(syntheticEvent);
-                      }
-                    }, true)}
-                  </CollapsibleContent>
-                </Collapsible>
-
-                <div className="mt-8">
-                  <ContractApprovalStatus 
-                    onApprovalComplete={handleApprovalComplete}
-                    requiredAmount={SUBMISSION_FEE.toString()} 
-                    isTestMode={isTestMode}
-                    currentFormData={formData}
-                  />
-                </div>
-              </div>
-            </Card>
-
-            <div className="flex justify-end mt-6">
-              
-            </div>
-          </div>
-
-          <div className="lg:col-span-4">
-            <div className="lg:sticky lg:top-28 space-y-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1 w-full max-w-3xl mx-auto"
-              >
-                <Card className="relative overflow-hidden bg-black/60 backdrop-blur-xl border-white/10">
-                  <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
-                  <div className="relative z-10 p-4 sm:p-6 md:p-8">
-                    <div className="text-center mb-4 sm:mb-6 md:mb-8">
-                      <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
-                        Promote Your Brand
-                      </h3>
-                      <p className="text-sm sm:text-base text-white/60 mt-2">
-                        Reach accounting firm owners and LedgerFund investors
-                      </p>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-2xl mx-auto">
-                      {/* Weekly Plan */}
-                      <div 
-                        onClick={() => address ? handleRentAdSpace('week') : connect()}
-                        className={cn(
-                          "p-3 sm:p-4 rounded-lg border transition-all duration-300 cursor-pointer group",
-                          address 
-                            ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-yellow-500/50" 
-                            : "bg-black/40 border-white/5 hover:bg-black/50"
-                        )}
-                      >
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="space-y-1">
-                            <span className="text-base sm:text-lg text-white/80">Weekly</span>
-                            {!address && (
-                              <div className="text-xs text-white/40">Connect wallet to rent</div>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="text-base sm:text-lg font-semibold text-yellow-400">2.5k LGR</div>
-                            {address && (
-                              <div className={cn(
-                                "w-2 h-2 rounded-full transition-colors",
-                                hasRequiredBalance ? "bg-green-500" : "bg-red-500"
-                              )} />
-                            )}
-                          </div>
-                        </div>
-                        
-                        {address && (
-                          <motion.div 
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="mt-2 text-xs text-white/40"
-                          >
-                            {hasRequiredBalance 
-                              ? "Click to rent ad space" 
-                              : "Insufficient LGR balance"}
-                          </motion.div>
-                        )}
-                      </div>
-
-                      {/* Monthly Plan */}
-                      <div 
-                        onClick={() => address ? handleRentAdSpace('month') : connect()}
-                        className={cn(
-                          "relative p-3 sm:p-4 rounded-lg border transition-all duration-300 cursor-pointer group",
-                          address 
-                            ? "bg-gradient-to-b from-white/10 to-white/5 border-white/10 hover:from-white/15 hover:to-white/10 hover:border-yellow-500/50" 
-                            : "bg-black/40 border-white/5 hover:bg-black/50"
-                        )}
-                      >
-                        <div className="absolute -top-2.5 right-2">
-                          <span className="px-2 py-0.5 bg-yellow-500/20 rounded-full text-yellow-400 text-xs">
-                            Best Value
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="space-y-1">
-                            <span className="text-base sm:text-lg text-white/80">Monthly</span>
-                            {!address && (
-                              <div className="text-xs text-white/40">Connect wallet to rent</div>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="text-base sm:text-lg font-semibold text-yellow-400">9k LGR</div>
-                            {address && (
-                              <div className={cn(
-                                "w-2 h-2 rounded-full transition-colors",
-                                hasRequiredBalance ? "bg-green-500" : "bg-red-500"
-                              )} />
-                            )}
-                          </div>
-                        </div>
-                        
-                        {address && (
-                          <motion.div 
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="mt-2 text-xs text-white/40"
-                          >
-                            {hasRequiredBalance 
-                              ? "Click to rent ad space" 
-                              : "Insufficient LGR balance"}
-                          </motion.div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-
-              <LGRWalletDisplay
-                submissionFee={SUBMISSION_FEE.toString()}
-                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
-                walletAddress={address}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
