@@ -151,7 +151,6 @@ const ThesisSubmission = () => {
     }
   });
 
-  // Update test mode synchronization
   useEffect(() => {
     if (isTestMode) {
       const savedTestData = localStorage.getItem('currentTestFormData');
@@ -191,7 +190,6 @@ const ThesisSubmission = () => {
     }
   }, [isTestMode]);
 
-  // Add storage event listener
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'currentTestFormData' && isTestMode) {
@@ -798,4 +796,21 @@ const ThesisSubmission = () => {
                 <Card className="relative overflow-hidden bg-black/60 backdrop-blur-xl border-white/10">
                   <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
                   <div className="relative z-10 p-4 sm:p-6 md:p-8">
-                    <div className="text-center mb-4 sm:mb-
+                    <div className="text-center mb-4">
+                      <h3 className="text-xl font-semibold text-white mb-2">Ready to Submit?</h3>
+                      <p className="text-gray-400">
+                        Review your investment thesis details before submitting to ensure everything is accurate.
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
