@@ -6,7 +6,7 @@ import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { Check, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { executeTransaction } from "@/services/transactionManager";
 import { TransactionStatus } from "./TransactionStatus";
@@ -34,6 +34,7 @@ export const ContractApprovalStatus = ({
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
+  const approvalCompletedRef = useRef(false);
   const { toast } = useToast();
   const { tokenBalances } = useTokenBalances({
     networkId: 137,
@@ -46,12 +47,13 @@ export const ContractApprovalStatus = ({
   const hasRequiredBalance = isTestMode || (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(requiredAmount));
 
   const handleApprove = async () => {
+    if (isApproving || isApproved || approvalCompletedRef.current) return;
+    
     setIsApproving(true);
     try {
       console.log("Starting approval process...", { isTestMode });
       
       if (isTestMode) {
-        // Create a mock transaction for test mode
         const txId = await transactionQueue.addTransaction({
           type: 'token',
           description: 'Test Mode: Simulating LGR approval'
@@ -61,8 +63,7 @@ export const ContractApprovalStatus = ({
         // Simulate a short delay for better UX
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Update transaction status
-        const tx = await transactionQueue.processTransaction(txId, async () => {
+        await transactionQueue.processTransaction(txId, async () => {
           return {
             success: true,
             transaction: {} as ethers.ContractTransaction,
@@ -71,8 +72,11 @@ export const ContractApprovalStatus = ({
         });
         
         console.log("Test mode transaction completed");
-        setIsApproved(true);
-        onApprovalComplete(currentFormData);
+        if (!approvalCompletedRef.current) {
+          approvalCompletedRef.current = true;
+          setIsApproved(true);
+          onApprovalComplete(currentFormData);
+        }
         return;
       }
 
@@ -85,7 +89,6 @@ export const ContractApprovalStatus = ({
         name: network.name
       });
       
-      // Create real transaction for non-test mode
       const txId = await transactionQueue.addTransaction({
         type: 'token',
         description: `Approve ${ethers.utils.formatEther(requiredAmount)} LGR tokens`
@@ -115,8 +118,11 @@ export const ContractApprovalStatus = ({
       );
 
       console.log("Transaction executed:", transaction);
-      setIsApproved(true);
-      onApprovalComplete(currentFormData, transaction);
+      if (!approvalCompletedRef.current) {
+        approvalCompletedRef.current = true;
+        setIsApproved(true);
+        onApprovalComplete(currentFormData, transaction);
+      }
       
     } catch (error) {
       console.error("Approval error:", error);
@@ -125,6 +131,7 @@ export const ContractApprovalStatus = ({
         description: error instanceof Error ? error.message : "Failed to approve contract",
         variant: "destructive"
       });
+      approvalCompletedRef.current = false;
     } finally {
       setIsApproving(false);
     }
@@ -132,18 +139,30 @@ export const ContractApprovalStatus = ({
 
   const handleTxComplete = () => {
     console.log("Transaction completed");
-    setIsApproved(true);
-    onApprovalComplete(currentFormData);
+    if (!approvalCompletedRef.current) {
+      approvalCompletedRef.current = true;
+      setIsApproved(true);
+      onApprovalComplete(currentFormData);
+    }
   };
 
   const handleTxError = (error: string) => {
     console.error("Transaction failed:", error);
+    approvalCompletedRef.current = false;
     toast({
       title: "Transaction Failed",
       description: error,
       variant: "destructive"
     });
   };
+
+  // Reset approval state when test mode changes
+  useEffect(() => {
+    setIsApproved(false);
+    setIsApproving(false);
+    approvalCompletedRef.current = false;
+    setCurrentTxId(null);
+  }, [isTestMode]);
 
   return (
     <Card className="bg-black/40 border-white/10 p-4 space-y-4">
