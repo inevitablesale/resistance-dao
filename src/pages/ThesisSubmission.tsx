@@ -404,41 +404,59 @@ const ThesisSubmission = () => {
       if (!wallet) {
         throw new Error("No wallet connected");
       }
+
+      console.log('Starting proposal submission in', isTestMode ? 'TEST MODE' : 'NORMAL MODE');
       const contractStatus = await getContractStatus(wallet);
+      
       if (contractStatus.isPaused) {
-        toast({
-          title: "Contract Paused",
-          description: "The contract is currently paused for maintenance. Please try again later.",
-          variant: "destructive"
-        });
-        return;
+        throw new Error("Contract is currently paused for maintenance");
       }
 
-      const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
-      if (targetCapitalWei.lt(contractStatus.minTargetCapital) || targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
-        throw new Error("Target capital out of allowed range");
-      }
-      if (votingDuration < contractStatus.minVotingDuration || votingDuration > contractStatus.maxVotingDuration) {
-        throw new Error("Voting duration out of allowed range");
+      if (!isTestMode) {
+        const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
+        if (targetCapitalWei.lt(contractStatus.minTargetCapital) || targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
+          throw new Error("Target capital out of allowed range");
+        }
+        if (votingDuration < contractStatus.minVotingDuration || votingDuration > contractStatus.maxVotingDuration) {
+          throw new Error("Voting duration out of allowed range");
+        }
       }
 
       updateStepStatus('submission', 'processing');
 
-      console.log('Uploading metadata to IPFS...');
-      const ipfsUri = await uploadMetadataToPinata(formData);
+      const metadataToUpload = {
+        ...formData,
+        isTestMode,
+        submissionTimestamp: Date.now(),
+        submitter: address
+      };
+
+      console.log('Uploading metadata to IPFS...', { isTestMode });
+      const ipfsUri = await uploadMetadataToPinata(metadataToUpload);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
+      
       if (!validateIPFSHash(ipfsHash)) {
         throw new Error("Invalid IPFS hash format");
       }
 
-      console.log('Estimating gas before submission...');
+      console.log('Estimating gas for proposal creation...', { isTestMode });
+      const targetCapitalWei = ethers.utils.parseEther(
+        isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData.investment.targetCapital
+      );
+
       const gasEstimate = await estimateProposalGas({
         targetCapital: targetCapitalWei,
         votingDuration,
         ipfsHash
       }, wallet);
 
-      console.log('Creating proposal...');
+      console.log('Creating proposal...', {
+        isTestMode,
+        targetCapital: ethers.utils.formatEther(targetCapitalWei),
+        votingDuration,
+        ipfsHash
+      });
+
       const result = await createProposal({
         targetCapital: targetCapitalWei,
         votingDuration,
@@ -450,17 +468,20 @@ const ThesisSubmission = () => {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
-        title: formData.title,
-        targetCapital: formData.investment.targetCapital.toString(),
-        status: 'pending'
+        title: isTestMode ? TEST_FORM_DATA.title : formData.title,
+        targetCapital: targetCapitalWei.toString(),
+        status: 'pending',
+        isTest: isTestMode
       };
       userProposals.push(newProposal);
       localStorage.setItem('userProposals', JSON.stringify(userProposals));
+
       updateStepStatus('submission', 'completed');
       toast({
-        title: "Success",
-        description: "Your investment thesis has been submitted successfully!"
+        title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
+        description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
       });
+
     } catch (error) {
       console.error("Submission error:", error);
       updateStepStatus(activeStep, 'failed');
