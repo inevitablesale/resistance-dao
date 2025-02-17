@@ -1,4 +1,3 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -136,7 +135,7 @@ const TEST_FORM_DATA: ProposalMetadata = {
     ]
   },
   investment: {
-    targetCapital: "250000.00",
+    targetCapital: "2500000",
     drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
     additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
   }
@@ -444,7 +443,7 @@ const ThesisSubmission = () => {
         targetCapital: targetCapitalWei,
         votingDuration,
         ipfsHash
-      }, wallet, isTestMode);
+      }, wallet);
 
       const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
       const newProposal: StoredProposal = {
@@ -615,7 +614,7 @@ const ThesisSubmission = () => {
                         {formErrors.title && <p className="text-red-400 text-sm">{formErrors.title[0]}</p>}
                       </div>
 
-                      <TargetCapitalInput value={formData.investment.targetCapital} onChange={value => handleFormDataChange('investment.targetCapital', value)} error={formErrors['investment.targetCapital']} isTestMode={isTestMode} />
+                      <TargetCapitalInput value={formData.investment.targetCapital} onChange={value => handleFormDataChange('investment.targetCapital', value)} error={formErrors['investment.targetCapital']} />
 
                       <div className="space-y-4">
                         <Label className="text-lg font-medium text-white">
@@ -808,6 +807,123 @@ const ThesisSubmission = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1 w-full"
+                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1 w-full max-w-3xl mx-auto"
               >
-                <div className
+                <Card className="relative overflow-hidden bg-black/60 backdrop-blur-xl border-white/10">
+                  <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
+                  <div className="relative z-10 p-4 sm:p-6 md:p-8">
+                    <div className="text-center mb-4 sm:mb-6 md:mb-8">
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
+                        Promote Your Brand
+                      </h3>
+                      <p className="text-sm sm:text-base text-white/60 mt-2">
+                        Reach accounting firm owners and LedgerFund investors
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-2xl mx-auto">
+                      {/* Weekly Plan */}
+                      <div 
+                        onClick={() => address ? handleRentAdSpace('week') : connect()}
+                        className={cn(
+                          "p-3 sm:p-4 rounded-lg border transition-all duration-300 cursor-pointer group",
+                          address 
+                            ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-yellow-500/50" 
+                            : "bg-black/40 border-white/5 hover:bg-black/50"
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <span className="text-base sm:text-lg text-white/80">Weekly</span>
+                            {!address && (
+                              <div className="text-xs text-white/40">Connect wallet to rent</div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-base sm:text-lg font-semibold text-yellow-400">2.5k LGR</div>
+                            {address && (
+                              <div className={cn(
+                                "w-2 h-2 rounded-full transition-colors",
+                                hasRequiredBalance ? "bg-green-500" : "bg-red-500"
+                              )} />
+                            )}
+                          </div>
+                        </div>
+                        
+                        {address && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="mt-2 text-xs text-white/40"
+                          >
+                            {hasRequiredBalance 
+                              ? "Click to rent ad space" 
+                              : "Insufficient LGR balance"}
+                          </motion.div>
+                        )}
+                      </div>
+
+                      {/* Monthly Plan */}
+                      <div 
+                        onClick={() => address ? handleRentAdSpace('month') : connect()}
+                        className={cn(
+                          "relative p-3 sm:p-4 rounded-lg border transition-all duration-300 cursor-pointer group",
+                          address 
+                            ? "bg-gradient-to-b from-white/10 to-white/5 border-white/10 hover:from-white/15 hover:to-white/10 hover:border-yellow-500/50" 
+                            : "bg-black/40 border-white/5 hover:bg-black/50"
+                        )}
+                      >
+                        <div className="absolute -top-2.5 right-2">
+                          <span className="px-2 py-0.5 bg-yellow-500/20 rounded-full text-yellow-400 text-xs">
+                            Best Value
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <span className="text-base sm:text-lg text-white/80">Monthly</span>
+                            {!address && (
+                              <div className="text-xs text-white/40">Connect wallet to rent</div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-base sm:text-lg font-semibold text-yellow-400">9k LGR</div>
+                            {address && (
+                              <div className={cn(
+                                "w-2 h-2 rounded-full transition-colors",
+                                hasRequiredBalance ? "bg-green-500" : "bg-red-500"
+                              )} />
+                            )}
+                          </div>
+                        </div>
+                        
+                        {address && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="mt-2 text-xs text-white/40"
+                          >
+                            {hasRequiredBalance 
+                              ? "Click to rent ad space" 
+                              : "Insufficient LGR balance"}
+                          </motion.div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+
+              <LGRWalletDisplay
+                submissionFee={SUBMISSION_FEE.toString()}
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
+                walletAddress={address}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;

@@ -9,7 +9,6 @@ interface TargetCapitalInputProps {
   value: string;
   onChange: (value: string) => void;
   error?: string[];
-  isTestMode?: boolean;
 }
 
 // Constants in USD terms
@@ -17,7 +16,7 @@ const MIN_TARGET_CAPITAL_USD = 1000;
 const MAX_TARGET_CAPITAL_USD = 25000000;
 const LGR_PRICE_USD = 0.10; // $0.10 per LGR token
 
-export const convertUSDToLGRWei = (usdAmount: string, isTestMode: boolean = false): ethers.BigNumber => {
+export const convertUSDToLGRWei = (usdAmount: string): ethers.BigNumber => {
   if (!usdAmount || isNaN(parseFloat(usdAmount))) return ethers.BigNumber.from(0);
   
   // Convert USD to LGR tokens (as a number first)
@@ -29,18 +28,16 @@ export const convertUSDToLGRWei = (usdAmount: string, isTestMode: boolean = fals
   
   try {
     // Convert the LGR amount to a decimal string with up to 18 decimal places
-    console.log("Converting USD amount:", usdAmount, "to LGR:", wholeLGRAmount, "Test mode:", isTestMode);
+    console.log("Converting USD amount:", usdAmount, "to LGR:", wholeLGRAmount);
     const weiAmount = ethers.utils.parseUnits(wholeLGRAmount.toString(), 18);
     console.log("Final wei amount:", weiAmount.toString());
     
-    // Skip validation in test mode
-    if (!isTestMode) {
-      if (weiAmount.lt(ethers.utils.parseUnits("1000", 18))) {
-        throw new Error(`Minimum target capital is 1,000 LGR ($${1000 * LGR_PRICE_USD} USD)`);
-      }
-      if (weiAmount.gt(ethers.utils.parseUnits("25000000", 18))) {
-        throw new Error(`Maximum target capital is 25,000,000 LGR ($${25000000 * LGR_PRICE_USD} USD)`);
-      }
+    // Validate against contract bounds after conversion
+    if (weiAmount.lt(ethers.utils.parseUnits("1000", 18))) {
+      throw new Error(`Minimum target capital is 1,000 LGR ($${1000 * LGR_PRICE_USD} USD)`);
+    }
+    if (weiAmount.gt(ethers.utils.parseUnits("25000000", 18))) {
+      throw new Error(`Maximum target capital is 25,000,000 LGR ($${25000000 * LGR_PRICE_USD} USD)`);
     }
     
     return weiAmount;
@@ -53,8 +50,7 @@ export const convertUSDToLGRWei = (usdAmount: string, isTestMode: boolean = fals
 export const TargetCapitalInput = ({
   value,
   onChange,
-  error,
-  isTestMode = false
+  error
 }: TargetCapitalInputProps) => {
   const formatValue = (val: string) => {
     // Remove all non-numeric characters except decimal point

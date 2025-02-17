@@ -151,8 +151,7 @@ export const estimateProposalGas = async (
 
 export const createProposal = async (
   config: ProposalConfig,
-  wallet: NonNullable<DynamicContextType['primaryWallet']>,
-  isTestMode: boolean = false
+  wallet: NonNullable<DynamicContextType['primaryWallet']>
 ): Promise<ethers.ContractTransaction> => {
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
@@ -161,7 +160,6 @@ export const createProposal = async (
   const lgrAmount = Number(ethers.utils.formatUnits(config.targetCapital, 18));
   console.log("Creating proposal with target capital:", lgrAmount, "LGR");
   console.log("Target capital in wei:", config.targetCapital.toString());
-  console.log("Test mode:", isTestMode);
   
   return await executeTransaction(
     () => factory.createProposal(
@@ -174,8 +172,7 @@ export const createProposal = async (
       description: `Creating proposal with target capital $${(lgrAmount * LGR_PRICE_USD).toLocaleString()} USD`,
       timeout: 180000,
       maxRetries: 3,
-      backoffMs: 5000,
-      isTestMode // Pass test mode flag to transaction manager
+      backoffMs: 5000
     }
   );
 };
