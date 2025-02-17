@@ -74,7 +74,11 @@ export const WalletAssets = () => {
               const maticBalance = await provider.getBalance(address);
               balance = ethers.utils.formatEther(maticBalance);
             } else {
-              balance = await getTokenBalance(token.address, address);
+              balance = await getTokenBalance(
+                provider,
+                token.address,
+                address
+              );
             }
             return { ...token, balance };
           })

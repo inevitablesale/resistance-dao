@@ -28,7 +28,7 @@ const DEFAULT_CONFIG: Omit<TransactionConfig, 'description' | 'type'> = {
 export const executeTransaction = async (
   transaction: () => Promise<ethers.ContractTransaction>,
   config: TransactionConfig,
-  provider?: ethers.providers.Provider
+  provider?: ethers.providers.Web3Provider
 ): Promise<ethers.ContractTransaction> => {
   // Check allowance if it's a token transaction
   if (config.type === 'token' && config.tokenConfig && provider) {
