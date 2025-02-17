@@ -6,7 +6,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ethers } from "ethers";
-import { transactionQueue, TransactionResult, TransactionFailure } from "@/services/transactionQueueService";
+import { transactionQueue, TransactionResult, TransactionFailure, TransactionSuccess } from "@/services/transactionQueueService";
 import { toast } from "@/hooks/use-toast";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
 import { ProposalError } from "@/services/errorHandlingService";
@@ -134,16 +134,8 @@ export const SmartWalletStatus = () => {
         };
       });
 
-      const isFailure = (result: TransactionResult): result is TransactionFailure => {
-        return !result.success;
-      };
-
-      if (isFailure(result)) {
-        throw new ProposalError({
-          category: 'transaction',
-          message: result.error.message,
-          recoverySteps: result.error.recoverySteps
-        });
+      if ('error' in result) {
+        throw result.error;
       }
 
       const storedWalletAddress = localStorage.getItem('zeroDevWalletAddress');

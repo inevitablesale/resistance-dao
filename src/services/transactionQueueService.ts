@@ -14,13 +14,13 @@ export interface QueuedTransaction {
   retryCount: number;
 }
 
-interface TransactionSuccess {
+export interface TransactionSuccess {
   success: true;
   transaction: ethers.ContractTransaction;
   receipt: ethers.ContractReceipt;
 }
 
-interface TransactionFailure {
+export interface TransactionFailure {
   success: false;
   error: ProposalError;
 }
