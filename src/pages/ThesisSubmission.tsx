@@ -843,6 +843,15 @@ const ThesisSubmission = () => {
                     }, true)}
                   </CollapsibleContent>
                 </Collapsible>
+
+                <div className="mt-8 border-t border-white/10 pt-8">
+                  <ContractApprovalStatus 
+                    onApprovalComplete={handleApprovalComplete}
+                    requiredAmount={SUBMISSION_FEE.toString()}
+                    isTestMode={isTestMode}
+                    currentFormData={formData}
+                  />
+                </div>
               </div>
             </Card>
           </div>
