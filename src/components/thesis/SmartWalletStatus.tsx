@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 import { Wallet, Check, AlertCircle, Loader } from "lucide-react";
 import { motion } from "framer-motion";
@@ -134,8 +135,14 @@ export const SmartWalletStatus = () => {
         };
       });
 
+      // Fixed type checking
       if (!result.success) {
-        throw result.error;
+        // Now TypeScript knows this is a TransactionFailure
+        throw new ProposalError({
+          category: 'transaction',
+          message: result.error.message,
+          recoverySteps: result.error.recoverySteps
+        });
       }
 
       const storedWalletAddress = localStorage.getItem('zeroDevWalletAddress');
