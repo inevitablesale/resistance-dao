@@ -185,10 +185,10 @@ const ThesisSubmission = () => {
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
 
   const [contractStatus, setContractStatus] = useState({
-    minTargetCapital: ethers.utils.formatEther(MIN_TARGET_CAPITAL),
-    maxTargetCapital: ethers.utils.formatEther(MAX_TARGET_CAPITAL),
-    submissionFee: SUBMISSION_FEE.toString(),
-    votingFee: VOTING_FEE.toString()
+    minTargetCapital: MIN_TARGET_CAPITAL,
+    maxTargetCapital: MAX_TARGET_CAPITAL,
+    submissionFee: ethers.utils.formatEther(SUBMISSION_FEE),
+    votingFee: ethers.utils.formatEther(VOTING_FEE)
   });
 
   useEffect(() => {
