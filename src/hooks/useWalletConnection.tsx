@@ -64,6 +64,10 @@ export const useWalletConnection = () => {
         throw new Error("Treasury address not available in contract status");
       }
 
+      // Convert the amount to a whole number and then to wei
+      const wholeLGRAmount = Math.floor(parseFloat(amount));
+      const amountInWei = ethers.utils.parseUnits(wholeLGRAmount.toString(), 18);
+      
       console.log(`Approving LGR tokens for treasury using ${walletProvider.type} wallet:`, status.treasury);
       const signer = walletProvider.provider.getSigner();
       const lgrToken = new ethers.Contract(
@@ -72,8 +76,8 @@ export const useWalletConnection = () => {
         signer
       );
 
-      console.log("Calling approve with amount:", amount, "isTestMode:", isTestMode);
-      return await lgrToken.approve(status.treasury, amount);
+      console.log("Calling approve with amount:", amountInWei.toString(), "isTestMode:", isTestMode);
+      return await lgrToken.approve(status.treasury, amountInWei);
     } catch (error) {
       console.error("Approval error in useWalletConnection:", error);
       throw error;
