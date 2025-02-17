@@ -462,9 +462,8 @@ const ThesisSubmission = () => {
       if (!wallet) {
         throw new Error("No wallet connected");
       }
-
-      const status = await getContractStatus(wallet);
-      if (status.isPaused) {
+      const contractStatus = await getContractStatus(wallet);
+      if (contractStatus.isPaused) {
         toast({
           title: "Contract Paused",
           description: "The contract is currently paused for maintenance. Please try again later.",
@@ -474,11 +473,10 @@ const ThesisSubmission = () => {
       }
 
       const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
-      if (targetCapitalWei.lt(status.minTargetCapital) || targetCapitalWei.gt(status.maxTargetCapital)) {
-        throw new Error(`Target capital must be between ${ethers.utils.formatEther(status.minTargetCapital)} and ${ethers.utils.formatEther(status.maxTargetCapital)} LGR`);
+      if (targetCapitalWei.lt(contractStatus.minTargetCapital) || targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
+        throw new Error("Target capital out of allowed range");
       }
-
-      if (votingDuration < status.minVotingDuration || votingDuration > status.maxVotingDuration) {
+      if (votingDuration < contractStatus.minVotingDuration || votingDuration > contractStatus.maxVotingDuration) {
         throw new Error("Voting duration out of allowed range");
       }
 

@@ -1,9 +1,8 @@
+
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { LGR_PRICE_USD } from "@/lib/constants";
-import { ProposalError } from "./errorHandlingService";
-import { getProvider } from "./walletProviderService";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
@@ -42,7 +41,7 @@ export interface ContractStatus {
 }
 
 export interface ProposalConfig {
-  targetCapital: string | ethers.BigNumber;
+  targetCapital: string; // In LGR (not wei)
   votingDuration: number;
   ipfsHash: string;
 }
@@ -51,6 +50,19 @@ export interface GasEstimate {
   gasLimit: ethers.BigNumber;
   gasPrice: ethers.BigNumber;
   totalCost: ethers.BigNumber;
+}
+
+async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet']>) {
+  try {
+    const walletClient = await wallet.getWalletClient();
+    if (!walletClient) {
+      throw new Error("No wallet client available");
+    }
+    return new ethers.providers.Web3Provider(walletClient as any);
+  } catch (error) {
+    console.error("Error getting provider:", error);
+    throw new Error("Failed to initialize provider");
+  }
 }
 
 export const getContractStatus = async (wallet: NonNullable<DynamicContextType['primaryWallet']>): Promise<ContractStatus> => {
@@ -90,11 +102,11 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       submissionFee: submissionFee.toString(),
       isPaused,
       isTestMode,
-      treasury,
+      treasury: treasury.toString(),
       minTargetCapital: minTargetCapital.toString(),
       maxTargetCapital: maxTargetCapital.toString(),
-      minVotingDuration,
-      maxVotingDuration,
+      minVotingDuration: Number(minVotingDuration),
+      maxVotingDuration: Number(maxVotingDuration),
       votingFee: votingFee.toString(),
       lgrTokenAddress,
       owner
@@ -115,16 +127,7 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
     };
   } catch (error) {
     console.error("Error getting contract status:", error);
-    throw new ProposalError({
-      category: 'contract',
-      message: "Failed to get contract status",
-      recoverySteps: [
-        "Please ensure you're connected to the correct network",
-        "Check your wallet connection",
-        "Try refreshing the page"
-      ],
-      technicalDetails: error instanceof Error ? error.stack : undefined
-    });
+    throw new Error("Failed to get contract status. Please ensure you're connected to the correct network.");
   }
 };
 
@@ -154,10 +157,8 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  // Convert targetCapital to BigNumber if it's a string
-  const targetCapitalWei = typeof config.targetCapital === 'string'
-    ? ethers.utils.parseEther(config.targetCapital)
-    : config.targetCapital;
+  // Convert LGR amount to wei format (18 decimals)
+  const targetCapitalWei = ethers.utils.parseEther(config.targetCapital);
   
   return await executeTransaction(
     () => factory.createProposal(
@@ -167,7 +168,7 @@ export const createProposal = async (
     ),
     {
       type: 'proposal',
-      description: `Creating proposal with target capital ${ethers.utils.formatEther(targetCapitalWei).toLocaleString()} LGR`,
+      description: `Creating proposal with target capital ${config.targetCapital.toLocaleString()} LGR`,
       timeout: 180000, // 3 minutes
       maxRetries: 3,
       backoffMs: 5000
