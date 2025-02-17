@@ -13,6 +13,7 @@ export const useWalletConnection = () => {
   const { primaryWallet, setShowAuthFlow, setShowOnRamp } = useDynamicContext();
   const { getProvider, validateNetwork, getWalletType } = useWalletProvider();
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isTestMode, setIsTestMode] = useState(false);
   const { toast } = useToast();
 
   const connect = async () => {
@@ -51,8 +52,22 @@ export const useWalletConnection = () => {
     }
   };
 
+  const toggleTestMode = (value: boolean) => {
+    console.log('Toggling test mode to:', value);
+    setIsTestMode(value);
+  };
+
   const approveLGR = async (amount: string, isTestMode: boolean = false): Promise<ethers.ContractTransaction> => {
     try {
+      // If in test mode, return a mock transaction
+      if (isTestMode) {
+        console.log("Test mode: Bypassing real LGR approval");
+        return {
+          hash: "0x" + "test".repeat(16),
+          wait: async () => ({ status: 1 }),
+        } as ethers.ContractTransaction;
+      }
+
       const walletProvider = await getProvider();
       await validateNetwork(walletProvider);
 
@@ -72,7 +87,7 @@ export const useWalletConnection = () => {
         signer
       );
 
-      console.log("Calling approve with amount:", amount, "isTestMode:", isTestMode);
+      console.log("Calling approve with amount:", amount);
       return await lgrToken.approve(status.treasury, amount);
     } catch (error) {
       console.error("Approval error in useWalletConnection:", error);
@@ -89,6 +104,8 @@ export const useWalletConnection = () => {
   return {
     isConnected: !!primaryWallet?.isConnected?.(),
     isConnecting,
+    isTestMode,
+    toggleTestMode,
     connect,
     disconnect,
     address: primaryWallet?.address,
