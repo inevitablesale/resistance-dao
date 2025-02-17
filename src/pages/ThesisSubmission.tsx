@@ -580,6 +580,50 @@ const ThesisSubmission = () => {
     const success = await toggleTestMode(enabled);
     if (success) {
       setIsTestMode(enabled);
+      if (enabled) {
+        // When enabling test mode, auto-complete all sections
+        setFormData(TEST_FORM_DATA);
+        setIsThesisOpen(false);
+        setIsStrategyOpen(false);
+        setIsApprovalOpen(false);
+        setIsSubmissionOpen(true);
+        // Mark all steps as completed
+        setSteps(prev => prev.map(step => ({
+          ...step,
+          status: 'completed'
+        })));
+        toast({
+          title: "Test Mode Enabled",
+          description: "Form pre-filled with test data",
+        });
+      } else {
+        // When disabling test mode, reset form and steps
+        setFormData({
+          title: "",
+          firmCriteria: {
+            size: "",
+            location: "",
+            dealType: "",
+            geographicFocus: ""
+          },
+          paymentTerms: [],
+          strategies: {
+            operational: [],
+            growth: [],
+            integration: []
+          },
+          investment: {
+            targetCapital: "",
+            drivers: "",
+            additionalCriteria: ""
+          }
+        });
+        setIsThesisOpen(true);
+        setIsStrategyOpen(false);
+        setIsApprovalOpen(false);
+        setIsSubmissionOpen(false);
+        setSteps(SUBMISSION_STEPS);
+      }
     }
   };
 
