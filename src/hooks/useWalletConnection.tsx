@@ -61,6 +61,7 @@ export const useWalletConnection = () => {
       if (isTestMode) {
         const mockFrom = "0x" + "3".repeat(40);
         const mockHash = "0x" + "1".repeat(64);
+        const mockBlockHash = "0x" + "4".repeat(64);
         
         return {
           hash: mockHash,
@@ -77,13 +78,19 @@ export const useWalletConnection = () => {
             from: mockFrom,
             contractAddress: LGR_TOKEN_ADDRESS,
             transactionHash: mockHash,
-            blockHash: "0x" + "4".repeat(64),
+            blockHash: mockBlockHash,
             blockNumber: 1,
             timestamp: Date.now(),
             confirmations: 1,
             events: [],
             logs: [],
-            status: 1
+            status: 1,
+            gasUsed: ethers.BigNumber.from(21000),
+            cumulativeGasUsed: ethers.BigNumber.from(21000),
+            effectiveGasPrice: ethers.BigNumber.from(1000000000),
+            logsBloom: "0x" + "0".repeat(512),
+            transactionIndex: 0,
+            byzantium: true
           })
         } as ethers.ContractTransaction;
       }
