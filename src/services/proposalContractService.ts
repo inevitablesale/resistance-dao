@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
@@ -13,8 +12,7 @@ const FACTORY_ABI = [
   "function minTargetCapital() public view returns (uint256)",
   "function maxTargetCapital() public view returns (uint256)",
   "function minVotingDuration() public view returns (uint256)",
-  "function maxVotingDuration() public view returns (uint256)",
-  "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"
+  "function maxVotingDuration() public view returns (uint256)"
 ];
 
 export interface ContractStatus {
@@ -59,6 +57,7 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
 
   try {
+    console.log("Calling contract methods...");
     const [
       submissionFee,
       isPaused,
@@ -69,15 +68,50 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       minVotingDuration,
       maxVotingDuration
     ] = await Promise.all([
-      factory.submissionFee(),
-      factory.paused(),
-      factory.testModeEnabled(),
-      factory.treasury(),
-      factory.minTargetCapital(),
-      factory.maxTargetCapital(),
-      factory.minVotingDuration(),
-      factory.maxVotingDuration()
+      factory.submissionFee().catch((e: Error) => {
+        console.error("Error calling submissionFee:", e);
+        throw e;
+      }),
+      factory.paused().catch((e: Error) => {
+        console.error("Error calling paused:", e);
+        throw e;
+      }),
+      factory.testModeEnabled().catch((e: Error) => {
+        console.error("Error calling testModeEnabled:", e);
+        throw e;
+      }),
+      factory.treasury().catch((e: Error) => {
+        console.error("Error calling treasury:", e);
+        throw e;
+      }),
+      factory.minTargetCapital().catch((e: Error) => {
+        console.error("Error calling minTargetCapital:", e);
+        throw e;
+      }),
+      factory.maxTargetCapital().catch((e: Error) => {
+        console.error("Error calling maxTargetCapital:", e);
+        throw e;
+      }),
+      factory.minVotingDuration().catch((e: Error) => {
+        console.error("Error calling minVotingDuration:", e);
+        throw e;
+      }),
+      factory.maxVotingDuration().catch((e: Error) => {
+        console.error("Error calling maxVotingDuration:", e);
+        throw e;
+      })
     ]);
+
+    console.log("Contract calls successful:", {
+      submissionFee: submissionFee.toString(),
+      isPaused,
+      isTestMode,
+      treasuryAddress,
+      minTargetCapital: minTargetCapital.toString(),
+      maxTargetCapital: maxTargetCapital.toString(),
+      minVotingDuration: Number(minVotingDuration),
+      maxVotingDuration: Number(maxVotingDuration)
+    });
 
     return {
       submissionFee,
