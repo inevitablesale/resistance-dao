@@ -23,11 +23,24 @@ export const convertUSDToLGRWei = (usdAmount: string): ethers.BigNumber => {
   const usdValue = parseFloat(usdAmount);
   const lgrAmount = usdValue / LGR_PRICE_USD;
   
+  // Validate LGR amount against contract bounds (1,000 - 25,000,000 LGR)
+  const wholeLGRAmount = Math.floor(lgrAmount);
+  if (wholeLGRAmount < 1000) {
+    throw new Error(`Minimum target capital is 1,000 LGR ($${1000 * LGR_PRICE_USD} USD)`);
+  }
+  if (wholeLGRAmount > 25000000) {
+    throw new Error(`Maximum target capital is 25,000,000 LGR ($${25000000 * LGR_PRICE_USD} USD)`);
+  }
+  
   try {
-    // Convert the whole LGR amount to wei (this adds 18 decimals)
-    const lgrAmountString = Math.floor(lgrAmount).toString();
-    console.log("Converting USD amount:", usdAmount, "to LGR:", lgrAmountString);
-    return ethers.utils.parseUnits(lgrAmountString, 18);
+    // Now convert the whole LGR amount to wei (this adds 18 decimals)
+    const lgrAmountString = wholeLGRAmount.toString();
+    console.log("Converting USD", usdAmount, "to", lgrAmountString, "LGR tokens");
+    
+    const weiAmount = ethers.utils.parseUnits(lgrAmountString, 18);
+    console.log("Final wei amount:", weiAmount.toString());
+    
+    return weiAmount;
   } catch (error) {
     console.error("Error converting to wei:", error);
     return ethers.BigNumber.from(0);
