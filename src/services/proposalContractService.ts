@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
@@ -162,12 +163,12 @@ export const createProposal = async (
   return await executeTransaction(
     () => factory.createProposal(
       config.ipfsHash,
-      config.targetCapital, // Use the BigNumber directly since it's already in wei
+      config.targetCapital,
       config.votingDuration
     ),
     {
       type: 'proposal',
-      description: `Creating proposal with target capital $${parseFloat(config.targetCapital.toString()).toLocaleString()} USD`,
+      description: `Creating proposal with target capital ${ethers.utils.formatUnits(config.targetCapital, 18)} LGR`,
       timeout: 180000, // 3 minutes for proposal creation
       maxRetries: 3,
       backoffMs: 5000
