@@ -11,8 +11,9 @@ interface TargetCapitalInputProps {
   error?: string[];
 }
 
-const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
-const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
+// These are in LGR tokens (contract expects LGR values)
+const MIN_TARGET_CAPITAL = "1000"; // 1,000 LGR
+const MAX_TARGET_CAPITAL = "25000000"; // 25M LGR
 const LGR_PRICE_USD = 0.10; // $0.10 per LGR token
 
 export const TargetCapitalInput = ({
@@ -26,6 +27,10 @@ export const TargetCapitalInput = ({
     // Ensure only one decimal point
     const parts = numericValue.split('.');
     if (parts.length > 2) return value;
+    // Limit to 2 decimal places
+    if (parts[1] && parts[1].length > 2) {
+      return `${parts[0]}.${parts[1].substring(0, 2)}`;
+    }
     return numericValue;
   };
 
@@ -34,21 +39,24 @@ export const TargetCapitalInput = ({
     onChange(formattedValue);
   };
 
-  const calculateLGRAmount = (usdAmount: string): string => {
-    if (!usdAmount) return "0";
-    const usdValue = parseFloat(usdAmount);
-    const lgrAmount = usdValue / LGR_PRICE_USD;
-    return lgrAmount.toFixed(2);
+  const calculateUSDAmount = (lgrAmount: string): string => {
+    if (!lgrAmount) return "0";
+    const lgrValue = parseFloat(lgrAmount);
+    const usdAmount = lgrValue * LGR_PRICE_USD;
+    return usdAmount.toFixed(2);
   };
 
   const getHelperText = () => {
     if (!value) return "";
-    const numValue = ethers.utils.parseEther(value || "0");
-    if (numValue.lt(MIN_TARGET_CAPITAL)) {
-      return `Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} USD`;
+    const numValue = parseFloat(value);
+    const minValue = parseFloat(MIN_TARGET_CAPITAL);
+    const maxValue = parseFloat(MAX_TARGET_CAPITAL);
+    
+    if (numValue < minValue) {
+      return `Minimum target capital is ${MIN_TARGET_CAPITAL.toLocaleString()} LGR`;
     }
-    if (numValue.gt(MAX_TARGET_CAPITAL)) {
-      return `Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} USD`;
+    if (numValue > maxValue) {
+      return `Maximum target capital is ${MAX_TARGET_CAPITAL.toLocaleString()} LGR`;
     }
     return "";
   };
@@ -57,17 +65,17 @@ export const TargetCapitalInput = ({
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <Label className="text-lg font-medium text-white mb-2 flex items-center gap-2">
-          Target Capital
+          Target Capital (LGR)
           <HelpCircle className="h-4 w-4 text-gray-400" />
         </Label>
         <div className="text-sm text-gray-400">
-          {value && `≈ ${calculateLGRAmount(value)} LGR`}
+          {value && `≈ $${calculateUSDAmount(value)}`}
         </div>
       </div>
       <div className="relative">
         <Input
           type="text"
-          placeholder="Enter amount in USD"
+          placeholder="Enter amount in LGR"
           className={cn(
             "bg-black/50 border-white/10 text-white placeholder:text-gray-500 pl-12",
             error ? "border-red-500" : ""
@@ -75,7 +83,7 @@ export const TargetCapitalInput = ({
           value={value}
           onChange={handleChange}
         />
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🪙</span>
       </div>
       {(error || getHelperText()) && (
         <p className="text-sm text-red-500">

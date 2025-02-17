@@ -41,7 +41,7 @@ export interface ContractStatus {
 }
 
 export interface ProposalConfig {
-  targetCapital: ethers.BigNumber;
+  targetCapital: string; // In LGR (not wei)
   votingDuration: number;
   ipfsHash: string;
 }
@@ -139,9 +139,9 @@ export const estimateProposalGas = async (
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
   
   // For ZeroDev bundler, we'll use a higher gas limit estimation
-  const gasEstimate = ethers.BigNumber.from("1000000"); // Base gas estimation for complex interactions
+  const gasEstimate = ethers.BigNumber.from("1000000"); // Base gas estimation
   const gasPrice = await provider.getGasPrice();
-  const gasLimit = gasEstimate.mul(150).div(100); // Add 50% buffer for AA transactions
+  const gasLimit = gasEstimate.mul(150).div(100); // Add 50% buffer
   
   return {
     gasLimit,
@@ -157,8 +157,8 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  // Convert USD amount to wei format
-  const targetCapitalWei = ethers.utils.parseEther(config.targetCapital.toString());
+  // Convert LGR amount to wei format (18 decimals)
+  const targetCapitalWei = ethers.utils.parseEther(config.targetCapital);
   
   return await executeTransaction(
     () => factory.createProposal(
@@ -168,8 +168,8 @@ export const createProposal = async (
     ),
     {
       type: 'proposal',
-      description: `Creating proposal with target capital $${ethers.utils.formatEther(targetCapitalWei)} USD`,
-      timeout: 180000, // 3 minutes for proposal creation
+      description: `Creating proposal with target capital ${config.targetCapital.toLocaleString()} LGR`,
+      timeout: 180000, // 3 minutes
       maxRetries: 3,
       backoffMs: 5000
     }
