@@ -206,9 +206,9 @@ const ThesisSubmission = () => {
     owner: ""
   });
 
-  const [displayContractStatus, setDisplayContractStatus] = useState<DisplayContractStatus>({
-    minTargetCapital: MIN_TARGET_CAPITAL,
-    maxTargetCapital: MAX_TARGET_CAPITAL,
+  const [displayStatus, setDisplayStatus] = useState<DisplayContractStatus>({
+    minTargetCapital: MIN_TARGET_CAPITAL.toString(),
+    maxTargetCapital: MAX_TARGET_CAPITAL.toString(),
     submissionFee: SUBMISSION_FEE.toString(),
     votingFee: VOTING_FEE.toString()
   });
@@ -219,7 +219,7 @@ const ThesisSubmission = () => {
       try {
         const status = await getContractStatus(wallet);
         setContractStatus(status);
-        setDisplayContractStatus({
+        setDisplayStatus({
           minTargetCapital: ethers.utils.formatEther(status.minTargetCapital),
           maxTargetCapital: ethers.utils.formatEther(status.maxTargetCapital),
           submissionFee: ethers.utils.formatEther(status.submissionFee),
@@ -240,12 +240,7 @@ const ThesisSubmission = () => {
     }
   }, [isConnected, wallet, toast]);
 
-  const displayContractStatus: DisplayContractStatus = {
-    minTargetCapital: ethers.utils.formatEther(contractStatus.minTargetCapital),
-    maxTargetCapital: ethers.utils.formatEther(contractStatus.maxTargetCapital),
-    submissionFee: ethers.utils.formatEther(contractStatus.submissionFee),
-    votingFee: ethers.utils.formatEther(contractStatus.votingFee)
-  };
+  const { minTargetCapital, maxTargetCapital, submissionFee, votingFee } = displayStatus;
 
   useEffect(() => {
     setFormData(isTestMode ? TEST_FORM_DATA : {
@@ -348,10 +343,10 @@ const ThesisSubmission = () => {
       try {
         const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
         if (targetCapitalWei.lt(MIN_TARGET_CAPITAL)) {
-          errors['investment.targetCapital'] = [`Minimum target capital is ${displayContractStatus.minTargetCapital} ETH`];
+          errors['investment.targetCapital'] = [`Minimum target capital is ${minTargetCapital} ETH`];
         }
         if (targetCapitalWei.gt(MAX_TARGET_CAPITAL)) {
-          errors['investment.targetCapital'] = [`Maximum target capital is ${displayContractStatus.maxTargetCapital} ETH`];
+          errors['investment.targetCapital'] = [`Maximum target capital is ${maxTargetCapital} ETH`];
         }
       } catch (error) {
         errors['investment.targetCapital'] = ['Invalid target capital amount'];
