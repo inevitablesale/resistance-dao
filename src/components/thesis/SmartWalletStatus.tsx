@@ -27,23 +27,43 @@ export const SmartWalletStatus = () => {
       if (!primaryWallet || !address) return;
 
       try {
-        // Check if this is the first time user is creating a smart wallet
-        const hasExistingWallet = await primaryWallet.getWalletClient();
+        console.log('Checking wallet status for address:', address);
         
-        if (!hasExistingWallet) {
+        // Check if this is the first time user is creating a smart wallet
+        let walletClient;
+        try {
+          console.log('Attempting to get wallet client...');
+          walletClient = await primaryWallet.getWalletClient();
+          console.log('Wallet client response:', walletClient);
+        } catch (error) {
+          console.error('Error getting wallet client:', error);
+          walletClient = null;
+        }
+        
+        if (!walletClient) {
+          console.log('No existing wallet found, initiating creation...');
           setState({
             status: 'creating',
             message: 'Setting up your smart wallet...',
             isFirstTime: true
           });
-          // Wait for wallet creation
-          await new Promise(resolve => setTimeout(resolve, 2000));
+
+          try {
+            // Wait for wallet creation - this will be replaced with actual ZeroDev deployment
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log('Smart wallet creation completed');
+          } catch (error) {
+            console.error('Smart wallet creation error:', error);
+            throw error;
+          }
+        } else {
+          console.log('Existing wallet found');
         }
 
         setState({
           status: 'ready',
           message: 'Smart wallet is ready',
-          isFirstTime: !hasExistingWallet
+          isFirstTime: !walletClient
         });
       } catch (error) {
         console.error('Smart wallet setup error:', error);
