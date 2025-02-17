@@ -471,7 +471,7 @@ const ThesisSubmission = () => {
         title: isTestMode ? TEST_FORM_DATA.title : formData.title,
         targetCapital: targetCapitalWei.toString(),
         status: 'pending',
-        isTest: isTestMode
+        isTestMode: isTestMode
       };
       userProposals.push(newProposal);
       localStorage.setItem('userProposals', JSON.stringify(userProposals));

@@ -6,7 +6,7 @@ export interface StoredProposal {
   title: string;
   targetCapital: string;
   status: 'pending' | 'completed' | 'failed';
-  isTest?: boolean;
+  isTestMode?: boolean;
 }
 
 export interface ProposalMetadata {

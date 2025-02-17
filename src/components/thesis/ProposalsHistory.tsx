@@ -44,7 +44,7 @@ export const ProposalsHistory = () => {
                   <h3 className="font-medium text-white">{proposal.title}</h3>
                   <div className="flex items-center gap-2 text-sm text-white/60">
                     <Calendar className="w-4 h-4" />
-                    <span>{format(parseInt(proposal.timestamp), 'PPP')}</span>
+                    <span>{format(new Date(proposal.timestamp), 'PPP')}</span>
                   </div>
                 </div>
               </div>
@@ -53,8 +53,8 @@ export const ProposalsHistory = () => {
                 <div className={cn(
                   "px-2 py-1 rounded text-xs font-medium",
                   proposal.status === 'pending' && "bg-yellow-500/10 text-yellow-500",
-                  proposal.status === 'active' && "bg-blue-500/10 text-blue-500",
-                  proposal.status === 'completed' && "bg-green-500/10 text-green-500"
+                  proposal.status === 'completed' && "bg-green-500/10 text-green-500",
+                  proposal.status === 'failed' && "bg-red-500/10 text-red-500"
                 )}>
                   {proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1)}
                 </div>
