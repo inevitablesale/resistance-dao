@@ -23,27 +23,27 @@ export const convertUSDToLGRWei = (usdAmount: string): ethers.BigNumber => {
   const usdValue = parseFloat(usdAmount);
   const lgrAmount = usdValue / LGR_PRICE_USD;
   
-  // Validate LGR amount against contract bounds (1,000 - 25,000,000 LGR)
+  // Round down to whole LGR tokens and validate bounds
   const wholeLGRAmount = Math.floor(lgrAmount);
-  if (wholeLGRAmount < 1000) {
-    throw new Error(`Minimum target capital is 1,000 LGR ($${1000 * LGR_PRICE_USD} USD)`);
-  }
-  if (wholeLGRAmount > 25000000) {
-    throw new Error(`Maximum target capital is 25,000,000 LGR ($${25000000 * LGR_PRICE_USD} USD)`);
-  }
   
   try {
-    // Now convert the whole LGR amount to wei (this adds 18 decimals)
-    const lgrAmountString = wholeLGRAmount.toString();
-    console.log("Converting USD", usdAmount, "to", lgrAmountString, "LGR tokens");
-    
-    const weiAmount = ethers.utils.parseUnits(lgrAmountString, 18);
+    // Convert the LGR amount to a decimal string with up to 18 decimal places
+    console.log("Converting USD amount:", usdAmount, "to LGR:", wholeLGRAmount);
+    const weiAmount = ethers.utils.parseUnits(wholeLGRAmount.toString(), 18);
     console.log("Final wei amount:", weiAmount.toString());
+    
+    // Validate against contract bounds after conversion
+    if (weiAmount.lt(ethers.utils.parseUnits("1000", 18))) {
+      throw new Error(`Minimum target capital is 1,000 LGR ($${1000 * LGR_PRICE_USD} USD)`);
+    }
+    if (weiAmount.gt(ethers.utils.parseUnits("25000000", 18))) {
+      throw new Error(`Maximum target capital is 25,000,000 LGR ($${25000000 * LGR_PRICE_USD} USD)`);
+    }
     
     return weiAmount;
   } catch (error) {
     console.error("Error converting to wei:", error);
-    return ethers.BigNumber.from(0);
+    throw error; // Re-throw to handle in the UI
   }
 };
 

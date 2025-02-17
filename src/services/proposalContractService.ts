@@ -157,8 +157,9 @@ export const createProposal = async (
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
   // Format target capital for logging (convert from wei to LGR)
-  const lgrAmount = parseFloat(ethers.utils.formatUnits(config.targetCapital, 18));
+  const lgrAmount = Number(ethers.utils.formatUnits(config.targetCapital, 18));
   console.log("Creating proposal with target capital:", lgrAmount, "LGR");
+  console.log("Target capital in wei:", config.targetCapital.toString());
   
   return await executeTransaction(
     () => factory.createProposal(
