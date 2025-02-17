@@ -23,7 +23,7 @@ export const ContractApprovalStatus = ({
   requiredAmount,
   isTestMode = false
 }: ContractApprovalStatusProps) => {
-  const { approveLGR, address, wallet } = useWalletConnection();
+  const { approveLGR, address } = useWalletConnection();
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const { toast } = useToast();
@@ -50,28 +50,8 @@ export const ContractApprovalStatus = ({
         setIsApproved(true);
         toast({
           title: "Approval Successful",
-          description: "Starting minting process...",
+          description: "Contract approved successfully",
         });
-        
-        // Create a synthetic form event for handleSubmit
-        const syntheticEvent = {
-          preventDefault: () => {},
-          target: null,
-          currentTarget: null,
-          bubbles: false,
-          cancelable: false,
-          defaultPrevented: false,
-          eventPhase: 0,
-          isTrusted: true,
-          nativeEvent: new Event('submit'),
-          stopPropagation: () => {},
-          isPropagationStopped: () => false,
-          persist: () => {},
-          isDefaultPrevented: () => false,
-          type: 'submit'
-        } as React.FormEvent<HTMLFormElement>;
-
-        // Call onApprovalComplete which will trigger handleSubmit
         onApprovalComplete();
       }
     } catch (error) {
@@ -84,10 +64,6 @@ export const ContractApprovalStatus = ({
     } finally {
       setIsApproving(false);
     }
-  };
-
-  const handleRentAdSpace = (frequency: 'week' | 'month') => {
-    // Implement ad space rental logic here
   };
 
   return (
