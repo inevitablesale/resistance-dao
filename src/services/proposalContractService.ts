@@ -157,13 +157,12 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  // Convert USD amount to LGR wei amount
-  const targetCapitalWei = convertUSDToLGRWei(config.targetCapital.toString());
+  console.log("Creating proposal with target capital:", config.targetCapital.toString(), "wei");
   
   return await executeTransaction(
     () => factory.createProposal(
       config.ipfsHash,
-      targetCapitalWei,
+      config.targetCapital, // Use the BigNumber directly since it's already in wei
       config.votingDuration
     ),
     {
