@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -23,27 +22,21 @@ export const convertUSDToLGRWei = (usdAmount: string): ethers.BigNumber => {
   const usdValue = parseFloat(usdAmount);
   const lgrAmount = usdValue / LGR_PRICE_USD;
   
-  // Round down to whole LGR tokens and validate bounds
+  // Validate LGR amount against contract bounds (1,000 - 25,000,000 LGR)
   const wholeLGRAmount = Math.floor(lgrAmount);
+  if (wholeLGRAmount < 1000) {
+    throw new Error(`Minimum target capital is 1,000 LGR (${1000 * LGR_PRICE_USD} USD)`);
+  }
+  if (wholeLGRAmount > 25000000) {
+    throw new Error(`Maximum target capital is 25,000,000 LGR (${25000000 * LGR_PRICE_USD} USD)`);
+  }
   
   try {
-    // Convert the LGR amount to a decimal string with up to 18 decimal places
-    console.log("Converting USD amount:", usdAmount, "to LGR:", wholeLGRAmount);
-    const weiAmount = ethers.utils.parseUnits(wholeLGRAmount.toString(), 18);
-    console.log("Final wei amount:", weiAmount.toString());
-    
-    // Validate against contract bounds after conversion
-    if (weiAmount.lt(ethers.utils.parseUnits("1000", 18))) {
-      throw new Error(`Minimum target capital is 1,000 LGR ($${1000 * LGR_PRICE_USD} USD)`);
-    }
-    if (weiAmount.gt(ethers.utils.parseUnits("25000000", 18))) {
-      throw new Error(`Maximum target capital is 25,000,000 LGR ($${25000000 * LGR_PRICE_USD} USD)`);
-    }
-    
-    return weiAmount;
+    // Now convert the whole LGR amount to wei (this adds 18 decimals)
+    return ethers.utils.parseUnits(wholeLGRAmount.toString(), 18);
   } catch (error) {
     console.error("Error converting to wei:", error);
-    throw error; // Re-throw to handle in the UI
+    return ethers.BigNumber.from(0);
   }
 };
 
@@ -75,7 +68,7 @@ export const TargetCapitalInput = ({
     const usdValue = parseFloat(usdAmount);
     if (isNaN(usdValue)) return "0";
     const lgrAmount = usdValue / LGR_PRICE_USD;
-    return Math.floor(lgrAmount).toString();
+    return Math.floor(lgrAmount).toString(); // Return whole tokens only
   };
 
   const getHelperText = () => {

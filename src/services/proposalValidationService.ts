@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ContractStatus } from "./proposalContractService";
 
@@ -49,8 +50,8 @@ const DEFAULT_CONFIG: ValidationConfig = {
   maxSummaryLength: 500,
   minTitleLength: 10,
   minDriversLength: 50,
-  targetCapitalMin: ethers.utils.parseUnits("1000", 18), // 1,000 LGR
-  targetCapitalMax: ethers.utils.parseUnits("25000000", 18) // 25,000,000 LGR
+  targetCapitalMin: ethers.utils.parseEther("1000"),
+  targetCapitalMax: ethers.utils.parseEther("25000000")
 };
 
 export const validateProposalMetadata = (
@@ -195,12 +196,10 @@ export const validateContractParameters = (
     errors.targetCapital = ['Target capital is required'];
   } else {
     if (config.targetCapital.lt(status.minTargetCapital)) {
-      const minLGR = ethers.utils.formatUnits(status.minTargetCapital, 18);
-      errors.targetCapital = [`Target capital must be at least ${minLGR} LGR`];
+      errors.targetCapital = [`Target capital must be at least ${ethers.utils.formatEther(status.minTargetCapital)} ETH`];
     }
     if (config.targetCapital.gt(status.maxTargetCapital)) {
-      const maxLGR = ethers.utils.formatUnits(status.maxTargetCapital, 18);
-      errors.targetCapital = [`Target capital must not exceed ${maxLGR} LGR`];
+      errors.targetCapital = [`Target capital must not exceed ${ethers.utils.formatEther(status.maxTargetCapital)} ETH`];
     }
   }
 

@@ -1,8 +1,8 @@
-
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { LGR_PRICE_USD } from "@/lib/constants";
+import { convertUSDToLGRWei } from "@/components/thesis/TargetCapitalInput";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
@@ -138,12 +138,10 @@ export const estimateProposalGas = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
   
-  // For ZeroDev bundler, we need a higher base estimate
-  const baseGasEstimate = ethers.BigNumber.from("3000000"); // Increased base estimate
+  // For ZeroDev bundler, we'll use a higher gas limit estimation
+  const gasEstimate = ethers.BigNumber.from("1000000"); // Base gas estimation for complex interactions
   const gasPrice = await provider.getGasPrice();
-  
-  // Add 100% buffer for complex AA transactions
-  const gasLimit = baseGasEstimate.mul(200).div(100);
+  const gasLimit = gasEstimate.mul(150).div(100); // Add 50% buffer for AA transactions
   
   return {
     gasLimit,
@@ -159,25 +157,18 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  // Format target capital for logging (convert from wei to LGR)
-  const lgrAmount = Number(ethers.utils.formatUnits(config.targetCapital, 18));
-  console.log("Creating proposal with target capital:", lgrAmount, "LGR");
-  console.log("Target capital in wei:", config.targetCapital.toString());
-
-  // Get gas estimate with buffer
-  const { gasLimit } = await estimateProposalGas(config, wallet);
+  console.log("Creating proposal with target capital:", config.targetCapital.toString(), "wei");
   
   return await executeTransaction(
     () => factory.createProposal(
       config.ipfsHash,
-      config.targetCapital,
-      config.votingDuration,
-      { gasLimit }
+      config.targetCapital, // Use the BigNumber directly since it's already in wei
+      config.votingDuration
     ),
     {
       type: 'proposal',
-      description: `Creating proposal with target capital $${(lgrAmount * LGR_PRICE_USD).toLocaleString()} USD`,
-      timeout: 180000,
+      description: `Creating proposal with target capital $${parseFloat(config.targetCapital.toString()).toLocaleString()} USD`,
+      timeout: 180000, // 3 minutes for proposal creation
       maxRetries: 3,
       backoffMs: 5000
     }
