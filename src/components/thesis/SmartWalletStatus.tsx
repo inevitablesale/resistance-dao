@@ -10,7 +10,7 @@ import { transactionQueue, TransactionResult, TransactionFailure, TransactionSuc
 import { toast } from "@/hooks/use-toast";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
 import { ProposalError } from "@/services/errorHandlingService";
-import { gasOptimizer } from "@/services/gasOptimizerService";
+import { gasOptimizer } from "@/services/gasOptimizationService";
 
 export interface SmartWalletState {
   status: 'checking' | 'creating' | 'ready' | 'error';
