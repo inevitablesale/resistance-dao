@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { Wallet, Check, AlertCircle, Loader } from "lucide-react";
 import { motion } from "framer-motion";
@@ -7,7 +6,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ethers } from "ethers";
-import { transactionQueue, TransactionResult } from "@/services/transactionQueueService";
+import { transactionQueue, TransactionResult, TransactionFailure } from "@/services/transactionQueueService";
 import { toast } from "@/hooks/use-toast";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
 import { ProposalError } from "@/services/errorHandlingService";
@@ -135,9 +134,11 @@ export const SmartWalletStatus = () => {
         };
       });
 
-      // Fixed type checking
-      if (!result.success) {
-        // Now TypeScript knows this is a TransactionFailure
+      const isFailure = (result: TransactionResult): result is TransactionFailure => {
+        return !result.success;
+      };
+
+      if (isFailure(result)) {
         throw new ProposalError({
           category: 'transaction',
           message: result.error.message,
