@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { ProposalError } from "@/services/errorHandlingService";
+import { useWalletProvider } from "./useWalletProvider";
 
 export interface WalletState {
   isConnected: boolean;
@@ -16,6 +17,7 @@ export const useDynamicUtils = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
   const [isInitializing, setIsInitializing] = useState(false);
+  const { getProvider, validateNetwork } = useWalletProvider();
 
   const getChainId = async (): Promise<number> => {
     if (!primaryWallet) {
@@ -26,8 +28,7 @@ export const useDynamicUtils = () => {
       });
     }
 
-    const walletClient = await primaryWallet.getWalletClient();
-    const provider = new ethers.providers.Web3Provider(walletClient as any);
+    const { provider } = await getProvider();
     const network = await provider.getNetwork();
     return network.chainId;
   };
@@ -51,47 +52,6 @@ export const useDynamicUtils = () => {
       address: primaryWallet.address,
       chainId
     };
-  };
-
-  const getProvider = async () => {
-    if (!primaryWallet) {
-      throw new ProposalError({
-        category: 'wallet',
-        message: 'No wallet connected',
-        recoverySteps: ['Please connect your wallet to continue']
-      });
-    }
-
-    try {
-      const walletClient = await primaryWallet.getWalletClient();
-      return new ethers.providers.Web3Provider(walletClient as any);
-    } catch (error) {
-      console.error('Provider error:', error);
-      throw new ProposalError({
-        category: 'network',
-        message: 'Failed to initialize provider',
-        recoverySteps: [
-          'Check your wallet connection',
-          'Make sure you are on the Polygon network',
-          'Try refreshing the page'
-        ]
-      });
-    }
-  };
-
-  const validateNetwork = async () => {
-    console.log('Starting network validation...');
-    const chainId = await getChainId();
-    console.log('Current chain ID:', chainId);
-    const targetChainId = 137; // Polygon Mainnet
-    
-    if (chainId !== targetChainId) {
-      throw new ProposalError({
-        category: 'network',
-        message: 'Please connect to Polygon network',
-        recoverySteps: ['Switch to Polygon Mainnet in your wallet']
-      });
-    }
   };
 
   const connectWallet = async () => {
@@ -119,4 +79,3 @@ export const useDynamicUtils = () => {
     getChainId
   };
 };
-
