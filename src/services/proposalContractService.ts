@@ -158,7 +158,8 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  console.log("Creating proposal with target capital:", config.targetCapital.toString(), "wei");
+  const lgrAmount = ethers.utils.formatUnits(config.targetCapital, 18);
+  console.log("Creating proposal with target capital:", config.targetCapital.toString(), "wei", `(${lgrAmount} LGR)`);
   
   return await executeTransaction(
     () => factory.createProposal(
@@ -168,8 +169,8 @@ export const createProposal = async (
     ),
     {
       type: 'proposal',
-      description: `Creating proposal with target capital ${ethers.utils.formatUnits(config.targetCapital, 18)} LGR`,
-      timeout: 180000, // 3 minutes for proposal creation
+      description: `Creating proposal with target capital ${lgrAmount} LGR`,
+      timeout: 180000,
       maxRetries: 3,
       backoffMs: 5000
     }
