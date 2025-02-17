@@ -828,3 +828,4 @@ const ThesisSubmission = () => {
                       formData={{
                         strategies: {
                           operational: formData.strategies.operational,
+                          growth:
