@@ -52,14 +52,35 @@ export const useWalletConnection = () => {
     }
   };
 
-  const approveLGR = async (amount: string, isTestMode: boolean = false) => {
+  const approveLGR = async (amount: string, isTestMode: boolean = false): Promise<ethers.ContractTransaction> => {
     try {
       // Always validate network
       await validateNetwork();
 
-      // In test mode, skip the actual contract interaction but still require network validation
+      // In test mode, return a mock transaction that matches the ContractTransaction interface
       if (isTestMode) {
-        return true;
+        return {
+          hash: "0x" + "1".repeat(64),
+          wait: async () => ({
+            to: "0x" + "2".repeat(40),
+            from: "0x" + "3".repeat(40),
+            contractAddress: LGR_TOKEN_ADDRESS,
+            transactionHash: "0x" + "1".repeat(64),
+            blockHash: "0x" + "4".repeat(64),
+            blockNumber: 1,
+            timestamp: Date.now(),
+            confirmations: 1,
+            events: [],
+            logs: [],
+            status: 1
+          }),
+          nonce: 0,
+          gasLimit: ethers.BigNumber.from(21000),
+          gasPrice: ethers.BigNumber.from(1000000000),
+          data: "0x",
+          value: ethers.BigNumber.from(0),
+          chainId: 137
+        } as ethers.ContractTransaction;
       }
 
       if (!treasury) {
@@ -83,15 +104,10 @@ export const useWalletConnection = () => {
       );
 
       console.log("Calling approve with amount:", amount);
-      const tx = await lgrToken.approve(treasury, amount);
-      console.log("Approval transaction sent:", tx.hash);
-      await tx.wait();
-      console.log("Approval transaction confirmed");
-      return true;
+      return await lgrToken.approve(treasury, amount);
     } catch (error) {
       console.error("Approval error in useWalletConnection:", error);
-      // Don't throw here, let the component handle the error display
-      return false;
+      throw error; // Let the component handle the error display
     }
   };
 
@@ -114,4 +130,3 @@ export const useWalletConnection = () => {
     wallet: primaryWallet
   };
 };
-
