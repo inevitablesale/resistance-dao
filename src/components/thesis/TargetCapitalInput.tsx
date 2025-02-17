@@ -18,11 +18,22 @@ const LGR_PRICE_USD = 0.10; // $0.10 per LGR token
 
 export const convertUSDToLGRWei = (usdAmount: string): ethers.BigNumber => {
   if (!usdAmount || isNaN(parseFloat(usdAmount))) return ethers.BigNumber.from(0);
+  
+  // Convert USD to LGR tokens (as a number first)
   const usdValue = parseFloat(usdAmount);
   const lgrAmount = usdValue / LGR_PRICE_USD;
-  // Convert to string with max 18 decimals to avoid precision issues
-  const lgrString = lgrAmount.toFixed(18);
-  return ethers.utils.parseEther(lgrString);
+  
+  // Convert to a regular decimal string without scientific notation
+  // and remove any decimals since we'll be working with whole LGR tokens
+  const wholeLGRAmount = Math.floor(lgrAmount).toString();
+  
+  try {
+    // Now convert the whole LGR amount to wei (this adds 18 decimals)
+    return ethers.utils.parseUnits(wholeLGRAmount, 18);
+  } catch (error) {
+    console.error("Error converting to wei:", error);
+    return ethers.BigNumber.from(0);
+  }
 };
 
 export const TargetCapitalInput = ({
@@ -53,7 +64,7 @@ export const TargetCapitalInput = ({
     const usdValue = parseFloat(usdAmount);
     if (isNaN(usdValue)) return "0";
     const lgrAmount = usdValue / LGR_PRICE_USD;
-    return lgrAmount.toFixed(2);
+    return Math.floor(lgrAmount).toString(); // Return whole tokens only
   };
 
   const getHelperText = () => {
