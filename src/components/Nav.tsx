@@ -24,10 +24,15 @@ const Nav = () => {
       <div className="absolute inset-0 bg-black/80 backdrop-blur-md border-b border-white/5" />
       <div className="container h-full mx-auto px-4 relative">
         <div className="flex items-center justify-between h-full">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {shouldShowHomeLink && (
               <Link to="/" className="text-white/80 hover:text-white transition-colors">
                 Home
+              </Link>
+            )}
+            {hasWallet && (
+              <Link to="/proposals" className="text-white/80 hover:text-white transition-colors">
+                Proposals
               </Link>
             )}
           </div>

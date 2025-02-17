@@ -18,6 +18,7 @@ import ContentHub from "./pages/ContentHub";
 import { Marketplace } from "./pages/Marketplace";
 import ThesisSubmission from "./pages/ThesisSubmission";
 import ProposalDetails from "./pages/ProposalDetails";
+import Proposals from "./pages/Proposals";
 import { Toaster } from "./components/ui/toaster";
 
 const zeroDevConfig = {
@@ -128,6 +129,7 @@ function Layout() {
         <Route path="/marketplace/:category/:slug" element={<KnowledgeArticle />} />
         <Route path="/content" element={<ContentHub />} />
         <Route path="/thesis" element={<ThesisSubmission />} />
+        <Route path="/proposals" element={<Proposals />} />
         <Route path="/proposals/:hash" element={<ProposalDetails />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

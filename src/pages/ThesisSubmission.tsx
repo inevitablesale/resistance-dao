@@ -152,7 +152,7 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const [isTestMode, setIsTestMode] = useState(true);
+  const [isTestMode, setIsTestMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
   const [activeStep, setActiveStep] = useState<string>('thesis');
@@ -369,7 +369,7 @@ const ThesisSubmission = () => {
         break;
       case 'terms':
         isValid = validateTermsTab();
-        if (isValid) handleSubmit(e);
+        handleSubmit(e);
         break;
     }
     if (!isValid) {
@@ -392,6 +392,7 @@ const ThesisSubmission = () => {
       connect();
       return;
     }
+
     try {
       setIsSubmitting(true);
       setFormErrors({});
@@ -404,41 +405,59 @@ const ThesisSubmission = () => {
       if (!wallet) {
         throw new Error("No wallet connected");
       }
+
+      console.log('Starting proposal submission in', isTestMode ? 'TEST MODE' : 'NORMAL MODE');
       const contractStatus = await getContractStatus(wallet);
+      
       if (contractStatus.isPaused) {
-        toast({
-          title: "Contract Paused",
-          description: "The contract is currently paused for maintenance. Please try again later.",
-          variant: "destructive"
-        });
-        return;
+        throw new Error("Contract is currently paused for maintenance");
       }
 
-      const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
-      if (targetCapitalWei.lt(contractStatus.minTargetCapital) || targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
-        throw new Error("Target capital out of allowed range");
-      }
-      if (votingDuration < contractStatus.minVotingDuration || votingDuration > contractStatus.maxVotingDuration) {
-        throw new Error("Voting duration out of allowed range");
+      if (!isTestMode) {
+        const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
+        if (targetCapitalWei.lt(contractStatus.minTargetCapital) || targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
+          throw new Error("Target capital out of allowed range");
+        }
+        if (votingDuration < contractStatus.minVotingDuration || votingDuration > contractStatus.maxVotingDuration) {
+          throw new Error("Voting duration out of allowed range");
+        }
       }
 
       updateStepStatus('submission', 'processing');
 
-      console.log('Uploading metadata to IPFS...');
-      const ipfsUri = await uploadMetadataToPinata(formData);
+      const metadataToUpload = {
+        ...formData,
+        isTestMode,
+        submissionTimestamp: Date.now(),
+        submitter: address
+      };
+
+      console.log('Uploading metadata to IPFS...', { isTestMode });
+      const ipfsUri = await uploadMetadataToPinata(metadataToUpload);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
+      
       if (!validateIPFSHash(ipfsHash)) {
         throw new Error("Invalid IPFS hash format");
       }
 
-      console.log('Estimating gas before submission...');
+      console.log('Estimating gas for proposal creation...', { isTestMode });
+      const targetCapitalWei = ethers.utils.parseEther(
+        isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData.investment.targetCapital
+      );
+
       const gasEstimate = await estimateProposalGas({
         targetCapital: targetCapitalWei,
         votingDuration,
         ipfsHash
       }, wallet);
 
-      console.log('Creating proposal...');
+      console.log('Creating proposal...', {
+        isTestMode,
+        targetCapital: ethers.utils.formatEther(targetCapitalWei),
+        votingDuration,
+        ipfsHash
+      });
+
       const result = await createProposal({
         targetCapital: targetCapitalWei,
         votingDuration,
@@ -450,17 +469,19 @@ const ThesisSubmission = () => {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
-        title: formData.title,
-        targetCapital: formData.investment.targetCapital.toString(),
+        title: isTestMode ? TEST_FORM_DATA.title : formData.title,
+        targetCapital: targetCapitalWei.toString(),
         status: 'pending'
       };
       userProposals.push(newProposal);
       localStorage.setItem('userProposals', JSON.stringify(userProposals));
+
       updateStepStatus('submission', 'completed');
       toast({
-        title: "Success",
-        description: "Your investment thesis has been submitted successfully!"
+        title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
+        description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
       });
+
     } catch (error) {
       console.error("Submission error:", error);
       updateStepStatus(activeStep, 'failed');
@@ -545,6 +566,67 @@ const ThesisSubmission = () => {
     // Implement ad space rental logic here
   };
 
+  const handleTestModeToggle = async (enabled: boolean) => {
+    if (!isConnected) {
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your wallet to toggle test mode",
+        variant: "destructive"
+      });
+      connect();
+      return;
+    }
+    
+    const success = await toggleTestMode(enabled);
+    if (success) {
+      setIsTestMode(enabled);
+      if (enabled) {
+        // When enabling test mode, auto-complete all sections
+        setFormData(TEST_FORM_DATA);
+        setIsThesisOpen(false);
+        setIsStrategyOpen(false);
+        setIsApprovalOpen(false);
+        setIsSubmissionOpen(true);
+        // Mark all steps as completed
+        setSteps(prev => prev.map(step => ({
+          ...step,
+          status: 'completed'
+        })));
+        toast({
+          title: "Test Mode Enabled",
+          description: "Form pre-filled with test data",
+        });
+      } else {
+        // When disabling test mode, reset form and steps
+        setFormData({
+          title: "",
+          firmCriteria: {
+            size: "",
+            location: "",
+            dealType: "",
+            geographicFocus: ""
+          },
+          paymentTerms: [],
+          strategies: {
+            operational: [],
+            growth: [],
+            integration: []
+          },
+          investment: {
+            targetCapital: "",
+            drivers: "",
+            additionalCriteria: ""
+          }
+        });
+        setIsThesisOpen(true);
+        setIsStrategyOpen(false);
+        setIsApprovalOpen(false);
+        setIsSubmissionOpen(false);
+        setSteps(SUBMISSION_STEPS);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white pb-20">
       <div className="container mx-auto px-4 py-8">
@@ -566,11 +648,12 @@ const ThesisSubmission = () => {
                 <Switch
                   id="test-mode"
                   checked={isTestMode}
-                  onCheckedChange={(checked) => {
-                    setIsTestMode(checked);
-                    toggleTestMode(checked);
-                  }}
-                  className="data-[state=checked]:bg-yellow-500"
+                  onCheckedChange={handleTestModeToggle}
+                  className={cn(
+                    "data-[state=checked]:bg-yellow-500",
+                    !isConnected && "opacity-50 cursor-not-allowed"
+                  )}
+                  disabled={!isConnected}
                 />
               </div>
             </div>
@@ -750,71 +833,18 @@ const ThesisSubmission = () => {
                         }
                       }}
                       formErrors={formErrors}
-                      onChange={handleStrategyChange}
+                      onChange={(field, value) => handleFormDataChange(`strategies.${field}`, value)}
                     />
-
-                    <div className="mt-6 space-y-4">
-                      <Label className="text-lg font-medium text-white">
-                        Additional Criteria (Optional)
-                      </Label>
-                      <textarea
-                        placeholder="Any additional criteria or notes..."
-                        className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3"
-                        value={formData.investment.additionalCriteria}
-                        onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
-                      />
-                    </div>
                     {isSubmissionOpen && renderContinueButton(() => {
-                      if (validateStrategyTab()) {
-                        const syntheticEvent = {
-                          preventDefault: () => {},
-                          target: null,
-                          currentTarget: null,
-                          bubbles: false,
-                          cancelable: false,
-                          defaultPrevented: false,
-                          eventPhase: 0,
-                          isTrusted: true,
-                          nativeEvent: new Event('submit'),
-                          stopPropagation: () => {},
-                          isPropagationStopped: () => false,
-                          persist: () => {},
-                          isDefaultPrevented: () => false,
-                          type: 'submit'
-                        } as React.FormEvent<HTMLFormElement>;
-                        
-                        handleSubmit(syntheticEvent);
+                      if (validateTermsTab()) {
+                        setIsSubmissionOpen(false);
+                        handleSubmit({} as React.FormEvent);
                       }
                     }, true)}
                   </CollapsibleContent>
                 </Collapsible>
-
-                <div className="mt-8">
-                  <ContractApprovalStatus 
-                    onApprovalComplete={handleApprovalComplete}
-                    requiredAmount={SUBMISSION_FEE.toString()} 
-                    isTestMode={isTestMode}
-                    currentFormData={formData}
-                  />
-                </div>
               </div>
             </Card>
-
-            <div className="flex justify-end mt-6">
-              
-            </div>
-          </div>
-
-          <div className="lg:col-span-4">
-            <div className="lg:sticky lg:top-28 space-y-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1 w-full"
-              >
-                {/* Sidebar components */}
-              </motion.div>
-            </div>
           </div>
         </div>
       </div>
