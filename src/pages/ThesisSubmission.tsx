@@ -813,9 +813,9 @@ const ThesisSubmission = () => {
               >
                 <div className="bg-black/40 backdrop-blur-sm rounded-lg p-6">
                   <LGRWalletDisplay 
-                    submissionFee={SUBMISSION_FEE}
+                    submissionFee={SUBMISSION_FEE.toString()}
                     currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
-                    walletAddress={address}
+                    walletAddress={address || ''}
                   />
                   <SubmissionProgress 
                     steps={steps}
@@ -836,10 +836,9 @@ const ThesisSubmission = () => {
                   />
                 </div>
               </motion.div>
-              <LGRFloatingWidget 
-                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
-                walletAddress={address}
-              />
+              {address && (
+                <LGRFloatingWidget />
+              )}
             </div>
           </div>
         </div>
