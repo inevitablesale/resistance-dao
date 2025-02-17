@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
@@ -59,8 +60,25 @@ async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet
     // For ZeroDev wallets
     if (wallet.connector?.name?.toLowerCase().includes('zerodev')) {
       console.log("Using ZeroDev provider");
-      // Use the wallet object directly as a provider
-      return new ethers.providers.Web3Provider(wallet as any);
+      try {
+        // Use the kernel account as provider for ZeroDev
+        const kernelProvider = await (wallet as any).connector?.getProvider?.();
+        if (!kernelProvider) {
+          throw new Error("Failed to get kernel provider");
+        }
+        return new ethers.providers.Web3Provider(kernelProvider);
+      } catch (error) {
+        console.error("ZeroDev provider error:", error);
+        throw new ProposalError({
+          category: 'wallet',
+          message: "Failed to initialize ZeroDev provider",
+          recoverySteps: [
+            "Please refresh and try again",
+            "Make sure your ZeroDev wallet is properly connected",
+            "Check if you're on the Polygon network"
+          ]
+        });
+      }
     }
     
     // For regular wallets
