@@ -812,12 +812,34 @@ const ThesisSubmission = () => {
                 className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1 w-full max-w-3xl mx-auto"
               >
                 <div className="bg-black/40 backdrop-blur-sm rounded-lg p-6">
-                  <LGRWalletDisplay address={address} balance={tokenBalances} />
-                  <SubmissionProgress steps={steps} currentStep={activeStep} />
-                  <TransactionStatus txId={currentTxId} />
+                  <LGRWalletDisplay 
+                    submissionFee={SUBMISSION_FEE}
+                    currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
+                    walletAddress={address}
+                  />
+                  <SubmissionProgress 
+                    steps={steps}
+                    currentStepId={activeStep}
+                  />
+                  <TransactionStatus 
+                    transactionId={currentTxId}
+                    onComplete={() => {
+                      console.log("Transaction completed");
+                    }}
+                    onError={(error: string) => {
+                      toast({
+                        title: "Transaction Failed",
+                        description: error,
+                        variant: "destructive"
+                      });
+                    }}
+                  />
                 </div>
               </motion.div>
-              <LGRFloatingWidget address={address} balance={tokenBalances} />
+              <LGRFloatingWidget 
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
+                walletAddress={address}
+              />
             </div>
           </div>
         </div>
