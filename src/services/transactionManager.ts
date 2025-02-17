@@ -16,6 +16,7 @@ export interface TransactionConfig {
     tokenAddress: string;
     spenderAddress: string;
     amount: string;
+    isTestMode?: boolean;
   };
 }
 
@@ -30,9 +31,27 @@ export const executeTransaction = async (
   config: TransactionConfig,
   provider?: ethers.providers.Web3Provider
 ): Promise<ethers.ContractTransaction> => {
-  // Check allowance if it's a token transaction
-  if (config.type === 'token' && config.tokenConfig && provider) {
+  if (config.type === 'token' && config.tokenConfig) {
+    console.log('Token transaction config:', {
+      ...config.tokenConfig,
+      amount: ethers.utils.formatEther(config.tokenConfig.amount),
+    });
+  }
+
+  // Log network info
+  if (provider) {
+    const network = await provider.getNetwork();
+    console.log('Current network:', {
+      chainId: network.chainId,
+      name: network.name
+    });
+  }
+
+  // Check allowance if it's a token transaction AND NOT in test mode
+  if (config.type === 'token' && config.tokenConfig && provider && !config.tokenConfig.isTestMode) {
+    console.log('Checking token allowance...');
     const signerAddress = await provider.getSigner().getAddress();
+    
     const hasAllowance = await checkTokenAllowance(
       provider,
       config.tokenConfig.tokenAddress,
@@ -51,6 +70,7 @@ export const executeTransaction = async (
         ]
       });
     }
+    console.log('Token allowance check passed');
   }
 
   // Add to queue first
@@ -61,6 +81,7 @@ export const executeTransaction = async (
   
   const result = await transactionQueue.processTransaction(txId, async () => {
     try {
+      console.log('Executing transaction...');
       const tx = await transaction();
       console.log('Transaction submitted:', tx.hash);
       
@@ -75,6 +96,7 @@ export const executeTransaction = async (
       const receiptPromise = tx.wait();
       
       const receipt = await Promise.race([receiptPromise, timeoutPromise]);
+      console.log('Transaction receipt received:', receipt);
       
       if (config.eventConfig) {
         try {

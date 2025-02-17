@@ -46,8 +46,16 @@ export const ContractApprovalStatus = ({
   const handleApprove = async () => {
     setIsApproving(true);
     try {
-      console.log("Starting approval process...");
+      console.log("Starting approval process...", { isTestMode });
       const provider = await getProvider();
+      
+      if (provider) {
+        const network = await provider.getNetwork();
+        console.log('Network before transaction:', {
+          chainId: network.chainId,
+          name: network.name
+        });
+      }
       
       const transaction = await executeTransaction(
         async () => {
@@ -63,7 +71,8 @@ export const ContractApprovalStatus = ({
           tokenConfig: {
             tokenAddress: LGR_TOKEN_ADDRESS,
             spenderAddress: address!,
-            amount: requiredAmount
+            amount: requiredAmount,
+            isTestMode
           }
         },
         provider
