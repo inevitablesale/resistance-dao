@@ -370,7 +370,7 @@ const ThesisSubmission = () => {
         break;
       case 'terms':
         isValid = validateTermsTab();
-        if (isValid) handleSubmit(e);
+        handleSubmit(e);
         break;
     }
     if (!isValid) {
@@ -393,6 +393,7 @@ const ThesisSubmission = () => {
       connect();
       return;
     }
+
     try {
       setIsSubmitting(true);
       setFormErrors({});
@@ -828,4 +829,4 @@ const ThesisSubmission = () => {
                       formData={{
                         strategies: {
                           operational: formData.strategies.operational,
-                          growth:
+                          growth: formData.strategies.
