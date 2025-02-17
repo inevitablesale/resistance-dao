@@ -1,11 +1,12 @@
-
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { LGR_PRICE_USD } from "@/lib/constants";
 import { convertUSDToLGRWei } from "@/components/thesis/TargetCapitalInput";
 
-const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
+const FACTORY_ADDRESS = "0xD00655Ce27387b8B1EE7759b1f44De5748916Ba5";
+const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
+
 const FACTORY_ABI = [
   // Core proposal creation
   "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
@@ -21,6 +22,8 @@ const FACTORY_ABI = [
   "function testModeEnabled() public view returns (bool)",
   "function treasury() public view returns (address)",
   "function submissionFee() public view returns (uint256)",
+  // Admin functions
+  "function setTestMode(bool _enabled) external",
   // Events
   "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)",
   "event Paused(address account)",
@@ -173,6 +176,40 @@ export const createProposal = async (
       timeout: 180000,
       maxRetries: 3,
       backoffMs: 5000
+    }
+  );
+};
+
+export const setTestMode = async (
+  enabled: boolean,
+  wallet: NonNullable<DynamicContextType['primaryWallet']>
+): Promise<ethers.ContractTransaction> => {
+  const provider = await getProvider(wallet);
+  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
+  
+  // Get the signer's address
+  const signerAddress = await provider.getSigner().getAddress();
+  
+  // Check if the signer is authorized to set test mode
+  const [owner, isAuthorized] = await Promise.all([
+    factory.owner(),
+    signerAddress.toLowerCase() === AUTHORIZED_TEST_MODE_ADDRESS.toLowerCase()
+  ]);
+  
+  if (owner.toLowerCase() !== signerAddress.toLowerCase() && !isAuthorized) {
+    throw new Error("Not authorized to set test mode");
+  }
+
+  console.log(`Setting test mode to: ${enabled}`);
+  
+  return await executeTransaction(
+    () => factory.setTestMode(enabled),
+    {
+      type: 'contract',
+      description: `Setting test mode to ${enabled}`,
+      timeout: 60000,
+      maxRetries: 2,
+      backoffMs: 3000
     }
   );
 };
