@@ -7,6 +7,7 @@ import { ethers } from "ethers";
 import { Check, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
@@ -24,6 +25,7 @@ export const ContractApprovalStatus = ({
   const { approveLGR, address } = useWalletConnection();
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
+  const { toast } = useToast();
   const { tokenBalances } = useTokenBalances({
     networkId: 137,
     accountAddress: address,
@@ -40,8 +42,19 @@ export const ContractApprovalStatus = ({
       const success = await approveLGR(requiredAmount, isTestMode);
       if (success) {
         setIsApproved(true);
+        toast({
+          title: "Approval Successful",
+          description: "Contract approved successfully",
+        });
         onApprovalComplete();
       }
+    } catch (error) {
+      console.error("Approval error in ContractApprovalStatus:", error);
+      toast({
+        title: "Approval Failed",
+        description: error instanceof Error ? error.message : "Failed to approve contract",
+        variant: "destructive"
+      });
     } finally {
       setIsApproving(false);
     }
@@ -99,3 +112,4 @@ export const ContractApprovalStatus = ({
     </Card>
   );
 };
+

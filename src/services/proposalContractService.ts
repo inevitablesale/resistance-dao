@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
@@ -29,7 +28,7 @@ export interface ContractStatus {
   submissionFee: ethers.BigNumber;
   isPaused: boolean;
   isTestMode: boolean;
-  treasuryAddress: string;
+  treasury: string;
   minTargetCapital: ethers.BigNumber;
   maxTargetCapital: ethers.BigNumber;
   minVotingDuration: number;
@@ -75,7 +74,7 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       submissionFee,
       isPaused,
       isTestMode,
-      treasuryAddress,
+      treasury,
       minTargetCapital,
       maxTargetCapital,
       minVotingDuration,
@@ -134,7 +133,7 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       submissionFee: submissionFee.toString(),
       isPaused,
       isTestMode,
-      treasuryAddress,
+      treasury: treasury.toString(),
       minTargetCapital: minTargetCapital.toString(),
       maxTargetCapital: maxTargetCapital.toString(),
       minVotingDuration: Number(minVotingDuration),
@@ -148,7 +147,7 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       submissionFee,
       isPaused,
       isTestMode,
-      treasuryAddress,
+      treasury,
       minTargetCapital,
       maxTargetCapital,
       minVotingDuration: Number(minVotingDuration),
@@ -208,4 +207,3 @@ export const createProposal = async (
     }
   );
 };
-

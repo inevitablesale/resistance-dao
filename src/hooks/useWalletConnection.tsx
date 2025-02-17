@@ -13,7 +13,7 @@ export const useWalletConnection = () => {
   const { primaryWallet, setShowAuthFlow, setShowOnRamp } = useDynamicContext();
   const { getWalletState, getProvider, connectWallet, validateNetwork } = useDynamicUtils();
   const [isConnecting, setIsConnecting] = useState(false);
-  const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
+  const [treasury, setTreasury] = useState<string | null>(null);
   const { toast } = useToast();
 
   const connect = async () => {
@@ -62,11 +62,18 @@ export const useWalletConnection = () => {
         return true;
       }
 
-      if (!treasuryAddress) {
+      if (!treasury) {
+        console.log("Fetching contract status to get treasury address...");
         const status = await getContractStatus(primaryWallet!);
-        setTreasuryAddress(status.treasuryAddress);
+        console.log("Contract status received:", status);
+        setTreasury(status.treasury);
       }
 
+      if (!treasury) {
+        throw new Error("Treasury address not available");
+      }
+
+      console.log("Approving LGR tokens for treasury:", treasury);
       const provider = await getProvider();
       const signer = provider.getSigner();
       const lgrToken = new ethers.Contract(
@@ -75,18 +82,16 @@ export const useWalletConnection = () => {
         signer
       );
 
-      const tx = await lgrToken.approve(treasuryAddress, amount);
+      console.log("Calling approve with amount:", amount);
+      const tx = await lgrToken.approve(treasury, amount);
+      console.log("Approval transaction sent:", tx.hash);
       await tx.wait();
+      console.log("Approval transaction confirmed");
       return true;
     } catch (error) {
-      console.error("Approval error:", error);
-      const proposalError = handleDynamicError(error);
-      toast({
-        title: "Approval Failed",
-        description: proposalError.message,
-        variant: "destructive"
-      });
-      throw proposalError;
+      console.error("Approval error in useWalletConnection:", error);
+      // Don't throw here, let the component handle the error display
+      return false;
     }
   };
 
@@ -109,3 +114,4 @@ export const useWalletConnection = () => {
     wallet: primaryWallet
   };
 };
+
