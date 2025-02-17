@@ -809,4 +809,22 @@ const ThesisSubmission = () => {
                           stopPropagation: () => {},
                           isPropagationStopped: () => false,
                           persist: () => {},
-                          isDefault
+                          isDefaultPrevented: () => false,
+                          type: 'submit'
+                        } as React.FormEvent<HTMLFormElement>;
+
+                        await handleSubmit(syntheticEvent);
+                      }
+                    })}
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
