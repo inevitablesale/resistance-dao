@@ -1,4 +1,3 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -829,4 +828,28 @@ const ThesisSubmission = () => {
                       formData={{
                         strategies: {
                           operational: formData.strategies.operational,
-                          growth: formData.strategies.
+                          growth: formData.strategies.growth,
+                          integration: formData.strategies.integration
+                        }
+                      }}
+                      formErrors={formErrors}
+                      onChange={(field, value) => handleFormDataChange(`strategies.${field}`, value)}
+                    />
+                    {isSubmissionOpen && renderContinueButton(() => {
+                      if (validateTermsTab()) {
+                        setIsSubmissionOpen(false);
+                        handleSubmit({} as React.FormEvent);
+                      }
+                    }, true)}
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
