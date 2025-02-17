@@ -8,37 +8,17 @@ import { Check, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { executeTransaction } from "@/services/transactionManager";
+import { TransactionStatus } from "./TransactionStatus";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 interface ContractApprovalStatusProps {
-  onApprovalComplete: (formData: any) => void;  // Modified to accept form data
+  onApprovalComplete: (formData: any) => void;
   requiredAmount: string;
   isTestMode?: boolean;
-  currentFormData: any;  // Added to receive form data
+  currentFormData: any;
 }
-
-// Mock data for test mode
-const mockFormData = {
-  title: "Mid-Market CPA Firm Acquisition - Southeast Region",
-  firmCriteria: {
-    size: "5m-10m",
-    location: "Florida",
-    dealType: "equity-buyout",
-    geographicFocus: "regional"
-  },
-  paymentTerms: ["cash", "seller-financing", "earnout"],
-  strategies: {
-    operational: ["tech-modernization", "process-standardization"],
-    growth: ["geographic-expansion", "service-expansion"],
-    integration: ["merging-operations", "systems-consolidation"]
-  },
-  investment: {
-    targetCapital: "3500000",
-    drivers: "Established client base with recurring revenue. Strong local presence with expansion potential.",
-    additionalCriteria: "Preference for firms with cloud-ready infrastructure."
-  }
-};
 
 export const ContractApprovalStatus = ({
   onApprovalComplete,
@@ -49,6 +29,7 @@ export const ContractApprovalStatus = ({
   const { approveLGR, address } = useWalletConnection();
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
+  const [currentTxId, setCurrentTxId] = useState<string | null>(null);
   const { toast } = useToast();
   const { tokenBalances } = useTokenBalances({
     networkId: 137,
@@ -63,23 +44,33 @@ export const ContractApprovalStatus = ({
   const handleApprove = async () => {
     setIsApproving(true);
     try {
-      const dataToSubmit = isTestMode ? mockFormData : currentFormData;
+      console.log("Starting approval process...");
       
-      // Store form data before approval
-      localStorage.setItem('currentFormData', JSON.stringify(dataToSubmit));
+      const transaction = await executeTransaction(
+        async () => {
+          console.log("Executing LGR approval transaction...");
+          return approveLGR(requiredAmount, isTestMode);
+        },
+        {
+          type: 'token',
+          description: `Approve ${ethers.utils.formatEther(requiredAmount)} LGR tokens`,
+          timeout: 180000,
+          maxRetries: 3,
+          backoffMs: 5000,
+          tokenConfig: {
+            tokenAddress: LGR_TOKEN_ADDRESS,
+            spenderAddress: address!,
+            amount: requiredAmount
+          }
+        }
+      );
+
+      console.log("Transaction executed:", transaction);
+      setIsApproved(true);
+      onApprovalComplete(currentFormData);
       
-      const success = await approveLGR(requiredAmount, isTestMode);
-      if (success) {
-        setIsApproved(true);
-        toast({
-          title: "Approval Successful",
-          description: "Starting submission process...",
-        });
-        // Pass the form data back to parent for submission
-        onApprovalComplete(dataToSubmit);
-      }
     } catch (error) {
-      console.error("Approval error in ContractApprovalStatus:", error);
+      console.error("Approval error:", error);
       toast({
         title: "Approval Failed",
         description: error instanceof Error ? error.message : "Failed to approve contract",
@@ -90,8 +81,23 @@ export const ContractApprovalStatus = ({
     }
   };
 
+  const handleTxComplete = () => {
+    console.log("Transaction completed");
+    setIsApproved(true);
+    onApprovalComplete(currentFormData);
+  };
+
+  const handleTxError = (error: string) => {
+    console.error("Transaction failed:", error);
+    toast({
+      title: "Transaction Failed",
+      description: error,
+      variant: "destructive"
+    });
+  };
+
   return (
-    <Card className="bg-black/40 border-white/10 p-4">
+    <Card className="bg-black/40 border-white/10 p-4 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {isApproved ? (
@@ -139,6 +145,14 @@ export const ContractApprovalStatus = ({
           </Button>
         )}
       </div>
+
+      {currentTxId && (
+        <TransactionStatus
+          transactionId={currentTxId}
+          onComplete={handleTxComplete}
+          onError={handleTxError}
+        />
+      )}
     </Card>
   );
 };
