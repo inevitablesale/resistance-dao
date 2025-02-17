@@ -185,11 +185,42 @@ const ThesisSubmission = () => {
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
 
   const [contractStatus, setContractStatus] = useState({
-    minTargetCapital: MIN_TARGET_CAPITAL,
-    maxTargetCapital: MAX_TARGET_CAPITAL,
-    submissionFee: ethers.utils.formatEther(SUBMISSION_FEE),
-    votingFee: ethers.utils.formatEther(VOTING_FEE)
+    minTargetCapital: ethers.utils.parseEther(MIN_TARGET_CAPITAL),
+    maxTargetCapital: ethers.utils.parseEther(MAX_TARGET_CAPITAL),
+    submissionFee: SUBMISSION_FEE,
+    votingFee: VOTING_FEE
   });
+
+  useEffect(() => {
+    const getAndSetContractStatus = async () => {
+      if (!wallet) return;
+      try {
+        const status = await getContractStatus(wallet);
+        setContractStatus({
+          minTargetCapital: status.minTargetCapital,
+          maxTargetCapital: status.maxTargetCapital,
+          submissionFee: status.submissionFee,
+          votingFee: status.votingFee
+        });
+      } catch (error) {
+        console.error("Error getting contract status:", error);
+        toast({
+          title: "Error",
+          description: "Failed to get contract status. Please try again.",
+          variant: "destructive"
+        });
+      }
+    };
+
+    if (isConnected && wallet) {
+      getAndSetContractStatus();
+    }
+  }, [isConnected, wallet, toast]);
+
+  const displayMinTargetCapital = ethers.utils.formatEther(contractStatus.minTargetCapital);
+  const displayMaxTargetCapital = ethers.utils.formatEther(contractStatus.maxTargetCapital);
+  const displaySubmissionFee = ethers.utils.formatEther(contractStatus.submissionFee);
+  const displayVotingFee = ethers.utils.formatEther(contractStatus.votingFee);
 
   useEffect(() => {
     setFormData(isTestMode ? TEST_FORM_DATA : {
@@ -213,33 +244,6 @@ const ThesisSubmission = () => {
       }
     });
   }, [isTestMode]);
-
-  useEffect(() => {
-    const getAndSetContractStatus = async () => {
-      if (!wallet) return;
-      try {
-        const status = await getContractStatus(wallet);
-        setContractStatus({
-          ...status,
-          minTargetCapital: ethers.utils.formatEther(status.minTargetCapital),
-          maxTargetCapital: ethers.utils.formatEther(status.maxTargetCapital),
-          submissionFee: status.submissionFee.toString(),
-          votingFee: status.votingFee.toString()
-        });
-      } catch (error) {
-        console.error("Error getting contract status:", error);
-        toast({
-          title: "Error",
-          description: "Failed to get contract status. Please try again.",
-          variant: "destructive"
-        });
-      }
-    };
-
-    if (isConnected && wallet) {
-      getAndSetContractStatus();
-    }
-  }, [isConnected, wallet, toast]);
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => step.id === stepId ? {
@@ -319,10 +323,10 @@ const ThesisSubmission = () => {
       try {
         const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
         if (targetCapitalWei.lt(MIN_TARGET_CAPITAL)) {
-          errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} ETH`];
+          errors['investment.targetCapital'] = [`Minimum target capital is ${displayMinTargetCapital} ETH`];
         }
         if (targetCapitalWei.gt(MAX_TARGET_CAPITAL)) {
-          errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} ETH`];
+          errors['investment.targetCapital'] = [`Maximum target capital is ${displayMaxTargetCapital} ETH`];
         }
       } catch (error) {
         errors['investment.targetCapital'] = ['Invalid target capital amount'];

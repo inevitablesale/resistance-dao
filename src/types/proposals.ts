@@ -1,15 +1,16 @@
+
 import { ethers } from "ethers";
 
 export interface ContractStatus {
-  submissionFee: string;
+  submissionFee: ethers.BigNumber;
   isPaused: boolean;
   isTestMode: boolean;
   treasury: string;
-  minTargetCapital: string;
-  maxTargetCapital: string;
+  minTargetCapital: ethers.BigNumber;
+  maxTargetCapital: ethers.BigNumber;
   minVotingDuration: number;
   maxVotingDuration: number;
-  votingFee: string;
+  votingFee: ethers.BigNumber;
   lgrTokenAddress: string;
   owner: string;
 }
