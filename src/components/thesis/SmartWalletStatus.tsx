@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 import { Wallet, Check, AlertCircle, Loader } from "lucide-react";
 import { motion } from "framer-motion";
@@ -8,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { ethers } from "ethers";
 import { transactionQueue } from "@/services/transactionQueueService";
 import { toast } from "@/hooks/use-toast";
+import { TransactionStatus } from "@/components/thesis/TransactionStatus";
 
 export interface SmartWalletState {
   status: 'checking' | 'creating' | 'ready' | 'error';
@@ -70,11 +72,23 @@ export const SmartWalletStatus = () => {
 
         const existingWalletAddress = await factory.getWalletAddress(ownerAddress);
         if (existingWalletAddress !== ethers.constants.AddressZero) {
+          // Store the existing wallet address
+          localStorage.setItem('zeroDevWalletAddress', existingWalletAddress);
           return {
             success: true,
-            transaction: { hash: '' },
-            receipt: null,
-            existingWallet: existingWalletAddress
+            transaction: {
+              wait: async () => null,
+              hash: '',
+              confirmations: 0,
+              from: ownerAddress,
+              nonce: 0,
+              gasLimit: ethers.BigNumber.from(0),
+              gasPrice: ethers.BigNumber.from(0),
+              data: '',
+              value: ethers.BigNumber.from(0),
+              chainId: 137
+            } as ethers.ContractTransaction,
+            receipt: null
           };
         }
 
@@ -96,6 +110,9 @@ export const SmartWalletStatus = () => {
           throw new Error('Failed to get deployed wallet address');
         }
 
+        // Store the newly deployed wallet address
+        localStorage.setItem('zeroDevWalletAddress', deployedAddress);
+
         return {
           success: true,
           transaction: tx,
@@ -104,14 +121,17 @@ export const SmartWalletStatus = () => {
       });
 
       if (!result.success) {
-        throw new Error(result.error.message);
+        throw result.error;
       }
 
-      const walletAddress = result.existingWallet || result.receipt?.events?.[0]?.args?.wallet;
+      const storedWalletAddress = localStorage.getItem('zeroDevWalletAddress');
+      if (!storedWalletAddress) {
+        throw new Error('Failed to retrieve wallet address');
+      }
 
       return {
         success: true,
-        walletAddress,
+        walletAddress: storedWalletAddress,
         estimatedGas: "0"
       };
 
