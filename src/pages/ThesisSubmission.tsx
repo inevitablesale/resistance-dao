@@ -184,6 +184,13 @@ const ThesisSubmission = () => {
   const [isApprovalOpen, setIsApprovalOpen] = useState(false);
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
 
+  const [contractStatus, setContractStatus] = useState({
+    minTargetCapital: ethers.utils.formatEther(MIN_TARGET_CAPITAL),
+    maxTargetCapital: ethers.utils.formatEther(MAX_TARGET_CAPITAL),
+    submissionFee: SUBMISSION_FEE.toString(),
+    votingFee: VOTING_FEE.toString()
+  });
+
   useEffect(() => {
     setFormData(isTestMode ? TEST_FORM_DATA : {
       title: "",
@@ -206,6 +213,33 @@ const ThesisSubmission = () => {
       }
     });
   }, [isTestMode]);
+
+  useEffect(() => {
+    const getAndSetContractStatus = async () => {
+      if (!wallet) return;
+      try {
+        const status = await getContractStatus(wallet);
+        setContractStatus({
+          ...status,
+          minTargetCapital: ethers.utils.formatEther(status.minTargetCapital),
+          maxTargetCapital: ethers.utils.formatEther(status.maxTargetCapital),
+          submissionFee: status.submissionFee.toString(),
+          votingFee: status.votingFee.toString()
+        });
+      } catch (error) {
+        console.error("Error getting contract status:", error);
+        toast({
+          title: "Error",
+          description: "Failed to get contract status. Please try again.",
+          variant: "destructive"
+        });
+      }
+    };
+
+    if (isConnected && wallet) {
+      getAndSetContractStatus();
+    }
+  }, [isConnected, wallet, toast]);
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => step.id === stepId ? {
