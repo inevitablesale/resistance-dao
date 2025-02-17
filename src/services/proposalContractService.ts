@@ -57,16 +57,25 @@ async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet
   try {
     console.log("Initializing provider for wallet type:", wallet.connector?.name);
     
-    // Check if it's a ZeroDev wallet
-    const isZeroDev = wallet.connector?.name?.toLowerCase().includes('zerodev');
-    
-    if (isZeroDev) {
-      // For ZeroDev wallets, we can use their provider directly
+    // For ZeroDev wallets
+    if (wallet.connector?.name?.toLowerCase().includes('zerodev')) {
       console.log("Using ZeroDev provider");
-      return new ethers.providers.Web3Provider(wallet as any);
+      // Get the provider from the wallet
+      const provider = await wallet.connector?.getProvider?.();
+      if (!provider) {
+        throw new ProposalError({
+          category: 'wallet',
+          message: "Failed to get ZeroDev provider",
+          recoverySteps: [
+            "Please refresh and try again",
+            "Make sure your ZeroDev wallet is properly connected"
+          ]
+        });
+      }
+      return new ethers.providers.Web3Provider(provider);
     }
     
-    // For regular wallets, get the wallet client
+    // For regular wallets
     console.log("Getting wallet client...");
     const walletClient = await wallet.getWalletClient();
     
