@@ -59,13 +59,24 @@ export const useWalletConnection = () => {
 
       // In test mode, return a mock transaction that matches the ContractTransaction interface
       if (isTestMode) {
+        const mockFrom = "0x" + "3".repeat(40);
+        const mockHash = "0x" + "1".repeat(64);
+        
         return {
-          hash: "0x" + "1".repeat(64),
+          hash: mockHash,
+          from: mockFrom,
+          confirmations: 1,
+          nonce: 0,
+          gasLimit: ethers.BigNumber.from(21000),
+          gasPrice: ethers.BigNumber.from(1000000000),
+          data: "0x",
+          value: ethers.BigNumber.from(0),
+          chainId: 137,
           wait: async () => ({
             to: "0x" + "2".repeat(40),
-            from: "0x" + "3".repeat(40),
+            from: mockFrom,
             contractAddress: LGR_TOKEN_ADDRESS,
-            transactionHash: "0x" + "1".repeat(64),
+            transactionHash: mockHash,
             blockHash: "0x" + "4".repeat(64),
             blockNumber: 1,
             timestamp: Date.now(),
@@ -73,13 +84,7 @@ export const useWalletConnection = () => {
             events: [],
             logs: [],
             status: 1
-          }),
-          nonce: 0,
-          gasLimit: ethers.BigNumber.from(21000),
-          gasPrice: ethers.BigNumber.from(1000000000),
-          data: "0x",
-          value: ethers.BigNumber.from(0),
-          chainId: 137
+          })
         } as ethers.ContractTransaction;
       }
 
