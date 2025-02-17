@@ -21,6 +21,12 @@ interface ZeroDevResponse {
   estimatedGas?: string;
 }
 
+const ZERODEV_FACTORY_ADDRESS = "0x5D07c471C0E12D89D9F27D4A5A7c29A04B393c8F"; // Polygon Mainnet
+const ZERODEV_FACTORY_ABI = [
+  "function createWallet(address owner) returns (address)",
+  "function getWalletAddress(address owner) view returns (address)"
+];
+
 export const SmartWalletStatus = () => {
   const { primaryWallet } = useDynamicContext();
   const { address } = useWalletConnection();
@@ -32,39 +38,63 @@ export const SmartWalletStatus = () => {
 
   const deploySmartWallet = async (signer: ethers.Signer): Promise<ZeroDevResponse> => {
     try {
-      // Get the owner's address
       const ownerAddress = await signer.getAddress();
       console.log('Deploying smart wallet for owner:', ownerAddress);
 
-      // Initialize ZeroDev wallet
       const walletClient = await primaryWallet?.getWalletClient();
-      
       if (!walletClient) {
         throw new Error('Failed to initialize wallet client');
       }
 
-      // Get the implementation contract
       const provider = new ethers.providers.Web3Provider(walletClient as any);
       const network = await provider.getNetwork();
       
-      if (network.chainId !== 137) { // Polygon Mainnet
+      if (network.chainId !== 137) {
         throw new Error('Please switch to Polygon network');
       }
 
-      // Simulate the deployment to get gas estimate
-      const gasEstimate = await provider.estimateGas({
-        from: ownerAddress,
-        to: null, // Contract deployment
-        data: '0x' // Contract deployment bytecode would go here
-      });
+      // Initialize ZeroDev Factory contract
+      const factory = new ethers.Contract(
+        ZERODEV_FACTORY_ADDRESS,
+        ZERODEV_FACTORY_ABI,
+        provider
+      );
 
+      // Check if wallet already exists
+      const existingWalletAddress = await factory.getWalletAddress(ownerAddress);
+      if (existingWalletAddress !== ethers.constants.AddressZero) {
+        return {
+          success: true,
+          walletAddress: existingWalletAddress,
+          estimatedGas: "0" // Already deployed
+        };
+      }
+
+      // Estimate gas for deployment
+      const gasEstimate = await factory.estimateGas.createWallet(ownerAddress);
       console.log('Estimated gas for deployment:', gasEstimate.toString());
 
-      // For now, return success without actual deployment
-      // This will be replaced with actual ZeroDev deployment
+      // Deploy the smart wallet
+      const factoryWithSigner = factory.connect(signer);
+      const tx = await factoryWithSigner.createWallet(ownerAddress, {
+        gasLimit: gasEstimate.mul(12).div(10) // Add 20% buffer
+      });
+
+      console.log('Deployment transaction sent:', tx.hash);
+
+      // Wait for deployment
+      const receipt = await tx.wait();
+      console.log('Deployment confirmed:', receipt);
+
+      // Get the deployed wallet address from events
+      const deployedAddress = receipt.events?.[0]?.args?.wallet;
+      if (!deployedAddress) {
+        throw new Error('Failed to get deployed wallet address');
+      }
+
       return {
         success: true,
-        walletAddress: ownerAddress,
+        walletAddress: deployedAddress,
         estimatedGas: gasEstimate.toString()
       };
 
@@ -84,14 +114,12 @@ export const SmartWalletStatus = () => {
       try {
         console.log('Checking wallet status for address:', address);
         
-        // Check if this is the first time user is creating a smart wallet
         let walletClient;
         try {
           console.log('Attempting to get wallet client...');
           walletClient = await primaryWallet.getWalletClient();
           console.log('Wallet client response:', walletClient);
 
-          // Get the provider and validate network
           const provider = new ethers.providers.Web3Provider(walletClient as any);
           const network = await provider.getNetwork();
           console.log('Connected to network:', network.name);
@@ -113,11 +141,9 @@ export const SmartWalletStatus = () => {
           });
 
           try {
-            // Get the signer
             const provider = new ethers.providers.Web3Provider(primaryWallet as any);
             const signer = provider.getSigner();
             
-            // Deploy the smart wallet
             const deploymentResult = await deploySmartWallet(signer);
             
             if (!deploymentResult.success) {
@@ -128,6 +154,9 @@ export const SmartWalletStatus = () => {
               address: deploymentResult.walletAddress,
               estimatedGas: deploymentResult.estimatedGas
             });
+
+            // Store the smart wallet address for future use
+            localStorage.setItem('zeroDevWalletAddress', deploymentResult.walletAddress);
           } catch (error) {
             console.error('Smart wallet creation error:', error);
             throw error;
