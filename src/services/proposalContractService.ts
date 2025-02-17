@@ -2,7 +2,6 @@ import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { LGR_PRICE_USD } from "@/lib/constants";
-import { convertUSDToLGRWei } from "@/components/thesis/TargetCapitalInput";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
@@ -157,18 +156,20 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  console.log("Creating proposal with target capital:", config.targetCapital.toString(), "wei");
+  // Format target capital for logging (convert from wei to LGR)
+  const lgrAmount = parseFloat(ethers.utils.formatUnits(config.targetCapital, 18));
+  console.log("Creating proposal with target capital:", lgrAmount, "LGR");
   
   return await executeTransaction(
     () => factory.createProposal(
       config.ipfsHash,
-      config.targetCapital, // Use the BigNumber directly since it's already in wei
+      config.targetCapital,
       config.votingDuration
     ),
     {
       type: 'proposal',
-      description: `Creating proposal with target capital $${parseFloat(config.targetCapital.toString()).toLocaleString()} USD`,
-      timeout: 180000, // 3 minutes for proposal creation
+      description: `Creating proposal with target capital $${(lgrAmount * LGR_PRICE_USD).toLocaleString()} USD`,
+      timeout: 180000,
       maxRetries: 3,
       backoffMs: 5000
     }
