@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -152,7 +153,7 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const [isTestMode, setIsTestMode] = useState(true);
+  const [isTestMode, setIsTestMode] = useState(false); // Changed from true to false
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
   const [activeStep, setActiveStep] = useState<string>('thesis');
