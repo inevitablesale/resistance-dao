@@ -26,6 +26,7 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
+import { ContractStatus } from "@/types/proposals";
 
 interface SubmissionStep {
   id: string;
@@ -192,10 +193,10 @@ const ThesisSubmission = () => {
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
 
   const [contractStatus, setContractStatus] = useState<ContractStatus>({
-    minTargetCapital: ethers.utils.parseEther(MIN_TARGET_CAPITAL),
-    maxTargetCapital: ethers.utils.parseEther(MAX_TARGET_CAPITAL),
-    submissionFee: SUBMISSION_FEE,
-    votingFee: VOTING_FEE,
+    minTargetCapital: ethers.utils.parseEther(MIN_TARGET_CAPITAL.toString()),
+    maxTargetCapital: ethers.utils.parseEther(MAX_TARGET_CAPITAL.toString()),
+    submissionFee: ethers.utils.parseEther(SUBMISSION_FEE.toString()),
+    votingFee: ethers.utils.parseEther(VOTING_FEE.toString()),
     isPaused: false,
     isTestMode: false,
     treasury: "",
