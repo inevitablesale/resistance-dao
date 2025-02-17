@@ -8,7 +8,6 @@ import { Check, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { TEST_FORM_DATA } from "@/data/testFormData";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
@@ -17,6 +16,28 @@ interface ContractApprovalStatusProps {
   requiredAmount: string;
   isTestMode?: boolean;
 }
+
+// Mock data for test mode
+const mockFormData = {
+  title: "Mid-Market CPA Firm Acquisition - Southeast Region",
+  firmCriteria: {
+    size: "5m-10m",
+    location: "Florida",
+    dealType: "equity-buyout",
+    geographicFocus: "regional"
+  },
+  paymentTerms: ["cash", "seller-financing", "earnout"],
+  strategies: {
+    operational: ["tech-modernization", "process-standardization"],
+    growth: ["geographic-expansion", "service-expansion"],
+    integration: ["merging-operations", "systems-consolidation"]
+  },
+  investment: {
+    targetCapital: "3500000",
+    drivers: "Established client base with recurring revenue. Strong local presence with expansion potential.",
+    additionalCriteria: "Preference for firms with cloud-ready infrastructure."
+  }
+};
 
 export const ContractApprovalStatus = ({
   onApprovalComplete,
@@ -40,9 +61,9 @@ export const ContractApprovalStatus = ({
   const handleApprove = async () => {
     setIsApproving(true);
     try {
-      // In test mode, save the test data to localStorage before approving
+      // In test mode, save the mock data to localStorage before approving
       if (isTestMode) {
-        localStorage.setItem('currentTestFormData', JSON.stringify(TEST_FORM_DATA));
+        localStorage.setItem('currentTestFormData', JSON.stringify(mockFormData));
       }
       
       const success = await approveLGR(requiredAmount, isTestMode);
