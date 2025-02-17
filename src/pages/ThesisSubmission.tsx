@@ -487,6 +487,40 @@ const ThesisSubmission = () => {
     }
   };
 
+  const handleApprovalComplete = async (formData: any) => {
+    try {
+      updateStepStatus('approval', 'completed');
+      setActiveStep('submission');
+      
+      const syntheticEvent = {
+        preventDefault: () => {},
+        target: null,
+        currentTarget: null,
+        bubbles: false,
+        cancelable: false,
+        defaultPrevented: false,
+        eventPhase: 0,
+        isTrusted: true,
+        nativeEvent: new Event('submit'),
+        stopPropagation: () => {},
+        isPropagationStopped: () => false,
+        persist: () => {},
+        isDefaultPrevented: () => false,
+        type: 'submit'
+      } as React.FormEvent<HTMLFormElement>;
+
+      await handleSubmit(syntheticEvent);
+    } catch (error) {
+      console.error("Error during submission:", error);
+      toast({
+        title: "Submission Failed",
+        description: error instanceof Error ? error.message : "Failed to submit thesis",
+        variant: "destructive"
+      });
+      updateStepStatus('submission', 'failed');
+    }
+  };
+
   const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(SUBMISSION_FEE));
 
   const renderContinueButton = (
@@ -767,12 +801,10 @@ const ThesisSubmission = () => {
 
                 <div className="mt-8">
                   <ContractApprovalStatus 
-                    onApprovalComplete={() => {
-                      updateStepStatus('approval', 'completed');
-                      setActiveStep('submission');
-                    }} 
+                    onApprovalComplete={handleApprovalComplete}
                     requiredAmount={SUBMISSION_FEE.toString()} 
                     isTestMode={isTestMode}
+                    currentFormData={formData}
                   />
                 </div>
               </div>

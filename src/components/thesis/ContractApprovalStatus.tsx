@@ -12,9 +12,10 @@ import { useToast } from "@/hooks/use-toast";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 interface ContractApprovalStatusProps {
-  onApprovalComplete: () => void;
+  onApprovalComplete: (formData: any) => void;  // Modified to accept form data
   requiredAmount: string;
   isTestMode?: boolean;
+  currentFormData: any;  // Added to receive form data
 }
 
 // Mock data for test mode
@@ -42,7 +43,8 @@ const mockFormData = {
 export const ContractApprovalStatus = ({
   onApprovalComplete,
   requiredAmount,
-  isTestMode = false
+  isTestMode = false,
+  currentFormData
 }: ContractApprovalStatusProps) => {
   const { approveLGR, address } = useWalletConnection();
   const [isApproving, setIsApproving] = useState(false);
@@ -61,20 +63,20 @@ export const ContractApprovalStatus = ({
   const handleApprove = async () => {
     setIsApproving(true);
     try {
-      // In test mode, save the mock data to localStorage before approving
-      if (isTestMode) {
-        localStorage.setItem('currentTestFormData', JSON.stringify(mockFormData));
-      }
+      const dataToSubmit = isTestMode ? mockFormData : currentFormData;
+      
+      // Store form data before approval
+      localStorage.setItem('currentFormData', JSON.stringify(dataToSubmit));
       
       const success = await approveLGR(requiredAmount, isTestMode);
       if (success) {
         setIsApproved(true);
         toast({
           title: "Approval Successful",
-          description: "Starting minting process...",
+          description: "Starting submission process...",
         });
-        // Immediately trigger the minting process
-        onApprovalComplete();
+        // Pass the form data back to parent for submission
+        onApprovalComplete(dataToSubmit);
       }
     } catch (error) {
       console.error("Approval error in ContractApprovalStatus:", error);
