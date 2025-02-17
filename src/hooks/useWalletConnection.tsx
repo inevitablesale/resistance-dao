@@ -53,8 +53,8 @@ export const useWalletConnection = () => {
 
   const approveLGR = async (amount: string, isTestMode: boolean = false): Promise<ethers.ContractTransaction> => {
     try {
-      const { provider, type } = await getProvider();
-      await validateNetwork(provider);
+      const walletProvider = await getProvider();
+      await validateNetwork(walletProvider);
 
       console.log("Fetching contract status to get treasury address...");
       const status = await getContractStatus(primaryWallet!);
@@ -64,8 +64,8 @@ export const useWalletConnection = () => {
         throw new Error("Treasury address not available in contract status");
       }
 
-      console.log(`Approving LGR tokens for treasury using ${type} wallet:`, status.treasury);
-      const signer = provider.getSigner();
+      console.log(`Approving LGR tokens for treasury using ${walletProvider.type} wallet:`, status.treasury);
+      const signer = walletProvider.provider.getSigner();
       const lgrToken = new ethers.Contract(
         LGR_TOKEN_ADDRESS,
         ["function approve(address spender, uint256 amount) returns (bool)"],

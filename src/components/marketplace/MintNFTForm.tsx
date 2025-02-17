@@ -1,15 +1,8 @@
-// src/components/marketplace/MintNFTForm.tsx
+
 import { useState } from 'react';
-import {
-  useAccount,
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
-} from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import {
   Form,
   FormControl,
@@ -24,7 +17,6 @@ import * as z from "zod"
 import { useToast } from "@/hooks/use-toast";
 import { useWalletProvider } from '@/hooks/useWalletProvider';
 import { ethers } from 'ethers';
-import { CONTRACT_ADDRESS, CONTRACT_ABI } from '@/lib/constants';
 
 const mintNFTFormSchema = z.object({
   name: z.string().min(2, {
@@ -38,13 +30,17 @@ const mintNFTFormSchema = z.object({
   }),
 })
 
-interface MintNFTFormProps {
+export interface MintNFTFormProps {
   wallet: any;
+  durationType?: 'short-term' | 'long-term' | '';
 }
 
-export const MintNFTForm: React.FC<MintNFTFormProps> = ({ wallet }) => {
+// Contract addresses will be environment variables in production
+const CONTRACT_ADDRESS = "0x123..."; // Placeholder address
+const CONTRACT_ABI = ["function safeMint(address to, string name, string description, string imageURI)"];
+
+export const MintNFTForm: React.FC<MintNFTFormProps> = ({ wallet, durationType }) => {
   const [isMinting, setIsMinting] = useState(false);
-  const { address } = useAccount();
   const { toast } = useToast();
   const { getProvider, validateNetwork } = useWalletProvider();
 
@@ -55,20 +51,6 @@ export const MintNFTForm: React.FC<MintNFTFormProps> = ({ wallet }) => {
       description: "",
       imageURI: "",
     },
-  })
-
-  const { config } = usePrepareContractWrite({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'safeMint',
-    args: [address, form.getValues("name"), form.getValues("description"), form.getValues("imageURI")],
-    enabled: !!address && form.formState.isValid,
-  });
-
-  const { write, data, isLoading: isWriteLoading, isError: isWriteError, error: writeError } = useContractWrite(config);
-
-  const { isLoading: isWaitForTransactionLoading, isError: isWaitForTransactionError, error: waitForTransactionError, isSuccess, } = useWaitForTransaction({
-    hash: data?.hash,
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -88,10 +70,29 @@ export const MintNFTForm: React.FC<MintNFTFormProps> = ({ wallet }) => {
         return;
       }
 
-      if (write) {
-        setIsMinting(true);
-        write();
-      }
+      setIsMinting(true);
+
+      const formValues = form.getValues();
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        CONTRACT_ABI,
+        provider.provider.getSigner()
+      );
+
+      const tx = await contract.safeMint(
+        wallet.address,
+        formValues.name,
+        formValues.description,
+        formValues.imageURI
+      );
+
+      await tx.wait();
+
+      toast({
+        title: "Success",
+        description: "NFT minted successfully!",
+      });
+
     } catch (error: any) {
       console.error("Minting error:", error);
       toast({
@@ -151,8 +152,8 @@ export const MintNFTForm: React.FC<MintNFTFormProps> = ({ wallet }) => {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isMinting || isWriteLoading || isWaitForTransactionLoading}>
-              {isMinting || isWriteLoading ? (
+            <Button type="submit" disabled={isMinting}>
+              {isMinting ? (
                 <>
                   Minting...
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent ml-2" />
@@ -161,25 +162,6 @@ export const MintNFTForm: React.FC<MintNFTFormProps> = ({ wallet }) => {
                 "Mint NFT"
               )}
             </Button>
-
-            {isWriteError && (
-              <div className="text-red-500">
-                Write Error: {(writeError as any)?.message || 'An error occurred while preparing the transaction.'}
-              </div>
-            )}
-
-            {isWaitForTransactionError && (
-              <div className="text-red-500">
-                Transaction Error: {(waitForTransactionError as any)?.message || 'An error occurred while waiting for the transaction.'}
-              </div>
-            )}
-
-            {isSuccess && (
-              <div className="text-green-500">
-                NFT Minted Successfully!
-                <a href={`https://polygonscan.com/tx/${data?.hash}`} target="_blank" rel="noopener noreferrer" className="underline">View on Polygonscan</a>
-              </div>
-            )}
           </form>
         </Form>
       </CardContent>
