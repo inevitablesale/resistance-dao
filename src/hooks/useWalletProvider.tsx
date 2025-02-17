@@ -36,6 +36,23 @@ export const useWalletProvider = () => {
 
     try {
       const walletType = getWalletType();
+      console.log('Getting provider for wallet type:', walletType);
+      
+      // For ZeroDev wallets, we create the provider directly from the wallet
+      if (walletType === 'zerodev') {
+        console.log('Initializing ZeroDev provider...');
+        const ethersProvider = new ethers.providers.Web3Provider(primaryWallet as any);
+        return {
+          provider: ethersProvider,
+          type: 'zerodev',
+          isSmartWallet: true,
+          getNetwork: () => ethersProvider.getNetwork(),
+          getSigner: () => ethersProvider.getSigner()
+        };
+      }
+
+      // For regular wallets, try to get the wallet client first
+      console.log('Initializing regular wallet provider...');
       const walletClient = await primaryWallet.getWalletClient();
       
       if (!walletClient) {
@@ -46,21 +63,6 @@ export const useWalletProvider = () => {
         });
       }
 
-      // For ZeroDev wallets, we need to use their bundler RPC
-      if (walletType === 'zerodev') {
-        console.log('Initializing ZeroDev provider...');
-        const ethersProvider = new ethers.providers.Web3Provider(walletClient as any);
-        return {
-          provider: ethersProvider,
-          type: 'zerodev',
-          isSmartWallet: true,
-          getNetwork: () => ethersProvider.getNetwork(),
-          getSigner: () => ethersProvider.getSigner()
-        };
-      }
-
-      // For regular wallets, use their native provider
-      console.log('Initializing regular wallet provider...');
       const ethersProvider = new ethers.providers.Web3Provider(walletClient as any);
       return {
         provider: ethersProvider,
