@@ -26,7 +26,6 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
-import { ContractStatus } from "@/types/proposals";
 
 interface SubmissionStep {
   id: string;
@@ -142,13 +141,6 @@ const TEST_FORM_DATA: ProposalMetadata = {
   }
 };
 
-interface DisplayContractStatus {
-  minTargetCapital: string;
-  maxTargetCapital: string;
-  submissionFee: string;
-  votingFee: string;
-}
-
 const ThesisSubmission = () => {
   const { toast } = useToast();
   const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
@@ -191,56 +183,6 @@ const ThesisSubmission = () => {
   const [isStrategyOpen, setIsStrategyOpen] = useState(false);
   const [isApprovalOpen, setIsApprovalOpen] = useState(false);
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
-
-  const [contractStatus, setContractStatus] = useState<ContractStatus>({
-    minTargetCapital: ethers.utils.parseEther(MIN_TARGET_CAPITAL.toString()),
-    maxTargetCapital: ethers.utils.parseEther(MAX_TARGET_CAPITAL.toString()),
-    submissionFee: ethers.utils.parseEther(SUBMISSION_FEE.toString()),
-    votingFee: ethers.utils.parseEther(VOTING_FEE.toString()),
-    isPaused: false,
-    isTestMode: false,
-    treasury: "",
-    minVotingDuration: MIN_VOTING_DURATION,
-    maxVotingDuration: MAX_VOTING_DURATION,
-    lgrTokenAddress: "",
-    owner: ""
-  });
-
-  const [displayStatus, setDisplayStatus] = useState<DisplayContractStatus>({
-    minTargetCapital: MIN_TARGET_CAPITAL.toString(),
-    maxTargetCapital: MAX_TARGET_CAPITAL.toString(),
-    submissionFee: SUBMISSION_FEE.toString(),
-    votingFee: VOTING_FEE.toString()
-  });
-
-  useEffect(() => {
-    const getAndSetContractStatus = async () => {
-      if (!wallet) return;
-      try {
-        const status = await getContractStatus(wallet);
-        setContractStatus(status);
-        setDisplayStatus({
-          minTargetCapital: ethers.utils.formatEther(status.minTargetCapital),
-          maxTargetCapital: ethers.utils.formatEther(status.maxTargetCapital),
-          submissionFee: ethers.utils.formatEther(status.submissionFee),
-          votingFee: ethers.utils.formatEther(status.votingFee)
-        });
-      } catch (error) {
-        console.error("Error getting contract status:", error);
-        toast({
-          title: "Error",
-          description: "Failed to get contract status. Please try again.",
-          variant: "destructive"
-        });
-      }
-    };
-
-    if (isConnected && wallet) {
-      getAndSetContractStatus();
-    }
-  }, [isConnected, wallet, toast]);
-
-  const { minTargetCapital, maxTargetCapital, submissionFee, votingFee } = displayStatus;
 
   useEffect(() => {
     setFormData(isTestMode ? TEST_FORM_DATA : {
@@ -342,11 +284,11 @@ const ThesisSubmission = () => {
     } else {
       try {
         const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
-        if (targetCapitalWei.lt(contractStatus.minTargetCapital)) {
-          errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(contractStatus.minTargetCapital)} LGR`];
+        if (targetCapitalWei.lt(MIN_TARGET_CAPITAL)) {
+          errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} ETH`];
         }
-        if (targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
-          errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(contractStatus.maxTargetCapital)} LGR`];
+        if (targetCapitalWei.gt(MAX_TARGET_CAPITAL)) {
+          errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} ETH`];
         }
       } catch (error) {
         errors['investment.targetCapital'] = ['Invalid target capital amount'];
