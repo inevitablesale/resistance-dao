@@ -45,10 +45,10 @@ export const TargetCapitalInput = ({
     if (!value) return "";
     const numValue = ethers.utils.parseEther(value || "0");
     if (numValue.lt(MIN_TARGET_CAPITAL)) {
-      return `Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} LGR`;
+      return `Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} USD`;
     }
     if (numValue.gt(MAX_TARGET_CAPITAL)) {
-      return `Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} LGR`;
+      return `Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} USD`;
     }
     return "";
   };
