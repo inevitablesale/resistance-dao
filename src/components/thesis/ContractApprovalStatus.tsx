@@ -17,6 +17,28 @@ interface ContractApprovalStatusProps {
   isTestMode?: boolean;
 }
 
+// Mock data for test mode
+const mockFormData = {
+  title: "Mid-Market CPA Firm Acquisition - Southeast Region",
+  firmCriteria: {
+    size: "5m-10m",
+    location: "Florida",
+    dealType: "equity-buyout",
+    geographicFocus: "regional"
+  },
+  paymentTerms: ["cash", "seller-financing", "earnout"],
+  strategies: {
+    operational: ["tech-modernization", "process-standardization"],
+    growth: ["geographic-expansion", "service-expansion"],
+    integration: ["merging-operations", "systems-consolidation"]
+  },
+  investment: {
+    targetCapital: "3500000",
+    drivers: "Established client base with recurring revenue. Strong local presence with expansion potential.",
+    additionalCriteria: "Preference for firms with cloud-ready infrastructure."
+  }
+};
+
 export const ContractApprovalStatus = ({
   onApprovalComplete,
   requiredAmount,
@@ -39,6 +61,11 @@ export const ContractApprovalStatus = ({
   const handleApprove = async () => {
     setIsApproving(true);
     try {
+      // In test mode, save the mock data to localStorage before approving
+      if (isTestMode) {
+        localStorage.setItem('currentTestFormData', JSON.stringify(mockFormData));
+      }
+      
       const success = await approveLGR(requiredAmount, isTestMode);
       if (success) {
         setIsApproved(true);
@@ -112,4 +139,3 @@ export const ContractApprovalStatus = ({
     </Card>
   );
 };
-
