@@ -398,8 +398,8 @@ const ThesisSubmission = () => {
 
       updateStepStatus('thesis', 'completed');
       updateStepStatus('strategy', 'completed');
-      updateStepStatus('approval', 'processing');
-      setActiveStep('approval');
+      updateStepStatus('approval', 'completed');
+      setActiveStep('submission');
 
       if (!wallet) {
         throw new Error("No wallet connected");
@@ -422,20 +422,7 @@ const ThesisSubmission = () => {
         throw new Error("Voting duration out of allowed range");
       }
 
-      console.log('Approving LGR tokens for submission...');
-      const submissionFeeApproval = await approveLGR(contractStatus.submissionFee.toString());
-      if (!submissionFeeApproval) {
-        updateStepStatus('approval', 'failed');
-        toast({
-          title: "Approval Failed",
-          description: "Failed to approve LGR tokens for submission. Please try again.",
-          variant: "destructive"
-        });
-        return;
-      }
-      updateStepStatus('approval', 'completed');
       updateStepStatus('submission', 'processing');
-      setActiveStep('submission');
 
       console.log('Uploading metadata to IPFS...');
       const ipfsUri = await uploadMetadataToPinata(formData);
@@ -487,7 +474,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleApprovalComplete = async (formData: any) => {
+  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction) => {
     try {
       updateStepStatus('approval', 'completed');
       setActiveStep('submission');

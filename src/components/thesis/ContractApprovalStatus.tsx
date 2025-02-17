@@ -15,7 +15,7 @@ import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 interface ContractApprovalStatusProps {
-  onApprovalComplete: (formData: any) => void;
+  onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction) => void;
   requiredAmount: string;
   isTestMode?: boolean;
   currentFormData: any;
@@ -80,7 +80,8 @@ export const ContractApprovalStatus = ({
 
       console.log("Transaction executed:", transaction);
       setIsApproved(true);
-      onApprovalComplete(currentFormData);
+      // Pass both the form data and the transaction
+      onApprovalComplete(currentFormData, transaction);
       
     } catch (error) {
       console.error("Approval error:", error);
@@ -169,3 +170,4 @@ export const ContractApprovalStatus = ({
     </Card>
   );
 };
+
