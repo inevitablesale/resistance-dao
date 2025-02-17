@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { LGR_PRICE_USD } from "@/lib/constants";
+import { ProposalError } from "./errorHandlingService";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
@@ -41,7 +42,7 @@ export interface ContractStatus {
 }
 
 export interface ProposalConfig {
-  targetCapital: string | ethers.BigNumber; // Can be either LGR string or wei BigNumber
+  targetCapital: string | ethers.BigNumber;
   votingDuration: number;
   ipfsHash: string;
 }
@@ -54,14 +55,48 @@ export interface GasEstimate {
 
 async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet']>) {
   try {
-    const walletClient = await wallet.getWalletClient();
-    if (!walletClient) {
-      throw new Error("No wallet client available");
+    console.log("Initializing provider for wallet type:", wallet.connector?.name);
+    
+    // Check if it's a ZeroDev wallet
+    const isZeroDev = wallet.connector?.name?.toLowerCase().includes('zerodev');
+    
+    if (isZeroDev) {
+      // For ZeroDev wallets, we can use their provider directly
+      console.log("Using ZeroDev provider");
+      return new ethers.providers.Web3Provider(wallet as any);
     }
+    
+    // For regular wallets, get the wallet client
+    console.log("Getting wallet client...");
+    const walletClient = await wallet.getWalletClient();
+    
+    if (!walletClient) {
+      throw new ProposalError({
+        category: 'wallet',
+        message: "No wallet client available",
+        recoverySteps: [
+          "Please refresh and try again",
+          "Make sure your wallet is properly connected"
+        ]
+      });
+    }
+    
+    console.log("Creating Web3Provider...");
     return new ethers.providers.Web3Provider(walletClient as any);
   } catch (error) {
     console.error("Error getting provider:", error);
-    throw new Error("Failed to initialize provider");
+    if (error instanceof ProposalError) {
+      throw error;
+    }
+    throw new ProposalError({
+      category: 'wallet',
+      message: "Failed to initialize provider",
+      recoverySteps: [
+        "Please refresh and try again",
+        "Check your wallet connection",
+        "Make sure you're on the Polygon network"
+      ]
+    });
   }
 }
 
@@ -102,11 +137,11 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       submissionFee: submissionFee.toString(),
       isPaused,
       isTestMode,
-      treasury: treasury.toString(),
+      treasury,
       minTargetCapital: minTargetCapital.toString(),
       maxTargetCapital: maxTargetCapital.toString(),
-      minVotingDuration: Number(minVotingDuration),
-      maxVotingDuration: Number(maxVotingDuration),
+      minVotingDuration,
+      maxVotingDuration,
       votingFee: votingFee.toString(),
       lgrTokenAddress,
       owner
@@ -127,7 +162,15 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
     };
   } catch (error) {
     console.error("Error getting contract status:", error);
-    throw new Error("Failed to get contract status. Please ensure you're connected to the correct network.");
+    throw new ProposalError({
+      category: 'contract',
+      message: "Failed to get contract status",
+      recoverySteps: [
+        "Please ensure you're connected to the correct network",
+        "Check your wallet connection",
+        "Try refreshing the page"
+      ]
+    });
   }
 };
 
