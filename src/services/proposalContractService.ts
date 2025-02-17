@@ -61,23 +61,48 @@ async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet
     if (wallet.connector?.name?.toLowerCase().includes('zerodev')) {
       console.log("Using ZeroDev provider");
       try {
-        // Use getAccountAbstractionProvider for ZeroDev
+        // Validate ZeroDev configuration
+        if (!wallet.connector) {
+          throw new Error("ZeroDev connector not found");
+        }
+
+        // Check for chain ID
+        const chainId = wallet.connector.chainId;
+        console.log("Current chain ID:", chainId);
+        
+        if (chainId !== 137) { // Polygon Mainnet
+          throw new Error("Please connect to Polygon Mainnet");
+        }
+
+        // Get AA provider with validation
         const aaProvider = await (wallet.connector as any).getAccountAbstractionProvider?.();
         if (!aaProvider) {
           throw new Error("Failed to get account abstraction provider");
         }
-        console.log("Successfully got AA provider:", aaProvider);
-        return new ethers.providers.Web3Provider(aaProvider);
+
+        // Verify provider network
+        const provider = new ethers.providers.Web3Provider(aaProvider);
+        const network = await provider.getNetwork();
+        console.log("Provider network:", network);
+
+        if (network.chainId !== 137) {
+          throw new Error("Provider not connected to Polygon Mainnet");
+        }
+
+        console.log("Successfully initialized AA provider");
+        return provider;
       } catch (error) {
         console.error("ZeroDev provider error:", error);
         throw new ProposalError({
           category: 'wallet',
-          message: "Failed to initialize ZeroDev provider",
+          message: error instanceof Error ? error.message : "Failed to initialize ZeroDev provider",
           recoverySteps: [
-            "Please refresh and try again",
-            "Make sure your ZeroDev wallet is properly connected",
-            "Check if you're on the Polygon network"
-          ]
+            "Please ensure you're connected to Polygon Mainnet",
+            "Refresh the page and try connecting again",
+            "Make sure your ZeroDev wallet is properly set up",
+            "Check your network connection"
+          ],
+          technicalDetails: error instanceof Error ? error.stack : undefined
         });
       }
     }
@@ -98,7 +123,22 @@ async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet
     }
     
     console.log("Creating Web3Provider...");
-    return new ethers.providers.Web3Provider(walletClient as any);
+    const provider = new ethers.providers.Web3Provider(walletClient as any);
+    
+    // Verify network for regular wallets too
+    const network = await provider.getNetwork();
+    if (network.chainId !== 137) {
+      throw new ProposalError({
+        category: 'network',
+        message: "Please connect to Polygon Mainnet",
+        recoverySteps: [
+          "Switch your wallet network to Polygon Mainnet",
+          "Refresh the page after switching networks"
+        ]
+      });
+    }
+
+    return provider;
   } catch (error) {
     console.error("Error getting provider:", error);
     if (error instanceof ProposalError) {
@@ -111,7 +151,8 @@ async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet
         "Please refresh and try again",
         "Check your wallet connection",
         "Make sure you're on the Polygon network"
-      ]
+      ],
+      technicalDetails: error instanceof Error ? error.stack : undefined
     });
   }
 }
@@ -185,7 +226,8 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
         "Please ensure you're connected to the correct network",
         "Check your wallet connection",
         "Try refreshing the page"
-      ]
+      ],
+      technicalDetails: error instanceof Error ? error.stack : undefined
     });
   }
 };
