@@ -5,14 +5,31 @@ import { executeTransaction } from "./transactionManager";
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
   "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
-  "function submissionFee() public view returns (uint256)",
+  "function LGR_TOKEN() public view returns (address)",
+  "function MAX_TARGET_CAPITAL() public view returns (uint256)",
+  "function MAX_VOTING_DURATION() public view returns (uint256)",
+  "function MIN_TARGET_CAPITAL() public view returns (uint256)",
+  "function MIN_VOTING_DURATION() public view returns (uint256)",
+  "function VOTING_FEE() public view returns (uint256)",
+  "function owner() public view returns (address)",
   "function paused() public view returns (bool)",
+  "function proposalContracts(uint256) public view returns (address)",
+  "function submissionFee() public view returns (uint256)",
   "function testModeEnabled() public view returns (bool)",
   "function treasury() public view returns (address)",
-  "function minTargetCapital() public view returns (uint256)",
-  "function maxTargetCapital() public view returns (uint256)",
-  "function minVotingDuration() public view returns (uint256)",
-  "function maxVotingDuration() public view returns (uint256)"
+  "function userProposals(address,uint256) public view returns (uint256)",
+  "function setTreasury(address newTreasury) external",
+  "function setSubmissionFee(uint256 newFee) external",
+  "function setTestMode(bool newStatus) external",
+  "function pause() external",
+  "function unpause() external",
+  "function withdrawStuckTokens(address token, uint256 amount) external",
+  "function renounceOwnership() external",
+  "function transferOwnership(address newOwner) external",
+  "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)",
+  "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+  "event Paused(address account)",
+  "event Unpaused(address account)"
 ];
 
 export interface ContractStatus {
@@ -24,6 +41,9 @@ export interface ContractStatus {
   maxTargetCapital: ethers.BigNumber;
   minVotingDuration: number;
   maxVotingDuration: number;
+  votingFee: ethers.BigNumber;
+  lgrTokenAddress: string;
+  owner: string;
 }
 
 export interface ProposalConfig {
@@ -66,7 +86,10 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       minTargetCapital,
       maxTargetCapital,
       minVotingDuration,
-      maxVotingDuration
+      maxVotingDuration,
+      votingFee,
+      lgrTokenAddress,
+      owner
     ] = await Promise.all([
       factory.submissionFee().catch((e: Error) => {
         console.error("Error calling submissionFee:", e);
@@ -84,20 +107,32 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
         console.error("Error calling treasury:", e);
         throw e;
       }),
-      factory.minTargetCapital().catch((e: Error) => {
-        console.error("Error calling minTargetCapital:", e);
+      factory.MIN_TARGET_CAPITAL().catch((e: Error) => {
+        console.error("Error calling MIN_TARGET_CAPITAL:", e);
         throw e;
       }),
-      factory.maxTargetCapital().catch((e: Error) => {
-        console.error("Error calling maxTargetCapital:", e);
+      factory.MAX_TARGET_CAPITAL().catch((e: Error) => {
+        console.error("Error calling MAX_TARGET_CAPITAL:", e);
         throw e;
       }),
-      factory.minVotingDuration().catch((e: Error) => {
-        console.error("Error calling minVotingDuration:", e);
+      factory.MIN_VOTING_DURATION().catch((e: Error) => {
+        console.error("Error calling MIN_VOTING_DURATION:", e);
         throw e;
       }),
-      factory.maxVotingDuration().catch((e: Error) => {
-        console.error("Error calling maxVotingDuration:", e);
+      factory.MAX_VOTING_DURATION().catch((e: Error) => {
+        console.error("Error calling MAX_VOTING_DURATION:", e);
+        throw e;
+      }),
+      factory.VOTING_FEE().catch((e: Error) => {
+        console.error("Error calling VOTING_FEE:", e);
+        throw e;
+      }),
+      factory.LGR_TOKEN().catch((e: Error) => {
+        console.error("Error calling LGR_TOKEN:", e);
+        throw e;
+      }),
+      factory.owner().catch((e: Error) => {
+        console.error("Error calling owner:", e);
         throw e;
       })
     ]);
@@ -110,7 +145,10 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       minTargetCapital: minTargetCapital.toString(),
       maxTargetCapital: maxTargetCapital.toString(),
       minVotingDuration: Number(minVotingDuration),
-      maxVotingDuration: Number(maxVotingDuration)
+      maxVotingDuration: Number(maxVotingDuration),
+      votingFee: votingFee.toString(),
+      lgrTokenAddress,
+      owner
     });
 
     return {
@@ -121,7 +159,10 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       minTargetCapital,
       maxTargetCapital,
       minVotingDuration: Number(minVotingDuration),
-      maxVotingDuration: Number(maxVotingDuration)
+      maxVotingDuration: Number(maxVotingDuration),
+      votingFee,
+      lgrTokenAddress,
+      owner
     };
   } catch (error) {
     console.error("Error getting contract status:", error);
