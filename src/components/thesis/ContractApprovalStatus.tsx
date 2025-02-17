@@ -71,8 +71,9 @@ export const ContractApprovalStatus = ({
         setIsApproved(true);
         toast({
           title: "Approval Successful",
-          description: "Contract approved successfully",
+          description: "Starting minting process...",
         });
+        // Immediately trigger the minting process
         onApprovalComplete();
       }
     } catch (error) {
