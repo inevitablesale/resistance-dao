@@ -1,10 +1,11 @@
+
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { LGR_PRICE_USD } from "@/lib/constants";
 import { convertUSDToLGRWei } from "@/components/thesis/TargetCapitalInput";
 
-const FACTORY_ADDRESS = "0xE933C03730E3816C343823B00746f0fC0C799B68";
+const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
   // Core proposal creation
   "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
