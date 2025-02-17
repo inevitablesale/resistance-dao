@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
@@ -60,19 +59,8 @@ async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet
     // For ZeroDev wallets
     if (wallet.connector?.name?.toLowerCase().includes('zerodev')) {
       console.log("Using ZeroDev provider");
-      // Access the wallet client directly for ZeroDev
-      const walletClient = await wallet.getWalletClient();
-      if (!walletClient) {
-        throw new ProposalError({
-          category: 'wallet',
-          message: "Failed to get ZeroDev wallet client",
-          recoverySteps: [
-            "Please refresh and try again",
-            "Make sure your ZeroDev wallet is properly connected"
-          ]
-        });
-      }
-      return new ethers.providers.Web3Provider(walletClient as any);
+      // Use the wallet object directly as a provider
+      return new ethers.providers.Web3Provider(wallet as any);
     }
     
     // For regular wallets
