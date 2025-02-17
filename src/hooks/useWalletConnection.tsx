@@ -57,44 +57,6 @@ export const useWalletConnection = () => {
       // Always validate network
       await validateNetwork();
 
-      // In test mode, return a mock transaction that matches the ContractTransaction interface
-      if (isTestMode) {
-        const mockFrom = "0x" + "3".repeat(40);
-        const mockHash = "0x" + "1".repeat(64);
-        const mockBlockHash = "0x" + "4".repeat(64);
-        
-        return {
-          hash: mockHash,
-          from: mockFrom,
-          confirmations: 1,
-          nonce: 0,
-          gasLimit: ethers.BigNumber.from(21000),
-          gasPrice: ethers.BigNumber.from(1000000000),
-          data: "0x",
-          value: ethers.BigNumber.from(0),
-          chainId: 137,
-          wait: async () => ({
-            to: "0x" + "2".repeat(40),
-            from: mockFrom,
-            contractAddress: LGR_TOKEN_ADDRESS,
-            transactionHash: mockHash,
-            blockHash: mockBlockHash,
-            blockNumber: 1,
-            timestamp: Date.now(),
-            confirmations: 1,
-            events: [],
-            logs: [],
-            status: 1,
-            gasUsed: ethers.BigNumber.from(21000),
-            cumulativeGasUsed: ethers.BigNumber.from(21000),
-            effectiveGasPrice: ethers.BigNumber.from(1000000000),
-            logsBloom: "0x" + "0".repeat(512),
-            transactionIndex: 0,
-            byzantium: true
-          })
-        } as ethers.ContractTransaction;
-      }
-
       if (!treasury) {
         console.log("Fetching contract status to get treasury address...");
         const status = await getContractStatus(primaryWallet!);
@@ -116,6 +78,7 @@ export const useWalletConnection = () => {
       );
 
       console.log("Calling approve with amount:", amount);
+      // Always make real contract call - the contract handles test mode
       return await lgrToken.approve(treasury, amount);
     } catch (error) {
       console.error("Approval error in useWalletConnection:", error);
