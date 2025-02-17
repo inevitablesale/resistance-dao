@@ -174,9 +174,11 @@ const ThesisSubmission = () => {
         const contractStatus = await getContractStatus(wallet);
         setIsTestMode(contractStatus.isTestMode);
         
-        const currentAddress = await wallet.getAddress();
-        setIsContractOwner(currentAddress.toLowerCase() === contractStatus.owner.toLowerCase());
-        setIsAuthorizedAddress(currentAddress.toLowerCase() === "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2".toLowerCase());
+        const currentAddress = wallet.address;
+        if (currentAddress) {
+          setIsContractOwner(currentAddress.toLowerCase() === contractStatus.owner.toLowerCase());
+          setIsAuthorizedAddress(currentAddress.toLowerCase() === "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2".toLowerCase());
+        }
       } catch (error) {
         console.error("Error initializing test mode:", error);
         toast({
@@ -772,9 +774,6 @@ const ThesisSubmission = () => {
                           operational: formData.strategies.operational,
                           growth: formData.strategies.growth,
                           integration: formData.strategies.integration
-                        },
-                        investment: {
-                          additionalCriteria: formData.investment.additionalCriteria
                         }
                       }}
                       formErrors={formErrors}
@@ -795,7 +794,11 @@ const ThesisSubmission = () => {
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
               <div className="p-6">
                 <h2 className="text-2xl font-bold mb-4">Wallet Overview</h2>
-                <LGRWalletDisplay />
+                <LGRWalletDisplay 
+                  submissionFee={SUBMISSION_FEE.toString()}
+                  currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
+                  walletAddress={address}
+                />
               </div>
             </Card>
           </div>
