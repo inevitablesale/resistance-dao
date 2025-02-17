@@ -1,4 +1,3 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -43,7 +42,6 @@ interface StoredProposal {
   status: 'pending' | 'completed' | 'failed';
 }
 
-// Update the factory address to match proposalContractService.ts
 const FACTORY_ADDRESS = "0xD00655Ce27387b8B1EE7759b1f44De5748916Ba5";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const FACTORY_ABI = ["function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)", "function submissionFee() public view returns (uint256)", "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"];
@@ -168,7 +166,6 @@ const ThesisSubmission = () => {
   const [isApprovalOpen, setIsApprovalOpen] = useState(false);
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
 
-  // Initialize test mode and authorization status
   useEffect(() => {
     const initializeTestMode = async () => {
       if (!wallet) return;
@@ -177,7 +174,6 @@ const ThesisSubmission = () => {
         const contractStatus = await getContractStatus(wallet);
         setIsTestMode(contractStatus.isTestMode);
         
-        // Check if current address is contract owner or authorized address
         const currentAddress = await wallet.getAddress();
         setIsContractOwner(currentAddress.toLowerCase() === contractStatus.owner.toLowerCase());
         setIsAuthorizedAddress(currentAddress.toLowerCase() === "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2".toLowerCase());
@@ -747,7 +743,7 @@ const ThesisSubmission = () => {
                         setIsSubmissionOpen(true);
                       }
                     })}
-                  CollapsibleContent>
+                  </CollapsibleContent>
                 </Collapsible>
 
                 <Collapsible open={isSubmissionOpen} onOpenChange={setIsSubmissionOpen} className="w-full">
@@ -797,10 +793,16 @@ const ThesisSubmission = () => {
 
           <div className="lg:col-span-4">
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-2xl font-bold">
-                  Wallet Overview
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                
+              <div className="p-6">
+                <h2 className="text-2xl font-bold mb-4">Wallet Overview</h2>
+                <LGRWalletDisplay />
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
