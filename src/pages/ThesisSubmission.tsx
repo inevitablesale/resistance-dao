@@ -136,7 +136,7 @@ const TEST_FORM_DATA: ProposalMetadata = {
     ]
   },
   investment: {
-    targetCapital: "250000.00", // Fixed: Now using proper USD format with decimals
+    targetCapital: "250000.00",
     drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
     additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
   }
@@ -808,4 +808,6 @@ const ThesisSubmission = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1 w-
+                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1 w-full"
+              >
+                <div className
