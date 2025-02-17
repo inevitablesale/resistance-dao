@@ -160,8 +160,11 @@ const ThesisSubmission = () => {
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
   const [formData, setFormData] = useState<ProposalMetadata>(TEST_FORM_DATA);
+  const [isThesisOpen, setIsThesisOpen] = useState(true);
+  const [isStrategyOpen, setIsStrategyOpen] = useState(false);
+  const [isApprovalOpen, setIsApprovalOpen] = useState(false);
+  const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
 
-  // Add effect to fetch contract status and update test mode
   useEffect(() => {
     const fetchContractStatus = async () => {
       if (wallet) {
@@ -183,7 +186,6 @@ const ThesisSubmission = () => {
     fetchContractStatus();
   }, [wallet, toast]);
 
-  // Update form data when test mode changes
   useEffect(() => {
     setFormData(isTestMode ? TEST_FORM_DATA : {
       title: "",
@@ -809,3 +811,19 @@ const ThesisSubmission = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1 w-full max-w-3xl mx-auto"
               >
+                <div className="bg-black/40 backdrop-blur-sm rounded-lg p-6">
+                  <LGRWalletDisplay address={address} balance={tokenBalances} />
+                  <SubmissionProgress steps={steps} currentStep={activeStep} />
+                  <TransactionStatus txId={currentTxId} />
+                </div>
+              </motion.div>
+              <LGRFloatingWidget address={address} balance={tokenBalances} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
