@@ -1,8 +1,10 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { HelpCircle } from "lucide-react";
 import { ethers } from "ethers";
+import { LGR_PRICE_USD } from "@/lib/constants";
 
 interface TargetCapitalInputProps {
   value: string;
@@ -13,7 +15,6 @@ interface TargetCapitalInputProps {
 // Constants in USD terms
 const MIN_TARGET_CAPITAL_USD = 1000;
 const MAX_TARGET_CAPITAL_USD = 25000000;
-const LGR_PRICE_USD = 0.10; // $0.10 per LGR token
 
 export const convertUSDToLGRWei = (usdAmount: string): ethers.BigNumber => {
   if (!usdAmount || isNaN(parseFloat(usdAmount))) return ethers.BigNumber.from(0);
@@ -24,11 +25,11 @@ export const convertUSDToLGRWei = (usdAmount: string): ethers.BigNumber => {
   
   // Validate LGR amount against contract bounds (1,000 - 25,000,000 LGR)
   const wholeLGRAmount = Math.floor(lgrAmount);
-  if (wholeLGRAmount < 1000) {
-    throw new Error(`Minimum target capital is 1,000 LGR (${1000 * LGR_PRICE_USD} USD)`);
+  if (wholeLGRAmount < MIN_TARGET_CAPITAL_USD / LGR_PRICE_USD) {
+    throw new Error(`Minimum target capital is ${MIN_TARGET_CAPITAL_USD / LGR_PRICE_USD} LGR (${MIN_TARGET_CAPITAL_USD} USD)`);
   }
-  if (wholeLGRAmount > 25000000) {
-    throw new Error(`Maximum target capital is 25,000,000 LGR (${25000000 * LGR_PRICE_USD} USD)`);
+  if (wholeLGRAmount > MAX_TARGET_CAPITAL_USD / LGR_PRICE_USD) {
+    throw new Error(`Maximum target capital is ${MAX_TARGET_CAPITAL_USD / LGR_PRICE_USD} LGR (${MAX_TARGET_CAPITAL_USD} USD)`);
   }
   
   try {
