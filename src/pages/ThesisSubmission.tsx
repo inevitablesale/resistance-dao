@@ -206,12 +206,25 @@ const ThesisSubmission = () => {
     owner: ""
   });
 
+  const [displayContractStatus, setDisplayContractStatus] = useState<DisplayContractStatus>({
+    minTargetCapital: MIN_TARGET_CAPITAL,
+    maxTargetCapital: MAX_TARGET_CAPITAL,
+    submissionFee: SUBMISSION_FEE.toString(),
+    votingFee: VOTING_FEE.toString()
+  });
+
   useEffect(() => {
     const getAndSetContractStatus = async () => {
       if (!wallet) return;
       try {
         const status = await getContractStatus(wallet);
         setContractStatus(status);
+        setDisplayContractStatus({
+          minTargetCapital: ethers.utils.formatEther(status.minTargetCapital),
+          maxTargetCapital: ethers.utils.formatEther(status.maxTargetCapital),
+          submissionFee: ethers.utils.formatEther(status.submissionFee),
+          votingFee: ethers.utils.formatEther(status.votingFee)
+        });
       } catch (error) {
         console.error("Error getting contract status:", error);
         toast({
