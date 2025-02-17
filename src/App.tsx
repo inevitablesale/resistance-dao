@@ -76,7 +76,11 @@ const dynamicSettings = {
     enableSessionRestoration: true,
     enableAuthProviders: true,
     enablePasskeys: false,
-    enableZeroDevWallets: false, // Explicitly disable ZeroDev
+    enableZeroDevWallets: false,
+    enableAccountAbstraction: false, // Explicitly disable account abstraction
+    accountAbstraction: {
+      enabled: false // Ensure account abstraction is disabled at all levels
+    },
     evmWallets: {
       options: {
         emailAuth: {
