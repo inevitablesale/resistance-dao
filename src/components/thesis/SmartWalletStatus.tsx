@@ -10,6 +10,7 @@ import { transactionQueue, TransactionResult, TransactionFailure, TransactionSuc
 import { toast } from "@/hooks/use-toast";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
 import { ProposalError } from "@/services/errorHandlingService";
+import { gasOptimizer } from "@/services/gasOptimizerService";
 
 export interface SmartWalletState {
   status: 'checking' | 'creating' | 'ready' | 'error';
@@ -83,7 +84,6 @@ export const SmartWalletStatus = () => {
           console.log('Existing wallet found:', existingWalletAddress);
           localStorage.setItem('zeroDevWalletAddress', existingWalletAddress);
           
-          // Create a mock transaction for existing wallet case
           const mockTx: ethers.ContractTransaction = {
             wait: async () => ({} as ethers.ContractReceipt),
             hash: '',
@@ -108,9 +108,14 @@ export const SmartWalletStatus = () => {
         const gasEstimate = await factory.estimateGas.createWallet(ownerAddress);
         console.log('Estimated gas for deployment:', gasEstimate.toString());
 
+        const optimizedGas = await gasOptimizer.optimizeGasLimit(gasEstimate, 'high');
+        const { maxFeePerGas, maxPriorityFeePerGas } = await gasOptimizer.getOptimizedGasPrice(provider, 'high');
+
         const factoryWithSigner = factory.connect(signer);
         const tx = await factoryWithSigner.createWallet(ownerAddress, {
-          gasLimit: gasEstimate.mul(12).div(10)
+          gasLimit: optimizedGas,
+          maxFeePerGas,
+          maxPriorityFeePerGas
         });
 
         console.log('Deployment transaction sent:', tx.hash);

@@ -2,6 +2,7 @@
 import { ethers } from "ethers";
 import { toast } from "@/hooks/use-toast";
 import { ProposalError } from "./errorHandlingService";
+import { gasOptimizer } from "./gasOptimizationService";
 
 export interface QueuedTransaction {
   id: string;
@@ -81,6 +82,14 @@ class TransactionQueueService {
       const result = await executor();
       
       if (result.success) {
+        // Add gas price to history through optimizer
+        if (result.transaction.provider) {
+          await gasOptimizer.getOptimizedGasPrice(
+            result.transaction.provider,
+            tx.type === 'contract' ? 'high' : 'medium'
+          );
+        }
+
         tx.status = 'completed';
         tx.hash = result.transaction.hash;
         this.notifyUpdate(tx);
@@ -101,8 +110,9 @@ class TransactionQueueService {
         tx.status = 'pending';
         this.notifyUpdate(tx);
         
-        // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, this.processingDelay));
+        // Wait before retrying with exponential backoff
+        const backoffTime = this.processingDelay * Math.pow(2, tx.retryCount - 1);
+        await new Promise(resolve => setTimeout(resolve, backoffTime));
         return this.processTransaction(id, executor);
       }
 
@@ -127,12 +137,16 @@ class TransactionQueueService {
   }
 
   private notifyUpdate(transaction: QueuedTransaction) {
+    const timingSuggestion = transaction.status === 'pending' 
+      ? gasOptimizer.getTransactionTimingSuggestion()
+      : null;
+
     // Update UI via toast notifications
     switch (transaction.status) {
       case 'pending':
         toast({
           title: "Transaction Pending",
-          description: transaction.description,
+          description: `${transaction.description}${timingSuggestion ? `\n${timingSuggestion}` : ''}`,
         });
         break;
       case 'processing':
