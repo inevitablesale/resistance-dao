@@ -10,6 +10,8 @@ interface WalletProvider {
   provider: ethers.providers.Web3Provider;
   type: WalletType;
   isSmartWallet: boolean;
+  getNetwork: () => Promise<ethers.providers.Network>;
+  getSigner: () => ethers.providers.JsonRpcSigner;
 }
 
 export const useWalletProvider = () => {
@@ -19,8 +21,7 @@ export const useWalletProvider = () => {
   const getWalletType = (): WalletType => {
     if (!primaryWallet) return 'unknown';
     // Check wallet properties to determine if it's ZeroDev
-    const isZeroDev = primaryWallet.connector?.name?.toLowerCase().includes('zerodev') || 
-                      primaryWallet.connector?.type?.toLowerCase().includes('zerodev');
+    const isZeroDev = primaryWallet.connector?.name?.toLowerCase().includes('zerodev');
     return isZeroDev ? 'zerodev' : 'regular';
   };
 
@@ -48,21 +49,25 @@ export const useWalletProvider = () => {
       // For ZeroDev wallets, we need to use their bundler RPC
       if (walletType === 'zerodev') {
         console.log('Initializing ZeroDev provider...');
-        const provider = new ethers.providers.Web3Provider(walletClient as any);
+        const ethersProvider = new ethers.providers.Web3Provider(walletClient as any);
         return {
-          provider,
+          provider: ethersProvider,
           type: 'zerodev',
-          isSmartWallet: true
+          isSmartWallet: true,
+          getNetwork: () => ethersProvider.getNetwork(),
+          getSigner: () => ethersProvider.getSigner()
         };
       }
 
       // For regular wallets, use their native provider
       console.log('Initializing regular wallet provider...');
-      const provider = new ethers.providers.Web3Provider(walletClient as any);
+      const ethersProvider = new ethers.providers.Web3Provider(walletClient as any);
       return {
-        provider,
+        provider: ethersProvider,
         type: 'regular',
-        isSmartWallet: false
+        isSmartWallet: false,
+        getNetwork: () => ethersProvider.getNetwork(),
+        getSigner: () => ethersProvider.getSigner()
       };
     } catch (error) {
       console.error('Provider initialization error:', error);
@@ -78,7 +83,7 @@ export const useWalletProvider = () => {
     }
   };
 
-  const validateNetwork = async (provider: ethers.providers.Web3Provider) => {
+  const validateNetwork = async (provider: WalletProvider) => {
     console.log('Starting network validation...');
     const network = await provider.getNetwork();
     console.log('Current chain ID:', network.chainId);
@@ -94,13 +99,13 @@ export const useWalletProvider = () => {
   };
 
   const estimateGas = async (
-    provider: ethers.providers.Web3Provider,
+    provider: WalletProvider,
     transaction: ethers.providers.TransactionRequest,
     walletType: WalletType
   ): Promise<ethers.BigNumber> => {
     try {
       console.log(`Estimating gas for ${walletType} wallet...`);
-      const gasEstimate = await provider.estimateGas(transaction);
+      const gasEstimate = await provider.provider.estimateGas(transaction);
       
       // Add a 20% buffer for safety
       const gasBuffer = gasEstimate.mul(120).div(100);

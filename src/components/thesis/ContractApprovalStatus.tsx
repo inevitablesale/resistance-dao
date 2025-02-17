@@ -47,16 +47,14 @@ export const ContractApprovalStatus = ({
     setIsApproving(true);
     try {
       console.log("Starting approval process...", { isTestMode });
-      const provider = await getProvider();
+      const walletProvider = await getProvider();
       const walletType = getWalletType();
       
-      if (provider) {
-        const network = await provider.getNetwork();
-        console.log('Network before transaction:', {
-          chainId: network.chainId,
-          name: network.name
-        });
-      }
+      const network = await walletProvider.getNetwork();
+      console.log('Network before transaction:', {
+        chainId: network.chainId,
+        name: network.name
+      });
       
       const transaction = await executeTransaction(
         async () => {
@@ -77,7 +75,7 @@ export const ContractApprovalStatus = ({
           },
           walletType
         },
-        provider.provider
+        walletProvider.provider
       );
 
       console.log("Transaction executed:", transaction);
