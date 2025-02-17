@@ -18,7 +18,10 @@ export const useWalletProvider = () => {
 
   const getWalletType = (): WalletType => {
     if (!primaryWallet) return 'unknown';
-    return primaryWallet.connector?.key === 'zerodev' ? 'zerodev' : 'regular';
+    // Check wallet properties to determine if it's ZeroDev
+    const isZeroDev = primaryWallet.connector?.name?.toLowerCase().includes('zerodev') || 
+                      primaryWallet.connector?.type?.toLowerCase().includes('zerodev');
+    return isZeroDev ? 'zerodev' : 'regular';
   };
 
   const getProvider = async (): Promise<WalletProvider> => {
@@ -111,7 +114,7 @@ export const useWalletProvider = () => {
         // For ZeroDev, we need to handle bundler-specific errors
         if (error.message.includes('execution reverted')) {
           throw new ProposalError({
-            category: 'gas',
+            category: 'transaction',
             message: 'Transaction simulation failed',
             recoverySteps: [
               'Verify transaction parameters',

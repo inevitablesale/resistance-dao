@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -11,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { executeTransaction } from "@/services/transactionManager";
 import { TransactionStatus } from "./TransactionStatus";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
+import { useWalletProvider } from "@/hooks/useWalletProvider";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
@@ -28,7 +28,7 @@ export const ContractApprovalStatus = ({
   currentFormData
 }: ContractApprovalStatusProps) => {
   const { approveLGR, address } = useWalletConnection();
-  const { getProvider } = useDynamicUtils();
+  const { getProvider, getWalletType } = useWalletProvider();
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
@@ -48,6 +48,7 @@ export const ContractApprovalStatus = ({
     try {
       console.log("Starting approval process...", { isTestMode });
       const provider = await getProvider();
+      const walletType = getWalletType();
       
       if (provider) {
         const network = await provider.getNetwork();
@@ -73,14 +74,14 @@ export const ContractApprovalStatus = ({
             spenderAddress: address!,
             amount: requiredAmount,
             isTestMode
-          }
+          },
+          walletType
         },
-        provider
+        provider.provider
       );
 
       console.log("Transaction executed:", transaction);
       setIsApproved(true);
-      // Pass both the form data and the transaction
       onApprovalComplete(currentFormData, transaction);
       
     } catch (error) {
@@ -170,4 +171,3 @@ export const ContractApprovalStatus = ({
     </Card>
   );
 };
-

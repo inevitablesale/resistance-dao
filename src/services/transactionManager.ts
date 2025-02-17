@@ -4,6 +4,7 @@ import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
 import { transactionQueue } from "./transactionQueueService";
 import { checkTokenAllowance } from "./tokenService";
+import { WalletType } from "@/hooks/useWalletProvider";
 
 export interface TransactionConfig {
   timeout: number;
@@ -18,6 +19,7 @@ export interface TransactionConfig {
     amount: string;
     isTestMode?: boolean;
   };
+  walletType?: WalletType;
 }
 
 const DEFAULT_CONFIG: Omit<TransactionConfig, 'description' | 'type'> = {
