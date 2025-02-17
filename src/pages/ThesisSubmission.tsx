@@ -143,7 +143,7 @@ const TEST_FORM_DATA: ProposalMetadata = {
 
 const ThesisSubmission = () => {
   const { toast } = useToast();
-  const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
+  const { isConnected, address, connect, approveLGR, wallet, toggleTestMode } = useWalletConnection();
   const { tokenBalances } = useTokenBalances({
     networkId: 137,
     accountAddress: address,
@@ -545,7 +545,7 @@ const ThesisSubmission = () => {
     // Implement ad space rental logic here
   };
 
-  const handleTestModeToggle = (enabled: boolean) => {
+  const handleTestModeToggle = async (enabled: boolean) => {
     if (!isConnected) {
       toast({
         title: "Connect Wallet",
@@ -556,11 +556,10 @@ const ThesisSubmission = () => {
       return;
     }
     
-    setIsTestMode(enabled);
-    toast({
-      title: `Test Mode ${enabled ? 'Enabled' : 'Disabled'}`,
-      description: `Successfully ${enabled ? 'enabled' : 'disabled'} test mode`,
-    });
+    const success = await toggleTestMode(enabled);
+    if (success) {
+      setIsTestMode(enabled);
+    }
   };
 
   return (
