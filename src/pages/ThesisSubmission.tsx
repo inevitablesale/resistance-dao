@@ -143,7 +143,7 @@ const TEST_FORM_DATA: ProposalMetadata = {
 
 const ThesisSubmission = () => {
   const { toast } = useToast();
-  const { isConnected, address, connect, approveLGR, wallet, toggleTestMode } = useWalletConnection();
+  const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
   const { tokenBalances } = useTokenBalances({
     networkId: 137,
     accountAddress: address,
@@ -152,7 +152,7 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const [isTestMode, setIsTestMode] = useState(false);
+  const [isTestMode, setIsTestMode] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
   const [activeStep, setActiveStep] = useState<string>('thesis');
@@ -369,7 +369,7 @@ const ThesisSubmission = () => {
         break;
       case 'terms':
         isValid = validateTermsTab();
-        handleSubmit(e);
+        if (isValid) handleSubmit(e);
         break;
     }
     if (!isValid) {
@@ -392,7 +392,6 @@ const ThesisSubmission = () => {
       connect();
       return;
     }
-
     try {
       setIsSubmitting(true);
       setFormErrors({});
@@ -405,59 +404,41 @@ const ThesisSubmission = () => {
       if (!wallet) {
         throw new Error("No wallet connected");
       }
-
-      console.log('Starting proposal submission in', isTestMode ? 'TEST MODE' : 'NORMAL MODE');
       const contractStatus = await getContractStatus(wallet);
-      
       if (contractStatus.isPaused) {
-        throw new Error("Contract is currently paused for maintenance");
+        toast({
+          title: "Contract Paused",
+          description: "The contract is currently paused for maintenance. Please try again later.",
+          variant: "destructive"
+        });
+        return;
       }
 
-      if (!isTestMode) {
-        const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
-        if (targetCapitalWei.lt(contractStatus.minTargetCapital) || targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
-          throw new Error("Target capital out of allowed range");
-        }
-        if (votingDuration < contractStatus.minVotingDuration || votingDuration > contractStatus.maxVotingDuration) {
-          throw new Error("Voting duration out of allowed range");
-        }
+      const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
+      if (targetCapitalWei.lt(contractStatus.minTargetCapital) || targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
+        throw new Error("Target capital out of allowed range");
+      }
+      if (votingDuration < contractStatus.minVotingDuration || votingDuration > contractStatus.maxVotingDuration) {
+        throw new Error("Voting duration out of allowed range");
       }
 
       updateStepStatus('submission', 'processing');
 
-      const metadataToUpload = {
-        ...formData,
-        isTestMode,
-        submissionTimestamp: Date.now(),
-        submitter: address
-      };
-
-      console.log('Uploading metadata to IPFS...', { isTestMode });
-      const ipfsUri = await uploadMetadataToPinata(metadataToUpload);
+      console.log('Uploading metadata to IPFS...');
+      const ipfsUri = await uploadMetadataToPinata(formData);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
-      
       if (!validateIPFSHash(ipfsHash)) {
         throw new Error("Invalid IPFS hash format");
       }
 
-      console.log('Estimating gas for proposal creation...', { isTestMode });
-      const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData.investment.targetCapital
-      );
-
+      console.log('Estimating gas before submission...');
       const gasEstimate = await estimateProposalGas({
         targetCapital: targetCapitalWei,
         votingDuration,
         ipfsHash
       }, wallet);
 
-      console.log('Creating proposal...', {
-        isTestMode,
-        targetCapital: ethers.utils.formatEther(targetCapitalWei),
-        votingDuration,
-        ipfsHash
-      });
-
+      console.log('Creating proposal...');
       const result = await createProposal({
         targetCapital: targetCapitalWei,
         votingDuration,
@@ -469,19 +450,17 @@ const ThesisSubmission = () => {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
-        title: isTestMode ? TEST_FORM_DATA.title : formData.title,
-        targetCapital: targetCapitalWei.toString(),
+        title: formData.title,
+        targetCapital: formData.investment.targetCapital.toString(),
         status: 'pending'
       };
       userProposals.push(newProposal);
       localStorage.setItem('userProposals', JSON.stringify(userProposals));
-
       updateStepStatus('submission', 'completed');
       toast({
-        title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
-        description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
+        title: "Success",
+        description: "Your investment thesis has been submitted successfully!"
       });
-
     } catch (error) {
       console.error("Submission error:", error);
       updateStepStatus(activeStep, 'failed');
@@ -566,67 +545,6 @@ const ThesisSubmission = () => {
     // Implement ad space rental logic here
   };
 
-  const handleTestModeToggle = async (enabled: boolean) => {
-    if (!isConnected) {
-      toast({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to toggle test mode",
-        variant: "destructive"
-      });
-      connect();
-      return;
-    }
-    
-    const success = await toggleTestMode(enabled);
-    if (success) {
-      setIsTestMode(enabled);
-      if (enabled) {
-        // When enabling test mode, auto-complete all sections
-        setFormData(TEST_FORM_DATA);
-        setIsThesisOpen(false);
-        setIsStrategyOpen(false);
-        setIsApprovalOpen(false);
-        setIsSubmissionOpen(true);
-        // Mark all steps as completed
-        setSteps(prev => prev.map(step => ({
-          ...step,
-          status: 'completed'
-        })));
-        toast({
-          title: "Test Mode Enabled",
-          description: "Form pre-filled with test data",
-        });
-      } else {
-        // When disabling test mode, reset form and steps
-        setFormData({
-          title: "",
-          firmCriteria: {
-            size: "",
-            location: "",
-            dealType: "",
-            geographicFocus: ""
-          },
-          paymentTerms: [],
-          strategies: {
-            operational: [],
-            growth: [],
-            integration: []
-          },
-          investment: {
-            targetCapital: "",
-            drivers: "",
-            additionalCriteria: ""
-          }
-        });
-        setIsThesisOpen(true);
-        setIsStrategyOpen(false);
-        setIsApprovalOpen(false);
-        setIsSubmissionOpen(false);
-        setSteps(SUBMISSION_STEPS);
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen bg-black text-white pb-20">
       <div className="container mx-auto px-4 py-8">
@@ -648,12 +566,8 @@ const ThesisSubmission = () => {
                 <Switch
                   id="test-mode"
                   checked={isTestMode}
-                  onCheckedChange={handleTestModeToggle}
-                  className={cn(
-                    "data-[state=checked]:bg-yellow-500",
-                    !isConnected && "opacity-50 cursor-not-allowed"
-                  )}
-                  disabled={!isConnected}
+                  onCheckedChange={setIsTestMode}
+                  className="data-[state=checked]:bg-yellow-500"
                 />
               </div>
             </div>
@@ -833,18 +747,178 @@ const ThesisSubmission = () => {
                         }
                       }}
                       formErrors={formErrors}
-                      onChange={(field, value) => handleFormDataChange(`strategies.${field}`, value)}
+                      onChange={handleStrategyChange}
                     />
+
+                    <div className="mt-6 space-y-4">
+                      <Label className="text-lg font-medium text-white">
+                        Additional Criteria (Optional)
+                      </Label>
+                      <textarea
+                        placeholder="Any additional criteria or notes..."
+                        className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3"
+                        value={formData.investment.additionalCriteria}
+                        onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
+                      />
+                    </div>
                     {isSubmissionOpen && renderContinueButton(() => {
-                      if (validateTermsTab()) {
-                        setIsSubmissionOpen(false);
-                        handleSubmit({} as React.FormEvent);
+                      if (validateStrategyTab()) {
+                        const syntheticEvent = {
+                          preventDefault: () => {},
+                          target: null,
+                          currentTarget: null,
+                          bubbles: false,
+                          cancelable: false,
+                          defaultPrevented: false,
+                          eventPhase: 0,
+                          isTrusted: true,
+                          nativeEvent: new Event('submit'),
+                          stopPropagation: () => {},
+                          isPropagationStopped: () => false,
+                          persist: () => {},
+                          isDefaultPrevented: () => false,
+                          type: 'submit'
+                        } as React.FormEvent<HTMLFormElement>;
+                        
+                        handleSubmit(syntheticEvent);
                       }
                     }, true)}
                   </CollapsibleContent>
                 </Collapsible>
+
+                <div className="mt-8">
+                  <ContractApprovalStatus 
+                    onApprovalComplete={handleApprovalComplete}
+                    requiredAmount={SUBMISSION_FEE.toString()} 
+                    isTestMode={isTestMode}
+                    currentFormData={formData}
+                  />
+                </div>
               </div>
             </Card>
+
+            <div className="flex justify-end mt-6">
+              
+            </div>
+          </div>
+
+          <div className="lg:col-span-4">
+            <div className="lg:sticky lg:top-28 space-y-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1 w-full max-w-3xl mx-auto"
+              >
+                <Card className="relative overflow-hidden bg-black/60 backdrop-blur-xl border-white/10">
+                  <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
+                  <div className="relative z-10 p-4 sm:p-6 md:p-8">
+                    <div className="text-center mb-4 sm:mb-6 md:mb-8">
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
+                        Promote Your Brand
+                      </h3>
+                      <p className="text-sm sm:text-base text-white/60 mt-2">
+                        Reach accounting firm owners and LedgerFund investors
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-2xl mx-auto">
+                      {/* Weekly Plan */}
+                      <div 
+                        onClick={() => address ? handleRentAdSpace('week') : connect()}
+                        className={cn(
+                          "p-3 sm:p-4 rounded-lg border transition-all duration-300 cursor-pointer group",
+                          address 
+                            ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-yellow-500/50" 
+                            : "bg-black/40 border-white/5 hover:bg-black/50"
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <span className="text-base sm:text-lg text-white/80">Weekly</span>
+                            {!address && (
+                              <div className="text-xs text-white/40">Connect wallet to rent</div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-base sm:text-lg font-semibold text-yellow-400">2.5k LGR</div>
+                            {address && (
+                              <div className={cn(
+                                "w-2 h-2 rounded-full transition-colors",
+                                hasRequiredBalance ? "bg-green-500" : "bg-red-500"
+                              )} />
+                            )}
+                          </div>
+                        </div>
+                        
+                        {address && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="mt-2 text-xs text-white/40"
+                          >
+                            {hasRequiredBalance 
+                              ? "Click to rent ad space" 
+                              : "Insufficient LGR balance"}
+                          </motion.div>
+                        )}
+                      </div>
+
+                      {/* Monthly Plan */}
+                      <div 
+                        onClick={() => address ? handleRentAdSpace('month') : connect()}
+                        className={cn(
+                          "relative p-3 sm:p-4 rounded-lg border transition-all duration-300 cursor-pointer group",
+                          address 
+                            ? "bg-gradient-to-b from-white/10 to-white/5 border-white/10 hover:from-white/15 hover:to-white/10 hover:border-yellow-500/50" 
+                            : "bg-black/40 border-white/5 hover:bg-black/50"
+                        )}
+                      >
+                        <div className="absolute -top-2.5 right-2">
+                          <span className="px-2 py-0.5 bg-yellow-500/20 rounded-full text-yellow-400 text-xs">
+                            Best Value
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <span className="text-base sm:text-lg text-white/80">Monthly</span>
+                            {!address && (
+                              <div className="text-xs text-white/40">Connect wallet to rent</div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-base sm:text-lg font-semibold text-yellow-400">9k LGR</div>
+                            {address && (
+                              <div className={cn(
+                                "w-2 h-2 rounded-full transition-colors",
+                                hasRequiredBalance ? "bg-green-500" : "bg-red-500"
+                              )} />
+                            )}
+                          </div>
+                        </div>
+                        
+                        {address && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="mt-2 text-xs text-white/40"
+                          >
+                            {hasRequiredBalance 
+                              ? "Click to rent ad space" 
+                              : "Insufficient LGR balance"}
+                          </motion.div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+
+              <LGRWalletDisplay
+                submissionFee={SUBMISSION_FEE.toString()}
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
+                walletAddress={address}
+              />
+            </div>
           </div>
         </div>
       </div>

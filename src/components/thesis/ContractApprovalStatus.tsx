@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -12,7 +11,6 @@ import { executeTransaction } from "@/services/transactionManager";
 import { TransactionStatus } from "./TransactionStatus";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
-import { transactionQueue } from "@/services/transactionQueueService";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
@@ -49,33 +47,6 @@ export const ContractApprovalStatus = ({
     setIsApproving(true);
     try {
       console.log("Starting approval process...", { isTestMode });
-      
-      if (isTestMode) {
-        // Create a mock transaction for test mode
-        const txId = await transactionQueue.addTransaction({
-          type: 'token',
-          description: 'Test Mode: Simulating LGR approval'
-        });
-        setCurrentTxId(txId);
-        
-        // Simulate a short delay for better UX
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Update transaction status
-        const tx = await transactionQueue.processTransaction(txId, async () => {
-          return {
-            success: true,
-            transaction: {} as ethers.ContractTransaction,
-            receipt: {} as ethers.ContractReceipt
-          };
-        });
-        
-        console.log("Test mode transaction completed");
-        setIsApproved(true);
-        onApprovalComplete(currentFormData);
-        return;
-      }
-
       const walletProvider = await getProvider();
       const walletType = getWalletType();
       
@@ -85,13 +56,6 @@ export const ContractApprovalStatus = ({
         name: network.name
       });
       
-      // Create real transaction for non-test mode
-      const txId = await transactionQueue.addTransaction({
-        type: 'token',
-        description: `Approve ${ethers.utils.formatEther(requiredAmount)} LGR tokens`
-      });
-      setCurrentTxId(txId);
-
       const transaction = await executeTransaction(
         async () => {
           console.log("Executing LGR approval transaction...");
@@ -186,10 +150,10 @@ export const ContractApprovalStatus = ({
             {isApproving ? (
               <div className="flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
-                {isTestMode ? "Simulating..." : "Approving..."}
+                Approving...
               </div>
             ) : (
-              hasRequiredBalance || isTestMode ? (isTestMode ? "Simulate Approval" : "Approve") : "Insufficient LGR Balance"
+              hasRequiredBalance || isTestMode ? "Approve" : "Insufficient LGR Balance"
             )}
           </Button>
         )}
@@ -205,4 +169,3 @@ export const ContractApprovalStatus = ({
     </Card>
   );
 };
-
