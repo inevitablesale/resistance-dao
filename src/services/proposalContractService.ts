@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
@@ -137,10 +138,12 @@ export const estimateProposalGas = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
   
-  // For ZeroDev bundler, we'll use a higher gas limit estimation
-  const gasEstimate = ethers.BigNumber.from("1000000"); // Base gas estimation for complex interactions
+  // For ZeroDev bundler, we need a higher base estimate
+  const baseGasEstimate = ethers.BigNumber.from("3000000"); // Increased base estimate
   const gasPrice = await provider.getGasPrice();
-  const gasLimit = gasEstimate.mul(150).div(100); // Add 50% buffer for AA transactions
+  
+  // Add 100% buffer for complex AA transactions
+  const gasLimit = baseGasEstimate.mul(200).div(100);
   
   return {
     gasLimit,
@@ -160,12 +163,16 @@ export const createProposal = async (
   const lgrAmount = Number(ethers.utils.formatUnits(config.targetCapital, 18));
   console.log("Creating proposal with target capital:", lgrAmount, "LGR");
   console.log("Target capital in wei:", config.targetCapital.toString());
+
+  // Get gas estimate with buffer
+  const { gasLimit } = await estimateProposalGas(config, wallet);
   
   return await executeTransaction(
     () => factory.createProposal(
       config.ipfsHash,
       config.targetCapital,
-      config.votingDuration
+      config.votingDuration,
+      { gasLimit }
     ),
     {
       type: 'proposal',
