@@ -86,6 +86,10 @@ export const ContractApprovalStatus = ({
     }
   };
 
+  const handleRentAdSpace = (frequency: 'week' | 'month') => {
+    // Implement ad space rental logic here
+  };
+
   return (
     <Card className="bg-black/40 border-white/10 p-4">
       <div className="flex items-center justify-between">
