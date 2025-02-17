@@ -1,9 +1,7 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
-import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
 import { Analytics } from '@vercel/analytics/react';
 import Nav from "./components/Nav";
 import Index from "./pages/Index";
@@ -19,12 +17,6 @@ import { Marketplace } from "./pages/Marketplace";
 import ThesisSubmission from "./pages/ThesisSubmission";
 import ProposalDetails from "./pages/ProposalDetails";
 import { Toaster } from "./components/ui/toaster";
-
-const zeroDevConfig = {
-  projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
-  bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
-  paymasterRpc: "https://rpc.zerodev.app/api/v2/paymaster/4b729792-4b38-4d73-8a69-4f7559f2c2cd"
-};
 
 const evmNetworks = [
   {
@@ -48,10 +40,7 @@ const evmNetworks = [
 
 const dynamicSettings = {
   environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
-  walletConnectors: [
-    EthereumWalletConnectors,
-    ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
-  ],
+  walletConnectors: [EthereumWalletConnectors],
   eventsCallbacks: {
     onAuthSuccess: (args: any) => {
       console.log("[Dynamic SDK] Auth Success:", args);
@@ -148,4 +137,3 @@ function App() {
 }
 
 export default App;
-

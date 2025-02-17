@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { ProposalError } from "@/services/errorHandlingService";
 
-export type WalletType = 'regular' | 'zerodev' | 'unknown';
+export type WalletType = 'regular' | 'unknown';
 
 interface WalletProvider {
   provider: ethers.providers.Web3Provider;
@@ -20,9 +20,7 @@ export const useWalletProvider = () => {
 
   const getWalletType = (): WalletType => {
     if (!primaryWallet) return 'unknown';
-    // Check wallet properties to determine if it's ZeroDev
-    const isZeroDev = primaryWallet.connector?.name?.toLowerCase().includes('zerodev');
-    return isZeroDev ? 'zerodev' : 'regular';
+    return 'regular';
   };
 
   const getProvider = async (): Promise<WalletProvider> => {
@@ -35,24 +33,7 @@ export const useWalletProvider = () => {
     }
 
     try {
-      const walletType = getWalletType();
-      console.log('Getting provider for wallet type:', walletType);
-      
-      // For ZeroDev wallets, we create the provider directly from the wallet
-      if (walletType === 'zerodev') {
-        console.log('Initializing ZeroDev provider...');
-        const ethersProvider = new ethers.providers.Web3Provider(primaryWallet as any);
-        return {
-          provider: ethersProvider,
-          type: 'zerodev',
-          isSmartWallet: true,
-          getNetwork: () => ethersProvider.getNetwork(),
-          getSigner: () => ethersProvider.getSigner()
-        };
-      }
-
-      // For regular wallets, try to get the wallet client first
-      console.log('Initializing regular wallet provider...');
+      console.log('Initializing wallet provider...');
       const walletClient = await primaryWallet.getWalletClient();
       
       if (!walletClient) {
@@ -102,11 +83,10 @@ export const useWalletProvider = () => {
 
   const estimateGas = async (
     provider: WalletProvider,
-    transaction: ethers.providers.TransactionRequest,
-    walletType: WalletType
+    transaction: ethers.providers.TransactionRequest
   ): Promise<ethers.BigNumber> => {
     try {
-      console.log(`Estimating gas for ${walletType} wallet...`);
+      console.log('Estimating gas...');
       const gasEstimate = await provider.provider.estimateGas(transaction);
       
       // Add a 20% buffer for safety
@@ -116,22 +96,6 @@ export const useWalletProvider = () => {
       return gasBuffer;
     } catch (error: any) {
       console.error('Gas estimation error:', error);
-      
-      if (walletType === 'zerodev') {
-        // For ZeroDev, we need to handle bundler-specific errors
-        if (error.message.includes('execution reverted')) {
-          throw new ProposalError({
-            category: 'transaction',
-            message: 'Transaction simulation failed',
-            recoverySteps: [
-              'Verify transaction parameters',
-              'Check if you have enough MATIC for gas',
-              'Try again with a higher gas limit'
-            ]
-          });
-        }
-      }
-      
       throw error;
     }
   };
