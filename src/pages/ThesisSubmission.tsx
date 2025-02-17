@@ -356,6 +356,19 @@ const ThesisSubmission = () => {
   };
 
   const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (activeStep === 'terms') {
+      // When clicking "Submit Thesis", just move to approval section
+      if (isTestMode) {
+        localStorage.setItem('currentTestFormData', JSON.stringify(TEST_FORM_DATA));
+      }
+      setIsSubmissionOpen(false);
+      setIsApprovalOpen(true);
+      updateStepStatus('thesis', 'completed');
+      updateStepStatus('strategy', 'completed');
+      setActiveStep('approval');
+      return;
+    }
+
     let isValid = false;
     switch (activeStep) {
       case 'thesis':
@@ -369,10 +382,6 @@ const ThesisSubmission = () => {
       case 'strategy':
         isValid = validateStrategyTab();
         if (isValid) setActiveStep('terms');
-        break;
-      case 'terms':
-        isValid = validateTermsTab();
-        if (isValid) handleSubmit(e);
         break;
     }
     if (!isValid) {
@@ -744,26 +753,14 @@ const ThesisSubmission = () => {
                       />
                     </div>
                     {isSubmissionOpen && renderContinueButton(() => {
-                      if (validateStrategyTab()) {
-                        const syntheticEvent = {
-                          preventDefault: () => {},
-                          target: null,
-                          currentTarget: null,
-                          bubbles: false,
-                          cancelable: false,
-                          defaultPrevented: false,
-                          eventPhase: 0,
-                          isTrusted: true,
-                          nativeEvent: new Event('submit'),
-                          stopPropagation: () => {},
-                          isPropagationStopped: () => false,
-                          persist: () => {},
-                          isDefaultPrevented: () => false,
-                          type: 'submit'
-                        } as React.FormEvent<HTMLFormElement>;
-                        
-                        handleSubmit(syntheticEvent);
+                      setIsSubmissionOpen(false);
+                      setIsApprovalOpen(true);
+                      if (isTestMode) {
+                        localStorage.setItem('currentTestFormData', JSON.stringify(TEST_FORM_DATA));
                       }
+                      updateStepStatus('thesis', 'completed');
+                      updateStepStatus('strategy', 'completed');
+                      setActiveStep('approval');
                     }, true)}
                   </CollapsibleContent>
                 </Collapsible>
