@@ -6,3 +6,6 @@ export const CONTRACT_ABI = [
   "function execute(uint256 proposalId) public",
   "function cancel(uint256 proposalId) public"
 ];
+
+export const LGR_PRICE_USD = 0.10; // $0.10 per LGR token
+export const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds

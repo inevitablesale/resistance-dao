@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
+import { LGR_PRICE_USD } from "@/lib/constants";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
@@ -50,6 +51,12 @@ export interface GasEstimate {
   totalCost: ethers.BigNumber;
 }
 
+const convertUSDtoLGR = (usdAmount: string): ethers.BigNumber => {
+  const usdValue = parseFloat(usdAmount);
+  const lgrAmount = usdValue / LGR_PRICE_USD;
+  return ethers.utils.parseEther(lgrAmount.toString());
+};
+
 async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet']>) {
   try {
     const walletClient = await wallet.getWalletClient();
@@ -83,50 +90,17 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       lgrTokenAddress,
       owner
     ] = await Promise.all([
-      factory.submissionFee().catch((e: Error) => {
-        console.error("Error calling submissionFee:", e);
-        throw e;
-      }),
-      factory.paused().catch((e: Error) => {
-        console.error("Error calling paused:", e);
-        throw e;
-      }),
-      factory.testModeEnabled().catch((e: Error) => {
-        console.error("Error calling testModeEnabled:", e);
-        throw e;
-      }),
-      factory.treasury().catch((e: Error) => {
-        console.error("Error calling treasury:", e);
-        throw e;
-      }),
-      factory.MIN_TARGET_CAPITAL().catch((e: Error) => {
-        console.error("Error calling MIN_TARGET_CAPITAL:", e);
-        throw e;
-      }),
-      factory.MAX_TARGET_CAPITAL().catch((e: Error) => {
-        console.error("Error calling MAX_TARGET_CAPITAL:", e);
-        throw e;
-      }),
-      factory.MIN_VOTING_DURATION().catch((e: Error) => {
-        console.error("Error calling MIN_VOTING_DURATION:", e);
-        throw e;
-      }),
-      factory.MAX_VOTING_DURATION().catch((e: Error) => {
-        console.error("Error calling MAX_VOTING_DURATION:", e);
-        throw e;
-      }),
-      factory.VOTING_FEE().catch((e: Error) => {
-        console.error("Error calling VOTING_FEE:", e);
-        throw e;
-      }),
-      factory.LGR_TOKEN().catch((e: Error) => {
-        console.error("Error calling LGR_TOKEN:", e);
-        throw e;
-      }),
-      factory.owner().catch((e: Error) => {
-        console.error("Error calling owner:", e);
-        throw e;
-      })
+      factory.submissionFee(),
+      factory.paused(),
+      factory.testModeEnabled(),
+      factory.treasury(),
+      factory.MIN_TARGET_CAPITAL(),
+      factory.MAX_TARGET_CAPITAL(),
+      factory.MIN_VOTING_DURATION(),
+      factory.MAX_VOTING_DURATION(),
+      factory.VOTING_FEE(),
+      factory.LGR_TOKEN(),
+      factory.owner()
     ]);
 
     console.log("Contract calls successful:", {
@@ -169,14 +143,10 @@ export const estimateProposalGas = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
   
-  const gasEstimate = await factory.estimateGas.createProposal(
-    config.ipfsHash,
-    config.targetCapital,
-    config.votingDuration
-  );
-
+  // For ZeroDev bundler, we'll use a higher gas limit estimation
+  const gasEstimate = ethers.BigNumber.from("1000000"); // Base gas estimation for complex interactions
   const gasPrice = await provider.getGasPrice();
-  const gasLimit = gasEstimate.mul(120).div(100); // Add 20% buffer
+  const gasLimit = gasEstimate.mul(150).div(100); // Add 50% buffer for AA transactions
   
   return {
     gasLimit,
@@ -192,15 +162,18 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
+  // Convert USD amount to LGR tokens
+  const targetCapitalInLGR = convertUSDtoLGR(config.targetCapital.toString());
+  
   return await executeTransaction(
     () => factory.createProposal(
       config.ipfsHash,
-      config.targetCapital,
+      targetCapitalInLGR,
       config.votingDuration
     ),
     {
       type: 'proposal',
-      description: `Creating proposal with target capital ${ethers.utils.formatEther(config.targetCapital)} ETH`,
+      description: `Creating proposal with target capital ${ethers.utils.formatEther(targetCapitalInLGR)} LGR`,
       timeout: 180000, // 3 minutes for proposal creation
       maxRetries: 3,
       backoffMs: 5000

@@ -56,6 +56,7 @@ export const VotingDurationInput = ({
         step={24 * 60 * 60} // 1 day steps
         className="w-full"
         onValueChange={onChange}
+        defaultValue={[MAX_VOTING_DURATION]} // Set default to 90 days
       />
       <div className="flex justify-between text-sm text-gray-400">
         <span>7 days (min)</span>
