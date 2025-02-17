@@ -61,12 +61,13 @@ async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet
     if (wallet.connector?.name?.toLowerCase().includes('zerodev')) {
       console.log("Using ZeroDev provider");
       try {
-        // Use the kernel account as provider for ZeroDev
-        const kernelProvider = await (wallet as any).connector?.getProvider?.();
-        if (!kernelProvider) {
-          throw new Error("Failed to get kernel provider");
+        // Use getAccountAbstractionProvider for ZeroDev
+        const aaProvider = await (wallet.connector as any).getAccountAbstractionProvider?.();
+        if (!aaProvider) {
+          throw new Error("Failed to get account abstraction provider");
         }
-        return new ethers.providers.Web3Provider(kernelProvider);
+        console.log("Successfully got AA provider:", aaProvider);
+        return new ethers.providers.Web3Provider(aaProvider);
       } catch (error) {
         console.error("ZeroDev provider error:", error);
         throw new ProposalError({
