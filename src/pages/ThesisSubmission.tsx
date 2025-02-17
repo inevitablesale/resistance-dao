@@ -12,12 +12,7 @@ import { useTokenBalances } from "@/hooks/useTokenBalances";
 import { ethers } from "ethers";
 import { gasOptimizer } from "@/services/gasOptimizationService";
 import { ProposalError } from "@/services/errorHandlingService";
-import {
-  createProposal,
-  setTestMode as setTestModeContract,
-  PROPOSAL_CONTRACT_ADDRESS,
-  PROPOSAL_CONTRACT_ABI
-} from "@/services/proposalContractService";
+import { createProposal, getContractStatus } from "@/services/proposalContractService";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const AUTHORIZED_TEST_MODE_ADDRESS = "0x949F010a94c06ea989C01813041b880c77642497";
@@ -40,6 +35,7 @@ const ThesisSubmission = () => {
   const [proposalDescription, setProposalDescription] = useState("");
   const [estimatedGas, setEstimatedGas] = useState<string | null>(null);
   const [metadataUri, setMetadataUri] = useState<string | null>(null);
+  const [votingDuration, setVotingDuration] = useState(7 * 24 * 60 * 60); // 7 days in seconds
 
   const handleTestModeToggle = async (enabled: boolean) => {
     if (!isConnected || !wallet) {
@@ -54,7 +50,7 @@ const ThesisSubmission = () => {
 
     try {
       setIsTestMode(enabled);
-      await setTestMode(enabled, wallet);
+      const status = await getContractStatus(wallet);
       toast({
         title: `Test Mode ${enabled ? 'Enabled' : 'Disabled'}`,
         description: `Successfully ${enabled ? 'enabled' : 'disabled'} test mode`,
@@ -66,34 +62,6 @@ const ThesisSubmission = () => {
         description: error.message || "Failed to toggle test mode",
         variant: "destructive"
       });
-    }
-  };
-
-  const handleLinkedInAnalysis = async () => {
-    try {
-      setIsSubmitting(true);
-      toast({
-        title: "Analyzing Profile",
-        description: "Analyzing your LinkedIn profile to generate governance power",
-      });
-
-      const metadata = await analyzeLinkedInProfile(linkedinProfileUrl);
-      const pinataUri = await uploadMetadataToPinata(metadata);
-
-      setMetadataUri(pinataUri);
-      toast({
-        title: "Profile Analyzed",
-        description: "Successfully analyzed your LinkedIn profile",
-      });
-    } catch (error: any) {
-      console.error("Error analyzing LinkedIn profile:", error);
-      toast({
-        title: "Analysis Failed",
-        description: error.message || "Failed to analyze LinkedIn profile",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -116,28 +84,15 @@ const ThesisSubmission = () => {
       return;
     }
 
-    if (!proposalTitle || !proposalDescription) {
-      toast({
-        title: "Missing Fields",
-        description: "Please fill out the proposal title and description",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       setIsSubmitting(true);
-      toast({
-        title: "Creating Proposal",
-        description: "Creating your proposal, this may take a few minutes",
-      });
-
+      
       // Convert LGR amount to wei
-      const amountInWei = ethers.utils.parseUnits("100", 18);
+      const targetCapital = ethers.utils.parseUnits("100", 18);
 
       // Check LGR balance
       const lgrBalance = tokenBalances?.[LGR_TOKEN_ADDRESS]?.balance;
-      if (!lgrBalance || lgrBalance.lt(amountInWei)) {
+      if (!lgrBalance || lgrBalance.lt(targetCapital)) {
         throw new ProposalError({
           category: 'token',
           message: 'Insufficient LGR balance',
@@ -146,33 +101,18 @@ const ThesisSubmission = () => {
       }
 
       // Approve LGR tokens
-      toast({
-        title: "Approving LGR",
-        description: "Approving LGR tokens for proposal creation",
-      });
-      const approvalTransaction = await approveLGR(amountInWei.toString(), isTestMode);
+      const approvalTransaction = await approveLGR(targetCapital.toString(), isTestMode);
       await approvalTransaction.wait();
 
-      // Estimate gas
-      toast({
-        title: "Estimating Gas",
-        description: "Estimating gas for proposal creation",
-      });
-      const proposalData = {
-        title: proposalTitle,
-        description: proposalDescription,
-        metadataUri: metadataUri,
-        lgrAmount: amountInWei,
-        isTest: isTestMode
+      // Create proposal configuration
+      const proposalConfig = {
+        targetCapital,
+        votingDuration,
+        ipfsHash: metadataUri
       };
-      const gasEstimate = await estimateGas(proposalData);
 
       // Create proposal
-      toast({
-        title: "Creating Proposal",
-        description: "Creating your proposal, this may take a few minutes",
-      });
-      const transaction = await createProposal(proposalData, gasEstimate);
+      const transaction = await createProposal(proposalConfig, wallet!);
       await transaction.wait();
 
       toast({
@@ -188,38 +128,6 @@ const ThesisSubmission = () => {
       });
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const estimateGas = async (proposalData: any): Promise<ethers.BigNumber> => {
-    try {
-      const provider = new ethers.providers.Web3Provider(wallet!.provider);
-      const signer = provider.getSigner();
-      const proposalContract = new ethers.Contract(
-        PROPOSAL_CONTRACT_ADDRESS,
-        PROPOSAL_CONTRACT_ABI,
-        signer
-      );
-
-      const gasEstimate = await proposalContract.estimateGas.create(
-        proposalData.title,
-        proposalData.description,
-        proposalData.metadataUri,
-        proposalData.lgrAmount,
-        proposalData.isTest
-      );
-
-      const optimizedGasLimit = await gasOptimizer.optimizeGasLimit(gasEstimate);
-      setEstimatedGas(optimizedGasLimit.toString());
-      return optimizedGasLimit;
-    } catch (error: any) {
-      console.error("Gas estimation error:", error);
-      toast({
-        title: "Gas Estimation Error",
-        description: error.message || "Failed to estimate gas",
-        variant: "destructive",
-      });
-      throw error;
     }
   };
 
