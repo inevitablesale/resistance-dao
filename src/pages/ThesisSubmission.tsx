@@ -11,6 +11,7 @@ import Nav from "@/components/Nav";
 import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
 import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
@@ -142,7 +143,15 @@ const TEST_FORM_DATA: ProposalMetadata = {
 
 const ThesisSubmission = () => {
   const { toast } = useToast();
-  const { isConnected, address, connect } = useWalletConnection();
+  const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
+  const { tokenBalances } = useTokenBalances({
+    networkId: 137,
+    accountAddress: address,
+    includeFiat: false,
+    includeNativeBalance: false,
+    tokenAddresses: [LGR_TOKEN_ADDRESS]
+  });
+
   const [isTestMode, setIsTestMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
