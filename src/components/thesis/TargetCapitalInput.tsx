@@ -11,9 +11,19 @@ interface TargetCapitalInputProps {
   error?: string[];
 }
 
-const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
-const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
+// Constants in USD terms
+const MIN_TARGET_CAPITAL_USD = 1000;
+const MAX_TARGET_CAPITAL_USD = 25000000;
 const LGR_PRICE_USD = 0.10; // $0.10 per LGR token
+
+export const convertUSDToLGRWei = (usdAmount: string): ethers.BigNumber => {
+  if (!usdAmount || isNaN(parseFloat(usdAmount))) return ethers.BigNumber.from(0);
+  const usdValue = parseFloat(usdAmount);
+  const lgrAmount = usdValue / LGR_PRICE_USD;
+  // Convert to string with max 18 decimals to avoid precision issues
+  const lgrString = lgrAmount.toFixed(18);
+  return ethers.utils.parseEther(lgrString);
+};
 
 export const TargetCapitalInput = ({
   value,
@@ -26,6 +36,10 @@ export const TargetCapitalInput = ({
     // Ensure only one decimal point
     const parts = numericValue.split('.');
     if (parts.length > 2) return value;
+    // Limit to 2 decimal places
+    if (parts[1]?.length > 2) {
+      return `${parts[0]}.${parts[1].slice(0, 2)}`;
+    }
     return numericValue;
   };
 
@@ -37,18 +51,20 @@ export const TargetCapitalInput = ({
   const calculateLGRAmount = (usdAmount: string): string => {
     if (!usdAmount) return "0";
     const usdValue = parseFloat(usdAmount);
+    if (isNaN(usdValue)) return "0";
     const lgrAmount = usdValue / LGR_PRICE_USD;
     return lgrAmount.toFixed(2);
   };
 
   const getHelperText = () => {
     if (!value) return "";
-    const numValue = ethers.utils.parseEther(value || "0");
-    if (numValue.lt(MIN_TARGET_CAPITAL)) {
-      return `Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} USD`;
+    const usdValue = parseFloat(value);
+    if (isNaN(usdValue)) return "Please enter a valid number";
+    if (usdValue < MIN_TARGET_CAPITAL_USD) {
+      return `Minimum target capital is $${MIN_TARGET_CAPITAL_USD.toLocaleString()} USD`;
     }
-    if (numValue.gt(MAX_TARGET_CAPITAL)) {
-      return `Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} USD`;
+    if (usdValue > MAX_TARGET_CAPITAL_USD) {
+      return `Maximum target capital is $${MAX_TARGET_CAPITAL_USD.toLocaleString()} USD`;
     }
     return "";
   };

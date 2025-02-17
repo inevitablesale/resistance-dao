@@ -1,8 +1,8 @@
-
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { LGR_PRICE_USD } from "@/lib/constants";
+import { convertUSDToLGRWei } from "@/components/thesis/TargetCapitalInput";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const FACTORY_ABI = [
@@ -157,8 +157,8 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  // Convert USD amount to wei format
-  const targetCapitalWei = ethers.utils.parseEther(config.targetCapital.toString());
+  // Convert USD amount to LGR wei amount
+  const targetCapitalWei = convertUSDToLGRWei(config.targetCapital.toString());
   
   return await executeTransaction(
     () => factory.createProposal(
@@ -168,7 +168,7 @@ export const createProposal = async (
     ),
     {
       type: 'proposal',
-      description: `Creating proposal with target capital $${ethers.utils.formatEther(targetCapitalWei)} USD`,
+      description: `Creating proposal with target capital $${parseFloat(config.targetCapital.toString()).toLocaleString()} USD`,
       timeout: 180000, // 3 minutes for proposal creation
       maxRetries: 3,
       backoffMs: 5000
