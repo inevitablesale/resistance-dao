@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ import Nav from "@/components/Nav";
 import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
 import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
@@ -144,16 +142,8 @@ const TEST_FORM_DATA: ProposalMetadata = {
 
 const ThesisSubmission = () => {
   const { toast } = useToast();
-  const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
-  const { tokenBalances } = useTokenBalances({
-    networkId: 137,
-    accountAddress: address,
-    includeFiat: false,
-    includeNativeBalance: false,
-    tokenAddresses: [LGR_TOKEN_ADDRESS]
-  });
-
-  const [isTestMode, setIsTestMode] = useState(false); // Changed from true to false
+  const { isConnected, address, connect } = useWalletConnection();
+  const [isTestMode, setIsTestMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
   const [activeStep, setActiveStep] = useState<string>('thesis');
@@ -546,6 +536,24 @@ const ThesisSubmission = () => {
     // Implement ad space rental logic here
   };
 
+  const handleTestModeToggle = (enabled: boolean) => {
+    if (!isConnected) {
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your wallet to toggle test mode",
+        variant: "destructive"
+      });
+      connect();
+      return;
+    }
+    
+    setIsTestMode(enabled);
+    toast({
+      title: `Test Mode ${enabled ? 'Enabled' : 'Disabled'}`,
+      description: `Successfully ${enabled ? 'enabled' : 'disabled'} test mode`,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-black text-white pb-20">
       <div className="container mx-auto px-4 py-8">
@@ -567,8 +575,12 @@ const ThesisSubmission = () => {
                 <Switch
                   id="test-mode"
                   checked={isTestMode}
-                  onCheckedChange={setIsTestMode}
-                  className="data-[state=checked]:bg-yellow-500"
+                  onCheckedChange={handleTestModeToggle}
+                  className={cn(
+                    "data-[state=checked]:bg-yellow-500",
+                    !isConnected && "opacity-50 cursor-not-allowed"
+                  )}
+                  disabled={!isConnected}
                 />
               </div>
             </div>
