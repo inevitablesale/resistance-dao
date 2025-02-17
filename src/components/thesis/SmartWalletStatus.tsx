@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 import { Wallet, Check, AlertCircle, Loader } from "lucide-react";
 import { motion } from "framer-motion";
@@ -108,8 +109,8 @@ export const SmartWalletStatus = () => {
         const gasEstimate = await factory.estimateGas.createWallet(ownerAddress);
         console.log('Estimated gas for deployment:', gasEstimate.toString());
 
-        const optimizedGas = await gasOptimizer.optimizeGasLimit(gasEstimate, 'high');
-        const { maxFeePerGas, maxPriorityFeePerGas } = await gasOptimizer.getOptimizedGasPrice(provider, 'high');
+        const optimizedGas = await gasOptimizer.optimizeGasLimit(gasEstimate);
+        const { maxFeePerGas, maxPriorityFeePerGas } = await gasOptimizer.getOptimizedGasPrice(provider);
 
         const factoryWithSigner = factory.connect(signer);
         const tx = await factoryWithSigner.createWallet(ownerAddress, {
