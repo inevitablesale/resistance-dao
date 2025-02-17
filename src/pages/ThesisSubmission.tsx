@@ -11,7 +11,6 @@ import Nav from "@/components/Nav";
 import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
 import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
@@ -143,15 +142,7 @@ const TEST_FORM_DATA: ProposalMetadata = {
 
 const ThesisSubmission = () => {
   const { toast } = useToast();
-  const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
-  const { tokenBalances } = useTokenBalances({
-    networkId: 137,
-    accountAddress: address,
-    includeFiat: false,
-    includeNativeBalance: false,
-    tokenAddresses: [LGR_TOKEN_ADDRESS]
-  });
-
+  const { isConnected, address, connect } = useWalletConnection();
   const [isTestMode, setIsTestMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
@@ -179,6 +170,10 @@ const ThesisSubmission = () => {
       additionalCriteria: ""
     }
   });
+  const [isThesisOpen, setIsThesisOpen] = useState(false);
+  const [isStrategyOpen, setIsStrategyOpen] = useState(false);
+  const [isApprovalOpen, setIsApprovalOpen] = useState(false);
+  const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
 
   useEffect(() => {
     setFormData(isTestMode ? TEST_FORM_DATA : {
@@ -202,24 +197,6 @@ const ThesisSubmission = () => {
       }
     });
   }, [isTestMode]);
-
-  const handleTestModeToggle = (enabled: boolean) => {
-    if (!isConnected) {
-      toast({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to toggle test mode",
-        variant: "destructive"
-      });
-      connect();
-      return;
-    }
-    
-    setIsTestMode(enabled);
-    toast({
-      title: `Test Mode ${enabled ? 'Enabled' : 'Disabled'}`,
-      description: `Successfully ${enabled ? 'enabled' : 'disabled'} test mode`,
-    });
-  };
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => step.id === stepId ? {
@@ -559,6 +536,24 @@ const ThesisSubmission = () => {
     // Implement ad space rental logic here
   };
 
+  const handleTestModeToggle = (enabled: boolean) => {
+    if (!isConnected) {
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your wallet to toggle test mode",
+        variant: "destructive"
+      });
+      connect();
+      return;
+    }
+    
+    setIsTestMode(enabled);
+    toast({
+      title: `Test Mode ${enabled ? 'Enabled' : 'Disabled'}`,
+      description: `Successfully ${enabled ? 'enabled' : 'disabled'} test mode`,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-black text-white pb-20">
       <div className="container mx-auto px-4 py-8">
@@ -822,9 +817,118 @@ const ThesisSubmission = () => {
 
           <div className="lg:col-span-4">
             <div className="lg:sticky lg:top-28 space-y-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-yellow-500/10 p-1 w-full max-w-3xl mx-auto"
+              >
+                <Card className="relative overflow-hidden bg-black/60 backdrop-blur-xl border-white/10">
+                  <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
+                  <div className="relative z-10 p-4 sm:p-6 md:p-8">
+                    <div className="text-center mb-4 sm:mb-6 md:mb-8">
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-yellow-400">
+                        Promote Your Brand
+                      </h3>
+                      <p className="text-sm sm:text-base text-white/60 mt-2">
+                        Reach accounting firm owners and LedgerFund investors
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-2xl mx-auto">
+                      {/* Weekly Plan */}
+                      <div 
+                        onClick={() => address ? handleRentAdSpace('week') : connect()}
+                        className={cn(
+                          "p-3 sm:p-4 rounded-lg border transition-all duration-300 cursor-pointer group",
+                          address 
+                            ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-yellow-500/50" 
+                            : "bg-black/40 border-white/5 hover:bg-black/50"
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <span className="text-base sm:text-lg text-white/80">Weekly</span>
+                            {!address && (
+                              <div className="text-xs text-white/40">Connect wallet to rent</div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-base sm:text-lg font-semibold text-yellow-400">2.5k LGR</div>
+                            {address && (
+                              <div className={cn(
+                                "w-2 h-2 rounded-full transition-colors",
+                                hasRequiredBalance ? "bg-green-500" : "bg-red-500"
+                              )} />
+                            )}
+                          </div>
+                        </div>
+                        
+                        {address && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="mt-2 text-xs text-white/40"
+                          >
+                            {hasRequiredBalance 
+                              ? "Click to rent ad space" 
+                              : "Insufficient LGR balance"}
+                          </motion.div>
+                        )}
+                      </div>
+
+                      {/* Monthly Plan */}
+                      <div 
+                        onClick={() => address ? handleRentAdSpace('month') : connect()}
+                        className={cn(
+                          "relative p-3 sm:p-4 rounded-lg border transition-all duration-300 cursor-pointer group",
+                          address 
+                            ? "bg-gradient-to-b from-white/10 to-white/5 border-white/10 hover:from-white/15 hover:to-white/10 hover:border-yellow-500/50" 
+                            : "bg-black/40 border-white/5 hover:bg-black/50"
+                        )}
+                      >
+                        <div className="absolute -top-2.5 right-2">
+                          <span className="px-2 py-0.5 bg-yellow-500/20 rounded-full text-yellow-400 text-xs">
+                            Best Value
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <span className="text-base sm:text-lg text-white/80">Monthly</span>
+                            {!address && (
+                              <div className="text-xs text-white/40">Connect wallet to rent</div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-base sm:text-lg font-semibold text-yellow-400">9k LGR</div>
+                            {address && (
+                              <div className={cn(
+                                "w-2 h-2 rounded-full transition-colors",
+                                hasRequiredBalance ? "bg-green-500" : "bg-red-500"
+                              )} />
+                            )}
+                          </div>
+                        </div>
+                        
+                        {address && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="mt-2 text-xs text-white/40"
+                          >
+                            {hasRequiredBalance 
+                              ? "Click to rent ad space" 
+                              : "Insufficient LGR balance"}
+                          </motion.div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+
               <LGRWalletDisplay
                 submissionFee={SUBMISSION_FEE.toString()}
-                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() ?? "0"}
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
                 walletAddress={address}
               />
             </div>
