@@ -343,10 +343,10 @@ const ThesisSubmission = () => {
       try {
         const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
         if (targetCapitalWei.lt(contractStatus.minTargetCapital)) {
-          errors['investment.targetCapital'] = [`Minimum target capital is ${displayStatus.minTargetCapital} LGR`];
+          errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(contractStatus.minTargetCapital)} LGR`];
         }
         if (targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
-          errors['investment.targetCapital'] = [`Maximum target capital is ${displayStatus.maxTargetCapital} LGR`];
+          errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(contractStatus.maxTargetCapital)} LGR`];
         }
       } catch (error) {
         errors['investment.targetCapital'] = ['Invalid target capital amount'];
