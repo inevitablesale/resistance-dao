@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
@@ -6,13 +5,14 @@ import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { StoredProposal, ProposalMetadata } from "@/types/proposals";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HandCoins, Clock, Users, ChevronLeft, Wallet } from "lucide-react";
+import { HandCoins, Clock, Users, ChevronLeft, Wallet, AlertCircle } from "lucide-react";
+import { getTokenBalance } from "@/services/tokenService";
 
 interface ProposalDetails {
   metadata: ProposalMetadata;
@@ -23,35 +23,89 @@ interface ProposalDetails {
   };
 }
 
+const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
+
 const ProposalDetails = () => {
   const { hash } = useParams<{ hash: string }>();
   const [proposalDetails, setProposalDetails] = useState<ProposalDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingChainData, setIsLoadingChainData] = useState(false);
+  const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
+  const [isCheckingBalance, setIsCheckingBalance] = useState(false);
   const { getProvider } = useWalletProvider();
-  const { isConnected, connect } = useWalletConnection();
+  const { isConnected, connect, address } = useWalletConnection();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Load IPFS data first (doesn't require wallet)
+  // Check LGR balance when wallet is connected
   useEffect(() => {
-    if (hash) {
+    const checkLGRBalance = async () => {
+      if (!isConnected || !address) {
+        setHasMinimumLGR(null);
+        return;
+      }
+
+      try {
+        setIsCheckingBalance(true);
+        const walletProvider = await getProvider();
+        const balance = await getTokenBalance(
+          walletProvider.provider,
+          LGR_TOKEN_ADDRESS,
+          address
+        );
+
+        const hasEnough = ethers.utils.parseEther(balance).gte(
+          ethers.utils.parseEther(MIN_LGR_REQUIRED)
+        );
+        
+        console.log('LGR Balance check:', {
+          balance,
+          required: MIN_LGR_REQUIRED,
+          hasEnough
+        });
+        
+        setHasMinimumLGR(hasEnough);
+        
+        if (!hasEnough) {
+          toast({
+            title: "Insufficient LGR Balance",
+            description: `You need at least ${MIN_LGR_REQUIRED} LGR to view proposal details`,
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error checking LGR balance:", error);
+        toast({
+          title: "Balance Check Failed",
+          description: "Failed to verify LGR balance. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsCheckingBalance(false);
+      }
+    };
+
+    checkLGRBalance();
+  }, [isConnected, address, getProvider]);
+
+  // Only load IPFS data after wallet connection and LGR balance verification
+  useEffect(() => {
+    if (hash && isConnected && hasMinimumLGR === true) {
       loadIPFSData();
     }
-  }, [hash]);
+  }, [hash, isConnected, hasMinimumLGR]);
 
-  // Load on-chain data when wallet is connected
+  // Load chain data after IPFS data is loaded
   useEffect(() => {
-    if (isConnected && proposalDetails && !proposalDetails.onChainData) {
+    if (isConnected && hasMinimumLGR && proposalDetails && !proposalDetails.onChainData) {
       loadChainData();
     }
-  }, [isConnected, proposalDetails]);
+  }, [isConnected, hasMinimumLGR, proposalDetails]);
 
   const loadIPFSData = async () => {
     try {
       setIsLoading(true);
       
-      // First, get the stored proposal data
       const storedProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
       const storedProposal = storedProposals.find(p => p.hash === hash);
       
@@ -59,7 +113,6 @@ const ProposalDetails = () => {
         throw new Error('Proposal not found');
       }
 
-      // Get IPFS metadata
       console.log('Fetching IPFS metadata from:', storedProposal.ipfsHash);
       const metadata = await getFromIPFS<ProposalMetadata>(storedProposal.ipfsHash, 'proposal');
       
@@ -79,7 +132,7 @@ const ProposalDetails = () => {
 
       setProposalDetails({
         metadata,
-        onChainData: undefined // Will be loaded separately when wallet is connected
+        onChainData: undefined
       });
     } catch (error: any) {
       console.error("Error loading IPFS data:", error);
@@ -151,6 +204,58 @@ const ProposalDetails = () => {
       setIsLoadingChainData(false);
     }
   };
+
+  if (!isConnected) {
+    return (
+      <div className="container mx-auto px-4 pt-32">
+        <Card className="bg-black/40 border-white/10">
+          <CardContent className="p-8 text-center">
+            <Wallet className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-4">Connect Your Wallet</h2>
+            <p className="text-white/60 mb-6">
+              Please connect your wallet to view proposal details. You need at least {MIN_LGR_REQUIRED} LGR token to access this content.
+            </p>
+            <Button onClick={connect} className="bg-yellow-500 hover:bg-yellow-600">
+              <Wallet className="w-4 h-4 mr-2" />
+              Connect Wallet
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isCheckingBalance) {
+    return (
+      <div className="container mx-auto px-4 pt-32">
+        <Card className="bg-black/40 border-white/10">
+          <CardContent className="p-8 text-center">
+            <div className="animate-spin w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-4">Checking LGR Balance</h2>
+            <p className="text-white/60">
+              Verifying your LGR token balance...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (hasMinimumLGR === false) {
+    return (
+      <div className="container mx-auto px-4 pt-32">
+        <Card className="bg-black/40 border-white/10">
+          <CardContent className="p-8 text-center">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-4">Insufficient LGR Balance</h2>
+            <p className="text-white/60 mb-6">
+              You need at least {MIN_LGR_REQUIRED} LGR token to view proposal details. Please acquire more LGR and try again.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
