@@ -6,6 +6,7 @@ export type ErrorCategory =
   | 'validation'
   | 'transaction'
   | 'token'
+  | 'initialization'  // Added this category
   | 'unknown';
 
 export interface ErrorDetails {
