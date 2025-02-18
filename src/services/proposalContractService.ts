@@ -1,9 +1,8 @@
-
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
-import { ProposalMetadata, ProposalConfig, ProposalInput } from "@/types/proposals";
+import { ProposalMetadata, ProposalConfig } from "@/types/proposals";
 
 export interface ContractStatus {
   submissionFee: ethers.BigNumber;
@@ -93,7 +92,7 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  const input: ProposalInput = {
+  const input = {
     title: config.metadata.title,
     ipfsMetadata: config.ipfsHash,
     targetCapital: config.targetCapital,
@@ -113,11 +112,18 @@ export const createProposal = async (
   return await executeTransaction(
     () => factory.createProposal(input, config.linkedInURL),
     {
-      type: 'proposal',
+      type: 'nft',
       description: `Creating proposal with target capital ${ethers.utils.formatEther(config.targetCapital)} LGR`,
       timeout: 180000,
       maxRetries: 3,
-      backoffMs: 5000
+      backoffMs: 5000,
+      nftConfig: {
+        tokenAddress: FACTORY_ADDRESS,
+        amount: 1,
+        standard: "ERC721",
+        symbol: "LFP",
+        name: "LedgerFren Proposal"
+      }
     }
   );
 };
@@ -162,7 +168,7 @@ export const estimateProposalGas = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  const input: ProposalInput = {
+  const input = {
     title: config.metadata.title,
     ipfsMetadata: config.ipfsHash,
     targetCapital: config.targetCapital,
@@ -187,4 +193,3 @@ export const estimateProposalGas = async (
     throw error;
   }
 };
-

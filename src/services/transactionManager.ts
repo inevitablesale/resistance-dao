@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -12,12 +11,20 @@ export interface TransactionConfig {
   backoffMs: number;
   eventConfig?: EventConfig;
   description: string;
-  type: 'proposal' | 'token' | 'contract';
+  type: 'proposal' | 'token' | 'contract' | 'nft';
   tokenConfig?: {
     tokenAddress: string;
     spenderAddress: string;
     amount: string;
     isTestMode?: boolean;
+  };
+  nftConfig?: {
+    tokenAddress: string;
+    tokenId?: number;
+    amount: number;
+    standard: "ERC721" | "ERC1155";
+    symbol?: string;
+    name?: string;
   };
   walletType?: WalletType;
 }
