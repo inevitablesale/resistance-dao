@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, Users, Target } from "lucide-react";
@@ -13,17 +12,8 @@ import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants
 import { getTokenBalance } from "@/services/tokenService";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata, ContractProposal } from "@/types/proposals";
-import { useToast } from "@/hooks/use-toast";
-import { IPFSContent } from "@/types/content";
 
 const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
-
-interface NFTMetadata extends IPFSContent {
-  name: string;
-  description: string;
-  image?: string;
-  attributes?: Array<{ trait_type: string; value: string }>;
-}
 
 interface ProposalEvent {
   tokenId: string;
@@ -32,7 +22,12 @@ interface ProposalEvent {
   transactionHash: string;
   contractData: ContractProposal;
   metadata?: ProposalMetadata;
-  nftMetadata?: NFTMetadata;
+  nftMetadata?: {
+    name: string;
+    description: string;
+    image?: string;
+    attributes?: Array<{ trait_type: string; value: string }>;
+  };
   pledgedAmount?: string;
 }
 
@@ -84,75 +79,31 @@ export const ProposalsHistory = () => {
     checkLGRBalance();
   }, [isConnected, address, getProvider]);
 
-  const fetchProposalData = async (contract: ethers.Contract, tokenId: number): Promise<ProposalEvent | null> => {
+  const fetchNFTMetadata = async (contract: ethers.Contract, tokenId: string) => {
     try {
-      console.log(`Fetching proposal data for token #${tokenId}`);
+      const tokenUri = await contract.tokenURI(tokenId);
+      console.log(`NFT metadata URI for token #${tokenId}:`, tokenUri);
       
-      const [proposalData, pledgedAmount] = await Promise.all([
-        contract.proposals(tokenId),
-        contract.pledgedAmount(tokenId)
-      ]);
-
-      console.log(`Raw proposal data for #${tokenId}:`, proposalData);
-
-      const contractData: ContractProposal = {
-        title: proposalData.title,
-        ipfsMetadata: proposalData.ipfsMetadata,
-        targetCapital: proposalData.targetCapital.toString(),
-        votingEnds: proposalData.votingEnds.toNumber(),
-        investmentDrivers: proposalData.investmentDrivers,
-        additionalCriteria: proposalData.additionalCriteria,
-        firmSize: proposalData.firmSize,
-        location: proposalData.location,
-        dealType: proposalData.dealType,
-        geographicFocus: proposalData.geographicFocus,
-        paymentTerms: proposalData.paymentTerms,
-        operationalStrategies: proposalData.operationalStrategies,
-        growthStrategies: proposalData.growthStrategies,
-        integrationStrategies: proposalData.integrationStrategies
-      };
-
-      // Try to fetch IPFS metadata if available
-      let metadata: ProposalMetadata | undefined;
-      let nftMetadata: NFTMetadata | undefined;
-
-      if (contractData.ipfsMetadata) {
-        try {
-          metadata = await getFromIPFS<ProposalMetadata>(contractData.ipfsMetadata, 'proposal');
-          console.log(`IPFS metadata fetched for #${tokenId}:`, metadata);
-        } catch (ipfsError) {
-          console.error(`Error fetching IPFS metadata for proposal #${tokenId}:`, ipfsError);
-        }
+      if (!tokenUri) {
+        console.log(`No tokenURI found for token #${tokenId}`);
+        return null;
       }
 
-      try {
-        const tokenUri = await contract.tokenURI(tokenId);
-        if (tokenUri && tokenUri.startsWith('ipfs://')) {
-          nftMetadata = await getFromIPFS<NFTMetadata>(tokenUri.replace('ipfs://', ''), 'proposal');
-          console.log(`NFT metadata fetched for #${tokenId}:`, nftMetadata);
-        }
-      } catch (nftError) {
-        console.error(`Error fetching NFT metadata for #${tokenId}:`, nftError);
+      if (tokenUri.startsWith('ipfs://')) {
+        const metadata = await getFromIPFS(tokenUri.replace('ipfs://', ''), 'proposal');
+        console.log(`NFT metadata fetched for token #${tokenId}:`, metadata);
+        return metadata;
       }
 
-      return {
-        tokenId: tokenId.toString(),
-        creator: proposalData.creator,
-        blockNumber: await contract.provider.getBlockNumber(),
-        transactionHash: '', // Not needed since we're not using events
-        contractData,
-        metadata,
-        nftMetadata,
-        pledgedAmount: ethers.utils.formatEther(pledgedAmount)
-      };
+      return null;
     } catch (error) {
-      console.error(`Error fetching data for proposal #${tokenId}:`, error);
+      console.error(`Error fetching NFT metadata for token #${tokenId}:`, error);
       return null;
     }
   };
 
   useEffect(() => {
-    const fetchProposals = async () => {
+    const fetchProposalData = async () => {
       if (!isConnected || !hasMinimumLGR) return;
 
       try {
@@ -164,28 +115,100 @@ export const ProposalsHistory = () => {
           walletProvider.provider
         );
 
-        // Get all Transfer events to determine existing token IDs
-        const filter = contract.filters.Transfer(
-          '0x0000000000000000000000000000000000000000',
-          null,
-          null
-        );
+        // Get all ProposalCreated events
+        const filter = contract.filters.ProposalCreated();
         const events = await contract.queryFilter(filter);
-        console.log('Found transfer events:', events.length);
+        console.log('Found proposal events:', events.length);
 
-        // Get unique token IDs from events
-        const tokenIds = [...new Set(events.map(event => event.args?.tokenId.toNumber()))];
-        console.log('Unique token IDs:', tokenIds);
+        // Process events and fetch metadata
+        const proposalsWithMetadata = await Promise.all(
+          events.map(async (event) => {
+            const tokenId = event.args?.tokenId.toString();
+            console.log(`Fetching proposal data for token #${tokenId}`);
 
-        // Fetch all proposal data in parallel
-        const proposalPromises = tokenIds.map(tokenId => fetchProposalData(contract, tokenId));
-        const proposals = (await Promise.all(proposalPromises)).filter((p): p is ProposalEvent => p !== null);
+            try {
+              // Get proposal data, pledged amount, and NFT metadata in parallel
+              const [proposalData, pledgedAmount, nftMetadata] = await Promise.all([
+                contract.proposals(tokenId),
+                contract.pledgedAmount(tokenId),
+                fetchNFTMetadata(contract, tokenId)
+              ]);
 
-        // Sort by block number (most recent first)
-        proposals.sort((a, b) => b.blockNumber - a.blockNumber);
+              // Format the contract data properly
+              const contractData: ContractProposal = {
+                title: proposalData.title,
+                ipfsMetadata: proposalData.ipfsMetadata,
+                targetCapital: proposalData.targetCapital.toString(),
+                votingEnds: proposalData.votingEnds.toNumber(),
+                investmentDrivers: proposalData.investmentDrivers,
+                additionalCriteria: proposalData.additionalCriteria,
+                firmSize: proposalData.firmSize,
+                location: proposalData.location,
+                dealType: proposalData.dealType,
+                geographicFocus: proposalData.geographicFocus,
+                paymentTerms: proposalData.paymentTerms,
+                operationalStrategies: proposalData.operationalStrategies,
+                growthStrategies: proposalData.growthStrategies,
+                integrationStrategies: proposalData.integrationStrategies
+              };
+
+              console.log(`Contract data for #${tokenId}:`, contractData);
+
+              // Get IPFS metadata if available
+              let metadata: ProposalMetadata | undefined;
+              if (contractData.ipfsMetadata) {
+                try {
+                  metadata = await getFromIPFS<ProposalMetadata>(contractData.ipfsMetadata, 'proposal');
+                  console.log(`IPFS metadata fetched for #${tokenId}:`, metadata);
+                } catch (ipfsError) {
+                  console.error(`Error fetching IPFS metadata for proposal #${tokenId}:`, ipfsError);
+                }
+              }
+
+              return {
+                tokenId,
+                creator: event.args?.creator,
+                blockNumber: event.blockNumber,
+                transactionHash: event.transactionHash,
+                contractData,
+                metadata,
+                nftMetadata,
+                pledgedAmount: ethers.utils.formatEther(pledgedAmount)
+              };
+            } catch (error) {
+              console.error(`Error fetching data for proposal #${tokenId}:`, error);
+              // Return minimal data if fetching fails
+              return {
+                tokenId,
+                creator: event.args?.creator,
+                blockNumber: event.blockNumber,
+                transactionHash: event.transactionHash,
+                contractData: {
+                  title: `Proposal #${tokenId}`,
+                  ipfsMetadata: '',
+                  targetCapital: '0',
+                  votingEnds: 0,
+                  investmentDrivers: '',
+                  additionalCriteria: '',
+                  firmSize: 0,
+                  location: '',
+                  dealType: 0,
+                  geographicFocus: 0,
+                  paymentTerms: [],
+                  operationalStrategies: [],
+                  growthStrategies: [],
+                  integrationStrategies: []
+                }
+              };
+            }
+          })
+        );
+
+        // Sort by newest first (highest block number)
+        proposalsWithMetadata.sort((a, b) => b.blockNumber - a.blockNumber);
         
-        console.log('Processed proposals:', proposals);
-        setProposalEvents(proposals);
+        console.log('Processed proposals with metadata:', proposalsWithMetadata);
+        setProposalEvents(proposalsWithMetadata);
       } catch (error) {
         console.error("Error fetching proposals:", error);
         toast({
@@ -198,7 +221,7 @@ export const ProposalsHistory = () => {
       }
     };
 
-    fetchProposals();
+    fetchProposalData();
   }, [isConnected, hasMinimumLGR, getProvider]);
 
   if (!isConnected) {
@@ -305,4 +328,3 @@ export const ProposalsHistory = () => {
     </div>
   );
 };
-
