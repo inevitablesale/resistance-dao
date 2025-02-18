@@ -1,11 +1,10 @@
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FileText, Calendar, ArrowRight, MapPin, Globe, DollarSign, Users, TrendingUp } from "lucide-react";
+import { FileText, Calendar } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { StoredProposal } from "@/types/proposals";
 import { Card, CardContent } from "@/components/ui/card";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
@@ -13,126 +12,24 @@ import { ethers } from "ethers";
 import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
 import { getTokenBalance } from "@/services/tokenService";
 import { useToast } from "@/hooks/use-toast";
-import { Progress } from "@/components/ui/progress";
 
 const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
 
-// Enum mappings for display
-const firmSizeMap = ['Below $1M', '$1M-$5M', '$5M-$10M', '$10M+'];
-const dealTypeMap = ['Acquisition', 'Merger', 'Equity Buyout', 'Franchise', 'Succession'];
-const geoFocusMap = ['Local', 'Regional', 'National', 'Remote'];
-
-interface EnrichedProposal extends StoredProposal {
-  progress: {
-    current: string;
-    target: string;
-    percentage: number;
-  };
-  firmSize: string;
-  dealType: string;
-  geographicFocus: string;
-  location: string;
-  votingEnds: Date;
-  strategies: {
-    paymentTerms: string[];
-    operational: string[];
-    growth: string[];
-    integration: string[];
-  };
+interface ProposalEvent {
+  tokenId: string;
+  creator: string;
+  blockNumber: number;
+  transactionHash: string;
 }
 
 export const ProposalsHistory = () => {
-  const [proposals, setProposals] = useState<EnrichedProposal[]>([]);
+  const [proposalEvents, setProposalEvents] = useState<ProposalEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
   const { isConnected, connect, address } = useWalletConnection();
   const { getProvider } = useWalletProvider();
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  const transformProposalData = async (
-    provider: ethers.providers.Web3Provider,
-    contract: ethers.Contract,
-    event: any
-  ): Promise<EnrichedProposal> => {
-    let tokenId: ethers.BigNumber | undefined;
-    
-    try {
-      tokenId = event.args?.tokenId;
-      console.log('Fetching data for proposal:', tokenId.toString());
-      console.log('Contract address:', contract.address);
-      console.log('Available contract functions:', Object.keys(contract.functions));
-      
-      // Direct mapping access
-      const proposalData = await contract.proposals(tokenId);
-      console.log('Raw proposal data:', proposalData);
-      
-      // Extract values from the proposal struct
-      const {
-        title,
-        ipfsMetadata,
-        targetCapital,
-        votingEnds,
-        investmentDrivers,
-        additionalCriteria,
-        firmSize,
-        location,
-        dealType,
-        geographicFocus,
-        paymentTerms,
-        operationalStrategies,
-        growthStrategies,
-        integrationStrategies
-      } = proposalData;
-
-      // Fetch pledged amount for this proposal
-      const pledgedAmount = await contract.pledgedAmount(tokenId);
-      console.log('Pledged amount for proposal:', pledgedAmount.toString());
-
-      // Map arrays to readable strings
-      const paymentTermsMap = ['Cash', 'Seller Financing', 'Earnout', 'Equity Rollover', 'Bank Financing'];
-      const operationalMap = ['Tech Modernization', 'Process Standardization', 'Staff Retention'];
-      const growthMap = ['Geographic Expansion', 'Service Expansion', 'Client Growth'];
-      const integrationMap = ['Merging Operations', 'Culture Integration', 'Systems Consolidation'];
-
-      const progress = {
-        current: ethers.utils.formatEther(pledgedAmount),
-        target: ethers.utils.formatEther(targetCapital),
-        percentage: pledgedAmount.mul(100).div(targetCapital).toNumber()
-      };
-
-      return {
-        hash: tokenId.toString(),
-        ipfsHash: ipfsMetadata,
-        timestamp: event.blockNumber.toString(),
-        title,
-        targetCapital: ethers.utils.formatEther(targetCapital),
-        status: pledgedAmount.gte(targetCapital)
-          ? 'completed'
-          : Date.now() >= votingEnds.toNumber() * 1000
-            ? 'failed'
-            : 'pending',
-        isTestMode: false,
-        progress,
-        firmSize: firmSizeMap[firmSize],
-        dealType: dealTypeMap[dealType],
-        geographicFocus: geoFocusMap[geographicFocus],
-        location,
-        votingEnds: new Date(votingEnds.toNumber() * 1000),
-        strategies: {
-          paymentTerms: paymentTerms.map((i: number) => paymentTermsMap[i]),
-          operational: operationalStrategies.map((i: number) => operationalMap[i]),
-          growth: growthStrategies.map((i: number) => growthMap[i]),
-          integration: integrationStrategies.map((i: number) => integrationMap[i])
-        }
-      };
-    } catch (error) {
-      console.error('Error in transformProposalData:', error);
-      console.error('Contract address:', contract.address);
-      console.error('Token ID:', tokenId?.toString() || 'undefined');
-      throw error;
-    }
-  };
 
   useEffect(() => {
     const checkLGRBalance = async () => {
@@ -174,7 +71,7 @@ export const ProposalsHistory = () => {
   }, [isConnected, address, getProvider]);
 
   useEffect(() => {
-    const fetchProposals = async () => {
+    const fetchProposalEvents = async () => {
       if (!isConnected || !hasMinimumLGR) return;
 
       try {
@@ -191,32 +88,20 @@ export const ProposalsHistory = () => {
         const events = await contract.queryFilter(filter);
         console.log('Found proposal events:', events.length);
 
-        const proposalPromises = events.map(event => 
-          transformProposalData(walletProvider.provider, contract, event)
-        );
-
-        const proposalsList = await Promise.all(proposalPromises.map(async (promise) => {
-          try {
-            return await promise;
-          } catch (error) {
-            console.error('Error processing proposal:', error);
-            return null;
-          }
+        const proposals = events.map(event => ({
+          tokenId: event.args?.tokenId.toString(),
+          creator: event.args?.creator,
+          blockNumber: event.blockNumber,
+          transactionHash: event.transactionHash
         }));
 
-        // Filter out any null results from failed transformations
-        const validProposals = proposalsList.filter((p): p is EnrichedProposal => p !== null);
+        // Sort by newest first (highest block number)
+        proposals.sort((a, b) => b.blockNumber - a.blockNumber);
         
-        console.log('Processed proposals:', validProposals);
-        
-        // Sort by newest first
-        validProposals.sort((a, b) => 
-          parseInt(b.timestamp) - parseInt(a.timestamp)
-        );
-        
-        setProposals(validProposals);
+        console.log('Processed proposal events:', proposals);
+        setProposalEvents(proposals);
       } catch (error) {
-        console.error("Error fetching proposals:", error);
+        console.error("Error fetching proposal events:", error);
         toast({
           title: "Error",
           description: "Failed to load proposals. Please try again.",
@@ -227,7 +112,7 @@ export const ProposalsHistory = () => {
       }
     };
 
-    fetchProposals();
+    fetchProposalEvents();
   }, [isConnected, hasMinimumLGR, getProvider]);
 
   if (!isConnected) {
@@ -264,7 +149,7 @@ export const ProposalsHistory = () => {
     );
   }
 
-  if (proposals.length === 0) {
+  if (proposalEvents.length === 0) {
     return (
       <Card className="bg-black/40 border-white/10">
         <CardContent className="p-6 text-center text-white/60">
@@ -284,13 +169,13 @@ export const ProposalsHistory = () => {
   return (
     <div className="space-y-4">
       <div className="grid gap-4">
-        {proposals.map((proposal, index) => (
+        {proposalEvents.map((event, index) => (
           <motion.div
-            key={proposal.hash}
+            key={event.tokenId}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            onClick={() => navigate(`/proposals/${proposal.hash}`)}
+            onClick={() => navigate(`/proposals/${event.tokenId}`)}
             className="p-4 rounded-lg border border-white/10 bg-white/5 hover:border-purple-500/20 transition-colors cursor-pointer"
           >
             <div className="space-y-4">
@@ -301,78 +186,14 @@ export const ProposalsHistory = () => {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-white">{proposal.title}</h3>
-                      {proposal.isTestMode && (
-                        <span className="px-2 py-1 text-xs bg-blue-500/10 text-blue-500 rounded">
-                          Test
-                        </span>
-                      )}
+                      <h3 className="font-medium text-white">Proposal #{event.tokenId}</h3>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-white/60">
                       <Calendar className="w-4 h-4" />
-                      <span>{format(new Date(parseInt(proposal.timestamp) * 1000), 'PPP')}</span>
+                      <span>{format(new Date(event.blockNumber * 1000), 'PPP')}</span>
                     </div>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-4">
-                  <div className={cn(
-                    "px-2 py-1 rounded text-xs font-medium",
-                    proposal.status === 'pending' && "bg-yellow-500/10 text-yellow-500",
-                    proposal.status === 'completed' && "bg-green-500/10 text-green-500",
-                    proposal.status === 'failed' && "bg-red-500/10 text-red-500"
-                  )}>
-                    {proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1)}
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-white/60" />
-                </div>
-              </div>
-
-              {/* Additional Info */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="flex items-center gap-2 text-sm text-white/60">
-                  <MapPin className="w-4 h-4" />
-                  <span>{proposal.location}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-white/60">
-                  <Globe className="w-4 h-4" />
-                  <span>{proposal.geographicFocus}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-white/60">
-                  <DollarSign className="w-4 h-4" />
-                  <span>{proposal.firmSize}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-white/60">
-                  <Users className="w-4 h-4" />
-                  <span>{proposal.dealType}</span>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-white/60">Progress</span>
-                  <span className="text-white">{proposal.progress.percentage}%</span>
-                </div>
-                <Progress value={proposal.progress.percentage} className="h-2" />
-                <div className="flex justify-between text-sm text-white/60">
-                  <span>{proposal.progress.current} LGR</span>
-                  <span>{proposal.progress.target} LGR</span>
-                </div>
-              </div>
-
-              {/* Strategy Tags */}
-              <div className="flex flex-wrap gap-2">
-                {proposal.strategies.paymentTerms.slice(0, 2).map((term, i) => (
-                  <span key={i} className="px-2 py-1 text-xs bg-purple-500/10 text-purple-400 rounded">
-                    {term}
-                  </span>
-                ))}
-                {proposal.strategies.paymentTerms.length > 2 && (
-                  <span className="px-2 py-1 text-xs bg-purple-500/10 text-purple-400 rounded">
-                    +{proposal.strategies.paymentTerms.length - 2} more
-                  </span>
-                )}
               </div>
             </div>
           </motion.div>
