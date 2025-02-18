@@ -75,12 +75,15 @@ interface ProposalMetadata {
     drivers: string;
     additionalCriteria: string;
   };
+  linkedInURL?: string;
 }
 
 interface ProposalConfig {
   targetCapital: ethers.BigNumber;
   votingDuration: number;
   ipfsHash: string;
+  metadata: ProposalMetadata;
+  linkedInURL: string;
 }
 
 const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
@@ -138,7 +141,8 @@ const TEST_FORM_DATA: ProposalMetadata = {
     targetCapital: "2500000",
     drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
     additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
-  }
+  },
+  linkedInURL: "https://www.linkedin.com/in/test-user"
 };
 
 const ThesisSubmission = () => {
@@ -177,7 +181,8 @@ const ThesisSubmission = () => {
       targetCapital: "",
       drivers: "",
       additionalCriteria: ""
-    }
+    },
+    linkedInURL: ""
   });
   const [isThesisOpen, setIsThesisOpen] = useState(false);
   const [isStrategyOpen, setIsStrategyOpen] = useState(false);
@@ -203,7 +208,8 @@ const ThesisSubmission = () => {
         targetCapital: "",
         drivers: "",
         additionalCriteria: ""
-      }
+      },
+      linkedInURL: ""
     });
   }, [isTestMode]);
 
@@ -445,11 +451,15 @@ const ThesisSubmission = () => {
         isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData.investment.targetCapital
       );
 
-      const gasEstimate = await estimateProposalGas({
-        targetCapital: targetCapitalWei,
-        votingDuration,
-        ipfsHash
-      }, wallet);
+    const proposalConfig: ProposalConfig = {
+      targetCapital: targetCapitalWei,
+      votingDuration,
+      ipfsHash,
+      metadata: formData,
+      linkedInURL: formData.linkedInURL || ''
+    };
+
+      const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
 
       console.log('Creating proposal...', {
         isTestMode,
@@ -458,11 +468,7 @@ const ThesisSubmission = () => {
         ipfsHash
       });
 
-      const result = await createProposal({
-        targetCapital: targetCapitalWei,
-        votingDuration,
-        ipfsHash
-      }, wallet);
+      const result = await createProposal(proposalConfig, wallet);
 
       const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
       const newProposal: StoredProposal = {
@@ -616,7 +622,8 @@ const ThesisSubmission = () => {
             targetCapital: "",
             drivers: "",
             additionalCriteria: ""
-          }
+          },
+          linkedInURL: ""
         });
         setIsThesisOpen(true);
         setIsStrategyOpen(false);
@@ -819,46 +826,4 @@ const ThesisSubmission = () => {
                             Growth and integration plans
                           </p>
                         </div>
-                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isSubmissionOpen && "transform rotate-180")} />
-                      </div>
-                    </button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-4 px-4 pb-6">
-                    <StrategiesSection 
-                      formData={{
-                        strategies: {
-                          operational: formData.strategies.operational,
-                          growth: formData.strategies.growth,
-                          integration: formData.strategies.integration
-                        }
-                      }}
-                      formErrors={formErrors}
-                      onChange={(field, value) => handleFormDataChange(`strategies.${field}`, value)}
-                    />
-                    {isSubmissionOpen && renderContinueButton(() => {
-                      if (validateTermsTab()) {
-                        setIsSubmissionOpen(false);
-                        handleSubmit({} as React.FormEvent);
-                      }
-                    }, true)}
-                  </CollapsibleContent>
-                </Collapsible>
-
-                <div className="mt-8 border-t border-white/10 pt-8">
-                  <ContractApprovalStatus 
-                    onApprovalComplete={handleApprovalComplete}
-                    requiredAmount={SUBMISSION_FEE.toString()}
-                    isTestMode={isTestMode}
-                    currentFormData={formData}
-                  />
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isSubmission
