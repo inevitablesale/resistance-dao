@@ -17,7 +17,7 @@ const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 interface ContractApprovalStatusProps {
   onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction) => void;
-  requiredAmount: ethers.BigNumberish;
+  requiredAmount: string;
   isTestMode?: boolean;
   currentFormData: any;
 }
@@ -43,7 +43,8 @@ export const ContractApprovalStatus = ({
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
+  const requiredAmountBN = ethers.utils.parseEther(requiredAmount || "0");
+
   const hasRequiredBalance = isTestMode || (tokenBalances?.find(token => 
     token.symbol === "LGR" && ethers.BigNumber.from(token.balance || "0").gte(requiredAmountBN)
   ));
@@ -62,7 +63,6 @@ export const ContractApprovalStatus = ({
         });
         setCurrentTxId(txId);
         
-        // Simulate a short delay for better UX
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         await transactionQueue.processTransaction(txId, async () => {

@@ -39,6 +39,7 @@ import {
   StoredProposal,
   ProposalConfig
 } from "@/types/proposals";
+import { SUBMISSION_FEE } from "@/lib/constants";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -679,7 +680,10 @@ const ThesisSubmission = () => {
             </motion.div>
             
             <div className="flex items-center gap-6">
-              <LGRWalletDisplay />
+              <LGRWalletDisplay 
+                submissionFee={SUBMISSION_FEE}
+                walletAddress={address}
+              />
               <div className="flex items-center space-x-3">
                 <Label htmlFor="test-mode" className="text-sm text-white/60">
                   Test Mode
