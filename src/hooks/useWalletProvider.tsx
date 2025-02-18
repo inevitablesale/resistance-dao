@@ -15,14 +15,16 @@ interface WalletProvider {
   getSigner: () => ethers.providers.JsonRpcSigner;
 }
 
-const MAX_RETRIES = 5; // Increased from 3 to 5
-const RETRY_DELAY = 1000; // Reduced from 2000 to 1000ms for faster retries
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 1000;
+const INITIALIZATION_TIMEOUT = 10000; // 10 seconds timeout
 
 export const useWalletProvider = () => {
   const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
   const providerRef = useRef<WalletProvider | null>(null);
   const initializingRef = useRef<boolean>(false);
+  const initTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -32,57 +34,86 @@ export const useWalletProvider = () => {
     return isZeroDev ? 'zerodev' : 'regular';
   };
 
+  const clearInitializationTimeout = () => {
+    if (initTimeoutRef.current) {
+      clearTimeout(initTimeoutRef.current);
+      initTimeoutRef.current = null;
+    }
+  };
+
   const initializeProvider = useCallback(async (
     walletClient: any, 
     retryCount: number = 0
   ): Promise<ethers.providers.Web3Provider> => {
     try {
-      console.log(`Initializing provider attempt ${retryCount + 1}/${MAX_RETRIES}`);
+      console.log(`[Provider] Initialization attempt ${retryCount + 1}/${MAX_RETRIES}`);
       
       if (!walletClient) {
+        console.error('[Provider] WalletClient is undefined');
         throw new Error('WalletClient is undefined');
       }
-      
+
+      // Create provider and immediately test it
       const provider = new ethers.providers.Web3Provider(walletClient);
-      // Verify the provider is working
-      await provider.getNetwork();
+      const network = await provider.getNetwork();
+      console.log('[Provider] Successfully connected to network:', network.chainId);
+      
       return provider;
     } catch (error) {
-      console.error('Provider initialization error:', error);
+      console.error('[Provider] Initialization error:', error);
+      
       if (retryCount < MAX_RETRIES - 1) {
-        console.log(`Provider initialization failed, retrying in ${RETRY_DELAY}ms...`);
+        console.log(`[Provider] Retrying in ${RETRY_DELAY}ms...`);
         await delay(RETRY_DELAY);
         return initializeProvider(walletClient, retryCount + 1);
       }
-      throw error;
+      
+      throw new ProposalError({
+        category: 'initialization',
+        message: 'Failed to initialize provider after multiple attempts',
+        recoverySteps: [
+          'Check your wallet connection',
+          'Make sure your wallet is unlocked',
+          'Try refreshing the page'
+        ]
+      });
     }
   }, []);
 
   const validateWalletClient = useCallback(async (attempts: number = 0): Promise<any> => {
     if (!primaryWallet) {
+      console.error('[Wallet] No primary wallet found');
       throw new ProposalError({
         category: 'initialization',
         message: 'Wallet not initialized',
-        recoverySteps: ['Please wait for wallet initialization to complete', 'Try refreshing the page']
+        recoverySteps: ['Please connect your wallet', 'Try refreshing the page']
       });
     }
 
     try {
-      console.log(`Getting wallet client attempt ${attempts + 1}/${MAX_RETRIES}`);
+      console.log(`[Wallet] Client validation attempt ${attempts + 1}/${MAX_RETRIES}`);
       const walletClient = await primaryWallet.getWalletClient();
       
       if (!walletClient) {
         if (attempts < MAX_RETRIES - 1) {
-          console.log(`Wallet client not available, retrying in ${RETRY_DELAY}ms...`);
+          console.log(`[Wallet] Client not available, retrying in ${RETRY_DELAY}ms...`);
           await delay(RETRY_DELAY);
           return validateWalletClient(attempts + 1);
         }
-        throw new Error('Failed to get wallet client after multiple attempts');
+        throw new Error('Wallet client unavailable after multiple attempts');
       }
 
+      console.log('[Wallet] Client validated successfully');
       return walletClient;
     } catch (error) {
-      console.error('Wallet client validation error:', error);
+      console.error('[Wallet] Client validation error:', error);
+      
+      if (attempts < MAX_RETRIES - 1) {
+        console.log(`[Wallet] Retrying validation in ${RETRY_DELAY}ms...`);
+        await delay(RETRY_DELAY);
+        return validateWalletClient(attempts + 1);
+      }
+
       throw new ProposalError({
         category: 'initialization',
         message: 'Failed to initialize wallet client',
@@ -101,28 +132,44 @@ export const useWalletProvider = () => {
     }
 
     if (initializingRef.current) {
-      await new Promise(resolve => {
+      return new Promise((resolve, reject) => {
+        let attempts = 0;
         const checkInterval = setInterval(() => {
-          if (!initializingRef.current) {
+          attempts++;
+          if (!initializingRef.current && providerRef.current) {
             clearInterval(checkInterval);
-            resolve(true);
+            resolve(providerRef.current);
+          }
+          if (attempts > 50) { // 5 seconds max wait
+            clearInterval(checkInterval);
+            reject(new Error('Initialization timeout'));
           }
         }, 100);
       });
-      if (providerRef.current) {
-        return providerRef.current;
-      }
     }
 
     initializingRef.current = true;
+    
+    // Set initialization timeout
+    initTimeoutRef.current = setTimeout(() => {
+      if (initializingRef.current) {
+        initializingRef.current = false;
+        console.error('[Provider] Initialization timeout');
+        toast({
+          title: "Connection Timeout",
+          description: "Failed to initialize wallet connection. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }, INITIALIZATION_TIMEOUT);
 
     try {
-      console.log('Starting provider initialization...');
+      console.log('[Provider] Starting initialization...');
       const walletClient = await validateWalletClient();
       let currentWalletType = getWalletType();
       
       if (currentWalletType === 'zerodev') {
-        console.log('Initializing ZeroDev provider...');
+        console.log('[Provider] Initializing ZeroDev provider...');
         try {
           const ethersProvider = await initializeProvider(walletClient);
           const provider: WalletProvider = {
@@ -135,7 +182,7 @@ export const useWalletProvider = () => {
           providerRef.current = provider;
           return provider;
         } catch (error) {
-          console.error('ZeroDev provider initialization failed, falling back to regular wallet');
+          console.error('[Provider] ZeroDev initialization failed, falling back to regular wallet');
           toast({
             title: "Smart Wallet Unavailable",
             description: "Falling back to regular wallet mode",
@@ -145,7 +192,7 @@ export const useWalletProvider = () => {
         }
       }
 
-      console.log('Initializing regular wallet provider...');
+      console.log('[Provider] Initializing regular wallet provider...');
       const ethersProvider = await initializeProvider(walletClient);
       const provider: WalletProvider = {
         provider: ethersProvider,
@@ -157,7 +204,7 @@ export const useWalletProvider = () => {
       providerRef.current = provider;
       return provider;
     } catch (error) {
-      console.error('Provider initialization error:', error);
+      console.error('[Provider] Initialization failed:', error);
       throw new ProposalError({
         category: 'initialization',
         message: 'Failed to initialize provider',
@@ -168,6 +215,7 @@ export const useWalletProvider = () => {
         ]
       });
     } finally {
+      clearInitializationTimeout();
       initializingRef.current = false;
     }
   }, [primaryWallet, toast, initializeProvider, validateWalletClient]);
@@ -176,6 +224,7 @@ export const useWalletProvider = () => {
   useEffect(() => {
     providerRef.current = null;
     return () => {
+      clearInitializationTimeout();
       providerRef.current = null;
     };
   }, [primaryWallet]);
@@ -183,10 +232,10 @@ export const useWalletProvider = () => {
   return {
     getProvider,
     validateNetwork: async (provider: WalletProvider) => {
-      console.log('Starting network validation...');
+      console.log('[Network] Starting validation...');
       try {
         const network = await provider.getNetwork();
-        console.log('Current chain ID:', network.chainId);
+        console.log('[Network] Current chain ID:', network.chainId);
         const targetChainId = 137; // Polygon Mainnet
         
         if (network.chainId !== targetChainId) {
