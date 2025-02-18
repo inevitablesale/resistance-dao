@@ -21,6 +21,8 @@ import ProposalDetails from "./pages/ProposalDetails";
 import Proposals from "./pages/Proposals";
 import { Toaster } from "./components/ui/toaster";
 
+const FACTORY_ADDRESS = "0x4b729792-4b38-4d73-8a69-4f7559f2c2cd";
+
 const zeroDevConfig = {
   projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
   bundlerRpc: "https://rpc.zerodev.app/api/v2/bundler/4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -114,6 +116,15 @@ const dynamicSettings = {
         name: "LedgerFund Token",
         icon: "/favicon.ico",
         chainId: 137
+      },
+      {
+        address: FACTORY_ADDRESS,
+        symbol: "LFP",
+        name: "LedgerFren Proposal",
+        icon: "/favicon.ico",
+        chainId: 137,
+        type: "ERC721",
+        standard: "ERC721"
       }
     ]
   }
@@ -155,4 +166,3 @@ function App() {
 }
 
 export default App;
-
