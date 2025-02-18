@@ -1,7 +1,8 @@
 
 import { useEffect, useState } from 'react';
 import { Publication, fetchPublications } from '../services/graphService';
-import { getFromIPFS, IPFSContent } from '../services/ipfsService';
+import { getFromIPFS } from '../services/ipfsService';
+import { IPFSContent } from '@/types/content';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
