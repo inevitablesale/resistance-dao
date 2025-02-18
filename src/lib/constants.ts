@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 
 export const FACTORY_ADDRESS = "0x624dFf6455FBE2f569571fba31c7D020b905b745";
@@ -53,6 +52,12 @@ export const FACTORY_ABI = [
   "function treasury() public view returns (address)",
   "function tester() public view returns (address)",
   
+  // Added functions for proposal details
+  "function pledgedAmount(uint256 tokenId) public view returns (uint128)",
+  "function getProposalBackers(uint256 tokenId) public view returns (address[])",
+  "function hasVoted(uint256 tokenId, address voter) public view returns (bool)",
+  "function voterPledges(uint256 tokenId, address voter) public view returns (uint128)",
+  
   // Vote functions
   "function vote(uint256 tokenId, uint128 pledgeAmount) external",
   "function hasVoted(uint256,address) public view returns (bool)",
@@ -69,4 +74,3 @@ export const FACTORY_ABI = [
   "event ProposalFullyPledged(uint256 indexed tokenId, uint128 totalPledged, address[] backers)",
   "event TestModeChanged(bool newStatus)"
 ];
-

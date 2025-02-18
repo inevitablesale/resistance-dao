@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, ArrowRight } from "lucide-react";
@@ -20,6 +19,10 @@ export const ProposalsHistory = () => {
     }
   }, []);
 
+  const handleProposalClick = (proposal: StoredProposal) => {
+    navigate(`/proposals/${proposal.hash}`);
+  };
+
   if (proposals.length === 0) {
     return (
       <Card className="bg-black/40 border-white/10">
@@ -28,7 +31,7 @@ export const ProposalsHistory = () => {
           <Button 
             variant="link" 
             onClick={() => navigate('/thesis')}
-            className="mt-2 text-polygon-primary"
+            className="mt-2 text-purple-400"
           >
             Create your first proposal
           </Button>
@@ -46,12 +49,13 @@ export const ProposalsHistory = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="p-4 rounded-lg border border-white/10 bg-white/5 hover:border-polygon-primary/20 transition-colors"
+            onClick={() => handleProposalClick(proposal)}
+            className="p-4 rounded-lg border border-white/10 bg-white/5 hover:border-purple-500/20 transition-colors cursor-pointer"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-polygon-primary/10 flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-polygon-primary" />
+                <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-purple-400" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
@@ -78,14 +82,7 @@ export const ProposalsHistory = () => {
                 )}>
                   {proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1)}
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-white/60 hover:text-white"
-                  onClick={() => navigate(`/proposals/${proposal.hash}`)}
-                >
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
+                <ArrowRight className="w-4 h-4 text-white/60" />
               </div>
             </div>
           </motion.div>
