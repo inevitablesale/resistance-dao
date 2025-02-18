@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, ArrowRight } from "lucide-react";
@@ -97,21 +96,24 @@ export const ProposalsHistory = () => {
             pledged: ethers.utils.formatEther(pledgedAmount)
           });
 
-          const status = pledgedAmount.gte(proposalData.targetCapital) 
+          // Explicitly type the status as one of the allowed values
+          const status: StoredProposal['status'] = pledgedAmount.gte(proposalData.targetCapital) 
             ? 'completed' 
             : Date.now() >= proposalData.votingEnds.toNumber() * 1000 
               ? 'failed' 
               : 'pending';
 
-          return {
+          const proposal: StoredProposal = {
             hash: tokenId.toString(),
             ipfsHash: proposalData.ipfsMetadata,
             timestamp: event.blockNumber.toString(),
             title: proposalData.title,
             targetCapital: ethers.utils.formatEther(proposalData.targetCapital),
             status,
-            isTestMode: false // We'll need to add this to the contract if needed
+            isTestMode: false
           };
+
+          return proposal;
         });
 
         const proposalsList = await Promise.all(proposalPromises);
