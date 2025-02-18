@@ -214,7 +214,6 @@ const ThesisSubmission = () => {
   }, [isTestMode, user, address]);
 
   useEffect(() => {
-    // Check LinkedIn URL on component mount
     const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
     if (!linkedInURL && isConnected) {
       toast({
@@ -450,7 +449,6 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
-      // Update formData with current values
       const updatedFormData = {
         ...formData,
         votingDuration,
@@ -601,13 +599,11 @@ const ThesisSubmission = () => {
     if (success) {
       setIsTestMode(enabled);
       if (enabled) {
-        // When enabling test mode, auto-complete all sections
         setFormData(TEST_FORM_DATA);
         setIsThesisOpen(false);
         setIsStrategyOpen(false);
         setIsApprovalOpen(false);
         setIsSubmissionOpen(true);
-        // Mark all steps as completed
         setSteps(prev => prev.map(step => ({
           ...step,
           status: 'completed'
@@ -617,7 +613,6 @@ const ThesisSubmission = () => {
           description: "Form pre-filled with test data",
         });
       } else {
-        // When disabling test mode, reset form and steps
         setFormData({
           title: "",
           firmCriteria: {
@@ -817,4 +812,18 @@ const ThesisSubmission = () => {
                     />
                     <div className="space-y-4">
                       <Label className="text-lg font-medium text-white">
-                        Additional
+                        Additional Requirements
+                      </Label>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
