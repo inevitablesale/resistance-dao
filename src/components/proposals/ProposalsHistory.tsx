@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, Users, Target } from "lucide-react";
@@ -7,10 +6,9 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useWalletProvider } from "@/hooks/useWalletProvider";
+import { useProposalProvider } from "@/hooks/useProposalProvider";
 import { ethers } from "ethers";
 import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
-import { getTokenBalance } from "@/services/tokenService";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata, ContractProposal } from "@/types/proposals";
@@ -32,7 +30,7 @@ export const ProposalsHistory = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
   const { isConnected, connect, address } = useWalletConnection();
-  const { getProvider } = useWalletProvider();
+  const { getProvider } = useProposalProvider();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -148,37 +146,18 @@ export const ProposalsHistory = () => {
               };
             } catch (error) {
               console.error(`Error fetching data for proposal #${tokenId}:`, error);
-              return {
-                tokenId,
-                creator: event.args?.creator,
-                blockNumber: event.blockNumber,
-                transactionHash: event.transactionHash,
-                contractData: {
-                  title: `Proposal #${tokenId}`,
-                  ipfsMetadata: '',
-                  targetCapital: '0',
-                  votingEnds: 0,
-                  investmentDrivers: '',
-                  additionalCriteria: '',
-                  firmSize: 0,
-                  location: '',
-                  dealType: 0,
-                  geographicFocus: 0,
-                  paymentTerms: [],
-                  operationalStrategies: [],
-                  growthStrategies: [],
-                  integrationStrategies: []
-                }
-              };
+              return null;
             }
           })
         );
 
-        // Sort by newest first (highest block number)
-        proposalsWithMetadata.sort((a, b) => b.blockNumber - a.blockNumber);
+        // Filter out null values and sort by newest first
+        const validProposals = proposalsWithMetadata
+          .filter((p): p is ProposalEvent => p !== null)
+          .sort((a, b) => b.blockNumber - a.blockNumber);
         
-        console.log('Processed proposals with metadata:', proposalsWithMetadata);
-        setProposalEvents(proposalsWithMetadata);
+        console.log('Processed proposals with metadata:', validProposals);
+        setProposalEvents(validProposals);
       } catch (error) {
         console.error("Error fetching proposals:", error);
         toast({
