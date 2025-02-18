@@ -2,7 +2,7 @@
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
-import { FACTORY_ADDRESS, FACTORY_ABI, AUTHORIZED_TEST_MODE_ADDRESS } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
 import { ProposalMetadata, ProposalConfig, ProposalInput } from "@/types/proposals";
 
 export interface ContractStatus {
@@ -17,6 +17,7 @@ export interface ContractStatus {
   votingFee: ethers.BigNumber;
   lgrTokenAddress: string;
   owner: string;
+  tester: string;
 }
 
 async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet']>) {
@@ -48,7 +49,8 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       maxVotingDuration,
       votingFee,
       lgrTokenAddress,
-      owner
+      owner,
+      tester
     ] = await Promise.all([
       factory.submissionFee(),
       factory.paused(),
@@ -60,7 +62,8 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       factory.MAX_VOTING_DURATION(),
       factory.VOTING_FEE(),
       factory.LGR_TOKEN(),
-      factory.owner()
+      factory.owner(),
+      factory.tester()
     ]);
 
     return {
@@ -74,7 +77,8 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       maxVotingDuration: Number(maxVotingDuration),
       votingFee,
       lgrTokenAddress,
-      owner
+      owner,
+      tester
     };
   } catch (error) {
     console.error("Error getting contract status:", error);
@@ -118,6 +122,32 @@ export const createProposal = async (
   );
 };
 
+export const setTestMode = async (
+  enabled: boolean,
+  wallet: NonNullable<DynamicContextType['primaryWallet']>
+): Promise<ethers.ContractTransaction> => {
+  const provider = await getProvider(wallet);
+  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
+  
+  const signerAddress = await provider.getSigner().getAddress();
+  const owner = await factory.owner();
+  
+  if (signerAddress.toLowerCase() !== owner.toLowerCase()) {
+    throw new Error("Not authorized to set test mode - must be contract owner");
+  }
+
+  return await executeTransaction(
+    () => factory.setTestMode(enabled),
+    {
+      type: 'contract',
+      description: `Setting test mode to ${enabled}`,
+      timeout: 60000,
+      maxRetries: 2,
+      backoffMs: 3000
+    }
+  );
+};
+
 export const estimateProposalGas = async (
   config: ProposalConfig,
   wallet: NonNullable<DynamicContextType['primaryWallet']>
@@ -149,29 +179,4 @@ export const estimateProposalGas = async (
     console.error("Gas estimation error:", error);
     throw error;
   }
-};
-
-export const setTestMode = async (
-  enabled: boolean,
-  wallet: NonNullable<DynamicContextType['primaryWallet']>
-): Promise<ethers.ContractTransaction> => {
-  const provider = await getProvider(wallet);
-  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
-  
-  const signerAddress = await provider.getSigner().getAddress();
-  
-  if (signerAddress.toLowerCase() !== AUTHORIZED_TEST_MODE_ADDRESS.toLowerCase()) {
-    throw new Error("Not authorized to set test mode");
-  }
-
-  return await executeTransaction(
-    () => factory.setTestMode(enabled),
-    {
-      type: 'contract',
-      description: `Setting test mode to ${enabled}`,
-      timeout: 60000,
-      maxRetries: 2,
-      backoffMs: 3000
-    }
-  );
 };

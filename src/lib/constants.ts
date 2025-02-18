@@ -1,7 +1,7 @@
 
 import { ethers } from "ethers";
 
-export const CONTRACT_ADDRESS = "0xE0Ae49Df82C207AD72a7b26Cb88c4ce1EA838250";
+export const CONTRACT_ADDRESS = "0x624dFf6455FBE2f569571fba31c7D020b905b745";
 export const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 export const LGR_PRICE_USD = 0.10; // $0.10 per LGR token
 
@@ -14,10 +14,10 @@ export const SUBMISSION_FEE = "250"; // 250 LGR
 export const VOTING_FEE = "10"; // 10 LGR
 
 // Contract addresses
-export const FACTORY_ADDRESS = "0xE0Ae49Df82C207AD72a7b26Cb88c4ce1EA838250";
+export const FACTORY_ADDRESS = "0x624dFf6455FBE2f569571fba31c7D020b905b745";
 export const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
-// Contract ABI
+// Contract ABI - Updated for new contract
 export const CONTRACT_ABI = [
   // Core proposal creation
   `function createProposal(
@@ -39,10 +39,11 @@ export const CONTRACT_ABI = [
     ) input,
     string linkedInURL
   ) external returns (uint256)`,
+
   // Read-only getters
   "function LGR_TOKEN() public view returns (address)",
-  "function MAX_TARGET_CAPITAL() public view returns (uint256)",
-  "function MIN_TARGET_CAPITAL() public view returns (uint256)",
+  "function MAX_TARGET_CAPITAL() public view returns (uint128)",
+  "function MIN_TARGET_CAPITAL() public view returns (uint128)",
   "function MIN_VOTING_DURATION() public view returns (uint256)",
   "function MAX_VOTING_DURATION() public view returns (uint256)",
   "function VOTING_FEE() public view returns (uint256)",
@@ -52,10 +53,21 @@ export const CONTRACT_ABI = [
   "function testModeEnabled() public view returns (bool)",
   "function treasury() public view returns (address)",
   "function tester() public view returns (address)",
+  
+  // Vote functions
+  "function vote(uint256 tokenId, uint128 pledgeAmount) external",
+  "function hasVoted(uint256,address) public view returns (bool)",
+  "function voterPledges(uint256,address) public view returns (uint128)",
+  "function pledgedAmount(uint256) public view returns (uint128)",
+  
   // Admin functions
   "function setTestMode(bool _enabled) external",
+  
   // Events
   "event ProposalCreated(uint256 indexed tokenId, address indexed creator)",
+  "event ProposalNFTMinted(uint256 indexed tokenId, address indexed creator)",
+  "event ProposalVoted(uint256 indexed tokenId, address indexed voter, uint128 pledgeAmount)",
+  "event ProposalFullyPledged(uint256 indexed tokenId, uint128 totalPledged, address[] backers)",
   "event TestModeChanged(bool newStatus)"
 ];
 
