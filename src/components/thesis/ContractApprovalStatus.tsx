@@ -1,10 +1,9 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
-import { Check, AlertTriangle } from "lucide-react";
+import { Check, AlertTriangle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -33,11 +32,13 @@ export const ContractApprovalStatus = ({
 }: ContractApprovalStatusProps) => {
   const { approveLGR, address, wallet } = useWalletConnection();
   const { getProvider, getWalletType } = useWalletProvider();
+  const { isInitializing } = useDynamicUtils();
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
   const [isTesterWallet, setIsTesterWallet] = useState(false);
   const [contractTestMode, setContractTestMode] = useState(false);
+  const [isWalletReady, setIsWalletReady] = useState(false);
   const approvalCompletedRef = useRef(false);
   const { toast } = useToast();
 
@@ -51,36 +52,57 @@ export const ContractApprovalStatus = ({
 
   const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
   
-  // Check if either test mode is active (tester wallet + contract test mode) or if we have enough balance
   const hasRequiredBalance = (isTesterWallet && contractTestMode) || tokenBalances?.find(token => 
     token.symbol === "LGR" && ethers.BigNumber.from(token.balance || "0").gte(requiredAmountBN)
   );
 
   useEffect(() => {
-    const checkTestMode = async () => {
-      if (wallet && address) {
+    const checkWalletStatus = async () => {
+      if (wallet && !isInitializing) {
         try {
-          const contractStatus = await getContractStatus(wallet);
-          const isTester = address.toLowerCase() === TESTER_ADDRESS.toLowerCase();
-          setIsTesterWallet(isTester);
-          setContractTestMode(contractStatus.isTestMode);
-          console.log("Test mode status:", {
-            isTesterWallet: isTester,
-            contractTestMode: contractStatus.isTestMode,
-            walletAddress: address,
-            testerAddress: TESTER_ADDRESS
-          });
+          const isConnected = await wallet.isConnected();
+          setIsWalletReady(isConnected);
         } catch (error) {
-          console.error("Error checking test mode:", error);
+          console.error("Error checking wallet connection:", error);
+          setIsWalletReady(false);
         }
+      } else {
+        setIsWalletReady(false);
+      }
+    };
+
+    checkWalletStatus();
+  }, [wallet, isInitializing]);
+
+  useEffect(() => {
+    const checkTestMode = async () => {
+      if (!isWalletReady || !wallet || !address) {
+        console.log("Wallet not ready for test mode check");
+        return;
+      }
+
+      try {
+        console.log("Checking test mode with ready wallet");
+        const contractStatus = await getContractStatus(wallet);
+        const isTester = address.toLowerCase() === TESTER_ADDRESS.toLowerCase();
+        setIsTesterWallet(isTester);
+        setContractTestMode(contractStatus.isTestMode);
+        console.log("Test mode status:", {
+          isTesterWallet: isTester,
+          contractTestMode: contractStatus.isTestMode,
+          walletAddress: address,
+          testerAddress: TESTER_ADDRESS
+        });
+      } catch (error) {
+        console.error("Error checking test mode:", error);
       }
     };
 
     checkTestMode();
-  }, [wallet, address]);
+  }, [wallet, address, isWalletReady]);
 
   const handleApprove = async () => {
-    if (isApproving || isApproved || approvalCompletedRef.current) return;
+    if (isApproving || isApproved || !isWalletReady || approvalCompletedRef.current) return;
     setIsApproving(true);
     try {
       console.log("Starting approval process...");
@@ -204,6 +226,17 @@ export const ContractApprovalStatus = ({
     setCurrentTxId(null);
   }, [isTestMode]);
 
+  if (!isWalletReady) {
+    return (
+      <Card className="bg-black/40 border-white/10 p-4">
+        <div className="flex items-center justify-center space-x-2 text-white/60">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span>Initializing wallet...</span>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card className="bg-black/40 border-white/10 p-4">
       {currentTxId && (
@@ -235,7 +268,7 @@ export const ContractApprovalStatus = ({
 
           <Button
             onClick={handleApprove}
-            disabled={isApproving || isApproved}
+            disabled={isApproving || isApproved || !isWalletReady}
             className="w-full"
           >
             {isApproving ? (

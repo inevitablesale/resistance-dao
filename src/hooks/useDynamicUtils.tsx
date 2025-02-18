@@ -2,7 +2,7 @@
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProposalError } from "@/services/errorHandlingService";
 import { useWalletProvider } from "./useWalletProvider";
 
@@ -16,8 +16,38 @@ export interface WalletState {
 export const useDynamicUtils = () => {
   const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
-  const [isInitializing, setIsInitializing] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
   const { getProvider, validateNetwork } = useWalletProvider();
+
+  useEffect(() => {
+    const checkInitialization = async () => {
+      if (!primaryWallet) {
+        setIsInitializing(false);
+        return;
+      }
+
+      try {
+        const isConnected = await primaryWallet.isConnected();
+        if (!isConnected) {
+          setIsInitializing(false);
+          return;
+        }
+
+        const walletClient = await primaryWallet.getWalletClient();
+        if (!walletClient) {
+          console.log("Wallet client not available yet");
+          return;
+        }
+
+        setIsInitializing(false);
+      } catch (error) {
+        console.error("Initialization check failed:", error);
+        setIsInitializing(false);
+      }
+    };
+
+    checkInitialization();
+  }, [primaryWallet]);
 
   const getChainId = async (): Promise<number> => {
     if (!primaryWallet) {
