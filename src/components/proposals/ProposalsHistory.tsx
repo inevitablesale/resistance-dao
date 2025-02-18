@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, Users, Target } from "lucide-react";
@@ -12,6 +13,7 @@ import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata, ContractProposal } from "@/types/proposals";
+import { getTokenBalance } from "@/services/tokenService";
 
 const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
 
@@ -153,7 +155,7 @@ export const ProposalsHistory = () => {
 
         // Filter out null values and sort by newest first
         const validProposals = proposalsWithMetadata
-          .filter((p): p is ProposalEvent => p !== null)
+          .filter((p): p is NonNullable<typeof p> => p !== null)
           .sort((a, b) => b.blockNumber - a.blockNumber);
         
         console.log('Processed proposals with metadata:', validProposals);
