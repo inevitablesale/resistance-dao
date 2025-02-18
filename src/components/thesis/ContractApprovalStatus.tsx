@@ -192,7 +192,7 @@ export const ContractApprovalStatus = ({
               {isTestMode ? (
                 "Test mode: No LGR required for approval"
               ) : (
-                `Approve ${ethers.utils.formatEther(requiredAmountBN)} LGR for submission`
+                `Approve ${ethers.utils.formatEther(requiredAmount.toString())} LGR for submission`
               )}
             </p>
           </div>
