@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
@@ -10,12 +12,11 @@ import { getFromIPFS } from "@/services/ipfsService";
 import { StoredProposal, ProposalMetadata } from "@/types/proposals";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HandCoins, Clock, Users, ChevronLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { HandCoins, Clock, Users, ChevronLeft, Wallet } from "lucide-react";
 
 interface ProposalDetails {
   metadata: ProposalMetadata;
-  onChainData: {
+  onChainData?: {
     pledgedAmount: ethers.BigNumber;
     votingEndsAt: number;
     backers: string[];
@@ -26,17 +27,27 @@ const ProposalDetails = () => {
   const { hash } = useParams<{ hash: string }>();
   const [proposalDetails, setProposalDetails] = useState<ProposalDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingChainData, setIsLoadingChainData] = useState(false);
   const { getProvider } = useWalletProvider();
+  const { isConnected, connect } = useWalletConnection();
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Load IPFS data first (doesn't require wallet)
   useEffect(() => {
     if (hash) {
-      loadProposalDetails();
+      loadIPFSData();
     }
   }, [hash]);
 
-  const loadProposalDetails = async () => {
+  // Load on-chain data when wallet is connected
+  useEffect(() => {
+    if (isConnected && proposalDetails && !proposalDetails.onChainData) {
+      loadChainData();
+    }
+  }, [isConnected, proposalDetails]);
+
+  const loadIPFSData = async () => {
     try {
       setIsLoading(true);
       
@@ -48,11 +59,29 @@ const ProposalDetails = () => {
         throw new Error('Proposal not found');
       }
 
-      // Get IPFS metadata with the correct type
+      // Get IPFS metadata
       console.log('Fetching IPFS metadata from:', storedProposal.ipfsHash);
       const metadata = await getFromIPFS<ProposalMetadata>(storedProposal.ipfsHash, 'proposal');
 
-      // Get on-chain data
+      setProposalDetails({
+        metadata,
+        onChainData: undefined // Will be loaded separately when wallet is connected
+      });
+    } catch (error: any) {
+      console.error("Error loading IPFS data:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to load proposal details",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadChainData = async () => {
+    try {
+      setIsLoadingChainData(true);
       const walletProvider = await getProvider();
       const contract = new ethers.Contract(
         FACTORY_ADDRESS,
@@ -61,29 +90,31 @@ const ProposalDetails = () => {
       );
 
       const [pledgedAmount, backers] = await Promise.all([
-        contract.pledgedAmount(storedProposal.hash),
-        contract.getProposalBackers(storedProposal.hash)
+        contract.pledgedAmount(hash),
+        contract.getProposalBackers(hash)
       ]);
 
-      const votingEndsAt = metadata.submissionTimestamp / 1000 + metadata.votingDuration;
-
-      setProposalDetails({
-        metadata,
-        onChainData: {
-          pledgedAmount,
-          votingEndsAt,
-          backers
-        }
-      });
+      if (proposalDetails) {
+        const votingEndsAt = proposalDetails.metadata.submissionTimestamp / 1000 + proposalDetails.metadata.votingDuration;
+        
+        setProposalDetails({
+          ...proposalDetails,
+          onChainData: {
+            pledgedAmount,
+            votingEndsAt,
+            backers
+          }
+        });
+      }
     } catch (error: any) {
-      console.error("Error loading proposal details:", error);
+      console.error("Error loading chain data:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to load proposal details",
+        description: "Failed to load on-chain data. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsLoadingChainData(false);
     }
   };
 
@@ -127,6 +158,20 @@ const ProposalDetails = () => {
             <ChevronLeft className="w-4 h-4 mr-2" />
             Back to Proposals
           </Button>
+
+          {!isConnected && (
+            <Card className="bg-yellow-500/10 border-yellow-500/20 mb-6">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <p className="text-yellow-200">Connect your wallet to view on-chain data and interact with this proposal</p>
+                  <Button onClick={connect} className="bg-yellow-500 hover:bg-yellow-600">
+                    <Wallet className="w-4 h-4 mr-2" />
+                    Connect Wallet
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="grid gap-8">
             <Card className="bg-black/40 border-white/10">
@@ -178,9 +223,13 @@ const ProposalDetails = () => {
                         </div>
                         <div>
                           <p className="text-sm text-white/60">Backers</p>
-                          <p className="text-xl font-bold text-white">
-                            {onChainData.backers.length}
-                          </p>
+                          {isLoadingChainData ? (
+                            <Skeleton className="h-4 w-16" />
+                          ) : (
+                            <p className="text-xl font-bold text-white">
+                              {onChainData?.backers.length ?? 'Connect Wallet'}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </CardContent>
@@ -194,9 +243,13 @@ const ProposalDetails = () => {
                         </div>
                         <div>
                           <p className="text-sm text-white/60">Voting Ends</p>
-                          <p className="text-xl font-bold text-white">
-                            {new Date(onChainData.votingEndsAt * 1000).toLocaleDateString()}
-                          </p>
+                          {isLoadingChainData ? (
+                            <Skeleton className="h-4 w-24" />
+                          ) : (
+                            <p className="text-xl font-bold text-white">
+                              {onChainData ? new Date(onChainData.votingEndsAt * 1000).toLocaleDateString() : 'Connect Wallet'}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </CardContent>
