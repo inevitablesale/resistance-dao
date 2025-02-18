@@ -48,6 +48,17 @@ export const executeTransaction = async (
     });
   }
 
+  if (config.type === 'nft' && config.nftConfig) {
+    console.log('NFT transaction config:', {
+      ...config.nftConfig,
+      tokenAddress: config.nftConfig.tokenAddress,
+      standard: config.nftConfig.standard,
+      amount: config.nftConfig.amount,
+      symbol: config.nftConfig.symbol || 'Unknown',
+      name: config.nftConfig.name || 'Unknown NFT'
+    });
+  }
+
   // Log network info
   if (provider) {
     const network = await provider.getNetwork();
@@ -107,6 +118,17 @@ export const executeTransaction = async (
       
       const receipt = await Promise.race([receiptPromise, timeoutPromise]);
       console.log('Transaction receipt received:', receipt);
+
+      if (config.type === 'nft') {
+        console.log('NFT transaction completed:', {
+          type: config.type,
+          tokenAddress: config.nftConfig?.tokenAddress,
+          amount: config.nftConfig?.amount,
+          standard: config.nftConfig?.standard,
+          symbol: config.nftConfig?.symbol,
+          name: config.nftConfig?.name
+        });
+      }
       
       if (config.eventConfig) {
         try {
