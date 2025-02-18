@@ -650,6 +650,22 @@ const ThesisSubmission = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <div className="fixed inset-0 z-0">
+        <div className="circuit-board" />
+        <div 
+          className="absolute inset-0 animate-parallax-slow"
+          style={{
+            background: `
+              radial-gradient(2px 2px at 20% 20%, rgba(234, 179, 8, 0.95) 100%, transparent),
+              radial-gradient(2px 2px at 40% 40%, rgba(234, 179, 8, 0.92) 100%, transparent),
+              radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
+            `,
+            backgroundSize: "240px 240px",
+            opacity: 0.1
+          }}
+        />
+      </div>
+
       <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -658,7 +674,7 @@ const ThesisSubmission = () => {
               animate={{ opacity: 1, y: 0 }}
               className="flex items-center justify-between"
             >
-              <h1 className="text-3xl font-bold">
+              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
                 Transform Accounting Firm Ownership
               </h1>
             </motion.div>
@@ -682,7 +698,7 @@ const ThesisSubmission = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 pt-32 pb-20">
+      <div className="container mx-auto px-4 pt-32 pb-20 relative z-10">
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-3">
             <div className="sticky top-32 space-y-4">
@@ -692,21 +708,21 @@ const ThesisSubmission = () => {
                   className={cn(
                     "relative",
                     index !== SUBMISSION_STEPS.length - 1 && "pb-8 after:absolute after:left-5 after:top-8 after:h-full after:w-0.5",
-                    step.status === 'completed' ? "after:bg-green-500" : "after:bg-white/10"
+                    step.status === 'completed' ? "after:bg-teal-500" : "after:bg-white/10"
                   )}
                 >
                   <button
                     onClick={() => setActiveStep(step.id)}
                     className={cn(
-                      "flex items-start gap-4 w-full rounded-lg p-4 transition-colors",
-                      step.id === activeStep ? "bg-white/5" : "hover:bg-white/5"
+                      "group flex items-start gap-4 w-full rounded-lg p-4 transition-all duration-300",
+                      step.id === activeStep ? "bg-white/5 cosmic-box yellow-energy active" : "hover:bg-white/5"
                     )}
                   >
                     <div className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
-                      step.status === 'completed' ? "bg-green-500 text-white" :
-                      step.status === 'processing' ? "bg-polygon-primary text-white animate-pulse" :
-                      step.id === activeStep ? "bg-polygon-primary/20 text-polygon-secondary border border-polygon-secondary" :
+                      "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-300",
+                      step.status === 'completed' ? "bg-teal-500 text-white" :
+                      step.status === 'processing' ? "bg-yellow-500 text-white animate-pulse" :
+                      step.id === activeStep ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/50" :
                       "bg-white/5 text-white/40"
                     )}>
                       {step.status === 'completed' ? (
@@ -717,8 +733,8 @@ const ThesisSubmission = () => {
                     </div>
                     <div className="text-left">
                       <p className={cn(
-                        "font-medium",
-                        step.id === activeStep ? "text-white" : "text-white/60"
+                        "font-medium transition-colors duration-300",
+                        step.id === activeStep ? "text-yellow-400" : "text-white/60 group-hover:text-white"
                       )}>
                         {step.title}
                       </p>
@@ -732,8 +748,8 @@ const ThesisSubmission = () => {
             </div>
           </div>
 
-          <div className="col-span-6 space-y-6">
-            <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
+          <div className="col-span-6 space-y-6 perspective-3000">
+            <Card className="relative bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden cosmic-box yellow-energy">
               <motion.div 
                 className="border-b border-white/5"
                 initial={{ opacity: 0 }}
@@ -741,7 +757,7 @@ const ThesisSubmission = () => {
                 transition={{ delay: 0.2 }}
               >
                 <div className="p-6 space-y-3">
-                  <p className="text-xl text-white/90">
+                  <p className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
                     Ready to revolutionize how accounting practices are acquired?
                   </p>
                   <p className="text-gray-400">
