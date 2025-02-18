@@ -17,8 +17,8 @@ export const VOTING_FEE = "10"; // 10 LGR
 export const FACTORY_ADDRESS = "0xE0Ae49Df82C207AD72a7b26Cb88c4ce1EA838250";
 export const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
-// Contract ABI sections - update to match actual contract
-export const FACTORY_ABI = [
+// Contract ABI
+export const CONTRACT_ABI = [
   // Core proposal creation
   `function createProposal(
     tuple(
@@ -59,5 +59,5 @@ export const FACTORY_ABI = [
   "event TestModeChanged(bool newStatus)"
 ];
 
-// Export CONTRACT_ABI for backward compatibility
-export { FACTORY_ABI as CONTRACT_ABI };
+// Also export FACTORY_ABI for new code
+export const FACTORY_ABI = CONTRACT_ABI;
