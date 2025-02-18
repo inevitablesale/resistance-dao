@@ -55,8 +55,10 @@ export const ProposalsHistory = () => {
     contract: ethers.Contract,
     event: any
   ): Promise<EnrichedProposal> => {
+    let tokenId: ethers.BigNumber | undefined;
+    
     try {
-      const tokenId = event.args?.tokenId;
+      tokenId = event.args?.tokenId;
       console.log('Fetching data for proposal:', tokenId.toString());
       console.log('Contract address:', contract.address);
       console.log('Available contract functions:', Object.keys(contract.functions));
@@ -127,7 +129,7 @@ export const ProposalsHistory = () => {
     } catch (error) {
       console.error('Error in transformProposalData:', error);
       console.error('Contract address:', contract.address);
-      console.error('Token ID:', tokenId?.toString());
+      console.error('Token ID:', tokenId?.toString() || 'undefined');
       throw error;
     }
   };
