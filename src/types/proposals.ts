@@ -47,16 +47,6 @@ export enum IntegrationStrategy {
   SYSTEMS_CONSOLIDATION
 }
 
-export interface StoredProposal {
-  hash: string;
-  ipfsHash: string;
-  timestamp: string;
-  title: string;
-  targetCapital: string;
-  status: 'pending' | 'completed' | 'failed';
-  isTestMode?: boolean;
-}
-
 export interface ProposalMetadata {
   title: string;
   firmCriteria: {
@@ -83,3 +73,12 @@ export interface ProposalMetadata {
   linkedInURL?: string;
 }
 
+export interface StoredProposal {
+  hash: string;
+  ipfsHash: string;
+  timestamp: string;
+  title: string;
+  targetCapital: string;
+  status: 'pending' | 'completed' | 'failed';
+  isTestMode?: boolean;
+}
