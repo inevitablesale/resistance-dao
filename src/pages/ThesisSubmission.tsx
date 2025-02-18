@@ -468,6 +468,14 @@ const ThesisSubmission = () => {
 
   const handleSubmit = async (e: React.FormEvent, formData?: ProposalMetadata, isTestMode?: boolean) => {
     e.preventDefault();
+    console.log("Submitting form with data:", {
+      providedFormData: formData,
+      currentFormData: formData || formData,
+      isTestMode,
+      contractTestMode,
+      testFormData: TEST_FORM_DATA
+    });
+
     if (!isConnected) {
       toast({
         title: "Connect Wallet",
@@ -498,15 +506,26 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
+      const effectiveTestMode = contractTestMode.isTester && contractTestMode.isEnabled && isTestMode;
+      console.log('Effective test mode status:', {
+        isTester: contractTestMode.isTester,
+        isContractTestMode: contractTestMode.isEnabled,
+        requestedTestMode: isTestMode,
+        effectiveTestMode
+      });
+
       const updatedFormData = {
-        ...formData || formData,
+        ...(effectiveTestMode ? TEST_FORM_DATA : formData || formData),
         votingDuration,
         linkedInURL,
         submissionTimestamp: Date.now(),
-        submitter: address
+        submitter: address,
+        isTestMode: effectiveTestMode
       };
 
-      console.log('Uploading metadata to IPFS...', { isTestMode });
+      console.log('Final form data being submitted:', updatedFormData);
+
+      console.log('Uploading metadata to IPFS...', { isTestMode: effectiveTestMode });
       const ipfsUri = await uploadMetadataToPinata(updatedFormData);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
       
@@ -514,9 +533,9 @@ const ThesisSubmission = () => {
         throw new Error("Invalid IPFS hash format");
       }
 
-      console.log('Estimating gas for proposal creation...', { isTestMode });
+      console.log('Estimating gas for proposal creation...', { isTestMode: effectiveTestMode });
       const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData?.investment.targetCapital || ""
+        effectiveTestMode ? TEST_FORM_DATA.investment.targetCapital : formData?.investment.targetCapital || ""
       );
 
       const proposalConfig: ProposalConfig = {
@@ -527,26 +546,30 @@ const ThesisSubmission = () => {
         linkedInURL
       };
 
+      console.log('Creating proposal with config:', proposalConfig);
       const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
-      console.log('Creating proposal...', proposalConfig);
+      console.log('Gas estimate:', gasEstimate.toString());
+      
       const result = await createProposal(proposalConfig, wallet);
+      console.log('Proposal creation result:', result);
 
       const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
       const newProposal: StoredProposal = {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
-        title: isTestMode ? TEST_FORM_DATA.title : formData?.title || "",
+        title: effectiveTestMode ? TEST_FORM_DATA.title : formData?.title || "",
         targetCapital: targetCapitalWei.toString(),
-        status: 'pending'
+        status: 'pending',
+        isTestMode: effectiveTestMode
       };
       userProposals.push(newProposal);
       localStorage.setItem('userProposals', JSON.stringify(userProposals));
 
       updateStepStatus('submission', 'completed');
       toast({
-        title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
-        description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
+        title: `${effectiveTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
+        description: `Your ${effectiveTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
       });
 
     } catch (error) {
