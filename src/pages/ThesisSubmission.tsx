@@ -1,3 +1,4 @@
+<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -35,15 +36,6 @@ interface SubmissionStep {
   description: string;
 }
 
-interface StoredProposal {
-  hash: string;
-  ipfsHash: string;
-  timestamp: string;
-  title: string;
-  targetCapital: string;
-  status: 'pending' | 'completed' | 'failed';
-}
-
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const FACTORY_ABI = ["function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)", "function submissionFee() public view returns (uint256)", "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"];
@@ -56,36 +48,6 @@ const VOTING_FEE = ethers.utils.parseEther("10");
 const MAX_STRATEGIES_PER_CATEGORY = 3;
 const MAX_SUMMARY_LENGTH = 500;
 const MAX_PAYMENT_TERMS = 5;
-
-interface ProposalMetadata {
-  title: string;
-  firmCriteria: {
-    size: string;
-    location: string;
-    dealType: string;
-    geographicFocus: string;
-  };
-  paymentTerms: string[];
-  strategies: {
-    operational: string[];
-    growth: string[];
-    integration: string[];
-  };
-  investment: {
-    targetCapital: string;
-    drivers: string;
-    additionalCriteria: string;
-  };
-  linkedInURL?: string;
-}
-
-interface ProposalConfig {
-  targetCapital: ethers.BigNumber;
-  votingDuration: number;
-  ipfsHash: string;
-  metadata: ProposalMetadata;
-  linkedInURL: string;
-}
 
 const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
 
@@ -434,6 +396,7 @@ const ThesisSubmission = () => {
 
       const metadataToUpload = {
         ...formData,
+        votingDuration,
         isTestMode,
         submissionTimestamp: Date.now(),
         submitter: address
@@ -456,7 +419,10 @@ const ThesisSubmission = () => {
         targetCapital: targetCapitalWei,
         votingDuration,
         ipfsHash,
-        metadata: formData,
+        metadata: {
+          ...formData,
+          votingDuration // Adding votingDuration to match ProposalMetadata interface
+        },
         linkedInURL: formData.linkedInURL || ''
       };
 
@@ -850,14 +816,4 @@ const ThesisSubmission = () => {
                       }
                     })}
                   </CollapsibleContent>
-                </Collapsible>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+                
