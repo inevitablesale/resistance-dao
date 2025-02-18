@@ -1,4 +1,3 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -28,23 +27,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { FirmSize, DealType, GeographicFocus } from "@/types/proposals";
-
-interface SubmissionStep {
-  id: string;
-  title: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  description: string;
-}
-
-interface StoredProposal {
-  hash: string;
-  ipfsHash: string;
-  timestamp: string;
-  title: string;
-  targetCapital: string;
-  status: 'pending' | 'completed' | 'failed';
-}
+import { 
+  FirmSize, 
+  DealType, 
+  GeographicFocus, 
+  PaymentTerm, 
+  OperationalStrategy,
+  GrowthStrategy,
+  IntegrationStrategy,
+  ProposalMetadata,
+  StoredProposal,
+  ProposalConfig
+} from "@/types/proposals";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -59,38 +53,11 @@ const MAX_STRATEGIES_PER_CATEGORY = 3;
 const MAX_SUMMARY_LENGTH = 500;
 const MAX_PAYMENT_TERMS = 5;
 
-interface ProposalMetadata {
+interface SubmissionStep {
+  id: string;
   title: string;
-  firmCriteria: {
-    size: FirmSize;
-    location: string;
-    dealType: DealType;
-    geographicFocus: GeographicFocus;
-  };
-  paymentTerms: string[];
-  strategies: {
-    operational: string[];
-    growth: string[];
-    integration: string[];
-  };
-  investment: {
-    targetCapital: string;
-    drivers: string;
-    additionalCriteria: string;
-  };
-  votingDuration: number;
-  linkedInURL: string;
-  isTestMode?: boolean;
-  submissionTimestamp?: number;
-  submitter?: string;
-}
-
-interface ProposalConfig {
-  targetCapital: ethers.BigNumber;
-  votingDuration: number;
-  ipfsHash: string;
-  metadata: ProposalMetadata;
-  linkedInURL: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  description: string;
 }
 
 const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
@@ -829,4 +796,25 @@ const ThesisSubmission = () => {
                           <h2 className="text-xl font-semibold text-green-400 group-hover:text-green-300 transition-colors">
                             Deal Structure
                           </h2>
-                          <p className="text-sm text-white/
+                          <p className="text-sm text-white/60">
+                            Payment terms and post-acquisition strategies
+                          </p>
+                        </div>
+                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isApprovalOpen && "transform rotate-180")} />
+                      </div>
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-4 px-4 pb-6">
+                    <PaymentTermsSection
+                      paymentTerms={formData.paymentTerms}
+                      onChange={value => handleFormDataChange('paymentTerms', value)}
+                      error={formErrors.paymentTerms}
+                    />
+                    <StrategiesSection
+                      strategies={formData.strategies}
+                      formErrors={formErrors}
+                      onStrategyChange={handleStrategyChange}
+                    />
+                    <div className="space-y-4">
+                      <Label className="text-lg font-medium text-white">
+                        Additional
