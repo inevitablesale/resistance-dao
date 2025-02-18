@@ -8,7 +8,7 @@ import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
 import Nav from "@/components/Nav";
-import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
+import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
@@ -169,10 +169,6 @@ const ThesisSubmission = () => {
     linkedInURL: "",
     isTestMode: false
   });
-  const [isThesisOpen, setIsThesisOpen] = useState(false);
-  const [isStrategyOpen, setIsStrategyOpen] = useState(false);
-  const [isApprovalOpen, setIsApprovalOpen] = useState(false);
-  const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
 
   useEffect(() => {
     setFormData(isTestMode ? {
@@ -618,18 +614,6 @@ const ThesisSubmission = () => {
       setIsTestMode(enabled);
       if (enabled) {
         setFormData(TEST_FORM_DATA);
-        setIsThesisOpen(false);
-        setIsStrategyOpen(false);
-        setIsApprovalOpen(false);
-        setIsSubmissionOpen(true);
-        setSteps(prev => prev.map(step => ({
-          ...step,
-          status: 'completed'
-        })));
-        toast({
-          title: "Test Mode Enabled",
-          description: "Form pre-filled with test data",
-        });
       } else {
         setFormData({
           title: "",
@@ -656,11 +640,6 @@ const ThesisSubmission = () => {
           submissionTimestamp: Date.now(),
           submitter: address
         });
-        setIsThesisOpen(true);
-        setIsStrategyOpen(false);
-        setIsApprovalOpen(false);
-        setIsSubmissionOpen(false);
-        setSteps(SUBMISSION_STEPS);
       }
     }
   };
@@ -670,118 +649,160 @@ const ThesisSubmission = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex gap-8">
-          <div className="flex-1 space-y-8">
-            <div className="flex items-center justify-between mb-8">
-              <motion.h1 
-                initial={{ opacity: 0, y: 20 }} 
-                animate={{ opacity: 1, y: 0 }} 
-                className="text-3xl md:text-4xl font-bold text-white"
-              >
+    <div className="min-h-screen bg-black text-white">
+      <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between"
+            >
+              <h1 className="text-3xl font-bold">
                 Transform Accounting Firm Ownership
-              </motion.h1>
-              
-              <div className="flex items-center space-x-2">
-                <Label htmlFor="test-mode" className="text-sm text-white/60">
-                  Test Mode
-                </Label>
-                <Switch
-                  id="test-mode"
-                  checked={isTestMode}
-                  onCheckedChange={handleTestModeToggle}
-                  className={cn(
-                    "data-[state=checked]:bg-yellow-500",
-                    !isConnected && "opacity-50 cursor-not-allowed"
-                  )}
-                  disabled={!isConnected}
-                />
-              </div>
+              </h1>
+            </motion.div>
+            
+            <div className="flex items-center space-x-3">
+              <Label htmlFor="test-mode" className="text-sm text-white/60">
+                Test Mode
+              </Label>
+              <Switch
+                id="test-mode"
+                checked={isTestMode}
+                onCheckedChange={handleTestModeToggle}
+                className={cn(
+                  "data-[state=checked]:bg-yellow-500",
+                  !isConnected && "opacity-50 cursor-not-allowed"
+                )}
+                disabled={!isConnected}
+              />
             </div>
+          </div>
+        </div>
+      </div>
 
+      <div className="container mx-auto px-4 pt-32 pb-20">
+        <div className="grid grid-cols-12 gap-8">
+          <div className="col-span-3">
+            <div className="sticky top-32 space-y-4">
+              {SUBMISSION_STEPS.map((step, index) => (
+                <div 
+                  key={step.id}
+                  className={cn(
+                    "relative",
+                    index !== SUBMISSION_STEPS.length - 1 && "pb-8 after:absolute after:left-5 after:top-8 after:h-full after:w-0.5",
+                    step.status === 'completed' ? "after:bg-green-500" : "after:bg-white/10"
+                  )}
+                >
+                  <button
+                    onClick={() => setActiveStep(step.id)}
+                    className={cn(
+                      "flex items-start gap-4 w-full rounded-lg p-4 transition-colors",
+                      step.id === activeStep ? "bg-white/5" : "hover:bg-white/5"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                      step.status === 'completed' ? "bg-green-500 text-white" :
+                      step.status === 'processing' ? "bg-polygon-primary text-white animate-pulse" :
+                      step.id === activeStep ? "bg-polygon-primary/20 text-polygon-secondary border border-polygon-secondary" :
+                      "bg-white/5 text-white/40"
+                    )}>
+                      {step.status === 'completed' ? (
+                        <Check className="w-5 h-5" />
+                      ) : (
+                        index + 1
+                      )}
+                    </div>
+                    <div className="text-left">
+                      <p className={cn(
+                        "font-medium",
+                        step.id === activeStep ? "text-white" : "text-white/60"
+                      )}>
+                        {step.title}
+                      </p>
+                      <p className="text-sm text-white/40">
+                        {step.description}
+                      </p>
+                    </div>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="col-span-6 space-y-6">
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
-              <div className="border-b border-white/5">
+              <motion.div 
+                className="border-b border-white/5"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
                 <div className="p-6 space-y-3">
-                  <p className="text-gray-200 text-lg">
-                    Ready to revolutionize how accounting practices are acquired? Your investment proposal could be the key to unlocking collaborative firm ownership.
+                  <p className="text-xl text-white/90">
+                    Ready to revolutionize how accounting practices are acquired?
                   </p>
                   <p className="text-gray-400">
-                    Follow these steps to present your vision to our community of forward-thinking investors.
+                    Present your vision to our community of forward-thinking investors through a structured investment thesis.
                   </p>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="p-6 space-y-8">
-                <Collapsible open={isThesisOpen} onOpenChange={setIsThesisOpen} className="w-full">
-                  <CollapsibleTrigger asChild>
-                    <button type="button" className="w-full text-left">
-                      <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                        <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
-                          1
-                        </div>
-                        <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-purple-400 group-hover:text-purple-300 transition-colors">
-                            Basic Thesis Information
-                          </h2>
-                          <p className="text-sm text-white/60">
-                            Title and investment details
-                          </p>
-                        </div>
-                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isThesisOpen && "transform rotate-180")} />
-                      </div>
-                    </button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-4 px-4 pb-6">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeStep}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className="p-6"
+                >
+                  {activeStep === 'thesis' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
-                        <Label className="text-lg font-medium text-white">
-                          Thesis Title
-                        </Label>
-                        <Input placeholder="Enter a clear, descriptive title" className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12" value={formData.title} onChange={e => handleFormDataChange('title', e.target.value)} />
-                        {formErrors.title && <p className="text-red-400 text-sm">{formErrors.title[0]}</p>}
+                        <Label className="text-lg font-medium">Thesis Title</Label>
+                        <Input 
+                          placeholder="Enter a clear, descriptive title"
+                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                          value={formData.title}
+                          onChange={e => handleFormDataChange('title', e.target.value)}
+                        />
+                        {formErrors.title && (
+                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                        )}
                       </div>
 
-                      <TargetCapitalInput value={formData.investment.targetCapital} onChange={value => handleFormDataChange('investment.targetCapital', value)} error={formErrors['investment.targetCapital']} />
+                      <TargetCapitalInput 
+                        value={formData.investment.targetCapital}
+                        onChange={value => handleFormDataChange('investment.targetCapital', value)}
+                        error={formErrors['investment.targetCapital']}
+                      />
+
+                      <VotingDurationInput
+                        value={votingDuration}
+                        onChange={handleVotingDurationChange}
+                        error={formErrors.votingDuration}
+                      />
 
                       <div className="space-y-4">
-                        <Label className="text-lg font-medium text-white">
-                          Investment Drivers
-                        </Label>
-                        <textarea placeholder="Describe the key drivers behind this investment thesis..." className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3" value={formData.investment.drivers} onChange={e => handleFormDataChange('investment.drivers', e.target.value)} />
-                        {formErrors['investment.drivers'] && <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>}
+                        <Label className="text-lg font-medium">Investment Drivers</Label>
+                        <textarea
+                          placeholder="Describe the key drivers behind this investment thesis..."
+                          className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none"
+                          value={formData.investment.drivers}
+                          onChange={e => handleFormDataChange('investment.drivers', e.target.value)}
+                        />
+                        {formErrors['investment.drivers'] && (
+                          <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
+                        )}
                       </div>
                     </div>
-                    {isThesisOpen && renderContinueButton(() => {
-                      if (validateBasicsTab()) {
-                        setIsThesisOpen(false);
-                        setIsStrategyOpen(true);
-                      }
-                    })}
-                  </CollapsibleContent>
-                </Collapsible>
+                  )}
 
-                <Collapsible open={isStrategyOpen} onOpenChange={setIsStrategyOpen} className="w-full">
-                  <CollapsibleTrigger asChild>
-                    <button type="button" className="w-full text-left">
-                      <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                        <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-semibold">
-                          2
-                        </div>
-                        <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-blue-400 group-hover:text-blue-300 transition-colors">
-                            Target Company Profile
-                          </h2>
-                          <p className="text-sm text-white/60">
-                            Size, location, and deal structure
-                          </p>
-                        </div>
-                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isStrategyOpen && "transform rotate-180")} />
-                      </div>
-                    </button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-4 px-4 pb-6">
-                    <FirmCriteriaSection 
+                  {activeStep === 'strategy' && (
+                    <FirmCriteriaSection
                       formData={{
                         firmCriteria: {
                           size: formData.firmCriteria.size,
@@ -793,101 +814,115 @@ const ThesisSubmission = () => {
                       formErrors={formErrors}
                       onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
                     />
-                    {isStrategyOpen && renderContinueButton(() => {
-                      if (validateFirmTab()) {
-                        setIsStrategyOpen(false);
-                        setIsApprovalOpen(true);
-                      }
-                    })}
-                  </CollapsibleContent>
-                </Collapsible>
+                  )}
 
-                <Collapsible open={isApprovalOpen} onOpenChange={setIsApprovalOpen} className="w-full">
-                  <CollapsibleTrigger asChild>
-                    <button type="button" className="w-full text-left">
-                      <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                        <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 font-semibold">
-                          3
-                        </div>
-                        <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-green-400 group-hover:text-green-300 transition-colors">
-                            Deal Structure
-                          </h2>
-                          <p className="text-sm text-white/60">
-                            Payment terms and post-acquisition strategies
-                          </p>
-                        </div>
-                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isApprovalOpen && "transform rotate-180")} />
-                      </div>
-                    </button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-4 px-4 pb-6">
-                    <PaymentTermsSection
-                      formData={formData}
-                      formErrors={formErrors}
-                      onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
-                    />
-                    <StrategiesSection
-                      formData={formData}
-                      formErrors={formErrors}
-                      onChange={(category, value) => handleStrategyChange(category, value)}
-                    />
-                    <div className="space-y-4">
-                      <Label className="text-lg font-medium text-white">
-                        Additional Requirements
-                      </Label>
+                  {activeStep === 'approval' && (
+                    <>
+                      <PaymentTermsSection
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
+                      />
+                      <StrategiesSection
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={(category, value) => handleStrategyChange(category, value)}
+                      />
+                    </>
+                  )}
+
+                  {activeStep === 'submission' && (
+                    <div className="space-y-6 text-center py-8">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
+                      >
+                        <Check className="w-8 h-8 text-white" />
+                      </motion.div>
+                      <h3 className="text-2xl font-semibold">Ready to Submit</h3>
+                      <p className="text-gray-400">
+                        Your investment thesis is ready to be submitted to the community
+                      </p>
                     </div>
-                  </CollapsibleContent>
-                </Collapsible>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+
+              <div className="px-6 pb-6 pt-4 border-t border-white/5">
+                <div className="flex justify-between items-center">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
+                      if (currentIndex > 0) {
+                        setActiveStep(SUBMISSION_STEPS[currentIndex - 1].id);
+                      }
+                    }}
+                    disabled={activeStep === SUBMISSION_STEPS[0].id}
+                    className="text-white/60 hover:text-white"
+                  >
+                    Previous Step
+                  </Button>
+                  {renderContinueButton(() => {
+                    const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
+                    if (currentIndex < SUBMISSION_STEPS.length - 1) {
+                      setActiveStep(SUBMISSION_STEPS[currentIndex + 1].id);
+                    } else {
+                      handleSubmit(new Event('submit') as any);
+                    }
+                  }, activeStep === SUBMISSION_STEPS[SUBMISSION_STEPS.length - 1].id)}
+                </div>
               </div>
             </Card>
           </div>
 
-          <div className="w-80 space-y-6">
-            <LGRWalletDisplay
-              submissionFee={SUBMISSION_FEE}
-              currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
-              walletAddress={address}
-              className="sticky top-8"
-            />
+          <div className="col-span-3">
+            <div className="sticky top-32 space-y-6">
+              <LGRWalletDisplay
+                submissionFee={SUBMISSION_FEE}
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
+                walletAddress={address}
+              />
 
-            <ContractApprovalStatus
-              onApprovalComplete={handleApprovalComplete}
-              requiredAmount={SUBMISSION_FEE}
-              isTestMode={isTestMode}
-              currentFormData={formData}
-            />
+              <ContractApprovalStatus
+                onApprovalComplete={handleApprovalComplete}
+                requiredAmount={SUBMISSION_FEE}
+                isTestMode={isTestMode}
+                currentFormData={formData}
+              />
 
-            <Card className="bg-black/40 border-white/10 p-6 space-y-4">
-              <h3 className="text-xl font-semibold text-white">Promote Your Thesis</h3>
-              <p className="text-sm text-white/60">
-                Increase visibility and engagement with promotional options
-              </p>
-              
-              <div className="space-y-4">
-                <Button
-                  onClick={() => handlePromotionSelect('weekly')}
-                  variant="outline"
-                  className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <span>Weekly Promotion</span>
-                    <span className="text-sm text-white/60">5 LGR</span>
-                  </div>
-                </Button>
+              <Card className="bg-black/40 border-white/10 p-6 space-y-4">
+                <h3 className="text-xl font-semibold">Promote Your Thesis</h3>
+                <p className="text-sm text-white/60">
+                  Increase visibility and engagement with promotional options
+                </p>
+                
+                <div className="space-y-4">
+                  <Button
+                    onClick={() => handlePromotionSelect('weekly')}
+                    variant="outline"
+                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span>Weekly Promotion</span>
+                      <span className="text-sm text-white/60">5 LGR</span>
+                    </div>
+                  </Button>
 
-                <Button
-                  onClick={() => handlePromotionSelect('monthly')}
-                  variant="outline"
-                  className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <span>Monthly Promotion</span>
-                    <span className="text-sm text-white/60">15 LGR</span>
-                  </div>
-                </Button>
-              </div>
-            </Card>
+                  <Button
+                    onClick={() => handlePromotionSelect('monthly')}
+                    variant="outline"
+                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span>Monthly Promotion</span>
+                      <span className="text-sm text-white/60">15 LGR</span>
+                    </div>
+                  </Button>
+                </div>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
