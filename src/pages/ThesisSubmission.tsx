@@ -144,6 +144,10 @@ const TEST_FORM_DATA: ProposalMetadata = {
   }
 };
 
+const isValidLinkedInURL = (url: string): boolean => {
+  return url.startsWith('https://www.linkedin.com/') || url.startsWith('https://linkedin.com/');
+};
+
 const ThesisSubmission = () => {
   const { toast } = useToast();
   const { isConnected, address, connect, approveLGR, wallet, toggleTestMode } = useWalletConnection();
@@ -210,6 +214,37 @@ const ThesisSubmission = () => {
       }
     });
   }, [isTestMode]);
+
+  useEffect(() => {
+    // Check LinkedIn URL on component mount
+    const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
+    if (!linkedInURL && isConnected) {
+      toast({
+        title: "LinkedIn Profile Required",
+        description: "Please add your LinkedIn URL in your wallet settings to submit a thesis",
+        variant: "warning"
+      });
+    }
+  }, [user, isConnected]);
+
+  const validateLinkedInURL = (): boolean => {
+    const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
+    if (!linkedInURL) {
+      setFormErrors(prev => ({
+        ...prev,
+        linkedInURL: ['LinkedIn URL is required. Please add it in your wallet settings.']
+      }));
+      return false;
+    }
+    if (!isValidLinkedInURL(linkedInURL)) {
+      setFormErrors(prev => ({
+        ...prev,
+        linkedInURL: ['Invalid LinkedIn URL format. Please update it in your wallet settings.']
+      }));
+      return false;
+    }
+    return true;
+  };
 
   const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
     setSteps(prev => prev.map(step => step.id === stepId ? {
@@ -401,6 +436,10 @@ const ThesisSubmission = () => {
       setIsSubmitting(true);
       setFormErrors({});
 
+      if (!validateLinkedInURL()) {
+        throw new Error("Please add a valid LinkedIn URL in your wallet settings");
+      }
+
       updateStepStatus('thesis', 'completed');
       updateStepStatus('strategy', 'completed');
       updateStepStatus('approval', 'completed');
@@ -411,9 +450,7 @@ const ThesisSubmission = () => {
       }
 
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
-      if (!linkedInURL) {
-        throw new Error("LinkedIn Profile URL not found. Please add it in your wallet settings.");
-      }
+      console.log('Retrieved LinkedIn URL:', linkedInURL);
 
       const metadataToUpload: ProposalMetadata = {
         ...formData,
