@@ -1,3 +1,4 @@
+<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,6 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
-import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
 import Nav from "@/components/Nav";
 import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
 import { 
   FirmSize, 
   DealType, 
@@ -820,79 +821,3 @@ const ThesisSubmission = () => {
                         <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isApprovalOpen && "transform rotate-180")} />
                       </div>
                     </button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-4 px-4 pb-6">
-                    <PaymentTermsSection
-                      formData={formData}
-                      formErrors={formErrors}
-                      onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
-                    />
-                    <StrategiesSection
-                      formData={formData}
-                      formErrors={formErrors}
-                      onChange={(category, value) => handleStrategyChange(category, value)}
-                    />
-                    <div className="space-y-4">
-                      <Label className="text-lg font-medium text-white">
-                        Additional Requirements
-                      </Label>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </div>
-            </Card>
-          </div>
-
-          <div className="w-80 space-y-6">
-            <LGRWalletDisplay
-              submissionFee={SUBMISSION_FEE}
-              currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
-              walletAddress={address}
-              className="sticky top-8"
-            />
-
-            <ContractApprovalStatus
-              onApprovalComplete={handleApprovalComplete}
-              requiredAmount={SUBMISSION_FEE}
-              isTestMode={isTestMode}
-              currentFormData={formData}
-            />
-
-            <Card className="bg-black/40 border-white/10 p-6 space-y-4">
-              <h3 className="text-xl font-semibold text-white">Promote Your Thesis</h3>
-              <p className="text-sm text-white/60">
-                Increase visibility and engagement with promotional options
-              </p>
-              
-              <div className="space-y-4">
-                <Button
-                  onClick={() => handlePromotionSelect('weekly')}
-                  variant="outline"
-                  className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <span>Weekly Promotion</span>
-                    <span className="text-sm text-white/60">5 LGR</span>
-                  </div>
-                </Button>
-
-                <Button
-                  onClick={() => handlePromotionSelect('monthly')}
-                  variant="outline"
-                  className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <span>Monthly Promotion</span>
-                    <span className="text-sm text-white/60">15 LGR</span>
-                  </div>
-                </Button>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;

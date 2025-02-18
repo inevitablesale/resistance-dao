@@ -17,7 +17,7 @@ const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 interface ContractApprovalStatusProps {
   onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction) => void;
-  requiredAmount: ethers.BigNumberish;
+  requiredAmount: string;
   isTestMode?: boolean;
   currentFormData: any;
 }
@@ -166,7 +166,7 @@ export const ContractApprovalStatus = ({
   }, [isTestMode]);
 
   return (
-    <Card className="bg-black/40 border-white/10 p-4 space-y-4">
+    <div className="p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {isApproved ? (
@@ -192,7 +192,7 @@ export const ContractApprovalStatus = ({
               {isTestMode ? (
                 "Test mode: No LGR required for approval"
               ) : (
-                `Approve ${ethers.utils.formatEther(requiredAmount.toString())} LGR for submission`
+                `Approve ${ethers.utils.formatEther(requiredAmount)} LGR for submission`
               )}
             </p>
           </div>
@@ -222,6 +222,6 @@ export const ContractApprovalStatus = ({
           onError={handleTxError}
         />
       )}
-    </Card>
+    </div>
   );
 };
