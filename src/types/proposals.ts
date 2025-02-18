@@ -92,3 +92,20 @@ export interface ProposalConfig {
   metadata: ProposalMetadata;
   linkedInURL: string;
 }
+
+export interface ProposalInput {
+  title: string;
+  ipfsMetadata: string;
+  targetCapital: ethers.BigNumber;
+  votingDuration: number;
+  investmentDrivers: string;
+  additionalCriteria: string;
+  firmSize: FirmSize;
+  location: string;
+  dealType: DealType;
+  geographicFocus: GeographicFocus;
+  paymentTerms: PaymentTerm[];
+  operationalStrategies: OperationalStrategy[];
+  growthStrategies: GrowthStrategy[];
+  integrationStrategies: IntegrationStrategy[];
+}

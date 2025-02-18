@@ -1,7 +1,9 @@
+
 import { ethers } from "ethers";
 
 export const CONTRACT_ADDRESS = "0xE0Ae49Df82C207AD72a7b26Cb88c4ce1EA838250";
 export const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
+export const LGR_PRICE_USD = 0.10; // $0.10 per LGR token
 
 // Contract-specific constants
 export const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
