@@ -18,7 +18,7 @@ const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const TESTER_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
 interface ContractApprovalStatusProps {
-  onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction, isTesterMode?: boolean) => void;
+  onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction) => void;
   requiredAmount: ethers.BigNumberish;
   isTestMode?: boolean;
   currentFormData: any;
@@ -140,7 +140,7 @@ export const ContractApprovalStatus = ({
         if (!approvalCompletedRef.current) {
           approvalCompletedRef.current = true;
           setIsApproved(true);
-          onApprovalComplete(currentFormData, undefined, true);
+          onApprovalComplete(currentFormData);
         }
         return;
       }
@@ -185,7 +185,7 @@ export const ContractApprovalStatus = ({
       if (!approvalCompletedRef.current) {
         approvalCompletedRef.current = true;
         setIsApproved(true);
-        onApprovalComplete(currentFormData, transaction, false);
+        onApprovalComplete(currentFormData, transaction);
       }
     } catch (error) {
       console.error("Approval error:", error);

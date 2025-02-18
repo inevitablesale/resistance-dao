@@ -16,62 +16,57 @@ export const VOTING_FEE = ethers.utils.parseEther("10"); // 10 LGR
 // Contract addresses
 export const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
-// Factory Contract ABI
+// Factory Contract ABI for LedgerFren Proposal Factory
 export const FACTORY_ABI = [
-  // Constructor and Initialization
-  "constructor(address _lgrToken, address _treasury, address _tester)",
+  // Core proposal creation
+  `function createProposal(
+    tuple(
+      string title,
+      string ipfsMetadata,
+      uint128 targetCapital,
+      uint256 votingDuration,
+      string investmentDrivers,
+      string additionalCriteria,
+      uint8 firmSize,
+      string location,
+      uint8 dealType,
+      uint8 geographicFocus,
+      uint8[] paymentTerms,
+      uint8[] operationalStrategies,
+      uint8[] growthStrategies,
+      uint8[] integrationStrategies
+    ) input,
+    string linkedInURL
+  ) external returns (uint256)`,
+
+  // Read-only getters
+  "function LGR_TOKEN() public view returns (address)",
+  "function MAX_TARGET_CAPITAL() public view returns (uint128)",
+  "function MIN_TARGET_CAPITAL() public view returns (uint128)",
+  "function MIN_VOTING_DURATION() public view returns (uint256)",
+  "function MAX_VOTING_DURATION() public view returns (uint256)",
+  "function VOTING_FEE() public view returns (uint256)",
+  "function submissionFee() public view returns (uint256)",
+  "function owner() public view returns (address)",
+  "function paused() public view returns (bool)",
+  "function testModeEnabled() public view returns (bool)",
+  "function treasury() public view returns (address)",
+  "function tester() public view returns (address)",
   
-  // State Variables
-  "function LGR_TOKEN() external view returns (address)",
-  "function tester() external view returns (address)",
-  "function treasury() external view returns (address)",
-  "function submissionFee() external view returns (uint256)",
-  "function testModeEnabled() external view returns (bool)",
-  "function MIN_VOTING_DURATION() external pure returns (uint256)",
-  "function MAX_VOTING_DURATION() external pure returns (uint256)",
-  "function MIN_TARGET_CAPITAL() external pure returns (uint128)",
-  "function MAX_TARGET_CAPITAL() external pure returns (uint128)",
-  "function VOTING_FEE() external pure returns (uint256)",
-  
-  // Pausable Functions
-  "function paused() external view returns (bool)",
-  "function pause() external",
-  "function unpause() external",
-  
-  // Function Interfaces
-  "function setTestMode(bool _enabled) external",
-  "function createProposal((string,string,uint128,uint256,string,string,uint8,string,uint8,uint8,uint8[],uint8[],uint8[],uint8[]) calldata input, string calldata linkedInURL) external returns (uint256)",
+  // Vote functions
   "function vote(uint256 tokenId, uint128 pledgeAmount) external",
+  "function hasVoted(uint256,address) public view returns (bool)",
+  "function voterPledges(uint256,address) public view returns (uint128)",
+  "function pledgedAmount(uint256) public view returns (uint128)",
   
-  // Mapping Access Functions
-  "function proposals(uint256) external view returns (address creator, string creatorLinkedIn, string title, string ipfsMetadata, uint128 targetCapital, uint256 votingEnds, string investmentDrivers, string additionalCriteria, uint8 firmSize, string location, uint8 dealType, uint8 geographicFocus, uint256 totalVotes)",
-  "function userProposals(address, uint256) external view returns (uint256)",
-  "function hasVoted(uint256, address) external view returns (bool)",
-  "function pledgedAmount(uint256) external view returns (uint128)",
-  "function voterPledges(uint256, address) external view returns (uint128)",
+  // Admin functions
+  "function setTestMode(bool _enabled) external",
   
   // Events
   "event ProposalCreated(uint256 indexed tokenId, address indexed creator)",
   "event ProposalNFTMinted(uint256 indexed tokenId, address indexed creator)",
   "event ProposalVoted(uint256 indexed tokenId, address indexed voter, uint128 pledgeAmount)",
   "event ProposalFullyPledged(uint256 indexed tokenId, uint128 totalPledged, address[] backers)",
-  "event TestModeChanged(bool newStatus)",
-  "event Paused(address account)",
-  "event Unpaused(address account)",
-  
-  // ERC721 Required Functions
-  "function balanceOf(address owner) external view returns (uint256)",
-  "function ownerOf(uint256 tokenId) external view returns (address)",
-  "function tokenURI(uint256 tokenId) external view returns (string)",
-  
-  // Optional but recommended ERC721 Functions
-  "function name() external view returns (string)",
-  "function symbol() external view returns (string)",
-  "function approve(address to, uint256 tokenId) external",
-  "function getApproved(uint256 tokenId) external view returns (address)",
-  "function setApprovalForAll(address operator, bool approved) external",
-  "function isApprovedForAll(address owner, address operator) external view returns (bool)",
-  "function transferFrom(address from, address to, uint256 tokenId) external",
-  "function safeTransferFrom(address from, address to, uint256 tokenId) external",
-  "function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data) external"
-] as const;
+  "event TestModeChanged(bool newStatus)"
+];
+
