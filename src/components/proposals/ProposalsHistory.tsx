@@ -59,9 +59,9 @@ export const ProposalsHistory = () => {
       const tokenId = event.args?.tokenId;
       console.log('Fetching data for proposal:', tokenId.toString());
       
-      // Access the mapping using the correct syntax for ethers.js
-      // For public mappings, ethers.js creates a method with the name of the mapping
-      const proposalData = await contract.proposals(tokenId);
+      // For Solidity mappings, we need to call the getter function that's generated
+      // The function name is the mapping name
+      const proposalData = await contract.callStatic.proposals(tokenId);
       console.log('Raw proposal data:', proposalData);
       
       // Extract values from the proposal struct
