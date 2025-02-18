@@ -1,18 +1,12 @@
-
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Settings2, TrendingUp, UsersRound, Globe, Layers, Users, Building, Network, ArrowLeftRight, Users2, ScrollText, Database } from "lucide-react";
+import { ProposalMetadata, OperationalStrategy, GrowthStrategy, IntegrationStrategy } from "@/types/proposals";
 
-interface StrategiesSectionProps {
-  formData: {
-    strategies: {
-      operational: string[];
-      growth: string[];
-      integration: string[];
-    };
-  };
+export interface StrategiesSectionProps {
+  formData: ProposalMetadata;
   formErrors: Record<string, string[]>;
-  onChange: (category: "operational" | "growth" | "integration", value: string[]) => void;
+  onChange: (category: "operational" | "growth" | "integration", value: (OperationalStrategy | GrowthStrategy | IntegrationStrategy)[]) => void;
 }
 
 export const StrategiesSection = ({ formData, formErrors, onChange }: StrategiesSectionProps) => {
@@ -21,7 +15,7 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
     const updatedStrategies = checked
       ? [...currentStrategies, value]
       : currentStrategies.filter(s => s !== value);
-    onChange(category, updatedStrategies);
+    onChange(category, updatedStrategies as (OperationalStrategy | GrowthStrategy | IntegrationStrategy)[]);
   };
 
   const strategies = {
@@ -108,4 +102,3 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
     </div>
   );
 };
-

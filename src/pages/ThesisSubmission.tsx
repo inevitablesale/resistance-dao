@@ -93,22 +93,22 @@ const TEST_FORM_DATA: ProposalMetadata = {
     geographicFocus: GeographicFocus.LOCAL
   },
   paymentTerms: [
-    "Initial payment of 30% upon signing",
-    "Monthly installments over 24 months",
-    "Performance-based earnout over 3 years"
+    PaymentTerm.CASH,
+    PaymentTerm.SELLER_FINANCING,
+    PaymentTerm.EARNOUT
   ],
   strategies: {
     operational: [
-      "Implement cloud-based workflow automation",
-      "Standardize service delivery processes"
+      OperationalStrategy.TECH_MODERNIZATION,
+      OperationalStrategy.PROCESS_STANDARDIZATION
     ],
     growth: [
-      "Expand service offerings to include AI solutions",
-      "Target enterprise clients"
+      GrowthStrategy.SERVICE_EXPANSION,
+      GrowthStrategy.CLIENT_GROWTH
     ],
     integration: [
-      "Retain key technical personnel",
-      "Gradual systems migration"
+      IntegrationStrategy.MERGING_OPERATIONS,
+      IntegrationStrategy.SYSTEMS_CONSOLIDATION
     ]
   },
   investment: {
@@ -801,14 +801,14 @@ const ThesisSubmission = () => {
                   </CollapsibleTrigger>
                   <CollapsibleContent className="pt-4 px-4 pb-6">
                     <PaymentTermsSection
-                      paymentTerms={formData.paymentTerms}
-                      onChange={value => handleFormDataChange('paymentTerms', value)}
-                      error={formErrors.paymentTerms}
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
                     />
                     <StrategiesSection
-                      strategies={formData.strategies}
+                      formData={formData}
                       formErrors={formErrors}
-                      onStrategyChange={handleStrategyChange}
+                      onChange={(category, value) => handleStrategyChange(category, value)}
                     />
                     <div className="space-y-4">
                       <Label className="text-lg font-medium text-white">

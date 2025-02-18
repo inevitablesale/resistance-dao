@@ -1,17 +1,15 @@
-
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ProposalMetadata, PaymentTerm } from "@/types/proposals";
 
-interface PaymentTermsSectionProps {
-  formData: {
-    paymentTerms: string[];
-  };
+export interface PaymentTermsSectionProps {
+  formData: ProposalMetadata;
   formErrors: Record<string, string[]>;
-  onChange: (field: string, value: string[]) => void;
+  onChange: (field: string, value: PaymentTerm[]) => void;
 }
 
 export const PaymentTermsSection = ({ formData, formErrors, onChange }: PaymentTermsSectionProps) => {
-  const handleTermChange = (term: string, checked: boolean) => {
+  const handleTermChange = (term: PaymentTerm, checked: boolean) => {
     const newTerms = checked 
       ? [...formData.paymentTerms, term]
       : formData.paymentTerms.filter(t => t !== term);
@@ -32,8 +30,8 @@ export const PaymentTermsSection = ({ formData, formErrors, onChange }: PaymentT
           <Checkbox 
             id="cash" 
             className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-            checked={formData.paymentTerms.includes('cash')}
-            onCheckedChange={(checked) => handleTermChange('cash', checked as boolean)}
+            checked={formData.paymentTerms.includes(PaymentTerm.CASH)}
+            onCheckedChange={(checked) => handleTermChange(PaymentTerm.CASH, checked as boolean)}
           />
           <Label htmlFor="cash" className="text-gray-200">Cash</Label>
         </div>
@@ -41,8 +39,8 @@ export const PaymentTermsSection = ({ formData, formErrors, onChange }: PaymentT
           <Checkbox 
             id="seller-financing" 
             className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-            checked={formData.paymentTerms.includes('seller-financing')}
-            onCheckedChange={(checked) => handleTermChange('seller-financing', checked as boolean)}
+            checked={formData.paymentTerms.includes(PaymentTerm.SELLER_FINANCING)}
+            onCheckedChange={(checked) => handleTermChange(PaymentTerm.SELLER_FINANCING, checked as boolean)}
           />
           <Label htmlFor="seller-financing" className="text-gray-200">Seller Financing</Label>
         </div>
@@ -50,8 +48,8 @@ export const PaymentTermsSection = ({ formData, formErrors, onChange }: PaymentT
           <Checkbox 
             id="earnout" 
             className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-            checked={formData.paymentTerms.includes('earnout')}
-            onCheckedChange={(checked) => handleTermChange('earnout', checked as boolean)}
+            checked={formData.paymentTerms.includes(PaymentTerm.EARNOUT)}
+            onCheckedChange={(checked) => handleTermChange(PaymentTerm.EARNOUT, checked as boolean)}
           />
           <Label htmlFor="earnout" className="text-gray-200">Earnout</Label>
         </div>
@@ -59,8 +57,8 @@ export const PaymentTermsSection = ({ formData, formErrors, onChange }: PaymentT
           <Checkbox 
             id="equity-rollover" 
             className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-            checked={formData.paymentTerms.includes('equity-rollover')}
-            onCheckedChange={(checked) => handleTermChange('equity-rollover', checked as boolean)}
+            checked={formData.paymentTerms.includes(PaymentTerm.EQUITY_ROLLOVER)}
+            onCheckedChange={(checked) => handleTermChange(PaymentTerm.EQUITY_ROLLOVER, checked as boolean)}
           />
           <Label htmlFor="equity-rollover" className="text-gray-200">Equity Rollover</Label>
         </div>
@@ -68,8 +66,8 @@ export const PaymentTermsSection = ({ formData, formErrors, onChange }: PaymentT
           <Checkbox 
             id="bank-financing" 
             className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-            checked={formData.paymentTerms.includes('bank-financing')}
-            onCheckedChange={(checked) => handleTermChange('bank-financing', checked as boolean)}
+            checked={formData.paymentTerms.includes(PaymentTerm.BANK_FINANCING)}
+            onCheckedChange={(checked) => handleTermChange(PaymentTerm.BANK_FINANCING, checked as boolean)}
           />
           <Label htmlFor="bank-financing" className="text-gray-200">Bank Financing</Label>
         </div>
