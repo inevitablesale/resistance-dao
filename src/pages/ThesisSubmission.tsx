@@ -458,8 +458,8 @@ const ThesisSubmission = () => {
         paymentTerms: formData.paymentTerms,
         strategies: formData.strategies,
         investment: formData.investment,
-        votingDuration,
-        linkedInURL,
+        votingDuration: votingDuration,
+        linkedInURL: linkedInURL,
         isTestMode,
         submissionTimestamp: Date.now(),
         submitter: address
