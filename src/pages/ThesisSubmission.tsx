@@ -502,7 +502,7 @@ const ThesisSubmission = () => {
         maxAllowed: ethers.utils.formatEther(MAX_TARGET_CAPITAL)
       });
 
-      if (!validateTargetCapital(targetCapital, !!isTestMode)) {
+      if (!validateTargetCapital(targetCapital.toString(), !!isTestMode)) {
         throw new Error(`Target capital must be between ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} and ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} LGR`);
       }
 
@@ -510,7 +510,7 @@ const ThesisSubmission = () => {
         throw new Error("No wallet connected");
       }
 
-      const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
+      const linkedInURL = (user?.metadata?.["LinkedIn Profile URL"] as string) || "";
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
       console.log('Uploading metadata to IPFS...', { isTestMode });
@@ -522,7 +522,7 @@ const ThesisSubmission = () => {
       }
 
       console.log('Preparing proposal config...');
-      const targetCapitalWei = ethers.utils.parseEther(targetCapital);
+      const targetCapitalWei = ethers.utils.parseEther(targetCapital.toString());
       console.log('Target capital in wei:', targetCapitalWei.toString());
 
       const proposalConfig: ProposalConfig = {
