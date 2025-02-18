@@ -717,11 +717,11 @@ const ThesisSubmission = () => {
                   <CollapsibleTrigger asChild>
                     <button type="button" className="w-full text-left">
                       <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                        <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
+                        <div className="w-12 h-12 rounded-full bg-polygon-primary/20 flex items-center justify-center text-polygon-secondary font-semibold">
                           1
                         </div>
                         <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-purple-400 group-hover:text-purple-300 transition-colors">
+                          <h2 className="text-xl font-semibold text-polygon-secondary group-hover:text-polygon-primary transition-colors">
                             Basic Thesis Information
                           </h2>
                           <p className="text-sm text-white/60">
@@ -738,17 +738,31 @@ const ThesisSubmission = () => {
                         <Label className="text-lg font-medium text-white">
                           Thesis Title
                         </Label>
-                        <Input placeholder="Enter a clear, descriptive title" className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12" value={formData.title} onChange={e => handleFormDataChange('title', e.target.value)} />
+                        <Input 
+                          placeholder="Enter a clear, descriptive title" 
+                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12" 
+                          value={formData.title} 
+                          onChange={e => handleFormDataChange('title', e.target.value)} 
+                        />
                         {formErrors.title && <p className="text-red-400 text-sm">{formErrors.title[0]}</p>}
                       </div>
 
-                      <TargetCapitalInput value={formData.investment.targetCapital} onChange={value => handleFormDataChange('investment.targetCapital', value)} error={formErrors['investment.targetCapital']} />
+                      <TargetCapitalInput 
+                        value={formData.investment.targetCapital} 
+                        onChange={value => handleFormDataChange('investment.targetCapital', value)} 
+                        error={formErrors['investment.targetCapital']} 
+                      />
 
                       <div className="space-y-4">
                         <Label className="text-lg font-medium text-white">
                           Investment Drivers
                         </Label>
-                        <textarea placeholder="Describe the key drivers behind this investment thesis..." className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3" value={formData.investment.drivers} onChange={e => handleFormDataChange('investment.drivers', e.target.value)} />
+                        <textarea 
+                          placeholder="Describe the key drivers behind this investment thesis..." 
+                          className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3" 
+                          value={formData.investment.drivers} 
+                          onChange={e => handleFormDataChange('investment.drivers', e.target.value)} 
+                        />
                         {formErrors['investment.drivers'] && <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>}
                       </div>
                     </div>
@@ -765,11 +779,11 @@ const ThesisSubmission = () => {
                   <CollapsibleTrigger asChild>
                     <button type="button" className="w-full text-left">
                       <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                        <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-semibold">
+                        <div className="w-12 h-12 rounded-full bg-polygon-primary/20 flex items-center justify-center text-polygon-secondary font-semibold">
                           2
                         </div>
                         <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-blue-400 group-hover:text-blue-300 transition-colors">
+                          <h2 className="text-xl font-semibold text-polygon-secondary group-hover:text-polygon-primary transition-colors">
                             Target Company Profile
                           </h2>
                           <p className="text-sm text-white/60">
@@ -806,11 +820,11 @@ const ThesisSubmission = () => {
                   <CollapsibleTrigger asChild>
                     <button type="button" className="w-full text-left">
                       <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                        <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 font-semibold">
+                        <div className="w-12 h-12 rounded-full bg-polygon-primary/20 flex items-center justify-center text-polygon-secondary font-semibold">
                           3
                         </div>
                         <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-green-400 group-hover:text-green-300 transition-colors">
+                          <h2 className="text-xl font-semibold text-polygon-secondary group-hover:text-polygon-primary transition-colors">
                             Deal Structure
                           </h2>
                           <p className="text-sm text-white/60">
@@ -832,11 +846,6 @@ const ThesisSubmission = () => {
                       formErrors={formErrors}
                       onChange={(category, value) => handleStrategyChange(category, value)}
                     />
-                    <div className="space-y-4">
-                      <Label className="text-lg font-medium text-white">
-                        Additional Requirements
-                      </Label>
-                    </div>
                   </CollapsibleContent>
                 </Collapsible>
               </div>
