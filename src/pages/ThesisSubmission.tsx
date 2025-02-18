@@ -542,7 +542,7 @@ const ThesisSubmission = () => {
 
       console.log('Estimating gas for proposal creation...', { isTestMode });
       const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : effectiveFormData?.investment.targetCapital || ""
+        isTestMode ? TEST_FORM_DATA.investment.targetCapital : effectiveFormData.investment.targetCapital
       );
 
       const proposalConfig: ProposalConfig = {
@@ -562,9 +562,10 @@ const ThesisSubmission = () => {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
-        title: isTestMode ? TEST_FORM_DATA.title : effectiveFormData?.title || "",
+        title: isTestMode ? TEST_FORM_DATA.title : effectiveFormData.title,
         targetCapital: targetCapitalWei.toString(),
-        status: 'pending'
+        status: 'pending',
+        isTestMode
       };
       userProposals.push(newProposal);
       localStorage.setItem('userProposals', JSON.stringify(userProposals));
@@ -609,7 +610,7 @@ const ThesisSubmission = () => {
     >
       {isSubmitting ? (
         <>
-          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
           <span>Processing...</span>
         </>
       ) : (
