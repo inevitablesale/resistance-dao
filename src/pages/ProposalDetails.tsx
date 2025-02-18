@@ -62,6 +62,20 @@ const ProposalDetails = () => {
       // Get IPFS metadata
       console.log('Fetching IPFS metadata from:', storedProposal.ipfsHash);
       const metadata = await getFromIPFS<ProposalMetadata>(storedProposal.ipfsHash, 'proposal');
+      
+      console.log('Processed IPFS metadata:', {
+        title: metadata.title,
+        firmCriteria: metadata.firmCriteria,
+        investment: {
+          ...metadata.investment,
+          targetCapital: ethers.utils.formatEther(metadata.investment.targetCapital)
+        },
+        paymentTerms: metadata.paymentTerms,
+        strategies: metadata.strategies,
+        isTestMode: metadata.isTestMode,
+        submissionTimestamp: new Date(metadata.submissionTimestamp).toLocaleString(),
+        submitter: metadata.submitter
+      });
 
       setProposalDetails({
         metadata,
