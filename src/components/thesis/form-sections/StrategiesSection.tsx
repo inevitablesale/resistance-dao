@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Settings2, TrendingUp, UsersRound, Globe, Layers, Users, Building, Network, ArrowLeftRight, Users2, ScrollText, Database } from "lucide-react";
@@ -13,26 +14,26 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
   const handleStrategyChange = (category: keyof typeof formData.strategies, value: string, checked: boolean) => {
     const currentStrategies = [...formData.strategies[category]];
     const updatedStrategies = checked
-      ? [...currentStrategies, value]
+      ? [...currentStrategies, value as (OperationalStrategy | GrowthStrategy | IntegrationStrategy)]
       : currentStrategies.filter(s => s !== value);
-    onChange(category, updatedStrategies as (OperationalStrategy | GrowthStrategy | IntegrationStrategy)[]);
+    onChange(category, updatedStrategies);
   };
 
   const strategies = {
     operational: [
-      { id: 'tech-modernization', label: 'Technology Modernization', icon: Settings2 },
-      { id: 'process-standardization', label: 'Process Standardization', icon: ScrollText },
-      { id: 'staff-retention', label: 'Staff Retention/Development', icon: UsersRound }
+      { id: OperationalStrategy.TECH_MODERNIZATION, label: 'Technology Modernization', icon: Settings2 },
+      { id: OperationalStrategy.PROCESS_STANDARDIZATION, label: 'Process Standardization', icon: ScrollText },
+      { id: OperationalStrategy.STAFF_RETENTION, label: 'Staff Retention/Development', icon: UsersRound }
     ],
     growth: [
-      { id: 'geographic-expansion', label: 'Geographic Expansion', icon: Globe },
-      { id: 'service-expansion', label: 'Service Line Expansion', icon: Layers },
-      { id: 'client-growth', label: 'Client Base Growth', icon: TrendingUp }
+      { id: GrowthStrategy.GEOGRAPHIC_EXPANSION, label: 'Geographic Expansion', icon: Globe },
+      { id: GrowthStrategy.SERVICE_EXPANSION, label: 'Service Line Expansion', icon: Layers },
+      { id: GrowthStrategy.CLIENT_GROWTH, label: 'Client Base Growth', icon: TrendingUp }
     ],
     integration: [
-      { id: 'merging-operations', label: 'Merging Operations', icon: ArrowLeftRight },
-      { id: 'culture-integration', label: 'Culture Integration', icon: Users2 },
-      { id: 'systems-consolidation', label: 'Systems Consolidation', icon: Database }
+      { id: IntegrationStrategy.MERGING_OPERATIONS, label: 'Merging Operations', icon: ArrowLeftRight },
+      { id: IntegrationStrategy.CULTURE_INTEGRATION, label: 'Culture Integration', icon: Users2 },
+      { id: IntegrationStrategy.SYSTEMS_CONSOLIDATION, label: 'Systems Consolidation', icon: Database }
     ]
   };
 
@@ -74,7 +75,11 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
                       className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
                       checked={formData.strategies[category as keyof typeof formData.strategies].includes(id)}
                       onCheckedChange={(checked) => {
-                        handleStrategyChange(category as keyof typeof formData.strategies, id, checked as boolean);
+                        handleStrategyChange(
+                          category as keyof typeof formData.strategies,
+                          id,
+                          checked as boolean
+                        );
                       }}
                     />
                     <div className="flex items-center gap-1.5">

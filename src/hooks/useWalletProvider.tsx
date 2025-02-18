@@ -87,9 +87,9 @@ export const useWalletProvider = () => {
     try {
       console.log('Starting provider initialization...');
       const walletClient = await validateWalletClient();
-      const walletType = getWalletType();
+      let currentWalletType = getWalletType();
       
-      if (walletType === 'zerodev') {
+      if (currentWalletType === 'zerodev') {
         console.log('Initializing ZeroDev provider...');
         try {
           const ethersProvider = await initializeProvider(walletClient);
@@ -107,7 +107,7 @@ export const useWalletProvider = () => {
             description: "Falling back to regular wallet mode",
             variant: "default"
           });
-          walletType = 'regular';
+          currentWalletType = 'regular';
         }
       }
 
@@ -115,7 +115,7 @@ export const useWalletProvider = () => {
       const ethersProvider = await initializeProvider(walletClient);
       return {
         provider: ethersProvider,
-        type: 'regular',
+        type: currentWalletType,
         isSmartWallet: false,
         getNetwork: () => ethersProvider.getNetwork(),
         getSigner: () => ethersProvider.getSigner()

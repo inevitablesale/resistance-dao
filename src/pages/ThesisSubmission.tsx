@@ -261,16 +261,17 @@ const ThesisSubmission = () => {
     return formData.paymentTerms.length <= 5;
   };
 
-  const handleStrategyChange = (category: "operational" | "growth" | "integration", value: string[]) => {
-    handleFormDataChange(`strategies.${category}`, value);
+  const handleStrategyChange = (
+    category: "operational" | "growth" | "integration",
+    values: (OperationalStrategy | GrowthStrategy | IntegrationStrategy)[]
+  ) => {
+    handleFormDataChange(`strategies.${category}`, values);
   };
 
   const handleFormDataChange = (field: string, value: any) => {
     setFormData(prev => {
       const newData = { ...prev };
-      
       const fields = field.split('.');
-      
       let current: any = newData;
       
       for (let i = 0; i < fields.length - 1; i++) {
@@ -281,7 +282,15 @@ const ThesisSubmission = () => {
       }
       
       const lastField = fields[fields.length - 1];
-      current[lastField] = value;
+      if (field === 'firmCriteria.size') {
+        current[lastField] = Number(value) as FirmSize;
+      } else if (field === 'firmCriteria.dealType') {
+        current[lastField] = Number(value) as DealType;
+      } else if (field === 'firmCriteria.geographicFocus') {
+        current[lastField] = Number(value) as GeographicFocus;
+      } else {
+        current[lastField] = value;
+      }
       
       return newData;
     });
