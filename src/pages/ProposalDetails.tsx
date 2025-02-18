@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ethers } from "ethers";
@@ -49,9 +48,9 @@ const ProposalDetails = () => {
         throw new Error('Proposal not found');
       }
 
-      // Get IPFS metadata - now returns ProposalMetadata directly
+      // Get IPFS metadata with the correct type
       console.log('Fetching IPFS metadata from:', storedProposal.ipfsHash);
-      const metadata = await getFromIPFS(storedProposal.ipfsHash);
+      const metadata = await getFromIPFS<ProposalMetadata>(storedProposal.ipfsHash, 'proposal');
 
       // Get on-chain data
       const walletProvider = await getProvider();
