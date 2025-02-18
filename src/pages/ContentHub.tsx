@@ -28,7 +28,7 @@ export default function ContentHub() {
       
       // Load IPFS content for new publications
       for (const pub of newPubs) {
-        const content = await getFromIPFS(pub.ipfsHash);
+        const content = await getFromIPFS<IPFSContent>(pub.ipfsHash, 'content');
         setContents(prev => new Map(prev).set(pub.ipfsHash, content));
       }
     } catch (error) {
