@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -11,7 +12,7 @@ export interface TransactionConfig {
   backoffMs: number;
   eventConfig?: EventConfig;
   description: string;
-  type: 'proposal' | 'token' | 'contract' | 'nft';
+  type: 'proposal' | 'token' | 'contract' | 'nft' | 'approval';
   tokenConfig?: {
     tokenAddress: string;
     spenderAddress: string;

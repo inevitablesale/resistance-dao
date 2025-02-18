@@ -5,7 +5,7 @@ import { ProposalError } from "./errorHandlingService";
 
 export interface QueuedTransaction {
   id: string;
-  type: 'contract' | 'proposal' | 'approval' | 'token';  // Added 'token' type
+  type: 'contract' | 'proposal' | 'approval' | 'token' | 'nft';  // Added 'nft' type
   status: 'pending' | 'processing' | 'completed' | 'failed';
   description: string;
   hash?: string;
