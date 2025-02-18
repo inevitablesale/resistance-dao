@@ -164,7 +164,7 @@ export const ContractApprovalStatus = ({
     <Card className="bg-black/40 border-white/10 p-4">
       {currentTxId && (
         <TransactionStatus
-          txId={currentTxId}
+          transactionId={currentTxId}
           onComplete={handleTxComplete}
           onError={handleTxError}
         />
