@@ -594,96 +594,67 @@ const ThesisSubmission = () => {
     </Button>
   );
 
-  const handleRentAdSpace = (frequency: 'week' | 'month') => {
-    // Implement ad space rental logic here
-  };
-
-  const handleTestModeToggle = async (enabled: boolean) => {
-    if (!isConnected) {
-      toast({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to toggle test mode",
-        variant: "destructive"
-      });
-      connect();
-      return;
-    }
-    
-    const success = await toggleTestMode(enabled);
-    if (success) {
-      setIsTestMode(enabled);
-      if (enabled) {
-        setFormData(TEST_FORM_DATA);
-      } else {
-        setFormData({
-          title: "",
-          firmCriteria: {
-            size: FirmSize.BELOW_1M,
-            location: "",
-            dealType: DealType.ACQUISITION,
-            geographicFocus: GeographicFocus.LOCAL
-          },
-          paymentTerms: [],
-          strategies: {
-            operational: [],
-            growth: [],
-            integration: []
-          },
-          investment: {
-            targetCapital: "",
-            drivers: "",
-            additionalCriteria: ""
-          },
-          votingDuration: MIN_VOTING_DURATION,
-          linkedInURL: "",
-          isTestMode: false,
-          submissionTimestamp: Date.now(),
-          submitter: address
-        });
-      }
-    }
-  };
-
-  const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
-    // Implement promotion selection logic here
-  };
-
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Background Elements */}
+      <div className="fixed inset-0 z-0">
+        <div className="circuit-board" />
+        <div 
+          className="absolute inset-0 animate-parallax-slow"
+          style={{
+            background: `
+              radial-gradient(2px 2px at 20% 20%, rgba(234, 179, 8, 0.95) 100%, transparent),
+              radial-gradient(2px 2px at 40% 40%, rgba(234, 179, 8, 0.92) 100%, transparent),
+              radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
+            `,
+            backgroundSize: "240px 240px",
+            opacity: 0.1
+          }}
+        />
+      </div>
+
+      {/* Header */}
       <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between py-4">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-between"
             >
-              <h1 className="text-3xl font-bold">
+              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
                 Transform Accounting Firm Ownership
               </h1>
             </motion.div>
             
-            <div className="flex items-center space-x-3">
-              <Label htmlFor="test-mode" className="text-sm text-white/60">
-                Test Mode
-              </Label>
-              <Switch
-                id="test-mode"
-                checked={isTestMode}
-                onCheckedChange={handleTestModeToggle}
-                className={cn(
-                  "data-[state=checked]:bg-yellow-500",
-                  !isConnected && "opacity-50 cursor-not-allowed"
-                )}
-                disabled={!isConnected}
+            <div className="flex items-center gap-6">
+              <LGRWalletDisplay
+                submissionFee={SUBMISSION_FEE}
+                walletAddress={address}
               />
+              <div className="flex items-center space-x-3">
+                <Label htmlFor="test-mode" className="text-sm text-white/60">
+                  Test Mode
+                </Label>
+                <Switch
+                  id="test-mode"
+                  checked={isTestMode}
+                  onCheckedChange={handleTestModeToggle}
+                  className={cn(
+                    "data-[state=checked]:bg-yellow-500",
+                    !isConnected && "opacity-50 cursor-not-allowed"
+                  )}
+                  disabled={!isConnected}
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="container mx-auto px-4 pt-32 pb-20">
         <div className="grid grid-cols-12 gap-8">
+          {/* Left Column - Steps */}
           <div className="col-span-3">
             <div className="sticky top-32 space-y-4">
               {SUBMISSION_STEPS.map((step, index) => (
@@ -732,6 +703,7 @@ const ThesisSubmission = () => {
             </div>
           </div>
 
+          {/* Center Column - Form */}
           <div className="col-span-6 space-y-6">
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
               <motion.div 
@@ -750,6 +722,7 @@ const ThesisSubmission = () => {
                 </div>
               </motion.div>
 
+              {/* Form Content */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeStep}
@@ -849,6 +822,7 @@ const ThesisSubmission = () => {
                 </motion.div>
               </AnimatePresence>
 
+              {/* Navigation Buttons */}
               <div className="px-6 pb-6 pt-4 border-t border-white/5">
                 <div className="flex justify-between items-center">
                   <Button
@@ -858,3 +832,58 @@ const ThesisSubmission = () => {
                       if (currentIndex > 0) {
                         setActiveStep(SUBMISSION_STEPS[currentIndex - 1].id);
                       }
+                    }}
+                    disabled={activeStep === SUBMISSION_STEPS[0].id}
+                    className="text-white/60 hover:text-white"
+                  >
+                    Previous Step
+                  </Button>
+                  {renderContinueButton(() => {
+                    const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
+                    if (currentIndex < SUBMISSION_STEPS.length - 1) {
+                      setActiveStep(SUBMISSION_STEPS[currentIndex + 1].id);
+                    } else {
+                      handleSubmit(new Event('submit') as any);
+                    }
+                  }, activeStep === SUBMISSION_STEPS[SUBMISSION_STEPS.length - 1].id)}
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Right Column - Status */}
+          <div className="col-span-3">
+            <div className="sticky top-32 space-y-6">
+              <LGRWalletDisplay
+                submissionFee={SUBMISSION_FEE}
+                walletAddress={address}
+              />
+
+              <ContractApprovalStatus
+                onApprovalComplete={handleApprovalComplete}
+                requiredAmount={SUBMISSION_FEE}
+                isTestMode={isTestMode}
+                currentFormData={formData}
+              />
+
+              {currentTxId && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <TransactionStatus
+                    transactionId={currentTxId}
+                    onComplete={handleTxComplete}
+                    onError={handleTxError}
+                  />
+                </motion.div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
