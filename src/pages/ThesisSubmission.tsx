@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,15 +8,6 @@ import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
-import Nav from "@/components/Nav";
-import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp, Check } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
-import { ethers } from "ethers";
-import { uploadMetadataToPinata } from "@/services/pinataService";
-import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
-import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
 import { LGRWalletDisplay } from "@/components/thesis/LGRWalletDisplay";
@@ -26,7 +18,15 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
+import { ethers } from "ethers";
+import { uploadMetadataToPinata } from "@/services/pinataService";
+import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
+import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { ArrowRight, Check } from "lucide-react";
 import { 
   FirmSize, 
   DealType, 
@@ -771,4 +771,46 @@ const ThesisSubmission = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                
+                <div className="p-6 space-y-3">
+                  <p className="text-xl text-white/90">
+                    Ready to revolutionize how accounting practices are acquired?
+                  </p>
+                  <p className="text-gray-400">
+                    Present your vision to our community of forward-thinking investors through a structured investment thesis.
+                  </p>
+                </div>
+              </motion.div>
+            </Card>
+          </div>
+
+          {/* Right Column - Status */}
+          <div className="col-span-3">
+            <div className="sticky top-32 space-y-6">
+              <ContractApprovalStatus
+                onApprovalComplete={handleApprovalComplete}
+                requiredAmount={SUBMISSION_FEE}
+                isTestMode={isTestMode}
+                currentFormData={null}
+              />
+
+              {currentTxId && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <TransactionStatus
+                    transactionId={currentTxId}
+                    onComplete={handleTxComplete}
+                    onError={handleTxError}
+                  />
+                </motion.div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
