@@ -845,7 +845,7 @@ const ThesisSubmission = () => {
 
           <div className="max-w-2xl mx-auto space-y-6">
             <LGRWalletDisplay
-              submissionFee={ethers.utils.formatEther(SUBMISSION_FEE)}
+              submissionFee={SUBMISSION_FEE}
               currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
               walletAddress={address}
               className="sticky top-8"
