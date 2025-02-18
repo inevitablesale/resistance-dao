@@ -11,10 +11,11 @@ export interface StrategiesSectionProps {
 }
 
 type StrategyType = OperationalStrategy | GrowthStrategy | IntegrationStrategy;
+type StrategyCategory = keyof typeof formData.strategies;
 
 export const StrategiesSection = ({ formData, formErrors, onChange }: StrategiesSectionProps) => {
   const handleStrategyChange = (
-    category: keyof typeof formData.strategies, 
+    category: StrategyCategory, 
     value: StrategyType, 
     checked: boolean
   ) => {
@@ -27,7 +28,12 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
       updatedStrategies = currentStrategies.filter(s => s !== value);
     }
     
-    onChange(category, updatedStrategies);
+    onChange(category as "operational" | "growth" | "integration", updatedStrategies);
+  };
+
+  const isStrategySelected = (category: StrategyCategory, strategyId: StrategyType) => {
+    const strategies = formData.strategies[category] as StrategyType[];
+    return strategies.includes(strategyId);
   };
 
   const strategies = {
@@ -52,10 +58,6 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
     operational: Settings2,
     growth: TrendingUp,
     integration: Building
-  };
-
-  const isStrategySelected = (category: keyof typeof formData.strategies, strategyId: StrategyType): boolean => {
-    return formData.strategies[category].includes(strategyId as any);
   };
 
   return (
@@ -88,10 +90,10 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
                     <Checkbox 
                       id={String(id)}
                       className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-                      checked={isStrategySelected(category as keyof typeof formData.strategies, id)}
+                      checked={isStrategySelected(category as StrategyCategory, id)}
                       onCheckedChange={(checked) => {
                         handleStrategyChange(
-                          category as keyof typeof formData.strategies,
+                          category as StrategyCategory,
                           id,
                           checked as boolean
                         );
