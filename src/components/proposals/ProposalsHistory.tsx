@@ -1,7 +1,6 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FileText, Calendar } from "lucide-react";
+import { FileText, Calendar, Users, Target } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +11,8 @@ import { ethers } from "ethers";
 import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
 import { getTokenBalance } from "@/services/tokenService";
 import { useToast } from "@/hooks/use-toast";
+import { getFromIPFS } from "@/services/ipfsService";
+import { ProposalMetadata } from "@/types/proposals";
 
 const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
 
@@ -20,6 +21,8 @@ interface ProposalEvent {
   creator: string;
   blockNumber: number;
   transactionHash: string;
+  metadata?: ProposalMetadata;
+  pledgedAmount?: string;
 }
 
 export const ProposalsHistory = () => {
@@ -71,7 +74,7 @@ export const ProposalsHistory = () => {
   }, [isConnected, address, getProvider]);
 
   useEffect(() => {
-    const fetchProposalEvents = async () => {
+    const fetchProposalData = async () => {
       if (!isConnected || !hasMinimumLGR) return;
 
       try {
@@ -88,20 +91,46 @@ export const ProposalsHistory = () => {
         const events = await contract.queryFilter(filter);
         console.log('Found proposal events:', events.length);
 
-        const proposals = events.map(event => ({
-          tokenId: event.args?.tokenId.toString(),
-          creator: event.args?.creator,
-          blockNumber: event.blockNumber,
-          transactionHash: event.transactionHash
-        }));
+        // Process events and fetch metadata
+        const proposalsWithMetadata = await Promise.all(
+          events.map(async (event) => {
+            const tokenId = event.args?.tokenId.toString();
+            const baseProposal = {
+              tokenId,
+              creator: event.args?.creator,
+              blockNumber: event.blockNumber,
+              transactionHash: event.transactionHash
+            };
+
+            try {
+              // Get token URI (IPFS hash) and pledged amount
+              const [tokenURI, pledgedAmount] = await Promise.all([
+                contract.tokenURI(tokenId),
+                contract.pledgedAmount(tokenId)
+              ]);
+
+              console.log(`Fetching metadata for proposal #${tokenId} from IPFS:`, tokenURI);
+              const metadata = await getFromIPFS<ProposalMetadata>(tokenURI, 'proposal');
+
+              return {
+                ...baseProposal,
+                metadata,
+                pledgedAmount: ethers.utils.formatEther(pledgedAmount)
+              };
+            } catch (error) {
+              console.error(`Error fetching metadata for proposal #${tokenId}:`, error);
+              return baseProposal;
+            }
+          })
+        );
 
         // Sort by newest first (highest block number)
-        proposals.sort((a, b) => b.blockNumber - a.blockNumber);
+        proposalsWithMetadata.sort((a, b) => b.blockNumber - a.blockNumber);
         
-        console.log('Processed proposal events:', proposals);
-        setProposalEvents(proposals);
+        console.log('Processed proposals with metadata:', proposalsWithMetadata);
+        setProposalEvents(proposalsWithMetadata);
       } catch (error) {
-        console.error("Error fetching proposal events:", error);
+        console.error("Error fetching proposals:", error);
         toast({
           title: "Error",
           description: "Failed to load proposals. Please try again.",
@@ -112,7 +141,7 @@ export const ProposalsHistory = () => {
       }
     };
 
-    fetchProposalEvents();
+    fetchProposalData();
   }, [isConnected, hasMinimumLGR, getProvider]);
 
   if (!isConnected) {
@@ -186,11 +215,29 @@ export const ProposalsHistory = () => {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-white">Proposal #{event.tokenId}</h3>
+                      <h3 className="font-medium text-white">
+                        {event.metadata?.title || `Proposal #${event.tokenId}`}
+                      </h3>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-white/60">
-                      <Calendar className="w-4 h-4" />
-                      <span>{format(new Date(event.blockNumber * 1000), 'PPP')}</span>
+                    <div className="flex items-center gap-4 text-sm text-white/60">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        <span>{format(new Date(event.blockNumber * 1000), 'PPP')}</span>
+                      </div>
+                      {event.metadata && (
+                        <>
+                          <div className="flex items-center gap-2">
+                            <Target className="w-4 h-4" />
+                            <span>{ethers.utils.formatEther(event.metadata.investment.targetCapital)} LGR Target</span>
+                          </div>
+                          {event.pledgedAmount && (
+                            <div className="flex items-center gap-2">
+                              <Users className="w-4 h-4" />
+                              <span>{event.pledgedAmount} LGR Pledged</span>
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
