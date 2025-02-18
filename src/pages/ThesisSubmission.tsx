@@ -853,7 +853,7 @@ const ThesisSubmission = () => {
 
             <ContractApprovalStatus
               onApprovalComplete={handleApprovalComplete}
-              requiredAmount={ethers.utils.formatEther(SUBMISSION_FEE)}
+              requiredAmount={SUBMISSION_FEE}
               isTestMode={isTestMode}
               currentFormData={formData}
             />
