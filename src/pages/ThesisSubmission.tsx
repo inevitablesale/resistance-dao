@@ -1,3 +1,4 @@
+<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -857,77 +858,4 @@ const ThesisSubmission = () => {
                       const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
                       if (currentIndex > 0) {
                         setActiveStep(SUBMISSION_STEPS[currentIndex - 1].id);
-                      }
-                    }}
-                    disabled={activeStep === SUBMISSION_STEPS[0].id}
-                    className="text-white/60 hover:text-white"
-                  >
-                    Previous Step
-                  </Button>
-                  {renderContinueButton(() => {
-                    const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
-                    if (currentIndex < SUBMISSION_STEPS.length - 1) {
-                      setActiveStep(SUBMISSION_STEPS[currentIndex + 1].id);
-                    } else {
-                      handleSubmit(new Event('submit') as any);
-                    }
-                  }, activeStep === SUBMISSION_STEPS[SUBMISSION_STEPS.length - 1].id)}
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          <div className="col-span-3">
-            <div className="sticky top-32 space-y-6">
-              <LGRWalletDisplay
-                submissionFee={SUBMISSION_FEE}
-                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
-                walletAddress={address}
-              />
-
-              <ContractApprovalStatus
-                onApprovalComplete={handleApprovalComplete}
-                requiredAmount={SUBMISSION_FEE}
-                isTestMode={isTestMode}
-                currentFormData={formData}
-              />
-
-              <Card className="bg-black/40 border-white/10 p-6 space-y-4">
-                <h3 className="text-xl font-semibold">Promote Your Thesis</h3>
-                <p className="text-sm text-white/60">
-                  Increase visibility and engagement with promotional options
-                </p>
-                
-                <div className="space-y-4">
-                  <Button
-                    onClick={() => handlePromotionSelect('weekly')}
-                    variant="outline"
-                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <span>Weekly Promotion</span>
-                      <span className="text-sm text-white/60">5 LGR</span>
-                    </div>
-                  </Button>
-
-                  <Button
-                    onClick={() => handlePromotionSelect('monthly')}
-                    variant="outline"
-                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <span>Monthly Promotion</span>
-                      <span className="text-sm text-white/60">15 LGR</span>
-                    </div>
-                  </Button>
-                </div>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+                      
