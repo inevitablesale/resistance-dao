@@ -112,7 +112,7 @@ const TEST_FORM_DATA: ProposalMetadata = {
     ]
   },
   investment: {
-    targetCapital: TEST_TARGET_CAPITAL,
+    targetCapital: "1000",
     drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
     additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
   },
@@ -573,7 +573,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0") >= Number(ethers.utils.formatEther(SUBMISSION_FEE));
+  const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance || "0") >= ethers.utils.parseEther(SUBMISSION_FEE.toString()).toString();
 
   const renderContinueButton = (
     onClick: () => void,
@@ -872,7 +872,7 @@ const ThesisSubmission = () => {
             <div className="sticky top-32 space-y-6">
               <LGRWalletDisplay
                 submissionFee={SUBMISSION_FEE}
-                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance || "0"}
                 walletAddress={address}
               />
 
