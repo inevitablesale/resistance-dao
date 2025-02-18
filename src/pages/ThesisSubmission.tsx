@@ -557,13 +557,12 @@ const ThesisSubmission = () => {
 
       await handleSubmit(syntheticEvent);
     } catch (error) {
-      console.error("Error during submission:", error);
+      console.error("Error during approval completion:", error);
       toast({
-        title: "Submission Failed",
-        description: error instanceof Error ? error.message : "Failed to submit thesis",
+        title: "Approval Completion Failed",
+        description: error instanceof Error ? error.message : "Failed to complete approval",
         variant: "destructive"
       });
-      updateStepStatus('submission', 'failed');
     }
   };
 
@@ -663,6 +662,36 @@ const ThesisSubmission = () => {
       description: error,
       variant: "destructive"
     });
+  };
+
+  const onApprovalComplete = async (formData: any) => {
+    try {
+      const syntheticEvent = {
+        preventDefault: () => {},
+        target: null,
+        currentTarget: null,
+        bubbles: false,
+        cancelable: false,
+        defaultPrevented: false,
+        eventPhase: 0,
+        isTrusted: true,
+        nativeEvent: new Event('submit'),
+        stopPropagation: () => {},
+        isPropagationStopped: () => false,
+        persist: () => {},
+        isDefaultPrevented: () => false,
+        type: 'submit'
+      } as React.FormEvent<HTMLFormElement>;
+
+      await handleSubmit(syntheticEvent);
+    } catch (error) {
+      console.error("Error during approval completion:", error);
+      toast({
+        title: "Approval Completion Failed",
+        description: error instanceof Error ? error.message : "Failed to complete approval",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -870,4 +899,81 @@ const ThesisSubmission = () => {
                   )}
 
                   {activeStep === 'submission' && (
-                    <div className="space
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <Label className="text-lg font-medium">Thesis Title</Label>
+                        <Input 
+                          placeholder="Enter a clear, descriptive title"
+                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                          value={formData.title}
+                          onChange={e => handleFormDataChange('title', e.target.value)}
+                        />
+                        {formErrors.title && (
+                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                        )}
+                      </div>
+
+                      <TargetCapitalInput 
+                        value={formData.investment.targetCapital}
+                        onChange={value => handleFormDataChange('investment.targetCapital', value)}
+                        error={formErrors['investment.targetCapital']}
+                      />
+
+                      <VotingDurationInput
+                        value={votingDuration}
+                        onChange={handleVotingDurationChange}
+                        error={formErrors.votingDuration}
+                      />
+
+                      <div className="space-y-4">
+                        <Label className="text-lg font-medium">Investment Drivers</Label>
+                        <textarea
+                          placeholder="Describe the key drivers behind this investment thesis..."
+                          className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none"
+                          value={formData.investment.drivers}
+                          onChange={e => handleFormDataChange('investment.drivers', e.target.value)}
+                        />
+                        {formErrors['investment.drivers'] && (
+                          <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+
+              <div className="px-6 pb-6 pt-4 border-t border-white/5">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <Button 
+                      onClick={handleContinue}
+                      disabled={isSubmitting}
+                      className={cn(
+                        "h-12 px-6 min-w-[200px] mt-6",
+                        "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+                        "hover:from-polygon-secondary hover:to-polygon-primary",
+                        "text-white font-medium",
+                        "transition-all duration-300",
+                        "disabled:opacity-50"
+                      )}
+                    >
+                      {getButtonText()}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <div className="col-span-3">
+            <div className="sticky top-32 space-y-6">
+              {/* Status components */}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
