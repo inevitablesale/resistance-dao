@@ -265,7 +265,13 @@ const ThesisSubmission = () => {
     category: "operational" | "growth" | "integration",
     values: (OperationalStrategy | GrowthStrategy | IntegrationStrategy)[]
   ) => {
-    handleFormDataChange(`strategies.${category}`, values);
+    setFormData(prev => ({
+      ...prev,
+      strategies: {
+        ...prev.strategies,
+        [category]: values
+      }
+    }));
   };
 
   const handleFormDataChange = (field: string, value: any) => {
@@ -282,12 +288,15 @@ const ThesisSubmission = () => {
       }
       
       const lastField = fields[fields.length - 1];
+      
       if (field === 'firmCriteria.size') {
         current[lastField] = Number(value) as FirmSize;
       } else if (field === 'firmCriteria.dealType') {
         current[lastField] = Number(value) as DealType;
       } else if (field === 'firmCriteria.geographicFocus') {
         current[lastField] = Number(value) as GeographicFocus;
+      } else if (field.startsWith('strategies.')) {
+        current[lastField] = value;
       } else {
         current[lastField] = value;
       }

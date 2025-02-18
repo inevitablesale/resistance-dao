@@ -10,12 +10,23 @@ export interface StrategiesSectionProps {
   onChange: (category: "operational" | "growth" | "integration", value: (OperationalStrategy | GrowthStrategy | IntegrationStrategy)[]) => void;
 }
 
+type StrategyType = OperationalStrategy | GrowthStrategy | IntegrationStrategy;
+
 export const StrategiesSection = ({ formData, formErrors, onChange }: StrategiesSectionProps) => {
-  const handleStrategyChange = (category: keyof typeof formData.strategies, value: string, checked: boolean) => {
+  const handleStrategyChange = (
+    category: keyof typeof formData.strategies, 
+    value: StrategyType, 
+    checked: boolean
+  ) => {
     const currentStrategies = [...formData.strategies[category]];
-    const updatedStrategies = checked
-      ? [...currentStrategies, value as (OperationalStrategy | GrowthStrategy | IntegrationStrategy)]
-      : currentStrategies.filter(s => s !== value);
+    let updatedStrategies: StrategyType[];
+    
+    if (checked) {
+      updatedStrategies = [...currentStrategies, value];
+    } else {
+      updatedStrategies = currentStrategies.filter(s => s !== value);
+    }
+    
     onChange(category, updatedStrategies);
   };
 
@@ -71,7 +82,7 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
                     className="flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-white/5"
                   >
                     <Checkbox 
-                      id={id} 
+                      id={String(id)}
                       className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
                       checked={formData.strategies[category as keyof typeof formData.strategies].includes(id)}
                       onCheckedChange={(checked) => {
@@ -85,7 +96,7 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
                     <div className="flex items-center gap-1.5">
                       <Icon className="w-3.5 h-3.5 text-purple-400/70" />
                       <Label 
-                        htmlFor={id} 
+                        htmlFor={String(id)}
                         className="text-sm text-gray-200 cursor-pointer hover:text-white transition-colors"
                       >
                         {label}
