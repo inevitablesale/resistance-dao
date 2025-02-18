@@ -672,8 +672,8 @@ const ThesisSubmission = () => {
   return (
     <div className="min-h-screen bg-black text-white pb-20">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-16">
-          <div className="lg:col-span-8">
+        <div className="space-y-8">
+          <div className="w-full">
             <div className="flex items-center justify-between mb-8">
               <motion.h1 
                 initial={{ opacity: 0, y: 20 }} 
@@ -843,17 +843,17 @@ const ThesisSubmission = () => {
             </Card>
           </div>
 
-          <div className="lg:col-span-4 space-y-6">
+          <div className="max-w-2xl mx-auto space-y-6">
             <LGRWalletDisplay
-              submissionFee={SUBMISSION_FEE}
-              currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString()}
+              submissionFee={ethers.utils.formatEther(SUBMISSION_FEE)}
+              currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
               walletAddress={address}
               className="sticky top-8"
             />
 
             <ContractApprovalStatus
               onApprovalComplete={handleApprovalComplete}
-              requiredAmount={SUBMISSION_FEE}
+              requiredAmount={ethers.utils.formatEther(SUBMISSION_FEE)}
               isTestMode={isTestMode}
               currentFormData={formData}
             />
