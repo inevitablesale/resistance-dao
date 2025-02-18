@@ -59,32 +59,31 @@ export const ProposalsHistory = () => {
       const tokenId = event.args?.tokenId;
       console.log('Fetching data for proposal:', tokenId.toString());
       
-      // Log the raw event data
-      console.log('Raw event data:', {
-        args: event.args,
-        blockNumber: event.blockNumber,
-        transactionHash: event.transactionHash
-      });
+      // Use the correct method to access the mapping
+      const proposalData = await contract.functions['proposals(uint256)'](tokenId);
+      console.log('Raw proposal data:', proposalData);
 
-      // Log the contract methods
-      console.log('Available contract methods:', Object.keys(contract.functions));
+      // The returned data is an array with one element containing the struct
+      const [proposal] = proposalData;
       
-      // Try to get the raw proposal data
-      try {
-        const rawProposal = await contract.proposals(tokenId);
-        console.log('Raw proposal data from mapping:', rawProposal);
-      } catch (error) {
-        console.log('Error accessing proposals mapping:', error);
-      }
-
-      // Try to get proposal using getProposal
-      try {
-        const proposalData = await contract.getProposal(tokenId);
-        console.log('Raw proposal data from getProposal:', proposalData);
-      } catch (error) {
-        console.log('Error calling getProposal:', error);
-      }
-
+      // Extract values from the proposal struct
+      const {
+        title,
+        ipfsMetadata,
+        targetCapital,
+        votingEnds,
+        investmentDrivers,
+        additionalCriteria,
+        firmSize,
+        location,
+        dealType,
+        geographicFocus,
+        paymentTerms,
+        operationalStrategies,
+        growthStrategies,
+        integrationStrategies
+      } = proposal;
+      
       const pledgedAmount = await contract.pledgedAmount(tokenId);
 
       // Map arrays to readable strings
@@ -95,33 +94,33 @@ export const ProposalsHistory = () => {
 
       const progress = {
         current: ethers.utils.formatEther(pledgedAmount),
-        target: ethers.utils.formatEther(proposalData.targetCapital),
-        percentage: pledgedAmount.mul(100).div(proposalData.targetCapital).toNumber()
+        target: ethers.utils.formatEther(targetCapital),
+        percentage: pledgedAmount.mul(100).div(targetCapital).toNumber()
       };
 
       return {
         hash: tokenId.toString(),
-        ipfsHash: proposalData.ipfsMetadata,
+        ipfsHash: ipfsMetadata,
         timestamp: event.blockNumber.toString(),
-        title: proposalData.title,
-        targetCapital: ethers.utils.formatEther(proposalData.targetCapital),
-        status: pledgedAmount.gte(proposalData.targetCapital)
+        title,
+        targetCapital: ethers.utils.formatEther(targetCapital),
+        status: pledgedAmount.gte(targetCapital)
           ? 'completed'
-          : Date.now() >= proposalData.votingEnds.toNumber() * 1000
+          : Date.now() >= votingEnds.toNumber() * 1000
             ? 'failed'
             : 'pending',
         isTestMode: false,
         progress,
-        firmSize: firmSizeMap[proposalData.firmSize],
-        dealType: dealTypeMap[proposalData.dealType],
-        geographicFocus: geoFocusMap[proposalData.geographicFocus],
-        location: proposalData.location,
-        votingEnds: new Date(proposalData.votingEnds.toNumber() * 1000),
+        firmSize: firmSizeMap[firmSize],
+        dealType: dealTypeMap[dealType],
+        geographicFocus: geoFocusMap[geographicFocus],
+        location,
+        votingEnds: new Date(votingEnds.toNumber() * 1000),
         strategies: {
-          paymentTerms: proposalData.paymentTerms.map((i: number) => paymentTermsMap[i]),
-          operational: proposalData.operationalStrategies.map((i: number) => operationalMap[i]),
-          growth: proposalData.growthStrategies.map((i: number) => growthMap[i]),
-          integration: proposalData.integrationStrategies.map((i: number) => integrationMap[i])
+          paymentTerms: paymentTerms.map((i: number) => paymentTermsMap[i]),
+          operational: operationalStrategies.map((i: number) => operationalMap[i]),
+          growth: growthStrategies.map((i: number) => growthMap[i]),
+          integration: integrationStrategies.map((i: number) => integrationMap[i])
         }
       };
     } catch (error) {
