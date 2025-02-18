@@ -39,17 +39,18 @@ import {
   StoredProposal,
   ProposalConfig
 } from "@/types/proposals";
-import { SUBMISSION_FEE } from "@/lib/constants";
+import { 
+  SUBMISSION_FEE,
+  MIN_TARGET_CAPITAL,
+  MAX_TARGET_CAPITAL,
+  MIN_VOTING_DURATION,
+  MAX_VOTING_DURATION,
+  VOTING_FEE,
+  FACTORY_ADDRESS,
+  LGR_TOKEN_ADDRESS,
+  FACTORY_ABI
+} from "@/lib/constants";
 
-const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
-const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
-const FACTORY_ABI = ["function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)", "function submissionFee() public view returns (uint256)", "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"];
-const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
-const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
-const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
-const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
-const SUBMISSION_FEE = ethers.utils.parseEther("250");
-const VOTING_FEE = ethers.utils.parseEther("10");
 const MAX_STRATEGIES_PER_CATEGORY = 3;
 const MAX_SUMMARY_LENGTH = 500;
 const MAX_PAYMENT_TERMS = 5;
@@ -594,60 +595,6 @@ const ThesisSubmission = () => {
       )}
     </Button>
   );
-
-  const handleRentAdSpace = (frequency: 'week' | 'month') => {
-    // Implement ad space rental logic here
-  };
-
-  const handleTestModeToggle = async (enabled: boolean) => {
-    if (!isConnected) {
-      toast({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to toggle test mode",
-        variant: "destructive"
-      });
-      connect();
-      return;
-    }
-    
-    const success = await toggleTestMode(enabled);
-    if (success) {
-      setIsTestMode(enabled);
-      if (enabled) {
-        setFormData(TEST_FORM_DATA);
-      } else {
-        setFormData({
-          title: "",
-          firmCriteria: {
-            size: FirmSize.BELOW_1M,
-            location: "",
-            dealType: DealType.ACQUISITION,
-            geographicFocus: GeographicFocus.LOCAL
-          },
-          paymentTerms: [],
-          strategies: {
-            operational: [],
-            growth: [],
-            integration: []
-          },
-          investment: {
-            targetCapital: "",
-            drivers: "",
-            additionalCriteria: ""
-          },
-          votingDuration: MIN_VOTING_DURATION,
-          linkedInURL: "",
-          isTestMode: false,
-          submissionTimestamp: Date.now(),
-          submitter: address
-        });
-      }
-    }
-  };
-
-  const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
-    // Implement promotion selection logic here
-  };
 
   return (
     <div className="min-h-screen bg-black text-white">
