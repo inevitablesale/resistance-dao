@@ -752,7 +752,6 @@ const ThesisSubmission = () => {
               </div>
             </motion.div>
 
-            {/* Form Sections */}
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
               <motion.div 
                 className="border-b border-white/5"
@@ -771,7 +770,6 @@ const ThesisSubmission = () => {
               </motion.div>
 
               <div className="divide-y divide-white/5">
-                {/* Basic Information Section */}
                 <Collapsible 
                   open={isThesisOpen} 
                   onOpenChange={setIsThesisOpen}
@@ -846,11 +844,147 @@ const ThesisSubmission = () => {
                   </CollapsibleContent>
                 </Collapsible>
 
-                {/* Firm Profile Section */}
                 <Collapsible
                   open={isStrategyOpen}
                   onOpenChange={setIsStrategyOpen}
                   className="w-full"
                 >
                   <CollapsibleTrigger asChild>
-                    <button className="w-full text-left px-6
+                    <button className="w-full text-left px-6 py-4 hover:bg-white/5 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className={cn(
+                          "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                          isStrategyOpen ? "bg-polygon-primary text-white" : "bg-white/5 text-white/60"
+                        )}>
+                          <Building2 className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-medium">Firm Profile</h3>
+                          <p className="text-sm text-white/60">Target company characteristics</p>
+                        </div>
+                        <ChevronDown className={cn(
+                          "w-5 h-5 text-white/60 transition-transform duration-200",
+                          isStrategyOpen && "rotate-180"
+                        )} />
+                      </div>
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="px-6 pb-6">
+                    <FirmCriteriaSection
+                      formData={{
+                        firmCriteria: {
+                          size: formData.firmCriteria.size,
+                          location: formData.firmCriteria.location,
+                          dealType: formData.firmCriteria.dealType,
+                          geographicFocus: formData.firmCriteria.geographicFocus
+                        }
+                      }}
+                      formErrors={formErrors}
+                      onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
+                    />
+                    {renderContinueButton(() => {
+                      if (validateFirmTab()) {
+                        setIsStrategyOpen(false);
+                        setIsApprovalOpen(true);
+                      }
+                    })}
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <Collapsible
+                  open={isApprovalOpen}
+                  onOpenChange={setIsApprovalOpen}
+                  className="w-full"
+                >
+                  <CollapsibleTrigger asChild>
+                    <button className="w-full text-left px-6 py-4 hover:bg-white/5 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className={cn(
+                          "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                          isApprovalOpen ? "bg-polygon-primary text-white" : "bg-white/5 text-white/60"
+                        )}>
+                          <Target className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-medium">Strategy & Terms</h3>
+                          <p className="text-sm text-white/60">Payment and post-acquisition plans</p>
+                        </div>
+                        <ChevronDown className={cn(
+                          "w-5 h-5 text-white/60 transition-transform duration-200",
+                          isApprovalOpen && "rotate-180"
+                        )} />
+                      </div>
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="px-6 pb-6">
+                    <PaymentTermsSection
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
+                    />
+                    <StrategiesSection
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={(category, value) => handleStrategyChange(category, value)}
+                    />
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            </Card>
+          </div>
+
+          {/* Right Column - Fixed Status Area */}
+          <div className="w-full lg:w-80 space-y-6">
+            <div className="lg:sticky lg:top-24 space-y-6">
+              <LGRWalletDisplay
+                submissionFee={SUBMISSION_FEE}
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
+                walletAddress={address}
+              />
+
+              <ContractApprovalStatus
+                onApprovalComplete={handleApprovalComplete}
+                requiredAmount={SUBMISSION_FEE}
+                isTestMode={isTestMode}
+                currentFormData={formData}
+              />
+
+              <Card className="bg-black/40 border-white/10 p-6 space-y-4">
+                <h3 className="text-xl font-semibold">Promote Your Thesis</h3>
+                <p className="text-sm text-white/60">
+                  Increase visibility and engagement with promotional options
+                </p>
+                
+                <div className="space-y-4">
+                  <Button
+                    onClick={() => handlePromotionSelect('weekly')}
+                    variant="outline"
+                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span>Weekly Promotion</span>
+                      <span className="text-sm text-white/60">5 LGR</span>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => handlePromotionSelect('monthly')}
+                    variant="outline"
+                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span>Monthly Promotion</span>
+                      <span className="text-sm text-white/60">15 LGR</span>
+                    </div>
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
