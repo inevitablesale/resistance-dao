@@ -665,11 +665,15 @@ const ThesisSubmission = () => {
     }
   };
 
+  const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
+    // Implement promotion selection logic here
+  };
+
   return (
     <div className="min-h-screen bg-black text-white pb-20">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-16">
-          <div className="lg:col-span-8">
+        <div className="space-y-8">
+          <div className="w-full">
             <div className="flex items-center justify-between mb-8">
               <motion.h1 
                 initial={{ opacity: 0, y: 20 }} 
@@ -835,6 +839,53 @@ const ThesisSubmission = () => {
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
+              </div>
+            </Card>
+          </div>
+
+          <div className="max-w-2xl mx-auto space-y-6">
+            <LGRWalletDisplay
+              submissionFee={ethers.utils.formatEther(SUBMISSION_FEE)}
+              currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
+              walletAddress={address}
+              className="sticky top-8"
+            />
+
+            <ContractApprovalStatus
+              onApprovalComplete={handleApprovalComplete}
+              requiredAmount={ethers.utils.formatEther(SUBMISSION_FEE)}
+              isTestMode={isTestMode}
+              currentFormData={formData}
+            />
+
+            <Card className="bg-black/40 border-white/10 p-6 space-y-4">
+              <h3 className="text-xl font-semibold text-white">Promote Your Thesis</h3>
+              <p className="text-sm text-white/60">
+                Increase visibility and engagement with promotional options
+              </p>
+              
+              <div className="space-y-4">
+                <Button
+                  onClick={() => handlePromotionSelect('weekly')}
+                  variant="outline"
+                  className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span>Weekly Promotion</span>
+                    <span className="text-sm text-white/60">5 LGR</span>
+                  </div>
+                </Button>
+
+                <Button
+                  onClick={() => handlePromotionSelect('monthly')}
+                  variant="outline"
+                  className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span>Monthly Promotion</span>
+                    <span className="text-sm text-white/60">15 LGR</span>
+                  </div>
+                </Button>
               </div>
             </Card>
           </div>
