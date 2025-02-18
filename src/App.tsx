@@ -124,7 +124,8 @@ const dynamicSettings = {
         icon: "/favicon.ico",
         chainId: 137,
         type: "ERC721",
-        standard: "ERC721"
+        standard: "ERC721",
+        decimals: 0  // Added decimals property for NFT
       }
     ]
   }
