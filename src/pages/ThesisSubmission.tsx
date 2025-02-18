@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -7,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
-import Nav from "@/components/Nav";
 import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -27,6 +27,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { subscribeToProposalEvents, waitForProposalCreation, EventConfig } from "@/services/eventListenerService";
 import { 
   FirmSize, 
   DealType, 
@@ -128,6 +129,7 @@ const isValidLinkedInURL = (url: string): boolean => {
 };
 
 const ThesisSubmission = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
   const { user } = useDynamicContext();
@@ -144,7 +146,7 @@ const ThesisSubmission = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
   const [activeStep, setActiveStep] = useState<string>('thesis');
   const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
-  const [currentTxId, setCurrentTxId] = useState<string | null>(null);
+  const [currentTxHash, setCurrentTxHash] = useState<string | null>(null);
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
@@ -521,13 +523,6 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
-      // Log the current state of form data
-      console.log('Current form state:', {
-        formData,
-        isTestMode,
-        TEST_FORM_DATA
-      });
-
       const effectiveFormData = isTestMode ? {
         ...TEST_FORM_DATA,
         linkedInURL,
@@ -555,11 +550,6 @@ const ThesisSubmission = () => {
         throw new Error("Invalid IPFS hash format");
       }
 
-      console.log('Estimating gas for proposal creation...', { 
-        isTestMode,
-        targetCapital: isTestMode ? TEST_FORM_DATA.investment.targetCapital : effectiveFormData.investment.targetCapital
-      });
-
       const targetCapitalWei = ethers.utils.parseEther(
         isTestMode ? TEST_FORM_DATA.investment.targetCapital : effectiveFormData.investment.targetCapital
       );
@@ -572,32 +562,32 @@ const ThesisSubmission = () => {
         linkedInURL
       };
 
-      console.log('Final proposal configuration:', proposalConfig);
-
-      const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
-      console.log('Gas estimate received:', gasEstimate);
-      
       const result = await createProposal(proposalConfig, wallet);
       console.log('Proposal creation result:', result);
+      setCurrentTxHash(result.hash);
 
-      const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
-      const newProposal: StoredProposal = {
-        hash: result.hash,
-        ipfsHash,
-        timestamp: new Date().toISOString(),
-        title: isTestMode ? TEST_FORM_DATA.title : effectiveFormData.title,
-        targetCapital: targetCapitalWei.toString(),
-        status: 'pending',
-        isTestMode
+      const provider = new ethers.providers.Web3Provider(await wallet.getWalletClient() as any);
+      const eventConfig: EventConfig = {
+        provider,
+        contractAddress: FACTORY_ADDRESS,
+        abi: FACTORY_ABI,
+        eventName: "ProposalCreated"
       };
-      userProposals.push(newProposal);
-      localStorage.setItem('userProposals', JSON.stringify(userProposals));
 
+      const proposalEvent = await waitForProposalCreation(eventConfig, result.hash);
+      console.log('Proposal event received:', proposalEvent);
+
+      setSubmissionComplete(true);
       updateStepStatus('submission', 'completed');
+
       toast({
         title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
         description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
       });
+
+      setTimeout(() => {
+        navigate('/proposals');
+      }, 2000);
 
     } catch (error) {
       console.error("Submission error:", error);
@@ -870,10 +860,28 @@ const ThesisSubmission = () => {
                       >
                         <Check className="w-8 h-8 text-white" />
                       </motion.div>
-                      <h3 className="text-2xl font-semibold">Ready to Submit</h3>
+                      <h3 className="text-2xl font-semibold">
+                        {submissionComplete 
+                          ? "Investment Thesis Submitted!"
+                          : "Ready to Submit"
+                        }
+                      </h3>
                       <p className="text-gray-400">
-                        Your investment thesis is ready to be submitted to the community
+                        {submissionComplete
+                          ? "Your investment thesis has been successfully submitted to the community"
+                          : "Your investment thesis is ready to be submitted to the community"
+                        }
                       </p>
+                      {currentTxHash && (
+                        <a
+                          href={`https://polygonscan.com/tx/${currentTxHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-polygon-primary hover:underline"
+                        >
+                          View transaction on PolygonScan
+                        </a>
+                      )}
                     </div>
                   )}
                 </motion.div>
