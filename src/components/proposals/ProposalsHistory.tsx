@@ -1,7 +1,9 @@
+
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { ethers } from "ethers";
 import { LGR_TOKEN_ADDRESS } from "@/lib/constants";
 import { getTokenBalance } from "@/services/tokenService";
@@ -16,6 +18,7 @@ const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
 export const ProposalsHistory = () => {
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
   const { isConnected, connect, address } = useWalletConnection();
+  const { getProvider } = useWalletProvider();
   const { proposals, loadingStates, refresh } = useProposalData();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -28,7 +31,7 @@ export const ProposalsHistory = () => {
       }
 
       try {
-        const walletProvider = await useWalletConnection().getProvider();
+        const walletProvider = await getProvider();
         const balance = await getTokenBalance(
           walletProvider.provider,
           LGR_TOKEN_ADDRESS,
@@ -57,7 +60,7 @@ export const ProposalsHistory = () => {
     };
 
     checkLGRBalance();
-  }, [isConnected, address]);
+  }, [isConnected, address, getProvider, toast]);
 
   if (!isConnected) {
     return (
