@@ -609,38 +609,35 @@ const ThesisSubmission = () => {
       return;
     }
     
-    const success = await toggleTestMode(enabled);
-    if (success) {
-      setIsTestMode(enabled);
-      if (enabled) {
-        setFormData(TEST_FORM_DATA);
-      } else {
-        setFormData({
-          title: "",
-          firmCriteria: {
-            size: FirmSize.BELOW_1M,
-            location: "",
-            dealType: DealType.ACQUISITION,
-            geographicFocus: GeographicFocus.LOCAL
-          },
-          paymentTerms: [],
-          strategies: {
-            operational: [],
-            growth: [],
-            integration: []
-          },
-          investment: {
-            targetCapital: "",
-            drivers: "",
-            additionalCriteria: ""
-          },
-          votingDuration: MIN_VOTING_DURATION,
-          linkedInURL: "",
-          isTestMode: false,
-          submissionTimestamp: Date.now(),
-          submitter: address
-        });
-      }
+    setIsTestMode(enabled);
+    if (enabled) {
+      setFormData(TEST_FORM_DATA);
+    } else {
+      setFormData({
+        title: "",
+        firmCriteria: {
+          size: FirmSize.BELOW_1M,
+          location: "",
+          dealType: DealType.ACQUISITION,
+          geographicFocus: GeographicFocus.LOCAL
+        },
+        paymentTerms: [],
+        strategies: {
+          operational: [],
+          growth: [],
+          integration: []
+        },
+        investment: {
+          targetCapital: "",
+          drivers: "",
+          additionalCriteria: ""
+        },
+        votingDuration: MIN_VOTING_DURATION,
+        linkedInURL: "",
+        isTestMode: false,
+        submissionTimestamp: Date.now(),
+        submitter: address
+      });
     }
   };
 
