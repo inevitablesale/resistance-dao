@@ -12,6 +12,7 @@ export const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000"); // 1,000 LGR
 export const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000"); // 25,000,000 LGR
 export const SUBMISSION_FEE = ethers.utils.parseEther("250"); // 250 LGR
 export const VOTING_FEE = ethers.utils.parseEther("10"); // 10 LGR
+export const TEST_TARGET_CAPITAL = "1000"; // 1,000 LGR for test mode
 
 // Contract addresses
 export const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
@@ -33,11 +34,6 @@ export const FACTORY_ABI = [
   "function MAX_TARGET_CAPITAL() external pure returns (uint128)",
   "function VOTING_FEE() external pure returns (uint256)",
   
-  // Pausable Functions
-  "function paused() external view returns (bool)",
-  "function pause() external",
-  "function unpause() external",
-  
   // Function Interfaces
   "function setTestMode(bool _enabled) external",
   "function createProposal((string,string,uint128,uint256,string,string,uint8,string,uint8,uint8,uint8[],uint8[],uint8[],uint8[]) calldata input, string calldata linkedInURL) external returns (uint256)",
@@ -56,8 +52,6 @@ export const FACTORY_ABI = [
   "event ProposalVoted(uint256 indexed tokenId, address indexed voter, uint128 pledgeAmount)",
   "event ProposalFullyPledged(uint256 indexed tokenId, uint128 totalPledged, address[] backers)",
   "event TestModeChanged(bool newStatus)",
-  "event Paused(address account)",
-  "event Unpaused(address account)",
   
   // ERC721 Required Functions
   "function balanceOf(address owner) external view returns (uint256)",

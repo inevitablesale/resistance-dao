@@ -112,7 +112,7 @@ const TEST_FORM_DATA: ProposalMetadata = {
     ]
   },
   investment: {
-    targetCapital: "1000",
+    targetCapital: TEST_TARGET_CAPITAL,
     drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
     additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
   },
@@ -502,7 +502,7 @@ const ThesisSubmission = () => {
         maxAllowed: ethers.utils.formatEther(MAX_TARGET_CAPITAL)
       });
 
-      if (!validateTargetCapital(targetCapital.toString(), !!isTestMode)) {
+      if (!validateTargetCapital(targetCapital, !!isTestMode)) {
         throw new Error(`Target capital must be between ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} and ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} LGR`);
       }
 
@@ -510,7 +510,7 @@ const ThesisSubmission = () => {
         throw new Error("No wallet connected");
       }
 
-      const linkedInURL = (user?.metadata?.["LinkedIn Profile URL"] as string) || "";
+      const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
       console.log('Uploading metadata to IPFS...', { isTestMode });
@@ -522,7 +522,7 @@ const ThesisSubmission = () => {
       }
 
       console.log('Preparing proposal config...');
-      const targetCapitalWei = ethers.utils.parseEther(targetCapital.toString());
+      const targetCapitalWei = ethers.utils.parseEther(targetCapital);
       console.log('Target capital in wei:', targetCapitalWei.toString());
 
       const proposalConfig: ProposalConfig = {
@@ -573,7 +573,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance || "0") >= ethers.utils.parseEther(SUBMISSION_FEE.toString()).toString();
+  const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0") >= Number(ethers.utils.formatEther(SUBMISSION_FEE));
 
   const renderContinueButton = (
     onClick: () => void,
@@ -872,7 +872,7 @@ const ThesisSubmission = () => {
             <div className="sticky top-32 space-y-6">
               <LGRWalletDisplay
                 submissionFee={SUBMISSION_FEE}
-                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance || "0"}
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
                 walletAddress={address}
               />
 
