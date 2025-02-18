@@ -15,8 +15,8 @@ interface WalletProvider {
   getSigner: () => ethers.providers.JsonRpcSigner;
 }
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 2000; // 2 seconds
+const MAX_RETRIES = 5; // Increased from 3 to 5
+const RETRY_DELAY = 1000; // Reduced from 2000 to 1000ms for faster retries
 
 export const useWalletProvider = () => {
   const { primaryWallet } = useDynamicContext();
@@ -38,8 +38,17 @@ export const useWalletProvider = () => {
   ): Promise<ethers.providers.Web3Provider> => {
     try {
       console.log(`Initializing provider attempt ${retryCount + 1}/${MAX_RETRIES}`);
-      return new ethers.providers.Web3Provider(walletClient);
+      
+      if (!walletClient) {
+        throw new Error('WalletClient is undefined');
+      }
+      
+      const provider = new ethers.providers.Web3Provider(walletClient);
+      // Verify the provider is working
+      await provider.getNetwork();
+      return provider;
     } catch (error) {
+      console.error('Provider initialization error:', error);
       if (retryCount < MAX_RETRIES - 1) {
         console.log(`Provider initialization failed, retrying in ${RETRY_DELAY}ms...`);
         await delay(RETRY_DELAY);
@@ -87,12 +96,10 @@ export const useWalletProvider = () => {
   }, [primaryWallet]);
 
   const getProvider = useCallback(async (): Promise<WalletProvider> => {
-    // Return cached provider if available
     if (providerRef.current) {
       return providerRef.current;
     }
 
-    // Prevent multiple simultaneous initialization attempts
     if (initializingRef.current) {
       await new Promise(resolve => {
         const checkInterval = setInterval(() => {
@@ -165,7 +172,7 @@ export const useWalletProvider = () => {
     }
   }, [primaryWallet, toast, initializeProvider, validateWalletClient]);
 
-  // Cleanup provider cache when wallet changes
+  // Reset provider cache when wallet changes
   useEffect(() => {
     providerRef.current = null;
     return () => {
