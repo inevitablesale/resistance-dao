@@ -1,165 +1,166 @@
 
 import { ethers } from "ethers";
-import { toast } from "@/hooks/use-toast";
+import { nanoid } from 'nanoid';
 import { ProposalError } from "./errorHandlingService";
-import { gasOptimizer } from "./gasOptimizationService";
 
 export interface QueuedTransaction {
   id: string;
-  type: 'proposal' | 'token' | 'contract';
+  type: 'contract' | 'proposal' | 'approval';
   status: 'pending' | 'processing' | 'completed' | 'failed';
-  hash?: string;
   description: string;
-  createdAt: number;
+  hash?: string;
   error?: string;
   retryCount: number;
+  maxRetries?: number;
+  timestamp: number;
 }
 
-export interface TransactionSuccess {
-  success: true;
-  transaction: ethers.ContractTransaction;
-  receipt: ethers.ContractReceipt;
+interface TransactionOptions {
+  maxRetries?: number;
+  retryDelay?: number;
+  timeout?: number;
 }
 
-export interface TransactionFailure {
-  success: false;
-  error: ProposalError;
-}
+class TransactionQueue {
+  private transactions: Map<string, QueuedTransaction> = new Map();
+  private readonly DEFAULT_MAX_RETRIES = 3;
+  private readonly DEFAULT_RETRY_DELAY = 2000;
+  private readonly DEFAULT_TIMEOUT = 30000;
 
-export type TransactionResult = TransactionSuccess | TransactionFailure;
+  constructor() {
+    // Initialize with empty queue
+    this.transactions = new Map();
+  }
 
-class TransactionQueueService {
-  private queue: Map<string, QueuedTransaction> = new Map();
-  private maxRetries = 3;
-  private processingDelay = 1000; // 1 second between retries
-
-  public async addTransaction(
-    transaction: Omit<QueuedTransaction, 'id' | 'status' | 'createdAt' | 'retryCount'>
+  async addTransaction(
+    transaction: Pick<QueuedTransaction, 'type' | 'description'>
   ): Promise<string> {
-    const id = crypto.randomUUID();
-    const queuedTx: QueuedTransaction = {
-      ...transaction,
+    const id = nanoid();
+    const newTransaction: QueuedTransaction = {
       id,
+      type: transaction.type,
       status: 'pending',
-      createdAt: Date.now(),
-      retryCount: 0
+      description: transaction.description,
+      retryCount: 0,
+      timestamp: Date.now()
     };
-
-    this.queue.set(id, queuedTx);
-    this.notifyUpdate(queuedTx);
+    
+    this.transactions.set(id, newTransaction);
     return id;
   }
 
-  public getTransaction(id: string): QueuedTransaction | undefined {
-    return this.queue.get(id);
+  getTransaction(id: string): QueuedTransaction | undefined {
+    return this.transactions.get(id);
   }
 
-  public getAllTransactions(): QueuedTransaction[] {
-    return Array.from(this.queue.values());
+  private async wait(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  public getPendingTransactions(): QueuedTransaction[] {
-    return this.getAllTransactions().filter(tx => tx.status === 'pending');
-  }
-
-  public async processTransaction(
-    id: string,
-    executor: () => Promise<TransactionResult>
-  ): Promise<TransactionResult> {
-    const tx = this.queue.get(id);
-    if (!tx) {
-      throw new ProposalError({
-        category: 'transaction',
-        message: 'Transaction not found',
-        recoverySteps: ['Check the transaction ID', 'Try submitting the transaction again']
-      });
-    }
-
-    tx.status = 'processing';
-    this.notifyUpdate(tx);
+  private async executeWithTimeout<T>(
+    promise: Promise<T>,
+    timeout: number
+  ): Promise<T> {
+    let timeoutId: NodeJS.Timeout;
+    
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(new Error('Transaction timeout'));
+      }, timeout);
+    });
 
     try {
-      const result = await executor();
-      
-      if (result.success) {
-        tx.status = 'completed';
-        tx.hash = result.transaction.hash;
-        this.notifyUpdate(tx);
-        return result;
-      }
-
-      // If we get here, it's a failure result
-      tx.status = 'failed';
-      tx.error = 'Transaction execution failed';
-      this.notifyUpdate(tx);
+      const result = await Promise.race([promise, timeoutPromise]);
+      clearTimeout(timeoutId!);
       return result;
-      
-    } catch (error: any) {
-      console.error(`Transaction ${id} failed:`, error);
-      
-      if (tx.retryCount < this.maxRetries) {
-        tx.retryCount++;
-        tx.status = 'pending';
-        this.notifyUpdate(tx);
-        
-        // Wait before retrying with exponential backoff
-        const backoffTime = this.processingDelay * Math.pow(2, tx.retryCount - 1);
-        await new Promise(resolve => setTimeout(resolve, backoffTime));
-        return this.processTransaction(id, executor);
-      }
-
-      tx.status = 'failed';
-      tx.error = error.message;
-      this.notifyUpdate(tx);
-      
-      return {
-        success: false,
-        error: new ProposalError({
-          category: 'transaction',
-          message: `Transaction failed after ${this.maxRetries} attempts`,
-          recoverySteps: [
-            'Check your wallet connection',
-            'Verify you have enough funds',
-            'Try increasing the gas price'
-          ],
-          technicalDetails: error.message
-        })
-      };
+    } catch (error) {
+      clearTimeout(timeoutId!);
+      throw error;
     }
   }
 
-  private notifyUpdate(transaction: QueuedTransaction) {
-    // Update UI via toast notifications
-    switch (transaction.status) {
-      case 'pending':
-        toast({
-          title: "Transaction Pending",
-          description: transaction.description,
-        });
-        break;
-      case 'processing':
-        toast({
-          title: "Processing Transaction",
-          description: `${transaction.description} - Attempt ${transaction.retryCount + 1}/${this.maxRetries + 1}`,
-        });
-        break;
-      case 'completed':
-        toast({
-          title: "Transaction Completed",
-          description: transaction.description,
-          variant: "default"
-        });
-        break;
-      case 'failed':
-        toast({
-          title: "Transaction Failed",
-          description: transaction.error || "Unknown error occurred",
-          variant: "destructive"
-        });
-        break;
+  async processTransaction<T>(
+    id: string,
+    operation: () => Promise<T>,
+    options: TransactionOptions = {}
+  ): Promise<T> {
+    const transaction = this.transactions.get(id);
+    if (!transaction) {
+      throw new Error('Transaction not found');
     }
+
+    const maxRetries = options.maxRetries ?? this.DEFAULT_MAX_RETRIES;
+    const retryDelay = options.retryDelay ?? this.DEFAULT_RETRY_DELAY;
+    const timeout = options.timeout ?? this.DEFAULT_TIMEOUT;
+
+    let lastError: any;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        transaction.status = 'processing';
+        transaction.retryCount = attempt;
+        this.transactions.set(id, transaction);
+
+        const result = await this.executeWithTimeout(operation(), timeout);
+
+        transaction.status = 'completed';
+        if (result && typeof result === 'object' && 'hash' in result) {
+          transaction.hash = (result as any).hash;
+        }
+        this.transactions.set(id, transaction);
+
+        return result;
+      } catch (error: any) {
+        console.error(`Transaction attempt ${attempt + 1} failed:`, error);
+        lastError = error;
+
+        if (this.shouldRetry(error) && attempt < maxRetries) {
+          await this.wait(retryDelay * Math.pow(2, attempt)); // Exponential backoff
+          continue;
+        }
+
+        break;
+      }
+    }
+
+    transaction.status = 'failed';
+    transaction.error = lastError?.message || 'Transaction failed';
+    this.transactions.set(id, transaction);
+
+    throw new ProposalError({
+      category: 'transaction',
+      message: lastError?.message || 'Transaction failed after multiple attempts',
+      recoverySteps: [
+        'Check your wallet connection',
+        'Verify you have enough balance',
+        'Try again in a few minutes'
+      ]
+    });
+  }
+
+  private shouldRetry(error: any): boolean {
+    const retryableErrors = [
+      'nonce too low',
+      'replacement transaction underpriced',
+      'transaction underpriced',
+      'insufficient funds',
+      'network error',
+      'timeout',
+      'failed to fetch',
+      'execution reverted'
+    ];
+
+    const errorMessage = error?.message?.toLowerCase() || '';
+    return retryableErrors.some(msg => errorMessage.includes(msg));
+  }
+
+  clearTransaction(id: string): void {
+    this.transactions.delete(id);
+  }
+
+  clearAllTransactions(): void {
+    this.transactions.clear();
   }
 }
 
-// Export singleton instance
-export const transactionQueue = new TransactionQueueService();
+export const transactionQueue = new TransactionQueue();
