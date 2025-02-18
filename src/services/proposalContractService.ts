@@ -130,11 +130,18 @@ export const setTestMode = async (
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
   const signerAddress = await provider.getSigner().getAddress();
-  const owner = await factory.owner();
+  const status = await getContractStatus(wallet);
   
-  if (signerAddress.toLowerCase() !== owner.toLowerCase()) {
-    throw new Error("Not authorized to set test mode - must be contract owner");
+  // Check if signer is the tester address
+  if (signerAddress.toLowerCase() !== status.tester.toLowerCase()) {
+    throw new Error("Not authorized - must be the tester address");
   }
+
+  console.log('Setting test mode with tester wallet:', {
+    signerAddress,
+    testerAddress: status.tester,
+    enabled
+  });
 
   return await executeTransaction(
     () => factory.setTestMode(enabled),
@@ -180,3 +187,4 @@ export const estimateProposalGas = async (
     throw error;
   }
 };
+
