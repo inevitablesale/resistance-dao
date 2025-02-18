@@ -26,6 +26,7 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
+import { StoredProposal, ProposalMetadata } from "@/types/proposals";
 
 interface SubmissionStep {
   id: string;
@@ -451,13 +452,13 @@ const ThesisSubmission = () => {
         isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData.investment.targetCapital
       );
 
-    const proposalConfig: ProposalConfig = {
-      targetCapital: targetCapitalWei,
-      votingDuration,
-      ipfsHash,
-      metadata: formData,
-      linkedInURL: formData.linkedInURL || ''
-    };
+      const proposalConfig = {
+        targetCapital: targetCapitalWei,
+        votingDuration,
+        ipfsHash,
+        metadata: formData,
+        linkedInURL: formData.linkedInURL || ''
+      };
 
       const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
 
@@ -826,4 +827,37 @@ const ThesisSubmission = () => {
                             Growth and integration plans
                           </p>
                         </div>
-                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isSubmission
+                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isSubmissionOpen && "transform rotate-180")} />
+                      </div>
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-4 px-4 pb-6">
+                    <StrategiesSection 
+                      formData={{
+                        strategies: {
+                          operational: formData.strategies.operational,
+                          growth: formData.strategies.growth,
+                          integration: formData.strategies.integration
+                        }
+                      }}
+                      formErrors={formErrors}
+                      onChange={(category, value) => handleStrategyChange(category, value)}
+                    />
+                    {isSubmissionOpen && renderContinueButton(() => {
+                      if (validateBasicsTab()) {
+                        setIsSubmissionOpen(false);
+                        handleApprovalComplete(formData);
+                      }
+                    })}
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
