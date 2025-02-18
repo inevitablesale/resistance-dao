@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, ArrowRight, MapPin, Globe, DollarSign, Users, TrendingUp } from "lucide-react";
@@ -60,23 +59,31 @@ export const ProposalsHistory = () => {
       const tokenId = event.args?.tokenId;
       console.log('Fetching data for proposal:', tokenId.toString());
       
-      // Call getProposal function instead of accessing mapping directly
-      const [
-        title,
-        ipfsMetadata,
-        targetCapital,
-        votingEnds,
-        investmentDrivers,
-        additionalCriteria,
-        firmSize,
-        location,
-        dealType,
-        geographicFocus,
-        paymentTerms,
-        operationalStrategies,
-        growthStrategies,
-        integrationStrategies
-      ] = await contract.getProposal(tokenId);
+      // Log the raw event data
+      console.log('Raw event data:', {
+        args: event.args,
+        blockNumber: event.blockNumber,
+        transactionHash: event.transactionHash
+      });
+
+      // Log the contract methods
+      console.log('Available contract methods:', Object.keys(contract.functions));
+      
+      // Try to get the raw proposal data
+      try {
+        const rawProposal = await contract.proposals(tokenId);
+        console.log('Raw proposal data from mapping:', rawProposal);
+      } catch (error) {
+        console.log('Error accessing proposals mapping:', error);
+      }
+
+      // Try to get proposal using getProposal
+      try {
+        const proposalData = await contract.getProposal(tokenId);
+        console.log('Raw proposal data from getProposal:', proposalData);
+      } catch (error) {
+        console.log('Error calling getProposal:', error);
+      }
 
       const pledgedAmount = await contract.pledgedAmount(tokenId);
 
@@ -88,37 +95,37 @@ export const ProposalsHistory = () => {
 
       const progress = {
         current: ethers.utils.formatEther(pledgedAmount),
-        target: ethers.utils.formatEther(targetCapital),
-        percentage: pledgedAmount.mul(100).div(targetCapital).toNumber()
+        target: ethers.utils.formatEther(proposalData.targetCapital),
+        percentage: pledgedAmount.mul(100).div(proposalData.targetCapital).toNumber()
       };
 
       return {
         hash: tokenId.toString(),
-        ipfsHash: ipfsMetadata,
+        ipfsHash: proposalData.ipfsMetadata,
         timestamp: event.blockNumber.toString(),
-        title,
-        targetCapital: ethers.utils.formatEther(targetCapital),
-        status: pledgedAmount.gte(targetCapital)
+        title: proposalData.title,
+        targetCapital: ethers.utils.formatEther(proposalData.targetCapital),
+        status: pledgedAmount.gte(proposalData.targetCapital)
           ? 'completed'
-          : Date.now() >= votingEnds.toNumber() * 1000
+          : Date.now() >= proposalData.votingEnds.toNumber() * 1000
             ? 'failed'
             : 'pending',
         isTestMode: false,
         progress,
-        firmSize: firmSizeMap[firmSize],
-        dealType: dealTypeMap[dealType],
-        geographicFocus: geoFocusMap[geographicFocus],
-        location,
-        votingEnds: new Date(votingEnds.toNumber() * 1000),
+        firmSize: firmSizeMap[proposalData.firmSize],
+        dealType: dealTypeMap[proposalData.dealType],
+        geographicFocus: geoFocusMap[proposalData.geographicFocus],
+        location: proposalData.location,
+        votingEnds: new Date(proposalData.votingEnds.toNumber() * 1000),
         strategies: {
-          paymentTerms: paymentTerms.map((i: number) => paymentTermsMap[i]),
-          operational: operationalStrategies.map((i: number) => operationalMap[i]),
-          growth: growthStrategies.map((i: number) => growthMap[i]),
-          integration: integrationStrategies.map((i: number) => integrationMap[i])
+          paymentTerms: proposalData.paymentTerms.map((i: number) => paymentTermsMap[i]),
+          operational: proposalData.operationalStrategies.map((i: number) => operationalMap[i]),
+          growth: proposalData.growthStrategies.map((i: number) => growthMap[i]),
+          integration: proposalData.integrationStrategies.map((i: number) => integrationMap[i])
         }
       };
     } catch (error) {
-      console.error('Error transforming proposal data:', error);
+      console.error('Error in transformProposalData:', error);
       throw error;
     }
   };
@@ -370,4 +377,3 @@ export const ProposalsHistory = () => {
     </div>
   );
 };
-
