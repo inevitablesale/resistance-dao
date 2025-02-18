@@ -667,32 +667,34 @@ const ThesisSubmission = () => {
       </div>
 
       <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between py-4">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-between"
             >
               <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
                 Transform Accounting Firm Ownership
               </h1>
             </motion.div>
             
-            <div className="flex items-center space-x-3">
-              <Label htmlFor="test-mode" className="text-sm text-white/60">
-                Test Mode
-              </Label>
-              <Switch
-                id="test-mode"
-                checked={isTestMode}
-                onCheckedChange={handleTestModeToggle}
-                className={cn(
-                  "data-[state=checked]:bg-yellow-500",
-                  !isConnected && "opacity-50 cursor-not-allowed"
-                )}
-                disabled={!isConnected}
-              />
+            <div className="flex items-center gap-6">
+              <LGRWalletDisplay />
+              <div className="flex items-center space-x-3">
+                <Label htmlFor="test-mode" className="text-sm text-white/60">
+                  Test Mode
+                </Label>
+                <Switch
+                  id="test-mode"
+                  checked={isTestMode}
+                  onCheckedChange={handleTestModeToggle}
+                  className={cn(
+                    "data-[state=checked]:bg-yellow-500",
+                    !isConnected && "opacity-50 cursor-not-allowed"
+                  )}
+                  disabled={!isConnected}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -895,7 +897,32 @@ const ThesisSubmission = () => {
 
           <div className="col-span-3">
             <div className="sticky top-32 space-y-6">
-              {/* ... keep existing right column content */}
+              {activeStep === 'approval' && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                >
+                  <ContractApprovalStatus
+                    onApprovalComplete={handleApprovalComplete}
+                    requiredAmount={formData.investment.targetCapital}
+                    isTestMode={isTestMode}
+                    currentFormData={formData}
+                  />
+                </motion.div>
+              )}
+              
+              {currentTxId && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <TransactionStatus
+                    transactionId={currentTxId}
+                    onComplete={handleTxComplete}
+                    onError={handleTxError}
+                  />
+                </motion.div>
+              )}
             </div>
           </div>
         </div>
