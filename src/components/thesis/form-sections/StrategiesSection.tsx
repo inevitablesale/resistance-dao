@@ -11,7 +11,7 @@ export interface StrategiesSectionProps {
 }
 
 type StrategyType = OperationalStrategy | GrowthStrategy | IntegrationStrategy;
-type StrategyCategory = keyof typeof formData.strategies;
+type StrategyCategory = "operational" | "growth" | "integration";
 
 export const StrategiesSection = ({ formData, formErrors, onChange }: StrategiesSectionProps) => {
   const handleStrategyChange = (
@@ -28,7 +28,7 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
       updatedStrategies = currentStrategies.filter(s => s !== value);
     }
     
-    onChange(category as "operational" | "growth" | "integration", updatedStrategies);
+    onChange(category, updatedStrategies);
   };
 
   const isStrategySelected = (category: StrategyCategory, strategyId: StrategyType) => {
