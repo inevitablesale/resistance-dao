@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 
 export const FACTORY_ADDRESS = "0x624dFf6455FBE2f569571fba31c7D020b905b745";
@@ -38,6 +39,24 @@ export const FACTORY_ABI = [
     string linkedInURL
   ) external returns (uint256)`,
 
+  // Added proposals mapping getter
+  `function proposals(uint256) public view returns (
+    string title,
+    string ipfsMetadata,
+    uint128 targetCapital,
+    uint256 votingEnds,
+    string investmentDrivers,
+    string additionalCriteria,
+    uint8 firmSize,
+    string location,
+    uint8 dealType,
+    uint8 geographicFocus,
+    uint8[] paymentTerms,
+    uint8[] operationalStrategies,
+    uint8[] growthStrategies,
+    uint8[] integrationStrategies
+  )`,
+
   // Read-only getters
   "function LGR_TOKEN() public view returns (address)",
   "function MAX_TARGET_CAPITAL() public view returns (uint128)",
@@ -74,3 +93,4 @@ export const FACTORY_ABI = [
   "event ProposalFullyPledged(uint256 indexed tokenId, uint128 totalPledged, address[] backers)",
   "event TestModeChanged(bool newStatus)"
 ];
+
