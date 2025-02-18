@@ -26,6 +26,7 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
+import { useDynamicContext } from "@/hooks/useDynamicContext";
 
 interface SubmissionStep {
   id: string;
@@ -146,6 +147,7 @@ const TEST_FORM_DATA: ProposalMetadata = {
 const ThesisSubmission = () => {
   const { toast } = useToast();
   const { isConnected, address, connect, approveLGR, wallet, toggleTestMode } = useWalletConnection();
+  const { user } = useDynamicContext();
   const { tokenBalances } = useTokenBalances({
     networkId: 137,
     accountAddress: address,
@@ -427,13 +429,18 @@ const ThesisSubmission = () => {
 
       updateStepStatus('submission', 'processing');
 
+      const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
+      if (!linkedInURL) {
+        throw new Error("LinkedIn Profile URL not found. Please add it in your wallet settings.");
+      }
+
       const metadataToUpload: ProposalMetadata = {
         ...formData,
-        votingDuration,
         isTestMode,
         submissionTimestamp: Date.now(),
         submitter: address,
-        linkedInURL: formData.linkedInURL || ''
+        linkedInURL,
+        votingDuration
       };
 
       console.log('Uploading metadata to IPFS...', { isTestMode });
@@ -454,7 +461,7 @@ const ThesisSubmission = () => {
         votingDuration,
         ipfsHash,
         metadata: metadataToUpload,
-        linkedInURL: metadataToUpload.linkedInURL
+        linkedInURL
       };
 
       const gasEstimate = await estimateProposalGas(proposalConfig, wallet);

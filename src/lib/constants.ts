@@ -58,3 +58,6 @@ export const FACTORY_ABI = [
   "event ProposalCreated(uint256 indexed tokenId, address indexed creator)",
   "event TestModeChanged(bool newStatus)"
 ];
+
+// Export CONTRACT_ABI for backward compatibility
+export { FACTORY_ABI as CONTRACT_ABI };
