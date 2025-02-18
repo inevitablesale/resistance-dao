@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 
 export enum FirmSize {
@@ -47,6 +46,23 @@ export enum IntegrationStrategy {
   MERGING_OPERATIONS,
   CULTURE_INTEGRATION,
   SYSTEMS_CONSOLIDATION
+}
+
+export interface ContractProposal {
+  title: string;
+  ipfsMetadata: string;
+  targetCapital: string;  // Will be formatted from BigNumber
+  votingEnds: number;
+  investmentDrivers: string;
+  additionalCriteria: string;
+  firmSize: FirmSize;
+  location: string;
+  dealType: DealType;
+  geographicFocus: GeographicFocus;
+  paymentTerms: PaymentTerm[];
+  operationalStrategies: OperationalStrategy[];
+  growthStrategies: GrowthStrategy[];
+  integrationStrategies: IntegrationStrategy[];
 }
 
 export interface ProposalMetadata {

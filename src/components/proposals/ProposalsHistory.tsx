@@ -13,7 +13,7 @@ import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants
 import { getTokenBalance } from "@/services/tokenService";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
-import { ProposalMetadata } from "@/types/proposals";
+import { ProposalMetadata, ContractProposal } from "@/types/proposals";
 
 const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
 
@@ -22,10 +22,7 @@ interface ProposalEvent {
   creator: string;
   blockNumber: number;
   transactionHash: string;
-  title: string;
-  ipfsMetadata: string;
-  targetCapital: ethers.BigNumber;
-  votingEnds: number;
+  contractData: ContractProposal;
   metadata?: ProposalMetadata;
   pledgedAmount?: string;
 }
@@ -109,18 +106,31 @@ export const ProposalsHistory = () => {
                 contract.pledgedAmount(tokenId)
               ]);
 
-              console.log(`Proposal data for #${tokenId}:`, {
+              // Format the contract data properly
+              const contractData: ContractProposal = {
                 title: proposalData.title,
-                ipfsHash: proposalData.ipfsMetadata,
+                ipfsMetadata: proposalData.ipfsMetadata,
                 targetCapital: proposalData.targetCapital.toString(),
-                votingEnds: proposalData.votingEnds.toString()
-              });
+                votingEnds: proposalData.votingEnds.toNumber(),
+                investmentDrivers: proposalData.investmentDrivers,
+                additionalCriteria: proposalData.additionalCriteria,
+                firmSize: proposalData.firmSize,
+                location: proposalData.location,
+                dealType: proposalData.dealType,
+                geographicFocus: proposalData.geographicFocus,
+                paymentTerms: proposalData.paymentTerms,
+                operationalStrategies: proposalData.operationalStrategies,
+                growthStrategies: proposalData.growthStrategies,
+                integrationStrategies: proposalData.integrationStrategies
+              };
+
+              console.log(`Contract data for #${tokenId}:`, contractData);
 
               // Get IPFS metadata if available
               let metadata: ProposalMetadata | undefined;
-              if (proposalData.ipfsMetadata) {
+              if (contractData.ipfsMetadata) {
                 try {
-                  metadata = await getFromIPFS<ProposalMetadata>(proposalData.ipfsMetadata, 'proposal');
+                  metadata = await getFromIPFS<ProposalMetadata>(contractData.ipfsMetadata, 'proposal');
                   console.log(`IPFS metadata fetched for #${tokenId}:`, metadata);
                 } catch (ipfsError) {
                   console.error(`Error fetching IPFS metadata for proposal #${tokenId}:`, ipfsError);
@@ -132,10 +142,7 @@ export const ProposalsHistory = () => {
                 creator: event.args?.creator,
                 blockNumber: event.blockNumber,
                 transactionHash: event.transactionHash,
-                title: proposalData.title,
-                ipfsMetadata: proposalData.ipfsMetadata,
-                targetCapital: proposalData.targetCapital,
-                votingEnds: proposalData.votingEnds.toNumber(),
+                contractData,
                 metadata,
                 pledgedAmount: ethers.utils.formatEther(pledgedAmount)
               };
@@ -146,10 +153,22 @@ export const ProposalsHistory = () => {
                 creator: event.args?.creator,
                 blockNumber: event.blockNumber,
                 transactionHash: event.transactionHash,
-                title: `Proposal #${tokenId}`,
-                ipfsMetadata: '',
-                targetCapital: ethers.BigNumber.from(0),
-                votingEnds: 0
+                contractData: {
+                  title: `Proposal #${tokenId}`,
+                  ipfsMetadata: '',
+                  targetCapital: '0',
+                  votingEnds: 0,
+                  investmentDrivers: '',
+                  additionalCriteria: '',
+                  firmSize: 0,
+                  location: '',
+                  dealType: 0,
+                  geographicFocus: 0,
+                  paymentTerms: [],
+                  operationalStrategies: [],
+                  growthStrategies: [],
+                  integrationStrategies: []
+                }
               };
             }
           })
@@ -247,7 +266,7 @@ export const ProposalsHistory = () => {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium text-white">
-                        {event.title || `Proposal #${event.tokenId}`}
+                        {event.contractData.title || `Proposal #${event.tokenId}`}
                       </h3>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-white/60">
@@ -257,7 +276,7 @@ export const ProposalsHistory = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Target className="w-4 h-4" />
-                        <span>{ethers.utils.formatEther(event.targetCapital)} LGR Target</span>
+                        <span>{ethers.utils.formatEther(event.contractData.targetCapital)} LGR Target</span>
                       </div>
                       {event.pledgedAmount && (
                         <div className="flex items-center gap-2">
