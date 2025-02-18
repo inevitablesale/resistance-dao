@@ -59,12 +59,10 @@ export const ProposalsHistory = () => {
       const tokenId = event.args?.tokenId;
       console.log('Fetching data for proposal:', tokenId.toString());
       
-      // Use the correct method to access the mapping
-      const proposalData = await contract.functions['proposals(uint256)'](tokenId);
+      // Access the mapping using the correct syntax for ethers.js
+      // For public mappings, ethers.js creates a method with the name of the mapping
+      const proposalData = await contract.proposals(tokenId);
       console.log('Raw proposal data:', proposalData);
-
-      // The returned data is an array with one element containing the struct
-      const [proposal] = proposalData;
       
       // Extract values from the proposal struct
       const {
@@ -82,8 +80,8 @@ export const ProposalsHistory = () => {
         operationalStrategies,
         growthStrategies,
         integrationStrategies
-      } = proposal;
-      
+      } = proposalData;
+
       const pledgedAmount = await contract.pledgedAmount(tokenId);
 
       // Map arrays to readable strings
