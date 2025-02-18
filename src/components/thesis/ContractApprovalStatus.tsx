@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -62,7 +63,6 @@ export const ContractApprovalStatus = ({
         });
         setCurrentTxId(txId);
         
-        // Simulate a short delay for better UX
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         await transactionQueue.processTransaction(txId, async () => {
@@ -111,7 +111,7 @@ export const ContractApprovalStatus = ({
           tokenConfig: {
             tokenAddress: LGR_TOKEN_ADDRESS,
             spenderAddress: address!,
-            amount: requiredAmount,
+            amount: requiredAmount.toString(), // Convert BigNumberish to string
             isTestMode
           },
           walletType
@@ -192,7 +192,7 @@ export const ContractApprovalStatus = ({
               {isTestMode ? (
                 "Test mode: No LGR required for approval"
               ) : (
-                `Approve ${ethers.utils.formatEther(requiredAmount.toString())} LGR for submission`
+                `Approve ${ethers.utils.formatEther(requiredAmount)} LGR for submission`
               )}
             </p>
           </div>

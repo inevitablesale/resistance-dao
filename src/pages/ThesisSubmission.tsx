@@ -891,37 +891,6 @@ const ThesisSubmission = () => {
                 isTestMode={isTestMode}
                 currentFormData={formData}
               />
-
-              <Card className="bg-black/40 border-white/10 p-6 space-y-4">
-                <h3 className="text-xl font-semibold">Promote Your Thesis</h3>
-                <p className="text-sm text-white/60">
-                  Increase visibility and engagement with promotional options
-                </p>
-                
-                <div className="space-y-4">
-                  <Button
-                    onClick={() => handlePromotionSelect('weekly')}
-                    variant="outline"
-                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <span>Weekly Promotion</span>
-                      <span className="text-sm text-white/60">5 LGR</span>
-                    </div>
-                  </Button>
-
-                  <Button
-                    onClick={() => handlePromotionSelect('monthly')}
-                    variant="outline"
-                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <span>Monthly Promotion</span>
-                      <span className="text-sm text-white/60">15 LGR</span>
-                    </div>
-                  </Button>
-                </div>
-              </Card>
             </div>
           </div>
         </div>
