@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, Users, Target } from "lucide-react";
@@ -21,6 +22,10 @@ interface ProposalEvent {
   creator: string;
   blockNumber: number;
   transactionHash: string;
+  title: string;
+  ipfsMetadata: string;
+  targetCapital: ethers.BigNumber;
+  votingEnds: number;
   metadata?: ProposalMetadata;
   pledgedAmount?: string;
 }
@@ -95,31 +100,57 @@ export const ProposalsHistory = () => {
         const proposalsWithMetadata = await Promise.all(
           events.map(async (event) => {
             const tokenId = event.args?.tokenId.toString();
-            const baseProposal = {
-              tokenId,
-              creator: event.args?.creator,
-              blockNumber: event.blockNumber,
-              transactionHash: event.transactionHash
-            };
+            console.log(`Fetching proposal data for token #${tokenId}`);
 
             try {
-              // Get token URI (IPFS hash) and pledged amount
-              const [tokenURI, pledgedAmount] = await Promise.all([
-                contract.tokenURI(tokenId),
+              // Get proposal data from contract and pledged amount
+              const [proposalData, pledgedAmount] = await Promise.all([
+                contract.proposals(tokenId),
                 contract.pledgedAmount(tokenId)
               ]);
 
-              console.log(`Fetching metadata for proposal #${tokenId} from IPFS:`, tokenURI);
-              const metadata = await getFromIPFS<ProposalMetadata>(tokenURI, 'proposal');
+              console.log(`Proposal data for #${tokenId}:`, {
+                title: proposalData.title,
+                ipfsHash: proposalData.ipfsMetadata,
+                targetCapital: proposalData.targetCapital.toString(),
+                votingEnds: proposalData.votingEnds.toString()
+              });
+
+              // Get IPFS metadata if available
+              let metadata: ProposalMetadata | undefined;
+              if (proposalData.ipfsMetadata) {
+                try {
+                  metadata = await getFromIPFS<ProposalMetadata>(proposalData.ipfsMetadata, 'proposal');
+                  console.log(`IPFS metadata fetched for #${tokenId}:`, metadata);
+                } catch (ipfsError) {
+                  console.error(`Error fetching IPFS metadata for proposal #${tokenId}:`, ipfsError);
+                }
+              }
 
               return {
-                ...baseProposal,
+                tokenId,
+                creator: event.args?.creator,
+                blockNumber: event.blockNumber,
+                transactionHash: event.transactionHash,
+                title: proposalData.title,
+                ipfsMetadata: proposalData.ipfsMetadata,
+                targetCapital: proposalData.targetCapital,
+                votingEnds: proposalData.votingEnds.toNumber(),
                 metadata,
                 pledgedAmount: ethers.utils.formatEther(pledgedAmount)
               };
             } catch (error) {
-              console.error(`Error fetching metadata for proposal #${tokenId}:`, error);
-              return baseProposal;
+              console.error(`Error fetching data for proposal #${tokenId}:`, error);
+              return {
+                tokenId,
+                creator: event.args?.creator,
+                blockNumber: event.blockNumber,
+                transactionHash: event.transactionHash,
+                title: `Proposal #${tokenId}`,
+                ipfsMetadata: '',
+                targetCapital: ethers.BigNumber.from(0),
+                votingEnds: 0
+              };
             }
           })
         );
@@ -216,7 +247,7 @@ export const ProposalsHistory = () => {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium text-white">
-                        {event.metadata?.title || `Proposal #${event.tokenId}`}
+                        {event.title || `Proposal #${event.tokenId}`}
                       </h3>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-white/60">
@@ -224,19 +255,15 @@ export const ProposalsHistory = () => {
                         <Calendar className="w-4 h-4" />
                         <span>{format(new Date(event.blockNumber * 1000), 'PPP')}</span>
                       </div>
-                      {event.metadata && (
-                        <>
-                          <div className="flex items-center gap-2">
-                            <Target className="w-4 h-4" />
-                            <span>{ethers.utils.formatEther(event.metadata.investment.targetCapital)} LGR Target</span>
-                          </div>
-                          {event.pledgedAmount && (
-                            <div className="flex items-center gap-2">
-                              <Users className="w-4 h-4" />
-                              <span>{event.pledgedAmount} LGR Pledged</span>
-                            </div>
-                          )}
-                        </>
+                      <div className="flex items-center gap-2">
+                        <Target className="w-4 h-4" />
+                        <span>{ethers.utils.formatEther(event.targetCapital)} LGR Target</span>
+                      </div>
+                      {event.pledgedAmount && (
+                        <div className="flex items-center gap-2">
+                          <Users className="w-4 h-4" />
+                          <span>{event.pledgedAmount} LGR Pledged</span>
+                        </div>
                       )}
                     </div>
                   </div>
