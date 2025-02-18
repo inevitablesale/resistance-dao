@@ -1,3 +1,6 @@
+
+import { ethers } from "ethers";
+
 export enum FirmSize {
   BELOW_1M,
   ONE_TO_FIVE_M,
@@ -69,7 +72,7 @@ export interface ProposalMetadata {
   isTestMode?: boolean;
   submissionTimestamp?: number;
   submitter?: string;
-  linkedInURL?: string;
+  linkedInURL: string;
 }
 
 export interface StoredProposal {

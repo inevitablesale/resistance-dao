@@ -1,12 +1,7 @@
-export const CONTRACT_ADDRESS = "0x123..."; // Replace with actual contract address
-export const CONTRACT_ABI = [
-  "function proposals(uint256) public view returns (uint256 id, address proposer, string description, uint256 amount, uint8 status)",
-  "function vote(uint256 proposalId, bool support) public",
-  "function execute(uint256 proposalId) public",
-  "function cancel(uint256 proposalId) public"
-];
+import { ethers } from "ethers";
 
-export const LGR_PRICE_USD = 0.10; // $0.10 per LGR token
+export const CONTRACT_ADDRESS = "0xE0Ae49Df82C207AD72a7b26Cb88c4ce1EA838250";
+export const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 // Contract-specific constants
 export const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
@@ -17,7 +12,7 @@ export const SUBMISSION_FEE = "250"; // 250 LGR
 export const VOTING_FEE = "10"; // 10 LGR
 
 // Contract addresses
-export const FACTORY_ADDRESS = "0xD00655Ce27387b8B1EE7759b1f44De5748916Ba5";
+export const FACTORY_ADDRESS = "0xE0Ae49Df82C207AD72a7b26Cb88c4ce1EA838250";
 export const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
 // Contract ABI sections - update to match actual contract

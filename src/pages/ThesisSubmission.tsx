@@ -427,11 +427,13 @@ const ThesisSubmission = () => {
 
       updateStepStatus('submission', 'processing');
 
-      const metadataToUpload = {
+      const metadataToUpload: ProposalMetadata = {
         ...formData,
+        votingDuration,
         isTestMode,
         submissionTimestamp: Date.now(),
-        submitter: address
+        submitter: address,
+        linkedInURL: formData.linkedInURL || ''
       };
 
       console.log('Uploading metadata to IPFS...', { isTestMode });
@@ -452,13 +454,11 @@ const ThesisSubmission = () => {
         votingDuration,
         ipfsHash,
         metadata: metadataToUpload,
-        linkedInURL: formData.linkedInURL || ''
+        linkedInURL: metadataToUpload.linkedInURL
       };
 
       const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
-
       console.log('Creating proposal...', proposalConfig);
-
       const result = await createProposal(proposalConfig, wallet);
 
       const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
