@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,18 +39,16 @@ import {
   StoredProposal,
   ProposalConfig
 } from "@/types/proposals";
-import { 
-  SUBMISSION_FEE,
-  MIN_TARGET_CAPITAL,
-  MAX_TARGET_CAPITAL,
-  MIN_VOTING_DURATION,
-  MAX_VOTING_DURATION,
-  VOTING_FEE,
-  FACTORY_ADDRESS,
-  LGR_TOKEN_ADDRESS,
-  FACTORY_ABI
-} from "@/lib/constants";
 
+const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
+const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
+const FACTORY_ABI = ["function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)", "function submissionFee() public view returns (uint256)", "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"];
+const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
+const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
+const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
+const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
+const SUBMISSION_FEE = ethers.utils.parseEther("250");
+const VOTING_FEE = ethers.utils.parseEther("10");
 const MAX_STRATEGIES_PER_CATEGORY = 3;
 const MAX_SUMMARY_LENGTH = 500;
 const MAX_PAYMENT_TERMS = 5;
@@ -171,10 +169,6 @@ const ThesisSubmission = () => {
     linkedInURL: "",
     isTestMode: false
   });
-
-  const approvalCompletedRef = useRef(false);
-  const [isApproved, setIsApproved] = useState(false);
-  const [currentFormData, setCurrentFormData] = useState<any>(null);
 
   useEffect(() => {
     setFormData(isTestMode ? {
@@ -557,12 +551,13 @@ const ThesisSubmission = () => {
 
       await handleSubmit(syntheticEvent);
     } catch (error) {
-      console.error("Error during approval completion:", error);
+      console.error("Error during submission:", error);
       toast({
-        title: "Approval Completion Failed",
-        description: error instanceof Error ? error.message : "Failed to complete approval",
+        title: "Submission Failed",
+        description: error instanceof Error ? error.message : "Failed to submit thesis",
         variant: "destructive"
       });
+      updateStepStatus('submission', 'failed');
     }
   };
 
@@ -598,6 +593,10 @@ const ThesisSubmission = () => {
       )}
     </Button>
   );
+
+  const handleRentAdSpace = (frequency: 'week' | 'month') => {
+    // Implement ad space rental logic here
+  };
 
   const handleTestModeToggle = async (enabled: boolean) => {
     if (!isConnected) {
@@ -645,111 +644,45 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleTxComplete = () => {
-    console.log("Transaction completed");
-    if (!approvalCompletedRef.current) {
-      approvalCompletedRef.current = true;
-      setIsApproved(true);
-      onApprovalComplete(currentFormData);
-    }
-  };
-
-  const handleTxError = (error: string) => {
-    console.error("Transaction failed:", error);
-    approvalCompletedRef.current = false;
-    toast({
-      title: "Transaction Failed",
-      description: error,
-      variant: "destructive"
-    });
-  };
-
-  const onApprovalComplete = async (formData: any) => {
-    try {
-      const syntheticEvent = {
-        preventDefault: () => {},
-        target: null,
-        currentTarget: null,
-        bubbles: false,
-        cancelable: false,
-        defaultPrevented: false,
-        eventPhase: 0,
-        isTrusted: true,
-        nativeEvent: new Event('submit'),
-        stopPropagation: () => {},
-        isPropagationStopped: () => false,
-        persist: () => {},
-        isDefaultPrevented: () => false,
-        type: 'submit'
-      } as React.FormEvent<HTMLFormElement>;
-
-      await handleSubmit(syntheticEvent);
-    } catch (error) {
-      console.error("Error during approval completion:", error);
-      toast({
-        title: "Approval Completion Failed",
-        description: error instanceof Error ? error.message : "Failed to complete approval",
-        variant: "destructive"
-      });
-    }
+  const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
+    // Implement promotion selection logic here
   };
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="fixed inset-0 z-0">
-        <div className="circuit-board" />
-        <div 
-          className="absolute inset-0 animate-parallax-slow"
-          style={{
-            background: `
-              radial-gradient(2px 2px at 20% 20%, rgba(234, 179, 8, 0.95) 100%, transparent),
-              radial-gradient(2px 2px at 40% 40%, rgba(234, 179, 8, 0.92) 100%, transparent),
-              radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
-            `,
-            backgroundSize: "240px 240px",
-            opacity: 0.1
-          }}
-        />
-      </div>
-
       <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between py-4">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between"
             >
-              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
+              <h1 className="text-3xl font-bold">
                 Transform Accounting Firm Ownership
               </h1>
             </motion.div>
             
-            <div className="flex items-center gap-6">
-              <LGRWalletDisplay 
-                submissionFee={SUBMISSION_FEE}
-                walletAddress={address}
+            <div className="flex items-center space-x-3">
+              <Label htmlFor="test-mode" className="text-sm text-white/60">
+                Test Mode
+              </Label>
+              <Switch
+                id="test-mode"
+                checked={isTestMode}
+                onCheckedChange={handleTestModeToggle}
+                className={cn(
+                  "data-[state=checked]:bg-yellow-500",
+                  !isConnected && "opacity-50 cursor-not-allowed"
+                )}
+                disabled={!isConnected}
               />
-              <div className="flex items-center space-x-3">
-                <Label htmlFor="test-mode" className="text-sm text-white/60">
-                  Test Mode
-                </Label>
-                <Switch
-                  id="test-mode"
-                  checked={isTestMode}
-                  onCheckedChange={handleTestModeToggle}
-                  className={cn(
-                    "data-[state=checked]:bg-yellow-500",
-                    !isConnected && "opacity-50 cursor-not-allowed"
-                  )}
-                  disabled={!isConnected}
-                />
-              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 pt-32 pb-20 relative z-10">
+      <div className="container mx-auto px-4 pt-32 pb-20">
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-3">
             <div className="sticky top-32 space-y-4">
@@ -759,21 +692,21 @@ const ThesisSubmission = () => {
                   className={cn(
                     "relative",
                     index !== SUBMISSION_STEPS.length - 1 && "pb-8 after:absolute after:left-5 after:top-8 after:h-full after:w-0.5",
-                    step.status === 'completed' ? "after:bg-teal-500" : "after:bg-white/10"
+                    step.status === 'completed' ? "after:bg-green-500" : "after:bg-white/10"
                   )}
                 >
                   <button
                     onClick={() => setActiveStep(step.id)}
                     className={cn(
-                      "group flex items-start gap-4 w-full rounded-lg p-4 transition-all duration-300",
-                      step.id === activeStep ? "bg-white/5 cosmic-box yellow-energy active" : "hover:bg-white/5"
+                      "flex items-start gap-4 w-full rounded-lg p-4 transition-colors",
+                      step.id === activeStep ? "bg-white/5" : "hover:bg-white/5"
                     )}
                   >
                     <div className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-300",
-                      step.status === 'completed' ? "bg-teal-500 text-white" :
-                      step.status === 'processing' ? "bg-yellow-500 text-white animate-pulse" :
-                      step.id === activeStep ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/50" :
+                      "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                      step.status === 'completed' ? "bg-green-500 text-white" :
+                      step.status === 'processing' ? "bg-polygon-primary text-white animate-pulse" :
+                      step.id === activeStep ? "bg-polygon-primary/20 text-polygon-secondary border border-polygon-secondary" :
                       "bg-white/5 text-white/40"
                     )}>
                       {step.status === 'completed' ? (
@@ -784,8 +717,8 @@ const ThesisSubmission = () => {
                     </div>
                     <div className="text-left">
                       <p className={cn(
-                        "font-medium transition-colors duration-300",
-                        step.id === activeStep ? "text-yellow-400" : "text-white/60 group-hover:text-white"
+                        "font-medium",
+                        step.id === activeStep ? "text-white" : "text-white/60"
                       )}>
                         {step.title}
                       </p>
@@ -799,8 +732,8 @@ const ThesisSubmission = () => {
             </div>
           </div>
 
-          <div className="col-span-6 space-y-6 perspective-3000">
-            <Card className="relative bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden cosmic-box yellow-energy">
+          <div className="col-span-6 space-y-6">
+            <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
               <motion.div 
                 className="border-b border-white/5"
                 initial={{ opacity: 0 }}
@@ -808,7 +741,7 @@ const ThesisSubmission = () => {
                 transition={{ delay: 0.2 }}
               >
                 <div className="p-6 space-y-3">
-                  <p className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
+                  <p className="text-xl text-white/90">
                     Ready to revolutionize how accounting practices are acquired?
                   </p>
                   <p className="text-gray-400">
@@ -899,44 +832,18 @@ const ThesisSubmission = () => {
                   )}
 
                   {activeStep === 'submission' && (
-                    <div className="space-y-6">
-                      <div className="space-y-4">
-                        <Label className="text-lg font-medium">Thesis Title</Label>
-                        <Input 
-                          placeholder="Enter a clear, descriptive title"
-                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
-                          value={formData.title}
-                          onChange={e => handleFormDataChange('title', e.target.value)}
-                        />
-                        {formErrors.title && (
-                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                        )}
-                      </div>
-
-                      <TargetCapitalInput 
-                        value={formData.investment.targetCapital}
-                        onChange={value => handleFormDataChange('investment.targetCapital', value)}
-                        error={formErrors['investment.targetCapital']}
-                      />
-
-                      <VotingDurationInput
-                        value={votingDuration}
-                        onChange={handleVotingDurationChange}
-                        error={formErrors.votingDuration}
-                      />
-
-                      <div className="space-y-4">
-                        <Label className="text-lg font-medium">Investment Drivers</Label>
-                        <textarea
-                          placeholder="Describe the key drivers behind this investment thesis..."
-                          className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none"
-                          value={formData.investment.drivers}
-                          onChange={e => handleFormDataChange('investment.drivers', e.target.value)}
-                        />
-                        {formErrors['investment.drivers'] && (
-                          <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
-                        )}
-                      </div>
+                    <div className="space-y-6 text-center py-8">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
+                      >
+                        <Check className="w-8 h-8 text-white" />
+                      </motion.div>
+                      <h3 className="text-2xl font-semibold">Ready to Submit</h3>
+                      <p className="text-gray-400">
+                        Your investment thesis is ready to be submitted to the community
+                      </p>
                     </div>
                   )}
                 </motion.div>
@@ -944,22 +851,27 @@ const ThesisSubmission = () => {
 
               <div className="px-6 pb-6 pt-4 border-t border-white/5">
                 <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-4">
-                    <Button 
-                      onClick={handleContinue}
-                      disabled={isSubmitting}
-                      className={cn(
-                        "h-12 px-6 min-w-[200px] mt-6",
-                        "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
-                        "hover:from-polygon-secondary hover:to-polygon-primary",
-                        "text-white font-medium",
-                        "transition-all duration-300",
-                        "disabled:opacity-50"
-                      )}
-                    >
-                      {getButtonText()}
-                    </Button>
-                  </div>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
+                      if (currentIndex > 0) {
+                        setActiveStep(SUBMISSION_STEPS[currentIndex - 1].id);
+                      }
+                    }}
+                    disabled={activeStep === SUBMISSION_STEPS[0].id}
+                    className="text-white/60 hover:text-white"
+                  >
+                    Previous Step
+                  </Button>
+                  {renderContinueButton(() => {
+                    const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
+                    if (currentIndex < SUBMISSION_STEPS.length - 1) {
+                      setActiveStep(SUBMISSION_STEPS[currentIndex + 1].id);
+                    } else {
+                      handleSubmit(new Event('submit') as any);
+                    }
+                  }, activeStep === SUBMISSION_STEPS[SUBMISSION_STEPS.length - 1].id)}
                 </div>
               </div>
             </Card>
@@ -967,7 +879,49 @@ const ThesisSubmission = () => {
 
           <div className="col-span-3">
             <div className="sticky top-32 space-y-6">
-              {/* Status components */}
+              <LGRWalletDisplay
+                submissionFee={SUBMISSION_FEE}
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
+                walletAddress={address}
+              />
+
+              <ContractApprovalStatus
+                onApprovalComplete={handleApprovalComplete}
+                requiredAmount={SUBMISSION_FEE}
+                isTestMode={isTestMode}
+                currentFormData={formData}
+              />
+
+              <Card className="bg-black/40 border-white/10 p-6 space-y-4">
+                <h3 className="text-xl font-semibold">Promote Your Thesis</h3>
+                <p className="text-sm text-white/60">
+                  Increase visibility and engagement with promotional options
+                </p>
+                
+                <div className="space-y-4">
+                  <Button
+                    onClick={() => handlePromotionSelect('weekly')}
+                    variant="outline"
+                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span>Weekly Promotion</span>
+                      <span className="text-sm text-white/60">5 LGR</span>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => handlePromotionSelect('monthly')}
+                    variant="outline"
+                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span>Monthly Promotion</span>
+                      <span className="text-sm text-white/60">15 LGR</span>
+                    </div>
+                  </Button>
+                </div>
+              </Card>
             </div>
           </div>
         </div>

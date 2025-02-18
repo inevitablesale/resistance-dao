@@ -40,12 +40,7 @@ interface LGRWalletDisplayProps {
   className?: string;
 }
 
-export const LGRWalletDisplay = ({ 
-  submissionFee, 
-  currentBalance, 
-  walletAddress, 
-  className 
-}: LGRWalletDisplayProps) => {
+export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress, className }: LGRWalletDisplayProps) => {
   const { toast } = useToast();
   const { setShowAuthFlow, primaryWallet } = useDynamicContext();
   const { enabled, open } = useOnramp();
@@ -65,10 +60,7 @@ export const LGRWalletDisplay = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isPromotionPending, setIsPromotionPending] = useState(false);
 
-  // Ensure we have a valid BigNumber for formatting
-  const formattedSubmissionFee = submissionFee ? 
-    ethers.utils.formatEther(submissionFee) : 
-    "0";
+  const formattedSubmissionFee = ethers.utils.formatEther(submissionFee);
 
   const hasInsufficientBalance = currentBalance && 
     Number(formattedSubmissionFee) > Number(currentBalance);
