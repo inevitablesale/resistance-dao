@@ -100,7 +100,7 @@ export const ContractApprovalStatus = ({
       const transaction = await executeTransaction(
         async () => {
           console.log("Executing LGR approval transaction...");
-          return approveLGR(requiredAmount, isTestMode);
+          return approveLGR(requiredAmount.toString(), isTestMode);
         },
         {
           type: 'token',
@@ -111,7 +111,7 @@ export const ContractApprovalStatus = ({
           tokenConfig: {
             tokenAddress: LGR_TOKEN_ADDRESS,
             spenderAddress: address!,
-            amount: requiredAmount.toString(), // Convert BigNumberish to string
+            amount: requiredAmount.toString(),
             isTestMode
           },
           walletType
@@ -192,7 +192,7 @@ export const ContractApprovalStatus = ({
               {isTestMode ? (
                 "Test mode: No LGR required for approval"
               ) : (
-                `Approve ${ethers.utils.formatEther(requiredAmount)} LGR for submission`
+                `Approve ${ethers.utils.formatEther(requiredAmountBN)} LGR for submission`
               )}
             </p>
           </div>
