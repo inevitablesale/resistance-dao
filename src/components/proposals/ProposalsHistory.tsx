@@ -18,7 +18,7 @@ import { IPFSContent } from "@/types/content";
 
 const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
 
-interface NFTMetadata extends Omit<IPFSContent, 'content'> {
+interface NFTMetadata extends IPFSContent {
   name: string;
   description: string;
   image?: string;
@@ -108,6 +108,7 @@ export const ProposalsHistory = () => {
           contentSchema: metadata.contentSchema,
           contentType: metadata.contentType,
           title: metadata.title,
+          content: metadata.content || '', // Provide default empty string for required content field
           metadata: metadata.metadata,
           name: metadata.name,
           description: metadata.description,
