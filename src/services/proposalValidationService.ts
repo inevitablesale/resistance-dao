@@ -1,15 +1,21 @@
 
 import { ethers } from "ethers";
 import { ContractStatus } from "./proposalContractService";
+import { ProposalMetadata } from "@/types/proposals";
 
 export interface ValidationConfig {
   maxPaymentTerms: number;
   maxStrategiesPerCategory: number;
   maxSummaryLength: number;
   minTitleLength: number;
+  maxTitleLength: number;
   minDriversLength: number;
+  maxDriversLength: number;
+  maxAdditionalCriteriaLength: number;
   targetCapitalMin: ethers.BigNumber;
   targetCapitalMax: ethers.BigNumber;
+  minLinkedInURLLength: number;
+  maxLinkedInURLLength: number;
 }
 
 export interface ValidationResult {
@@ -17,41 +23,19 @@ export interface ValidationResult {
   errors: Record<string, string[]>;
 }
 
-export interface FirmCriteria {
-  size: string;
-  location: string;
-  dealType: string;
-  geographicFocus: string;
-}
-
-export interface Investment {
-  targetCapital: string;
-  drivers: string;
-  additionalCriteria: string;
-}
-
-export interface Strategies {
-  operational: string[];
-  growth: string[];
-  integration: string[];
-}
-
-export interface ProposalMetadata {
-  title: string;
-  firmCriteria: FirmCriteria;
-  paymentTerms: string[];
-  strategies: Strategies;
-  investment: Investment;
-}
-
 const DEFAULT_CONFIG: ValidationConfig = {
   maxPaymentTerms: 5,
   maxStrategiesPerCategory: 3,
   maxSummaryLength: 500,
   minTitleLength: 10,
+  maxTitleLength: 100,
   minDriversLength: 50,
+  maxDriversLength: 500,
+  maxAdditionalCriteriaLength: 500,
   targetCapitalMin: ethers.utils.parseEther("1000"),
-  targetCapitalMax: ethers.utils.parseEther("25000000")
+  targetCapitalMax: ethers.utils.parseEther("25000000"),
+  minLinkedInURLLength: 1,
+  maxLinkedInURLLength: 200
 };
 
 export const validateProposalMetadata = (
@@ -60,11 +44,11 @@ export const validateProposalMetadata = (
 ): ValidationResult => {
   const errors: Record<string, string[]> = {};
 
-  // Basic Info validation
+  // Title validation
   if (!metadata.title) {
     errors.title = ['Title is required'];
-  } else if (metadata.title.trim().length < config.minTitleLength) {
-    errors.title = [`Title must be at least ${config.minTitleLength} characters`];
+  } else if (metadata.title.length < config.minTitleLength || metadata.title.length > config.maxTitleLength) {
+    errors.title = [`Title must be between ${config.minTitleLength} and ${config.maxTitleLength} characters`];
   }
 
   // Target Capital validation
@@ -87,52 +71,36 @@ export const validateProposalMetadata = (
   // Investment Drivers validation
   if (!metadata.investment.drivers) {
     errors['investment.drivers'] = ['Investment drivers are required'];
-  } else if (metadata.investment.drivers.trim().length < config.minDriversLength) {
-    errors['investment.drivers'] = [`Please provide at least ${config.minDriversLength} characters explaining the investment drivers`];
-  } else if (metadata.investment.drivers.length > config.maxSummaryLength) {
-    errors['investment.drivers'] = [`Maximum length is ${config.maxSummaryLength} characters`];
+  } else if (metadata.investment.drivers.length < config.minDriversLength || 
+             metadata.investment.drivers.length > config.maxDriversLength) {
+    errors['investment.drivers'] = [`Investment drivers must be between ${config.minDriversLength} and ${config.maxDriversLength} characters`];
   }
 
-  // Firm Criteria validation
-  if (!metadata.firmCriteria.size) {
-    errors['firmCriteria.size'] = ['Please select a firm size'];
-  } else if (!['below-1m', '1m-5m', '5m-10m', '10m-plus'].includes(metadata.firmCriteria.size)) {
-    errors['firmCriteria.size'] = ['Invalid firm size selected'];
+  // Additional Criteria validation
+  if (metadata.investment.additionalCriteria && 
+      metadata.investment.additionalCriteria.length > config.maxAdditionalCriteriaLength) {
+    errors['investment.additionalCriteria'] = [`Maximum length is ${config.maxAdditionalCriteriaLength} characters`];
   }
 
-  // Location is optional, but if provided must be valid
-  if (metadata.firmCriteria.location && 
-      !US_STATES.includes(metadata.firmCriteria.location.toUpperCase())) {
-    errors['firmCriteria.location'] = ['Please select a valid state'];
-  }
-
-  if (!metadata.firmCriteria.geographicFocus) {
-    errors['firmCriteria.geographicFocus'] = ['Please select a geographic focus'];
-  } else if (!['local', 'regional', 'national', 'remote'].includes(metadata.firmCriteria.geographicFocus)) {
-    errors['firmCriteria.geographicFocus'] = ['Invalid geographic focus selected'];
-  }
-
-  if (!metadata.firmCriteria.dealType) {
-    errors['firmCriteria.dealType'] = ['Please select a deal type'];
-  } else if (!['acquisition', 'merger', 'equity-buyout', 'franchise', 'succession'].includes(metadata.firmCriteria.dealType)) {
-    errors['firmCriteria.dealType'] = ['Invalid deal type selected'];
+  // LinkedIn URL validation
+  if (!metadata.linkedInURL) {
+    errors.linkedInURL = ['LinkedIn URL is required'];
+  } else if (metadata.linkedInURL.length < config.minLinkedInURLLength || 
+             metadata.linkedInURL.length > config.maxLinkedInURLLength) {
+    errors.linkedInURL = [`LinkedIn URL must be between ${config.minLinkedInURLLength} and ${config.maxLinkedInURLLength} characters`];
   }
 
   // Payment Terms validation
-  const validPaymentTerms = ['cash', 'seller-financing', 'earnout', 'equity-rollover', 'bank-financing'];
   if (!Array.isArray(metadata.paymentTerms) || metadata.paymentTerms.length === 0) {
     errors.paymentTerms = ['Please select at least one payment term'];
   } else if (metadata.paymentTerms.length > config.maxPaymentTerms) {
     errors.paymentTerms = [`Maximum ${config.maxPaymentTerms} payment terms allowed`];
-  } else if (!metadata.paymentTerms.every(term => validPaymentTerms.includes(term))) {
-    errors.paymentTerms = ['Invalid payment term selected'];
   }
 
   // Strategies validation
   const validateStrategyCategory = (
-    category: keyof Strategies,
-    strategies: string[],
-    validOptions: string[]
+    category: keyof typeof metadata.strategies,
+    strategies: any[]
   ) => {
     if (!Array.isArray(strategies) || strategies.length === 0) {
       errors[`strategies.${category}`] = [`Please select at least one ${category} strategy`];
@@ -140,43 +108,18 @@ export const validateProposalMetadata = (
       errors[`strategies.${category}`] = [
         `Maximum ${config.maxStrategiesPerCategory} strategies allowed`
       ];
-    } else if (!strategies.every(strategy => validOptions.includes(strategy))) {
-      errors[`strategies.${category}`] = ['Invalid strategy selected'];
     }
   };
 
-  validateStrategyCategory('operational', metadata.strategies.operational, 
-    ['tech-modernization', 'process-standardization', 'staff-retention']);
-  validateStrategyCategory('growth', metadata.strategies.growth,
-    ['geographic-expansion', 'service-expansion', 'client-growth']);
-  validateStrategyCategory('integration', metadata.strategies.integration,
-    ['merging-operations', 'culture-integration', 'systems-consolidation']);
-
-  // Additional Criteria validation (optional but with length limit if provided)
-  if (metadata.investment.additionalCriteria && 
-      metadata.investment.additionalCriteria.length > config.maxSummaryLength) {
-    errors['investment.additionalCriteria'] = [
-      `Maximum length is ${config.maxSummaryLength} characters`
-    ];
-  }
+  validateStrategyCategory('operational', metadata.strategies.operational);
+  validateStrategyCategory('growth', metadata.strategies.growth);
+  validateStrategyCategory('integration', metadata.strategies.integration);
 
   return {
     isValid: Object.keys(errors).length === 0,
     errors
   };
 };
-
-// Helper constants
-const US_STATES = [
-  "ALABAMA", "ALASKA", "ARIZONA", "ARKANSAS", "CALIFORNIA", "COLORADO", "CONNECTICUT", 
-  "DELAWARE", "FLORIDA", "GEORGIA", "HAWAII", "IDAHO", "ILLINOIS", "INDIANA", "IOWA", 
-  "KANSAS", "KENTUCKY", "LOUISIANA", "MAINE", "MARYLAND", "MASSACHUSETTS", "MICHIGAN", 
-  "MINNESOTA", "MISSISSIPPI", "MISSOURI", "MONTANA", "NEBRASKA", "NEVADA", "NEW HAMPSHIRE", 
-  "NEW JERSEY", "NEW MEXICO", "NEW YORK", "NORTH CAROLINA", "NORTH DAKOTA", "OHIO", 
-  "OKLAHOMA", "OREGON", "PENNSYLVANIA", "RHODE ISLAND", "SOUTH CAROLINA", "SOUTH DAKOTA", 
-  "TENNESSEE", "TEXAS", "UTAH", "VERMONT", "VIRGINIA", "WASHINGTON", "WEST VIRGINIA", 
-  "WISCONSIN", "WYOMING"
-];
 
 export const validateIPFSHash = (hash: string): boolean => {
   // IPFS hash validation (for CIDv0 and CIDv1)
@@ -219,3 +162,4 @@ export const validateContractParameters = (
     errors
   };
 };
+

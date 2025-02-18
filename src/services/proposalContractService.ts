@@ -3,13 +3,32 @@ import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { LGR_PRICE_USD } from "@/lib/constants";
 import { convertUSDToLGRWei } from "@/components/thesis/TargetCapitalInput";
+import { ProposalMetadata } from "@/types/proposals";
 
 const FACTORY_ADDRESS = "0xD00655Ce27387b8B1EE7759b1f44De5748916Ba5";
 const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
 const FACTORY_ABI = [
   // Core proposal creation
-  "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
+  `function createProposal(
+    tuple(
+      string title,
+      string ipfsMetadata,
+      uint128 targetCapital,
+      uint256 votingDuration,
+      string investmentDrivers,
+      string additionalCriteria,
+      uint8 firmSize,
+      string location,
+      uint8 dealType,
+      uint8 geographicFocus,
+      uint8[] paymentTerms,
+      uint8[] operationalStrategies,
+      uint8[] growthStrategies,
+      uint8[] integrationStrategies
+    ) input,
+    string linkedInURL
+  ) external returns (uint256)`,
   // Read-only getters
   "function LGR_TOKEN() public view returns (address)",
   "function MAX_TARGET_CAPITAL() public view returns (uint256)",
@@ -22,12 +41,12 @@ const FACTORY_ABI = [
   "function testModeEnabled() public view returns (bool)",
   "function treasury() public view returns (address)",
   "function submissionFee() public view returns (uint256)",
+  "function tester() public view returns (address)",
   // Admin functions
   "function setTestMode(bool _enabled) external",
   // Events
-  "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)",
-  "event Paused(address account)",
-  "event Unpaused(address account)"
+  "event ProposalCreated(uint256 indexed tokenId, address indexed creator)",
+  "event TestModeChanged(bool newStatus)"
 ];
 
 export interface ContractStatus {
@@ -48,6 +67,8 @@ export interface ProposalConfig {
   targetCapital: ethers.BigNumber;
   votingDuration: number;
   ipfsHash: string;
+  metadata: ProposalMetadata;
+  linkedInURL: string;
 }
 
 export interface GasEstimate {
@@ -164,12 +185,25 @@ export const createProposal = async (
   const lgrAmount = ethers.utils.formatUnits(config.targetCapital, 18);
   console.log("Creating proposal with target capital:", config.targetCapital.toString(), "wei", `(${lgrAmount} LGR)`);
   
+  const input = {
+    title: config.metadata.title,
+    ipfsMetadata: config.ipfsHash,
+    targetCapital: config.targetCapital,
+    votingDuration: config.votingDuration,
+    investmentDrivers: config.metadata.investment.drivers,
+    additionalCriteria: config.metadata.investment.additionalCriteria || "",
+    firmSize: config.metadata.firmCriteria.size,
+    location: config.metadata.firmCriteria.location,
+    dealType: config.metadata.firmCriteria.dealType,
+    geographicFocus: config.metadata.firmCriteria.geographicFocus,
+    paymentTerms: config.metadata.paymentTerms,
+    operationalStrategies: config.metadata.strategies.operational,
+    growthStrategies: config.metadata.strategies.growth,
+    integrationStrategies: config.metadata.strategies.integration
+  };
+  
   return await executeTransaction(
-    () => factory.createProposal(
-      config.ipfsHash,
-      config.targetCapital,
-      config.votingDuration
-    ),
+    () => factory.createProposal(input, config.linkedInURL),
     {
       type: 'proposal',
       description: `Creating proposal with target capital ${lgrAmount} LGR`,
