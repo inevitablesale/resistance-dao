@@ -81,29 +81,49 @@ const ProposalDetails = () => {
 
   const loadChainData = async () => {
     try {
+      console.log('Starting to load chain data...');
       setIsLoadingChainData(true);
       const walletProvider = await getProvider();
+      console.log('Provider obtained, initializing contract...');
+      
       const contract = new ethers.Contract(
         FACTORY_ADDRESS,
         FACTORY_ABI,
         walletProvider.provider
       );
 
+      console.log('Contract initialized, fetching on-chain data for hash:', hash);
       const [pledgedAmount, backers] = await Promise.all([
         contract.pledgedAmount(hash),
         contract.getProposalBackers(hash)
       ]);
 
+      console.log('On-chain data received:', {
+        pledgedAmount: ethers.utils.formatEther(pledgedAmount),
+        backers,
+        hash
+      });
+
       if (proposalDetails) {
         const votingEndsAt = proposalDetails.metadata.submissionTimestamp / 1000 + proposalDetails.metadata.votingDuration;
+        console.log('Calculated voting end time:', new Date(votingEndsAt * 1000).toLocaleString());
         
+        const onChainData = {
+          pledgedAmount,
+          votingEndsAt,
+          backers
+        };
+
+        console.log('Final on-chain data:', {
+          pledgedAmount: ethers.utils.formatEther(pledgedAmount),
+          votingEndsAt: new Date(votingEndsAt * 1000).toLocaleString(),
+          backersCount: backers.length,
+          backers
+        });
+
         setProposalDetails({
           ...proposalDetails,
-          onChainData: {
-            pledgedAmount,
-            votingEndsAt,
-            backers
-          }
+          onChainData
         });
       }
     } catch (error: any) {
