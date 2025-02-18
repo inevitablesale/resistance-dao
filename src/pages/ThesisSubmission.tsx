@@ -672,8 +672,8 @@ const ThesisSubmission = () => {
   return (
     <div className="min-h-screen bg-black text-white pb-20">
       <div className="container mx-auto px-4 py-8">
-        <div className="space-y-8">
-          <div className="w-full">
+        <div className="flex gap-8">
+          <div className="flex-1 space-y-8">
             <div className="flex items-center justify-between mb-8">
               <motion.h1 
                 initial={{ opacity: 0, y: 20 }} 
@@ -843,7 +843,7 @@ const ThesisSubmission = () => {
             </Card>
           </div>
 
-          <div className="max-w-2xl mx-auto space-y-6">
+          <div className="w-80 space-y-6">
             <LGRWalletDisplay
               submissionFee={SUBMISSION_FEE}
               currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
