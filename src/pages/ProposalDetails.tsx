@@ -49,7 +49,7 @@ const ProposalDetails = () => {
         throw new Error('Proposal not found');
       }
 
-      // Get IPFS metadata
+      // Get IPFS metadata - now returns ProposalMetadata directly
       console.log('Fetching IPFS metadata from:', storedProposal.ipfsHash);
       const metadata = await getFromIPFS(storedProposal.ipfsHash);
 
@@ -66,10 +66,10 @@ const ProposalDetails = () => {
         contract.getProposalBackers(storedProposal.hash)
       ]);
 
-      const votingEndsAt = metadata.submissionTimestamp + metadata.votingDuration;
+      const votingEndsAt = metadata.submissionTimestamp / 1000 + metadata.votingDuration;
 
       setProposalDetails({
-        metadata: metadata as ProposalMetadata,
+        metadata,
         onChainData: {
           pledgedAmount,
           votingEndsAt,
