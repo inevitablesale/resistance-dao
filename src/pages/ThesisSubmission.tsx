@@ -1,4 +1,3 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -277,7 +276,7 @@ const ThesisSubmission = () => {
       const fields = field.split('.');
       let current: any = newData;
       
-      for (let i = 0; < fields.length - 1; i++) {
+      for (let i = 0; i < fields.length - 1; i++) {
         if (!current[fields[i]]) {
           current[fields[i]] = {};
         }
@@ -772,86 +771,4 @@ const ThesisSubmission = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <div className="p-6 space-y-3">
-                  <p className="text-xl text-white/90">
-                    Ready to revolutionize how accounting practices are acquired?
-                  </p>
-                  <p className="text-gray-400">
-                    Present your vision to our community of forward-thinking investors through a structured investment thesis.
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Form Content */}
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeStep}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2 }}
-                  className="p-6"
-                >
-                  {activeStep === 'thesis' && (
-                    <div className="space-y-6">
-                      <div className="space-y-4">
-                        <Label className="text-lg font-medium">Thesis Title</Label>
-                        <Input 
-                          placeholder="Enter a clear, descriptive title"
-                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
-                          value={formData.title}
-                          onChange={e => handleFormDataChange('title', e.target.value)}
-                        />
-                        {formErrors.title && (
-                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                        )}
-                      </div>
-
-                      <TargetCapitalInput 
-                        value={formData.investment.targetCapital}
-                        onChange={value => handleFormDataChange('investment.targetCapital', value)}
-                        error={formErrors['investment.targetCapital']}
-                      />
-
-                      <VotingDurationInput
-                        value={votingDuration}
-                        onChange={handleVotingDurationChange}
-                        error={formErrors.votingDuration}
-                      />
-
-                      <div className="space-y-4">
-                        <Label className="text-lg font-medium">Investment Drivers</Label>
-                        <textarea
-                          placeholder="Describe the key drivers behind this investment thesis..."
-                          className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none"
-                          value={formData.investment.drivers}
-                          onChange={e => handleFormDataChange('investment.drivers', e.target.value)}
-                        />
-                        {formErrors['investment.drivers'] && (
-                          <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {activeStep === 'strategy' && (
-                    <FirmCriteriaSection
-                      formData={{
-                        firmCriteria: {
-                          size: formData.firmCriteria.size,
-                          location: formData.firmCriteria.location,
-                          dealType: formData.firmCriteria.dealType,
-                          geographicFocus: formData.firmCriteria.geographicFocus
-                        }
-                      }}
-                      formErrors={formErrors}
-                      onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
-                    />
-                  )}
-
-                  {activeStep === 'approval' && (
-                    <>
-                      <PaymentTermsSection
-                        formData={formData}
-                        formErrors={formErrors}
-                        
+                
