@@ -26,13 +26,21 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
-import { StoredProposal, ProposalMetadata } from "@/types/proposals";
 
 interface SubmissionStep {
   id: string;
   title: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   description: string;
+}
+
+interface StoredProposal {
+  hash: string;
+  ipfsHash: string;
+  timestamp: string;
+  title: string;
+  targetCapital: string;
+  status: 'pending' | 'completed' | 'failed';
 }
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
@@ -47,6 +55,33 @@ const VOTING_FEE = ethers.utils.parseEther("10");
 const MAX_STRATEGIES_PER_CATEGORY = 3;
 const MAX_SUMMARY_LENGTH = 500;
 const MAX_PAYMENT_TERMS = 5;
+
+interface ProposalMetadata {
+  title: string;
+  firmCriteria: {
+    size: string;
+    location: string;
+    dealType: string;
+    geographicFocus: string;
+  };
+  paymentTerms: string[];
+  strategies: {
+    operational: string[];
+    growth: string[];
+    integration: string[];
+  };
+  investment: {
+    targetCapital: string;
+    drivers: string;
+    additionalCriteria: string;
+  };
+}
+
+interface ProposalConfig {
+  targetCapital: ethers.BigNumber;
+  votingDuration: number;
+  ipfsHash: string;
+}
 
 const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
 
@@ -103,8 +138,7 @@ const TEST_FORM_DATA: ProposalMetadata = {
     targetCapital: "2500000",
     drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
     additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
-  },
-  linkedInURL: "https://www.linkedin.com/in/test-user"
+  }
 };
 
 const ThesisSubmission = () => {
@@ -143,8 +177,7 @@ const ThesisSubmission = () => {
       targetCapital: "",
       drivers: "",
       additionalCriteria: ""
-    },
-    linkedInURL: ""
+    }
   });
   const [isThesisOpen, setIsThesisOpen] = useState(false);
   const [isStrategyOpen, setIsStrategyOpen] = useState(false);
@@ -170,8 +203,7 @@ const ThesisSubmission = () => {
         targetCapital: "",
         drivers: "",
         additionalCriteria: ""
-      },
-      linkedInURL: ""
+      }
     });
   }, [isTestMode]);
 
@@ -395,7 +427,6 @@ const ThesisSubmission = () => {
 
       const metadataToUpload = {
         ...formData,
-        votingDuration,
         isTestMode,
         submissionTimestamp: Date.now(),
         submitter: address
@@ -414,18 +445,11 @@ const ThesisSubmission = () => {
         isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData.investment.targetCapital
       );
 
-      const proposalConfig = {
+      const gasEstimate = await estimateProposalGas({
         targetCapital: targetCapitalWei,
         votingDuration,
-        ipfsHash,
-        metadata: {
-          ...formData,
-          votingDuration // Adding votingDuration to match ProposalMetadata interface
-        },
-        linkedInURL: formData.linkedInURL || ''
-      };
-
-      const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
+        ipfsHash
+      }, wallet);
 
       console.log('Creating proposal...', {
         isTestMode,
@@ -434,7 +458,11 @@ const ThesisSubmission = () => {
         ipfsHash
       });
 
-      const result = await createProposal(proposalConfig, wallet);
+      const result = await createProposal({
+        targetCapital: targetCapitalWei,
+        votingDuration,
+        ipfsHash
+      }, wallet);
 
       const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
       const newProposal: StoredProposal = {
@@ -588,8 +616,7 @@ const ThesisSubmission = () => {
             targetCapital: "",
             drivers: "",
             additionalCriteria: ""
-          },
-          linkedInURL: ""
+          }
         });
         setIsThesisOpen(true);
         setIsStrategyOpen(false);
@@ -806,13 +833,32 @@ const ThesisSubmission = () => {
                         }
                       }}
                       formErrors={formErrors}
-                      onChange={(category, value) => handleStrategyChange(category, value)}
+                      onChange={(field, value) => handleFormDataChange(`strategies.${field}`, value)}
                     />
                     {isSubmissionOpen && renderContinueButton(() => {
-                      if (validateBasicsTab()) {
+                      if (validateTermsTab()) {
                         setIsSubmissionOpen(false);
-                        handleApprovalComplete(formData);
+                        handleSubmit({} as React.FormEvent);
                       }
-                    })}
+                    }, true)}
                   </CollapsibleContent>
-                </Collapsible
+                </Collapsible>
+
+                <div className="mt-8 border-t border-white/10 pt-8">
+                  <ContractApprovalStatus 
+                    onApprovalComplete={handleApprovalComplete}
+                    requiredAmount={SUBMISSION_FEE.toString()}
+                    isTestMode={isTestMode}
+                    currentFormData={formData}
+                  />
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
