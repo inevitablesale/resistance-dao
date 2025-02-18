@@ -58,8 +58,10 @@ export const ProposalsHistory = () => {
     try {
       const tokenId = event.args?.tokenId;
       console.log('Fetching data for proposal:', tokenId.toString());
+      console.log('Contract address:', contract.address);
+      console.log('Available contract functions:', Object.keys(contract.functions));
       
-      // Access the mapping directly without callStatic
+      // Direct mapping access
       const proposalData = await contract.proposals(tokenId);
       console.log('Raw proposal data:', proposalData);
       
@@ -81,7 +83,9 @@ export const ProposalsHistory = () => {
         integrationStrategies
       } = proposalData;
 
+      // Fetch pledged amount for this proposal
       const pledgedAmount = await contract.pledgedAmount(tokenId);
+      console.log('Pledged amount for proposal:', pledgedAmount.toString());
 
       // Map arrays to readable strings
       const paymentTermsMap = ['Cash', 'Seller Financing', 'Earnout', 'Equity Rollover', 'Bank Financing'];
@@ -122,6 +126,8 @@ export const ProposalsHistory = () => {
       };
     } catch (error) {
       console.error('Error in transformProposalData:', error);
+      console.error('Contract address:', contract.address);
+      console.error('Token ID:', tokenId?.toString());
       throw error;
     }
   };
