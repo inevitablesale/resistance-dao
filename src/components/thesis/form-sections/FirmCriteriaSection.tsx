@@ -2,25 +2,15 @@
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const US_STATES = [
-  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
-  "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", 
-  "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", 
-  "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", 
-  "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", 
-  "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", 
-  "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", 
-  "Wisconsin", "Wyoming"
-];
+import { FirmSize, DealType, GeographicFocus } from "@/types/proposals";
 
 interface FirmCriteriaSectionProps {
   formData: {
     firmCriteria: {
-      size: string;
+      size: FirmSize;
       location: string;
-      dealType: string;
-      geographicFocus: string;
+      dealType: DealType;
+      geographicFocus: GeographicFocus;
     };
   };
   formErrors: Record<string, string[]>;
@@ -39,13 +29,13 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Preferred Firm Size (Revenue)</Label>
         <RadioGroup 
-          value={formData.firmCriteria.size}
-          onValueChange={(value) => onChange('firmCriteria.size', value)}
+          value={String(formData.firmCriteria.size)}
+          onValueChange={(value) => onChange('size', Number(value))}
           className="flex flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="below-1m" 
+              value={String(FirmSize.BELOW_1M)}
               id="below-1m" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -53,7 +43,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="1m-5m" 
+              value={String(FirmSize.ONE_TO_FIVE_M)}
               id="1m-5m" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -61,7 +51,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="5m-10m" 
+              value={String(FirmSize.FIVE_TO_TEN_M)}
               id="5m-10m" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -69,7 +59,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="10m-plus" 
+              value={String(FirmSize.TEN_PLUS)}
               id="10m-plus" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -84,13 +74,13 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Geographic Focus</Label>
         <RadioGroup 
-          value={formData.firmCriteria.geographicFocus}
-          onValueChange={(value) => onChange('firmCriteria.geographicFocus', value)}
+          value={String(formData.firmCriteria.geographicFocus)}
+          onValueChange={(value) => onChange('geographicFocus', Number(value))}
           className="flex flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="local" 
+              value={String(GeographicFocus.LOCAL)}
               id="local" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -98,7 +88,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="regional" 
+              value={String(GeographicFocus.REGIONAL)}
               id="regional" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -106,7 +96,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="national" 
+              value={String(GeographicFocus.NATIONAL)}
               id="national" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -114,7 +104,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="remote" 
+              value={String(GeographicFocus.REMOTE)}
               id="remote" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -130,7 +120,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
         <Label className="text-white mb-2 block">Primary State (Optional)</Label>
         <Select 
           value={formData.firmCriteria.location}
-          onValueChange={(value) => onChange('firmCriteria.location', value)}
+          onValueChange={(value) => onChange('location', value)}
         >
           <SelectTrigger className="bg-black/50 border-white/10 text-white">
             <SelectValue placeholder="Select a state" />
@@ -149,13 +139,13 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Deal Type</Label>
         <RadioGroup 
-          value={formData.firmCriteria.dealType}
-          onValueChange={(value) => onChange('firmCriteria.dealType', value)}
+          value={String(formData.firmCriteria.dealType)}
+          onValueChange={(value) => onChange('dealType', Number(value))}
           className="flex flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="acquisition" 
+              value={String(DealType.ACQUISITION)}
               id="acquisition" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -163,7 +153,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="merger" 
+              value={String(DealType.MERGER)}
               id="merger" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -171,7 +161,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="equity-buyout" 
+              value={String(DealType.EQUITY_BUYOUT)}
               id="equity-buyout" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -179,7 +169,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="franchise" 
+              value={String(DealType.FRANCHISE)}
               id="franchise" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -187,7 +177,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
           <div className="flex items-center space-x-2">
             <RadioGroupItem 
-              value="succession" 
+              value={String(DealType.SUCCESSION)}
               id="succession" 
               className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
@@ -201,4 +191,3 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
     </div>
   );
 };
-

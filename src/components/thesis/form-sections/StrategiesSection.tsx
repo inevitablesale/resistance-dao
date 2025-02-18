@@ -54,6 +54,10 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
     integration: Building
   };
 
+  const isStrategySelected = (category: keyof typeof formData.strategies, strategyId: StrategyType): boolean => {
+    return formData.strategies[category].includes(strategyId as any);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between border-b border-white/10 pb-2">
@@ -84,7 +88,7 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
                     <Checkbox 
                       id={String(id)}
                       className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-                      checked={formData.strategies[category as keyof typeof formData.strategies].includes(id)}
+                      checked={isStrategySelected(category as keyof typeof formData.strategies, id)}
                       onCheckedChange={(checked) => {
                         handleStrategyChange(
                           category as keyof typeof formData.strategies,
