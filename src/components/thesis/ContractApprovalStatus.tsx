@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -13,22 +14,9 @@ import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { transactionQueue } from "@/services/transactionQueueService";
 import { getContractStatus } from "@/services/proposalContractService";
-import { TransactionBreakdown } from "./TransactionBreakdown";
-import { Zap } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const TESTER_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
-
-export interface TransactionStep {
-  id: string;
-  title: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  isGasless: boolean;
-  estimatedGas?: string;
-  hash?: string;
-  description?: string;
-}
 
 interface ContractApprovalStatusProps {
   onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => void;
@@ -68,38 +56,6 @@ export const ContractApprovalStatus = ({
   const hasRequiredBalance = (isTesterWallet && contractTestMode) || tokenBalances?.find(token => 
     token.symbol === "LGR" && ethers.BigNumber.from(token.balance || "0").gte(requiredAmountBN)
   );
-
-  const [transactionSteps, setTransactionSteps] = useState<TransactionStep[]>([
-    {
-      id: 'token-approval',
-      title: 'LGR Token Approval',
-      status: 'pending',
-      isGasless: false,
-      estimatedGas: '0.002',
-      description: 'Approve LGR tokens for submission'
-    },
-    {
-      id: 'proposal-creation',
-      title: 'Create Proposal',
-      status: 'pending',
-      isGasless: false,
-      estimatedGas: '0.005',
-      description: 'Submit your thesis to the blockchain'
-    },
-    {
-      id: 'nft-minting',
-      title: 'NFT Recognition',
-      status: 'pending',
-      isGasless: true,
-      description: 'Your thesis will be minted as an NFT'
-    }
-  ]);
-
-  const updateStepStatus = (stepId: string, status: TransactionStep['status'], hash?: string) => {
-    setTransactionSteps(prev => prev.map(step => 
-      step.id === stepId ? { ...step, status, hash } : step
-    ));
-  };
 
   useEffect(() => {
     const checkWalletStatus = async () => {
@@ -149,9 +105,15 @@ export const ContractApprovalStatus = ({
   const handleApprove = async () => {
     if (isApproving || isApproved || !isWalletReady || approvalCompletedRef.current) return;
     setIsApproving(true);
-    
     try {
-      updateStepStatus('token-approval', 'processing');
+      console.log("Starting approval process...", {
+        walletAddress: address,
+        testerAddress: TESTER_ADDRESS,
+        isTesterWallet,
+        contractTestMode,
+        isTestMode,
+        currentFormData
+      });
       
       if (wallet) {
         const contractStatus = await getContractStatus(wallet);
@@ -226,10 +188,7 @@ export const ContractApprovalStatus = ({
         walletProvider.provider
       );
 
-      updateStepStatus('token-approval', 'completed', transaction.hash);
-      updateStepStatus('proposal-creation', 'processing');
-
-      console.log("Token approval completed, proceeding with proposal creation");
+      console.log("Transaction executed:", transaction);
       if (!approvalCompletedRef.current) {
         approvalCompletedRef.current = true;
         setIsApproved(true);
@@ -237,7 +196,6 @@ export const ContractApprovalStatus = ({
       }
     } catch (error) {
       console.error("Approval error:", error);
-      updateStepStatus('token-approval', 'failed');
       toast({
         title: "Approval Failed",
         description: error instanceof Error ? error.message : "Failed to approve contract",
@@ -252,8 +210,6 @@ export const ContractApprovalStatus = ({
   const handleTxComplete = () => {
     console.log("Transaction completed");
     if (!approvalCompletedRef.current) {
-      updateStepStatus('proposal-creation', 'completed');
-      updateStepStatus('nft-minting', 'completed');
       approvalCompletedRef.current = true;
       setIsApproved(true);
       onApprovalComplete(currentFormData, undefined, isTesterWallet && contractTestMode);
@@ -262,7 +218,6 @@ export const ContractApprovalStatus = ({
 
   const handleTxError = (error: string) => {
     console.error("Transaction failed:", error);
-    updateStepStatus('proposal-creation', 'failed');
     approvalCompletedRef.current = false;
     toast({
       title: "Transaction Failed",
@@ -291,13 +246,33 @@ export const ContractApprovalStatus = ({
 
   return (
     <Card className="bg-black/40 border-white/10 p-4">
-      <TransactionBreakdown 
-        steps={transactionSteps}
-        currentStepId={currentTxId ? 'proposal-creation' : 'token-approval'}
-      />
+      {currentTxId && (
+        <TransactionStatus
+          transactionId={currentTxId}
+          onComplete={handleTxComplete}
+          onError={handleTxError}
+        />
+      )}
       
-      {!currentTxId && !isApproved && (
-        <div className="mt-4">
+      {!currentTxId && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h3 className="text-lg font-medium">Contract Approval</h3>
+              <p className="text-sm text-gray-400">
+                {isTesterWallet && contractTestMode 
+                  ? "Test Mode: Approval will be simulated"
+                  : "Approve LGR tokens for contract interaction"
+                }
+              </p>
+            </div>
+            {isApproved ? (
+              <Check className="w-5 h-5 text-green-500" />
+            ) : (
+              <AlertTriangle className="w-5 h-5 text-yellow-500" />
+            )}
+          </div>
+
           <Button
             onClick={handleApprove}
             disabled={isApproving || isApproved || !isWalletReady}
@@ -308,19 +283,13 @@ export const ContractApprovalStatus = ({
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 <span>Approving...</span>
               </div>
+            ) : isApproved ? (
+              "Approved"
             ) : (
-              "Start Submission Process"
+              "Approve Contract"
             )}
           </Button>
         </div>
-      )}
-
-      {currentTxId && (
-        <TransactionStatus
-          transactionId={currentTxId}
-          onComplete={handleTxComplete}
-          onError={handleTxError}
-        />
       )}
     </Card>
   );

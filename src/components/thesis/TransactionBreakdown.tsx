@@ -1,7 +1,7 @@
 
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { FileText, Zap, HandCoins, Check, Loader2, AlertTriangle, Hexagon } from "lucide-react";
+import { FileText, Zap, HandCoins, Check, Loader2, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 export interface TransactionStep {
@@ -11,7 +11,6 @@ export interface TransactionStep {
   isGasless: boolean;
   estimatedGas?: string;
   hash?: string;
-  description?: string;
 }
 
 interface TransactionBreakdownProps {
@@ -25,12 +24,12 @@ export const TransactionBreakdown = ({
 }: TransactionBreakdownProps) => {
   const getStepIcon = (step: TransactionStep) => {
     switch (step.id) {
+      case 'smart-wallet':
+        return FileText;
+      case 'gas-sponsorship':
+        return Zap;
       case 'token-approval':
         return HandCoins;
-      case 'proposal-creation':
-        return FileText;
-      case 'nft-minting':
-        return Hexagon;
       default:
         return FileText;
     }
@@ -85,12 +84,6 @@ export const TransactionBreakdown = ({
                     </span>
                   )}
                 </div>
-
-                {step.description && (
-                  <p className="text-sm text-white/60">
-                    {step.description}
-                  </p>
-                )}
 
                 {step.hash && (
                   <a
