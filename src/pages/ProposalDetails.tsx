@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CONTRACT_ADDRESS, CONTRACT_ABI } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 
 const ProposalDetails = () => {
@@ -25,8 +25,8 @@ const ProposalDetails = () => {
       const walletProvider = await getProvider();
       // Use the ethers provider directly
       const contract = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        CONTRACT_ABI,
+        FACTORY_ADDRESS,
+        FACTORY_ABI,
         walletProvider.provider
       );
 
