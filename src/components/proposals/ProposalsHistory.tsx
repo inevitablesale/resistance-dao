@@ -59,9 +59,8 @@ export const ProposalsHistory = () => {
       const tokenId = event.args?.tokenId;
       console.log('Fetching data for proposal:', tokenId.toString());
       
-      // For Solidity mappings, we need to call the getter function that's generated
-      // The function name is the mapping name
-      const proposalData = await contract.callStatic.proposals(tokenId);
+      // Access the mapping directly without callStatic
+      const proposalData = await contract.proposals(tokenId);
       console.log('Raw proposal data:', proposalData);
       
       // Extract values from the proposal struct
