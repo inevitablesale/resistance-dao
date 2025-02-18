@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,15 @@ import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
+import Nav from "@/components/Nav";
+import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
+import { ethers } from "ethers";
+import { uploadMetadataToPinata } from "@/services/pinataService";
+import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
+import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
 import { LGRWalletDisplay } from "@/components/thesis/LGRWalletDisplay";
@@ -18,15 +26,7 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
-import { ethers } from "ethers";
-import { uploadMetadataToPinata } from "@/services/pinataService";
-import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
-import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { ArrowRight, Check } from "lucide-react";
 import { 
   FirmSize, 
   DealType, 
@@ -594,6 +594,10 @@ const ThesisSubmission = () => {
     </Button>
   );
 
+  const handleRentAdSpace = (frequency: 'week' | 'month') => {
+    // Implement ad space rental logic here
+  };
+
   const handleTestModeToggle = async (enabled: boolean) => {
     if (!isConnected) {
       toast({
@@ -640,80 +644,46 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleTxComplete = () => {
-    console.log("Transaction completed");
-  };
-
-  const handleTxError = (error: string) => {
-    console.error("Transaction failed:", error);
-    toast({
-      title: "Transaction Failed",
-      description: error,
-      variant: "destructive"
-    });
+  const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
+    // Implement promotion selection logic here
   };
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Background Elements */}
-      <div className="fixed inset-0 z-0">
-        <div className="circuit-board" />
-        <div 
-          className="absolute inset-0 animate-parallax-slow"
-          style={{
-            background: `
-              radial-gradient(2px 2px at 20% 20%, rgba(234, 179, 8, 0.95) 100%, transparent),
-              radial-gradient(2px 2px at 40% 40%, rgba(234, 179, 8, 0.92) 100%, transparent),
-              radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
-            `,
-            backgroundSize: "240px 240px",
-            opacity: 0.1
-          }}
-        />
-      </div>
-
-      {/* Header */}
       <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between py-4">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between"
             >
-              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
+              <h1 className="text-3xl font-bold">
                 Transform Accounting Firm Ownership
               </h1>
             </motion.div>
             
-            <div className="flex items-center gap-6">
-              <LGRWalletDisplay
-                submissionFee={SUBMISSION_FEE}
-                walletAddress={address}
+            <div className="flex items-center space-x-3">
+              <Label htmlFor="test-mode" className="text-sm text-white/60">
+                Test Mode
+              </Label>
+              <Switch
+                id="test-mode"
+                checked={isTestMode}
+                onCheckedChange={handleTestModeToggle}
+                className={cn(
+                  "data-[state=checked]:bg-yellow-500",
+                  !isConnected && "opacity-50 cursor-not-allowed"
+                )}
+                disabled={!isConnected}
               />
-              <div className="flex items-center space-x-3">
-                <Label htmlFor="test-mode" className="text-sm text-white/60">
-                  Test Mode
-                </Label>
-                <Switch
-                  id="test-mode"
-                  checked={isTestMode}
-                  onCheckedChange={handleTestModeToggle}
-                  className={cn(
-                    "data-[state=checked]:bg-yellow-500",
-                    !isConnected && "opacity-50 cursor-not-allowed"
-                  )}
-                  disabled={!isConnected}
-                />
-              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="container mx-auto px-4 pt-32 pb-20">
         <div className="grid grid-cols-12 gap-8">
-          {/* Left Column - Steps */}
           <div className="col-span-3">
             <div className="sticky top-32 space-y-4">
               {SUBMISSION_STEPS.map((step, index) => (
@@ -762,7 +732,6 @@ const ThesisSubmission = () => {
             </div>
           </div>
 
-          {/* Center Column - Form */}
           <div className="col-span-6 space-y-6">
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
               <motion.div 
@@ -780,31 +749,179 @@ const ThesisSubmission = () => {
                   </p>
                 </div>
               </motion.div>
+
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeStep}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className="p-6"
+                >
+                  {activeStep === 'thesis' && (
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <Label className="text-lg font-medium">Thesis Title</Label>
+                        <Input 
+                          placeholder="Enter a clear, descriptive title"
+                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                          value={formData.title}
+                          onChange={e => handleFormDataChange('title', e.target.value)}
+                        />
+                        {formErrors.title && (
+                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                        )}
+                      </div>
+
+                      <TargetCapitalInput 
+                        value={formData.investment.targetCapital}
+                        onChange={value => handleFormDataChange('investment.targetCapital', value)}
+                        error={formErrors['investment.targetCapital']}
+                      />
+
+                      <VotingDurationInput
+                        value={votingDuration}
+                        onChange={handleVotingDurationChange}
+                        error={formErrors.votingDuration}
+                      />
+
+                      <div className="space-y-4">
+                        <Label className="text-lg font-medium">Investment Drivers</Label>
+                        <textarea
+                          placeholder="Describe the key drivers behind this investment thesis..."
+                          className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none"
+                          value={formData.investment.drivers}
+                          onChange={e => handleFormDataChange('investment.drivers', e.target.value)}
+                        />
+                        {formErrors['investment.drivers'] && (
+                          <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {activeStep === 'strategy' && (
+                    <FirmCriteriaSection
+                      formData={{
+                        firmCriteria: {
+                          size: formData.firmCriteria.size,
+                          location: formData.firmCriteria.location,
+                          dealType: formData.firmCriteria.dealType,
+                          geographicFocus: formData.firmCriteria.geographicFocus
+                        }
+                      }}
+                      formErrors={formErrors}
+                      onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
+                    />
+                  )}
+
+                  {activeStep === 'approval' && (
+                    <>
+                      <PaymentTermsSection
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
+                      />
+                      <StrategiesSection
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={(category, value) => handleStrategyChange(category, value)}
+                      />
+                    </>
+                  )}
+
+                  {activeStep === 'submission' && (
+                    <div className="space-y-6 text-center py-8">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
+                      >
+                        <Check className="w-8 h-8 text-white" />
+                      </motion.div>
+                      <h3 className="text-2xl font-semibold">Ready to Submit</h3>
+                      <p className="text-gray-400">
+                        Your investment thesis is ready to be submitted to the community
+                      </p>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+
+              <div className="px-6 pb-6 pt-4 border-t border-white/5">
+                <div className="flex justify-between items-center">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
+                      if (currentIndex > 0) {
+                        setActiveStep(SUBMISSION_STEPS[currentIndex - 1].id);
+                      }
+                    }}
+                    disabled={activeStep === SUBMISSION_STEPS[0].id}
+                    className="text-white/60 hover:text-white"
+                  >
+                    Previous Step
+                  </Button>
+                  {renderContinueButton(() => {
+                    const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
+                    if (currentIndex < SUBMISSION_STEPS.length - 1) {
+                      setActiveStep(SUBMISSION_STEPS[currentIndex + 1].id);
+                    } else {
+                      handleSubmit(new Event('submit') as any);
+                    }
+                  }, activeStep === SUBMISSION_STEPS[SUBMISSION_STEPS.length - 1].id)}
+                </div>
+              </div>
             </Card>
           </div>
 
-          {/* Right Column - Status */}
           <div className="col-span-3">
             <div className="sticky top-32 space-y-6">
+              <LGRWalletDisplay
+                submissionFee={SUBMISSION_FEE}
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
+                walletAddress={address}
+              />
+
               <ContractApprovalStatus
                 onApprovalComplete={handleApprovalComplete}
                 requiredAmount={SUBMISSION_FEE}
                 isTestMode={isTestMode}
-                currentFormData={null}
+                currentFormData={formData}
               />
 
-              {currentTxId && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <TransactionStatus
-                    transactionId={currentTxId}
-                    onComplete={handleTxComplete}
-                    onError={handleTxError}
-                  />
-                </motion.div>
-              )}
+              <Card className="bg-black/40 border-white/10 p-6 space-y-4">
+                <h3 className="text-xl font-semibold">Promote Your Thesis</h3>
+                <p className="text-sm text-white/60">
+                  Increase visibility and engagement with promotional options
+                </p>
+                
+                <div className="space-y-4">
+                  <Button
+                    onClick={() => handlePromotionSelect('weekly')}
+                    variant="outline"
+                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span>Weekly Promotion</span>
+                      <span className="text-sm text-white/60">5 LGR</span>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => handlePromotionSelect('monthly')}
+                    variant="outline"
+                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span>Monthly Promotion</span>
+                      <span className="text-sm text-white/60">15 LGR</span>
+                    </div>
+                  </Button>
+                </div>
+              </Card>
             </div>
           </div>
         </div>

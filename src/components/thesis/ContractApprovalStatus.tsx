@@ -62,6 +62,7 @@ export const ContractApprovalStatus = ({
         });
         setCurrentTxId(txId);
         
+        // Simulate a short delay for better UX
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         await transactionQueue.processTransaction(txId, async () => {
@@ -92,25 +93,25 @@ export const ContractApprovalStatus = ({
       
       const txId = await transactionQueue.addTransaction({
         type: 'token',
-        description: `Approve ${ethers.utils.formatEther(requiredAmount)} LGR tokens`
+        description: `Approve ${ethers.utils.formatEther(requiredAmountBN)} LGR tokens`
       });
       setCurrentTxId(txId);
 
       const transaction = await executeTransaction(
         async () => {
           console.log("Executing LGR approval transaction...");
-          return approveLGR(requiredAmount.toString(), isTestMode);
+          return approveLGR(requiredAmount, isTestMode);
         },
         {
           type: 'token',
-          description: `Approve ${ethers.utils.formatEther(requiredAmount)} LGR tokens`,
+          description: `Approve ${ethers.utils.formatEther(requiredAmountBN)} LGR tokens`,
           timeout: 180000,
           maxRetries: 3,
           backoffMs: 5000,
           tokenConfig: {
             tokenAddress: LGR_TOKEN_ADDRESS,
             spenderAddress: address!,
-            amount: requiredAmount.toString(),
+            amount: requiredAmount,
             isTestMode
           },
           walletType
