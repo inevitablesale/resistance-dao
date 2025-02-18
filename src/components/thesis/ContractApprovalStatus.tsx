@@ -111,7 +111,8 @@ export const ContractApprovalStatus = ({
         testerAddress: TESTER_ADDRESS,
         isTesterWallet,
         contractTestMode,
-        isTestMode
+        isTestMode,
+        currentFormData
       });
       
       if (wallet) {
@@ -142,7 +143,7 @@ export const ContractApprovalStatus = ({
             receipt: {} as ethers.ContractReceipt
           };
         });
-        console.log("Test mode transaction completed");
+        console.log("Test mode transaction completed with form data:", currentFormData);
         if (!approvalCompletedRef.current) {
           approvalCompletedRef.current = true;
           setIsApproved(true);

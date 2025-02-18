@@ -171,42 +171,15 @@ const ThesisSubmission = () => {
   });
 
   useEffect(() => {
-    setFormData(isTestMode ? {
-      title: TEST_FORM_DATA.title,
-      firmCriteria: TEST_FORM_DATA.firmCriteria,
-      paymentTerms: TEST_FORM_DATA.paymentTerms,
-      strategies: TEST_FORM_DATA.strategies,
-      investment: TEST_FORM_DATA.investment,
-      votingDuration: MIN_VOTING_DURATION,
-      linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
-      isTestMode: true,
-      submissionTimestamp: Date.now(),
-      submitter: address
-    } : {
-      title: "",
-      firmCriteria: {
-        size: FirmSize.BELOW_1M,
-        location: "",
-        dealType: DealType.ACQUISITION,
-        geographicFocus: GeographicFocus.LOCAL
-      },
-      paymentTerms: [],
-      strategies: {
-        operational: [],
-        growth: [],
-        integration: []
-      },
-      investment: {
-        targetCapital: "",
-        drivers: "",
-        additionalCriteria: ""
-      },
-      votingDuration: MIN_VOTING_DURATION,
-      linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
-      isTestMode: false,
-      submissionTimestamp: Date.now(),
-      submitter: address
-    });
+    if (isTestMode) {
+      console.log("Setting test form data:", TEST_FORM_DATA);
+      setFormData({
+        ...TEST_FORM_DATA,
+        linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
+        submissionTimestamp: Date.now(),
+        submitter: address
+      });
+    }
   }, [isTestMode, user, address]);
 
   useEffect(() => {
@@ -529,36 +502,89 @@ const ThesisSubmission = () => {
 
   const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => {
     try {
-      console.log("Approval completed:", { isTestMode });
+      setIsSubmitting(true);
+      setFormErrors({});
+
+      if (!validateLinkedInURL()) {
+        throw new Error("Please add a valid LinkedIn URL in your wallet settings");
+      }
+
+      updateStepStatus('thesis', 'completed');
+      updateStepStatus('strategy', 'completed');
       updateStepStatus('approval', 'completed');
       setActiveStep('submission');
-      
-      const syntheticEvent = {
-        preventDefault: () => {},
-        target: null,
-        currentTarget: null,
-        bubbles: false,
-        cancelable: false,
-        defaultPrevented: false,
-        eventPhase: 0,
-        isTrusted: true,
-        nativeEvent: new Event('submit'),
-        stopPropagation: () => {},
-        isPropagationStopped: () => false,
-        persist: () => {},
-        isDefaultPrevented: () => false,
-        type: 'submit'
-      } as React.FormEvent<HTMLFormElement>;
 
-      await handleSubmit(syntheticEvent, formData, isTestMode);
+      if (!wallet) {
+        throw new Error("No wallet connected");
+      }
+
+      const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
+      console.log('Retrieved LinkedIn URL:', linkedInURL);
+
+      const effectiveFormData = isTestMode ? {
+        ...TEST_FORM_DATA,
+        linkedInURL,
+        submissionTimestamp: Date.now(),
+        submitter: address
+      } : formData;
+
+      console.log('Uploading metadata to IPFS...', { 
+        isTestMode, 
+        effectiveFormData 
+      });
+      
+      const ipfsUri = await uploadMetadataToPinata(effectiveFormData);
+      const ipfsHash = ipfsUri.replace('ipfs://', '');
+      
+      if (!validateIPFSHash(ipfsHash)) {
+        throw new Error("Invalid IPFS hash format");
+      }
+
+      console.log('Estimating gas for proposal creation...', { isTestMode });
+      const targetCapitalWei = ethers.utils.parseEther(
+        isTestMode ? TEST_FORM_DATA.investment.targetCapital : effectiveFormData?.investment.targetCapital || ""
+      );
+
+      const proposalConfig: ProposalConfig = {
+        targetCapital: targetCapitalWei,
+        votingDuration,
+        ipfsHash,
+        metadata: effectiveFormData,
+        linkedInURL
+      };
+
+      const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
+      console.log('Creating proposal...', proposalConfig);
+      const result = await createProposal(proposalConfig, wallet);
+
+      const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
+      const newProposal: StoredProposal = {
+        hash: result.hash,
+        ipfsHash,
+        timestamp: new Date().toISOString(),
+        title: isTestMode ? TEST_FORM_DATA.title : effectiveFormData?.title || "",
+        targetCapital: targetCapitalWei.toString(),
+        status: 'pending'
+      };
+      userProposals.push(newProposal);
+      localStorage.setItem('userProposals', JSON.stringify(userProposals));
+
+      updateStepStatus('submission', 'completed');
+      toast({
+        title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
+        description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
+      });
+
     } catch (error) {
-      console.error("Error during submission:", error);
+      console.error("Submission error:", error);
+      updateStepStatus(activeStep, 'failed');
       toast({
         title: "Submission Failed",
         description: error instanceof Error ? error.message : "Failed to submit thesis",
         variant: "destructive"
       });
-      updateStepStatus('submission', 'failed');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -829,54 +855,4 @@ const ThesisSubmission = () => {
                 </motion.div>
               </AnimatePresence>
 
-              <div className="px-6 pb-6 pt-4 border-t border-white/5">
-                <div className="flex justify-between items-center">
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
-                      if (currentIndex > 0) {
-                        setActiveStep(SUBMISSION_STEPS[currentIndex - 1].id);
-                      }
-                    }}
-                    disabled={activeStep === SUBMISSION_STEPS[0].id}
-                    className="text-white/60 hover:text-white"
-                  >
-                    Previous Step
-                  </Button>
-                  {renderContinueButton(() => {
-                    const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
-                    if (currentIndex < SUBMISSION_STEPS.length - 1) {
-                      setActiveStep(SUBMISSION_STEPS[currentIndex + 1].id);
-                    } else {
-                      handleSubmit(new Event('submit') as any);
-                    }
-                  }, activeStep === SUBMISSION_STEPS[SUBMISSION_STEPS.length - 1].id)}
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          <div className="col-span-3">
-            <div className="sticky top-32 space-y-6">
-              <LGRWalletDisplay
-                submissionFee={SUBMISSION_FEE}
-                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
-                walletAddress={address}
-              />
-
-              <ContractApprovalStatus
-                onApprovalComplete={handleApprovalComplete}
-                requiredAmount={SUBMISSION_FEE}
-                isTestMode={isTestMode}
-                currentFormData={formData}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+              <div
