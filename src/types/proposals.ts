@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 
 export enum FirmSize {
@@ -68,10 +69,10 @@ export interface ProposalMetadata {
     additionalCriteria: string;
   };
   votingDuration: number;
+  linkedInURL: string;
   isTestMode?: boolean;
   submissionTimestamp?: number;
   submitter?: string;
-  linkedInURL: string;
 }
 
 export interface StoredProposal {

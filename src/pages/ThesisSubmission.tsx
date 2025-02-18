@@ -26,7 +26,7 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
-import { useDynamicContext } from "@/hooks/useDynamicContext";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 interface SubmissionStep {
   id: string;
@@ -410,25 +410,6 @@ const ThesisSubmission = () => {
         throw new Error("No wallet connected");
       }
 
-      console.log('Starting proposal submission in', isTestMode ? 'TEST MODE' : 'NORMAL MODE');
-      const contractStatus = await getContractStatus(wallet);
-      
-      if (contractStatus.isPaused) {
-        throw new Error("Contract is currently paused for maintenance");
-      }
-
-      if (!isTestMode) {
-        const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
-        if (targetCapitalWei.lt(contractStatus.minTargetCapital) || targetCapitalWei.gt(contractStatus.maxTargetCapital)) {
-          throw new Error("Target capital out of allowed range");
-        }
-        if (votingDuration < contractStatus.minVotingDuration || votingDuration > contractStatus.maxVotingDuration) {
-          throw new Error("Voting duration out of allowed range");
-        }
-      }
-
-      updateStepStatus('submission', 'processing');
-
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       if (!linkedInURL) {
         throw new Error("LinkedIn Profile URL not found. Please add it in your wallet settings.");
@@ -436,11 +417,11 @@ const ThesisSubmission = () => {
 
       const metadataToUpload: ProposalMetadata = {
         ...formData,
+        votingDuration,
+        linkedInURL,
         isTestMode,
         submissionTimestamp: Date.now(),
-        submitter: address,
-        linkedInURL,
-        votingDuration
+        submitter: address
       };
 
       console.log('Uploading metadata to IPFS...', { isTestMode });
