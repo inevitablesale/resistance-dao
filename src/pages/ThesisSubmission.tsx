@@ -521,6 +521,13 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
+      // Log the current state of form data
+      console.log('Current form state:', {
+        formData,
+        isTestMode,
+        TEST_FORM_DATA
+      });
+
       const effectiveFormData = isTestMode ? {
         ...TEST_FORM_DATA,
         linkedInURL,
@@ -528,19 +535,31 @@ const ThesisSubmission = () => {
         submitter: address
       } : formData;
 
-      console.log('Uploading metadata to IPFS...', { 
-        isTestMode, 
-        effectiveFormData 
+      console.log('Preparing data for IPFS submission:', { 
+        isTestMode,
+        effectiveFormData,
+        linkedInURL,
+        submitter: address,
+        timestamp: Date.now()
       });
       
       const ipfsUri = await uploadMetadataToPinata(effectiveFormData);
+      console.log('IPFS upload result:', {
+        ipfsUri,
+        submittedData: effectiveFormData
+      });
+
       const ipfsHash = ipfsUri.replace('ipfs://', '');
       
       if (!validateIPFSHash(ipfsHash)) {
         throw new Error("Invalid IPFS hash format");
       }
 
-      console.log('Estimating gas for proposal creation...', { isTestMode });
+      console.log('Estimating gas for proposal creation...', { 
+        isTestMode,
+        targetCapital: isTestMode ? TEST_FORM_DATA.investment.targetCapital : effectiveFormData.investment.targetCapital
+      });
+
       const targetCapitalWei = ethers.utils.parseEther(
         isTestMode ? TEST_FORM_DATA.investment.targetCapital : effectiveFormData.investment.targetCapital
       );
@@ -553,9 +572,13 @@ const ThesisSubmission = () => {
         linkedInURL
       };
 
+      console.log('Final proposal configuration:', proposalConfig);
+
       const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
-      console.log('Creating proposal...', proposalConfig);
+      console.log('Gas estimate received:', gasEstimate);
+      
       const result = await createProposal(proposalConfig, wallet);
+      console.log('Proposal creation result:', result);
 
       const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
       const newProposal: StoredProposal = {
@@ -841,57 +864,4 @@ const ThesisSubmission = () => {
                   {activeStep === 'submission' && (
                     <div className="space-y-6 text-center py-8">
                       <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
-                      >
-                        <Check className="w-8 h-8 text-white" />
-                      </motion.div>
-                      <h3 className="text-2xl font-semibold">Ready to Submit</h3>
-                      <p className="text-gray-400">
-                        Your investment thesis is ready to be submitted to the community
-                      </p>
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-
-              <div className="border-t border-white/5 p-6">
-                <Button 
-                  onClick={handleContinue}
-                  disabled={isSubmitting}
-                  className="w-full h-12"
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Processing...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-2">
-                      <span>{getButtonText()}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  )}
-                </Button>
-              </div>
-            </Card>
-          </div>
-
-          <div className="col-span-3">
-            <div className="sticky top-32 space-y-4">
-              <ContractApprovalStatus
-                onApprovalComplete={handleApprovalComplete}
-                requiredAmount={SUBMISSION_FEE}
-                isTestMode={isTestMode}
-                currentFormData={formData}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+                        initial={{ scale:
