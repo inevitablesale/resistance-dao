@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -569,27 +568,38 @@ const ThesisSubmission = () => {
       setCurrentTxHash(result.hash);
 
       const provider = new ethers.providers.Web3Provider(await wallet.getWalletClient() as any);
-      const eventConfig: EventConfig = {
-        provider,
-        contractAddress: FACTORY_ADDRESS,
-        abi: FACTORY_ABI,
-        eventName: "ProposalCreated"
-      };
+      const receipt = await result.wait();
+      console.log('Transaction receipt received:', receipt);
 
-      const proposalEvent = await waitForProposalCreation(eventConfig, result.hash);
-      console.log('Proposal event received:', proposalEvent);
+      if (receipt.status === 1) { // Transaction successful
+        setSubmissionComplete(true);
+        updateStepStatus('submission', 'completed');
 
-      setSubmissionComplete(true);
-      updateStepStatus('submission', 'completed');
+        toast({
+          title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
+          description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
+        });
 
-      toast({
-        title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
-        description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
-      });
+        // Store proposal in local storage
+        const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
+        const newProposal: StoredProposal = {
+          hash: result.hash,
+          ipfsHash,
+          timestamp: new Date().toISOString(),
+          title: isTestMode ? TEST_FORM_DATA.title : effectiveFormData.title,
+          targetCapital: targetCapitalWei.toString(),
+          status: 'pending'
+        };
+        userProposals.push(newProposal);
+        localStorage.setItem('userProposals', JSON.stringify(userProposals));
 
-      setTimeout(() => {
-        navigate('/proposals');
-      }, 2000);
+        // Redirect after a short delay to allow the user to see the success state
+        setTimeout(() => {
+          navigate('/proposals');
+        }, 2000);
+      } else {
+        throw new Error('Transaction failed');
+      }
 
     } catch (error) {
       console.error("Submission error:", error);
