@@ -34,7 +34,7 @@ import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
 import { motion } from "framer-motion";
 
 interface LGRWalletDisplayProps {
-  submissionFee: string;
+  submissionFee: ethers.BigNumberish;
   currentBalance?: string;
   walletAddress?: string;
   className?: string;
@@ -60,8 +60,10 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isPromotionPending, setIsPromotionPending] = useState(false);
 
+  const formattedSubmissionFee = ethers.utils.formatEther(submissionFee);
+
   const hasInsufficientBalance = currentBalance && 
-    Number(ethers.utils.formatEther(submissionFee)) > Number(currentBalance);
+    Number(formattedSubmissionFee) > Number(currentBalance);
 
   useEffect(() => {
     const fetchBalances = async () => {

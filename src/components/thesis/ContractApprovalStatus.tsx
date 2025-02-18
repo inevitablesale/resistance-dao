@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -18,7 +17,7 @@ const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 interface ContractApprovalStatusProps {
   onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction) => void;
-  requiredAmount: string;
+  requiredAmount: ethers.BigNumberish;
   isTestMode?: boolean;
   currentFormData: any;
 }
@@ -44,7 +43,10 @@ export const ContractApprovalStatus = ({
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const hasRequiredBalance = isTestMode || (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(requiredAmount));
+  const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
+  const hasRequiredBalance = isTestMode || (tokenBalances?.find(token => 
+    token.symbol === "LGR" && ethers.BigNumber.from(token.balance || "0").gte(requiredAmountBN)
+  ));
 
   const handleApprove = async () => {
     if (isApproving || isApproved || approvalCompletedRef.current) return;
@@ -91,7 +93,7 @@ export const ContractApprovalStatus = ({
       
       const txId = await transactionQueue.addTransaction({
         type: 'token',
-        description: `Approve ${ethers.utils.formatEther(requiredAmount)} LGR tokens`
+        description: `Approve ${ethers.utils.formatEther(requiredAmountBN)} LGR tokens`
       });
       setCurrentTxId(txId);
 
@@ -102,7 +104,7 @@ export const ContractApprovalStatus = ({
         },
         {
           type: 'token',
-          description: `Approve ${ethers.utils.formatEther(requiredAmount)} LGR tokens`,
+          description: `Approve ${ethers.utils.formatEther(requiredAmountBN)} LGR tokens`,
           timeout: 180000,
           maxRetries: 3,
           backoffMs: 5000,
@@ -156,7 +158,6 @@ export const ContractApprovalStatus = ({
     });
   };
 
-  // Reset approval state when test mode changes
   useEffect(() => {
     setIsApproved(false);
     setIsApproving(false);
@@ -191,7 +192,7 @@ export const ContractApprovalStatus = ({
               {isTestMode ? (
                 "Test mode: No LGR required for approval"
               ) : (
-                `Approve ${ethers.utils.formatEther(requiredAmount)} LGR for submission`
+                `Approve ${ethers.utils.formatEther(requiredAmountBN)} LGR for submission`
               )}
             </p>
           </div>
@@ -224,4 +225,3 @@ export const ContractApprovalStatus = ({
     </Card>
   );
 };
-

@@ -101,6 +101,11 @@ const dynamicSettings = {
       displaySiweStatement: false
     },
     shadowDOMEnabled: false,
+    allowedDomains: [
+      "id-preview--20de67db-692b-43bc-8918-dfa81ea94ccd.lovable.app",
+      "app.dynamicauth.com",
+      "localhost"
+    ],
     tokens: [
       {
         address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
