@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, Users, Target } from "lucide-react";
@@ -11,7 +10,6 @@ import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { ethers } from "ethers";
 import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
 import { getTokenBalance } from "@/services/tokenService";
-import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata, ContractProposal } from "@/types/proposals";
 
@@ -24,6 +22,12 @@ interface ProposalEvent {
   transactionHash: string;
   contractData: ContractProposal;
   metadata?: ProposalMetadata;
+  nftMetadata?: {
+    name: string;
+    description: string;
+    image?: string;
+    attributes?: Array<{ trait_type: string; value: string }>;
+  };
   pledgedAmount?: string;
 }
 
@@ -75,6 +79,29 @@ export const ProposalsHistory = () => {
     checkLGRBalance();
   }, [isConnected, address, getProvider]);
 
+  const fetchNFTMetadata = async (contract: ethers.Contract, tokenId: string) => {
+    try {
+      const tokenUri = await contract.tokenURI(tokenId);
+      console.log(`NFT metadata URI for token #${tokenId}:`, tokenUri);
+      
+      if (!tokenUri) {
+        console.log(`No tokenURI found for token #${tokenId}`);
+        return null;
+      }
+
+      if (tokenUri.startsWith('ipfs://')) {
+        const metadata = await getFromIPFS(tokenUri.replace('ipfs://', ''), 'proposal');
+        console.log(`NFT metadata fetched for token #${tokenId}:`, metadata);
+        return metadata;
+      }
+
+      return null;
+    } catch (error) {
+      console.error(`Error fetching NFT metadata for token #${tokenId}:`, error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const fetchProposalData = async () => {
       if (!isConnected || !hasMinimumLGR) return;
@@ -100,10 +127,11 @@ export const ProposalsHistory = () => {
             console.log(`Fetching proposal data for token #${tokenId}`);
 
             try {
-              // Get proposal data from contract and pledged amount
-              const [proposalData, pledgedAmount] = await Promise.all([
+              // Get proposal data, pledged amount, and NFT metadata in parallel
+              const [proposalData, pledgedAmount, nftMetadata] = await Promise.all([
                 contract.proposals(tokenId),
-                contract.pledgedAmount(tokenId)
+                contract.pledgedAmount(tokenId),
+                fetchNFTMetadata(contract, tokenId)
               ]);
 
               // Format the contract data properly
@@ -144,10 +172,12 @@ export const ProposalsHistory = () => {
                 transactionHash: event.transactionHash,
                 contractData,
                 metadata,
+                nftMetadata,
                 pledgedAmount: ethers.utils.formatEther(pledgedAmount)
               };
             } catch (error) {
               console.error(`Error fetching data for proposal #${tokenId}:`, error);
+              // Return minimal data if fetching fails
               return {
                 tokenId,
                 creator: event.args?.creator,
@@ -266,7 +296,7 @@ export const ProposalsHistory = () => {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium text-white">
-                        {event.contractData.title || `Proposal #${event.tokenId}`}
+                        {event.nftMetadata?.name || event.contractData.title || `Proposal #${event.tokenId}`}
                       </h3>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-white/60">
@@ -288,6 +318,9 @@ export const ProposalsHistory = () => {
                   </div>
                 </div>
               </div>
+              {event.nftMetadata?.description && (
+                <p className="text-sm text-white/60 mt-2">{event.nftMetadata.description}</p>
+              )}
             </div>
           </motion.div>
         ))}
