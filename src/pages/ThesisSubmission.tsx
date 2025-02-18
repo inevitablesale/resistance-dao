@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -129,7 +130,7 @@ const isValidLinkedInURL = (url: string): boolean => {
 
 const ThesisSubmission = () => {
   const { toast } = useToast();
-  const { isConnected, address, connect, approveLGR, wallet, toggleTestMode } = useWalletConnection();
+  const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
   const { user } = useDynamicContext();
   const { tokenBalances } = useTokenBalances({
     networkId: 137,
