@@ -858,3 +858,34 @@ const ThesisSubmission = () => {
                       if (currentIndex > 0) {
                         setActiveStep(SUBMISSION_STEPS[currentIndex - 1].id);
                       }
+                    }}
+                    disabled={activeStep === SUBMISSION_STEPS[0].id}
+                    className="text-white/60 hover:text-white"
+                  >
+                    Previous Step
+                  </Button>
+                  {renderContinueButton(() => {
+                    const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
+                    if (currentIndex < SUBMISSION_STEPS.length - 1) {
+                      setActiveStep(SUBMISSION_STEPS[currentIndex + 1].id);
+                    } else {
+                      handleSubmit(new Event('submit') as any);
+                    }
+                  }, activeStep === SUBMISSION_STEPS[SUBMISSION_STEPS.length - 1].id)}
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <div className="col-span-3">
+            <div className="sticky top-32 space-y-6">
+              {/* ... keep existing right column content */}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
