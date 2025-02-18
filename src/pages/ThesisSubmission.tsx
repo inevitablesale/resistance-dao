@@ -222,7 +222,7 @@ const ThesisSubmission = () => {
       toast({
         title: "LinkedIn Profile Required",
         description: "Please add your LinkedIn URL in your wallet settings to submit a thesis",
-        variant: "warning"
+        variant: "default"
       });
     }
   }, [user, isConnected]);
@@ -453,7 +453,11 @@ const ThesisSubmission = () => {
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
       const metadataToUpload: ProposalMetadata = {
-        ...formData,
+        title: formData.title,
+        firmCriteria: formData.firmCriteria,
+        paymentTerms: formData.paymentTerms,
+        strategies: formData.strategies,
+        investment: formData.investment,
         votingDuration,
         linkedInURL,
         isTestMode,
