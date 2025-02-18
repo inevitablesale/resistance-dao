@@ -1,9 +1,9 @@
-
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
 import { ProposalMetadata, ProposalConfig, ProposalInput } from "@/types/proposals";
+import { ProposalError } from "./errorHandlingService";
 
 export interface ContractStatus {
   submissionFee: ethers.BigNumber;
@@ -24,12 +24,20 @@ async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet
   try {
     const walletClient = await wallet.getWalletClient();
     if (!walletClient) {
-      throw new Error("No wallet client available");
+      throw new ProposalError({
+        category: 'wallet',
+        message: "No wallet client available",
+        recoverySteps: ['Please refresh and try again', 'Check wallet connection']
+      });
     }
     return new ethers.providers.Web3Provider(walletClient as any);
   } catch (error) {
     console.error("Error getting provider:", error);
-    throw new Error("Failed to initialize provider");
+    throw new ProposalError({
+      category: 'wallet',
+      message: "Failed to initialize provider",
+      recoverySteps: ['Check wallet connection', 'Try reconnecting your wallet']
+    });
   }
 }
 
@@ -38,6 +46,8 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
 
   try {
+    console.log("Fetching contract status...");
+    
     const [
       submissionFee,
       isPaused,
@@ -66,6 +76,13 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       factory.tester()
     ]);
 
+    console.log("Contract status fetched successfully:", {
+      isPaused,
+      isTestMode,
+      treasury,
+      tester
+    });
+
     return {
       submissionFee,
       isPaused,
@@ -80,9 +97,32 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       owner,
       tester
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error getting contract status:", error);
-    throw new Error("Failed to get contract status");
+    
+    // Handle specific contract errors
+    if (error.message.includes("paused is not a function")) {
+      throw new ProposalError({
+        category: 'contract',
+        message: "Contract pause status check failed",
+        recoverySteps: ['Check contract deployment', 'Verify contract ABI']
+      });
+    }
+    
+    if (error.message.includes("testModeEnabled is not a function")) {
+      throw new ProposalError({
+        category: 'contract',
+        message: "Test mode status check failed",
+        recoverySteps: ['Check contract deployment', 'Verify contract ABI']
+      });
+    }
+
+    throw new ProposalError({
+      category: 'contract',
+      message: "Failed to get contract status",
+      recoverySteps: ['Try again', 'Check network connection'],
+      technicalDetails: error.message
+    });
   }
 };
 
@@ -187,4 +227,3 @@ export const estimateProposalGas = async (
     throw error;
   }
 };
-

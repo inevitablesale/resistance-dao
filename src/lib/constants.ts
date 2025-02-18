@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 
 export const FACTORY_ADDRESS = "0x624dFf6455FBE2f569571fba31c7D020b905b745";
@@ -32,6 +33,11 @@ export const FACTORY_ABI = [
   "function MAX_TARGET_CAPITAL() external pure returns (uint128)",
   "function VOTING_FEE() external pure returns (uint256)",
   
+  // Pausable Functions
+  "function paused() external view returns (bool)",
+  "function pause() external",
+  "function unpause() external",
+  
   // Function Interfaces
   "function setTestMode(bool _enabled) external",
   "function createProposal((string,string,uint128,uint256,string,string,uint8,string,uint8,uint8,uint8[],uint8[],uint8[],uint8[]) calldata input, string calldata linkedInURL) external returns (uint256)",
@@ -50,6 +56,8 @@ export const FACTORY_ABI = [
   "event ProposalVoted(uint256 indexed tokenId, address indexed voter, uint128 pledgeAmount)",
   "event ProposalFullyPledged(uint256 indexed tokenId, uint128 totalPledged, address[] backers)",
   "event TestModeChanged(bool newStatus)",
+  "event Paused(address account)",
+  "event Unpaused(address account)",
   
   // ERC721 Required Functions
   "function balanceOf(address owner) external view returns (uint256)",
