@@ -1,4 +1,3 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -858,4 +857,4 @@ const ThesisSubmission = () => {
                       const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
                       if (currentIndex > 0) {
                         setActiveStep(SUBMISSION_STEPS[currentIndex - 1].id);
-                      
+                      }
