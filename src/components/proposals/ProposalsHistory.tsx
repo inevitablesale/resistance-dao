@@ -1,41 +1,22 @@
-
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { FileText, Calendar, Users, Target } from "lucide-react";
-import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { ethers } from "ethers";
-import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
+import { LGR_TOKEN_ADDRESS } from "@/lib/constants";
 import { getTokenBalance } from "@/services/tokenService";
 import { useToast } from "@/hooks/use-toast";
-import { getFromIPFS } from "@/services/ipfsService";
-import { ProposalMetadata } from "@/types/proposals";
+import { useNavigate } from "react-router-dom";
+import { useProposalData } from "@/hooks/useProposalData";
+import { ProposalCard } from "./ProposalCard";
+import { ProposalLoadingIndicator } from "./ProposalLoadingIndicator";
 
 const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
 
-interface ProposalEvent {
-  tokenId: string;
-  creator: string;
-  blockNumber: number;
-  transactionHash: string;
-  title: string;
-  ipfsMetadata: string;
-  targetCapital: ethers.BigNumber;
-  votingEnds: number;
-  metadata?: ProposalMetadata;
-  pledgedAmount?: string;
-}
-
 export const ProposalsHistory = () => {
-  const [proposalEvents, setProposalEvents] = useState<ProposalEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
   const { isConnected, connect, address } = useWalletConnection();
-  const { getProvider } = useWalletProvider();
+  const { proposals, loadingStates, refresh } = useProposalData();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -47,7 +28,7 @@ export const ProposalsHistory = () => {
       }
 
       try {
-        const walletProvider = await getProvider();
+        const walletProvider = await useWalletConnection().getProvider();
         const balance = await getTokenBalance(
           walletProvider.provider,
           LGR_TOKEN_ADDRESS,
@@ -76,104 +57,7 @@ export const ProposalsHistory = () => {
     };
 
     checkLGRBalance();
-  }, [isConnected, address, getProvider]);
-
-  useEffect(() => {
-    const fetchProposalData = async () => {
-      if (!isConnected || !hasMinimumLGR) return;
-
-      try {
-        setIsLoading(true);
-        const walletProvider = await getProvider();
-        const contract = new ethers.Contract(
-          FACTORY_ADDRESS,
-          FACTORY_ABI,
-          walletProvider.provider
-        );
-
-        // Get all ProposalCreated events
-        const filter = contract.filters.ProposalCreated();
-        const events = await contract.queryFilter(filter);
-        console.log('Found proposal events:', events.length);
-
-        // Process events and fetch metadata
-        const proposalsWithMetadata = await Promise.all(
-          events.map(async (event) => {
-            const tokenId = event.args?.tokenId.toString();
-            console.log(`Fetching proposal data for token #${tokenId}`);
-
-            try {
-              // Get proposal data from contract and pledged amount
-              const [proposalData, pledgedAmount] = await Promise.all([
-                contract.proposals(tokenId),
-                contract.pledgedAmount(tokenId)
-              ]);
-
-              console.log(`Proposal data for #${tokenId}:`, {
-                title: proposalData.title,
-                ipfsHash: proposalData.ipfsMetadata,
-                targetCapital: proposalData.targetCapital.toString(),
-                votingEnds: proposalData.votingEnds.toString()
-              });
-
-              // Get IPFS metadata if available
-              let metadata: ProposalMetadata | undefined;
-              if (proposalData.ipfsMetadata) {
-                try {
-                  metadata = await getFromIPFS<ProposalMetadata>(proposalData.ipfsMetadata, 'proposal');
-                  console.log(`IPFS metadata fetched for #${tokenId}:`, metadata);
-                } catch (ipfsError) {
-                  console.error(`Error fetching IPFS metadata for proposal #${tokenId}:`, ipfsError);
-                }
-              }
-
-              return {
-                tokenId,
-                creator: event.args?.creator,
-                blockNumber: event.blockNumber,
-                transactionHash: event.transactionHash,
-                title: proposalData.title,
-                ipfsMetadata: proposalData.ipfsMetadata,
-                targetCapital: proposalData.targetCapital,
-                votingEnds: proposalData.votingEnds.toNumber(),
-                metadata,
-                pledgedAmount: ethers.utils.formatEther(pledgedAmount)
-              };
-            } catch (error) {
-              console.error(`Error fetching data for proposal #${tokenId}:`, error);
-              return {
-                tokenId,
-                creator: event.args?.creator,
-                blockNumber: event.blockNumber,
-                transactionHash: event.transactionHash,
-                title: `Proposal #${tokenId}`,
-                ipfsMetadata: '',
-                targetCapital: ethers.BigNumber.from(0),
-                votingEnds: 0
-              };
-            }
-          })
-        );
-
-        // Sort by newest first (highest block number)
-        proposalsWithMetadata.sort((a, b) => b.blockNumber - a.blockNumber);
-        
-        console.log('Processed proposals with metadata:', proposalsWithMetadata);
-        setProposalEvents(proposalsWithMetadata);
-      } catch (error) {
-        console.error("Error fetching proposals:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load proposals. Please try again.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProposalData();
-  }, [isConnected, hasMinimumLGR, getProvider]);
+  }, [isConnected, address]);
 
   if (!isConnected) {
     return (
@@ -198,18 +82,34 @@ export const ProposalsHistory = () => {
     );
   }
 
+  const isLoading = loadingStates.some(state => state.isLoading);
+  const hasError = loadingStates.some(state => state.error);
+
   if (isLoading) {
     return (
       <Card className="bg-black/40 border-white/10">
-        <CardContent className="p-6 text-center">
+        <CardContent className="p-6 text-center space-y-4">
           <div className="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto mb-2" />
-          <p className="text-white/60">Loading proposals...</p>
+          <ProposalLoadingIndicator loadingStates={loadingStates} />
         </CardContent>
       </Card>
     );
   }
 
-  if (proposalEvents.length === 0) {
+  if (hasError) {
+    return (
+      <Card className="bg-black/40 border-white/10">
+        <CardContent className="p-6 text-center space-y-4">
+          <p className="text-white/60">Failed to load proposals.</p>
+          <Button onClick={refresh} className="bg-purple-500 hover:bg-purple-600">
+            Try Again
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (proposals.length === 0) {
     return (
       <Card className="bg-black/40 border-white/10">
         <CardContent className="p-6 text-center text-white/60">
@@ -229,48 +129,12 @@ export const ProposalsHistory = () => {
   return (
     <div className="space-y-4">
       <div className="grid gap-4">
-        {proposalEvents.map((event, index) => (
-          <motion.div
-            key={event.tokenId}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            onClick={() => navigate(`/proposals/${event.tokenId}`)}
-            className="p-4 rounded-lg border border-white/10 bg-white/5 hover:border-purple-500/20 transition-colors cursor-pointer"
-          >
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-white">
-                        {event.title || `Proposal #${event.tokenId}`}
-                      </h3>
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-white/60">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{format(new Date(event.blockNumber * 1000), 'PPP')}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Target className="w-4 h-4" />
-                        <span>{ethers.utils.formatEther(event.targetCapital)} LGR Target</span>
-                      </div>
-                      {event.pledgedAmount && (
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4" />
-                          <span>{event.pledgedAmount} LGR Pledged</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+        {proposals.map((proposal, index) => (
+          <ProposalCard 
+            key={proposal.tokenId} 
+            proposal={proposal} 
+            index={index} 
+          />
         ))}
       </div>
     </div>
