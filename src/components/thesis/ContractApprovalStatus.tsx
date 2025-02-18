@@ -36,6 +36,8 @@ export const ContractApprovalStatus = ({
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
+  const [isTesterWallet, setIsTesterWallet] = useState(false);
+  const [contractTestMode, setContractTestMode] = useState(false);
   const approvalCompletedRef = useRef(false);
   const { toast } = useToast();
 
@@ -48,9 +50,34 @@ export const ContractApprovalStatus = ({
   });
 
   const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
-  const hasRequiredBalance = isTestMode || tokenBalances?.find(token => 
+  
+  // Check if either test mode is active (tester wallet + contract test mode) or if we have enough balance
+  const hasRequiredBalance = (isTesterWallet && contractTestMode) || tokenBalances?.find(token => 
     token.symbol === "LGR" && ethers.BigNumber.from(token.balance || "0").gte(requiredAmountBN)
   );
+
+  useEffect(() => {
+    const checkTestMode = async () => {
+      if (wallet && address) {
+        try {
+          const contractStatus = await getContractStatus(wallet);
+          const isTester = address.toLowerCase() === TESTER_ADDRESS.toLowerCase();
+          setIsTesterWallet(isTester);
+          setContractTestMode(contractStatus.isTestMode);
+          console.log("Test mode status:", {
+            isTesterWallet: isTester,
+            contractTestMode: contractStatus.isTestMode,
+            walletAddress: address,
+            testerAddress: TESTER_ADDRESS
+          });
+        } catch (error) {
+          console.error("Error checking test mode:", error);
+        }
+      }
+    };
+
+    checkTestMode();
+  }, [wallet, address]);
 
   const handleApprove = async () => {
     if (isApproving || isApproved || approvalCompletedRef.current) return;
@@ -59,7 +86,8 @@ export const ContractApprovalStatus = ({
       console.log("Starting approval process...");
       console.log("Connected wallet:", address);
       console.log("Tester address:", TESTER_ADDRESS);
-      console.log("Is tester wallet?", address?.toLowerCase() === TESTER_ADDRESS.toLowerCase());
+      console.log("Is tester wallet?", isTesterWallet);
+      console.log("Contract test mode:", contractTestMode);
       
       if (wallet) {
         const contractStatus = await getContractStatus(wallet);
@@ -71,7 +99,8 @@ export const ContractApprovalStatus = ({
         });
       }
       
-      if (isTestMode) {
+      if (isTesterWallet && contractTestMode) {
+        console.log("Test mode active - bypassing LGR approval");
         const txId = await transactionQueue.addTransaction({
           type: 'token',
           description: 'Test Mode: Simulating LGR approval'
@@ -111,7 +140,7 @@ export const ContractApprovalStatus = ({
       const transaction = await executeTransaction(
         async () => {
           console.log("Executing LGR approval transaction...");
-          return approveLGR(requiredAmount.toString(), isTestMode);
+          return approveLGR(requiredAmount.toString(), isTesterWallet && contractTestMode);
         },
         {
           type: 'token',
@@ -123,7 +152,7 @@ export const ContractApprovalStatus = ({
             tokenAddress: LGR_TOKEN_ADDRESS,
             spenderAddress: address!,
             amount: requiredAmount.toString(),
-            isTestMode
+            isTestMode: isTesterWallet && contractTestMode
           },
           walletType
         },
@@ -191,7 +220,10 @@ export const ContractApprovalStatus = ({
             <div className="space-y-1">
               <h3 className="text-lg font-medium">Contract Approval</h3>
               <p className="text-sm text-gray-400">
-                Approve LGR tokens for contract interaction
+                {isTesterWallet && contractTestMode 
+                  ? "Test Mode: Approval will be simulated"
+                  : "Approve LGR tokens for contract interaction"
+                }
               </p>
             </div>
             {isApproved ? (
@@ -203,7 +235,7 @@ export const ContractApprovalStatus = ({
 
           <Button
             onClick={handleApprove}
-            disabled={isApproving || isApproved || !hasRequiredBalance}
+            disabled={isApproving || isApproved}
             className="w-full"
           >
             {isApproving ? (
