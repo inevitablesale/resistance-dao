@@ -18,7 +18,7 @@ export const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac
 
 // Factory Contract ABI for LedgerFren Proposal Factory
 export const FACTORY_ABI = [
-  // Core proposal creation
+  // Proposal creation
   `function createProposal(
     tuple(
       string title,
@@ -39,8 +39,10 @@ export const FACTORY_ABI = [
     string linkedInURL
   ) external returns (uint256)`,
 
-  // Added proposals mapping getter
+  // Proposal data getters
   `function proposals(uint256) public view returns (
+    address creator,
+    string creatorLinkedIn,
     string title,
     string ipfsMetadata,
     uint128 targetCapital,
@@ -54,37 +56,41 @@ export const FACTORY_ABI = [
     uint8[] paymentTerms,
     uint8[] operationalStrategies,
     uint8[] growthStrategies,
-    uint8[] integrationStrategies
+    uint8[] integrationStrategies,
+    uint256 totalVotes
   )`,
 
-  // Read-only getters
+  // Core contract getters
   "function LGR_TOKEN() public view returns (address)",
-  "function MAX_TARGET_CAPITAL() public view returns (uint128)",
-  "function MIN_TARGET_CAPITAL() public view returns (uint128)",
+  "function tester() public view returns (address)",
+  "function treasury() public view returns (address)",
+  "function submissionFee() public view returns (uint256)",
+  "function testModeEnabled() public view returns (bool)",
+
+  // Constants getters
   "function MIN_VOTING_DURATION() public view returns (uint256)",
   "function MAX_VOTING_DURATION() public view returns (uint256)",
+  "function MIN_TARGET_CAPITAL() public view returns (uint128)",
+  "function MAX_TARGET_CAPITAL() public view returns (uint128)",
   "function VOTING_FEE() public view returns (uint256)",
-  "function submissionFee() public view returns (uint256)",
-  "function owner() public view returns (address)",
-  "function paused() public view returns (bool)",
-  "function testModeEnabled() public view returns (bool)",
-  "function treasury() public view returns (address)",
-  "function tester() public view returns (address)",
-  
-  // Added functions for proposal details
-  "function pledgedAmount(uint256 tokenId) public view returns (uint128)",
-  "function getProposalBackers(uint256 tokenId) public view returns (address[])",
-  "function hasVoted(uint256 tokenId, address voter) public view returns (bool)",
-  "function voterPledges(uint256 tokenId, address voter) public view returns (uint128)",
-  
-  // Vote functions
-  "function vote(uint256 tokenId, uint128 pledgeAmount) external",
+
+  // Proposal tracking
+  "function userProposals(address) public view returns (uint256[])",
   "function hasVoted(uint256,address) public view returns (bool)",
-  "function voterPledges(uint256,address) public view returns (uint128)",
   "function pledgedAmount(uint256) public view returns (uint128)",
+  "function voterPledges(uint256,address) public view returns (uint128)",
+  "function proposalVoters(uint256) public view returns (address[])",
+
+  // Voting functionality
+  "function vote(uint256 tokenId, uint128 pledgeAmount) external",
   
   // Admin functions
   "function setTestMode(bool _enabled) external",
+  "function owner() public view returns (address)",
+  "function paused() public view returns (bool)",
+  
+  // NFT functionality
+  "function tokenURI(uint256) public view returns (string)",
   
   // Events
   "event ProposalCreated(uint256 indexed tokenId, address indexed creator)",
