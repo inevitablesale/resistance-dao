@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -432,7 +431,42 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction, isTesterMode?: boolean) => {
+    try {
+      updateStepStatus('approval', 'completed');
+      setActiveStep('submission');
+      
+      const syntheticEvent = {
+        preventDefault: () => {},
+        target: null,
+        currentTarget: null,
+        bubbles: false,
+        cancelable: false,
+        defaultPrevented: false,
+        eventPhase: 0,
+        isTrusted: true,
+        nativeEvent: new Event('submit'),
+        stopPropagation: () => {},
+        isPropagationStopped: () => false,
+        persist: () => {},
+        isDefaultPrevented: () => false,
+        type: 'submit'
+      } as React.FormEvent<HTMLFormElement>;
+
+      const updatedFormData = isTesterMode ? TEST_FORM_DATA : formData;
+      await handleSubmit(syntheticEvent, updatedFormData);
+    } catch (error) {
+      console.error("Error during submission:", error);
+      toast({
+        title: "Submission Failed",
+        description: error instanceof Error ? error.message : "Failed to submit thesis",
+        variant: "destructive"
+      });
+      updateStepStatus('submission', 'failed');
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent, overrideFormData?: any) => {
     e.preventDefault();
     if (!isConnected) {
       toast({
@@ -464,16 +498,9 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
-      const updatedFormData = {
-        ...formData,
-        votingDuration,
-        linkedInURL,
-        submissionTimestamp: Date.now(),
-        submitter: address
-      };
-
+      const dataToSubmit = overrideFormData || formData;
       console.log('Uploading metadata to IPFS...', { isTestMode });
-      const ipfsUri = await uploadMetadataToPinata(updatedFormData);
+      const ipfsUri = await uploadMetadataToPinata(dataToSubmit);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
       
       if (!validateIPFSHash(ipfsHash)) {
@@ -481,15 +508,13 @@ const ThesisSubmission = () => {
       }
 
       console.log('Estimating gas for proposal creation...', { isTestMode });
-      const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData.investment.targetCapital
-      );
+      const targetCapitalWei = ethers.utils.parseEther(dataToSubmit.investment.targetCapital);
 
       const proposalConfig: ProposalConfig = {
         targetCapital: targetCapitalWei,
         votingDuration,
         ipfsHash,
-        metadata: updatedFormData,
+        metadata: dataToSubmit,
         linkedInURL
       };
 
@@ -502,7 +527,7 @@ const ThesisSubmission = () => {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
-        title: isTestMode ? TEST_FORM_DATA.title : formData.title,
+        title: dataToSubmit.title,
         targetCapital: targetCapitalWei.toString(),
         status: 'pending'
       };
@@ -525,40 +550,6 @@ const ThesisSubmission = () => {
       });
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction) => {
-    try {
-      updateStepStatus('approval', 'completed');
-      setActiveStep('submission');
-      
-      const syntheticEvent = {
-        preventDefault: () => {},
-        target: null,
-        currentTarget: null,
-        bubbles: false,
-        cancelable: false,
-        defaultPrevented: false,
-        eventPhase: 0,
-        isTrusted: true,
-        nativeEvent: new Event('submit'),
-        stopPropagation: () => {},
-        isPropagationStopped: () => false,
-        persist: () => {},
-        isDefaultPrevented: () => false,
-        type: 'submit'
-      } as React.FormEvent<HTMLFormElement>;
-
-      await handleSubmit(syntheticEvent);
-    } catch (error) {
-      console.error("Error during submission:", error);
-      toast({
-        title: "Submission Failed",
-        description: error instanceof Error ? error.message : "Failed to submit thesis",
-        variant: "destructive"
-      });
-      updateStepStatus('submission', 'failed');
     }
   };
 
