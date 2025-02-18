@@ -9,6 +9,15 @@ interface DynamicErrorMapping {
 }
 
 const ERROR_MAPPINGS: Record<string, DynamicErrorMapping> = {
+  INITIALIZATION_ERROR: {
+    category: 'initialization',
+    message: 'Wallet initialization failed',
+    recoverySteps: [
+      'Please wait for initialization to complete',
+      'Try refreshing the page',
+      'Make sure your wallet is unlocked'
+    ]
+  },
   WALLET_CONNECTION_ERROR: {
     category: 'wallet',
     message: 'Failed to connect wallet',
@@ -49,6 +58,18 @@ const ERROR_MAPPINGS: Record<string, DynamicErrorMapping> = {
 
 export const handleDynamicError = (error: unknown): ProposalError => {
   console.error('Dynamic error:', error);
+
+  // Handle initialization-specific errors
+  if (error instanceof Error && error.message.includes('wallet client')) {
+    return new ProposalError({
+      category: 'initialization',
+      message: 'Wallet initialization in progress',
+      recoverySteps: [
+        'Please wait for initialization to complete',
+        'Try refreshing the page if this persists'
+      ]
+    });
+  }
 
   // Check if it's an error with a code property
   if (typeof error === 'object' && error !== null && 'code' in error) {

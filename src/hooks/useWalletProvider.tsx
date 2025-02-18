@@ -49,9 +49,9 @@ export const useWalletProvider = () => {
   const validateWalletClient = async (attempts: number = 0): Promise<any> => {
     if (!primaryWallet) {
       throw new ProposalError({
-        category: 'wallet',
-        message: 'No wallet connected',
-        recoverySteps: ['Please connect your wallet to continue']
+        category: 'initialization',
+        message: 'Wallet not initialized',
+        recoverySteps: ['Please wait for wallet initialization to complete', 'Try refreshing the page']
       });
     }
 
@@ -72,10 +72,10 @@ export const useWalletProvider = () => {
     } catch (error) {
       console.error('Wallet client validation error:', error);
       throw new ProposalError({
-        category: 'wallet',
+        category: 'initialization',
         message: 'Failed to initialize wallet client',
         recoverySteps: [
-          'Please refresh the page',
+          'Please wait a few moments',
           'Make sure your wallet is unlocked',
           'Try disconnecting and reconnecting your wallet'
         ]
@@ -123,11 +123,11 @@ export const useWalletProvider = () => {
     } catch (error) {
       console.error('Provider initialization error:', error);
       throw new ProposalError({
-        category: 'network',
+        category: 'initialization',
         message: 'Failed to initialize provider',
         recoverySteps: [
+          'Please wait for initialization to complete',
           'Check your wallet connection',
-          'Make sure you are on the Polygon network',
           'Try refreshing the page'
         ]
       });
@@ -163,45 +163,9 @@ export const useWalletProvider = () => {
     }
   };
 
-  const estimateGas = async (
-    provider: WalletProvider,
-    transaction: ethers.providers.TransactionRequest,
-    walletType: WalletType
-  ): Promise<ethers.BigNumber> => {
-    try {
-      console.log(`Estimating gas for ${walletType} wallet...`);
-      const gasEstimate = await provider.provider.estimateGas(transaction);
-      
-      // Add a 20% buffer for safety
-      const gasBuffer = gasEstimate.mul(120).div(100);
-      console.log('Gas estimate with buffer:', gasBuffer.toString());
-      
-      return gasBuffer;
-    } catch (error: any) {
-      console.error('Gas estimation error:', error);
-      
-      if (walletType === 'zerodev') {
-        if (error.message.includes('execution reverted')) {
-          throw new ProposalError({
-            category: 'transaction',
-            message: 'Transaction simulation failed',
-            recoverySteps: [
-              'Verify transaction parameters',
-              'Check if you have enough MATIC for gas',
-              'Try again with a higher gas limit'
-            ]
-          });
-        }
-      }
-      
-      throw error;
-    }
-  };
-
   return {
     getProvider,
     validateNetwork,
-    estimateGas,
     getWalletType,
     isConnected: !!primaryWallet?.isConnected?.()
   };
