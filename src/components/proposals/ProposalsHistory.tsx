@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, Users, Target } from "lucide-react";
@@ -13,10 +14,11 @@ import { getTokenBalance } from "@/services/tokenService";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata, ContractProposal } from "@/types/proposals";
 import { useToast } from "@/hooks/use-toast";
+import { IPFSContent } from "@/types/content";
 
 const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
 
-interface NFTMetadata {
+interface NFTMetadata extends Omit<IPFSContent, 'content'> {
   name: string;
   description: string;
   image?: string;
@@ -101,7 +103,19 @@ export const ProposalsHistory = () => {
           return null;
         }
         
-        return metadata;
+        // Ensure we're returning a properly formatted NFTMetadata object
+        const nftMetadata: NFTMetadata = {
+          contentSchema: metadata.contentSchema,
+          contentType: metadata.contentType,
+          title: metadata.title,
+          metadata: metadata.metadata,
+          name: metadata.name,
+          description: metadata.description,
+          image: metadata.image,
+          attributes: metadata.attributes
+        };
+        
+        return nftMetadata;
       }
 
       return null;
