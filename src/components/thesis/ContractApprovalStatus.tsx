@@ -13,8 +13,10 @@ import { TransactionStatus } from "./TransactionStatus";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { transactionQueue } from "@/services/transactionQueueService";
+import { getContractStatus } from "@/services/proposalContractService";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
+const TESTER_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
 interface ContractApprovalStatusProps {
   onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction) => void;
@@ -29,7 +31,7 @@ export const ContractApprovalStatus = ({
   isTestMode = false,
   currentFormData
 }: ContractApprovalStatusProps) => {
-  const { approveLGR, address } = useWalletConnection();
+  const { approveLGR, address, wallet } = useWalletConnection();
   const { getProvider, getWalletType } = useWalletProvider();
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
@@ -54,7 +56,20 @@ export const ContractApprovalStatus = ({
     if (isApproving || isApproved || approvalCompletedRef.current) return;
     setIsApproving(true);
     try {
-      console.log("Starting approval process...", { isTestMode });
+      console.log("Starting approval process...");
+      console.log("Connected wallet:", address);
+      console.log("Tester address:", TESTER_ADDRESS);
+      console.log("Is tester wallet?", address?.toLowerCase() === TESTER_ADDRESS.toLowerCase());
+      
+      if (wallet) {
+        const contractStatus = await getContractStatus(wallet);
+        console.log("Contract status:", {
+          isTestMode: contractStatus.isTestMode,
+          testerAddress: contractStatus.tester,
+          connectedAddress: address,
+          isTesterWallet: address?.toLowerCase() === contractStatus.tester.toLowerCase()
+        });
+      }
       
       if (isTestMode) {
         const txId = await transactionQueue.addTransaction({

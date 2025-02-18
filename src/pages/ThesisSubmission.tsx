@@ -652,33 +652,15 @@ const ThesisSubmission = () => {
     <div className="min-h-screen bg-black text-white">
       <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-between"
-            >
-              <h1 className="text-3xl font-bold">
-                Transform Accounting Firm Ownership
-              </h1>
-            </motion.div>
-            
-            <div className="flex items-center space-x-3">
-              <Label htmlFor="test-mode" className="text-sm text-white/60">
-                Test Mode
-              </Label>
-              <Switch
-                id="test-mode"
-                checked={isTestMode}
-                onCheckedChange={handleTestModeToggle}
-                className={cn(
-                  "data-[state=checked]:bg-yellow-500",
-                  !isConnected && "opacity-50 cursor-not-allowed"
-                )}
-                disabled={!isConnected}
-              />
-            </div>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-between"
+          >
+            <h1 className="text-3xl font-bold">
+              Transform Accounting Firm Ownership
+            </h1>
+          </motion.div>
         </div>
       </div>
 
