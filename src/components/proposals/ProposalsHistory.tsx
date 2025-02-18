@@ -56,47 +56,71 @@ export const ProposalsHistory = () => {
     contract: ethers.Contract,
     event: any
   ): Promise<EnrichedProposal> => {
-    const tokenId = event.args?.tokenId;
-    const proposalData = await contract.proposals(tokenId);
-    const pledgedAmount = await contract.pledgedAmount(tokenId);
+    try {
+      const tokenId = event.args?.tokenId;
+      console.log('Fetching data for proposal:', tokenId.toString());
+      
+      // Call getProposal function instead of accessing mapping directly
+      const [
+        title,
+        ipfsMetadata,
+        targetCapital,
+        votingEnds,
+        investmentDrivers,
+        additionalCriteria,
+        firmSize,
+        location,
+        dealType,
+        geographicFocus,
+        paymentTerms,
+        operationalStrategies,
+        growthStrategies,
+        integrationStrategies
+      ] = await contract.getProposal(tokenId);
 
-    // Map arrays to readable strings
-    const paymentTermsMap = ['Cash', 'Seller Financing', 'Earnout', 'Equity Rollover', 'Bank Financing'];
-    const operationalMap = ['Tech Modernization', 'Process Standardization', 'Staff Retention'];
-    const growthMap = ['Geographic Expansion', 'Service Expansion', 'Client Growth'];
-    const integrationMap = ['Merging Operations', 'Culture Integration', 'Systems Consolidation'];
+      const pledgedAmount = await contract.pledgedAmount(tokenId);
 
-    const progress = {
-      current: ethers.utils.formatEther(pledgedAmount),
-      target: ethers.utils.formatEther(proposalData.targetCapital),
-      percentage: pledgedAmount.mul(100).div(proposalData.targetCapital).toNumber()
-    };
+      // Map arrays to readable strings
+      const paymentTermsMap = ['Cash', 'Seller Financing', 'Earnout', 'Equity Rollover', 'Bank Financing'];
+      const operationalMap = ['Tech Modernization', 'Process Standardization', 'Staff Retention'];
+      const growthMap = ['Geographic Expansion', 'Service Expansion', 'Client Growth'];
+      const integrationMap = ['Merging Operations', 'Culture Integration', 'Systems Consolidation'];
 
-    return {
-      hash: tokenId.toString(),
-      ipfsHash: proposalData.ipfsMetadata,
-      timestamp: event.blockNumber.toString(),
-      title: proposalData.title,
-      targetCapital: ethers.utils.formatEther(proposalData.targetCapital),
-      status: pledgedAmount.gte(proposalData.targetCapital)
-        ? 'completed'
-        : Date.now() >= proposalData.votingEnds.toNumber() * 1000
-          ? 'failed'
-          : 'pending',
-      isTestMode: false,
-      progress,
-      firmSize: firmSizeMap[proposalData.firmSize],
-      dealType: dealTypeMap[proposalData.dealType],
-      geographicFocus: geoFocusMap[proposalData.geographicFocus],
-      location: proposalData.location,
-      votingEnds: new Date(proposalData.votingEnds.toNumber() * 1000),
-      strategies: {
-        paymentTerms: proposalData.paymentTerms.map((i: number) => paymentTermsMap[i]),
-        operational: proposalData.operationalStrategies.map((i: number) => operationalMap[i]),
-        growth: proposalData.growthStrategies.map((i: number) => growthMap[i]),
-        integration: proposalData.integrationStrategies.map((i: number) => integrationMap[i])
-      }
-    };
+      const progress = {
+        current: ethers.utils.formatEther(pledgedAmount),
+        target: ethers.utils.formatEther(targetCapital),
+        percentage: pledgedAmount.mul(100).div(targetCapital).toNumber()
+      };
+
+      return {
+        hash: tokenId.toString(),
+        ipfsHash: ipfsMetadata,
+        timestamp: event.blockNumber.toString(),
+        title,
+        targetCapital: ethers.utils.formatEther(targetCapital),
+        status: pledgedAmount.gte(targetCapital)
+          ? 'completed'
+          : Date.now() >= votingEnds.toNumber() * 1000
+            ? 'failed'
+            : 'pending',
+        isTestMode: false,
+        progress,
+        firmSize: firmSizeMap[firmSize],
+        dealType: dealTypeMap[dealType],
+        geographicFocus: geoFocusMap[geographicFocus],
+        location,
+        votingEnds: new Date(votingEnds.toNumber() * 1000),
+        strategies: {
+          paymentTerms: paymentTerms.map((i: number) => paymentTermsMap[i]),
+          operational: operationalStrategies.map((i: number) => operationalMap[i]),
+          growth: growthStrategies.map((i: number) => growthMap[i]),
+          integration: integrationStrategies.map((i: number) => integrationMap[i])
+        }
+      };
+    } catch (error) {
+      console.error('Error transforming proposal data:', error);
+      throw error;
+    }
   };
 
   useEffect(() => {
@@ -160,15 +184,26 @@ export const ProposalsHistory = () => {
           transformProposalData(walletProvider.provider, contract, event)
         );
 
-        const proposalsList = await Promise.all(proposalPromises);
-        console.log('Processed proposals:', proposalsList);
+        const proposalsList = await Promise.all(proposalPromises.map(async (promise) => {
+          try {
+            return await promise;
+          } catch (error) {
+            console.error('Error processing proposal:', error);
+            return null;
+          }
+        }));
+
+        // Filter out any null results from failed transformations
+        const validProposals = proposalsList.filter((p): p is EnrichedProposal => p !== null);
+        
+        console.log('Processed proposals:', validProposals);
         
         // Sort by newest first
-        proposalsList.sort((a, b) => 
+        validProposals.sort((a, b) => 
           parseInt(b.timestamp) - parseInt(a.timestamp)
         );
         
-        setProposals(proposalsList);
+        setProposals(validProposals);
       } catch (error) {
         console.error("Error fetching proposals:", error);
         toast({
