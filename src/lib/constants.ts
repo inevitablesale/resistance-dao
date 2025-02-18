@@ -12,61 +12,7 @@ export const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000"); // 1,000 LGR
 export const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000"); // 25,000,000 LGR
 export const SUBMISSION_FEE = ethers.utils.parseEther("250"); // 250 LGR
 export const VOTING_FEE = ethers.utils.parseEther("10"); // 10 LGR
+export const TEST_TARGET_CAPITAL = "1000"; // 1,000 LGR for test mode
 
 // Contract addresses
 export const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
-
-// Factory Contract ABI for LedgerFren Proposal Factory
-export const FACTORY_ABI = [
-  // Core proposal creation
-  `function createProposal(
-    tuple(
-      string title,
-      string ipfsMetadata,
-      uint128 targetCapital,
-      uint256 votingDuration,
-      string investmentDrivers,
-      string additionalCriteria,
-      uint8 firmSize,
-      string location,
-      uint8 dealType,
-      uint8 geographicFocus,
-      uint8[] paymentTerms,
-      uint8[] operationalStrategies,
-      uint8[] growthStrategies,
-      uint8[] integrationStrategies
-    ) input,
-    string linkedInURL
-  ) external returns (uint256)`,
-
-  // Read-only getters
-  "function LGR_TOKEN() public view returns (address)",
-  "function MAX_TARGET_CAPITAL() public view returns (uint128)",
-  "function MIN_TARGET_CAPITAL() public view returns (uint128)",
-  "function MIN_VOTING_DURATION() public view returns (uint256)",
-  "function MAX_VOTING_DURATION() public view returns (uint256)",
-  "function VOTING_FEE() public view returns (uint256)",
-  "function submissionFee() public view returns (uint256)",
-  "function owner() public view returns (address)",
-  "function paused() public view returns (bool)",
-  "function testModeEnabled() public view returns (bool)",
-  "function treasury() public view returns (address)",
-  "function tester() public view returns (address)",
-  
-  // Vote functions
-  "function vote(uint256 tokenId, uint128 pledgeAmount) external",
-  "function hasVoted(uint256,address) public view returns (bool)",
-  "function voterPledges(uint256,address) public view returns (uint128)",
-  "function pledgedAmount(uint256) public view returns (uint128)",
-  
-  // Admin functions
-  "function setTestMode(bool _enabled) external",
-  
-  // Events
-  "event ProposalCreated(uint256 indexed tokenId, address indexed creator)",
-  "event ProposalNFTMinted(uint256 indexed tokenId, address indexed creator)",
-  "event ProposalVoted(uint256 indexed tokenId, address indexed voter, uint128 pledgeAmount)",
-  "event ProposalFullyPledged(uint256 indexed tokenId, uint128 totalPledged, address[] backers)",
-  "event TestModeChanged(bool newStatus)"
-];
-

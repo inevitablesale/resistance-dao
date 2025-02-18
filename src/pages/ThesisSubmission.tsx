@@ -112,7 +112,7 @@ const TEST_FORM_DATA: ProposalMetadata = {
     ]
   },
   investment: {
-    targetCapital: "2500000",
+    targetCapital: TEST_TARGET_CAPITAL,
     drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
     additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
   },
@@ -125,6 +125,16 @@ const TEST_FORM_DATA: ProposalMetadata = {
 
 const isValidLinkedInURL = (url: string): boolean => {
   return url.startsWith('https://www.linkedin.com/') || url.startsWith('https://linkedin.com/');
+};
+
+const validateTargetCapital = (value: string, isTestMode: boolean): boolean => {
+  try {
+    const weiValue = ethers.utils.parseEther(value);
+    return weiValue.gte(MIN_TARGET_CAPITAL) && weiValue.lte(MAX_TARGET_CAPITAL);
+  } catch (error) {
+    console.error("Target capital validation error:", error);
+    return false;
+  }
 };
 
 const ThesisSubmission = () => {
@@ -433,28 +443,23 @@ const ThesisSubmission = () => {
 
   const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction, isTesterMode?: boolean) => {
     try {
+      console.log("Approval complete with test mode:", isTesterMode);
       updateStepStatus('approval', 'completed');
       setActiveStep('submission');
       
-      const syntheticEvent = {
-        preventDefault: () => {},
-        target: null,
-        currentTarget: null,
-        bubbles: false,
-        cancelable: false,
-        defaultPrevented: false,
-        eventPhase: 0,
-        isTrusted: true,
-        nativeEvent: new Event('submit'),
-        stopPropagation: () => {},
-        isPropagationStopped: () => false,
-        persist: () => {},
-        isDefaultPrevented: () => false,
-        type: 'submit'
-      } as React.FormEvent<HTMLFormElement>;
+      const updatedFormData = isTesterMode ? {
+        ...TEST_FORM_DATA,
+        linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
+        submitter: address
+      } : formData;
 
-      const updatedFormData = isTesterMode ? TEST_FORM_DATA : formData;
-      await handleSubmit(syntheticEvent, updatedFormData);
+      console.log("Using form data:", {
+        isTestMode: isTesterMode,
+        targetCapital: updatedFormData.investment.targetCapital,
+        targetCapitalWei: ethers.utils.parseEther(updatedFormData.investment.targetCapital).toString()
+      });
+
+      await handleSubmit(null, updatedFormData, isTesterMode);
     } catch (error) {
       console.error("Error during submission:", error);
       toast({
@@ -466,8 +471,9 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent, overrideFormData?: any) => {
-    e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent | null, overrideFormData?: any, isTestMode?: boolean) => {
+    if (e) e.preventDefault();
+    
     if (!isConnected) {
       toast({
         title: "Connect Wallet",
@@ -486,10 +492,19 @@ const ThesisSubmission = () => {
         throw new Error("Please add a valid LinkedIn URL in your wallet settings");
       }
 
-      updateStepStatus('thesis', 'completed');
-      updateStepStatus('strategy', 'completed');
-      updateStepStatus('approval', 'completed');
-      setActiveStep('submission');
+      const dataToSubmit = overrideFormData || formData;
+      const targetCapital = dataToSubmit.investment.targetCapital;
+
+      console.log("Validating submission:", {
+        targetCapital,
+        isTestMode,
+        minRequired: ethers.utils.formatEther(MIN_TARGET_CAPITAL),
+        maxAllowed: ethers.utils.formatEther(MAX_TARGET_CAPITAL)
+      });
+
+      if (!validateTargetCapital(targetCapital, !!isTestMode)) {
+        throw new Error(`Target capital must be between ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} and ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} LGR`);
+      }
 
       if (!wallet) {
         throw new Error("No wallet connected");
@@ -498,7 +513,6 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
-      const dataToSubmit = overrideFormData || formData;
       console.log('Uploading metadata to IPFS...', { isTestMode });
       const ipfsUri = await uploadMetadataToPinata(dataToSubmit);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
@@ -507,8 +521,9 @@ const ThesisSubmission = () => {
         throw new Error("Invalid IPFS hash format");
       }
 
-      console.log('Estimating gas for proposal creation...', { isTestMode });
-      const targetCapitalWei = ethers.utils.parseEther(dataToSubmit.investment.targetCapital);
+      console.log('Preparing proposal config...');
+      const targetCapitalWei = ethers.utils.parseEther(targetCapital);
+      console.log('Target capital in wei:', targetCapitalWei.toString());
 
       const proposalConfig: ProposalConfig = {
         targetCapital: targetCapitalWei,
@@ -518,8 +533,12 @@ const ThesisSubmission = () => {
         linkedInURL
       };
 
-      const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
-      console.log('Creating proposal...', proposalConfig);
+      console.log('Creating proposal with config:', {
+        targetCapital: ethers.utils.formatEther(proposalConfig.targetCapital),
+        isTestMode,
+        linkedInURL: proposalConfig.linkedInURL
+      });
+
       const result = await createProposal(proposalConfig, wallet);
 
       const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
@@ -529,7 +548,8 @@ const ThesisSubmission = () => {
         timestamp: new Date().toISOString(),
         title: dataToSubmit.title,
         targetCapital: targetCapitalWei.toString(),
-        status: 'pending'
+        status: 'pending',
+        isTestMode: !!isTestMode
       };
       userProposals.push(newProposal);
       localStorage.setItem('userProposals', JSON.stringify(userProposals));
@@ -553,7 +573,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(SUBMISSION_FEE));
+  const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0") >= Number(ethers.utils.formatEther(SUBMISSION_FEE));
 
   const renderContinueButton = (
     onClick: () => void,
