@@ -1,33 +1,34 @@
+
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
-import { LGR_PRICE_USD } from "@/lib/constants";
 import { convertUSDToLGRWei } from "@/components/thesis/TargetCapitalInput";
+import { ProposalInput, ProposalData } from "@/types/proposals";
 
 const FACTORY_ADDRESS = "0xD00655Ce27387b8B1EE7759b1f44De5748916Ba5";
 const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
 const FACTORY_ABI = [
   // Core proposal creation
-  "function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)",
+  "function createProposal(tuple(string title, string ipfsMetadata, uint128 targetCapital, uint256 votingDuration, string investmentDrivers, string additionalCriteria, uint8 firmSize, string location, uint8 dealType, uint8 geographicFocus, uint8[] paymentTerms, uint8[] operationalStrategies, uint8[] growthStrategies, uint8[] integrationStrategies) input, string linkedInURL) external returns (uint256)",
+  "function testCreateProposal(tuple(string title, string ipfsMetadata, uint128 targetCapital, uint256 votingDuration, string investmentDrivers, string additionalCriteria, uint8 firmSize, string location, uint8 dealType, uint8 geographicFocus, uint8[] paymentTerms, uint8[] operationalStrategies, uint8[] growthStrategies, uint8[] integrationStrategies) input, string linkedInURL) external",
   // Read-only getters
   "function LGR_TOKEN() public view returns (address)",
-  "function MAX_TARGET_CAPITAL() public view returns (uint256)",
-  "function MIN_TARGET_CAPITAL() public view returns (uint256)",
+  "function treasury() public view returns (address)",
+  "function tester() public view returns (address)",
+  "function submissionFee() public view returns (uint256)",
+  "function testModeEnabled() public view returns (bool)",
+  "function paused() public view returns (bool)",
   "function MIN_VOTING_DURATION() public view returns (uint256)",
   "function MAX_VOTING_DURATION() public view returns (uint256)",
+  "function MIN_TARGET_CAPITAL() public view returns (uint128)",
+  "function MAX_TARGET_CAPITAL() public view returns (uint128)",
   "function VOTING_FEE() public view returns (uint256)",
-  "function owner() public view returns (address)",
-  "function paused() public view returns (bool)",
-  "function testModeEnabled() public view returns (bool)",
-  "function treasury() public view returns (address)",
-  "function submissionFee() public view returns (uint256)",
-  // Admin functions
-  "function setTestMode(bool _enabled) external",
+  "function proposals(uint256) public view returns (tuple(address creator, string creatorLinkedIn, string title, string ipfsMetadata, uint128 targetCapital, uint256 votingEnds, string investmentDrivers, string additionalCriteria, uint8 firmSize, string location, uint8 dealType, uint8 geographicFocus, uint8[] paymentTerms, uint8[] operationalStrategies, uint8[] growthStrategies, uint8[] integrationStrategies, uint256 totalVotes))",
   // Events
-  "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)",
-  "event Paused(address account)",
-  "event Unpaused(address account)"
+  "event ProposalCreated(uint256 indexed tokenId, address indexed creator)",
+  "event ProposalNFTMinted(uint256 indexed tokenId, address indexed creator)",
+  "event TestModeChanged(bool newStatus)"
 ];
 
 export interface ContractStatus {
@@ -35,25 +36,13 @@ export interface ContractStatus {
   isPaused: boolean;
   isTestMode: boolean;
   treasury: string;
+  tester: string;
   minTargetCapital: ethers.BigNumber;
   maxTargetCapital: ethers.BigNumber;
   minVotingDuration: number;
   maxVotingDuration: number;
   votingFee: ethers.BigNumber;
   lgrTokenAddress: string;
-  owner: string;
-}
-
-export interface ProposalConfig {
-  targetCapital: ethers.BigNumber;
-  votingDuration: number;
-  ipfsHash: string;
-}
-
-export interface GasEstimate {
-  gasLimit: ethers.BigNumber;
-  gasPrice: ethers.BigNumber;
-  totalCost: ethers.BigNumber;
 }
 
 async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet']>) {
@@ -81,135 +70,120 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       isPaused,
       isTestMode,
       treasury,
+      tester,
       minTargetCapital,
       maxTargetCapital,
       minVotingDuration,
       maxVotingDuration,
       votingFee,
-      lgrTokenAddress,
-      owner
+      lgrTokenAddress
     ] = await Promise.all([
       factory.submissionFee(),
       factory.paused(),
       factory.testModeEnabled(),
       factory.treasury(),
+      factory.tester(),
       factory.MIN_TARGET_CAPITAL(),
       factory.MAX_TARGET_CAPITAL(),
       factory.MIN_VOTING_DURATION(),
       factory.MAX_VOTING_DURATION(),
       factory.VOTING_FEE(),
-      factory.LGR_TOKEN(),
-      factory.owner()
+      factory.LGR_TOKEN()
     ]);
-
-    console.log("Contract calls successful:", {
-      submissionFee: submissionFee.toString(),
-      isPaused,
-      isTestMode,
-      treasury: treasury.toString(),
-      minTargetCapital: minTargetCapital.toString(),
-      maxTargetCapital: maxTargetCapital.toString(),
-      minVotingDuration: Number(minVotingDuration),
-      maxVotingDuration: Number(maxVotingDuration),
-      votingFee: votingFee.toString(),
-      lgrTokenAddress,
-      owner
-    });
 
     return {
       submissionFee,
       isPaused,
       isTestMode,
       treasury,
+      tester,
       minTargetCapital,
       maxTargetCapital,
       minVotingDuration: Number(minVotingDuration),
       maxVotingDuration: Number(maxVotingDuration),
       votingFee,
-      lgrTokenAddress,
-      owner
+      lgrTokenAddress
     };
   } catch (error) {
     console.error("Error getting contract status:", error);
-    throw new Error("Failed to get contract status. Please ensure you're connected to the correct network.");
+    throw new Error("Failed to get contract status");
   }
-};
-
-export const estimateProposalGas = async (
-  config: ProposalConfig,
-  wallet: NonNullable<DynamicContextType['primaryWallet']>
-): Promise<GasEstimate> => {
-  const provider = await getProvider(wallet);
-  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
-  
-  // For ZeroDev bundler, we'll use a higher gas limit estimation
-  const gasEstimate = ethers.BigNumber.from("1000000"); // Base gas estimation for complex interactions
-  const gasPrice = await provider.getGasPrice();
-  const gasLimit = gasEstimate.mul(150).div(100); // Add 50% buffer for AA transactions
-  
-  return {
-    gasLimit,
-    gasPrice,
-    totalCost: gasLimit.mul(gasPrice)
-  };
 };
 
 export const createProposal = async (
-  config: ProposalConfig,
-  wallet: NonNullable<DynamicContextType['primaryWallet']>
+  input: ProposalInput,
+  linkedInURL: string,
+  wallet: NonNullable<DynamicContextType['primaryWallet']>,
+  isTestMode: boolean = false
 ): Promise<ethers.ContractTransaction> => {
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
+  const status = await getContractStatus(wallet);
   
-  const lgrAmount = ethers.utils.formatUnits(config.targetCapital, 18);
-  console.log("Creating proposal with target capital:", config.targetCapital.toString(), "wei", `(${lgrAmount} LGR)`);
-  
-  return await executeTransaction(
-    () => factory.createProposal(
-      config.ipfsHash,
-      config.targetCapital,
-      config.votingDuration
-    ),
-    {
-      type: 'proposal',
-      description: `Creating proposal with target capital ${lgrAmount} LGR`,
-      timeout: 180000,
-      maxRetries: 3,
-      backoffMs: 5000
-    }
-  );
-};
-
-export const setTestMode = async (
-  enabled: boolean,
-  wallet: NonNullable<DynamicContextType['primaryWallet']>
-): Promise<ethers.ContractTransaction> => {
-  const provider = await getProvider(wallet);
-  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
-  
-  // Get the signer's address
-  const signerAddress = await provider.getSigner().getAddress();
-  
-  // Check if the signer is authorized to set test mode
-  const [owner, isAuthorized] = await Promise.all([
-    factory.owner(),
-    signerAddress.toLowerCase() === AUTHORIZED_TEST_MODE_ADDRESS.toLowerCase()
-  ]);
-  
-  if (owner.toLowerCase() !== signerAddress.toLowerCase() && !isAuthorized) {
-    throw new Error("Not authorized to set test mode");
+  // Validate submission requirements
+  if (status.isPaused) {
+    throw new Error("Contract is currently paused");
   }
 
-  console.log(`Setting test mode to: ${enabled}`);
-  
-  return await executeTransaction(
-    () => factory.setTestMode(enabled),
-    {
-      type: 'contract',
-      description: `Setting test mode to ${enabled}`,
-      timeout: 60000,
-      maxRetries: 2,
-      backoffMs: 3000
+  // Format input for contract
+  const proposalInput = {
+    ...input,
+    targetCapital: ethers.utils.parseUnits(input.targetCapital, 18)
+  };
+
+  console.log("Creating proposal with input:", {
+    ...proposalInput,
+    targetCapital: proposalInput.targetCapital.toString(),
+    isTestMode
+  });
+
+  try {
+    // Use appropriate creation function based on test mode
+    if (isTestMode) {
+      const signerAddress = await provider.getSigner().getAddress();
+      if (signerAddress.toLowerCase() !== status.tester.toLowerCase()) {
+        throw new Error("Not authorized to create test proposals");
+      }
+      return await factory.testCreateProposal(proposalInput, linkedInURL);
+    } else {
+      return await factory.createProposal(proposalInput, linkedInURL);
     }
-  );
+  } catch (error) {
+    console.error("Error creating proposal:", error);
+    throw error;
+  }
+};
+
+export const getProposal = async (
+  tokenId: number,
+  wallet: NonNullable<DynamicContextType['primaryWallet']>
+): Promise<ProposalData> => {
+  const provider = await getProvider(wallet);
+  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+
+  try {
+    const proposal = await factory.proposals(tokenId);
+    return {
+      creator: proposal.creator,
+      creatorLinkedIn: proposal.creatorLinkedIn,
+      title: proposal.title,
+      ipfsMetadata: proposal.ipfsMetadata,
+      targetCapital: ethers.utils.formatUnits(proposal.targetCapital, 18),
+      votingEnds: Number(proposal.votingEnds),
+      investmentDrivers: proposal.investmentDrivers,
+      additionalCriteria: proposal.additionalCriteria,
+      firmSize: proposal.firmSize,
+      location: proposal.location,
+      dealType: proposal.dealType,
+      geographicFocus: proposal.geographicFocus,
+      paymentTerms: proposal.paymentTerms,
+      operationalStrategies: proposal.operationalStrategies,
+      growthStrategies: proposal.growthStrategies,
+      integrationStrategies: proposal.integrationStrategies,
+      totalVotes: Number(proposal.totalVotes)
+    };
+  } catch (error) {
+    console.error("Error fetching proposal:", error);
+    throw error;
+  }
 };
