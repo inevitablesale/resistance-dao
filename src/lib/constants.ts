@@ -1,7 +1,7 @@
 
 import { ethers } from "ethers";
 
-export const CONTRACT_ADDRESS = "0x624dFf6455FBE2f569571fba31c7D020b905b745";
+export const FACTORY_ADDRESS = "0x624dFf6455FBE2f569571fba31c7D020b905b745";
 export const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 export const LGR_PRICE_USD = 0.10; // $0.10 per LGR token
 
@@ -14,11 +14,10 @@ export const SUBMISSION_FEE = ethers.utils.parseEther("250"); // 250 LGR
 export const VOTING_FEE = ethers.utils.parseEther("10"); // 10 LGR
 
 // Contract addresses
-export const FACTORY_ADDRESS = "0x624dFf6455FBE2f569571fba31c7D020b905b745";
 export const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
-// Contract ABI - Updated for new contract
-export const CONTRACT_ABI = [
+// Factory Contract ABI for LedgerFren Proposal Factory
+export const FACTORY_ABI = [
   // Core proposal creation
   `function createProposal(
     tuple(
@@ -71,5 +70,3 @@ export const CONTRACT_ABI = [
   "event TestModeChanged(bool newStatus)"
 ];
 
-// Also export FACTORY_ABI for new code
-export const FACTORY_ABI = CONTRACT_ABI;
