@@ -1,3 +1,4 @@
+<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -276,7 +277,7 @@ const ThesisSubmission = () => {
       const fields = field.split('.');
       let current: any = newData;
       
-      for (let i = 0; i < fields.length - 1; i++) {
+      for (let i = 0; < fields.length - 1; i++) {
         if (!current[fields[i]]) {
           current[fields[i]] = {};
         }
@@ -594,6 +595,65 @@ const ThesisSubmission = () => {
     </Button>
   );
 
+  const handleTestModeToggle = async (enabled: boolean) => {
+    if (!isConnected) {
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your wallet to toggle test mode",
+        variant: "destructive"
+      });
+      connect();
+      return;
+    }
+    
+    const success = await toggleTestMode(enabled);
+    if (success) {
+      setIsTestMode(enabled);
+      if (enabled) {
+        setFormData(TEST_FORM_DATA);
+      } else {
+        setFormData({
+          title: "",
+          firmCriteria: {
+            size: FirmSize.BELOW_1M,
+            location: "",
+            dealType: DealType.ACQUISITION,
+            geographicFocus: GeographicFocus.LOCAL
+          },
+          paymentTerms: [],
+          strategies: {
+            operational: [],
+            growth: [],
+            integration: []
+          },
+          investment: {
+            targetCapital: "",
+            drivers: "",
+            additionalCriteria: ""
+          },
+          votingDuration: MIN_VOTING_DURATION,
+          linkedInURL: "",
+          isTestMode: false,
+          submissionTimestamp: Date.now(),
+          submitter: address
+        });
+      }
+    }
+  };
+
+  const handleTxComplete = () => {
+    console.log("Transaction completed");
+  };
+
+  const handleTxError = (error: string) => {
+    console.error("Transaction failed:", error);
+    toast({
+      title: "Transaction Failed",
+      description: error,
+      variant: "destructive"
+    });
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Background Elements */}
@@ -794,96 +854,4 @@ const ThesisSubmission = () => {
                       <PaymentTermsSection
                         formData={formData}
                         formErrors={formErrors}
-                        onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
-                      />
-                      <StrategiesSection
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={(category, value) => handleStrategyChange(category, value)}
-                      />
-                    </>
-                  )}
-
-                  {activeStep === 'submission' && (
-                    <div className="space-y-6 text-center py-8">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
-                      >
-                        <Check className="w-8 h-8 text-white" />
-                      </motion.div>
-                      <h3 className="text-2xl font-semibold">Ready to Submit</h3>
-                      <p className="text-gray-400">
-                        Your investment thesis is ready to be submitted to the community
-                      </p>
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-
-              {/* Navigation Buttons */}
-              <div className="px-6 pb-6 pt-4 border-t border-white/5">
-                <div className="flex justify-between items-center">
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
-                      if (currentIndex > 0) {
-                        setActiveStep(SUBMISSION_STEPS[currentIndex - 1].id);
-                      }
-                    }}
-                    disabled={activeStep === SUBMISSION_STEPS[0].id}
-                    className="text-white/60 hover:text-white"
-                  >
-                    Previous Step
-                  </Button>
-                  {renderContinueButton(() => {
-                    const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
-                    if (currentIndex < SUBMISSION_STEPS.length - 1) {
-                      setActiveStep(SUBMISSION_STEPS[currentIndex + 1].id);
-                    } else {
-                      handleSubmit(new Event('submit') as any);
-                    }
-                  }, activeStep === SUBMISSION_STEPS[SUBMISSION_STEPS.length - 1].id)}
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Right Column - Status */}
-          <div className="col-span-3">
-            <div className="sticky top-32 space-y-6">
-              <LGRWalletDisplay
-                submissionFee={SUBMISSION_FEE}
-                walletAddress={address}
-              />
-
-              <ContractApprovalStatus
-                onApprovalComplete={handleApprovalComplete}
-                requiredAmount={SUBMISSION_FEE}
-                isTestMode={isTestMode}
-                currentFormData={formData}
-              />
-
-              {currentTxId && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <TransactionStatus
-                    transactionId={currentTxId}
-                    onComplete={handleTxComplete}
-                    onError={handleTxError}
-                  />
-                </motion.div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+                        
