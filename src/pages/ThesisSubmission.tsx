@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
+import Nav from "@/components/Nav";
 import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -593,6 +594,60 @@ const ThesisSubmission = () => {
     </Button>
   );
 
+  const handleRentAdSpace = (frequency: 'week' | 'month') => {
+    // Implement ad space rental logic here
+  };
+
+  const handleTestModeToggle = async (enabled: boolean) => {
+    if (!isConnected) {
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your wallet to toggle test mode",
+        variant: "destructive"
+      });
+      connect();
+      return;
+    }
+    
+    const success = await toggleTestMode(enabled);
+    if (success) {
+      setIsTestMode(enabled);
+      if (enabled) {
+        setFormData(TEST_FORM_DATA);
+      } else {
+        setFormData({
+          title: "",
+          firmCriteria: {
+            size: FirmSize.BELOW_1M,
+            location: "",
+            dealType: DealType.ACQUISITION,
+            geographicFocus: GeographicFocus.LOCAL
+          },
+          paymentTerms: [],
+          strategies: {
+            operational: [],
+            growth: [],
+            integration: []
+          },
+          investment: {
+            targetCapital: "",
+            drivers: "",
+            additionalCriteria: ""
+          },
+          votingDuration: MIN_VOTING_DURATION,
+          linkedInURL: "",
+          isTestMode: false,
+          submissionTimestamp: Date.now(),
+          submitter: address
+        });
+      }
+    }
+  };
+
+  const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
+    // Implement promotion selection logic here
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
@@ -804,10 +859,19 @@ const ThesisSubmission = () => {
                         setActiveStep(SUBMISSION_STEPS[currentIndex - 1].id);
                       }
                     }}
+                    disabled={activeStep === SUBMISSION_STEPS[0].id}
+                    className="text-white/60 hover:text-white"
                   >
-                    Back
+                    Previous Step
                   </Button>
-                  {renderContinueButton(handleContinue, activeStep === 'submission')}
+                  {renderContinueButton(() => {
+                    const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
+                    if (currentIndex < SUBMISSION_STEPS.length - 1) {
+                      setActiveStep(SUBMISSION_STEPS[currentIndex + 1].id);
+                    } else {
+                      handleSubmit(new Event('submit') as any);
+                    }
+                  }, activeStep === SUBMISSION_STEPS[SUBMISSION_STEPS.length - 1].id)}
                 </div>
               </div>
             </Card>
@@ -827,6 +891,37 @@ const ThesisSubmission = () => {
                 isTestMode={isTestMode}
                 currentFormData={formData}
               />
+
+              <Card className="bg-black/40 border-white/10 p-6 space-y-4">
+                <h3 className="text-xl font-semibold">Promote Your Thesis</h3>
+                <p className="text-sm text-white/60">
+                  Increase visibility and engagement with promotional options
+                </p>
+                
+                <div className="space-y-4">
+                  <Button
+                    onClick={() => handlePromotionSelect('weekly')}
+                    variant="outline"
+                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span>Weekly Promotion</span>
+                      <span className="text-sm text-white/60">5 LGR</span>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => handlePromotionSelect('monthly')}
+                    variant="outline"
+                    className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span>Monthly Promotion</span>
+                      <span className="text-sm text-white/60">15 LGR</span>
+                    </div>
+                  </Button>
+                </div>
+              </Card>
             </div>
           </div>
         </div>
