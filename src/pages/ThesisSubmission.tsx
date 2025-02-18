@@ -204,10 +204,17 @@ const ThesisSubmission = () => {
         });
       } catch (error) {
         console.error("Error checking test mode:", error);
+        toast({
+          title: "Test Mode Check Failed",
+          description: "Unable to verify test mode status. Please try reconnecting your wallet.",
+          variant: "destructive"
+        });
       }
     };
 
-    checkTestMode();
+    if (isConnected && wallet && address) {
+      setTimeout(checkTestMode, 1000);
+    }
   }, [wallet, address, isConnected]);
 
   useEffect(() => {
