@@ -39,26 +39,9 @@ export const FACTORY_ABI = [
     string linkedInURL
   ) external returns (uint256)`,
 
-  // Proposal data getters
-  `function proposals(uint256) public view returns (
-    address creator,
-    string creatorLinkedIn,
-    string title,
-    string ipfsMetadata,
-    uint128 targetCapital,
-    uint256 votingEnds,
-    string investmentDrivers,
-    string additionalCriteria,
-    uint8 firmSize,
-    string location,
-    uint8 dealType,
-    uint8 geographicFocus,
-    uint8[] paymentTerms,
-    uint8[] operationalStrategies,
-    uint8[] growthStrategies,
-    uint8[] integrationStrategies,
-    uint256 totalVotes
-  )`,
+  // Proposal data getters (using Solidity's automatic getter pattern)
+  "function proposals(uint256,uint256) public view returns (string)", // For string values
+  "function proposals(uint256) public view returns (address,uint128,uint256,uint8,uint8,uint8,uint256)", // For value types
 
   // Core contract getters
   "function LGR_TOKEN() public view returns (address)",
