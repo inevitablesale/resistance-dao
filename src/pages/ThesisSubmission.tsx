@@ -1,3 +1,4 @@
+<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { FirmSize, DealType, GeographicFocus } from "@/types/proposals";
 
 interface SubmissionStep {
   id: string;
@@ -60,10 +62,10 @@ const MAX_PAYMENT_TERMS = 5;
 interface ProposalMetadata {
   title: string;
   firmCriteria: {
-    size: string;
+    size: FirmSize;
     location: string;
-    dealType: string;
-    geographicFocus: string;
+    dealType: DealType;
+    geographicFocus: GeographicFocus;
   };
   paymentTerms: string[];
   strategies: {
@@ -76,6 +78,11 @@ interface ProposalMetadata {
     drivers: string;
     additionalCriteria: string;
   };
+  votingDuration: number;
+  linkedInURL: string;
+  isTestMode?: boolean;
+  submissionTimestamp?: number;
+  submitter?: string;
 }
 
 interface ProposalConfig {
@@ -113,10 +120,10 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
 const TEST_FORM_DATA: ProposalMetadata = {
   title: "Test Proposal - Automated Backend Services Firm",
   firmCriteria: {
-    size: "Small (5-20 employees)",
+    size: FirmSize.BELOW_1M,
     location: "California",
-    dealType: "Full Acquisition",
-    geographicFocus: "West Coast"
+    dealType: DealType.ACQUISITION,
+    geographicFocus: GeographicFocus.LOCAL
   },
   paymentTerms: [
     "Initial payment of 30% upon signing",
@@ -141,7 +148,12 @@ const TEST_FORM_DATA: ProposalMetadata = {
     targetCapital: "2500000",
     drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
     additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
-  }
+  },
+  votingDuration: MIN_VOTING_DURATION,
+  linkedInURL: "",
+  isTestMode: true,
+  submissionTimestamp: Date.now(),
+  submitter: ""
 };
 
 const isValidLinkedInURL = (url: string): boolean => {
@@ -167,13 +179,13 @@ const ThesisSubmission = () => {
   const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
-  const [formData, setFormData] = useState<ProposalMetadata>(isTestMode ? TEST_FORM_DATA : {
+  const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     firmCriteria: {
-      size: "",
+      size: FirmSize.BELOW_1M,
       location: "",
-      dealType: "",
-      geographicFocus: ""
+      dealType: DealType.ACQUISITION,
+      geographicFocus: GeographicFocus.LOCAL
     },
     paymentTerms: [],
     strategies: {
@@ -185,7 +197,10 @@ const ThesisSubmission = () => {
       targetCapital: "",
       drivers: "",
       additionalCriteria: ""
-    }
+    },
+    votingDuration: MIN_VOTING_DURATION,
+    linkedInURL: "",
+    isTestMode: false
   });
   const [isThesisOpen, setIsThesisOpen] = useState(false);
   const [isStrategyOpen, setIsStrategyOpen] = useState(false);
@@ -193,13 +208,24 @@ const ThesisSubmission = () => {
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
 
   useEffect(() => {
-    setFormData(isTestMode ? TEST_FORM_DATA : {
+    setFormData(isTestMode ? {
+      title: TEST_FORM_DATA.title,
+      firmCriteria: TEST_FORM_DATA.firmCriteria,
+      paymentTerms: TEST_FORM_DATA.paymentTerms,
+      strategies: TEST_FORM_DATA.strategies,
+      investment: TEST_FORM_DATA.investment,
+      votingDuration: MIN_VOTING_DURATION,
+      linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
+      isTestMode: true,
+      submissionTimestamp: Date.now(),
+      submitter: address
+    } : {
       title: "",
       firmCriteria: {
-        size: "",
+        size: FirmSize.BELOW_1M,
         location: "",
-        dealType: "",
-        geographicFocus: ""
+        dealType: DealType.ACQUISITION,
+        geographicFocus: GeographicFocus.LOCAL
       },
       paymentTerms: [],
       strategies: {
@@ -211,9 +237,14 @@ const ThesisSubmission = () => {
         targetCapital: "",
         drivers: "",
         additionalCriteria: ""
-      }
+      },
+      votingDuration: MIN_VOTING_DURATION,
+      linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
+      isTestMode: false,
+      submissionTimestamp: Date.now(),
+      submitter: address
     });
-  }, [isTestMode]);
+  }, [isTestMode, user, address]);
 
   useEffect(() => {
     // Check LinkedIn URL on component mount
@@ -225,7 +256,7 @@ const ThesisSubmission = () => {
         variant: "default"
       });
     }
-  }, [user, isConnected]);
+  }, [user, isConnected, toast]);
 
   const validateLinkedInURL = (): boolean => {
     const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
@@ -452,21 +483,17 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
-      const metadataToUpload: ProposalMetadata = {
-        title: formData.title,
-        firmCriteria: formData.firmCriteria,
-        paymentTerms: formData.paymentTerms,
-        strategies: formData.strategies,
-        investment: formData.investment,
-        votingDuration: votingDuration,
-        linkedInURL: linkedInURL,
-        isTestMode,
+      // Update formData with current values
+      const updatedFormData = {
+        ...formData,
+        votingDuration,
+        linkedInURL,
         submissionTimestamp: Date.now(),
         submitter: address
       };
 
       console.log('Uploading metadata to IPFS...', { isTestMode });
-      const ipfsUri = await uploadMetadataToPinata(metadataToUpload);
+      const ipfsUri = await uploadMetadataToPinata(updatedFormData);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
       
       if (!validateIPFSHash(ipfsHash)) {
@@ -482,7 +509,7 @@ const ThesisSubmission = () => {
         targetCapital: targetCapitalWei,
         votingDuration,
         ipfsHash,
-        metadata: metadataToUpload,
+        metadata: updatedFormData,
         linkedInURL
       };
 
@@ -627,10 +654,10 @@ const ThesisSubmission = () => {
         setFormData({
           title: "",
           firmCriteria: {
-            size: "",
+            size: FirmSize.BELOW_1M,
             location: "",
-            dealType: "",
-            geographicFocus: ""
+            dealType: DealType.ACQUISITION,
+            geographicFocus: GeographicFocus.LOCAL
           },
           paymentTerms: [],
           strategies: {
@@ -642,7 +669,12 @@ const ThesisSubmission = () => {
             targetCapital: "",
             drivers: "",
             additionalCriteria: ""
-          }
+          },
+          votingDuration: MIN_VOTING_DURATION,
+          linkedInURL: "",
+          isTestMode: false,
+          submissionTimestamp: Date.now(),
+          submitter: address
         });
         setIsThesisOpen(true);
         setIsStrategyOpen(false);
@@ -797,94 +829,4 @@ const ThesisSubmission = () => {
                           <h2 className="text-xl font-semibold text-green-400 group-hover:text-green-300 transition-colors">
                             Deal Structure
                           </h2>
-                          <p className="text-sm text-white/60">
-                            Payment terms and voting duration
-                          </p>
-                        </div>
-                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isApprovalOpen && "transform rotate-180")} />
-                      </div>
-                    </button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-4 px-4 pb-6">
-                    <div className="space-y-6">
-                      <PaymentTermsSection 
-                        formData={{
-                          paymentTerms: formData.paymentTerms
-                        }}
-                        formErrors={formErrors}
-                        onChange={(value) => handleFormDataChange('paymentTerms', value)}
-                      />
-
-                      <VotingDurationInput
-                        value={votingDuration}
-                        onChange={handleVotingDurationChange}
-                        error={formErrors.votingDuration}
-                      />
-                    </div>
-                    {isApprovalOpen && renderContinueButton(() => {
-                      if (validateTermsTab()) {
-                        setIsApprovalOpen(false);
-                        setIsSubmissionOpen(true);
-                      }
-                    })}
-                  </CollapsibleContent>
-                </Collapsible>
-
-                <Collapsible open={isSubmissionOpen} onOpenChange={setIsSubmissionOpen} className="w-full">
-                  <CollapsibleTrigger asChild>
-                    <button type="button" className="w-full text-left">
-                      <div className="group flex items-center gap-4 p-4 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                        <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 font-semibold">
-                          4
-                        </div>
-                        <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-orange-400 group-hover:text-orange-300 transition-colors">
-                            Post-Acquisition Strategy
-                          </h2>
-                          <p className="text-sm text-white/60">
-                            Growth and integration plans
-                          </p>
-                        </div>
-                        <ChevronDown className={cn("w-5 h-5 text-white/60 transition-transform duration-200", isSubmissionOpen && "transform rotate-180")} />
-                      </div>
-                    </button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-4 px-4 pb-6">
-                    <StrategiesSection 
-                      formData={{
-                        strategies: {
-                          operational: formData.strategies.operational,
-                          growth: formData.strategies.growth,
-                          integration: formData.strategies.integration
-                        }
-                      }}
-                      formErrors={formErrors}
-                      onChange={(field, value) => handleFormDataChange(`strategies.${field}`, value)}
-                    />
-                    {isSubmissionOpen && renderContinueButton(() => {
-                      if (validateTermsTab()) {
-                        setIsSubmissionOpen(false);
-                        handleSubmit({} as React.FormEvent);
-                      }
-                    }, true)}
-                  </CollapsibleContent>
-                </Collapsible>
-
-                <div className="mt-8 border-t border-white/10 pt-8">
-                  <ContractApprovalStatus 
-                    onApprovalComplete={handleApprovalComplete}
-                    requiredAmount={SUBMISSION_FEE.toString()}
-                    isTestMode={isTestMode}
-                    currentFormData={formData}
-                  />
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+                          <p className="text-sm text-white/
