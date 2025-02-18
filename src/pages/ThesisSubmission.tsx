@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -432,7 +431,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, formData?: ProposalMetadata, isTestMode?: boolean) => {
     e.preventDefault();
     if (!isConnected) {
       toast({
@@ -465,7 +464,7 @@ const ThesisSubmission = () => {
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
       const updatedFormData = {
-        ...formData,
+        ...formData || formData,
         votingDuration,
         linkedInURL,
         submissionTimestamp: Date.now(),
@@ -482,7 +481,7 @@ const ThesisSubmission = () => {
 
       console.log('Estimating gas for proposal creation...', { isTestMode });
       const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData.investment.targetCapital
+        isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData?.investment.targetCapital || ""
       );
 
       const proposalConfig: ProposalConfig = {
@@ -502,7 +501,7 @@ const ThesisSubmission = () => {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
-        title: isTestMode ? TEST_FORM_DATA.title : formData.title,
+        title: isTestMode ? TEST_FORM_DATA.title : formData?.title || "",
         targetCapital: targetCapitalWei.toString(),
         status: 'pending'
       };
@@ -528,8 +527,9 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction) => {
+  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => {
     try {
+      console.log("Approval completed:", { isTestMode });
       updateStepStatus('approval', 'completed');
       setActiveStep('submission');
       
@@ -550,7 +550,7 @@ const ThesisSubmission = () => {
         type: 'submit'
       } as React.FormEvent<HTMLFormElement>;
 
-      await handleSubmit(syntheticEvent);
+      await handleSubmit(syntheticEvent, formData, isTestMode);
     } catch (error) {
       console.error("Error during submission:", error);
       toast({

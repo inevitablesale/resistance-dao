@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -18,7 +19,7 @@ const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const TESTER_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
 interface ContractApprovalStatusProps {
-  onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction) => void;
+  onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => void;
   requiredAmount: ethers.BigNumberish;
   isTestMode?: boolean;
   currentFormData: any;
@@ -82,7 +83,7 @@ export const ContractApprovalStatus = ({
       }
 
       try {
-        console.log("Checking test mode with ready wallet");
+        console.log("Checking test mode status...");
         const contractStatus = await getContractStatus(wallet);
         const isTester = address.toLowerCase() === TESTER_ADDRESS.toLowerCase();
         setIsTesterWallet(isTester);
@@ -105,11 +106,13 @@ export const ContractApprovalStatus = ({
     if (isApproving || isApproved || !isWalletReady || approvalCompletedRef.current) return;
     setIsApproving(true);
     try {
-      console.log("Starting approval process...");
-      console.log("Connected wallet:", address);
-      console.log("Tester address:", TESTER_ADDRESS);
-      console.log("Is tester wallet?", isTesterWallet);
-      console.log("Contract test mode:", contractTestMode);
+      console.log("Starting approval process...", {
+        walletAddress: address,
+        testerAddress: TESTER_ADDRESS,
+        isTesterWallet,
+        contractTestMode,
+        isTestMode
+      });
       
       if (wallet) {
         const contractStatus = await getContractStatus(wallet);
@@ -121,7 +124,10 @@ export const ContractApprovalStatus = ({
         });
       }
       
-      if (isTesterWallet && contractTestMode) {
+      const effectiveTestMode = isTesterWallet && contractTestMode;
+      console.log("Effective test mode:", effectiveTestMode);
+      
+      if (effectiveTestMode) {
         console.log("Test mode active - bypassing LGR approval");
         const txId = await transactionQueue.addTransaction({
           type: 'token',
@@ -140,7 +146,7 @@ export const ContractApprovalStatus = ({
         if (!approvalCompletedRef.current) {
           approvalCompletedRef.current = true;
           setIsApproved(true);
-          onApprovalComplete(currentFormData);
+          onApprovalComplete(currentFormData, undefined, effectiveTestMode);
         }
         return;
       }
@@ -162,7 +168,7 @@ export const ContractApprovalStatus = ({
       const transaction = await executeTransaction(
         async () => {
           console.log("Executing LGR approval transaction...");
-          return approveLGR(requiredAmount.toString(), isTesterWallet && contractTestMode);
+          return approveLGR(requiredAmount.toString(), effectiveTestMode);
         },
         {
           type: 'token',
@@ -174,7 +180,7 @@ export const ContractApprovalStatus = ({
             tokenAddress: LGR_TOKEN_ADDRESS,
             spenderAddress: address!,
             amount: requiredAmount.toString(),
-            isTestMode: isTesterWallet && contractTestMode
+            isTestMode: effectiveTestMode
           },
           walletType
         },
@@ -185,7 +191,7 @@ export const ContractApprovalStatus = ({
       if (!approvalCompletedRef.current) {
         approvalCompletedRef.current = true;
         setIsApproved(true);
-        onApprovalComplete(currentFormData, transaction);
+        onApprovalComplete(currentFormData, transaction, effectiveTestMode);
       }
     } catch (error) {
       console.error("Approval error:", error);
@@ -205,7 +211,7 @@ export const ContractApprovalStatus = ({
     if (!approvalCompletedRef.current) {
       approvalCompletedRef.current = true;
       setIsApproved(true);
-      onApprovalComplete(currentFormData);
+      onApprovalComplete(currentFormData, undefined, isTesterWallet && contractTestMode);
     }
   };
 
