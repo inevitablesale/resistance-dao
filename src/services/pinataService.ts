@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 interface PinataResponse {
@@ -30,7 +31,18 @@ export const uploadMetadataToPinata = async (metadata: any): Promise<string> => 
     }
 
     const result: PinataResponse = await response.json();
-    return `ipfs://${result.IpfsHash}`;
+    const ipfsUrl = `ipfs://${result.IpfsHash}`;
+    const gatewayUrl = `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`;
+    
+    console.log('IPFS Upload Success:', {
+      ipfsUrl,
+      gatewayUrl,
+      hash: result.IpfsHash,
+      size: result.PinSize,
+      timestamp: result.Timestamp
+    });
+
+    return ipfsUrl;
   } catch (error) {
     console.error('Error uploading to Pinata:', error);
     throw error;
@@ -68,6 +80,17 @@ export const uploadImageToPinata = async (imageUrl: string): Promise<string> => 
     }
 
     const result: PinataResponse = await response.json();
+    const ipfsUrl = `ipfs://${result.IpfsHash}`;
+    const gatewayUrl = `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`;
+    
+    console.log('Image Upload Success:', {
+      ipfsUrl,
+      gatewayUrl,
+      hash: result.IpfsHash,
+      size: result.PinSize,
+      timestamp: result.Timestamp
+    });
+
     return result.IpfsHash;
   } catch (error) {
     console.error('Error uploading image to Pinata:', error);
