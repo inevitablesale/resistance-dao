@@ -39,7 +39,7 @@ export const FACTORY_ABI = [
     string linkedInURL
   ) external returns (uint256)`,
 
-  // Proposal data getter
+  // Proposal data getters
   `function proposals(uint256) public view returns (
     address creator,
     string creatorLinkedIn,

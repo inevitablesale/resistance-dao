@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useProposalProvider } from "@/hooks/useProposalProvider";
+import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { ethers } from "ethers";
 import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
+import { getTokenBalance } from "@/services/tokenService";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata, ContractProposal } from "@/types/proposals";
-import { getTokenBalance } from "@/services/tokenService";
 
 const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
 
@@ -32,7 +32,7 @@ export const ProposalsHistory = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
   const { isConnected, connect, address } = useWalletConnection();
-  const { getProvider } = useProposalProvider();
+  const { getProvider } = useWalletProvider();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -100,78 +100,37 @@ export const ProposalsHistory = () => {
             console.log(`Fetching proposal data for token #${tokenId}`);
 
             try {
-              // Get each field individually using the auto-generated getters
-              const [
-                creator,
-                creatorLinkedIn,
-                title,
-                ipfsMetadata,
-                targetCapital,
-                votingEnds,
-                investmentDrivers,
-                additionalCriteria,
-                firmSize,
-                location,
-                dealType,
-                geographicFocus,
-                paymentTerms,
-                operationalStrategies,
-                growthStrategies,
-                integrationStrategies,
-                totalVotes,
-                pledgedAmount
-              ] = await Promise.all([
-                contract.proposals(tokenId, 0), // creator
-                contract.proposals(tokenId, 1), // creatorLinkedIn
-                contract.proposals(tokenId, 2), // title
-                contract.proposals(tokenId, 3), // ipfsMetadata
-                contract.proposals(tokenId, 4), // targetCapital
-                contract.proposals(tokenId, 5), // votingEnds
-                contract.proposals(tokenId, 6), // investmentDrivers
-                contract.proposals(tokenId, 7), // additionalCriteria
-                contract.proposals(tokenId, 8), // firmSize
-                contract.proposals(tokenId, 9), // location
-                contract.proposals(tokenId, 10), // dealType
-                contract.proposals(tokenId, 11), // geographicFocus
-                contract.proposals(tokenId, 12), // paymentTerms
-                contract.proposals(tokenId, 13), // operationalStrategies
-                contract.proposals(tokenId, 14), // growthStrategies
-                contract.proposals(tokenId, 15), // integrationStrategies
-                contract.proposals(tokenId, 16), // totalVotes
+              // Get proposal data from contract and pledged amount
+              const [proposalData, pledgedAmount] = await Promise.all([
+                contract.proposals(tokenId),
                 contract.pledgedAmount(tokenId)
               ]);
 
-              console.log(`Contract data fields for #${tokenId}:`, {
-                creator,
-                title,
-                targetCapital: targetCapital.toString(),
-                votingEnds: votingEnds.toNumber(),
-                pledgedAmount: ethers.utils.formatEther(pledgedAmount)
-              });
-
               // Format the contract data properly
               const contractData: ContractProposal = {
-                title,
-                ipfsMetadata,
-                targetCapital: targetCapital.toString(),
-                votingEnds: votingEnds.toNumber(),
-                investmentDrivers,
-                additionalCriteria,
-                firmSize,
-                location,
-                dealType,
-                geographicFocus,
-                paymentTerms,
-                operationalStrategies,
-                growthStrategies,
-                integrationStrategies
+                title: proposalData.title,
+                ipfsMetadata: proposalData.ipfsMetadata,
+                targetCapital: proposalData.targetCapital.toString(),
+                votingEnds: proposalData.votingEnds.toNumber(),
+                investmentDrivers: proposalData.investmentDrivers,
+                additionalCriteria: proposalData.additionalCriteria,
+                firmSize: proposalData.firmSize,
+                location: proposalData.location,
+                dealType: proposalData.dealType,
+                geographicFocus: proposalData.geographicFocus,
+                paymentTerms: proposalData.paymentTerms,
+                operationalStrategies: proposalData.operationalStrategies,
+                growthStrategies: proposalData.growthStrategies,
+                integrationStrategies: proposalData.integrationStrategies
               };
+
+              console.log(`Contract data for #${tokenId}:`, contractData);
 
               // Get IPFS metadata if available
               let metadata: ProposalMetadata | undefined;
-              if (ipfsMetadata) {
+              if (contractData.ipfsMetadata) {
                 try {
-                  metadata = await getFromIPFS<ProposalMetadata>(ipfsMetadata, 'proposal');
+                  metadata = await getFromIPFS<ProposalMetadata>(contractData.ipfsMetadata, 'proposal');
                   console.log(`IPFS metadata fetched for #${tokenId}:`, metadata);
                 } catch (ipfsError) {
                   console.error(`Error fetching IPFS metadata for proposal #${tokenId}:`, ipfsError);
@@ -180,7 +139,7 @@ export const ProposalsHistory = () => {
 
               return {
                 tokenId,
-                creator,
+                creator: event.args?.creator,
                 blockNumber: event.blockNumber,
                 transactionHash: event.transactionHash,
                 contractData,
@@ -189,18 +148,37 @@ export const ProposalsHistory = () => {
               };
             } catch (error) {
               console.error(`Error fetching data for proposal #${tokenId}:`, error);
-              return null;
+              return {
+                tokenId,
+                creator: event.args?.creator,
+                blockNumber: event.blockNumber,
+                transactionHash: event.transactionHash,
+                contractData: {
+                  title: `Proposal #${tokenId}`,
+                  ipfsMetadata: '',
+                  targetCapital: '0',
+                  votingEnds: 0,
+                  investmentDrivers: '',
+                  additionalCriteria: '',
+                  firmSize: 0,
+                  location: '',
+                  dealType: 0,
+                  geographicFocus: 0,
+                  paymentTerms: [],
+                  operationalStrategies: [],
+                  growthStrategies: [],
+                  integrationStrategies: []
+                }
+              };
             }
           })
         );
 
-        // Filter out null values and sort by newest first
-        const validProposals = proposalsWithMetadata
-          .filter((p): p is NonNullable<typeof p> => p !== null)
-          .sort((a, b) => b.blockNumber - a.blockNumber);
+        // Sort by newest first (highest block number)
+        proposalsWithMetadata.sort((a, b) => b.blockNumber - a.blockNumber);
         
-        console.log('Processed proposals with metadata:', validProposals);
-        setProposalEvents(validProposals);
+        console.log('Processed proposals with metadata:', proposalsWithMetadata);
+        setProposalEvents(proposalsWithMetadata);
       } catch (error) {
         console.error("Error fetching proposals:", error);
         toast({
