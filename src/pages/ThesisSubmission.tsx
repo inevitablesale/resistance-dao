@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -171,6 +171,10 @@ const ThesisSubmission = () => {
     linkedInURL: "",
     isTestMode: false
   });
+
+  const approvalCompletedRef = useRef(false);
+  const [isApproved, setIsApproved] = useState(false);
+  const [currentFormData, setCurrentFormData] = useState<any>(null);
 
   useEffect(() => {
     setFormData(isTestMode ? {
@@ -596,6 +600,71 @@ const ThesisSubmission = () => {
     </Button>
   );
 
+  const handleTestModeToggle = async (enabled: boolean) => {
+    if (!isConnected) {
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your wallet to toggle test mode",
+        variant: "destructive"
+      });
+      connect();
+      return;
+    }
+    
+    const success = await toggleTestMode(enabled);
+    if (success) {
+      setIsTestMode(enabled);
+      if (enabled) {
+        setFormData(TEST_FORM_DATA);
+      } else {
+        setFormData({
+          title: "",
+          firmCriteria: {
+            size: FirmSize.BELOW_1M,
+            location: "",
+            dealType: DealType.ACQUISITION,
+            geographicFocus: GeographicFocus.LOCAL
+          },
+          paymentTerms: [],
+          strategies: {
+            operational: [],
+            growth: [],
+            integration: []
+          },
+          investment: {
+            targetCapital: "",
+            drivers: "",
+            additionalCriteria: ""
+          },
+          votingDuration: MIN_VOTING_DURATION,
+          linkedInURL: "",
+          isTestMode: false,
+          submissionTimestamp: Date.now(),
+          submitter: address
+        });
+      }
+    }
+  };
+
+  const handleTxComplete = () => {
+    console.log("Transaction completed");
+    if (!approvalCompletedRef.current) {
+      approvalCompletedRef.current = true;
+      setIsApproved(true);
+      onApprovalComplete(currentFormData);
+    }
+  };
+
+  const handleTxError = (error: string) => {
+    console.error("Transaction failed:", error);
+    approvalCompletedRef.current = false;
+    toast({
+      title: "Transaction Failed",
+      description: error,
+      variant: "destructive"
+    });
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="fixed inset-0 z-0">
@@ -801,85 +870,4 @@ const ThesisSubmission = () => {
                   )}
 
                   {activeStep === 'submission' && (
-                    <div className="space-y-6 text-center py-8">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
-                      >
-                        <Check className="w-8 h-8 text-white" />
-                      </motion.div>
-                      <h3 className="text-2xl font-semibold">Ready to Submit</h3>
-                      <p className="text-gray-400">
-                        Your investment thesis is ready to be submitted to the community
-                      </p>
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-
-              <div className="px-6 pb-6 pt-4 border-t border-white/5">
-                <div className="flex justify-between items-center">
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
-                      if (currentIndex > 0) {
-                        setActiveStep(SUBMISSION_STEPS[currentIndex - 1].id);
-                      }
-                    }}
-                    disabled={activeStep === SUBMISSION_STEPS[0].id}
-                    className="text-white/60 hover:text-white"
-                  >
-                    Previous Step
-                  </Button>
-                  {renderContinueButton(() => {
-                    const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
-                    if (currentIndex < SUBMISSION_STEPS.length - 1) {
-                      setActiveStep(SUBMISSION_STEPS[currentIndex + 1].id);
-                    } else {
-                      handleSubmit(new Event('submit') as any);
-                    }
-                  }, activeStep === SUBMISSION_STEPS[SUBMISSION_STEPS.length - 1].id)}
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          <div className="col-span-3">
-            <div className="sticky top-32 space-y-6">
-              {activeStep === 'approval' && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                >
-                  <ContractApprovalStatus
-                    onApprovalComplete={handleApprovalComplete}
-                    requiredAmount={formData.investment.targetCapital}
-                    isTestMode={isTestMode}
-                    currentFormData={formData}
-                  />
-                </motion.div>
-              )}
-              
-              {currentTxId && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <TransactionStatus
-                    transactionId={currentTxId}
-                    onComplete={handleTxComplete}
-                    onError={handleTxError}
-                  />
-                </motion.div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+                    <div className="space
