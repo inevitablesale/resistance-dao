@@ -1,4 +1,3 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
-import Nav from "@/components/Nav";
 import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -595,60 +593,6 @@ const ThesisSubmission = () => {
     </Button>
   );
 
-  const handleRentAdSpace = (frequency: 'week' | 'month') => {
-    // Implement ad space rental logic here
-  };
-
-  const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
-    // Implement promotion selection logic here
-  };
-
-  const handleTestModeToggle = async (enabled: boolean) => {
-    if (!isConnected) {
-      toast({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to toggle test mode",
-        variant: "destructive"
-      });
-      connect();
-      return;
-    }
-    
-    const success = await toggleTestMode(enabled);
-    if (success) {
-      setIsTestMode(enabled);
-      if (enabled) {
-        setFormData(TEST_FORM_DATA);
-      } else {
-        setFormData({
-          title: "",
-          firmCriteria: {
-            size: FirmSize.BELOW_1M,
-            location: "",
-            dealType: DealType.ACQUISITION,
-            geographicFocus: GeographicFocus.LOCAL
-          },
-          paymentTerms: [],
-          strategies: {
-            operational: [],
-            growth: [],
-            integration: []
-          },
-          investment: {
-            targetCapital: "",
-            drivers: "",
-            additionalCriteria: ""
-          },
-          votingDuration: MIN_VOTING_DURATION,
-          linkedInURL: "",
-          isTestMode: false,
-          submissionTimestamp: Date.now(),
-          submitter: address
-        });
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
@@ -858,4 +802,37 @@ const ThesisSubmission = () => {
                       const currentIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
                       if (currentIndex > 0) {
                         setActiveStep(SUBMISSION_STEPS[currentIndex - 1].id);
-                      
+                      }
+                    }}
+                  >
+                    Back
+                  </Button>
+                  {renderContinueButton(handleContinue, activeStep === 'submission')}
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <div className="col-span-3">
+            <div className="sticky top-32 space-y-6">
+              <LGRWalletDisplay
+                submissionFee={SUBMISSION_FEE}
+                currentBalance={tokenBalances?.find(token => token.symbol === "LGR")?.balance?.toString() || "0"}
+                walletAddress={address}
+              />
+
+              <ContractApprovalStatus
+                onApprovalComplete={handleApprovalComplete}
+                requiredAmount={SUBMISSION_FEE}
+                isTestMode={isTestMode}
+                currentFormData={formData}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
