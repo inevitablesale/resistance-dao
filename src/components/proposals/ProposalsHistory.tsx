@@ -100,37 +100,78 @@ export const ProposalsHistory = () => {
             console.log(`Fetching proposal data for token #${tokenId}`);
 
             try {
-              // Get proposal data from contract and pledged amount
-              const [proposalData, pledgedAmount] = await Promise.all([
-                contract.proposals(tokenId),
+              // Get each field individually using the auto-generated getters
+              const [
+                creator,
+                creatorLinkedIn,
+                title,
+                ipfsMetadata,
+                targetCapital,
+                votingEnds,
+                investmentDrivers,
+                additionalCriteria,
+                firmSize,
+                location,
+                dealType,
+                geographicFocus,
+                paymentTerms,
+                operationalStrategies,
+                growthStrategies,
+                integrationStrategies,
+                totalVotes,
+                pledgedAmount
+              ] = await Promise.all([
+                contract.proposals(tokenId, 0), // creator
+                contract.proposals(tokenId, 1), // creatorLinkedIn
+                contract.proposals(tokenId, 2), // title
+                contract.proposals(tokenId, 3), // ipfsMetadata
+                contract.proposals(tokenId, 4), // targetCapital
+                contract.proposals(tokenId, 5), // votingEnds
+                contract.proposals(tokenId, 6), // investmentDrivers
+                contract.proposals(tokenId, 7), // additionalCriteria
+                contract.proposals(tokenId, 8), // firmSize
+                contract.proposals(tokenId, 9), // location
+                contract.proposals(tokenId, 10), // dealType
+                contract.proposals(tokenId, 11), // geographicFocus
+                contract.proposals(tokenId, 12), // paymentTerms
+                contract.proposals(tokenId, 13), // operationalStrategies
+                contract.proposals(tokenId, 14), // growthStrategies
+                contract.proposals(tokenId, 15), // integrationStrategies
+                contract.proposals(tokenId, 16), // totalVotes
                 contract.pledgedAmount(tokenId)
               ]);
 
+              console.log(`Contract data fields for #${tokenId}:`, {
+                creator,
+                title,
+                targetCapital: targetCapital.toString(),
+                votingEnds: votingEnds.toNumber(),
+                pledgedAmount: ethers.utils.formatEther(pledgedAmount)
+              });
+
               // Format the contract data properly
               const contractData: ContractProposal = {
-                title: proposalData.title,
-                ipfsMetadata: proposalData.ipfsMetadata,
-                targetCapital: proposalData.targetCapital.toString(),
-                votingEnds: proposalData.votingEnds.toNumber(),
-                investmentDrivers: proposalData.investmentDrivers,
-                additionalCriteria: proposalData.additionalCriteria,
-                firmSize: proposalData.firmSize,
-                location: proposalData.location,
-                dealType: proposalData.dealType,
-                geographicFocus: proposalData.geographicFocus,
-                paymentTerms: proposalData.paymentTerms,
-                operationalStrategies: proposalData.operationalStrategies,
-                growthStrategies: proposalData.growthStrategies,
-                integrationStrategies: proposalData.integrationStrategies
+                title,
+                ipfsMetadata,
+                targetCapital: targetCapital.toString(),
+                votingEnds: votingEnds.toNumber(),
+                investmentDrivers,
+                additionalCriteria,
+                firmSize,
+                location,
+                dealType,
+                geographicFocus,
+                paymentTerms,
+                operationalStrategies,
+                growthStrategies,
+                integrationStrategies
               };
-
-              console.log(`Contract data for #${tokenId}:`, contractData);
 
               // Get IPFS metadata if available
               let metadata: ProposalMetadata | undefined;
-              if (contractData.ipfsMetadata) {
+              if (ipfsMetadata) {
                 try {
-                  metadata = await getFromIPFS<ProposalMetadata>(contractData.ipfsMetadata, 'proposal');
+                  metadata = await getFromIPFS<ProposalMetadata>(ipfsMetadata, 'proposal');
                   console.log(`IPFS metadata fetched for #${tokenId}:`, metadata);
                 } catch (ipfsError) {
                   console.error(`Error fetching IPFS metadata for proposal #${tokenId}:`, ipfsError);
@@ -139,7 +180,7 @@ export const ProposalsHistory = () => {
 
               return {
                 tokenId,
-                creator: event.args?.creator,
+                creator,
                 blockNumber: event.blockNumber,
                 transactionHash: event.transactionHash,
                 contractData,
