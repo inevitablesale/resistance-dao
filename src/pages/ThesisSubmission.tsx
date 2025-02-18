@@ -170,18 +170,53 @@ const ThesisSubmission = () => {
     isTestMode: false
   });
 
+  const [contractTestMode, setContractTestMode] = useState<{
+    isTester: boolean;
+    isEnabled: boolean;
+    testerAddress: string;
+  }>({
+    isTester: false,
+    isEnabled: false,
+    testerAddress: ''
+  });
+
   useEffect(() => {
-    setFormData(isTestMode ? {
-      title: TEST_FORM_DATA.title,
-      firmCriteria: TEST_FORM_DATA.firmCriteria,
-      paymentTerms: TEST_FORM_DATA.paymentTerms,
-      strategies: TEST_FORM_DATA.strategies,
-      investment: TEST_FORM_DATA.investment,
-      votingDuration: MIN_VOTING_DURATION,
+    const checkTestMode = async () => {
+      if (!isConnected || !wallet || !address) {
+        console.log("Wallet not ready for test mode check");
+        return;
+      }
+
+      try {
+        console.log("Checking test mode status...");
+        const status = await getContractStatus(wallet);
+        const isTester = address.toLowerCase() === status.tester.toLowerCase();
+        setContractTestMode({
+          isTester,
+          isEnabled: status.isTestMode,
+          testerAddress: status.tester
+        });
+        console.log("Test mode status:", {
+          isTester,
+          isEnabled: status.isTestMode,
+          walletAddress: address,
+          testerAddress: status.tester
+        });
+      } catch (error) {
+        console.error("Error checking test mode:", error);
+      }
+    };
+
+    checkTestMode();
+  }, [wallet, address, isConnected]);
+
+  useEffect(() => {
+    const shouldAutoFill = contractTestMode.isTester && contractTestMode.isEnabled && isTestMode;
+    setFormData(shouldAutoFill ? {
+      ...TEST_FORM_DATA,
       linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
-      isTestMode: true,
       submissionTimestamp: Date.now(),
-      submitter: address
+      submitter: address || ""
     } : {
       title: "",
       firmCriteria: {
@@ -205,9 +240,9 @@ const ThesisSubmission = () => {
       linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
       isTestMode: false,
       submissionTimestamp: Date.now(),
-      submitter: address
+      submitter: address || ""
     });
-  }, [isTestMode, user, address]);
+  }, [isTestMode, contractTestMode, user, address]);
 
   useEffect(() => {
     const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
@@ -609,37 +644,31 @@ const ThesisSubmission = () => {
       connect();
       return;
     }
+
+    if (!contractTestMode.isTester) {
+      toast({
+        title: "Test Mode Restricted",
+        description: "Only the tester wallet can enable test mode",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!contractTestMode.isEnabled) {
+      toast({
+        title: "Test Mode Disabled",
+        description: "Test mode is currently disabled in the contract",
+        variant: "destructive"
+      });
+      return;
+    }
     
     setIsTestMode(enabled);
-    if (enabled) {
-      setFormData(TEST_FORM_DATA);
-    } else {
-      setFormData({
-        title: "",
-        firmCriteria: {
-          size: FirmSize.BELOW_1M,
-          location: "",
-          dealType: DealType.ACQUISITION,
-          geographicFocus: GeographicFocus.LOCAL
-        },
-        paymentTerms: [],
-        strategies: {
-          operational: [],
-          growth: [],
-          integration: []
-        },
-        investment: {
-          targetCapital: "",
-          drivers: "",
-          additionalCriteria: ""
-        },
-        votingDuration: MIN_VOTING_DURATION,
-        linkedInURL: "",
-        isTestMode: false,
-        submissionTimestamp: Date.now(),
-        submitter: address
-      });
-    }
+    console.log("Test mode toggled:", {
+      enabled,
+      isTester: contractTestMode.isTester,
+      isContractTestMode: contractTestMode.isEnabled
+    });
   };
 
   const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
@@ -715,18 +744,38 @@ const ThesisSubmission = () => {
           <div className="col-span-6 space-y-6">
             <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
               <motion.div 
-                className="border-b border-white/5"
+                className="border-b border-white/5 p-6"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <div className="p-6 space-y-3">
-                  <p className="text-xl text-white/90">
-                    Ready to revolutionize how accounting practices are acquired?
-                  </p>
-                  <p className="text-gray-400">
-                    Present your vision to our community of forward-thinking investors through a structured investment thesis.
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-3">
+                    <p className="text-xl text-white/90">
+                      Ready to revolutionize how accounting practices are acquired?
+                    </p>
+                    <p className="text-gray-400">
+                      Present your vision to our community of forward-thinking investors through a structured investment thesis.
+                    </p>
+                  </div>
+                  {isConnected && (
+                    <div className="flex items-center gap-4">
+                      {contractTestMode.isTester ? (
+                        <div className="flex items-center gap-2 bg-black/20 rounded-lg p-2">
+                          <Switch 
+                            checked={isTestMode}
+                            onCheckedChange={handleTestModeToggle}
+                            disabled={!contractTestMode.isEnabled}
+                          />
+                          <span className="text-sm">
+                            {contractTestMode.isEnabled 
+                              ? "Test Mode Available" 
+                              : "Test Mode Disabled"}
+                          </span>
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
                 </div>
               </motion.div>
 

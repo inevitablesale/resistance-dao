@@ -85,14 +85,14 @@ export const ContractApprovalStatus = ({
       try {
         console.log("Checking test mode status...");
         const contractStatus = await getContractStatus(wallet);
-        const isTester = address.toLowerCase() === TESTER_ADDRESS.toLowerCase();
+        const isTester = address.toLowerCase() === contractStatus.tester.toLowerCase();
         setIsTesterWallet(isTester);
         setContractTestMode(contractStatus.isTestMode);
         console.log("Test mode status:", {
           isTesterWallet: isTester,
           contractTestMode: contractStatus.isTestMode,
           walletAddress: address,
-          testerAddress: TESTER_ADDRESS
+          testerAddress: contractStatus.tester
         });
       } catch (error) {
         console.error("Error checking test mode:", error);
