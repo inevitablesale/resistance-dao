@@ -81,6 +81,8 @@ interface ProposalConfig {
   targetCapital: ethers.BigNumber;
   votingDuration: number;
   ipfsHash: string;
+  metadata: ProposalMetadata;
+  linkedInURL: string;
 }
 
 const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
@@ -445,24 +447,19 @@ const ThesisSubmission = () => {
         isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData.investment.targetCapital
       );
 
-      const gasEstimate = await estimateProposalGas({
+      const proposalConfig: ProposalConfig = {
         targetCapital: targetCapitalWei,
         votingDuration,
-        ipfsHash
-      }, wallet);
+        ipfsHash,
+        metadata: metadataToUpload,
+        linkedInURL: formData.linkedInURL || ''
+      };
 
-      console.log('Creating proposal...', {
-        isTestMode,
-        targetCapital: ethers.utils.formatEther(targetCapitalWei),
-        votingDuration,
-        ipfsHash
-      });
+      const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
 
-      const result = await createProposal({
-        targetCapital: targetCapitalWei,
-        votingDuration,
-        ipfsHash
-      }, wallet);
+      console.log('Creating proposal...', proposalConfig);
+
+      const result = await createProposal(proposalConfig, wallet);
 
       const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
       const newProposal: StoredProposal = {

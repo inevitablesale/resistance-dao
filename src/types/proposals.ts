@@ -1,4 +1,3 @@
-
 export enum FirmSize {
   BELOW_1M,
   ONE_TO_FIVE_M,
@@ -81,4 +80,12 @@ export interface StoredProposal {
   targetCapital: string;
   status: 'pending' | 'completed' | 'failed';
   isTestMode?: boolean;
+}
+
+export interface ProposalConfig {
+  targetCapital: ethers.BigNumber;
+  votingDuration: number;
+  ipfsHash: string;
+  metadata: ProposalMetadata;
+  linkedInURL: string;
 }
