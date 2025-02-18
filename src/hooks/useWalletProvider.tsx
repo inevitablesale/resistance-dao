@@ -3,6 +3,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { ProposalError } from "@/services/errorHandlingService";
+import { useCallback, useEffect, useRef } from "react";
 
 export type WalletType = 'regular' | 'zerodev' | 'unknown';
 
@@ -20,6 +21,8 @@ const RETRY_DELAY = 2000; // 2 seconds
 export const useWalletProvider = () => {
   const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
+  const providerRef = useRef<WalletProvider | null>(null);
+  const initializingRef = useRef<boolean>(false);
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -29,7 +32,7 @@ export const useWalletProvider = () => {
     return isZeroDev ? 'zerodev' : 'regular';
   };
 
-  const initializeProvider = async (
+  const initializeProvider = useCallback(async (
     walletClient: any, 
     retryCount: number = 0
   ): Promise<ethers.providers.Web3Provider> => {
@@ -44,9 +47,9 @@ export const useWalletProvider = () => {
       }
       throw error;
     }
-  };
+  }, []);
 
-  const validateWalletClient = async (attempts: number = 0): Promise<any> => {
+  const validateWalletClient = useCallback(async (attempts: number = 0): Promise<any> => {
     if (!primaryWallet) {
       throw new ProposalError({
         category: 'initialization',
@@ -81,9 +84,31 @@ export const useWalletProvider = () => {
         ]
       });
     }
-  };
+  }, [primaryWallet]);
 
-  const getProvider = async (): Promise<WalletProvider> => {
+  const getProvider = useCallback(async (): Promise<WalletProvider> => {
+    // Return cached provider if available
+    if (providerRef.current) {
+      return providerRef.current;
+    }
+
+    // Prevent multiple simultaneous initialization attempts
+    if (initializingRef.current) {
+      await new Promise(resolve => {
+        const checkInterval = setInterval(() => {
+          if (!initializingRef.current) {
+            clearInterval(checkInterval);
+            resolve(true);
+          }
+        }, 100);
+      });
+      if (providerRef.current) {
+        return providerRef.current;
+      }
+    }
+
+    initializingRef.current = true;
+
     try {
       console.log('Starting provider initialization...');
       const walletClient = await validateWalletClient();
@@ -93,13 +118,15 @@ export const useWalletProvider = () => {
         console.log('Initializing ZeroDev provider...');
         try {
           const ethersProvider = await initializeProvider(walletClient);
-          return {
+          const provider: WalletProvider = {
             provider: ethersProvider,
             type: 'zerodev',
             isSmartWallet: true,
             getNetwork: () => ethersProvider.getNetwork(),
             getSigner: () => ethersProvider.getSigner()
           };
+          providerRef.current = provider;
+          return provider;
         } catch (error) {
           console.error('ZeroDev provider initialization failed, falling back to regular wallet');
           toast({
@@ -113,13 +140,15 @@ export const useWalletProvider = () => {
 
       console.log('Initializing regular wallet provider...');
       const ethersProvider = await initializeProvider(walletClient);
-      return {
+      const provider: WalletProvider = {
         provider: ethersProvider,
         type: currentWalletType,
         isSmartWallet: false,
         getNetwork: () => ethersProvider.getNetwork(),
         getSigner: () => ethersProvider.getSigner()
       };
+      providerRef.current = provider;
+      return provider;
     } catch (error) {
       console.error('Provider initialization error:', error);
       throw new ProposalError({
@@ -131,41 +160,49 @@ export const useWalletProvider = () => {
           'Try refreshing the page'
         ]
       });
+    } finally {
+      initializingRef.current = false;
     }
-  };
+  }, [primaryWallet, toast, initializeProvider, validateWalletClient]);
 
-  const validateNetwork = async (provider: WalletProvider) => {
-    console.log('Starting network validation...');
-    try {
-      const network = await provider.getNetwork();
-      console.log('Current chain ID:', network.chainId);
-      const targetChainId = 137; // Polygon Mainnet
-      
-      if (network.chainId !== targetChainId) {
-        throw new ProposalError({
-          category: 'network',
-          message: 'Please connect to Polygon network',
-          recoverySteps: ['Switch to Polygon Mainnet in your wallet']
-        });
-      }
-    } catch (error) {
-      if (error instanceof ProposalError) throw error;
-      
-      throw new ProposalError({
-        category: 'network',
-        message: 'Network validation failed',
-        recoverySteps: [
-          'Check your internet connection',
-          'Make sure you are connected to Polygon network',
-          'Try refreshing the page'
-        ]
-      });
-    }
-  };
+  // Cleanup provider cache when wallet changes
+  useEffect(() => {
+    providerRef.current = null;
+    return () => {
+      providerRef.current = null;
+    };
+  }, [primaryWallet]);
 
   return {
     getProvider,
-    validateNetwork,
+    validateNetwork: async (provider: WalletProvider) => {
+      console.log('Starting network validation...');
+      try {
+        const network = await provider.getNetwork();
+        console.log('Current chain ID:', network.chainId);
+        const targetChainId = 137; // Polygon Mainnet
+        
+        if (network.chainId !== targetChainId) {
+          throw new ProposalError({
+            category: 'network',
+            message: 'Please connect to Polygon network',
+            recoverySteps: ['Switch to Polygon Mainnet in your wallet']
+          });
+        }
+      } catch (error) {
+        if (error instanceof ProposalError) throw error;
+        
+        throw new ProposalError({
+          category: 'network',
+          message: 'Network validation failed',
+          recoverySteps: [
+            'Check your internet connection',
+            'Make sure you are connected to Polygon network',
+            'Try refreshing the page'
+          ]
+        });
+      }
+    },
     getWalletType,
     isConnected: !!primaryWallet?.isConnected?.()
   };
