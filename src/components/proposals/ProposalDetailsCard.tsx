@@ -9,13 +9,14 @@ import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata, FirmSize, DealType, GeographicFocus, PaymentTerm } from "@/types/proposals";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink, Users, Target, Coins, Info, Clock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { getTokenBalance } from "@/services/tokenService";
 import { format, formatDistanceToNow, isPast } from "date-fns";
+import { loadingStates } from "./LoadingStates";
+import { ProposalLoadingCard } from "./ProposalLoadingCard";
 
 const MIN_LGR_REQUIRED = "1";
 
