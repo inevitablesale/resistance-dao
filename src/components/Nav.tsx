@@ -1,7 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useToast } from "@/hooks/use-toast";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Twitter from "./icons/Twitter";
 import Linked from "./icons/Linked";
@@ -16,12 +15,10 @@ import {
 
 const Nav = () => {
   const { primaryWallet } = useDynamicContext();
-  const { toast } = useToast();
   const location = useLocation();
   const hasWallet = !!primaryWallet?.address;
   
   const hideHomeRoutes = ['/', '/thesis'];
-  const shouldShowHomeLink = !hideHomeRoutes.includes(location.pathname);
   const shouldShowProposals = location.pathname !== '/';
 
   const getBreadcrumbs = () => {
@@ -102,19 +99,13 @@ const Nav = () => {
       <div className="container h-full mx-auto px-4 relative">
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-4">
-            {shouldShowHomeLink && (
+            {hideHomeRoutes.includes(location.pathname) ? (
               <Link to="/" className="text-white/80 hover:text-white transition-colors">
                 Home
               </Link>
+            ) : (
+              getBreadcrumbs()
             )}
-            {hasWallet && shouldShowProposals && (
-              <Link to="/proposals" className="text-white/80 hover:text-white transition-colors">
-                Proposals
-              </Link>
-            )}
-            <div className="ml-4">
-              {getBreadcrumbs()}
-            </div>
           </div>
 
           <div className="flex items-center gap-4">
