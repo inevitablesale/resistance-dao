@@ -1,3 +1,4 @@
+
 import { ProposalsHistory } from "@/components/proposals/ProposalsHistory";
 import { Button } from "@/components/ui/button";
 import { FileText, Plus, Building2, HandCoins, TrendingUp, MessageSquare } from "lucide-react";
@@ -5,14 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { Link } from "react-router-dom";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 
 const Proposals = () => {
   const navigate = useNavigate();
@@ -51,20 +44,6 @@ const Proposals = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-purple-500/10 to-pink-500/10 animate-gradient" />
         
         <div className="container mx-auto px-4 pt-32 pb-20">
-          <Breadcrumb className="mb-8">
-            <BreadcrumbList className="text-white/60">
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to="/" className="hover:text-white">Home</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-white/40" />
-              <BreadcrumbItem>
-                <BreadcrumbPage className="text-white">Proposals</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
           <div className="text-center mb-12">
             <div className="mb-8">
               <Building2 className="w-20 h-20 mx-auto text-yellow-500 animate-cosmic-pulse" />
