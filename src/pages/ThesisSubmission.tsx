@@ -1,3 +1,4 @@
+<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -51,17 +52,26 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-// Constants
-const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
-const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
-const SUBMISSION_FEE = ethers.utils.parseEther("250");
-const VOTING_FEE = ethers.utils.parseEther("10");
-const MAX_STRATEGIES_PER_CATEGORY = 3;
-const MIN_TITLE_LENGTH = 10;
-const MAX_TITLE_LENGTH = 100;
-const MIN_DRIVERS_LENGTH = 50;
-const MAX_DRIVERS_LENGTH = 500;
+// Contract-aligned constants
+const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds (matches contract)
+const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds (matches contract)
+const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000"); // 1,000 LGR (matches contract)
+const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000"); // 25M LGR (matches contract)
+const SUBMISSION_FEE = ethers.utils.parseEther("250"); // 250 LGR
+const VOTING_FEE = ethers.utils.parseEther("10"); // 10 LGR
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
+
+// Text length constraints (matching contract)
+const TITLE_MIN_LENGTH = 10;
+const TITLE_MAX_LENGTH = 100;
+const INVESTMENT_DRIVERS_MIN_LENGTH = 50;
+const INVESTMENT_DRIVERS_MAX_LENGTH = 500;
+const ADDITIONAL_CRITERIA_MAX_LENGTH = 500;
+const LINKEDIN_URL_MAX_LENGTH = 200;
+
+// Strategy constraints
+const MAX_STRATEGIES_PER_CATEGORY = 3;
+const MAX_PAYMENT_TERMS = 5;
 
 const SUBMISSION_STEPS = [{
   id: 'thesis',
@@ -84,6 +94,46 @@ const SUBMISSION_STEPS = [{
   status: 'pending',
   description: 'Define your payment structure'
 }];
+
+const validateTitle = (title: string): string[] => {
+  const errors: string[] = [];
+  if (!title) {
+    errors.push('Title is required');
+  } else if (title.length < TITLE_MIN_LENGTH || title.length > TITLE_MAX_LENGTH) {
+    errors.push(`Title must be between ${TITLE_MIN_LENGTH} and ${TITLE_MAX_LENGTH} characters`);
+  }
+  return errors;
+};
+
+const validateInvestmentDrivers = (drivers: string): string[] => {
+  const errors: string[] = [];
+  if (!drivers) {
+    errors.push('Investment drivers are required');
+  } else if (drivers.length < INVESTMENT_DRIVERS_MIN_LENGTH || drivers.length > INVESTMENT_DRIVERS_MAX_LENGTH) {
+    errors.push(`Investment drivers must be between ${INVESTMENT_DRIVERS_MIN_LENGTH} and ${INVESTMENT_DRIVERS_MAX_LENGTH} characters`);
+  }
+  return errors;
+};
+
+const validateAdditionalCriteria = (criteria: string): string[] => {
+  const errors: string[] = [];
+  if (criteria && criteria.length > ADDITIONAL_CRITERIA_MAX_LENGTH) {
+    errors.push(`Additional criteria must not exceed ${ADDITIONAL_CRITERIA_MAX_LENGTH} characters`);
+  }
+  return errors;
+};
+
+const validateLinkedInURL = (url: string): string[] => {
+  const errors: string[] = [];
+  if (!url) {
+    errors.push('LinkedIn URL is required');
+  } else if (url.length > LINKEDIN_URL_MAX_LENGTH) {
+    errors.push(`LinkedIn URL must not exceed ${LINKEDIN_URL_MAX_LENGTH} characters`);
+  } else if (!url.startsWith('https://www.linkedin.com/') && !url.startsWith('https://linkedin.com/')) {
+    errors.push('Invalid LinkedIn URL format');
+  }
+  return errors;
+};
 
 const ThesisSubmission = () => {
   const navigate = useNavigate();
@@ -149,7 +199,7 @@ const ThesisSubmission = () => {
     }
   }, [user, isConnected, toast]);
 
-  const validateLinkedInURL = (): boolean => {
+  const validateLinkedInURLFromProfile = (): boolean => {
     const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
     if (!linkedInURL) {
       setFormErrors(prev => ({
@@ -200,90 +250,119 @@ const ThesisSubmission = () => {
   };
 
   const validateBasicsTab = (): boolean => {
+    let isValid = true;
+    const titleErrors = validateTitle(formData.title);
+    const investmentDriversErrors = validateInvestmentDrivers(formData.investment.drivers);
+    const additionalCriteriaErrors = validateAdditionalCriteria(formData.investment.additionalCriteria);
+    const linkedInErrors = validateLinkedInURL(formData.linkedInURL);
+  
     const errors: Record<string, string[]> = {};
-    if (!formData.title || formData.title.trim().length < MIN_TITLE_LENGTH) {
-      errors.title = [`Title must be at least ${MIN_TITLE_LENGTH} characters long`];
+  
+    if (titleErrors.length) {
+      errors.title = titleErrors;
+      isValid = false;
     }
-    if (formData.title.trim().length > MAX_TITLE_LENGTH) {
-      errors.title = [`Title must not exceed ${MAX_TITLE_LENGTH} characters`];
+    if (investmentDriversErrors.length) {
+      errors['investment.drivers'] = investmentDriversErrors;
+      isValid = false;
     }
+    if (additionalCriteriaErrors.length) {
+      errors['investment.additionalCriteria'] = additionalCriteriaErrors;
+      isValid = false;
+    }
+    if (linkedInErrors.length) {
+      errors.linkedInURL = linkedInErrors;
+      isValid = false;
+    }
+  
     if (!formData.investment.targetCapital) {
       errors['investment.targetCapital'] = ['Target capital is required'];
+      isValid = false;
     } else {
       try {
         const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
-        const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
-        const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
         if (targetCapitalWei.lt(MIN_TARGET_CAPITAL)) {
           errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} LGR`];
+          isValid = false;
         }
         if (targetCapitalWei.gt(MAX_TARGET_CAPITAL)) {
           errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} LGR`];
+          isValid = false;
         }
       } catch (error) {
         errors['investment.targetCapital'] = ['Invalid target capital amount'];
+        isValid = false;
       }
     }
-    if (!formData.investment.drivers || formData.investment.drivers.trim().length < MIN_DRIVERS_LENGTH) {
-      errors['investment.drivers'] = [`Investment drivers must be at least ${MIN_DRIVERS_LENGTH} characters`];
-    }
-    if (formData.investment.drivers.trim().length > MAX_DRIVERS_LENGTH) {
-      errors['investment.drivers'] = [`Investment drivers must not exceed ${MAX_DRIVERS_LENGTH} characters`];
-    }
+  
     setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    return isValid;
   };
 
   const validateFirmTab = (): boolean => {
     const errors: Record<string, string[]> = {};
+    let isValid = true;
     if (!formData.firmCriteria.size) {
       errors['firmCriteria.size'] = ['Please select a firm size'];
+      isValid = false;
     }
     if (!formData.firmCriteria.dealType) {
       errors['firmCriteria.dealType'] = ['Please select a deal type'];
+      isValid = false;
     }
     if (!formData.firmCriteria.geographicFocus) {
       errors['firmCriteria.geographicFocus'] = ['Please select a geographic focus'];
+      isValid = false;
     }
     setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    return isValid;
   };
 
   const validateStrategyTab = (): boolean => {
     const errors: Record<string, string[]> = {};
+    let isValid = true;
     
     if (!formData.strategies.operational.length) {
       errors['strategies.operational'] = ['Please select at least one operational strategy'];
+      isValid = false;
     } else if (formData.strategies.operational.length > 3) {
       errors['strategies.operational'] = ['Maximum 3 operational strategies allowed'];
+      isValid = false;
     }
     
     if (!formData.strategies.growth.length) {
       errors['strategies.growth'] = ['Please select at least one growth strategy'];
+      isValid = false;
     } else if (formData.strategies.growth.length > 3) {
       errors['strategies.growth'] = ['Maximum 3 growth strategies allowed'];
+      isValid = false;
     }
     
     if (!formData.strategies.integration.length) {
       errors['strategies.integration'] = ['Please select at least one integration strategy'];
+      isValid = false;
     } else if (formData.strategies.integration.length > 3) {
       errors['strategies.integration'] = ['Maximum 3 integration strategies allowed'];
+      isValid = false;
     }
     
     setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    return isValid;
   };
 
   const validateTermsTab = (): boolean => {
     const errors: Record<string, string[]> = {};
+    let isValid = true;
     if (!formData.paymentTerms.length) {
       errors.paymentTerms = ['Please select at least one payment term'];
+      isValid = false;
     }
     if (formData.paymentTerms.length > 5) {
       errors.paymentTerms = [`Maximum of 5 payment terms allowed`];
+      isValid = false;
     }
     setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    return isValid;
   };
 
   const getCurrentValidator = () => {
@@ -365,7 +444,7 @@ const ThesisSubmission = () => {
       setIsSubmitting(true);
       setFormErrors({});
 
-      if (!validateLinkedInURL()) {
+      if (!validateLinkedInURLFromProfile()) {
         throw new Error("Please add a valid LinkedIn URL in your wallet settings");
       }
 
@@ -450,7 +529,7 @@ const ThesisSubmission = () => {
       setIsSubmitting(true);
       setFormErrors({});
 
-      if (!validateLinkedInURL()) {
+      if (!validateLinkedInURLFromProfile()) {
         throw new Error("Please add a valid LinkedIn URL in your wallet settings");
       }
 
@@ -763,23 +842,4 @@ const ThesisSubmission = () => {
                           onChange={e => handleFormDataChange('title', e.target.value)}
                         />
                         {formErrors.title && (
-                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            </Card>
-          </div>
-        </div>
-
-        <div className="mt-12">
-          {renderContinueButton(handleContinue, activeStep === 'terms')}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+                          <p className="text-red-400 text-sm">{formErrors.
