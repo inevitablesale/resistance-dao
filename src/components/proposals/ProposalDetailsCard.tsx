@@ -30,7 +30,7 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
 
-  // Check LGR balance, exactly like in ProposalsHistory
+  // Independent LGR balance check effect, exactly like ProposalsHistory
   useEffect(() => {
     const checkLGRBalance = async () => {
       if (!isConnected || !address) {
@@ -59,31 +59,26 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
         setHasMinimumLGR(hasEnough);
       } catch (error) {
         console.error("Error checking LGR balance:", error);
-        toast({
-          title: "Balance Check Failed",
-          description: "Failed to verify LGR balance. Please try again.",
-          variant: "destructive",
-        });
       }
     };
 
     checkLGRBalance();
-  }, [isConnected, address, getProvider, toast]);
+  }, [isConnected, address, getProvider]); // Removed toast dependency
 
-  // Fetch proposal details only after wallet and balance checks
+  // Separate effect for proposal data fetching
   useEffect(() => {
-    if (!tokenId) {
-      toast({
-        title: "Invalid Proposal ID",
-        description: "Please provide a valid proposal ID.",
-        variant: "destructive",
-      });
+    if (!tokenId || !isConnected || !hasMinimumLGR) {
+      if (!tokenId) {
+        toast({
+          title: "Invalid Proposal ID",
+          description: "Please provide a valid proposal ID.",
+          variant: "destructive",
+        });
+      }
       return;
     }
 
     const fetchProposalDetails = async () => {
-      if (!isConnected || hasMinimumLGR === null || !hasMinimumLGR) return;
-
       setIsLoading(true);
       setLoadingProgress(20);
 
@@ -99,9 +94,11 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
         const proposal = await factoryContract.proposals(tokenId);
         setLoadingProgress(60);
 
+        console.log('Fetching IPFS metadata for hash:', proposal.ipfsMetadata);
         const metadata = await getFromIPFS<ProposalMetadata>(proposal.ipfsMetadata, "proposal");
         setLoadingProgress(90);
 
+        console.log('Proposal metadata:', metadata);
         setProposalDetails(metadata);
       } catch (error: any) {
         console.error("Error fetching proposal details:", error);
@@ -117,7 +114,7 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
     };
 
     fetchProposalDetails();
-  }, [tokenId, isConnected, hasMinimumLGR, getProvider, toast]);
+  }, [tokenId, isConnected, hasMinimumLGR, getProvider]); // Removed toast dependency from main fetch effect
 
   if (!isConnected) {
     return (
