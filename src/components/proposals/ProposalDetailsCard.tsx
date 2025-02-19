@@ -94,6 +94,7 @@ interface ProposalDetailsCardProps {
 export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDetailsCardProps) => {
   const { toast } = useToast();
   const { isConnected, connect, address } = useWalletConnection();
+  const { getProvider } = useWalletProvider();
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
   const [pledgeInput, setPledgeInput] = useState("");
   const [isPledging, setIsPledging] = useState(false);
@@ -220,7 +221,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       const factoryContract = new ethers.Contract(
         FACTORY_ADDRESS,
         FACTORY_ABI,
-        walletProvider.provider.getSigner()
+        signer
       );
 
       const lgrToken = new ethers.Contract(
@@ -242,15 +243,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         description: `Your commitment of ${pledgeInput} LGR has been recorded. The 10 LGR voting fee has been processed.`,
       });
 
-      setPledgedAmount(prev => {
-        const currentAmount = ethers.utils.parseEther(prev);
-        const newAmount = currentAmount.add(pledgeAmountBN);
-        return ethers.utils.formatEther(newAmount);
-      });
-      
-      setBackerCount(prev => prev + 1);
-      setHasUserVoted(true);
-      setUserVoteAmount(pledgeInput);
       setPledgeInput("");
     } catch (error: any) {
       console.error("Pledging error:", error);
