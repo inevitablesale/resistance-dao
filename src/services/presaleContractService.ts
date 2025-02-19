@@ -26,8 +26,8 @@ export const PRESALE_END_TIME = 1746057600; // May 1, 2025
 export const TOTAL_PRESALE_SUPPLY = ethers.utils.parseUnits("5", 24); // 5 million tokens with 18 decimals
 export const USD_PRICE = ethers.utils.parseUnits("0.1", 18); // $0.10 per token
 
-// Get Dynamic provider
-export const getDynamicProvider = async () => {
+// Function specifically for presale contract interactions
+export const getPresaleProvider = async () => {
   const { primaryWallet } = useDynamicContext();
   if (!primaryWallet) {
     throw new Error("No wallet connected");
@@ -54,7 +54,7 @@ export const getLgrTokenContract = async (provider: ethers.providers.Provider) =
 // Function to fetch total LGR sold
 export const fetchTotalLGRSold = async () => {
   try {
-    const provider = await getDynamicProvider();
+    const provider = await getPresaleProvider();
     const lgrTokenContract = await getLgrTokenContract(provider);
     const remainingBalance = await lgrTokenContract.balanceOf(PRESALE_CONTRACT_ADDRESS);
     const totalSold = TOTAL_PRESALE_SUPPLY.sub(remainingBalance);
@@ -68,7 +68,7 @@ export const fetchTotalLGRSold = async () => {
 // Function to fetch remaining presale supply
 export const fetchRemainingPresaleSupply = async () => {
   try {
-    const provider = await getDynamicProvider();
+    const provider = await getPresaleProvider();
     const lgrTokenContract = await getLgrTokenContract(provider);
     const remainingBalance = await lgrTokenContract.balanceOf(PRESALE_CONTRACT_ADDRESS);
     return ethers.utils.formatUnits(remainingBalance, 18);
@@ -81,7 +81,7 @@ export const fetchRemainingPresaleSupply = async () => {
 // Function to fetch presale price in USD (fixed at $0.10)
 export const fetchPresaleUSDPrice = async () => {
   try {
-    const provider = await getDynamicProvider();
+    const provider = await getPresaleProvider();
     const contract = await getPresaleContract(provider);
     const usdPrice = await contract.PRESALE_USD_PRICE();
     return ethers.utils.formatUnits(usdPrice, 18);
@@ -94,7 +94,7 @@ export const fetchPresaleUSDPrice = async () => {
 // Function to fetch latest MATIC price and convert presale price to MATIC
 export const fetchPresaleMaticPrice = async () => {
   try {
-    const provider = await getDynamicProvider();
+    const provider = await getPresaleProvider();
     const contract = await getPresaleContract(provider);
     const maticPriceInUsd = await contract.getLatestMaticPrice();
     const maticPriceUsd = ethers.utils.formatUnits(maticPriceInUsd, 8);
@@ -107,7 +107,7 @@ export const fetchPresaleMaticPrice = async () => {
   }
 };
 
-// Function to purchase tokens using Dynamic+ZeroDev integration
+// Function specifically for purchasing tokens in presale
 export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string) => {
   try {
     console.log('Starting token purchase with MATIC amount:', maticAmount);
@@ -138,7 +138,7 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
     const minExpectedTokens = expectedTokens.mul(99).div(100);
     console.log('Min expected tokens with 1% slippage:', ethers.utils.formatEther(minExpectedTokens));
 
-    // Let Dynamic+ZeroDev handle the transaction
+    // Use Dynamic's native integration for the transaction
     const tx = await contract.buyTokens(minExpectedTokens, {
       value: maticAmountWei
     });
@@ -162,7 +162,7 @@ export const fetchConversionRates = async () => {
   try {
     console.log('Fetching conversion rates...');
     
-    const provider = await getDynamicProvider();
+    const provider = await getPresaleProvider();
     console.log('Provider connected');
     
     const contract = await getPresaleContract(provider);
