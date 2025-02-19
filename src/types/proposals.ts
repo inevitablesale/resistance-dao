@@ -85,6 +85,7 @@ export interface ProposalMetadata {
     additionalCriteria: string;
   };
   votingDuration: number;
+  votingEnds: number;  // Added this field
   linkedInURL: string;
   isTestMode?: boolean;
   submissionTimestamp?: number;

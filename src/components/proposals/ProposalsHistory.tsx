@@ -1,6 +1,7 @@
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FileText, Calendar, Users, Target, Database, Link, Shield, Server } from "lucide-react";
+import { FileText, Calendar, Users, Target } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -34,50 +35,9 @@ interface ProposalEvent {
   pledgedAmount?: string;
 }
 
-interface LoadingState {
-  message: string;
-  subtitle: string;
-  progress: number;
-  icon: React.ElementType;
-}
-
-const loadingStates: LoadingState[] = [
-  {
-    message: "Connecting Wallet to Smart Contract",
-    subtitle: "Verified on Polygon",
-    progress: 20,
-    icon: Database
-  },
-  {
-    message: "Querying Polygon Network",
-    subtitle: "Decentralized Storage",
-    progress: 40,
-    icon: Link
-  },
-  {
-    message: "Verifying On-Chain Proposals",
-    subtitle: "Smart Contract Protected",
-    progress: 60,
-    icon: Shield
-  },
-  {
-    message: "Fetching IPFS Documents",
-    subtitle: "Web3 Secured",
-    progress: 80,
-    icon: Server
-  },
-  {
-    message: "Synchronizing with Latest Block",
-    subtitle: "Blockchain Validated",
-    progress: 100,
-    icon: Database
-  }
-];
-
 export const ProposalsHistory = () => {
   const [proposalEvents, setProposalEvents] = useState<ProposalEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [loadingStateIndex, setLoadingStateIndex] = useState(0);
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
   const { isConnected, connect, address } = useWalletConnection();
   const { getProvider } = useWalletProvider();
@@ -93,28 +53,6 @@ export const ProposalsHistory = () => {
       currency: 'USD'
     }).format(usdAmount);
   };
-
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    if (isLoading) {
-      const cycleLoadingStates = () => {
-        setLoadingStateIndex(prev => {
-          if (prev < loadingStates.length - 1) {
-            timeoutId = setTimeout(cycleLoadingStates, 1000);
-            return prev + 1;
-          }
-          return prev;
-        });
-      };
-
-      timeoutId = setTimeout(cycleLoadingStates, 1000);
-    }
-
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [isLoading]);
 
   useEffect(() => {
     const checkLGRBalance = async () => {
@@ -286,51 +224,11 @@ export const ProposalsHistory = () => {
   }
 
   if (isLoading) {
-    const currentState = loadingStates[loadingStateIndex];
-    const LoadingIcon = currentState.icon;
-
     return (
       <Card className="bg-black/40 border-white/10">
-        <CardContent className="p-6">
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <motion.div 
-              className="w-16 h-16 rounded-full bg-purple-500/20 flex items-center justify-center"
-              animate={{ 
-                scale: [1, 1.2, 1],
-                rotate: [0, 360]
-              }}
-              transition={{ 
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <LoadingIcon className="w-8 h-8 text-purple-500" />
-            </motion.div>
-            
-            <motion.div 
-              className="text-center"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h3 className="text-lg font-medium text-white mb-1">
-                {currentState.message}
-              </h3>
-              <p className="text-sm text-white/60">
-                {currentState.subtitle}
-              </p>
-            </motion.div>
-
-            <div className="w-full max-w-xs bg-white/5 rounded-full h-2 mt-4">
-              <motion.div
-                className="h-full bg-purple-500 rounded-full"
-                initial={{ width: "0%" }}
-                animate={{ width: `${currentState.progress}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-          </div>
+        <CardContent className="p-6 text-center">
+          <div className="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto mb-2" />
+          <p className="text-white/60">Loading proposals...</p>
         </CardContent>
       </Card>
     );
