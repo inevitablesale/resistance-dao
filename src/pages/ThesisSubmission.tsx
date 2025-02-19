@@ -85,7 +85,7 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
   description: 'Submit your thesis to the blockchain'
 }];
 
-const TEST_FORM_DATA = (address: string | undefined): ProposalMetadata => ({
+const getTestFormData = (address: string | undefined): ProposalMetadata => ({
   title: "Test Proposal - Automated Backend Services Firm",
   firmCriteria: {
     size: FirmSize.BELOW_1M,
@@ -179,9 +179,10 @@ const ThesisSubmission = () => {
 
   useEffect(() => {
     if (isTestMode) {
-      console.log("Setting test form data:", TEST_FORM_DATA(address));
+      const testData = getTestFormData(address);
+      console.log("Setting test form data:", testData);
       setFormData({
-        ...TEST_FORM_DATA(address),
+        ...testData,
         linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
         submissionTimestamp: Date.now(),
         submitter: address || ""
@@ -676,7 +677,7 @@ const ThesisSubmission = () => {
     
     setIsTestMode(enabled);
     if (enabled) {
-      setFormData(TEST_FORM_DATA(address));
+      setFormData(getTestFormData(address));
     } else {
       setFormData({
         title: "",
@@ -698,6 +699,7 @@ const ThesisSubmission = () => {
           additionalCriteria: ""
         },
         votingDuration: MIN_VOTING_DURATION,
+        votingEnds: Math.floor(Date.now() / 1000) + MIN_VOTING_DURATION,
         linkedInURL: "",
         isTestMode: false,
         submissionTimestamp: Date.now(),
