@@ -698,7 +698,7 @@ const ThesisSubmission = () => {
   const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(SUBMISSION_FEE));
 
   const renderContinueButton = (
-    onClick: () => void,
+    onClick: (e: React.MouseEvent<HTMLButtonElement>) => void,
     isLastSection: boolean = false
   ) => (
     <Button 
