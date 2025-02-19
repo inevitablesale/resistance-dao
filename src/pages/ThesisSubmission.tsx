@@ -151,7 +151,7 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const [isTestMode, setIsTestMode] = useState(false);
+  const isTestMode = true;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
@@ -180,7 +180,7 @@ const ThesisSubmission = () => {
     },
     votingDuration: MIN_VOTING_DURATION,
     linkedInURL: "",
-    isTestMode: false
+    isTestMode: true
   });
 
   useEffect(() => {
