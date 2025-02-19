@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
-import { ProposalMetadata } from "@/types/proposals";
+import { ProposalMetadata, FirmSize, DealType, GeographicFocus, PaymentTerm } from "@/types/proposals";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink, Users, Target, Coins, Info } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -17,11 +17,75 @@ import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { getTokenBalance } from "@/services/tokenService";
 import { format } from "date-fns";
 
+const MIN_LGR_REQUIRED = "1";
+
+const getFirmSizeLabel = (size: FirmSize): string => {
+  switch (size) {
+    case FirmSize.BELOW_1M:
+      return "Below $1M";
+    case FirmSize.ONE_TO_FIVE_M:
+      return "$1M-$5M";
+    case FirmSize.FIVE_TO_TEN_M:
+      return "$5M-$10M";
+    case FirmSize.TEN_PLUS:
+      return "$10M+";
+    default:
+      return "Unknown";
+  }
+};
+
+const getDealTypeLabel = (type: DealType): string => {
+  switch (type) {
+    case DealType.ACQUISITION:
+      return "Acquisition";
+    case DealType.MERGER:
+      return "Merger";
+    case DealType.EQUITY_BUYOUT:
+      return "Equity Buyout";
+    case DealType.FRANCHISE:
+      return "Franchise";
+    case DealType.SUCCESSION:
+      return "Succession";
+    default:
+      return "Unknown";
+  }
+};
+
+const getGeographicFocusLabel = (focus: GeographicFocus): string => {
+  switch (focus) {
+    case GeographicFocus.LOCAL:
+      return "Local";
+    case GeographicFocus.REGIONAL:
+      return "Regional";
+    case GeographicFocus.NATIONAL:
+      return "National";
+    case GeographicFocus.REMOTE:
+      return "Remote";
+    default:
+      return "Unknown";
+  }
+};
+
+const getPaymentTermLabel = (term: PaymentTerm): string => {
+  switch (term) {
+    case PaymentTerm.CASH:
+      return "Cash";
+    case PaymentTerm.SELLER_FINANCING:
+      return "Seller Financing";
+    case PaymentTerm.EARNOUT:
+      return "Earnout";
+    case PaymentTerm.EQUITY_ROLLOVER:
+      return "Equity Rollover";
+    case PaymentTerm.BANK_FINANCING:
+      return "Bank Financing";
+    default:
+      return "Unknown";
+  }
+};
+
 interface ProposalDetailsCardProps {
   tokenId?: string;
 }
-
-const MIN_LGR_REQUIRED = "1";
 
 export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
   const { toast } = useToast();
@@ -200,7 +264,6 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
         walletProvider.provider.getSigner()
       );
 
-      // Using the vote function as the pledging mechanism
       const tx = await factoryContract.vote(tokenId, amount);
       await tx.wait();
 
@@ -209,14 +272,12 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
         description: `Successfully pledged ${pledgeInput} LGR to back this proposal`,
       });
 
-      // Update the total pledged amount
       setPledgedAmount(prev => {
         const currentAmount = ethers.utils.parseEther(prev);
         const newAmount = currentAmount.add(amount);
         return ethers.utils.formatEther(newAmount);
       });
       
-      // Increment backer count (this is simplified, in reality you'd want to fetch the actual count)
       setBackerCount(prev => prev + 1);
       
       setPledgeInput("");
@@ -296,7 +357,6 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
       transition={{ duration: 0.2 }}
     >
       <div className="mb-8 space-y-6">
-        {/* Backing Section */}
         <div className="bg-gradient-to-br from-purple-500/10 via-transparent to-yellow-500/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -362,15 +422,15 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
       <Card className="w-full bg-black/40 border-white/10">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-white">
-            {proposalDetails.title}
+            {proposalDetails?.title}
           </CardTitle>
           <div className="flex items-center gap-4 text-sm text-white/60 mt-2">
-            {proposalDetails.submissionTimestamp && (
+            {proposalDetails?.submissionTimestamp && (
               <span>
                 Submitted on {format(proposalDetails.submissionTimestamp, 'PPP')}
               </span>
             )}
-            {proposalDetails.investment?.targetCapital && (
+            {proposalDetails?.investment?.targetCapital && (
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4" />
                 <span>
@@ -395,7 +455,7 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {proposalDetails.investment && (
+          {proposalDetails?.investment && (
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-white">Investment Details</h3>
               <p className="text-white/80">{proposalDetails.investment.drivers}</p>
@@ -403,31 +463,31 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
             </div>
           )}
 
-          {proposalDetails.firmCriteria && (
+          {proposalDetails?.firmCriteria && (
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-white">Firm Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-white/80">
                 <div>
                   <strong>Firm Size:</strong>{" "}
-                  {proposalDetails.firmCriteria.size}
+                  {getFirmSizeLabel(proposalDetails.firmCriteria.size)}
                 </div>
                 <div>
                   <strong>Deal Type:</strong>{" "}
-                  {proposalDetails.firmCriteria.dealType}
+                  {getDealTypeLabel(proposalDetails.firmCriteria.dealType)}
                 </div>
                 <div>
                   <strong>Geographic Focus:</strong>{" "}
-                  {proposalDetails.firmCriteria.geographicFocus}
+                  {getGeographicFocusLabel(proposalDetails.firmCriteria.geographicFocus)}
                 </div>
                 <div>
                   <strong>Payment Terms:</strong>{" "}
-                  {proposalDetails.paymentTerms?.join(", ")}
+                  {proposalDetails.paymentTerms?.map(term => getPaymentTermLabel(term)).join(", ")}
                 </div>
               </div>
             </div>
           )}
 
-          {proposalDetails.linkedInURL && (
+          {proposalDetails?.linkedInURL && (
             <div className="mt-4">
               <a 
                 href={proposalDetails.linkedInURL} 
