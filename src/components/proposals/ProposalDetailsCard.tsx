@@ -599,7 +599,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
     );
   }
 
-  if (view === 'details') {
+  if (view === 'details' && proposalDetails) {
     return (
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
@@ -609,7 +609,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-white">
-              {proposalDetails?.title}
+              {proposalDetails.title}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-8">
@@ -668,7 +668,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
     );
   }
 
-  if (view === 'investment') {
+  if (view === 'investment' && proposalDetails?.investment) {
     return (
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
@@ -677,25 +677,21 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       >
         <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
           <CardContent className="p-8 space-y-8">
-            {proposalDetails?.investment && (
-              <>
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-white">Investment Drivers</h3>
-                  <p className="text-white/80 bg-white/5 p-6 rounded-xl backdrop-blur-sm leading-relaxed border border-yellow-500/10">
-                    {proposalDetails.investment.drivers}
-                  </p>
-                </div>
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-white">Investment Drivers</h3>
+              <p className="text-white/80 bg-white/5 p-6 rounded-xl backdrop-blur-sm leading-relaxed border border-yellow-500/10">
+                {proposalDetails.investment.drivers}
+              </p>
+            </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-white">Additional Criteria</h3>
-                  <p className="text-white/80 bg-white/5 p-6 rounded-xl backdrop-blur-sm leading-relaxed border border-teal-500/10">
-                    {proposalDetails.investment.additionalCriteria}
-                  </p>
-                </div>
-              </>
-            )}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-white">Additional Criteria</h3>
+              <p className="text-white/80 bg-white/5 p-6 rounded-xl backdrop-blur-sm leading-relaxed border border-teal-500/10">
+                {proposalDetails.investment.additionalCriteria}
+              </p>
+            </div>
 
-            {proposalDetails?.linkedInURL && (
+            {proposalDetails.linkedInURL && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
