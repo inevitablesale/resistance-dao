@@ -210,16 +210,20 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         );
         setLoadingProgress(40);
 
-        console.log(`Getting tokenURI and pledged amount for token #${tokenId}`);
-        const [tokenUri, pledged] = await Promise.all([
+        console.log(`Getting tokenURI, pledged amount, and voters for token #${tokenId}`);
+        const [tokenUri, pledged, voters] = await Promise.all([
           factoryContract.tokenURI(tokenId),
-          factoryContract.pledgedAmount(tokenId)
+          factoryContract.pledgedAmount(tokenId),
+          factoryContract.proposalVoters(tokenId)
         ]);
         setLoadingProgress(60);
 
         console.log('Token URI:', tokenUri);
         console.log('Pledged amount:', ethers.utils.formatEther(pledged));
+        console.log('Voter count:', voters.length);
+        
         setPledgedAmount(ethers.utils.formatEther(pledged));
+        setBackerCount(voters.length);
 
         if (tokenUri) {
           console.log('Starting IPFS fetch for metadata');
