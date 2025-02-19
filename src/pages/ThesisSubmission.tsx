@@ -151,7 +151,7 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const [isTestMode, setIsTestMode] = useState(false);
+  const [isTestMode] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
@@ -180,20 +180,19 @@ const ThesisSubmission = () => {
     },
     votingDuration: MIN_VOTING_DURATION,
     linkedInURL: "",
-    isTestMode: false
+    isTestMode: true,
+    submissionTimestamp: Date.now(),
+    submitter: address || ""
   });
 
   useEffect(() => {
-    if (isTestMode) {
-      console.log("Setting test form data:", TEST_FORM_DATA);
-      setFormData({
-        ...TEST_FORM_DATA,
-        linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
-        submissionTimestamp: Date.now(),
-        submitter: address
-      });
+    if (user?.metadata?.["LinkedIn Profile URL"]) {
+      setFormData(prev => ({
+        ...prev,
+        linkedInURL: user.metadata["LinkedIn Profile URL"] as string
+      }));
     }
-  }, [isTestMode, user, address]);
+  }, [user]);
 
   useEffect(() => {
     const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
@@ -507,7 +506,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent, formData?: ProposalMetadata, isTestMode?: boolean) => {
+  const handleSubmit = async (e: React.FormEvent, submittedFormData?: ProposalMetadata) => {
     e.preventDefault();
     if (!isConnected) {
       toast({
@@ -540,14 +539,15 @@ const ThesisSubmission = () => {
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
       const updatedFormData = {
-        ...formData || formData,
+        ...formData,
         votingDuration,
         linkedInURL,
         submissionTimestamp: Date.now(),
-        submitter: address
+        submitter: address,
+        isTestMode: true
       };
 
-      console.log('Uploading metadata to IPFS...', { isTestMode });
+      console.log('Uploading metadata to IPFS...', { isTestMode: true });
       const ipfsUri = await uploadMetadataToPinata(updatedFormData);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
       
@@ -555,10 +555,7 @@ const ThesisSubmission = () => {
         throw new Error("Invalid IPFS hash format");
       }
 
-      console.log('Estimating gas for proposal creation...', { isTestMode });
-      const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData?.investment.targetCapital || ""
-      );
+      const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
 
       const proposalConfig: ProposalConfig = {
         targetCapital: targetCapitalWei,
@@ -568,7 +565,6 @@ const ThesisSubmission = () => {
         linkedInURL
       };
 
-      const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
       console.log('Creating proposal...', proposalConfig);
       const result = await createProposal(proposalConfig, wallet);
 
@@ -577,17 +573,18 @@ const ThesisSubmission = () => {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
-        title: isTestMode ? TEST_FORM_DATA.title : formData?.title || "",
+        title: formData.title,
         targetCapital: targetCapitalWei.toString(),
-        status: 'pending'
+        status: 'pending',
+        isTestMode: true
       };
       userProposals.push(newProposal);
       localStorage.setItem('userProposals', JSON.stringify(userProposals));
 
       updateStepStatus('submission', 'completed');
       toast({
-        title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
-        description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
+        title: 'Test Proposal Submitted',
+        description: 'Your test investment thesis has been submitted successfully!'
       });
 
     } catch (error) {
@@ -603,7 +600,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => {
+  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction) => {
     try {
       setIsSubmitting(true);
       setFormErrors({});
@@ -624,15 +621,17 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
-      const effectiveFormData = isTestMode ? {
-        ...TEST_FORM_DATA,
+      const effectiveFormData = {
+        ...formData,
+        votingDuration,
         linkedInURL,
         submissionTimestamp: Date.now(),
-        submitter: address
-      } : formData;
+        submitter: address,
+        isTestMode: true
+      };
 
       console.log('Preparing data for IPFS submission:', { 
-        isTestMode,
+        isTestMode: true,
         effectiveFormData,
         linkedInURL,
         submitter: address,
@@ -652,7 +651,7 @@ const ThesisSubmission = () => {
       }
 
       const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : effectiveFormData.investment.targetCapital
+        formData.investment.targetCapital
       );
 
       const proposalConfig: ProposalConfig = {
@@ -676,8 +675,8 @@ const ThesisSubmission = () => {
         updateStepStatus('submission', 'completed');
 
         toast({
-          title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
-          description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
+          title: 'Test Proposal Submitted',
+          description: 'Your test investment thesis has been submitted successfully!'
         });
 
         // Store proposal in local storage
@@ -686,9 +685,10 @@ const ThesisSubmission = () => {
           hash: result.hash,
           ipfsHash,
           timestamp: new Date().toISOString(),
-          title: isTestMode ? TEST_FORM_DATA.title : effectiveFormData.title,
+          title: formData.title,
           targetCapital: targetCapitalWei.toString(),
-          status: 'pending'
+          status: 'pending',
+          isTestMode: true
         };
         userProposals.push(newProposal);
         localStorage.setItem('userProposals', JSON.stringify(userProposals));
