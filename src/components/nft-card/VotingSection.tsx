@@ -30,8 +30,8 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
 
     if (!pledgeAmount) {
       toast({
-        title: "Enter Pledge Amount",
-        description: "Please enter how much LGR you want to pledge as a commitment",
+        title: "Enter Commitment Amount",
+        description: "Please enter how much LGR you want to commit to this proposal",
         variant: "destructive",
       });
       return;
@@ -39,7 +39,7 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
 
     try {
       setIsVoting(true);
-      console.log('Starting vote process...');
+      console.log('Starting commitment recording process...');
 
       const walletProvider = await getProvider();
       console.log('Got wallet provider');
@@ -64,7 +64,7 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
       if (balance.lt(votingFee)) {
         toast({
           title: "Insufficient LGR Balance",
-          description: "You need at least 10 LGR tokens to cover the voting fee",
+          description: "You need 10 LGR to cover the voting fee to record your soft commitment",
           variant: "destructive",
         });
         return;
@@ -77,35 +77,35 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
       console.log('Voting fee approved');
 
       // Submit vote with pledge amount (not transferred, just recorded)
-      console.log('Submitting vote with pledge amount:', pledgeAmount, 'LGR');
+      console.log('Recording soft commitment amount:', pledgeAmount, 'LGR');
       const voteTx = await factory.vote(tokenId, ethers.utils.parseEther(pledgeAmount), {
         gasLimit: 500000
       });
       
       const receipt = await voteTx.wait();
-      console.log('Vote confirmed in block:', receipt.blockNumber);
+      console.log('Soft commitment confirmed in block:', receipt.blockNumber);
 
       toast({
-        title: "Vote Submitted Successfully",
-        description: `Pledged ${pledgeAmount} LGR (commitment only). Paid 10 LGR voting fee.`,
+        title: "Soft Commitment Recorded",
+        description: `Recorded ${pledgeAmount} LGR commitment. Paid 10 LGR voting fee.`,
       });
 
       setPledgeAmount("");
     } catch (error: any) {
-      console.error('Error voting:', error);
+      console.error('Error recording commitment:', error);
       
       // Provide more specific error messages
-      let errorMessage = "Failed to submit your vote. Please try again.";
+      let errorMessage = "Failed to record your soft commitment. Please try again.";
       if (error.message.includes("Voting fee transfer failed")) {
         errorMessage = "Failed to transfer voting fee. Please ensure you have 10 LGR available.";
       } else if (error.message.includes("Already voted")) {
-        errorMessage = "You have already voted on this proposal.";
+        errorMessage = "You have already recorded a commitment for this proposal.";
       } else if (error.message.includes("Voting period ended")) {
-        errorMessage = "The voting period for this proposal has ended.";
+        errorMessage = "The commitment period for this proposal has ended.";
       }
 
       toast({
-        title: "Error Voting",
+        title: "Error Recording Commitment",
         description: errorMessage,
         variant: "destructive",
       });
@@ -126,7 +126,7 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
       <div className="mt-4 space-y-4">
         <div className="space-y-2">
           <Label htmlFor="pledgeAmount" className="text-white/60">
-            Pledge Amount (LGR)
+            Commitment Amount (LGR)
           </Label>
           <Input
             id="pledgeAmount"
@@ -135,16 +135,16 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
             step="0.1"
             value={pledgeAmount}
             onChange={(e) => setPledgeAmount(e.target.value)}
-            placeholder="Enter LGR amount"
+            placeholder="Enter LGR amount you want to commit"
             className="bg-black/40 border-white/10 text-white"
           />
           <div className="space-y-1">
             <p className="text-sm text-white/60 flex items-center gap-2">
               <Info className="w-4 h-4" />
-              A 10 LGR voting fee will be charged to submit your vote
+              10 LGR voting fee will be charged to record your soft commitment
             </p>
             <p className="text-sm text-white/60 flex items-center gap-2 pl-6">
-              Your pledged amount is a commitment and will not be transferred
+              Your committed amount is a soft commitment and will not be transferred
             </p>
           </div>
         </div>
@@ -158,7 +158,7 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
             disabled={isVoting}
           >
             <ThumbsUp className="w-5 h-5" />
-            {isVoting ? "Submitting..." : "Submit Vote"}
+            {isVoting ? "Recording..." : "Record Commitment"}
           </Button>
           <Button
             variant="outline"
@@ -174,3 +174,4 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
     </>
   );
 };
+
