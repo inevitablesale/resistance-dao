@@ -111,24 +111,27 @@ const ProposalDetails = () => {
       const factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
       setLoadingProgress(40);
 
-      const proposal = await factoryContract.getProposal(tokenId);
+      console.log('Fetching proposal data for token ID:', tokenId);
+      const proposal = await factoryContract.proposals(tokenId);
       setLoadingProgress(60);
 
-      const proposalURI = await factoryContract.uri(tokenId);
+      console.log('Fetching proposal URI...');
+      const proposalURI = proposal.ipfsMetadata;
       setLoadingProgress(80);
 
+      console.log('Fetching metadata from IPFS:', proposalURI);
       const metadata = await getFromIPFS<ProposalMetadata>(proposalURI, "proposal");
       setLoadingProgress(90);
 
       return { 
         metadata,
         onChainData: {
-          pledgedAmount: proposal.pledgedAmount,
-          votingEndsAt: proposal.votingEndsAt.toNumber(),
-          backers: proposal.backers,
+          pledgedAmount: proposal.targetCapital,
+          votingEndsAt: proposal.votingEnds.toNumber(),
+          backers: [],
           creator: proposal.creator,
-          blockNumber: proposal.blockNumber,
-          transactionHash: proposal.transactionHash
+          blockNumber: 0,
+          transactionHash: ""
         }
       };
     } catch (error: any) {
