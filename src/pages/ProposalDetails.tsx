@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
@@ -39,6 +38,48 @@ import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 
+const getFirmSizeLabel = (size: FirmSize): string => {
+  const labels: Record<FirmSize, string> = {
+    [FirmSize.BELOW_1M]: "Below $1M",
+    [FirmSize.ONE_TO_FIVE_M]: "$1M - $5M",
+    [FirmSize.FIVE_TO_TEN_M]: "$5M - $10M",
+    [FirmSize.TEN_PLUS]: "$10M+"
+  };
+  return labels[size] || "Unknown";
+};
+
+const getDealTypeLabel = (type: DealType): string => {
+  const labels: Record<DealType, string> = {
+    [DealType.ACQUISITION]: "Acquisition",
+    [DealType.MERGER]: "Merger",
+    [DealType.EQUITY_BUYOUT]: "Equity Buyout",
+    [DealType.FRANCHISE]: "Franchise",
+    [DealType.SUCCESSION]: "Succession"
+  };
+  return labels[type] || "Unknown";
+};
+
+const getGeographicFocusLabel = (focus: GeographicFocus): string => {
+  const labels: Record<GeographicFocus, string> = {
+    [GeographicFocus.LOCAL]: "Local",
+    [GeographicFocus.REGIONAL]: "Regional",
+    [GeographicFocus.NATIONAL]: "National",
+    [GeographicFocus.REMOTE]: "Remote"
+  };
+  return labels[focus] || "Unknown";
+};
+
+const getPaymentTermLabel = (term: PaymentTerm): string => {
+  const labels: Record<PaymentTerm, string> = {
+    [PaymentTerm.CASH]: "Cash",
+    [PaymentTerm.SELLER_FINANCING]: "Seller Financing",
+    [PaymentTerm.EARNOUT]: "Earnout",
+    [PaymentTerm.EQUITY_ROLLOVER]: "Equity Rollover",
+    [PaymentTerm.BANK_FINANCING]: "Bank Financing"
+  };
+  return labels[term] || "Unknown";
+};
+
 interface ProposalDetails {
   metadata: ProposalMetadata;
   onChainData?: {
@@ -60,8 +101,6 @@ const ProposalDetails = () => {
   const { isConnected, connect } = useWalletConnection();
   const [proposalDetails, setProposalDetails] = useState<ProposalDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingChainData, setIsLoadingChainData] = useState(true);
-  const [isCheckingBalance, setIsCheckingBalance] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
   const { getProvider } = useWalletProvider();
@@ -72,7 +111,7 @@ const ProposalDetails = () => {
 
     try {
       const walletProvider = await getProvider();
-      const provider = walletProvider.provider; // Get the ethers provider from our WalletProvider
+      const provider = walletProvider.provider;
       const factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
       setLoadingProgress(40);
 
@@ -82,7 +121,7 @@ const ProposalDetails = () => {
       const proposalURI = await factoryContract.uri(tokenId);
       setLoadingProgress(80);
 
-      const metadata = await getFromIPFS<ProposalMetadata>(proposalURI);
+      const metadata = await getFromIPFS<ProposalMetadata>(proposalURI, "json");
       setLoadingProgress(90);
 
       return { 
@@ -174,7 +213,7 @@ const ProposalDetails = () => {
     );
   }
 
-  const { metadata, onChainData } = proposalDetails;
+  const { metadata, onChainData } = proposalDetails || { metadata: null, onChainData: null };
 
   return (
     <div className="min-h-screen bg-black">
@@ -194,7 +233,7 @@ const ProposalDetails = () => {
           <Card className="bg-black/40 border-white/10">
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-white">
-                {metadata.title}
+                {metadata?.title}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -206,17 +245,17 @@ const ProposalDetails = () => {
                     <div className="mt-2 space-y-2">
                       <div className="flex items-center gap-2">
                         <Badge variant="outline">
-                          {getFirmSizeLabel(metadata.firmCriteria.size)}
+                          {getFirmSizeLabel(metadata?.firmCriteria.size)}
                         </Badge>
                         <Badge variant="outline">
-                          {getDealTypeLabel(metadata.firmCriteria.dealType)}
+                          {getDealTypeLabel(metadata?.firmCriteria.dealType)}
                         </Badge>
                       </div>
                       <p className="text-white/60">
-                        Location: {metadata.firmCriteria.location}
+                        Location: {metadata?.firmCriteria.location}
                       </p>
                       <p className="text-white/60">
-                        Focus: {getGeographicFocusLabel(metadata.firmCriteria.geographicFocus)}
+                        Focus: {getGeographicFocusLabel(metadata?.firmCriteria.geographicFocus)}
                       </p>
                     </div>
                   </div>
@@ -224,7 +263,7 @@ const ProposalDetails = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-white">Payment Terms</h3>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      {metadata.paymentTerms.map((term, index) => (
+                      {metadata?.paymentTerms.map((term, index) => (
                         <Badge key={index} variant="outline">
                           {getPaymentTermLabel(term)}
                         </Badge>
@@ -240,16 +279,16 @@ const ProposalDetails = () => {
                     <div>
                       <p className="text-white/60">Target Capital</p>
                       <p className="text-xl font-bold text-white">
-                        {ethers.utils.formatEther(metadata.investment.targetCapital)} LGR
+                        {metadata?.investment.targetCapital && ethers.utils.formatEther(metadata.investment.targetCapital)} LGR
                       </p>
                     </div>
                     <div>
                       <p className="text-white/60">Investment Drivers</p>
-                      <p className="text-white">{metadata.investment.drivers}</p>
+                      <p className="text-white">{metadata?.investment.drivers}</p>
                     </div>
                     <div>
                       <p className="text-white/60">Additional Criteria</p>
-                      <p className="text-white">{metadata.investment.additionalCriteria}</p>
+                      <p className="text-white">{metadata?.investment.additionalCriteria}</p>
                     </div>
                   </div>
                 </div>
