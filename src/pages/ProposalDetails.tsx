@@ -5,7 +5,7 @@ import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS, LGR_PRICE_USD } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { 
@@ -36,7 +36,6 @@ import {
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
-import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 
 const getFirmSizeLabel = (size: FirmSize): string => {
   const labels: Record<FirmSize, string> = {
@@ -92,8 +91,6 @@ interface ProposalDetails {
   };
 }
 
-const MIN_LGR_REQUIRED = "1000000000000000000"; // 1 LGR in wei
-
 const ProposalDetails = () => {
   const { tokenId } = useParams();
   const navigate = useNavigate();
@@ -102,8 +99,7 @@ const ProposalDetails = () => {
   const [proposalDetails, setProposalDetails] = useState<ProposalDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
-
-  const { getProvider } = useWalletProvider();
+  const { getProvider, isSessionRestored } = useWalletProvider();
 
   const fetchProposalDetails = async (tokenId: string) => {
     setIsLoading(true);
@@ -150,12 +146,22 @@ const ProposalDetails = () => {
   };
 
   useEffect(() => {
+    if (!isSessionRestored) {
+      console.log('Waiting for session restoration...');
+      return;
+    }
+
     if (!tokenId) {
       toast({
         title: "Invalid Proposal ID",
         description: "Please provide a valid proposal ID.",
         variant: "destructive",
       });
+      return;
+    }
+
+    if (!isConnected) {
+      console.log('Wallet not connected, skipping proposal fetch');
       return;
     }
 
@@ -167,7 +173,25 @@ const ProposalDetails = () => {
     };
 
     loadProposalDetails();
-  }, [tokenId, toast]);
+  }, [tokenId, toast, isConnected, isSessionRestored]);
+
+  if (!isSessionRestored) {
+    return (
+      <div className="min-h-screen bg-black">
+        <div className="container mx-auto px-4 pt-32">
+          <Card className="bg-black/40 border-white/10">
+            <CardContent className="p-8 text-center">
+              <Loader2 className="w-12 h-12 text-yellow-500 mx-auto mb-4 animate-spin" />
+              <h2 className="text-2xl font-bold text-white mb-4">Initializing...</h2>
+              <p className="text-white/60 mb-6">
+                Please wait while we restore your wallet session.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (!isConnected) {
     return (
@@ -187,7 +211,6 @@ const ProposalDetails = () => {
             </CardContent>
           </Card>
         </div>
-        <LGRFloatingWidget />
       </div>
     );
   }
@@ -208,12 +231,11 @@ const ProposalDetails = () => {
             </CardContent>
           </Card>
         </div>
-        <LGRFloatingWidget />
       </div>
     );
   }
 
-  const { metadata, onChainData } = proposalDetails || { metadata: null, onChainData: null };
+  const { metadata, onChainData } = proposalDetails;
 
   return (
     <div className="min-h-screen bg-black">
@@ -233,7 +255,7 @@ const ProposalDetails = () => {
           <Card className="bg-black/40 border-white/10">
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-white">
-                {metadata?.title}
+                {metadata.title}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -245,17 +267,17 @@ const ProposalDetails = () => {
                     <div className="mt-2 space-y-2">
                       <div className="flex items-center gap-2">
                         <Badge variant="outline">
-                          {getFirmSizeLabel(metadata?.firmCriteria.size)}
+                          {getFirmSizeLabel(metadata.firmCriteria.size)}
                         </Badge>
                         <Badge variant="outline">
-                          {getDealTypeLabel(metadata?.firmCriteria.dealType)}
+                          {getDealTypeLabel(metadata.firmCriteria.dealType)}
                         </Badge>
                       </div>
                       <p className="text-white/60">
-                        Location: {metadata?.firmCriteria.location}
+                        Location: {metadata.firmCriteria.location}
                       </p>
                       <p className="text-white/60">
-                        Focus: {getGeographicFocusLabel(metadata?.firmCriteria.geographicFocus)}
+                        Focus: {getGeographicFocusLabel(metadata.firmCriteria.geographicFocus)}
                       </p>
                     </div>
                   </div>
@@ -263,7 +285,7 @@ const ProposalDetails = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-white">Payment Terms</h3>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      {metadata?.paymentTerms.map((term, index) => (
+                      {metadata.paymentTerms.map((term, index) => (
                         <Badge key={index} variant="outline">
                           {getPaymentTermLabel(term)}
                         </Badge>
@@ -279,16 +301,16 @@ const ProposalDetails = () => {
                     <div>
                       <p className="text-white/60">Target Capital</p>
                       <p className="text-xl font-bold text-white">
-                        {metadata?.investment.targetCapital && ethers.utils.formatEther(metadata.investment.targetCapital)} LGR
+                        {metadata.investment.targetCapital && ethers.utils.formatEther(metadata.investment.targetCapital)} LGR
                       </p>
                     </div>
                     <div>
                       <p className="text-white/60">Investment Drivers</p>
-                      <p className="text-white">{metadata?.investment.drivers}</p>
+                      <p className="text-white">{metadata.investment.drivers}</p>
                     </div>
                     <div>
                       <p className="text-white/60">Additional Criteria</p>
-                      <p className="text-white">{metadata?.investment.additionalCriteria}</p>
+                      <p className="text-white">{metadata.investment.additionalCriteria}</p>
                     </div>
                   </div>
                 </div>
@@ -297,7 +319,6 @@ const ProposalDetails = () => {
           </Card>
         </div>
       </div>
-      <LGRFloatingWidget />
     </div>
   );
 };
