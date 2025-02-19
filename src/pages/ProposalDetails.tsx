@@ -13,7 +13,8 @@ import {
   ProposalMetadata, 
   FirmSize, 
   DealType, 
-  GeographicFocus 
+  GeographicFocus, 
+  PaymentTerm 
 } from "@/types/proposals";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -64,6 +65,17 @@ const getGeographicFocusLabel = (focus: GeographicFocus): string => {
     [GeographicFocus.REMOTE]: "Remote"
   };
   return focusMap[focus] || "Unknown";
+};
+
+const getPaymentTermLabel = (term: PaymentTerm): string => {
+  const termMap: Record<PaymentTerm, string> = {
+    [PaymentTerm.CASH]: "Cash",
+    [PaymentTerm.SELLER_FINANCING]: "Seller Financing",
+    [PaymentTerm.EARNOUT]: "Earnout",
+    [PaymentTerm.EQUITY_ROLLOVER]: "Equity Rollover",
+    [PaymentTerm.BANK_FINANCING]: "Bank Financing"
+  };
+  return termMap[term] || "Unknown";
 };
 
 const ProposalDetails = () => {
@@ -571,8 +583,23 @@ const ProposalDetails = () => {
                         {metadata.firmCriteria.location}
                       </Badge>
                       <Badge variant="outline" className="text-white/80">
-                        {metadata.firmCriteria.geographicFocus}
+                        {getGeographicFocusLabel(metadata.firmCriteria.geographicFocus)}
                       </Badge>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-4">Payment Terms</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {metadata.paymentTerms.map((term, index) => (
+                        <Badge 
+                          key={index}
+                          variant="outline" 
+                          className="text-purple-400 border-purple-400"
+                        >
+                          {getPaymentTermLabel(term)}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
                 </div>
