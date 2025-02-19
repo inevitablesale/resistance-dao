@@ -141,7 +141,7 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
 
         console.log(`Getting proposal data for token #${tokenId}`);
         const [proposal, pledged] = await Promise.all([
-          factoryContract.proposals(tokenId),
+          factoryContract.getProposal(tokenId),
           factoryContract.pledgedAmount(tokenId)
         ]);
         setLoadingProgress(60);
