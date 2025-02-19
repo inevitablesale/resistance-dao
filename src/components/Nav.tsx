@@ -7,7 +7,7 @@ import Twitter from "./icons/Twitter";
 import Linked from "./icons/Linked";
 
 const Nav = () => {
-  const { primaryWallet, setShowOnRamp } = useDynamicContext();
+  const { primaryWallet } = useDynamicContext();
   const { toast } = useToast();
   const location = useLocation();
   const hasWallet = !!primaryWallet?.address;
@@ -51,7 +51,9 @@ const Nav = () => {
             >
               <Linked className="w-5 h-5" />
             </a>
-            <DynamicWidget />
+            <div className="relative">
+              <DynamicWidget dropdownVariant="detached" />
+            </div>
           </div>
         </div>
       </div>
