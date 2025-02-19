@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, Users, Target } from "lucide-react";
@@ -89,6 +90,8 @@ export const ProposalsHistory = () => {
       try {
         setIsLoading(true);
         const walletProvider = await getProvider();
+        console.log('Initializing contract to fetch proposals...');
+        
         const contract = new ethers.Contract(
           FACTORY_ADDRESS,
           FACTORY_ABI,
@@ -102,27 +105,40 @@ export const ProposalsHistory = () => {
         const proposalsWithMetadata = await Promise.all(
           events.map(async (event) => {
             const tokenId = event.args?.tokenId.toString();
+            console.log(`\n--- Processing token #${tokenId} ---`);
             console.log(`Fetching proposal data for token #${tokenId}`);
 
             try {
+              console.log(`Getting tokenURI and pledged amount for #${tokenId}...`);
               const [tokenUri, pledgedAmount] = await Promise.all([
                 contract.tokenURI(tokenId),
                 contract.pledgedAmount(tokenId)
               ]);
 
               console.log(`NFT metadata URI for token #${tokenId}:`, tokenUri);
+              console.log(`Pledged amount for token #${tokenId}:`, ethers.utils.formatEther(pledgedAmount));
 
               let metadata: ProposalMetadata | undefined;
-              if (tokenUri && tokenUri.startsWith('ipfs://')) {
+              if (tokenUri) {
                 try {
+                  console.log(`Starting IPFS fetch for token #${tokenId}`);
+                  const ipfsHash = tokenUri.replace('ipfs://', '');
+                  console.log(`IPFS hash for token #${tokenId}:`, ipfsHash);
+                  
                   metadata = await getFromIPFS<ProposalMetadata>(
-                    tokenUri.replace('ipfs://', ''),
+                    ipfsHash,
                     'proposal'
                   );
-                  console.log(`IPFS metadata fetched for #${tokenId}:`, metadata);
-                } catch (ipfsError) {
-                  console.error(`Error fetching IPFS metadata for proposal #${tokenId}:`, ipfsError);
+                  console.log(`Successfully fetched IPFS data for token #${tokenId}:`, metadata);
+                } catch (ipfsError: any) {
+                  console.error(`Error fetching IPFS metadata for proposal #${tokenId}:`, {
+                    error: ipfsError,
+                    message: ipfsError.message,
+                    stack: ipfsError.stack
+                  });
                 }
+              } else {
+                console.warn(`No tokenURI found for token #${tokenId}`);
               }
 
               const proposalEvent: ProposalEvent = {
@@ -134,9 +150,14 @@ export const ProposalsHistory = () => {
                 pledgedAmount: ethers.utils.formatEther(pledgedAmount)
               };
 
+              console.log(`Completed processing token #${tokenId}:`, proposalEvent);
               return proposalEvent;
-            } catch (error) {
-              console.error(`Error fetching data for proposal #${tokenId}:`, error);
+            } catch (error: any) {
+              console.error(`Error processing token #${tokenId}:`, {
+                error,
+                message: error.message,
+                stack: error.stack
+              });
               return {
                 tokenId,
                 creator: event.args?.creator,
@@ -147,11 +168,15 @@ export const ProposalsHistory = () => {
           })
         );
 
+        console.log('All proposals processed. Final result:', proposalsWithMetadata);
         proposalsWithMetadata.sort((a, b) => b.blockNumber - a.blockNumber);
-        console.log('Processed proposals with metadata:', proposalsWithMetadata);
         setProposalEvents(proposalsWithMetadata);
-      } catch (error) {
-        console.error("Error fetching proposals:", error);
+      } catch (error: any) {
+        console.error("Error fetching proposals:", {
+          error,
+          message: error.message,
+          stack: error.stack
+        });
         toast({
           title: "Error",
           description: "Failed to load proposals. Please try again.",
