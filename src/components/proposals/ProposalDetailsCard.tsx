@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -35,7 +34,7 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
   const formatUSDAmount = (lgrAmount: string): string => {
     const amount = parseFloat(lgrAmount);
     if (isNaN(amount)) return "$0.00";
-    const LGR_PRICE_USD = 0.10; // Hardcoded price as per your constants
+    const LGR_PRICE_USD = 0.10;
     const usdAmount = amount * LGR_PRICE_USD;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -45,19 +44,33 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
 
   useEffect(() => {
     const checkLGRBalance = async () => {
-      if (!isConnected || !address) {
+      console.log('Checking LGR balance...', { isConnected, address });
+      
+      if (!isConnected) {
+        console.log('Not connected, skipping LGR check');
+        setHasMinimumLGR(null);
+        return;
+      }
+
+      if (!address) {
+        console.log('No address available, skipping LGR check');
         setHasMinimumLGR(null);
         return;
       }
 
       try {
+        console.log('Getting wallet provider...');
         const walletProvider = await getProvider();
+        console.log('Wallet provider obtained, checking balance...');
+        
         const balance = await getTokenBalance(
           walletProvider.provider,
           LGR_TOKEN_ADDRESS,
           address
         );
 
+        console.log('Balance retrieved:', balance);
+        
         const hasEnough = ethers.utils.parseEther(balance).gte(
           ethers.utils.parseEther(MIN_LGR_REQUIRED)
         );
@@ -71,21 +84,42 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
         setHasMinimumLGR(hasEnough);
       } catch (error) {
         console.error("Error checking LGR balance:", error);
+        toast({
+          title: "Error Checking Balance",
+          description: "Failed to verify your LGR balance. Please try again.",
+          variant: "destructive",
+        });
+        setHasMinimumLGR(null);
       }
     };
 
     checkLGRBalance();
-  }, [isConnected, address, getProvider]);
+  }, [isConnected, address, getProvider, toast]);
 
   useEffect(() => {
-    if (!tokenId || !isConnected || !hasMinimumLGR) {
-      if (!tokenId) {
-        toast({
-          title: "Invalid Proposal ID",
-          description: "Please provide a valid proposal ID.",
-          variant: "destructive",
-        });
-      }
+    console.log('Proposal details effect running...', {
+      tokenId,
+      isConnected,
+      hasMinimumLGR
+    });
+
+    if (!tokenId) {
+      console.log('No token ID provided');
+      toast({
+        title: "Invalid Proposal ID",
+        description: "Please provide a valid proposal ID.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isConnected) {
+      console.log('Wallet not connected');
+      return;
+    }
+
+    if (hasMinimumLGR === false) {
+      console.log('Insufficient LGR balance');
       return;
     }
 
@@ -94,8 +128,9 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
       setLoadingProgress(20);
 
       try {
+        console.log('Getting wallet provider...');
         const walletProvider = await getProvider();
-        console.log('Initializing contract to fetch proposal details...');
+        console.log('Initializing contract...');
         
         const factoryContract = new ethers.Contract(
           FACTORY_ADDRESS,
@@ -115,7 +150,11 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
         console.log('Pledged amount:', ethers.utils.formatEther(pledged));
         setPledgedAmount(ethers.utils.formatEther(pledged));
 
-        console.log('Fetching IPFS metadata for hash:', proposal.ipfsMetadata);
+        if (!proposal.ipfsMetadata) {
+          throw new Error('No IPFS metadata found for proposal');
+        }
+
+        console.log('Fetching IPFS metadata:', proposal.ipfsMetadata);
         const metadata = await getFromIPFS<ProposalMetadata>(proposal.ipfsMetadata, "proposal");
         setLoadingProgress(90);
 
