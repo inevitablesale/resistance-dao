@@ -1,4 +1,3 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -28,7 +27,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { subscribeToProposalEvents, waitForProposalCreation, EventConfig } from "@/services/eventListenerService";
+import { subscribeToProposalEvents, waitForProposalCreation } from "@/services/eventListenerService";
 import { 
   FirmSize, 
   DealType, 
@@ -821,3 +820,21 @@ const ThesisSubmission = () => {
                         {formErrors.title && (
                           <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
                         )}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </Card>
+          </div>
+        </div>
+
+        <div className="mt-12">
+          {renderContinueButton(handleContinue, activeStep === 'thesis')}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
