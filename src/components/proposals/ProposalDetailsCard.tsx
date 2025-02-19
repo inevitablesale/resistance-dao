@@ -10,12 +10,12 @@ import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata, FirmSize, DealType, GeographicFocus, PaymentTerm } from "@/types/proposals";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ExternalLink, Users, Target, Coins, Info } from "lucide-react";
+import { ExternalLink, Users, Target, Coins, Info, Clock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { getTokenBalance } from "@/services/tokenService";
-import { format } from "date-fns";
+import { format, formatDistanceToNow, isPast } from "date-fns";
 
 const MIN_LGR_REQUIRED = "1";
 
@@ -100,6 +100,8 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
   const [backerCount, setBackerCount] = useState(0);
   const [pledgeInput, setPledgeInput] = useState("");
   const [isPledging, setIsPledging] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
+  const [isVotingEnded, setIsVotingEnded] = useState(false);
   const VOTING_FEE = ethers.utils.parseEther("10");
 
   const formatUSDAmount = (lgrAmount: string): string => {
@@ -261,6 +263,27 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
     fetchProposalDetails();
   }, [tokenId, isConnected, hasMinimumLGR, getProvider, toast]);
+
+  useEffect(() => {
+    if (proposalDetails?.submissionTimestamp && proposalDetails?.votingDuration) {
+      const updateTimeRemaining = () => {
+        const endTimestamp = proposalDetails.submissionTimestamp + (proposalDetails.votingDuration * 1000);
+        const endDate = new Date(endTimestamp);
+        
+        if (isPast(endDate)) {
+          setIsVotingEnded(true);
+          setTimeRemaining("Voting has ended");
+        } else {
+          setIsVotingEnded(false);
+          setTimeRemaining(formatDistanceToNow(endDate, { addSuffix: true }));
+        }
+      };
+
+      updateTimeRemaining();
+      const timer = setInterval(updateTimeRemaining, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [proposalDetails]);
 
   const handlePledge = async () => {
     if (!tokenId || !isConnected || !pledgeInput) return;
@@ -425,6 +448,12 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   <Info className="w-4 h-4" />
                   Make a soft commitment to show your interest
                 </p>
+                <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5">
+                  <Clock className="w-4 h-4 text-yellow-500" />
+                  <span className={`text-sm ${isVotingEnded ? 'text-red-400' : 'text-yellow-400'}`}>
+                    {timeRemaining}
+                  </span>
+                </div>
               </div>
               <div className="text-center md:text-right">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm">
