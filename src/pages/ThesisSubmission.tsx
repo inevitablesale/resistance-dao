@@ -51,53 +51,39 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
-const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
-const FACTORY_ABI = ["function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)", "function submissionFee() public view returns (uint256)", "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"];
-const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
-const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
+// Constants
 const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
 const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
 const SUBMISSION_FEE = ethers.utils.parseEther("250");
 const VOTING_FEE = ethers.utils.parseEther("10");
 const MAX_STRATEGIES_PER_CATEGORY = 3;
-const MAX_SUMMARY_LENGTH = 500;
-const MAX_PAYMENT_TERMS = 5;
+const MIN_TITLE_LENGTH = 10;
+const MAX_TITLE_LENGTH = 100;
+const MIN_DRIVERS_LENGTH = 50;
+const MAX_DRIVERS_LENGTH = 500;
+const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
-interface SubmissionStep {
-  id: string;
-  title: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  description: string;
-}
-
-const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
-
-const SUBMISSION_STEPS: SubmissionStep[] = [{
+const SUBMISSION_STEPS = [{
   id: 'thesis',
   title: 'Investment Thesis',
   status: 'pending',
   description: 'Fill out your investment thesis details'
+}, {
+  id: 'firm',
+  title: 'Firm Details',
+  status: 'pending',
+  description: 'Define your target firm criteria'
 }, {
   id: 'strategy',
   title: 'Strategy Selection',
   status: 'pending',
   description: 'Select your post-acquisition strategies'
 }, {
-  id: 'approval',
-  title: 'Token Approval',
+  id: 'terms',
+  title: 'Payment Terms',
   status: 'pending',
-  description: 'Approve LGR tokens for submission'
-}, {
-  id: 'submission',
-  title: 'Thesis Submission',
-  status: 'pending',
-  description: 'Submit your thesis to the blockchain'
+  description: 'Define your payment structure'
 }];
-
-const isValidLinkedInURL = (url: string): boolean => {
-  return url.startsWith('https://www.linkedin.com/') || url.startsWith('https://linkedin.com/');
-};
 
 const ThesisSubmission = () => {
   const navigate = useNavigate();
@@ -117,9 +103,11 @@ const ThesisSubmission = () => {
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
   const [activeStep, setActiveStep] = useState<string>('thesis');
-  const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
+  const [steps, setSteps] = useState(SUBMISSION_STEPS);
   const [currentTxHash, setCurrentTxHash] = useState<string | null>(null);
-  const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
+  const [votingDuration, setVotingDuration] = useState(MIN_VOTING_DURATION);
+  
+  // Initialize form data with test mode flag matching constant
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     firmCriteria: {
@@ -141,9 +129,15 @@ const ThesisSubmission = () => {
     },
     votingDuration: MIN_VOTING_DURATION,
     linkedInURL: "",
-    isTestMode: false
+    isTestMode: true // Matching the constant
   });
 
+  // Clear form errors when changing steps
+  useEffect(() => {
+    setFormErrors({});
+  }, [activeStep]);
+
+  // LinkedIn URL validation
   useEffect(() => {
     const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
     if (!linkedInURL && isConnected) {
@@ -164,7 +158,7 @@ const ThesisSubmission = () => {
       }));
       return false;
     }
-    if (!isValidLinkedInURL(linkedInURL)) {
+    if (!linkedInURL.startsWith('https://www.linkedin.com/') && !linkedInURL.startsWith('https://linkedin.com/')) {
       setFormErrors(prev => ({
         ...prev,
         linkedInURL: ['Invalid LinkedIn URL format. Please update it in your wallet settings.']
@@ -174,7 +168,7 @@ const ThesisSubmission = () => {
     return true;
   };
 
-  const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
+  const updateStepStatus = (stepId: string, status: 'pending' | 'processing' | 'completed' | 'failed') => {
     setSteps(prev => prev.map(step => step.id === stepId ? {
       ...step,
       status
@@ -205,73 +199,21 @@ const ThesisSubmission = () => {
     }));
   };
 
-  const handleFormDataChange = (field: string, value: any) => {
-    setFormData(prev => {
-      const newData = { ...prev };
-      const fields = field.split('.');
-      let current: any = newData;
-      
-      for (let i = 0; i < fields.length - 1; i++) {
-        if (!current[fields[i]]) {
-          current[fields[i]] = {};
-        }
-        current = current[fields[i]];
-      }
-      
-      const lastField = fields[fields.length - 1];
-      
-      if (field === 'firmCriteria.size') {
-        current[lastField] = Number(value) as FirmSize;
-      } else if (field === 'firmCriteria.dealType') {
-        current[lastField] = Number(value) as DealType;
-      } else if (field === 'firmCriteria.geographicFocus') {
-        current[lastField] = Number(value) as GeographicFocus;
-      } else if (field.startsWith('strategies.')) {
-        current[lastField] = value;
-      } else {
-        current[lastField] = value;
-      }
-      
-      return newData;
-    });
-  };
-
-  const handleVotingDurationChange = (value: number[]) => {
-    setVotingDuration(value[0]);
-  };
-
-  const getButtonText = () => {
-    if (isSubmitting) {
-      return <div className="flex items-center justify-center">
-          <span className="mr-2">Submitting...</span>
-          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
-        </div>;
-    }
-    switch (activeStep) {
-      case 'thesis':
-        return "Continue to Firm Details";
-      case 'strategy':
-        return "Continue to Terms";
-      case 'terms':
-        return "Submit Investment Thesis";
-      default:
-        return "Continue";
-    }
-  };
-
   const validateBasicsTab = (): boolean => {
     const errors: Record<string, string[]> = {};
-    if (!formData.title || formData.title.trim().length < 10) {
-      errors.title = ['Title must be at least 10 characters long'];
+    if (!formData.title || formData.title.trim().length < MIN_TITLE_LENGTH) {
+      errors.title = [`Title must be at least ${MIN_TITLE_LENGTH} characters long`];
     }
-    if (formData.title.trim().length > 100) {
-      errors.title = ['Title must not exceed 100 characters'];
+    if (formData.title.trim().length > MAX_TITLE_LENGTH) {
+      errors.title = [`Title must not exceed ${MAX_TITLE_LENGTH} characters`];
     }
     if (!formData.investment.targetCapital) {
       errors['investment.targetCapital'] = ['Target capital is required'];
     } else {
       try {
         const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
+        const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
+        const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
         if (targetCapitalWei.lt(MIN_TARGET_CAPITAL)) {
           errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} LGR`];
         }
@@ -282,11 +224,11 @@ const ThesisSubmission = () => {
         errors['investment.targetCapital'] = ['Invalid target capital amount'];
       }
     }
-    if (!formData.investment.drivers || formData.investment.drivers.trim().length < 50) {
-      errors['investment.drivers'] = ['Investment drivers must be at least 50 characters'];
+    if (!formData.investment.drivers || formData.investment.drivers.trim().length < MIN_DRIVERS_LENGTH) {
+      errors['investment.drivers'] = [`Investment drivers must be at least ${MIN_DRIVERS_LENGTH} characters`];
     }
-    if (formData.investment.drivers.trim().length > 500) {
-      errors['investment.drivers'] = ['Investment drivers must not exceed 500 characters'];
+    if (formData.investment.drivers.trim().length > MAX_DRIVERS_LENGTH) {
+      errors['investment.drivers'] = [`Investment drivers must not exceed ${MAX_DRIVERS_LENGTH} characters`];
     }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -337,8 +279,8 @@ const ThesisSubmission = () => {
     if (!formData.paymentTerms.length) {
       errors.paymentTerms = ['Please select at least one payment term'];
     }
-    if (formData.paymentTerms.length > MAX_PAYMENT_TERMS) {
-      errors.paymentTerms = [`Maximum of ${MAX_PAYMENT_TERMS} payment terms allowed`];
+    if (formData.paymentTerms.length > 5) {
+      errors.paymentTerms = [`Maximum of 5 payment terms allowed`];
     }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -359,71 +301,25 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleStepChange = (newStep: string) => {
-    const currentValidator = getCurrentValidator();
-    if (currentValidator()) {
-      updateStepStatus(activeStep, 'completed');
-      setActiveStep(newStep);
-    } else {
-      toast({
-        title: "Validation Error",
-        description: "Please complete all required fields before proceeding",
-        variant: "destructive"
-      });
-    }
+  const handleFormDataChange = (field: keyof ProposalMetadata | string, value: any) => {
+    setFormData(prev => {
+      const newData = { ...prev };
+      const fields = field.split('.');
+      let current: any = newData;
+      
+      for (let i = 0; i < fields.length - 1; i++) {
+        if (!current[fields[i]]) {
+          current[fields[i]] = {};
+        }
+        current = current[fields[i]];
+      }
+      
+      const lastField = fields[fields.length - 1];
+      current[lastField] = value;
+      
+      return newData;
+    });
   };
-
-  const renderSteps = () => (
-    SUBMISSION_STEPS.map((step, index) => (
-      <div 
-        key={step.id}
-        className={cn(
-          "relative",
-          index !== SUBMISSION_STEPS.length - 1 && "pb-8 after:absolute after:left-5 after:top-8 after:h-full after:w-0.5",
-          step.status === 'completed' ? "after:bg-yellow-500" : "after:bg-white/10"
-        )}
-      >
-        <button
-          onClick={() => handleStepChange(step.id)}
-          className={cn(
-            "flex items-start gap-4 w-full rounded-lg p-4 transition-colors",
-            step.id === activeStep ? "bg-white/5" : "hover:bg-white/5",
-            formErrors && Object.keys(formErrors).length > 0 && step.id === activeStep ? "border border-red-500/50" : ""
-          )}
-        >
-          <div className={cn(
-            "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
-            step.status === 'completed' ? "bg-yellow-500 text-white" :
-            step.status === 'processing' ? "bg-teal-500 text-white animate-pulse" :
-            step.id === activeStep ? "bg-yellow-500/20 text-yellow-500 border border-yellow-500" :
-            "bg-white/5 text-white/40"
-          )}>
-            {step.status === 'completed' ? (
-              <Check className="w-5 h-5" />
-            ) : (
-              index + 1
-            )}
-          </div>
-          <div className="text-left">
-            <p className={cn(
-              "font-medium",
-              step.id === activeStep ? "text-white" : "text-white/60"
-            )}>
-              {step.title}
-            </p>
-            <p className="text-sm text-white/40">
-              {step.description}
-            </p>
-            {formErrors && Object.keys(formErrors).length > 0 && step.id === activeStep && (
-              <p className="text-sm text-red-400 mt-2">
-                Please fix validation errors before proceeding
-              </p>
-            )}
-          </div>
-        </button>
-      </div>
-    ))
-  );
 
   const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -438,21 +334,18 @@ const ThesisSubmission = () => {
       return;
     }
 
-    switch (activeStep) {
-      case 'thesis':
-        handleStepChange('firm');
-        break;
-      case 'firm':
-        handleStepChange('strategy');
-        break;
-      case 'strategy':
-        handleStepChange('terms');
-        break;
-      case 'terms':
-        if (validateTermsTab()) {
-          handleSubmit(e);
-        }
-        break;
+    const nextStepMap: Record<string, string> = {
+      'thesis': 'firm',
+      'firm': 'strategy',
+      'strategy': 'terms'
+    };
+
+    const nextStep = nextStepMap[activeStep];
+    if (nextStep) {
+      updateStepStatus(activeStep, 'completed');
+      setActiveStep(nextStep);
+    } else if (activeStep === 'terms' && validateTermsTab()) {
+      handleSubmit(e);
     }
   };
 
@@ -697,6 +590,58 @@ const ThesisSubmission = () => {
 
   const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(SUBMISSION_FEE));
 
+  const renderSteps = () => (
+    SUBMISSION_STEPS.map((step, index) => (
+      <div 
+        key={step.id}
+        className={cn(
+          "relative",
+          index !== SUBMISSION_STEPS.length - 1 && "pb-8 after:absolute after:left-5 after:top-8 after:h-full after:w-0.5",
+          step.status === 'completed' ? "after:bg-yellow-500" : "after:bg-white/10"
+        )}
+      >
+        <button
+          onClick={() => handleContinue(new Event('click') as any)}
+          className={cn(
+            "flex items-start gap-4 w-full rounded-lg p-4 transition-colors",
+            step.id === activeStep ? "bg-white/5" : "hover:bg-white/5",
+            formErrors && Object.keys(formErrors).length > 0 && step.id === activeStep ? "border border-red-500/50" : ""
+          )}
+        >
+          <div className={cn(
+            "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
+            step.status === 'completed' ? "bg-yellow-500 text-white" :
+            step.status === 'processing' ? "bg-teal-500 text-white animate-pulse" :
+            step.id === activeStep ? "bg-yellow-500/20 text-yellow-500 border border-yellow-500" :
+            "bg-white/5 text-white/40"
+          )}>
+            {step.status === 'completed' ? (
+              <Check className="w-5 h-5" />
+            ) : (
+              index + 1
+            )}
+          </div>
+          <div className="text-left">
+            <p className={cn(
+              "font-medium",
+              step.id === activeStep ? "text-white" : "text-white/60"
+            )}>
+              {step.title}
+            </p>
+            <p className="text-sm text-white/40">
+              {step.description}
+            </p>
+            {formErrors && Object.keys(formErrors).length > 0 && step.id === activeStep && (
+              <p className="text-sm text-red-400 mt-2">
+                Please fix validation errors before proceeding
+              </p>
+            )}
+          </div>
+        </button>
+      </div>
+    ))
+  );
+
   const renderContinueButton = (
     onClick: (e: React.MouseEvent<HTMLButtonElement>) => void,
     isLastSection: boolean = false
@@ -830,7 +775,7 @@ const ThesisSubmission = () => {
         </div>
 
         <div className="mt-12">
-          {renderContinueButton(handleContinue, activeStep === 'thesis')}
+          {renderContinueButton(handleContinue, activeStep === 'terms')}
         </div>
       </div>
     </div>
