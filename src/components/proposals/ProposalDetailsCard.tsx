@@ -440,20 +440,22 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
           <div className="relative">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
               <div>
-                <h3 className="text-2xl font-semibold text-white mb-2 flex items-center gap-2">
-                  <Coins className="w-6 h-6 text-yellow-500" />
-                  Support This Proposal
-                </h3>
+                <div className="flex items-center gap-3 mb-4">
+                  <h3 className="text-2xl font-semibold text-white flex items-center gap-2">
+                    <Coins className="w-6 h-6 text-yellow-500" />
+                    Support This Proposal
+                  </h3>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 backdrop-blur-sm border border-yellow-500/20">
+                    <Clock className="w-5 h-5 text-yellow-500" />
+                    <span className={`text-lg font-medium ${isVotingEnded ? 'text-red-400' : 'text-yellow-500'}`}>
+                      {timeRemaining}
+                    </span>
+                  </div>
+                </div>
                 <p className="text-white/60 text-sm flex items-center gap-1">
                   <Info className="w-4 h-4" />
                   Make a soft commitment to show your interest
                 </p>
-                <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5">
-                  <Clock className="w-4 h-4 text-yellow-500" />
-                  <span className={`text-sm ${isVotingEnded ? 'text-red-400' : 'text-yellow-400'}`}>
-                    {timeRemaining}
-                  </span>
-                </div>
               </div>
               <div className="text-center md:text-right">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm">
