@@ -6,14 +6,15 @@ import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS, LGR_PRICE_USD } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { StoredProposal, ProposalMetadata } from "@/types/proposals";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HandCoins, Clock, Users, ChevronLeft, Wallet, AlertCircle } from "lucide-react";
+import { HandCoins, Clock, Users, ChevronLeft, Wallet, AlertCircle, DollarSign } from "lucide-react";
 import { getTokenBalance } from "@/services/tokenService";
+import { Progress } from "@/components/ui/progress";
 
 interface ProposalDetails {
   metadata: ProposalMetadata;
@@ -33,10 +34,29 @@ const ProposalDetails = () => {
   const [isLoadingChainData, setIsLoadingChainData] = useState(false);
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
   const [isCheckingBalance, setIsCheckingBalance] = useState(false);
+  const [loadingStage, setLoadingStage] = useState<string>("");
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const { getProvider } = useWalletProvider();
   const { isConnected, connect, address } = useWalletConnection();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Loading stages tracking
+  useEffect(() => {
+    if (isCheckingBalance) {
+      setLoadingStage("Checking LGR Balance...");
+      setLoadingProgress(25);
+    } else if (isLoading) {
+      setLoadingStage("Loading proposal metadata...");
+      setLoadingProgress(50);
+    } else if (isLoadingChainData) {
+      setLoadingStage("Fetching on-chain data...");
+      setLoadingProgress(75);
+    } else if (proposalDetails) {
+      setLoadingStage("Complete");
+      setLoadingProgress(100);
+    }
+  }, [isCheckingBalance, isLoading, isLoadingChainData, proposalDetails]);
 
   // Check LGR balance when wallet is connected
   useEffect(() => {
@@ -48,6 +68,8 @@ const ProposalDetails = () => {
 
       try {
         setIsCheckingBalance(true);
+        console.log('Starting LGR balance check for address:', address);
+        
         const walletProvider = await getProvider();
         const balance = await getTokenBalance(
           walletProvider.provider,
@@ -116,7 +138,6 @@ const ProposalDetails = () => {
         walletProvider.provider
       );
 
-      // Get the tokenURI from the contract
       const tokenUri = await contract.tokenURI(tokenId);
       console.log('NFT metadata URI:', tokenUri);
 
@@ -206,6 +227,27 @@ const ProposalDetails = () => {
     }
   };
 
+  const calculateProgress = () => {
+    if (!proposalDetails?.onChainData?.pledgedAmount || !proposalDetails.metadata.investment.targetCapital) {
+      return 0;
+    }
+    
+    const pledged = Number(ethers.utils.formatEther(proposalDetails.onChainData.pledgedAmount));
+    const target = Number(ethers.utils.formatEther(proposalDetails.metadata.investment.targetCapital));
+    return Math.min((pledged / target) * 100, 100);
+  };
+
+  const formatUSDValue = (lgrAmount: string) => {
+    const amount = Number(ethers.utils.formatEther(lgrAmount));
+    const usdValue = amount * LGR_PRICE_USD;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(usdValue);
+  };
+
   if (!isConnected) {
     return (
       <div className="container mx-auto px-4 pt-32">
@@ -226,16 +268,21 @@ const ProposalDetails = () => {
     );
   }
 
-  if (isCheckingBalance) {
+  if (isCheckingBalance || isLoading || isLoadingChainData) {
     return (
       <div className="container mx-auto px-4 pt-32">
         <Card className="bg-black/40 border-white/10">
-          <CardContent className="p-8 text-center">
-            <div className="animate-spin w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-4">Checking LGR Balance</h2>
-            <p className="text-white/60">
-              Verifying your LGR token balance...
-            </p>
+          <CardContent className="p-8">
+            <div className="space-y-4">
+              <div className="flex items-center justify-center mb-6">
+                <div className="animate-spin w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full" />
+              </div>
+              <h2 className="text-2xl font-bold text-white text-center mb-4">{loadingStage}</h2>
+              <Progress value={loadingProgress} className="w-full bg-white/10" />
+              <p className="text-white/60 text-center">
+                Please wait while we load the proposal details...
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -254,18 +301,6 @@ const ProposalDetails = () => {
             </p>
           </CardContent>
         </Card>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 pt-32">
-        <div className="space-y-4">
-          <Skeleton className="h-8 w-[200px]" />
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-24 w-full" />
-        </div>
       </div>
     );
   }
@@ -298,20 +333,6 @@ const ProposalDetails = () => {
             <ChevronLeft className="w-4 h-4 mr-2" />
             Back to Proposals
           </Button>
-
-          {!isConnected && (
-            <Card className="bg-yellow-500/10 border-yellow-500/20 mb-6">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <p className="text-yellow-200">Connect your wallet to view on-chain data and interact with this proposal</p>
-                  <Button onClick={connect} className="bg-yellow-500 hover:bg-yellow-600">
-                    <Wallet className="w-4 h-4 mr-2" />
-                    Connect Wallet
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           <div className="grid gap-8">
             <Card className="bg-black/40 border-white/10">
@@ -347,11 +368,35 @@ const ProposalDetails = () => {
                         </div>
                         <div>
                           <p className="text-sm text-white/60">Target Capital</p>
-                          <p className="text-xl font-bold text-white">
-                            {ethers.utils.formatEther(metadata.investment.targetCapital)} LGR
-                          </p>
+                          <div className="space-y-1">
+                            <p className="text-xl font-bold text-white">
+                              {ethers.utils.formatEther(metadata.investment.targetCapital)} LGR
+                            </p>
+                            <p className="text-sm text-yellow-500">
+                              ≈ {formatUSDValue(metadata.investment.targetCapital)}
+                            </p>
+                          </div>
                         </div>
                       </div>
+                      {onChainData && (
+                        <div className="mt-4">
+                          <div className="flex justify-between text-sm text-white/60 mb-2">
+                            <span>Progress</span>
+                            <span>{calculateProgress().toFixed(1)}%</span>
+                          </div>
+                          <Progress 
+                            value={calculateProgress()} 
+                            className="h-2 bg-white/10"
+                          />
+                          <div className="mt-2 text-sm text-white/60">
+                            <span>Pledged: </span>
+                            <span className="text-white">{ethers.utils.formatEther(onChainData.pledgedAmount)} LGR</span>
+                            <span className="text-yellow-500 ml-2">
+                              ≈ {formatUSDValue(onChainData.pledgedAmount)}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
 
