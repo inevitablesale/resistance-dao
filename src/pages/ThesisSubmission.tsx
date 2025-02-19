@@ -52,16 +52,16 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-// Contract-aligned constants
-const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds (matches contract)
-const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds (matches contract)
-const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000"); // 1,000 LGR (matches contract)
-const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000"); // 25M LGR (matches contract)
+// Contract-aligned constants (matching smart contract exactly)
+const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
+const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
+const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000"); // 1,000 LGR
+const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000"); // 25M LGR
 const SUBMISSION_FEE = ethers.utils.parseEther("250"); // 250 LGR
 const VOTING_FEE = ethers.utils.parseEther("10"); // 10 LGR
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
-// Text length constraints (matching contract)
+// Contract-aligned validation constraints
 const TITLE_MIN_LENGTH = 10;
 const TITLE_MAX_LENGTH = 100;
 const INVESTMENT_DRIVERS_MIN_LENGTH = 50;
@@ -842,4 +842,5 @@ const ThesisSubmission = () => {
                           onChange={e => handleFormDataChange('title', e.target.value)}
                         />
                         {formErrors.title && (
-                          <p className="text-red-400 text-sm">{formErrors.
+                          <p className="text-red-400 text-sm">{formErrors.title.join(', ')}</p>
+                        )}
