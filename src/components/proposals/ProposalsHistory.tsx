@@ -1,8 +1,4 @@
-
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { FileText, Calendar, Users, Target } from "lucide-react";
-import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,8 +11,11 @@ import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata } from "@/types/proposals";
 import { useToast } from "@/hooks/use-toast";
 import { IPFSContent } from "@/types/content";
+import { loadingStates } from "./LoadingStates";
+import { ProposalLoadingCard } from "./ProposalLoadingCard";
+import { ProposalListItem } from "./ProposalListItem";
 
-const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
+const MIN_LGR_REQUIRED = "1";
 
 interface NFTMetadata extends IPFSContent {
   name: string;
@@ -38,6 +37,7 @@ interface ProposalEvent {
 export const ProposalsHistory = () => {
   const [proposalEvents, setProposalEvents] = useState<ProposalEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingStateIndex, setLoadingStateIndex] = useState(0);
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
   const { isConnected, connect, address } = useWalletConnection();
   const { getProvider } = useWalletProvider();
@@ -53,6 +53,28 @@ export const ProposalsHistory = () => {
       currency: 'USD'
     }).format(usdAmount);
   };
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    if (isLoading) {
+      const cycleLoadingStates = () => {
+        setLoadingStateIndex(prev => {
+          if (prev < loadingStates.length - 1) {
+            timeoutId = setTimeout(cycleLoadingStates, 1000);
+            return prev + 1;
+          }
+          return prev;
+        });
+      };
+
+      timeoutId = setTimeout(cycleLoadingStates, 1000);
+    }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [isLoading]);
 
   useEffect(() => {
     const checkLGRBalance = async () => {
@@ -224,14 +246,7 @@ export const ProposalsHistory = () => {
   }
 
   if (isLoading) {
-    return (
-      <Card className="bg-black/40 border-white/10">
-        <CardContent className="p-6 text-center">
-          <div className="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto mb-2" />
-          <p className="text-white/60">Loading proposals...</p>
-        </CardContent>
-      </Card>
-    );
+    return <ProposalLoadingCard loadingState={loadingStates[loadingStateIndex]} />;
   }
 
   if (proposalEvents.length === 0) {
@@ -255,62 +270,15 @@ export const ProposalsHistory = () => {
     <div className="space-y-4">
       <div className="grid gap-4">
         {proposalEvents.map((event, index) => (
-          <motion.div
+          <ProposalListItem
             key={event.tokenId}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            onClick={() => navigate(`/proposals/${event.tokenId}`)}
-            className="p-4 rounded-lg border border-white/10 bg-white/5 hover:border-purple-500/20 transition-colors cursor-pointer"
-          >
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-white">
-                        {event.metadata?.title || `Proposal #${event.tokenId}`}
-                      </h3>
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-white/60">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{format(event.metadata?.submissionTimestamp || new Date(event.blockNumber * 1000), 'PPP')}</span>
-                      </div>
-                      {event.metadata?.investment?.targetCapital && (
-                        <div className="flex items-center gap-2">
-                          <Target className="w-4 h-4" />
-                          <span>
-                            {event.metadata.investment.targetCapital} LGR Target
-                            <span className="text-white/40 ml-1">
-                              ({formatUSDAmount(event.metadata.investment.targetCapital)})
-                            </span>
-                          </span>
-                        </div>
-                      )}
-                      {event.pledgedAmount && (
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4" />
-                          <span>
-                            {event.pledgedAmount} LGR Pledged
-                            <span className="text-white/40 ml-1">
-                              ({formatUSDAmount(event.pledgedAmount)})
-                            </span>
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {event.metadata?.investment?.drivers && (
-                <p className="text-sm text-white/60 mt-2">{event.metadata.investment.drivers}</p>
-              )}
-            </div>
-          </motion.div>
+            index={index}
+            tokenId={event.tokenId}
+            metadata={event.metadata}
+            pledgedAmount={event.pledgedAmount}
+            blockNumber={event.blockNumber}
+            formatUSDAmount={formatUSDAmount}
+          />
         ))}
       </div>
     </div>
