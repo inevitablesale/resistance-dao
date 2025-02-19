@@ -18,6 +18,7 @@ import { format, formatDistanceToNow, isPast } from "date-fns";
 import { loadingStates } from "./LoadingStates";
 import { ProposalLoadingCard } from "./ProposalLoadingCard";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useProposalData } from "@/hooks/useProposalData";
 
 const MIN_LGR_REQUIRED = "1";
 
@@ -93,21 +94,22 @@ interface ProposalDetailsCardProps {
 export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDetailsCardProps) => {
   const { toast } = useToast();
   const { isConnected, connect, address } = useWalletConnection();
-  const { getProvider } = useWalletProvider();
-  const [proposalDetails, setProposalDetails] = useState<ProposalMetadata | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState(0);
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
-  const [pledgedAmount, setPledgedAmount] = useState<string>("0");
-  const [backerCount, setBackerCount] = useState(0);
   const [pledgeInput, setPledgeInput] = useState("");
   const [isPledging, setIsPledging] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [isVotingEnded, setIsVotingEnded] = useState(false);
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
-  const [hasUserVoted, setHasUserVoted] = useState(false);
-  const [userVoteAmount, setUserVoteAmount] = useState<string>("0");
   const VOTING_FEE = ethers.utils.parseEther("10");
+
+  const {
+    proposalDetails,
+    pledgedAmount,
+    backerCount,
+    hasUserVoted,
+    userVoteAmount,
+    isLoading
+  } = useProposalData(tokenId);
 
   const formatUSDAmount = (lgrAmount: string): string => {
     const amount = parseFloat(lgrAmount);
@@ -173,116 +175,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
     checkLGRBalance();
   }, [isConnected, address, getProvider, toast]);
-
-  useEffect(() => {
-    console.log('Proposal details effect running...', {
-      tokenId,
-      isConnected,
-      hasMinimumLGR,
-      address
-    });
-
-    if (!tokenId) {
-      console.log('No token ID provided');
-      toast({
-        title: "Invalid Proposal ID",
-        description: "Please provide a valid proposal ID.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!isConnected) {
-      console.log('Wallet not connected');
-      return;
-    }
-
-    if (hasMinimumLGR === false) {
-      console.log('Insufficient LGR balance');
-      return;
-    }
-
-    const fetchProposalDetails = async () => {
-      setIsLoading(true);
-      setLoadingProgress(20);
-
-      try {
-        console.log('Getting wallet provider...');
-        const walletProvider = await getProvider();
-        console.log('Initializing contract...');
-        
-        const factoryContract = new ethers.Contract(
-          FACTORY_ADDRESS,
-          FACTORY_ABI,
-          walletProvider.provider
-        );
-        setLoadingProgress(40);
-
-        console.log(`Getting tokenURI, pledged amount, and vote events for token #${tokenId}`);
-        
-        const [tokenUri, pledged] = await Promise.all([
-          factoryContract.tokenURI(tokenId),
-          factoryContract.pledgedAmount(tokenId)
-        ]);
-        setLoadingProgress(50);
-
-        console.log('Querying ProposalVoted events...');
-        const filter = factoryContract.filters.ProposalVoted(tokenId, null);
-        const events = await factoryContract.queryFilter(filter);
-        
-        if (address) {
-          const userFilter = factoryContract.filters.ProposalVoted(tokenId, address);
-          const userVoteEvents = await factoryContract.queryFilter(userFilter);
-          const hasVoted = userVoteEvents.length > 0;
-          setHasUserVoted(hasVoted);
-          
-          if (hasVoted && userVoteEvents[0]) {
-            const votedAmount = userVoteEvents[0].args?.pledgeAmount;
-            if (votedAmount) {
-              setUserVoteAmount(ethers.utils.formatEther(votedAmount));
-            }
-          }
-        }
-        
-        console.log('Token URI:', tokenUri);
-        console.log('Pledged amount:', ethers.utils.formatEther(pledged));
-        console.log('Vote events count:', events.length);
-        
-        setPledgedAmount(ethers.utils.formatEther(pledged));
-        setBackerCount(events.length);
-        setLoadingProgress(60);
-
-        if (tokenUri) {
-          console.log('Starting IPFS fetch for metadata');
-          const ipfsHash = tokenUri.replace('ipfs://', '');
-          console.log('IPFS hash:', ipfsHash);
-          
-          const metadata = await getFromIPFS<ProposalMetadata>(
-            ipfsHash,
-            'proposal'
-          );
-          console.log('Successfully fetched IPFS data:', metadata);
-          setProposalDetails(metadata);
-        } else {
-          console.warn('No tokenURI found for this proposal');
-          throw new Error('No metadata found for this proposal');
-        }
-        
-        setLoadingProgress(100);
-      } catch (error: any) {
-        console.error("Error fetching proposal details:", error);
-        toast({
-          title: "Failed to Load Proposal",
-          description: error.message || "Could not retrieve proposal details.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProposalDetails();
-  }, [tokenId, isConnected, hasMinimumLGR, getProvider, toast, address]);
 
   useEffect(() => {
     if (proposalDetails?.submissionTimestamp && proposalDetails?.votingDuration) {
@@ -424,7 +316,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         className="space-y-6"
       >
         <ProposalLoadingCard 
-          loadingState={loadingStates[Math.floor((loadingProgress / 100) * loadingStates.length)]} 
+          loadingState={loadingStates[Math.floor((100 / 100) * loadingStates.length)]} 
         />
       </motion.div>
     );
