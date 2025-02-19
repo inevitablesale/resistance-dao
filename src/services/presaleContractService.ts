@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
@@ -130,6 +131,7 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
   try {
     console.log('Starting token purchase with MATIC amount:', maticAmount);
     
+    // Get contract instance with the provided signer
     const contract = await getPresaleContract(signer);
     
     // Get current LGR price in MATIC
@@ -147,7 +149,8 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
 
     // Execute purchase transaction
     const tx = await contract.buyTokens(minExpectedTokens, {
-      value: maticAmountWei
+      value: maticAmountWei,
+      gasLimit: 500000 // Added explicit gas limit for better transaction handling
     });
     
     console.log('Purchase transaction submitted:', tx.hash);
