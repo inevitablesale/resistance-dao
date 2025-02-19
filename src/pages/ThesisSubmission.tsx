@@ -305,26 +305,29 @@ const ThesisSubmission = () => {
     if (!formData.title || formData.title.trim().length < 10) {
       errors.title = ['Title must be at least 10 characters long'];
     }
+    if (formData.title.trim().length > 100) {
+      errors.title = ['Title must not exceed 100 characters'];
+    }
     if (!formData.investment.targetCapital) {
       errors['investment.targetCapital'] = ['Target capital is required'];
     } else {
       try {
         const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
         if (targetCapitalWei.lt(MIN_TARGET_CAPITAL)) {
-          errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} ETH`];
+          errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} LGR`];
         }
         if (targetCapitalWei.gt(MAX_TARGET_CAPITAL)) {
-          errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} ETH`];
+          errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} LGR`];
         }
       } catch (error) {
         errors['investment.targetCapital'] = ['Invalid target capital amount'];
       }
     }
-    if (votingDuration < MIN_VOTING_DURATION) {
-      errors.votingDuration = ['Minimum voting duration is 7 days'];
+    if (!formData.investment.drivers || formData.investment.drivers.trim().length < 50) {
+      errors['investment.drivers'] = ['Investment drivers must be at least 50 characters'];
     }
-    if (votingDuration > MAX_VOTING_DURATION) {
-      errors.votingDuration = ['Maximum voting duration is 90 days'];
+    if (formData.investment.drivers.trim().length > 500) {
+      errors['investment.drivers'] = ['Investment drivers must not exceed 500 characters'];
     }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -334,9 +337,6 @@ const ThesisSubmission = () => {
     const errors: Record<string, string[]> = {};
     if (!formData.firmCriteria.size) {
       errors['firmCriteria.size'] = ['Please select a firm size'];
-    }
-    if (!formData.firmCriteria.location) {
-      errors['firmCriteria.location'] = ['Please select a location'];
     }
     if (!formData.firmCriteria.dealType) {
       errors['firmCriteria.dealType'] = ['Please select a deal type'];
@@ -350,18 +350,25 @@ const ThesisSubmission = () => {
 
   const validateStrategyTab = (): boolean => {
     const errors: Record<string, string[]> = {};
+    
     if (!formData.strategies.operational.length) {
       errors['strategies.operational'] = ['Please select at least one operational strategy'];
+    } else if (formData.strategies.operational.length > 3) {
+      errors['strategies.operational'] = ['Maximum 3 operational strategies allowed'];
     }
+    
     if (!formData.strategies.growth.length) {
       errors['strategies.growth'] = ['Please select at least one growth strategy'];
+    } else if (formData.strategies.growth.length > 3) {
+      errors['strategies.growth'] = ['Maximum 3 growth strategies allowed'];
     }
+    
     if (!formData.strategies.integration.length) {
       errors['strategies.integration'] = ['Please select at least one integration strategy'];
+    } else if (formData.strategies.integration.length > 3) {
+      errors['strategies.integration'] = ['Maximum 3 integration strategies allowed'];
     }
-    if (!formData.investment.drivers || formData.investment.drivers.trim().length < 50) {
-      errors['investment.drivers'] = ['Investment drivers must be at least 50 characters long'];
-    }
+    
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -378,32 +385,115 @@ const ThesisSubmission = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
-    let isValid = false;
+  const getCurrentValidator = () => {
     switch (activeStep) {
       case 'thesis':
-        isValid = validateBasicsTab();
-        if (isValid) setActiveStep('firm');
-        break;
+        return validateBasicsTab;
       case 'firm':
-        isValid = validateFirmTab();
-        if (isValid) setActiveStep('strategy');
-        break;
+        return validateFirmTab;
       case 'strategy':
-        isValid = validateStrategyTab();
-        if (isValid) setActiveStep('terms');
-        break;
+        return validateStrategyTab;
       case 'terms':
-        isValid = validateTermsTab();
-        handleSubmit(e);
-        break;
+        return validateTermsTab;
+      default:
+        return () => true;
     }
-    if (!isValid) {
+  };
+
+  const handleStepChange = (newStep: string) => {
+    const currentValidator = getCurrentValidator();
+    if (currentValidator()) {
+      updateStepStatus(activeStep, 'completed');
+      setActiveStep(newStep);
+    } else {
       toast({
         title: "Validation Error",
-        description: "Please fill in all required fields correctly before proceeding.",
+        description: "Please complete all required fields before proceeding",
         variant: "destructive"
       });
+    }
+  };
+
+  const renderSteps = () => (
+    SUBMISSION_STEPS.map((step, index) => (
+      <div 
+        key={step.id}
+        className={cn(
+          "relative",
+          index !== SUBMISSION_STEPS.length - 1 && "pb-8 after:absolute after:left-5 after:top-8 after:h-full after:w-0.5",
+          step.status === 'completed' ? "after:bg-yellow-500" : "after:bg-white/10"
+        )}
+      >
+        <button
+          onClick={() => handleStepChange(step.id)}
+          className={cn(
+            "flex items-start gap-4 w-full rounded-lg p-4 transition-colors",
+            step.id === activeStep ? "bg-white/5" : "hover:bg-white/5",
+            formErrors && Object.keys(formErrors).length > 0 && step.id === activeStep ? "border border-red-500/50" : ""
+          )}
+        >
+          <div className={cn(
+            "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
+            step.status === 'completed' ? "bg-yellow-500 text-white" :
+            step.status === 'processing' ? "bg-teal-500 text-white animate-pulse" :
+            step.id === activeStep ? "bg-yellow-500/20 text-yellow-500 border border-yellow-500" :
+            "bg-white/5 text-white/40"
+          )}>
+            {step.status === 'completed' ? (
+              <Check className="w-5 h-5" />
+            ) : (
+              index + 1
+            )}
+          </div>
+          <div className="text-left">
+            <p className={cn(
+              "font-medium",
+              step.id === activeStep ? "text-white" : "text-white/60"
+            )}>
+              {step.title}
+            </p>
+            <p className="text-sm text-white/40">
+              {step.description}
+            </p>
+            {formErrors && Object.keys(formErrors).length > 0 && step.id === activeStep && (
+              <p className="text-sm text-red-400 mt-2">
+                Please fix validation errors before proceeding
+              </p>
+            )}
+          </div>
+        </button>
+      </div>
+    ))
+  );
+
+  const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const currentValidator = getCurrentValidator();
+    
+    if (!currentValidator()) {
+      toast({
+        title: "Validation Error",
+        description: "Please complete all required fields before proceeding",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    switch (activeStep) {
+      case 'thesis':
+        handleStepChange('firm');
+        break;
+      case 'firm':
+        handleStepChange('strategy');
+        break;
+      case 'strategy':
+        handleStepChange('terms');
+        break;
+      case 'terms':
+        if (validateTermsTab()) {
+          handleSubmit(e);
+        }
+        break;
     }
   };
 
@@ -721,54 +811,15 @@ const ThesisSubmission = () => {
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-3">
             <div className="sticky top-32 space-y-4">
-              {SUBMISSION_STEPS.map((step, index) => (
-                <div 
-                  key={step.id}
-                  className={cn(
-                    "relative",
-                    index !== SUBMISSION_STEPS.length - 1 && "pb-8 after:absolute after:left-5 after:top-8 after:h-full after:w-0.5",
-                    step.status === 'completed' ? "after:bg-yellow-500" : "after:bg-white/10"
-                  )}
-                >
-                  <button
-                    onClick={() => setActiveStep(step.id)}
-                    className={cn(
-                      "flex items-start gap-4 w-full rounded-lg p-4 transition-colors",
-                      step.id === activeStep ? "bg-white/5" : "hover:bg-white/5"
-                    )}
-                  >
-                    <div className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
-                      step.status === 'completed' ? "bg-yellow-500 text-white" :
-                      step.status === 'processing' ? "bg-teal-500 text-white animate-pulse" :
-                      step.id === activeStep ? "bg-yellow-500/20 text-yellow-500 border border-yellow-500" :
-                      "bg-white/5 text-white/40"
-                    )}>
-                      {step.status === 'completed' ? (
-                        <Check className="w-5 h-5" />
-                      ) : (
-                        index + 1
-                      )}
-                    </div>
-                    <div className="text-left">
-                      <p className={cn(
-                        "font-medium",
-                        step.id === activeStep ? "text-white" : "text-white/60"
-                      )}>
-                        {step.title}
-                      </p>
-                      <p className="text-sm text-white/40">
-                        {step.description}
-                      </p>
-                    </div>
-                  </button>
-                </div>
-              ))}
+              {renderSteps()}
             </div>
           </div>
 
           <div className="col-span-6 space-y-6">
-            <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
+            <Card className={cn(
+              "bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden",
+              formErrors && Object.keys(formErrors).length > 0 ? "border-red-500/20" : ""
+            )}>
               <motion.div 
                 className="border-b border-white/5"
                 initial={{ opacity: 0 }}
