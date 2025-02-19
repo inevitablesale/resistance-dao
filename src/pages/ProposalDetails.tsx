@@ -40,7 +40,6 @@ const ProposalDetails = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Loading stages tracking
   useEffect(() => {
     if (isCheckingBalance) {
       setLoadingStage("Checking LGR Balance...");
@@ -57,7 +56,6 @@ const ProposalDetails = () => {
     }
   }, [isCheckingBalance, isLoading, isLoadingChainData, proposalDetails]);
 
-  // Check LGR balance when wallet is connected
   useEffect(() => {
     const checkLGRBalance = async () => {
       if (!isConnected || !address) {
@@ -110,7 +108,6 @@ const ProposalDetails = () => {
     checkLGRBalance();
   }, [isConnected, address, getProvider]);
 
-  // Add debug logging for dependency values
   useEffect(() => {
     console.log('Proposal Details Dependencies:', {
       tokenId,
@@ -132,7 +129,6 @@ const ProposalDetails = () => {
     }
   }, [tokenId, isConnected, hasMinimumLGR]);
 
-  // Load chain data after IPFS data is loaded
   useEffect(() => {
     if (isConnected && hasMinimumLGR && proposalDetails && !proposalDetails.onChainData) {
       loadChainData();
@@ -251,8 +247,15 @@ const ProposalDetails = () => {
     return Math.min((pledged / target) * 100, 100);
   };
 
-  const formatUSDValue = (lgrAmount: string) => {
-    const amount = Number(ethers.utils.formatEther(lgrAmount));
+  const formatUSDValue = (lgrAmount: ethers.BigNumber | string) => {
+    let amount: number;
+    
+    if (typeof lgrAmount === 'string') {
+      amount = Number(ethers.utils.formatEther(lgrAmount));
+    } else {
+      amount = Number(ethers.utils.formatEther(lgrAmount));
+    }
+    
     const usdValue = amount * LGR_PRICE_USD;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
