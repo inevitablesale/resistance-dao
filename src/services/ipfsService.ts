@@ -3,30 +3,25 @@ import { Buffer } from 'buffer';
 import { ProposalMetadata } from '@/types/proposals';
 import { IPFSContent } from '@/types/content';
 
-const IPFS_GATEWAYS = [
-  'https://ipfs.io/ipfs/',
-  'https://cloudflare-ipfs.com/ipfs/',
-  'https://gateway.pinata.cloud/ipfs/',
-];
-
-let currentGatewayIndex = 0;
+const PINATA_GATEWAY = 'https://blue-shaggy-halibut-668.mypinata.cloud/ipfs/';
+const PINATA_GATEWAY_TOKEN = 'LxW7Vt1WCzQk4x7VPUWYizgTK5BXllL4JMUQVXMeZEPqSoovWPXI-jmwcFsZ3hs';
 
 export const getFromIPFS = async <T extends ProposalMetadata | IPFSContent>(
   hash: string,
   type: 'proposal' | 'content'
 ): Promise<T> => {
   try {
-    const gateway = IPFS_GATEWAYS[currentGatewayIndex];
-    const url = `${gateway}${hash}`;
-    console.log('Fetching from IPFS gateway:', url);
+    const url = `${PINATA_GATEWAY}${hash}?pinataGatewayToken=${PINATA_GATEWAY_TOKEN}`;
+    console.log('Fetching from Pinata gateway:', url);
 
     const response = await fetch(url);
     if (!response.ok) {
+      console.error('Pinata gateway response not OK:', response.status, response.statusText);
       throw new Error(`IPFS fetch failed: ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('Raw IPFS data:', JSON.stringify(data, null, 2));
+    console.log('Raw IPFS data from Pinata:', JSON.stringify(data, null, 2));
 
     if (type === 'proposal') {
       // Map string values to enum types if needed
@@ -42,7 +37,7 @@ export const getFromIPFS = async <T extends ProposalMetadata | IPFSContent>(
       return data as T;
     }
   } catch (error) {
-    console.error('Error fetching from IPFS:', error);
+    console.error('Error fetching from Pinata gateway:', error);
     throw error;
   }
 };
@@ -59,3 +54,4 @@ export const uploadToIPFS = async <T extends ProposalMetadata | IPFSContent>(
     throw error;
   }
 };
+
