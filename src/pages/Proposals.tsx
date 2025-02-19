@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FileText, Plus, Trophy, Building2, Users, Shield, Rocket } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 
 const Proposals = () => {
   const navigate = useNavigate();
@@ -92,6 +93,9 @@ const Proposals = () => {
         </div>
         <ProposalsHistory />
       </div>
+
+      {/* LGR Floating Widget */}
+      <LGRFloatingWidget />
     </div>
   );
 };
