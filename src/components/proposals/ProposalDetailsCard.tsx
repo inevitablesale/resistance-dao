@@ -4,27 +4,73 @@ import { ethers } from "ethers";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata } from "@/types/proposals";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ExternalLink, Loader2 } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
+import { useWalletProvider } from "@/hooks/useWalletProvider";
+import { getTokenBalance } from "@/services/tokenService";
 
 interface ProposalDetailsCardProps {
   tokenId?: string;
 }
 
+const MIN_LGR_REQUIRED = "1";
+
 export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
   const { toast } = useToast();
-  const { isConnected, connect, hasMinimumLGR } = useWalletConnection();
+  const { isConnected, connect, address } = useWalletConnection();
+  const { getProvider } = useWalletProvider();
   const [proposalDetails, setProposalDetails] = useState<ProposalMetadata | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
 
+  // Check LGR balance, exactly like in ProposalsHistory
+  useEffect(() => {
+    const checkLGRBalance = async () => {
+      if (!isConnected || !address) {
+        setHasMinimumLGR(null);
+        return;
+      }
+
+      try {
+        const walletProvider = await getProvider();
+        const balance = await getTokenBalance(
+          walletProvider.provider,
+          LGR_TOKEN_ADDRESS,
+          address
+        );
+
+        const hasEnough = ethers.utils.parseEther(balance).gte(
+          ethers.utils.parseEther(MIN_LGR_REQUIRED)
+        );
+        
+        console.log('LGR Balance check:', {
+          balance,
+          required: MIN_LGR_REQUIRED,
+          hasEnough
+        });
+        
+        setHasMinimumLGR(hasEnough);
+      } catch (error) {
+        console.error("Error checking LGR balance:", error);
+        toast({
+          title: "Balance Check Failed",
+          description: "Failed to verify LGR balance. Please try again.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    checkLGRBalance();
+  }, [isConnected, address, getProvider, toast]);
+
+  // Fetch proposal details only after wallet and balance checks
   useEffect(() => {
     if (!tokenId) {
       toast({
@@ -36,17 +82,17 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
     }
 
     const fetchProposalDetails = async () => {
-      if (!isConnected || !hasMinimumLGR) return;
+      if (!isConnected || hasMinimumLGR === null || !hasMinimumLGR) return;
 
       setIsLoading(true);
       setLoadingProgress(20);
 
       try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const walletProvider = await getProvider();
         const factoryContract = new ethers.Contract(
           FACTORY_ADDRESS,
           FACTORY_ABI,
-          provider
+          walletProvider.provider
         );
         setLoadingProgress(40);
 
@@ -71,7 +117,7 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
     };
 
     fetchProposalDetails();
-  }, [tokenId, isConnected, hasMinimumLGR, toast]);
+  }, [tokenId, isConnected, hasMinimumLGR, getProvider, toast]);
 
   if (!isConnected) {
     return (
@@ -90,7 +136,7 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
     return (
       <Card className="w-full max-w-3xl mx-auto bg-black/80 text-white border-white/10">
         <CardContent className="p-6 text-center text-white/60">
-          <p>You need at least 1 LGR to view proposal details</p>
+          <p>You need at least {MIN_LGR_REQUIRED} LGR to view proposal details</p>
         </CardContent>
       </Card>
     );
