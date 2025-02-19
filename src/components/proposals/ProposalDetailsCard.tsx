@@ -329,6 +329,66 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.2 }}
     >
+      <div className="mb-8 space-y-6 glass">
+        <div className="flex items-center justify-center gap-4">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => handleVote(true)}
+            disabled={isVoting}
+            className="bg-teal-500 border-teal-400 hover:bg-teal-600 hover:border-teal-500 text-white"
+          >
+            <ThumbsUp className="mr-2" />
+            Vote Up {votesUp > 0 && `(${votesUp})`}
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => handleVote(false)}
+            disabled={isVoting}
+            className="bg-red-500 border-red-400 hover:bg-red-600 hover:border-red-500 text-white"
+          >
+            <ThumbsDown className="mr-2" />
+            Vote Down {votesDown > 0 && `(${votesDown})`}
+          </Button>
+        </div>
+
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <Coins className="w-5 h-5" />
+            Pledge LGR Tokens
+          </h3>
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <Label htmlFor="pledgeAmount" className="text-white/60">
+                Amount to Pledge
+              </Label>
+              <Input
+                id="pledgeAmount"
+                type="number"
+                min="0"
+                step="0.1"
+                value={pledgeInput}
+                onChange={(e) => setPledgeInput(e.target.value)}
+                placeholder="Enter LGR amount"
+                className="bg-black/40 border-white/10 text-white"
+              />
+            </div>
+            <Button
+              onClick={handlePledge}
+              disabled={isPledging || !pledgeInput}
+              className="self-end bg-purple-500 hover:bg-purple-600 text-white"
+            >
+              {isPledging ? "Pledging..." : "Pledge LGR"}
+            </Button>
+          </div>
+          <p className="text-sm text-white/40 mt-2">
+            Current total pledged: {pledgedAmount} LGR
+            ({formatUSDAmount(pledgedAmount)})
+          </p>
+        </div>
+      </div>
+
       <Card className="w-full bg-black/40 border-white/10">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-white">
@@ -396,66 +456,6 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
               </div>
             </div>
           )}
-
-          <div className="mt-8 space-y-6">
-            <div className="flex items-center justify-center gap-4">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => handleVote(true)}
-                disabled={isVoting}
-                className="bg-teal-900/40 border-teal-500/40 hover:bg-teal-500/20 hover:border-teal-500/40"
-              >
-                <ThumbsUp className="mr-2" />
-                Vote Up {votesUp > 0 && `(${votesUp})`}
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => handleVote(false)}
-                disabled={isVoting}
-                className="bg-red-900/40 border-red-500/40 hover:bg-red-500/20 hover:border-red-500/40"
-              >
-                <ThumbsDown className="mr-2" />
-                Vote Down {votesDown > 0 && `(${votesDown})`}
-              </Button>
-            </div>
-
-            <div className="bg-black/20 rounded-lg p-6 border border-white/10">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <Coins className="w-5 h-5" />
-                Pledge LGR Tokens
-              </h3>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <Label htmlFor="pledgeAmount" className="text-white/60">
-                    Amount to Pledge
-                  </Label>
-                  <Input
-                    id="pledgeAmount"
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    value={pledgeInput}
-                    onChange={(e) => setPledgeInput(e.target.value)}
-                    placeholder="Enter LGR amount"
-                    className="bg-black/40 border-white/10 text-white"
-                  />
-                </div>
-                <Button
-                  onClick={handlePledge}
-                  disabled={isPledging || !pledgeInput}
-                  className="self-end bg-purple-500 hover:bg-purple-600"
-                >
-                  {isPledging ? "Pledging..." : "Pledge LGR"}
-                </Button>
-              </div>
-              <p className="text-sm text-white/40 mt-2">
-                Current total pledged: {pledgedAmount} LGR
-                ({formatUSDAmount(pledgedAmount)})
-              </p>
-            </div>
-          </div>
 
           {proposalDetails.linkedInURL && (
             <div className="mt-4">
