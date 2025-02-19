@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
@@ -9,10 +8,16 @@ import { Button } from "@/components/ui/button";
 import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS, LGR_PRICE_USD } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
-import { StoredProposal, ProposalMetadata } from "@/types/proposals";
+import { 
+  StoredProposal, 
+  ProposalMetadata, 
+  FirmSize, 
+  DealType, 
+  GeographicFocus 
+} from "@/types/proposals";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HandCoins, Clock, Users, ChevronLeft, Wallet, AlertCircle, DollarSign } from "lucide-react";
+import { HandCoins, Clock, Users, ChevronLeft, Wallet, AlertCircle } from "lucide-react";
 import { getTokenBalance } from "@/services/tokenService";
 import { Progress } from "@/components/ui/progress";
 
@@ -26,6 +31,37 @@ interface ProposalDetails {
 }
 
 const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
+
+const getFirmSizeLabel = (size: number): string => {
+  const sizeMap: Record<number, string> = {
+    [FirmSize.BELOW_1M]: "Below $1M",
+    [FirmSize.ONE_TO_FIVE_M]: "$1M - $5M",
+    [FirmSize.FIVE_TO_TEN_M]: "$5M - $10M",
+    [FirmSize.TEN_PLUS]: "$10M+"
+  };
+  return sizeMap[size] || "Unknown";
+};
+
+const getDealTypeLabel = (type: number): string => {
+  const typeMap: Record<number, string> = {
+    [DealType.ACQUISITION]: "Acquisition",
+    [DealType.MERGER]: "Merger",
+    [DealType.EQUITY_BUYOUT]: "Equity Buyout",
+    [DealType.FRANCHISE]: "Franchise",
+    [DealType.SUCCESSION]: "Succession"
+  };
+  return typeMap[type] || "Unknown";
+};
+
+const getGeographicFocusLabel = (focus: number): string => {
+  const focusMap: Record<number, string> = {
+    [GeographicFocus.LOCAL]: "Local",
+    [GeographicFocus.REGIONAL]: "Regional",
+    [GeographicFocus.NATIONAL]: "National",
+    [GeographicFocus.REMOTE]: "Remote"
+  };
+  return focusMap[focus] || "Unknown";
+};
 
 const ProposalDetails = () => {
   const { tokenId } = useParams<{ tokenId: string }>();
@@ -157,7 +193,17 @@ const ProposalDetails = () => {
       }
 
       console.log('Fetching IPFS metadata from:', tokenUri);
-      const metadata = await getFromIPFS<ProposalMetadata>(tokenUri, 'proposal');
+      const rawMetadata = await getFromIPFS<ProposalMetadata>(tokenUri, 'proposal');
+      
+      const metadata: ProposalMetadata = {
+        ...rawMetadata,
+        firmCriteria: {
+          ...rawMetadata.firmCriteria,
+          size: getFirmSizeLabel(rawMetadata.firmCriteria.size),
+          dealType: getDealTypeLabel(rawMetadata.firmCriteria.dealType),
+          geographicFocus: getGeographicFocusLabel(rawMetadata.firmCriteria.geographicFocus)
+        }
+      };
       
       console.log('Processed IPFS metadata:', metadata);
       setProposalDetails({
@@ -192,7 +238,7 @@ const ProposalDetails = () => {
       console.log('Contract initialized, fetching on-chain data for token:', tokenId);
       const [pledgedAmount, backers] = await Promise.all([
         contract.pledgedAmount(tokenId),
-        contract.proposalVoters(tokenId)  // Changed from getProposalBackers to proposalVoters
+        contract.proposalVoters(tokenId)
       ]);
 
       console.log('On-chain data received:', {
