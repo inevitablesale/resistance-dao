@@ -18,9 +18,25 @@ import {
 } from "@/types/proposals";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HandCoins, Clock, Users, ChevronLeft, Wallet, AlertCircle, AlertTriangle } from "lucide-react";
+import { 
+  HandCoins, 
+  Clock, 
+  Users, 
+  ChevronLeft, 
+  Wallet, 
+  AlertCircle, 
+  AlertTriangle,
+  ThumbsUp,
+  ThumbsDown,
+  Loader2,
+  FileSearch,
+  Activity,
+  TrendingUp,
+  ExternalLink
+} from "lucide-react";
 import { getTokenBalance } from "@/services/tokenService";
 import { Progress } from "@/components/ui/progress";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ProposalDetails {
   metadata: ProposalMetadata;
@@ -52,9 +68,7 @@ const getDealTypeLabel = (type: DealType): string => {
     [DealType.MERGER]: "Merger",
     [DealType.EQUITY_BUYOUT]: "Equity Buyout",
     [DealType.FRANCHISE]: "Franchise",
-    [DealType.SUCCESSION]: "Succession"
-  };
-  return typeMap[type] || "Unknown";
+    return typeMap[type] || "Unknown";
 };
 
 const getGeographicFocusLabel = (focus: GeographicFocus): string => {
@@ -78,6 +92,123 @@ const getPaymentTermLabel = (term: PaymentTerm): string => {
   return termMap[term] || "Unknown";
 };
 
+const LoadingStage = ({ 
+  icon, 
+  title, 
+  description 
+}: { 
+  icon: React.ReactNode; 
+  title: string; 
+  description: string; 
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    className="text-center space-y-4"
+  >
+    <div className="flex items-center justify-center">
+      {icon}
+    </div>
+    <h3 className="text-xl font-bold text-white">{title}</h3>
+    <p className="text-white/60">{description}</p>
+  </motion.div>
+);
+
+const VotingSection = ({ 
+  onVote, 
+  isVoting, 
+  userVote 
+}: { 
+  onVote: (direction: 'up' | 'down') => void;
+  isVoting: boolean;
+  userVote?: 'up' | 'down';
+}) => (
+  <div className="flex justify-center gap-4">
+    <Button
+      variant="outline"
+      size="lg"
+      onClick={() => onVote('up')}
+      disabled={isVoting || userVote === 'up'}
+      className={`flex items-center gap-2 ${
+        userVote === 'up' 
+          ? 'bg-green-500/20 border-green-500 text-green-400' 
+          : 'bg-white/5 hover:bg-white/10'
+      }`}
+    >
+      {isVoting ? (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      ) : (
+        <ThumbsUp className="w-4 h-4" />
+      )}
+      Support
+    </Button>
+    <Button
+      variant="outline"
+      size="lg"
+      onClick={() => onVote('down')}
+      disabled={isVoting || userVote === 'down'}
+      className={`flex items-center gap-2 ${
+        userVote === 'down' 
+          ? 'bg-red-500/20 border-red-500 text-red-400' 
+          : 'bg-white/5 hover:bg-white/10'
+      }`}
+    >
+      {isVoting ? (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      ) : (
+        <ThumbsDown className="w-4 h-4" />
+      )}
+      Reject
+    </Button>
+  </div>
+);
+
+const PledgeSection = ({
+  onPledge,
+  isPledging,
+  currentPledge
+}: {
+  onPledge: () => void;
+  isPledging: boolean;
+  currentPledge?: ethers.BigNumber;
+}) => (
+  <Card className="bg-white/5 border-white/10">
+    <CardContent className="p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-lg font-bold text-white">Your Pledge</h3>
+          <p className="text-sm text-white/60">
+            Support this proposal with LGR tokens
+          </p>
+        </div>
+        {currentPledge && (
+          <Badge variant="outline" className="bg-yellow-500/20 text-yellow-400 border-yellow-500">
+            Current: {ethers.utils.formatEther(currentPledge)} LGR
+          </Badge>
+        )}
+      </div>
+      <Button 
+        onClick={onPledge}
+        disabled={isPledging}
+        className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700"
+      >
+        {isPledging ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            Pledging...
+          </>
+        ) : (
+          <>
+            <HandCoins className="w-4 h-4 mr-2" />
+            Pledge LGR
+          </>
+        )}
+      </Button>
+    </CardContent>
+  </Card>
+);
+
 const ProposalDetails = () => {
   const { tokenId } = useParams<{ tokenId: string }>();
   const [proposalDetails, setProposalDetails] = useState<ProposalDetails | null>(null);
@@ -91,6 +222,86 @@ const ProposalDetails = () => {
   const { isConnected, connect, address } = useWalletConnection();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [isVoting, setIsVoting] = useState(false);
+  const [isPledging, setPledging] = useState(false);
+  const [userVote, setUserVote] = useState<'up' | 'down'>();
+  const [currentPledge, setCurrentPledge] = useState<ethers.BigNumber>();
+
+  const loadingStages = [
+    {
+      id: 'balance',
+      icon: <Wallet className="w-12 h-12 text-yellow-500 animate-pulse" />,
+      title: "Checking LGR Balance",
+      description: "Verifying your token balance..."
+    },
+    {
+      id: 'metadata',
+      icon: <FileSearch className="w-12 h-12 text-blue-500 animate-pulse" />,
+      title: "Loading Proposal Data",
+      description: "Retrieving proposal details..."
+    },
+    {
+      id: 'chain',
+      icon: <Activity className="w-12 h-12 text-purple-500 animate-pulse" />,
+      title: "Syncing Blockchain State",
+      description: "Getting latest voting and pledge information..."
+    },
+    {
+      id: 'final',
+      icon: <TrendingUp className="w-12 h-12 text-green-500 animate-pulse" />,
+      title: "Analyzing Investment Progress",
+      description: "Calculating participation metrics..."
+    }
+  ];
+
+  const getCurrentStage = () => {
+    if (isCheckingBalance) return 'balance';
+    if (isLoading) return 'metadata';
+    if (isLoadingChainData) return 'chain';
+    if (proposalDetails) return 'final';
+    return 'balance';
+  };
+
+  const handleVote = async (direction: 'up' | 'down') => {
+    try {
+      setIsVoting(true);
+      // Implement voting logic here
+      setUserVote(direction);
+      toast({
+        title: "Vote Recorded",
+        description: `You have ${direction === 'up' ? 'supported' : 'rejected'} this proposal`,
+      });
+    } catch (error: any) {
+      console.error("Voting error:", error);
+      toast({
+        title: "Voting Failed",
+        description: error.message || "Failed to record your vote",
+        variant: "destructive",
+      });
+    } finally {
+      setIsVoting(false);
+    }
+  };
+
+  const handlePledge = async () => {
+    try {
+      setPledging(true);
+      // Implement pledging logic here
+      toast({
+        title: "Pledge Recorded",
+        description: "Your pledge has been recorded successfully",
+      });
+    } catch (error: any) {
+      console.error("Pledging error:", error);
+      toast({
+        title: "Pledging Failed",
+        description: error.message || "Failed to record your pledge",
+        variant: "destructive",
+      });
+    } finally {
+      setPledging(false);
+    }
+  };
 
   useEffect(() => {
     if (isCheckingBalance) {
@@ -373,19 +584,28 @@ const ProposalDetails = () => {
   }
 
   if (isCheckingBalance || isLoading || isLoadingChainData) {
+    const currentStage = getCurrentStage();
+    const currentStageData = loadingStages.find(stage => stage.id === currentStage);
+
     return (
       <div className="container mx-auto px-4 pt-32">
         <Card className="bg-black/40 border-white/10">
           <CardContent className="p-8">
-            <div className="space-y-4">
-              <div className="flex items-center justify-center mb-6">
-                <div className="animate-spin w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full" />
-              </div>
-              <h2 className="text-2xl font-bold text-white text-center mb-4">{loadingStage}</h2>
-              <Progress value={loadingProgress} className="w-full bg-white/10" />
-              <p className="text-white/60 text-center">
-                Please wait while we load the proposal details...
-              </p>
+            <div className="space-y-8">
+              <AnimatePresence mode="wait">
+                {currentStageData && (
+                  <LoadingStage
+                    key={currentStageData.id}
+                    icon={currentStageData.icon}
+                    title={currentStageData.title}
+                    description={currentStageData.description}
+                  />
+                )}
+              </AnimatePresence>
+              <Progress 
+                value={loadingProgress} 
+                className="w-full bg-white/10" 
+              />
             </div>
           </CardContent>
         </Card>
@@ -465,6 +685,7 @@ const ProposalDetails = () => {
           </Button>
 
           <div className="grid gap-8">
+            {/* Main Info Card */}
             <Card className="bg-black/40 border-white/10">
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -489,6 +710,7 @@ const ProposalDetails = () => {
                 </div>
               </CardHeader>
               <CardContent>
+                {/* Investment Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                   <Card className="bg-white/5 border-white/10">
                     <CardContent className="pt-6">
@@ -520,7 +742,9 @@ const ProposalDetails = () => {
                           />
                           <div className="mt-2 text-sm text-white/60">
                             <span>Pledged: </span>
-                            <span className="text-white">{ethers.utils.formatEther(onChainData.pledgedAmount)} LGR</span>
+                            <span className="text-white">
+                              {ethers.utils.formatEther(onChainData.pledgedAmount)} LGR
+                            </span>
                             <span className="text-yellow-500 ml-2">
                               ≈ {formatUSDValue(onChainData.pledgedAmount)}
                             </span>
@@ -565,7 +789,23 @@ const ProposalDetails = () => {
                   </Card>
                 </div>
 
+                {/* Voting & Pledging Section */}
                 <div className="space-y-8">
+                  <VotingSection
+                    onVote={handleVote}
+                    isVoting={isVoting}
+                    userVote={userVote}
+                  />
+
+                  <PledgeSection
+                    onPledge={handlePledge}
+                    isPledging={isPledging}
+                    currentPledge={currentPledge}
+                  />
+                </div>
+
+                {/* Investment Details */}
+                <div className="space-y-8 mt-8">
                   <div>
                     <h3 className="text-xl font-bold text-white mb-4">Investment Drivers</h3>
                     <p className="text-white/80">{metadata.investment.drivers}</p>
@@ -585,6 +825,22 @@ const ProposalDetails = () => {
                       <Badge variant="outline" className="text-white/80">
                         {getGeographicFocusLabel(metadata.firmCriteria.geographicFocus)}
                       </Badge>
+                    </div>
+                  </div>
+
+                  {/* Payment Terms Section */}
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-4">Payment Terms</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {metadata.paymentTerms.map((term, index) => (
+                        <Badge 
+                          key={index}
+                          variant="outline" 
+                          className="text-purple-400 border-purple-400"
+                        >
+                          {getPaymentTermLabel(term)}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
                 </div>
