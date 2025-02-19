@@ -118,10 +118,11 @@ const TEST_FORM_DATA: ProposalMetadata = {
     additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
   },
   votingDuration: MIN_VOTING_DURATION,
+  votingEnds: Math.floor(Date.now() / 1000) + MIN_VOTING_DURATION,
   linkedInURL: "",
   isTestMode: true,
   submissionTimestamp: Date.now(),
-  submitter: ""
+  submitter: address || ""
 };
 
 const isValidLinkedInURL = (url: string): boolean => {
@@ -169,8 +170,11 @@ const ThesisSubmission = () => {
       additionalCriteria: ""
     },
     votingDuration: MIN_VOTING_DURATION,
+    votingEnds: Math.floor(Date.now() / 1000) + MIN_VOTING_DURATION,
     linkedInURL: "",
-    isTestMode: false
+    isTestMode: false,
+    submissionTimestamp: Date.now(),
+    submitter: address || ""
   });
 
   useEffect(() => {
@@ -279,6 +283,11 @@ const ThesisSubmission = () => {
 
   const handleVotingDurationChange = (value: number[]) => {
     setVotingDuration(value[0]);
+    setFormData(prev => ({
+      ...prev,
+      votingDuration: value[0],
+      votingEnds: Math.floor(Date.now() / 1000) + value[0]
+    }));
   };
 
   const getButtonText = () => {
