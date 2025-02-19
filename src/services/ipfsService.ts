@@ -2,29 +2,66 @@
 import { Buffer } from 'buffer';
 import { ProposalMetadata } from '@/types/proposals';
 import { IPFSContent } from '@/types/content';
-
-const PINATA_GATEWAY = 'https://blue-shaggy-halibut-668.mypinata.cloud/ipfs/';
-const PINATA_GATEWAY_TOKEN = 'LxW7Vt1WCzQk4x7VPUWYizgTK5BXllL4JMUQVXMeZEPqSoovWPXI-jmwcFsZ3hs';
+import { supabase } from "@/integrations/supabase/client";
 
 export const getFromIPFS = async <T extends ProposalMetadata | IPFSContent>(
   hash: string,
   type: 'proposal' | 'content'
 ): Promise<T> => {
   try {
-    const url = `${PINATA_GATEWAY}${hash}?pinataGatewayToken=${PINATA_GATEWAY_TOKEN}`;
-    console.log('Fetching from Pinata gateway:', url);
+    console.log('Getting Pinata credentials from Supabase...');
+    const { data: credentials, error: credentialsError } = await supabase
+      .functions.invoke('get-pinata-credentials');
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      console.error('Pinata gateway response not OK:', response.status, response.statusText);
-      throw new Error(`IPFS fetch failed: ${response.statusText}`);
+    if (credentialsError || !credentials.PINATA_API_KEY || !credentials.PINATA_API_SECRET) {
+      console.error('Error getting Pinata credentials:', credentialsError);
+      throw new Error('Failed to get Pinata credentials');
     }
 
-    const data = await response.json();
-    console.log('Raw IPFS data from Pinata:', JSON.stringify(data, null, 2));
+    const url = `https://api.pinata.cloud/data/pinList?status=pinned&hashContains=${hash}`;
+    console.log('Fetching from Pinata API:', url);
+
+    const response = await fetch(url, {
+      headers: {
+        'pinata_api_key': credentials.PINATA_API_KEY,
+        'pinata_secret_api_key': credentials.PINATA_API_SECRET,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      console.error('Pinata API response not OK:', response.status, response.statusText);
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
+      throw new Error(`Pinata API fetch failed: ${response.statusText}`);
+    }
+
+    const pinListData = await response.json();
+    console.log('Pin list response:', pinListData);
+
+    if (!pinListData.rows || pinListData.rows.length === 0) {
+      throw new Error(`Content not found for hash: ${hash}`);
+    }
+
+    // Get the metadata URL from the pin list response
+    const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${hash}`;
+    console.log('Fetching metadata from:', ipfsUrl);
+
+    const metadataResponse = await fetch(ipfsUrl, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!metadataResponse.ok) {
+      console.error('Metadata fetch failed:', metadataResponse.status, metadataResponse.statusText);
+      throw new Error(`Metadata fetch failed: ${metadataResponse.statusText}`);
+    }
+
+    const data = await metadataResponse.json();
+    console.log('Raw metadata from Pinata:', JSON.stringify(data, null, 2));
 
     if (type === 'proposal') {
-      // Map string values to enum types if needed
       const mappedData = {
         ...data,
         votingDuration: data.votingDuration || 604800, // Default to 7 days if not specified
@@ -32,12 +69,11 @@ export const getFromIPFS = async <T extends ProposalMetadata | IPFSContent>(
       console.log('Mapped proposal data:', JSON.stringify(mappedData, null, 2));
       return mappedData as T;
     } else {
-      // Handle content type
       console.log('Mapped content data:', JSON.stringify(data, null, 2));
       return data as T;
     }
   } catch (error) {
-    console.error('Error fetching from Pinata gateway:', error);
+    console.error('Error in IPFS retrieval:', error);
     throw error;
   }
 };
@@ -46,12 +82,40 @@ export const uploadToIPFS = async <T extends ProposalMetadata | IPFSContent>(
   content: T
 ): Promise<string> => {
   try {
-    console.log('Uploading to IPFS:', JSON.stringify(content, null, 2));
-    const mockHash = `Qm${Math.random().toString(36).substring(2, 15)}`;
-    return mockHash;
+    console.log('Getting Pinata credentials from Supabase...');
+    const { data: credentials, error: credentialsError } = await supabase
+      .functions.invoke('get-pinata-credentials');
+
+    if (credentialsError || !credentials.PINATA_API_KEY || !credentials.PINATA_API_SECRET) {
+      console.error('Error getting Pinata credentials:', credentialsError);
+      throw new Error('Failed to get Pinata credentials');
+    }
+
+    console.log('Uploading content to Pinata:', JSON.stringify(content, null, 2));
+    
+    const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'pinata_api_key': credentials.PINATA_API_KEY,
+        'pinata_secret_api_key': credentials.PINATA_API_SECRET
+      },
+      body: JSON.stringify(content)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Pinata upload failed:', errorText);
+      throw new Error('Failed to upload to Pinata');
+    }
+
+    const result = await response.json();
+    const ipfsHash = result.IpfsHash;
+    console.log('Upload successful. IPFS hash:', ipfsHash);
+    
+    return ipfsHash;
   } catch (error) {
     console.error('Error uploading to IPFS:', error);
     throw error;
   }
 };
-
