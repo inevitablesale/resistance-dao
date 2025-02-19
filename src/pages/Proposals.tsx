@@ -41,9 +41,11 @@ const Proposals = () => {
   return (
     <div className="min-h-screen bg-black">
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-purple-500/10 to-pink-500/10 animate-gradient" />
+        {/* Gradient overlay - now with pointer-events-none */}
+        <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-purple-500/10 to-pink-500/10 animate-gradient pointer-events-none" />
         
-        <div className="container mx-auto px-4 pt-32 pb-20">
+        {/* Main content - now with proper z-index */}
+        <div className="container mx-auto px-4 pt-32 pb-20 relative z-10">
           <div className="text-center mb-12">
             <div className="mb-8">
               <Building2 className="w-20 h-20 mx-auto text-yellow-500 animate-cosmic-pulse" />
@@ -93,7 +95,7 @@ const Proposals = () => {
             </div>
           </div>
 
-          <div className="mb-16">
+          <div className="mb-16 relative z-10">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
