@@ -34,7 +34,7 @@ const Nav = () => {
             </BreadcrumbItem>
             <BreadcrumbSeparator className="text-white/40" />
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-white">Proposals</BreadcrumbPage>
+              <BreadcrumbPage className="text-white">All Proposals</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -53,7 +53,7 @@ const Nav = () => {
             <BreadcrumbSeparator className="text-white/40" />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/proposals" className="hover:text-white">Proposals</Link>
+                <Link to="/proposals" className="hover:text-white">All Proposals</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="text-white/40" />
@@ -77,12 +77,12 @@ const Nav = () => {
             <BreadcrumbSeparator className="text-white/40" />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/proposals" className="hover:text-white">Proposals</Link>
+                <Link to="/proposals" className="hover:text-white">All Proposals</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="text-white/40" />
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-white">Submit Proposal</BreadcrumbPage>
+              <BreadcrumbPage className="text-white">Create a Fund Proposal</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
