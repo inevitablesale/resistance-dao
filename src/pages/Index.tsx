@@ -295,7 +295,13 @@ const IndexContent = () => {
           </p>
 
           <div className="space-y-6">
-            <div className="flex justify-center">
+            <div className="flex justify-center gap-4">
+              <button 
+                onClick={() => navigate('/thesis')}
+                className="px-12 py-6 bg-white/10 text-white rounded-lg font-bold text-2xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
+              >
+                Create Fund Proposal
+              </button>
               <button 
                 onClick={() => window.open('https://calendly.com/inevitable-sale/lgr-presale', '_blank')}
                 className="px-12 py-6 bg-white/10 text-white rounded-lg font-bold text-2xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
