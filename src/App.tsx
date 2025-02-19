@@ -147,7 +147,7 @@ function Layout() {
         <Route path="/content" element={<ContentHub />} />
         <Route path="/thesis" element={<ThesisSubmission />} />
         <Route path="/proposals" element={<Proposals />} />
-        <Route path="/proposals/:hash" element={<ProposalDetails />} />
+        <Route path="/proposals/:tokenId" element={<ProposalDetails />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
@@ -111,10 +110,25 @@ const ProposalDetails = () => {
     checkLGRBalance();
   }, [isConnected, address, getProvider]);
 
-  // Only load IPFS data after wallet connection and LGR balance verification
+  // Add debug logging for dependency values
   useEffect(() => {
+    console.log('Proposal Details Dependencies:', {
+      tokenId,
+      isConnected,
+      hasMinimumLGR,
+      isConnectedType: typeof isConnected,
+      hasMinimumLGRType: typeof hasMinimumLGR
+    });
+
     if (tokenId && isConnected && hasMinimumLGR === true) {
+      console.log('Starting IPFS data load for token:', tokenId);
       loadIPFSData();
+    } else {
+      console.log('IPFS load conditions not met:', {
+        hasTokenId: !!tokenId,
+        isConnected,
+        hasMinimumLGR
+      });
     }
   }, [tokenId, isConnected, hasMinimumLGR]);
 
