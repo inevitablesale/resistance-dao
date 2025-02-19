@@ -51,23 +51,20 @@ const Proposals = () => {
               <Building2 className="w-20 h-20 mx-auto text-yellow-500 animate-cosmic-pulse" />
             </div>
             <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient">
-              Investment Proposals
+              Co-Investment Opportunities
             </h1>
             <p className="text-xl text-white/80 max-w-3xl mx-auto mb-8">
-              Join a community of like-minded investors to propose and develop investment strategies for accounting practices.
+              Pool resources with like-minded investors to acquire and grow accounting practices. Share insights, combine capital, and participate in vetted opportunities.
             </p>
             <Button onClick={() => navigate('/thesis')} className="px-8 py-6 bg-white/10 text-white rounded-lg font-bold text-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm">
               <Plus className="w-5 h-5 mr-2" />
-              Submit New Proposal
+              Propose a Co-Investment
             </Button>
           </div>
 
           <div className="mb-20">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-white mb-4">Supporting Investment Proposals</h2>
-              <p className="text-lg text-white/60 max-w-2xl mx-auto">
-                Understand how to participate in and support investment proposals through our community-driven process.
-              </p>
+              <h2 className="text-3xl font-bold text-white mb-4">How Co-Investment Works</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {processSteps.map((step, index) => {
@@ -101,12 +98,8 @@ const Proposals = () => {
                 <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
                   <FileText className="w-5 h-5 text-purple-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-white">Active Proposals</h2>
+                <h2 className="text-2xl font-bold text-white">Current Co-Investment Opportunities</h2>
               </div>
-              <Button onClick={() => navigate('/thesis')} className="bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors">
-                <Plus className="w-4 h-4 mr-2" />
-                New Proposal
-              </Button>
             </div>
             <ProposalsHistory />
           </div>
