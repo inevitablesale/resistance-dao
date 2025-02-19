@@ -1,7 +1,7 @@
 
 import { ProposalsHistory } from "@/components/proposals/ProposalsHistory";
 import { Button } from "@/components/ui/button";
-import { FileText, Plus, Trophy, Building2, Shield, Rocket } from "lucide-react";
+import { FileText, Plus, Trophy, Building2, Users, Shield, Rocket } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
@@ -36,9 +36,9 @@ const Proposals = () => {
         <div className="container mx-auto px-4 pt-32 pb-20">
           <div className="text-center mb-12">
             <div className="mb-8">
-              <Building2 className="w-20 h-20 mx-auto text-yellow-500" />
+              <Building2 className="w-20 h-20 mx-auto text-yellow-500 animate-cosmic-pulse" />
             </div>
-            <h1 className="text-6xl font-bold mb-6 text-[#B3E6D9]">
+            <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient">
               Investment Proposals
             </h1>
             <p className="text-xl text-white/80 max-w-3xl mx-auto mb-8">
@@ -46,7 +46,7 @@ const Proposals = () => {
             </p>
             <Button 
               onClick={() => navigate('/thesis')} 
-              className="px-8 py-4 text-white rounded-lg font-bold text-xl bg-[#1F1F2D] hover:bg-[#2a2a3d] transition-all duration-300"
+              className="px-8 py-6 bg-white/10 text-white rounded-lg font-bold text-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
             >
               <Plus className="w-5 h-5 mr-2" />
               Submit New Proposal
@@ -58,13 +58,8 @@ const Proposals = () => {
             {boardMembers.map((member, index) => {
               const Icon = member.icon;
               return (
-                <Card 
-                  key={index} 
-                  className="relative bg-gradient-to-br from-[#1F1F2D] to-[#1A1A27] border-none p-6 rounded-xl overflow-hidden"
-                  style={{
-                    backgroundImage: 'radial-gradient(circle at 100% 100%, rgba(50, 50, 70, 0.2) 0%, transparent 50%)'
-                  }}
-                >
+                <Card key={index} className="relative group bg-black/40 backdrop-blur-sm border border-white/10 p-6">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000" />
                   <div className="relative">
                     <div className="p-2 bg-yellow-500/10 rounded-lg inline-block mb-4">
                       <Icon className="w-8 h-8 text-yellow-500" />
