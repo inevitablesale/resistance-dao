@@ -5,6 +5,14 @@ import { useToast } from "@/hooks/use-toast";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import Twitter from "./icons/Twitter";
 import Linked from "./icons/Linked";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const Nav = () => {
   const { primaryWallet } = useDynamicContext();
@@ -15,6 +23,78 @@ const Nav = () => {
   const hideHomeRoutes = ['/', '/thesis'];
   const shouldShowHomeLink = !hideHomeRoutes.includes(location.pathname);
   const shouldShowProposals = location.pathname !== '/';
+
+  const getBreadcrumbs = () => {
+    const path = location.pathname;
+    
+    if (path === '/proposals') {
+      return (
+        <Breadcrumb>
+          <BreadcrumbList className="text-white/60">
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/" className="hover:text-white">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="text-white/40" />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-white">Proposals</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      );
+    }
+
+    if (path.startsWith('/proposals/')) {
+      return (
+        <Breadcrumb>
+          <BreadcrumbList className="text-white/60">
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/" className="hover:text-white">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="text-white/40" />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/proposals" className="hover:text-white">Proposals</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="text-white/40" />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-white">Proposal Details</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      );
+    }
+
+    if (path === '/thesis') {
+      return (
+        <Breadcrumb>
+          <BreadcrumbList className="text-white/60">
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/" className="hover:text-white">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="text-white/40" />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/proposals" className="hover:text-white">Proposals</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="text-white/40" />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-white">Submit Proposal</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100] h-16">
@@ -32,6 +112,9 @@ const Nav = () => {
                 Proposals
               </Link>
             )}
+            <div className="ml-4">
+              {getBreadcrumbs()}
+            </div>
           </div>
 
           <div className="flex items-center gap-4">
