@@ -5,162 +5,31 @@ import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS, LGR_PRICE_USD } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { 
   StoredProposal, 
-  ProposalMetadata, 
-  FirmSize, 
-  DealType, 
-  GeographicFocus, 
-  PaymentTerm 
+  ProposalMetadata
 } from "@/types/proposals";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
-  HandCoins, 
-  Clock, 
-  Users, 
   ChevronLeft, 
   Wallet, 
-  AlertCircle, 
-  AlertTriangle,
-  ThumbsUp,
-  ThumbsDown,
-  Loader2,
-  FileSearch,
-  Activity,
-  TrendingUp,
-  ExternalLink
+  Loader2
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
-
-interface ProposalDetails {
-  metadata: ProposalMetadata;
-  storedProposal: StoredProposal;
-  lgrPriceInUSD: number;
-  formattedLGRPrice: string;
-  formattedSubmissionFee: string;
-  hasSufficientBalance: boolean;
-  isApproved: boolean;
-  isRejected: boolean;
-  isAwaitingApproval: boolean;
-  isFunded: boolean;
-  isFundingFailed: boolean;
-  isRefunded: boolean;
-  isFunding: boolean;
-  isFinalized: boolean;
-  isFinalizationFailed: boolean;
-  isAwaitingFinalization: boolean;
-  isExecuting: boolean;
-  isExecutionFailed: boolean;
-  isCompleted: boolean;
-  isCancelled: boolean;
-  isExpired: boolean;
-  isRefundable: boolean;
-  isExecutable: boolean;
-  canBeVotedOn: boolean;
-  canBeFinalized: boolean;
-  canBeRefunded: boolean;
-  canBeExecuted: boolean;
-  canBeCancelled: boolean;
-  canBeExpired: boolean;
-  canBeFunded: boolean;
-  canBeRejected: boolean;
-  canBeApproved: boolean;
-  isTestMode: boolean;
-  isLgrBalanceLoading: boolean;
-  lgrBalance: string;
-  lgrAllowance: string;
-  isLgrAllowanceLoading: boolean;
-  isApprovingLgr: boolean;
-  isFundingProposal: boolean;
-  isFinalizingProposal: boolean;
-  isExecutingProposal: boolean;
-  isCancellingProposal: boolean;
-  isExpiringProposal: boolean;
-  isRefundingProposal: boolean;
-  isVoting: boolean;
-  isApprovedByCurrentUser: boolean | null;
-  isRejectedByCurrentUser: boolean | null;
-  totalVotes: number;
-  approvalPercentage: number;
-  rejectionPercentage: number;
-  isCurrentUserEligibleToVote: boolean;
-  isCurrentUserVoted: boolean;
-  isCurrentUserOwner: boolean;
-  isCurrentUserConnected: boolean;
-  isCurrentUserHasEnoughLgr: boolean;
-  isCurrentUserHasEnoughAllowance: boolean;
-  isCurrentUserHasEnoughBalance: boolean;
-  isCurrentUserCanFinalize: boolean;
-  isCurrentUserCanExecute: boolean;
-  isCurrentUserCanRefund: boolean;
-  isCurrentUserCanCancel: boolean;
-  isCurrentUserCanExpire: boolean;
-  isCurrentUserCanFund: boolean;
-  isCurrentUserCanReject: boolean;
-  isCurrentUserCanApprove: boolean;
-  isCurrentUserCanVote: boolean;
-  isCurrentUserCanFinalizeProposal: boolean;
-  isCurrentUserCanExecuteProposal: boolean;
-  isCurrentUserCanRefundProposal: boolean;
-  isCurrentUserCanCancelProposal: boolean;
-  isCurrentUserCanExpireProposal: boolean;
-  isCurrentUserCanFundProposal: boolean;
-  isCurrentUserCanRejectProposal: boolean;
-  isCurrentUserCanApproveProposal: boolean;
-  isCurrentUserCanVoteProposal: boolean;
-  isCurrentUserCanVoteOnProposal: boolean;
-  isCurrentUserCanFinalizeOnProposal: boolean;
-  isCurrentUserCanExecuteOnProposal: boolean;
-  isCurrentUserCanRefundOnProposal: boolean;
-  isCurrentUserCanCancelOnProposal: boolean;
-  isCurrentUserCanExpireOnProposal: boolean;
-  isCurrentUserCanFundOnProposal: boolean;
-  isCurrentUserCanRejectOnProposal: boolean;
-  isCurrentUserCanApproveOnProposal: boolean;
-  isCurrentUserCanVoteOnThisProposal: boolean;
-  isCurrentUserCanFinalizeThisProposal: boolean;
-  isCurrentUserCanExecuteThisProposal: boolean;
-  isCurrentUserCanRefundThisProposal: boolean;
-  isCurrentUserCanCancelThisProposal: boolean;
-  isCurrentUserCanExpireThisProposal: boolean;
-  isCurrentUserCanFundThisProposal: boolean;
-  isCurrentUserCanRejectThisProposal: boolean;
-  isCurrentUserCanApproveThisProposal: boolean;
-  isCurrentUserCanVoteOnThisSpecificProposal: boolean;
-  isCurrentUserCanFinalizeThisSpecificProposal: boolean;
-  isCurrentUserCanExecuteThisSpecificProposal: boolean;
-  isCurrentUserCanRefundThisSpecificProposal: boolean;
-  isCurrentUserCanCancelThisSpecificProposal: boolean;
-  isCurrentUserCanExpireThisSpecificProposal: boolean;
-  isCurrentUserCanFundThisSpecificProposal: boolean;
-  isCurrentUserCanRejectThisSpecificProposal: boolean;
-  isCurrentUserCanApproveThisSpecificProposal: boolean;
-  isCurrentUserCanVoteOnThisParticularProposal: boolean;
-  isCurrentUserCanFinalizeThisParticularProposal: boolean;
-  isCurrentUserCanExecuteThisParticularProposal: boolean;
-  isCurrentUserCanRefundThisParticularProposal: boolean;
-  isCurrentUserCanCancelThisParticularProposal: boolean;
-  isCurrentUserCanExpireThisParticularProposal: boolean;
-  isCurrentUserCanFundThisParticularProposal: boolean;
-  isCurrentUserCanRejectThisParticularProposal: boolean;
-  isCurrentUserCanApproveThisParticularProposal: boolean;
-}
 
 const ProposalDetails = () => {
   const { tokenId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isConnected, connect } = useWalletConnection();
-  const [proposalDetails, setProposalDetails] = useState<ProposalDetails | null>(null);
+  const [proposalDetails, setProposalDetails] = useState<ProposalMetadata | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingChainData, setIsLoadingChainData] = useState(true);
-  const [isCheckingBalance, setIsCheckingBalance] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
   const { getProvider } = useWalletProvider();
@@ -174,16 +43,13 @@ const ProposalDetails = () => {
       const factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
       setLoadingProgress(40);
 
-      const proposal = await factoryContract.getProposal(tokenId);
+      const proposal = await factoryContract.proposals(tokenId);
       setLoadingProgress(60);
 
-      const proposalURI = await factoryContract.uri(tokenId);
-      setLoadingProgress(80);
-
-      const metadata = await getFromIPFS<ProposalMetadata>(proposalURI);
+      const metadata = await getFromIPFS<ProposalMetadata>(proposal.ipfsMetadata);
       setLoadingProgress(90);
 
-      return { metadata, proposal };
+      return metadata;
     } catch (error: any) {
       console.error("Error fetching proposal details:", error);
       toast({
@@ -211,7 +77,7 @@ const ProposalDetails = () => {
     const loadProposalDetails = async () => {
       const details = await fetchProposalDetails(tokenId);
       if (details) {
-        setProposalDetails(details as any);
+        setProposalDetails(details);
       }
     };
 
@@ -257,13 +123,13 @@ const ProposalDetails = () => {
               <Card className="w-full max-w-3xl mx-auto bg-black/80 text-white border-white/10">
                 <CardHeader>
                   <CardTitle className="text-2xl font-bold">
-                    {proposalDetails.metadata.title}
+                    {proposalDetails.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
                     <h3 className="text-lg font-semibold">Description</h3>
-                    <p className="text-white/80">{proposalDetails.metadata.description}</p>
+                    <p className="text-white/80">{proposalDetails.description}</p>
                   </div>
 
                   <div className="space-y-2">
@@ -271,19 +137,19 @@ const ProposalDetails = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <strong>Firm Size:</strong>{" "}
-                        {proposalDetails.metadata.firmSize}
+                        {proposalDetails.firmSize}
                       </div>
                       <div>
                         <strong>Deal Type:</strong>{" "}
-                        {proposalDetails.metadata.dealType}
+                        {proposalDetails.dealType}
                       </div>
                       <div>
                         <strong>Geographic Focus:</strong>{" "}
-                        {proposalDetails.metadata.geographicFocus}
+                        {proposalDetails.geographicFocus}
                       </div>
                       <div>
                         <strong>Payment Term:</strong>{" "}
-                        {proposalDetails.metadata.paymentTerm}
+                        {proposalDetails.paymentTerm}
                       </div>
                     </div>
                   </div>
@@ -292,15 +158,15 @@ const ProposalDetails = () => {
                     <h3 className="text-lg font-semibold">Team</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <strong>Name:</strong> {proposalDetails.metadata.team.name}
+                        <strong>Name:</strong> {proposalDetails.team.name}
                       </div>
                       <div>
-                        <strong>Email:</strong> {proposalDetails.metadata.team.email}
+                        <strong>Email:</strong> {proposalDetails.team.email}
                       </div>
                       <div>
                         <strong>LinkedIn:</strong>{" "}
                         <a 
-                          href={proposalDetails.metadata.team.linkedin} 
+                          href={proposalDetails.team.linkedin} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-blue-500 hover:underline"
