@@ -85,9 +85,10 @@ const getPaymentTermLabel = (term: PaymentTerm): string => {
 
 interface ProposalDetailsCardProps {
   tokenId?: string;
+  view?: 'overview' | 'details' | 'investment';
 }
 
-export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
+export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDetailsCardProps) => {
   const { toast } = useToast();
   const { isConnected, connect, address } = useWalletConnection();
   const { getProvider } = useWalletProvider();
@@ -296,13 +297,18 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
   if (!isConnected) {
     return (
       <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
-        <CardContent className="p-6 text-center">
+        <CardContent className="p-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
           >
-            <p className="text-white/60 mb-4">Connect your wallet to view proposal details</p>
-            <Button onClick={connect} className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700">
+            <p className="text-white/60 text-lg">Connect your wallet to view proposal details</p>
+            <Button 
+              onClick={connect} 
+              size="lg"
+              className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
+            >
               Connect Wallet
             </Button>
           </motion.div>
@@ -314,13 +320,18 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
   if (hasMinimumLGR === false) {
     return (
       <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
-        <CardContent className="p-6 text-center">
+        <CardContent className="p-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-white/60"
+            className="space-y-4"
           >
-            <p>You need at least {MIN_LGR_REQUIRED} LGR to view proposal details</p>
+            <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Coins className="w-8 h-8 text-yellow-500" />
+            </div>
+            <p className="text-white/60 text-lg">
+              You need at least {MIN_LGR_REQUIRED} LGR to view proposal details
+            </p>
           </motion.div>
         </CardContent>
       </Card>
@@ -330,16 +341,15 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
   if (isLoading) {
     return (
       <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-white">
-            Loading Proposal Details
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Skeleton className="h-4 w-[80%] bg-white/5" />
-          <Skeleton className="h-4 w-[60%] bg-white/5" />
-          <Skeleton className="h-4 w-[40%] bg-white/5" />
-          <Progress value={loadingProgress} className="mt-4" />
+        <CardContent className="p-8 space-y-6">
+          <div className="flex items-center gap-4 mb-4">
+            <Skeleton className="w-12 h-12 rounded-full bg-white/5" />
+            <div className="space-y-2 flex-1">
+              <Skeleton className="h-4 w-[60%] bg-white/5" />
+              <Skeleton className="h-3 w-[40%] bg-white/5" />
+            </div>
+          </div>
+          <Progress value={loadingProgress} className="h-2 bg-white/5" />
         </CardContent>
       </Card>
     );
@@ -348,13 +358,8 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
   if (!proposalDetails) {
     return (
       <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-white">
-            Proposal Not Found
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-white/60">The requested proposal could not be found.</p>
+        <CardContent className="p-8 text-center">
+          <p className="text-white/60 text-lg">The requested proposal could not be found.</p>
         </CardContent>
       </Card>
     );
@@ -364,194 +369,234 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
     ? (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100
     : 0;
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.2 }}
-      className="space-y-6"
-    >
-      <div className="relative bg-gradient-to-br from-purple-500/10 via-transparent to-yellow-500/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-        <div className="absolute inset-0 bg-black/20 rounded-2xl backdrop-blur-sm" />
-        
-        <div className="relative">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-2 flex items-center gap-2">
-                <Coins className="w-6 h-6 text-yellow-500" />
-                Back This Proposal
-              </h3>
-              <p className="text-white/60 text-sm flex items-center gap-1">
-                <Info className="w-4 h-4" />
-                Pledge LGR tokens to show your support
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-white mb-1">
-                {pledgedAmount} LGR
-              </p>
-              <p className="text-sm text-white/60">
-                from {backerCount} backer{backerCount !== 1 ? 's' : ''}
-              </p>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <div className="flex justify-between text-sm text-white/60 mb-2">
-              <span>Progress</span>
-              <span>{progressPercentage.toFixed(1)}%</span>
-            </div>
-            <Progress 
-              value={progressPercentage} 
-              className="h-2 bg-white/5"
-            />
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Label htmlFor="pledgeAmount" className="text-white/60">
-                  Pledge Amount
-                </Label>
-                <Input
-                  id="pledgeAmount"
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  value={pledgeInput}
-                  onChange={(e) => setPledgeInput(e.target.value)}
-                  placeholder="Enter LGR amount"
-                  className="bg-black/40 border-white/10 text-white"
-                />
+  if (view === 'overview') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.2 }}
+        className="space-y-6"
+      >
+        <div className="relative bg-gradient-to-br from-purple-500/10 via-transparent to-yellow-500/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+          <div className="absolute inset-0 bg-black/20 rounded-2xl backdrop-blur-sm" />
+          
+          <div className="relative">
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
+              <div>
+                <h3 className="text-2xl font-semibold text-white mb-2 flex items-center gap-2">
+                  <Coins className="w-6 h-6 text-yellow-500" />
+                  Back This Proposal
+                </h3>
+                <p className="text-white/60 text-sm flex items-center gap-1">
+                  <Info className="w-4 h-4" />
+                  Pledge LGR tokens to show your support
+                </p>
               </div>
-              <Button
-                onClick={handlePledge}
-                disabled={isPledging || !pledgeInput}
-                size="lg"
-                className="self-end bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold transition-all duration-300 transform hover:scale-105"
-              >
-                {isPledging ? (
-                  "Pledging..."
-                ) : (
-                  <>
-                    <Coins className="w-5 h-5 mr-2" />
-                    Pledge Support
-                  </>
-                )}
-              </Button>
+              <div className="text-center md:text-right">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm">
+                  <p className="text-2xl font-bold text-white">
+                    {pledgedAmount} LGR
+                  </p>
+                  <span className="text-sm text-white/60 border-l border-white/10 pl-2">
+                    {backerCount} backer{backerCount !== 1 ? 's' : ''}
+                  </span>
+                </div>
+              </div>
             </div>
-            <p className="text-sm text-white/40">
-              Current value: {formatUSDAmount(pledgedAmount)}
-            </p>
+
+            <div className="mb-8">
+              <div className="flex justify-between text-sm text-white/60 mb-2">
+                <span>Progress</span>
+                <span>{progressPercentage.toFixed(1)}%</span>
+              </div>
+              <Progress 
+                value={progressPercentage} 
+                className="h-3 bg-white/5"
+              />
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <Label htmlFor="pledgeAmount" className="text-white/60 mb-2 block">
+                    Pledge Amount
+                  </Label>
+                  <Input
+                    id="pledgeAmount"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    value={pledgeInput}
+                    onChange={(e) => setPledgeInput(e.target.value)}
+                    placeholder="Enter LGR amount"
+                    className="bg-black/40 border-white/10 text-white h-12"
+                  />
+                </div>
+                <Button
+                  onClick={handlePledge}
+                  disabled={isPledging || !pledgeInput}
+                  size="lg"
+                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold transition-all duration-300 transform hover:scale-105 h-12 mt-8 md:mt-0"
+                >
+                  {isPledging ? (
+                    "Pledging..."
+                  ) : (
+                    <>
+                      <Coins className="w-5 h-5 mr-2" />
+                      Pledge Support
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-sm text-white/40">
+                Current value: {formatUSDAmount(pledgedAmount)}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-white bg-clip-text">
-            {proposalDetails?.title}
-          </CardTitle>
-          <div className="flex items-center gap-4 text-sm text-white/60 mt-2 flex-wrap">
-            {proposalDetails?.submissionTimestamp && (
-              <span className="bg-white/5 px-3 py-1 rounded-full">
-                Submitted on {format(proposalDetails.submissionTimestamp, 'PPP')}
-              </span>
-            )}
-            {proposalDetails?.investment?.targetCapital && (
-              <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
-                <Target className="w-4 h-4" />
-                <span>
+        <Card className="bg-black/40 border-white/10 backdrop-blur-sm overflow-hidden">
+          <CardHeader className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-yellow-500/5 animate-gradient" />
+            <CardTitle className="text-2xl font-bold text-white relative">
+              {proposalDetails?.title}
+            </CardTitle>
+            <div className="flex flex-wrap gap-3 mt-4 relative">
+              {proposalDetails?.submissionTimestamp && (
+                <span className="inline-flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full text-sm text-white/60">
+                  Submitted on {format(proposalDetails.submissionTimestamp, 'PPP')}
+                </span>
+              )}
+              {proposalDetails?.investment?.targetCapital && (
+                <span className="inline-flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full text-sm text-white/60">
+                  <Target className="w-4 h-4" />
                   {proposalDetails.investment.targetCapital} LGR Target
-                  <span className="text-white/40 ml-1">
+                  <span className="text-white/40">
                     ({formatUSDAmount(proposalDetails.investment.targetCapital)})
                   </span>
                 </span>
-              </div>
-            )}
-            {pledgedAmount && Number(pledgedAmount) > 0 && (
-              <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
-                <Users className="w-4 h-4" />
-                <span>
-                  {pledgedAmount} LGR Pledged
-                  <span className="text-white/40 ml-1">
-                    ({formatUSDAmount(pledgedAmount)})
-                  </span>
-                </span>
-              </div>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {proposalDetails?.investment && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="space-y-2"
-            >
-              <h3 className="text-lg font-semibold text-white">Investment Details</h3>
-              <p className="text-white/80 bg-white/5 p-4 rounded-lg backdrop-blur-sm">
-                {proposalDetails.investment.drivers}
-              </p>
-              <p className="text-white/80 bg-white/5 p-4 rounded-lg backdrop-blur-sm">
-                {proposalDetails.investment.additionalCriteria}
-              </p>
-            </motion.div>
-          )}
+              )}
+            </div>
+          </CardHeader>
+        </Card>
+      </motion.div>
+    );
+  }
 
-          {proposalDetails?.firmCriteria && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="space-y-2"
-            >
-              <h3 className="text-lg font-semibold text-white">Firm Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white/5 p-4 rounded-lg backdrop-blur-sm hover:bg-white/10 transition-colors">
-                  <strong className="text-purple-400">Firm Size:</strong>{" "}
-                  <span className="text-white/80">{getFirmSizeLabel(proposalDetails.firmCriteria.size)}</span>
-                </div>
-                <div className="bg-white/5 p-4 rounded-lg backdrop-blur-sm hover:bg-white/10 transition-colors">
-                  <strong className="text-purple-400">Deal Type:</strong>{" "}
-                  <span className="text-white/80">{getDealTypeLabel(proposalDetails.firmCriteria.dealType)}</span>
-                </div>
-                <div className="bg-white/5 p-4 rounded-lg backdrop-blur-sm hover:bg-white/10 transition-colors">
-                  <strong className="text-purple-400">Geographic Focus:</strong>{" "}
-                  <span className="text-white/80">{getGeographicFocusLabel(proposalDetails.firmCriteria.geographicFocus)}</span>
-                </div>
-                <div className="bg-white/5 p-4 rounded-lg backdrop-blur-sm hover:bg-white/10 transition-colors">
-                  <strong className="text-purple-400">Payment Terms:</strong>{" "}
-                  <span className="text-white/80">
-                    {proposalDetails.paymentTerms?.map(term => getPaymentTermLabel(term)).join(", ")}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {proposalDetails?.linkedInURL && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="mt-4"
-            >
-              <a 
-                href={proposalDetails.linkedInURL} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors"
+  if (view === 'details') {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-6"
+      >
+        <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+          <CardContent className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <motion.div 
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group"
               >
-                View LinkedIn Profile 
-                <ExternalLink className="w-4 h-4 ml-2" />
-              </a>
-            </motion.div>
-          )}
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
+                <strong className="text-purple-400 block mb-2">Firm Size</strong>
+                <span className="text-white/80 text-lg">
+                  {getFirmSizeLabel(proposalDetails.firmCriteria.size)}
+                </span>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group"
+              >
+                <strong className="text-purple-400 block mb-2">Deal Type</strong>
+                <span className="text-white/80 text-lg">
+                  {getDealTypeLabel(proposalDetails.firmCriteria.dealType)}
+                </span>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group"
+              >
+                <strong className="text-purple-400 block mb-2">Geographic Focus</strong>
+                <span className="text-white/80 text-lg">
+                  {getGeographicFocusLabel(proposalDetails.firmCriteria.geographicFocus)}
+                </span>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group"
+              >
+                <strong className="text-purple-400 block mb-2">Payment Terms</strong>
+                <span className="text-white/80 text-lg">
+                  {proposalDetails.paymentTerms?.map(term => getPaymentTermLabel(term)).join(", ")}
+                </span>
+              </motion.div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
+
+  if (view === 'investment') {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-6"
+      >
+        <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+          <CardContent className="p-8 space-y-8">
+            {proposalDetails?.investment && (
+              <>
+                <div className="space-y-4">
+                  <h3 className="text-xl font-semibold text-white">Investment Drivers</h3>
+                  <p className="text-white/80 bg-white/5 p-6 rounded-xl backdrop-blur-sm leading-relaxed">
+                    {proposalDetails.investment.drivers}
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-xl font-semibold text-white">Additional Criteria</h3>
+                  <p className="text-white/80 bg-white/5 p-6 rounded-xl backdrop-blur-sm leading-relaxed">
+                    {proposalDetails.investment.additionalCriteria}
+                  </p>
+                </div>
+              </>
+            )}
+
+            {proposalDetails?.linkedInURL && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <a 
+                  href={proposalDetails.linkedInURL} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 rounded-xl bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors text-lg"
+                >
+                  View LinkedIn Profile 
+                  <ExternalLink className="w-5 h-5 ml-2" />
+                </a>
+              </motion.div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
+
+  return null;
 };
