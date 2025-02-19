@@ -100,6 +100,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
   const [backerCount, setBackerCount] = useState(0);
   const [pledgeInput, setPledgeInput] = useState("");
   const [isPledging, setIsPledging] = useState(false);
+  const VOTING_FEE = ethers.utils.parseEther("10");
 
   const formatUSDAmount = (lgrAmount: string): string => {
     const amount = parseFloat(lgrAmount);
@@ -257,15 +258,40 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
     
     setIsPledging(true);
     try {
-      const amount = ethers.utils.parseEther(pledgeInput);
       const walletProvider = await getProvider();
+      const pledgeAmount = ethers.utils.parseEther(pledgeInput);
+      const totalNeeded = pledgeAmount.add(VOTING_FEE);
+
+      console.log('Checking balance for pledge:', {
+        pledgeAmount: ethers.utils.formatEther(pledgeAmount),
+        votingFee: ethers.utils.formatEther(VOTING_FEE),
+        totalNeeded: ethers.utils.formatEther(totalNeeded)
+      });
+
+      const balance = await getTokenBalance(
+        walletProvider.provider,
+        LGR_TOKEN_ADDRESS,
+        address!
+      );
+      const userBalance = ethers.utils.parseEther(balance);
+
+      console.log('User balance check:', {
+        userBalance: balance,
+        hasEnough: userBalance.gte(totalNeeded)
+      });
+
+      if (userBalance.lt(totalNeeded)) {
+        const shortfall = ethers.utils.formatEther(totalNeeded.sub(userBalance));
+        throw new Error(`Insufficient LGR balance. You need ${shortfall} more LGR to complete this transaction (including 10 LGR voting fee)`);
+      }
+
       const factoryContract = new ethers.Contract(
         FACTORY_ADDRESS,
         FACTORY_ABI,
         walletProvider.provider.getSigner()
       );
 
-      const tx = await factoryContract.vote(tokenId, amount);
+      const tx = await factoryContract.vote(tokenId, pledgeAmount);
       await tx.wait();
 
       toast({
@@ -275,12 +301,11 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
       setPledgedAmount(prev => {
         const currentAmount = ethers.utils.parseEther(prev);
-        const newAmount = currentAmount.add(amount);
+        const newAmount = currentAmount.add(pledgeAmount);
         return ethers.utils.formatEther(newAmount);
       });
       
       setBackerCount(prev => prev + 1);
-      
       setPledgeInput("");
     } catch (error: any) {
       console.error("Pledging error:", error);
