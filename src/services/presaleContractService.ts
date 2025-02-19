@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
@@ -38,7 +39,6 @@ export const getWorkingProvider = async () => {
   for (const rpc of RPC_ENDPOINTS) {
     try {
       const provider = new ethers.providers.JsonRpcProvider(rpc);
-      // Test the connection
       await provider.getNetwork();
       return provider;
     } catch (error) {
@@ -53,22 +53,20 @@ export const getPresaleContract = async (providerOrSigner: ethers.providers.Prov
   return new ethers.Contract(PRESALE_CONTRACT_ADDRESS, PRESALE_ABI, providerOrSigner);
 };
 
-// Function to get LGR token contract
 export const getLgrTokenContract = async (provider: ethers.providers.Provider) => {
   const presaleContract = await getPresaleContract(provider);
   const lgrTokenAddress = await presaleContract.lgrToken();
   return new ethers.Contract(lgrTokenAddress, ERC20_ABI, provider);
 };
 
-// Function to fetch total LGR sold by checking contract's token balance
+// Function to fetch total LGR sold
 export const fetchTotalLGRSold = async () => {
   try {
     const provider = await getWorkingProvider();
     const lgrTokenContract = await getLgrTokenContract(provider);
     const remainingBalance = await lgrTokenContract.balanceOf(PRESALE_CONTRACT_ADDRESS);
     const totalSold = TOTAL_PRESALE_SUPPLY.sub(remainingBalance);
-    const formattedAmount = Number(ethers.utils.formatUnits(totalSold, 18)).toFixed(2);
-    return formattedAmount;
+    return ethers.utils.formatUnits(totalSold, 18);
   } catch (error) {
     console.error("Error fetching total LGR sold:", error);
     return "0";
@@ -106,18 +104,10 @@ export const fetchPresaleMaticPrice = async () => {
   try {
     const provider = await getWorkingProvider();
     const contract = await getPresaleContract(provider);
-    
-    // Get the latest MATIC price in USD from the contract (assuming 8 decimals)
     const maticPriceInUsd = await contract.getLatestMaticPrice();
-    const maticPriceUsd = ethers.utils.formatUnits(maticPriceInUsd, 8); // Convert to USD value
-    
-    // LGR price is fixed at $0.10
+    const maticPriceUsd = ethers.utils.formatUnits(maticPriceInUsd, 8);
     const lgrPriceUsd = 0.10;
-    
-    // Calculate MATIC required for 1 LGR: ($0.10 / MATIC USD price)
     const maticRequired = lgrPriceUsd / Number(maticPriceUsd);
-    
-    // Format to 4 decimal places for display
     return maticRequired.toFixed(4);
   } catch (error) {
     console.error("Error fetching MATIC price:", error);
@@ -125,7 +115,7 @@ export const fetchPresaleMaticPrice = async () => {
   }
 };
 
-// Function to purchase tokens
+// Function to purchase tokens using Dynamic+ZeroDev integration
 export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string) => {
   try {
     console.log('Starting token purchase with MATIC amount:', maticAmount);
@@ -136,7 +126,7 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
     const maticPrice = await contract.getLGRPrice();
     console.log('Current MATIC price per token:', ethers.utils.formatEther(maticPrice));
     
-    // Calculate expected number of tokens based on $0.10 per token
+    // Calculate expected number of tokens
     const maticAmountWei = ethers.utils.parseEther(maticAmount);
     const expectedTokens = maticAmountWei.mul(ethers.utils.parseEther("1")).div(maticPrice);
     console.log('Expected tokens:', ethers.utils.formatEther(expectedTokens));
@@ -145,7 +135,7 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
     const minExpectedTokens = expectedTokens.mul(99).div(100);
     console.log('Min expected tokens with 1% slippage:', ethers.utils.formatEther(minExpectedTokens));
 
-    // Execute purchase transaction
+    // Let Dynamic+ZeroDev handle the transaction
     const tx = await contract.buyTokens(minExpectedTokens, {
       value: maticAmountWei
     });
@@ -181,14 +171,11 @@ export const fetchConversionRates = async () => {
     const lgrMaticPrice = await contract.getLGRPrice();
     console.log('LGR MATIC price:', lgrMaticPrice.toString());
     
-    const rates = {
+    return {
       usdToMatic: Number(ethers.utils.formatUnits(maticUsdPrice, 18)),
       maticToLgr: Number(ethers.utils.formatEther(lgrMaticPrice)),
       lastUpdated: new Date()
     };
-    
-    console.log('Formatted rates:', rates);
-    return rates;
   } catch (error) {
     console.error("Error details:", {
       message: error.message,
