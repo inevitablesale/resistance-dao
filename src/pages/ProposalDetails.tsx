@@ -32,8 +32,8 @@ interface ProposalDetails {
 
 const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
 
-const getFirmSizeLabel = (size: number): string => {
-  const sizeMap: Record<number, string> = {
+const getFirmSizeLabel = (size: FirmSize): string => {
+  const sizeMap: Record<FirmSize, string> = {
     [FirmSize.BELOW_1M]: "Below $1M",
     [FirmSize.ONE_TO_FIVE_M]: "$1M - $5M",
     [FirmSize.FIVE_TO_TEN_M]: "$5M - $10M",
@@ -42,8 +42,8 @@ const getFirmSizeLabel = (size: number): string => {
   return sizeMap[size] || "Unknown";
 };
 
-const getDealTypeLabel = (type: number): string => {
-  const typeMap: Record<number, string> = {
+const getDealTypeLabel = (type: DealType): string => {
+  const typeMap: Record<DealType, string> = {
     [DealType.ACQUISITION]: "Acquisition",
     [DealType.MERGER]: "Merger",
     [DealType.EQUITY_BUYOUT]: "Equity Buyout",
@@ -53,8 +53,8 @@ const getDealTypeLabel = (type: number): string => {
   return typeMap[type] || "Unknown";
 };
 
-const getGeographicFocusLabel = (focus: number): string => {
-  const focusMap: Record<number, string> = {
+const getGeographicFocusLabel = (focus: GeographicFocus): string => {
+  const focusMap: Record<GeographicFocus, string> = {
     [GeographicFocus.LOCAL]: "Local",
     [GeographicFocus.REGIONAL]: "Regional",
     [GeographicFocus.NATIONAL]: "National",
@@ -199,9 +199,9 @@ const ProposalDetails = () => {
         ...rawMetadata,
         firmCriteria: {
           ...rawMetadata.firmCriteria,
-          size: getFirmSizeLabel(rawMetadata.firmCriteria.size),
-          dealType: getDealTypeLabel(rawMetadata.firmCriteria.dealType),
-          geographicFocus: getGeographicFocusLabel(rawMetadata.firmCriteria.geographicFocus)
+          size: rawMetadata.firmCriteria.size as FirmSize,
+          dealType: rawMetadata.firmCriteria.dealType as DealType,
+          geographicFocus: rawMetadata.firmCriteria.geographicFocus as GeographicFocus
         }
       };
       
@@ -405,10 +405,10 @@ const ProposalDetails = () => {
                     </CardTitle>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="text-yellow-500 border-yellow-500">
-                        {metadata.firmCriteria.dealType}
+                        {getDealTypeLabel(metadata.firmCriteria.dealType)}
                       </Badge>
                       <Badge variant="outline" className="text-teal-500 border-teal-500">
-                        {metadata.firmCriteria.size}
+                        {getFirmSizeLabel(metadata.firmCriteria.size)}
                       </Badge>
                     </div>
                   </div>
