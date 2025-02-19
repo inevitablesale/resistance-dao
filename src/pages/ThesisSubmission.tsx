@@ -699,7 +699,7 @@ const ThesisSubmission = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black relative">
       <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
         <div className="container mx-auto px-4 py-4">
           <motion.div 
@@ -933,6 +933,8 @@ const ThesisSubmission = () => {
           </div>
         </div>
       </div>
+
+      <LGRFloatingWidget />
     </div>
   );
 };
