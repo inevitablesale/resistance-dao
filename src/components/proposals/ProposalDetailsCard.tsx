@@ -272,10 +272,11 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         
         if (isPast(endDate)) {
           setIsVotingEnded(true);
-          setTimeRemaining("Voting has ended");
+          setTimeRemaining("Voting ended");
         } else {
           setIsVotingEnded(false);
-          setTimeRemaining(formatDistanceToNow(endDate, { addSuffix: true }));
+          const timeLeft = formatDistanceToNow(endDate);
+          setTimeRemaining(`Proposal ends in ${timeLeft}`);
         }
       };
 
@@ -396,18 +397,15 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
   if (isLoading) {
     return (
-      <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
-        <CardContent className="p-8 space-y-6">
-          <div className="flex items-center gap-4 mb-4">
-            <Skeleton className="w-12 h-12 rounded-full bg-white/5" />
-            <div className="space-y-2 flex-1">
-              <Skeleton className="h-4 w-[60%] bg-white/5" />
-              <Skeleton className="h-3 w-[40%] bg-white/5" />
-            </div>
-          </div>
-          <Progress value={loadingProgress} className="h-2 bg-white/5" />
-        </CardContent>
-      </Card>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-6"
+      >
+        <ProposalLoadingCard 
+          loadingState={loadingStates[Math.floor((loadingProgress / 100) * loadingStates.length)]} 
+        />
+      </motion.div>
     );
   }
 
@@ -547,31 +545,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
             </div>
           </div>
         </div>
-
-        <Card className="bg-black/40 border-white/10 backdrop-blur-sm overflow-hidden">
-          <CardHeader className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-teal-500/5 animate-gradient" />
-            <CardTitle className="text-2xl font-bold text-white relative">
-              {proposalDetails?.title}
-            </CardTitle>
-            <div className="flex flex-wrap gap-3 mt-4 relative">
-              {proposalDetails?.submissionTimestamp && (
-                <span className="inline-flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full text-sm text-white/60">
-                  Submitted on {format(proposalDetails.submissionTimestamp, 'PPP')}
-                </span>
-              )}
-              {proposalDetails?.investment?.targetCapital && (
-                <span className="inline-flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full text-sm text-white/60">
-                  <Target className="w-4 h-4" />
-                  {proposalDetails.investment.targetCapital} LGR Target
-                  <span className="text-white/40">
-                    ({formatUSDAmount(proposalDetails.investment.targetCapital)})
-                  </span>
-                </span>
-              )}
-            </div>
-          </CardHeader>
-        </Card>
       </motion.div>
     );
   }
@@ -584,6 +557,11 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         className="space-y-6"
       >
         <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-white">
+              {proposalDetails?.title}
+            </CardTitle>
+          </CardHeader>
           <CardContent className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <motion.div 

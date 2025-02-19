@@ -4,32 +4,32 @@ import { LoadingState } from "@/types/loading";
 
 export const loadingStates: LoadingState[] = [
   {
-    message: "Connecting Wallet to Smart Contract",
-    subtitle: "Verified on Polygon",
+    message: "Connecting to Blockchain",
+    subtitle: "Accessing Smart Contract",
     progress: 20,
     icon: Database
   },
   {
-    message: "Querying Polygon Network",
-    subtitle: "Decentralized Storage",
+    message: "Loading Proposal Details",
+    subtitle: "Fetching from IPFS",
     progress: 40,
     icon: Link
   },
   {
-    message: "Verifying On-Chain Proposals",
-    subtitle: "Smart Contract Protected",
+    message: "Verifying Investment Data",
+    subtitle: "Checking On-Chain Status",
     progress: 60,
     icon: Shield
   },
   {
-    message: "Fetching IPFS Documents",
-    subtitle: "Web3 Secured",
+    message: "Syncing Support Status",
+    subtitle: "Calculating Commitments",
     progress: 80,
     icon: Server
   },
   {
-    message: "Synchronizing with Latest Block",
-    subtitle: "Blockchain Validated",
+    message: "Finalizing Details",
+    subtitle: "Almost Ready",
     progress: 100,
     icon: Database
   }
