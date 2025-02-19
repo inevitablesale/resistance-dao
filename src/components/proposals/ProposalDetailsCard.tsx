@@ -174,27 +174,27 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       hasMinimumLGR
     });
 
+    if (!tokenId) {
+      console.log('No token ID provided');
+      toast({
+        title: "Invalid Proposal ID",
+        description: "Please provide a valid proposal ID.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isConnected) {
+      console.log('Wallet not connected');
+      return;
+    }
+
+    if (hasMinimumLGR === false) {
+      console.log('Insufficient LGR balance');
+      return;
+    }
+
     const fetchProposalDetails = async () => {
-      if (!tokenId) {
-        console.log('No token ID provided');
-        toast({
-          title: "Invalid Proposal ID",
-          description: "Please provide a valid proposal ID.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!isConnected) {
-        console.log('Wallet not connected');
-        return;
-      }
-
-      if (hasMinimumLGR === false) {
-        console.log('Insufficient LGR balance');
-        return;
-      }
-
       setIsLoading(true);
       setLoadingProgress(20);
 
@@ -210,20 +210,16 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         );
         setLoadingProgress(40);
 
-        console.log(`Getting proposal data for token #${tokenId}`);
-        const [tokenUri, pledged, proposal] = await Promise.all([
+        console.log(`Getting tokenURI and pledged amount for token #${tokenId}`);
+        const [tokenUri, pledged] = await Promise.all([
           factoryContract.tokenURI(tokenId),
-          factoryContract.pledgedAmount(tokenId),
-          factoryContract.proposals(tokenId)
+          factoryContract.pledgedAmount(tokenId)
         ]);
-        
+        setLoadingProgress(60);
+
         console.log('Token URI:', tokenUri);
         console.log('Pledged amount:', ethers.utils.formatEther(pledged));
-        console.log('Total votes:', proposal.totalVotes.toString());
-        
         setPledgedAmount(ethers.utils.formatEther(pledged));
-        setBackerCount(Number(proposal.totalVotes));
-        setLoadingProgress(60);
 
         if (tokenUri) {
           console.log('Starting IPFS fetch for metadata');
