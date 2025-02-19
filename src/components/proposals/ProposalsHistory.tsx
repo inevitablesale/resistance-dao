@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, Users, Target } from "lucide-react";
@@ -12,7 +11,7 @@ import { ethers } from "ethers";
 import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
 import { getTokenBalance } from "@/services/tokenService";
 import { getFromIPFS } from "@/services/ipfsService";
-import { ProposalMetadata, ContractProposal } from "@/types/proposals";
+import { ProposalMetadata } from "@/types/proposals";
 import { useToast } from "@/hooks/use-toast";
 import { IPFSContent } from "@/types/content";
 
@@ -30,7 +29,6 @@ interface ProposalEvent {
   creator: string;
   blockNumber: number;
   transactionHash: string;
-  contractData: ContractProposal;
   metadata?: ProposalMetadata;
   nftMetadata?: NFTMetadata;
   pledgedAmount?: string;
@@ -84,48 +82,6 @@ export const ProposalsHistory = () => {
     checkLGRBalance();
   }, [isConnected, address, getProvider]);
 
-  const fetchNFTMetadata = async (contract: ethers.Contract, tokenId: string): Promise<NFTMetadata | null> => {
-    try {
-      const tokenUri = await contract.tokenURI(tokenId);
-      console.log(`NFT metadata URI for token #${tokenId}:`, tokenUri);
-      
-      if (!tokenUri) {
-        console.log(`No tokenURI found for token #${tokenId}`);
-        return null;
-      }
-
-      if (tokenUri.startsWith('ipfs://')) {
-        const metadata = await getFromIPFS<NFTMetadata>(tokenUri.replace('ipfs://', ''), 'proposal');
-        console.log(`NFT metadata fetched for token #${tokenId}:`, metadata);
-        
-        if (!metadata || !metadata.name || !metadata.description) {
-          console.error(`Invalid NFT metadata structure for token #${tokenId}`);
-          return null;
-        }
-        
-        // Ensure we're returning a properly formatted NFTMetadata object
-        const nftMetadata: NFTMetadata = {
-          contentSchema: metadata.contentSchema,
-          contentType: metadata.contentType,
-          title: metadata.title,
-          content: metadata.content || '', // Provide default empty string for required content field
-          metadata: metadata.metadata,
-          name: metadata.name,
-          description: metadata.description,
-          image: metadata.image,
-          attributes: metadata.attributes
-        };
-        
-        return nftMetadata;
-      }
-
-      return null;
-    } catch (error) {
-      console.error(`Error fetching NFT metadata for token #${tokenId}:`, error);
-      return null;
-    }
-  };
-
   useEffect(() => {
     const fetchProposalData = async () => {
       if (!isConnected || !hasMinimumLGR) return;
@@ -149,35 +105,20 @@ export const ProposalsHistory = () => {
             console.log(`Fetching proposal data for token #${tokenId}`);
 
             try {
-              const [proposalData, pledgedAmount, nftMetadata] = await Promise.all([
-                contract.proposals(tokenId),
-                contract.pledgedAmount(tokenId),
-                fetchNFTMetadata(contract, tokenId)
+              const [tokenUri, pledgedAmount] = await Promise.all([
+                contract.tokenURI(tokenId),
+                contract.pledgedAmount(tokenId)
               ]);
 
-              const contractData: ContractProposal = {
-                title: proposalData.title,
-                ipfsMetadata: proposalData.ipfsMetadata,
-                targetCapital: proposalData.targetCapital.toString(),
-                votingEnds: proposalData.votingEnds.toNumber(),
-                investmentDrivers: proposalData.investmentDrivers,
-                additionalCriteria: proposalData.additionalCriteria,
-                firmSize: proposalData.firmSize,
-                location: proposalData.location,
-                dealType: proposalData.dealType,
-                geographicFocus: proposalData.geographicFocus,
-                paymentTerms: proposalData.paymentTerms,
-                operationalStrategies: proposalData.operationalStrategies,
-                growthStrategies: proposalData.growthStrategies,
-                integrationStrategies: proposalData.integrationStrategies
-              };
-
-              console.log(`Contract data for #${tokenId}:`, contractData);
+              console.log(`NFT metadata URI for token #${tokenId}:`, tokenUri);
 
               let metadata: ProposalMetadata | undefined;
-              if (contractData.ipfsMetadata) {
+              if (tokenUri && tokenUri.startsWith('ipfs://')) {
                 try {
-                  metadata = await getFromIPFS<ProposalMetadata>(contractData.ipfsMetadata, 'proposal');
+                  metadata = await getFromIPFS<ProposalMetadata>(
+                    tokenUri.replace('ipfs://', ''),
+                    'proposal'
+                  );
                   console.log(`IPFS metadata fetched for #${tokenId}:`, metadata);
                 } catch (ipfsError) {
                   console.error(`Error fetching IPFS metadata for proposal #${tokenId}:`, ipfsError);
@@ -189,44 +130,24 @@ export const ProposalsHistory = () => {
                 creator: event.args?.creator,
                 blockNumber: event.blockNumber,
                 transactionHash: event.transactionHash,
-                contractData,
                 metadata,
-                nftMetadata: nftMetadata || undefined,
                 pledgedAmount: ethers.utils.formatEther(pledgedAmount)
               };
 
               return proposalEvent;
             } catch (error) {
               console.error(`Error fetching data for proposal #${tokenId}:`, error);
-              const fallbackEvent: ProposalEvent = {
+              return {
                 tokenId,
                 creator: event.args?.creator,
                 blockNumber: event.blockNumber,
-                transactionHash: event.transactionHash,
-                contractData: {
-                  title: `Proposal #${tokenId}`,
-                  ipfsMetadata: '',
-                  targetCapital: '0',
-                  votingEnds: 0,
-                  investmentDrivers: '',
-                  additionalCriteria: '',
-                  firmSize: 0,
-                  location: '',
-                  dealType: 0,
-                  geographicFocus: 0,
-                  paymentTerms: [],
-                  operationalStrategies: [],
-                  growthStrategies: [],
-                  integrationStrategies: []
-                }
+                transactionHash: event.transactionHash
               };
-              return fallbackEvent;
             }
           })
         );
 
         proposalsWithMetadata.sort((a, b) => b.blockNumber - a.blockNumber);
-        
         console.log('Processed proposals with metadata:', proposalsWithMetadata);
         setProposalEvents(proposalsWithMetadata);
       } catch (error) {
@@ -316,18 +237,20 @@ export const ProposalsHistory = () => {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium text-white">
-                        {event.nftMetadata?.name || event.contractData.title || `Proposal #${event.tokenId}`}
+                        {event.metadata?.title || `Proposal #${event.tokenId}`}
                       </h3>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-white/60">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        <span>{format(new Date(event.blockNumber * 1000), 'PPP')}</span>
+                        <span>{format(event.metadata?.submissionTimestamp || new Date(event.blockNumber * 1000), 'PPP')}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Target className="w-4 h-4" />
-                        <span>{ethers.utils.formatEther(event.contractData.targetCapital)} LGR Target</span>
-                      </div>
+                      {event.metadata?.investment?.targetCapital && (
+                        <div className="flex items-center gap-2">
+                          <Target className="w-4 h-4" />
+                          <span>{event.metadata.investment.targetCapital} LGR Target</span>
+                        </div>
+                      )}
                       {event.pledgedAmount && (
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4" />
@@ -338,8 +261,8 @@ export const ProposalsHistory = () => {
                   </div>
                 </div>
               </div>
-              {event.nftMetadata?.description && (
-                <p className="text-sm text-white/60 mt-2">{event.nftMetadata.description}</p>
+              {event.metadata?.investment?.drivers && (
+                <p className="text-sm text-white/60 mt-2">{event.metadata.investment.drivers}</p>
               )}
             </div>
           </motion.div>
