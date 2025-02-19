@@ -17,7 +17,7 @@ interface WalletProvider {
 
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 1000;
-const INITIALIZATION_TIMEOUT = 10000;
+const INITIALIZATION_TIMEOUT = 10000; // 10 seconds timeout
 
 export const useWalletProvider = () => {
   const { primaryWallet } = useDynamicContext();
@@ -40,6 +40,45 @@ export const useWalletProvider = () => {
       initTimeoutRef.current = null;
     }
   };
+
+  const initializeProvider = useCallback(async (
+    walletClient: any, 
+    retryCount: number = 0
+  ): Promise<ethers.providers.Web3Provider> => {
+    try {
+      console.log(`[Provider] Initialization attempt ${retryCount + 1}/${MAX_RETRIES}`);
+      
+      if (!walletClient) {
+        console.error('[Provider] WalletClient is undefined');
+        throw new Error('WalletClient is undefined');
+      }
+
+      // Create provider and immediately test it
+      const provider = new ethers.providers.Web3Provider(walletClient);
+      const network = await provider.getNetwork();
+      console.log('[Provider] Successfully connected to network:', network.chainId);
+      
+      return provider;
+    } catch (error) {
+      console.error('[Provider] Initialization error:', error);
+      
+      if (retryCount < MAX_RETRIES - 1) {
+        console.log(`[Provider] Retrying in ${RETRY_DELAY}ms...`);
+        await delay(RETRY_DELAY);
+        return initializeProvider(walletClient, retryCount + 1);
+      }
+      
+      throw new ProposalError({
+        category: 'initialization',
+        message: 'Failed to initialize provider after multiple attempts',
+        recoverySteps: [
+          'Check your wallet connection',
+          'Make sure your wallet is unlocked',
+          'Try refreshing the page'
+        ]
+      });
+    }
+  }, []);
 
   const validateWalletClient = useCallback(async (attempts: number = 0): Promise<any> => {
     if (!primaryWallet) {
@@ -87,44 +126,6 @@ export const useWalletProvider = () => {
     }
   }, [primaryWallet]);
 
-  const initializeProvider = useCallback(async (
-    walletClient: any, 
-    retryCount: number = 0
-  ): Promise<ethers.providers.Web3Provider> => {
-    try {
-      console.log(`[Provider] Initialization attempt ${retryCount + 1}/${MAX_RETRIES}`);
-      
-      if (!walletClient) {
-        console.error('[Provider] WalletClient is undefined');
-        throw new Error('WalletClient is undefined');
-      }
-
-      const provider = new ethers.providers.Web3Provider(walletClient, "any");
-      const network = await provider.getNetwork();
-      console.log('[Provider] Successfully connected to network:', network.chainId);
-      
-      return provider;
-    } catch (error) {
-      console.error('[Provider] Initialization error:', error);
-      
-      if (retryCount < MAX_RETRIES - 1) {
-        console.log(`[Provider] Retrying in ${RETRY_DELAY}ms...`);
-        await delay(RETRY_DELAY);
-        return initializeProvider(walletClient, retryCount + 1);
-      }
-      
-      throw new ProposalError({
-        category: 'initialization',
-        message: 'Failed to initialize provider after multiple attempts',
-        recoverySteps: [
-          'Check your wallet connection',
-          'Make sure your wallet is unlocked',
-          'Try refreshing the page'
-        ]
-      });
-    }
-  }, []);
-
   const getProvider = useCallback(async (): Promise<WalletProvider> => {
     if (providerRef.current) {
       return providerRef.current;
@@ -139,7 +140,7 @@ export const useWalletProvider = () => {
             clearInterval(checkInterval);
             resolve(providerRef.current);
           }
-          if (attempts > 50) {
+          if (attempts > 50) { // 5 seconds max wait
             clearInterval(checkInterval);
             reject(new Error('Initialization timeout'));
           }
@@ -149,6 +150,7 @@ export const useWalletProvider = () => {
 
     initializingRef.current = true;
     
+    // Set initialization timeout
     initTimeoutRef.current = setTimeout(() => {
       if (initializingRef.current) {
         initializingRef.current = false;
@@ -200,13 +202,6 @@ export const useWalletProvider = () => {
         getSigner: () => ethersProvider.getSigner()
       };
       providerRef.current = provider;
-      
-      toast({
-        title: "Wallet Connected",
-        description: "Your wallet is ready for transactions",
-        variant: "default"
-      });
-      
       return provider;
     } catch (error) {
       console.error('[Provider] Initialization failed:', error);
@@ -223,8 +218,9 @@ export const useWalletProvider = () => {
       clearInitializationTimeout();
       initializingRef.current = false;
     }
-  }, [primaryWallet, toast, initializeProvider]);
+  }, [primaryWallet, toast, initializeProvider, validateWalletClient]);
 
+  // Reset provider cache when wallet changes
   useEffect(() => {
     providerRef.current = null;
     return () => {

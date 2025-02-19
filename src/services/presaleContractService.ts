@@ -1,6 +1,4 @@
-
 import { ethers } from "ethers";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 export const PRESALE_CONTRACT_ADDRESS = "0xC0c47EE9300653ac9D333c16eC6A99C66b2cE72c";
 
@@ -26,39 +24,51 @@ export const PRESALE_END_TIME = 1746057600; // May 1, 2025
 export const TOTAL_PRESALE_SUPPLY = ethers.utils.parseUnits("5", 24); // 5 million tokens with 18 decimals
 export const USD_PRICE = ethers.utils.parseUnits("0.1", 18); // $0.10 per token
 
-// Function specifically for presale contract interactions
-export const getPresaleProvider = async () => {
-  const { primaryWallet } = useDynamicContext();
-  if (!primaryWallet) {
-    throw new Error("No wallet connected");
-  }
+// Array of RPC endpoints for redundancy
+export const RPC_ENDPOINTS = [
+  "https://polygon-rpc.com",
+  "https://rpc-mainnet.matic.network",
+  "https://matic-mainnet.chainstacklabs.com",
+  "https://rpc-mainnet.maticvigil.com",
+  "https://rpc-mainnet.matic.quiknode.pro"
+];
 
-  const walletClient = await primaryWallet.getWalletClient();
-  if (!walletClient) {
-    throw new Error("Failed to get wallet client");
+// Function to get a working RPC provider
+export const getWorkingProvider = async () => {
+  for (const rpc of RPC_ENDPOINTS) {
+    try {
+      const provider = new ethers.providers.JsonRpcProvider(rpc);
+      // Test the connection
+      await provider.getNetwork();
+      return provider;
+    } catch (error) {
+      console.warn(`RPC ${rpc} failed, trying next one...`);
+      continue;
+    }
   }
-
-  return new ethers.providers.Web3Provider(walletClient as any);
+  throw new Error("All RPC endpoints failed");
 };
 
 export const getPresaleContract = async (providerOrSigner: ethers.providers.Provider | ethers.Signer) => {
   return new ethers.Contract(PRESALE_CONTRACT_ADDRESS, PRESALE_ABI, providerOrSigner);
 };
 
+// Function to get LGR token contract
 export const getLgrTokenContract = async (provider: ethers.providers.Provider) => {
   const presaleContract = await getPresaleContract(provider);
   const lgrTokenAddress = await presaleContract.lgrToken();
   return new ethers.Contract(lgrTokenAddress, ERC20_ABI, provider);
 };
 
-// Function to fetch total LGR sold
+// Function to fetch total LGR sold by checking contract's token balance
 export const fetchTotalLGRSold = async () => {
   try {
-    const provider = await getPresaleProvider();
+    const provider = await getWorkingProvider();
     const lgrTokenContract = await getLgrTokenContract(provider);
     const remainingBalance = await lgrTokenContract.balanceOf(PRESALE_CONTRACT_ADDRESS);
     const totalSold = TOTAL_PRESALE_SUPPLY.sub(remainingBalance);
-    return ethers.utils.formatUnits(totalSold, 18);
+    const formattedAmount = Number(ethers.utils.formatUnits(totalSold, 18)).toFixed(2);
+    return formattedAmount;
   } catch (error) {
     console.error("Error fetching total LGR sold:", error);
     return "0";
@@ -68,7 +78,7 @@ export const fetchTotalLGRSold = async () => {
 // Function to fetch remaining presale supply
 export const fetchRemainingPresaleSupply = async () => {
   try {
-    const provider = await getPresaleProvider();
+    const provider = await getWorkingProvider();
     const lgrTokenContract = await getLgrTokenContract(provider);
     const remainingBalance = await lgrTokenContract.balanceOf(PRESALE_CONTRACT_ADDRESS);
     return ethers.utils.formatUnits(remainingBalance, 18);
@@ -81,7 +91,7 @@ export const fetchRemainingPresaleSupply = async () => {
 // Function to fetch presale price in USD (fixed at $0.10)
 export const fetchPresaleUSDPrice = async () => {
   try {
-    const provider = await getPresaleProvider();
+    const provider = await getWorkingProvider();
     const contract = await getPresaleContract(provider);
     const usdPrice = await contract.PRESALE_USD_PRICE();
     return ethers.utils.formatUnits(usdPrice, 18);
@@ -94,12 +104,20 @@ export const fetchPresaleUSDPrice = async () => {
 // Function to fetch latest MATIC price and convert presale price to MATIC
 export const fetchPresaleMaticPrice = async () => {
   try {
-    const provider = await getPresaleProvider();
+    const provider = await getWorkingProvider();
     const contract = await getPresaleContract(provider);
+    
+    // Get the latest MATIC price in USD from the contract (assuming 8 decimals)
     const maticPriceInUsd = await contract.getLatestMaticPrice();
-    const maticPriceUsd = ethers.utils.formatUnits(maticPriceInUsd, 8);
+    const maticPriceUsd = ethers.utils.formatUnits(maticPriceInUsd, 8); // Convert to USD value
+    
+    // LGR price is fixed at $0.10
     const lgrPriceUsd = 0.10;
+    
+    // Calculate MATIC required for 1 LGR: ($0.10 / MATIC USD price)
     const maticRequired = lgrPriceUsd / Number(maticPriceUsd);
+    
+    // Format to 4 decimal places for display
     return maticRequired.toFixed(4);
   } catch (error) {
     console.error("Error fetching MATIC price:", error);
@@ -107,29 +125,18 @@ export const fetchPresaleMaticPrice = async () => {
   }
 };
 
-// Function specifically for purchasing tokens in presale
+// Function to purchase tokens
 export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string) => {
   try {
     console.log('Starting token purchase with MATIC amount:', maticAmount);
     
-    const { primaryWallet } = useDynamicContext();
-    if (!primaryWallet) {
-      throw new Error("No wallet connected");
-    }
-
-    const walletClient = await primaryWallet.getWalletClient();
-    if (!walletClient) {
-      throw new Error("Failed to get wallet client");
-    }
-
-    const provider = new ethers.providers.Web3Provider(walletClient as any);
-    const contract = await getPresaleContract(provider.getSigner());
+    const contract = await getPresaleContract(signer);
     
     // Get current LGR price in MATIC
     const maticPrice = await contract.getLGRPrice();
     console.log('Current MATIC price per token:', ethers.utils.formatEther(maticPrice));
     
-    // Calculate expected number of tokens
+    // Calculate expected number of tokens based on $0.10 per token
     const maticAmountWei = ethers.utils.parseEther(maticAmount);
     const expectedTokens = maticAmountWei.mul(ethers.utils.parseEther("1")).div(maticPrice);
     console.log('Expected tokens:', ethers.utils.formatEther(expectedTokens));
@@ -138,7 +145,7 @@ export const purchaseTokens = async (signer: ethers.Signer, maticAmount: string)
     const minExpectedTokens = expectedTokens.mul(99).div(100);
     console.log('Min expected tokens with 1% slippage:', ethers.utils.formatEther(minExpectedTokens));
 
-    // Use Dynamic's native integration for the transaction
+    // Execute purchase transaction
     const tx = await contract.buyTokens(minExpectedTokens, {
       value: maticAmountWei
     });
@@ -162,7 +169,7 @@ export const fetchConversionRates = async () => {
   try {
     console.log('Fetching conversion rates...');
     
-    const provider = await getPresaleProvider();
+    const provider = await getWorkingProvider();
     console.log('Provider connected');
     
     const contract = await getPresaleContract(provider);
@@ -174,11 +181,14 @@ export const fetchConversionRates = async () => {
     const lgrMaticPrice = await contract.getLGRPrice();
     console.log('LGR MATIC price:', lgrMaticPrice.toString());
     
-    return {
+    const rates = {
       usdToMatic: Number(ethers.utils.formatUnits(maticUsdPrice, 18)),
       maticToLgr: Number(ethers.utils.formatEther(lgrMaticPrice)),
       lastUpdated: new Date()
     };
+    
+    console.log('Formatted rates:', rates);
+    return rates;
   } catch (error) {
     console.error("Error details:", {
       message: error.message,

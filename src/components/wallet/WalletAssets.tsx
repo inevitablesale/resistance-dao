@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { getDynamicProvider, getLgrTokenContract, getPresaleContract, fetchPresaleMaticPrice, purchaseTokens } from "@/services/presaleContractService";
+import { getWorkingProvider, getLgrTokenContract, getPresaleContract } from "@/services/presaleContractService";
 import { ethers } from "ethers";
 import { Coins, Loader2 } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -64,7 +65,7 @@ export const WalletAssets = () => {
 
       try {
         setIsLoading(true);
-        const provider = await getDynamicProvider();
+        const provider = await getWorkingProvider();
 
         const updatedTokens = await Promise.all(
           tokens.map(async (token) => {
