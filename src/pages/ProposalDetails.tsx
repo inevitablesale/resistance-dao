@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
@@ -26,7 +27,7 @@ interface ProposalDetails {
 const MIN_LGR_REQUIRED = "1"; // 1 LGR required to view proposals
 
 const ProposalDetails = () => {
-  const { hash } = useParams<{ hash: string }>();
+  const { tokenId } = useParams<{ tokenId: string }>();
   const [proposalDetails, setProposalDetails] = useState<ProposalDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingChainData, setIsLoadingChainData] = useState(false);
@@ -90,10 +91,10 @@ const ProposalDetails = () => {
 
   // Only load IPFS data after wallet connection and LGR balance verification
   useEffect(() => {
-    if (hash && isConnected && hasMinimumLGR === true) {
+    if (tokenId && isConnected && hasMinimumLGR === true) {
       loadIPFSData();
     }
-  }, [hash, isConnected, hasMinimumLGR]);
+  }, [tokenId, isConnected, hasMinimumLGR]);
 
   // Load chain data after IPFS data is loaded
   useEffect(() => {
@@ -106,30 +107,30 @@ const ProposalDetails = () => {
     try {
       setIsLoading(true);
       
-      const storedProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
-      const storedProposal = storedProposals.find(p => p.hash === hash);
+      const walletProvider = await getProvider();
+      console.log('Getting contract for token:', tokenId);
       
-      if (!storedProposal) {
-        throw new Error('Proposal not found');
+      const contract = new ethers.Contract(
+        FACTORY_ADDRESS,
+        FACTORY_ABI,
+        walletProvider.provider
+      );
+
+      // Get the tokenURI from the contract
+      const tokenUri = await contract.tokenURI(tokenId);
+      console.log('NFT metadata URI:', tokenUri);
+
+      if (!tokenUri || !tokenUri.startsWith('ipfs://')) {
+        throw new Error('Invalid token URI format');
       }
 
-      console.log('Fetching IPFS metadata from:', storedProposal.ipfsHash);
-      const metadata = await getFromIPFS<ProposalMetadata>(storedProposal.ipfsHash, 'proposal');
+      console.log('Fetching IPFS metadata from:', tokenUri);
+      const metadata = await getFromIPFS<ProposalMetadata>(
+        tokenUri.replace('ipfs://', ''),
+        'proposal'
+      );
       
-      console.log('Processed IPFS metadata:', {
-        title: metadata.title,
-        firmCriteria: metadata.firmCriteria,
-        investment: {
-          ...metadata.investment,
-          targetCapital: ethers.utils.formatEther(metadata.investment.targetCapital)
-        },
-        paymentTerms: metadata.paymentTerms,
-        strategies: metadata.strategies,
-        isTestMode: metadata.isTestMode,
-        submissionTimestamp: new Date(metadata.submissionTimestamp).toLocaleString(),
-        submitter: metadata.submitter
-      });
-
+      console.log('Processed IPFS metadata:', metadata);
       setProposalDetails({
         metadata,
         onChainData: undefined
@@ -159,16 +160,16 @@ const ProposalDetails = () => {
         walletProvider.provider
       );
 
-      console.log('Contract initialized, fetching on-chain data for hash:', hash);
+      console.log('Contract initialized, fetching on-chain data for token:', tokenId);
       const [pledgedAmount, backers] = await Promise.all([
-        contract.pledgedAmount(hash),
-        contract.getProposalBackers(hash)
+        contract.pledgedAmount(tokenId),
+        contract.getProposalBackers(tokenId)
       ]);
 
       console.log('On-chain data received:', {
         pledgedAmount: ethers.utils.formatEther(pledgedAmount),
         backers,
-        hash
+        tokenId
       });
 
       if (proposalDetails) {
