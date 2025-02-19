@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FileText, Calendar, Users, Target, Loader2 } from "lucide-react";
+import { FileText, Calendar, Users, Target } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -39,7 +39,7 @@ export const ProposalsHistory = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
   const { isConnected, connect, address } = useWalletConnection();
-  const { getProvider, isSessionRestored } = useWalletProvider();
+  const { getProvider } = useWalletProvider();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -55,7 +55,7 @@ export const ProposalsHistory = () => {
 
   useEffect(() => {
     const checkLGRBalance = async () => {
-      if (!isConnected || !address || !isSessionRestored) {
+      if (!isConnected || !address) {
         setHasMinimumLGR(null);
         return;
       }
@@ -90,11 +90,11 @@ export const ProposalsHistory = () => {
     };
 
     checkLGRBalance();
-  }, [isConnected, address, isSessionRestored, getProvider]);
+  }, [isConnected, address, getProvider]);
 
   useEffect(() => {
     const fetchProposalData = async () => {
-      if (!isConnected || !hasMinimumLGR || !isSessionRestored) return;
+      if (!isConnected || !hasMinimumLGR) return;
 
       try {
         setIsLoading(true);
@@ -181,7 +181,11 @@ export const ProposalsHistory = () => {
         proposalsWithMetadata.sort((a, b) => b.blockNumber - a.blockNumber);
         setProposalEvents(proposalsWithMetadata);
       } catch (error: any) {
-        console.error("Error fetching proposals:", error);
+        console.error("Error fetching proposals:", {
+          error,
+          message: error.message,
+          stack: error.stack
+        });
         toast({
           title: "Error",
           description: "Failed to load proposals. Please try again.",
@@ -193,20 +197,7 @@ export const ProposalsHistory = () => {
     };
 
     fetchProposalData();
-  }, [isConnected, hasMinimumLGR, isSessionRestored, getProvider]);
-
-  if (!isSessionRestored) {
-    return (
-      <Card className="bg-black/40 border-white/10">
-        <CardContent className="p-6 text-center">
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <Loader2 className="w-8 h-8 text-yellow-500 animate-spin" />
-            <p className="text-white/60">Restoring wallet session...</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  }, [isConnected, hasMinimumLGR, getProvider]);
 
   if (!isConnected) {
     return (

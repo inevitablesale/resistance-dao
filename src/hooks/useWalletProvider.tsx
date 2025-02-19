@@ -1,8 +1,9 @@
+
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { ProposalError } from "@/services/errorHandlingService";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 export type WalletType = 'regular' | 'zerodev' | 'unknown';
 
@@ -17,7 +18,6 @@ interface WalletProvider {
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 1000;
 const INITIALIZATION_TIMEOUT = 10000; // 10 seconds timeout
-const SESSION_RESTORE_TIMEOUT = 5000; // 5 seconds timeout for session restoration
 
 export const useWalletProvider = () => {
   const { primaryWallet } = useDynamicContext();
@@ -25,8 +25,6 @@ export const useWalletProvider = () => {
   const providerRef = useRef<WalletProvider | null>(null);
   const initializingRef = useRef<boolean>(false);
   const initTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [isSessionRestored, setIsSessionRestored] = useState(false);
-  const sessionRestorationTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -42,47 +40,6 @@ export const useWalletProvider = () => {
       initTimeoutRef.current = null;
     }
   };
-
-  const clearSessionRestorationTimeout = () => {
-    if (sessionRestorationTimeout.current) {
-      clearTimeout(sessionRestorationTimeout.current);
-      sessionRestorationTimeout.current = null;
-    }
-  };
-
-  useEffect(() => {
-    if (!primaryWallet) {
-      setIsSessionRestored(false);
-      return;
-    }
-
-    const checkSession = async () => {
-      try {
-        const isConnected = await primaryWallet.isConnected();
-        if (isConnected) {
-          console.log('[Wallet] Session restored successfully');
-          setIsSessionRestored(true);
-          clearSessionRestorationTimeout();
-          return;
-        }
-      } catch (error) {
-        console.error('[Wallet] Error checking session:', error);
-      }
-    };
-
-    sessionRestorationTimeout.current = setTimeout(() => {
-      if (!isSessionRestored) {
-        console.warn('[Wallet] Session restoration timeout');
-        setIsSessionRestored(true); // Continue anyway after timeout
-      }
-    }, SESSION_RESTORE_TIMEOUT);
-
-    checkSession();
-
-    return () => {
-      clearSessionRestorationTimeout();
-    };
-  }, [primaryWallet]);
 
   const initializeProvider = useCallback(async (
     walletClient: any, 
@@ -124,12 +81,12 @@ export const useWalletProvider = () => {
   }, []);
 
   const validateWalletClient = useCallback(async (attempts: number = 0): Promise<any> => {
-    if (!primaryWallet || !isSessionRestored) {
-      console.error('[Wallet] Session not ready');
+    if (!primaryWallet) {
+      console.error('[Wallet] No primary wallet found');
       throw new ProposalError({
         category: 'initialization',
-        message: 'Wallet session not ready',
-        recoverySteps: ['Please wait for session restoration', 'Try refreshing the page']
+        message: 'Wallet not initialized',
+        recoverySteps: ['Please connect your wallet', 'Try refreshing the page']
       });
     }
 
@@ -167,7 +124,7 @@ export const useWalletProvider = () => {
         ]
       });
     }
-  }, [primaryWallet, isSessionRestored]);
+  }, [primaryWallet]);
 
   const getProvider = useCallback(async (): Promise<WalletProvider> => {
     if (providerRef.current) {
@@ -193,6 +150,7 @@ export const useWalletProvider = () => {
 
     initializingRef.current = true;
     
+    // Set initialization timeout
     initTimeoutRef.current = setTimeout(() => {
       if (initializingRef.current) {
         initializingRef.current = false;
@@ -262,6 +220,7 @@ export const useWalletProvider = () => {
     }
   }, [primaryWallet, toast, initializeProvider, validateWalletClient]);
 
+  // Reset provider cache when wallet changes
   useEffect(() => {
     providerRef.current = null;
     return () => {
@@ -301,7 +260,6 @@ export const useWalletProvider = () => {
       }
     },
     getWalletType,
-    isConnected: !!primaryWallet?.isConnected?.(),
-    isSessionRestored
+    isConnected: !!primaryWallet?.isConnected?.()
   };
 };
