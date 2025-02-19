@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, Users, Target } from "lucide-react";
@@ -9,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { ethers } from "ethers";
-import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS, LGR_PRICE_USD } from "@/lib/constants";
 import { getTokenBalance } from "@/services/tokenService";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata } from "@/types/proposals";
@@ -43,6 +42,16 @@ export const ProposalsHistory = () => {
   const { getProvider } = useWalletProvider();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const formatUSDAmount = (lgrAmount: string): string => {
+    const amount = parseFloat(lgrAmount);
+    if (isNaN(amount)) return "$0.00";
+    const usdAmount = amount * LGR_PRICE_USD;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(usdAmount);
+  };
 
   useEffect(() => {
     const checkLGRBalance = async () => {
@@ -273,13 +282,23 @@ export const ProposalsHistory = () => {
                       {event.metadata?.investment?.targetCapital && (
                         <div className="flex items-center gap-2">
                           <Target className="w-4 h-4" />
-                          <span>{event.metadata.investment.targetCapital} LGR Target</span>
+                          <span>
+                            {event.metadata.investment.targetCapital} LGR Target
+                            <span className="text-white/40 ml-1">
+                              ({formatUSDAmount(event.metadata.investment.targetCapital)})
+                            </span>
+                          </span>
                         </div>
                       )}
                       {event.pledgedAmount && (
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4" />
-                          <span>{event.pledgedAmount} LGR Pledged</span>
+                          <span>
+                            {event.pledgedAmount} LGR Pledged
+                            <span className="text-white/40 ml-1">
+                              ({formatUSDAmount(event.pledgedAmount)})
+                            </span>
+                          </span>
                         </div>
                       )}
                     </div>
