@@ -45,8 +45,25 @@ const Proposals = () => {
             </Button>
           </div>
 
+          {/* Proposals List Section */}
+          <div className="mb-16">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-purple-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-white">Active Proposals</h2>
+              </div>
+              <Button onClick={() => navigate('/thesis')} className="bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors">
+                <Plus className="w-4 h-4 mr-2" />
+                New Proposal
+              </Button>
+            </div>
+            <ProposalsHistory />
+          </div>
+
           {/* Board Members Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {boardMembers.map((member, index) => {
               const Icon = member.icon;
               return (
@@ -61,23 +78,6 @@ const Proposals = () => {
             })}
           </div>
         </div>
-      </div>
-
-      {/* Proposals List Section */}
-      <div className="container mx-auto px-4 py-12 relative z-10">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-purple-400" />
-            </div>
-            <h2 className="text-2xl font-bold text-white">Active Proposals</h2>
-          </div>
-          <Button onClick={() => navigate('/thesis')} className="bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors">
-            <Plus className="w-4 h-4 mr-2" />
-            New Proposal
-          </Button>
-        </div>
-        <ProposalsHistory />
       </div>
 
       {/* LGR Floating Widget */}
