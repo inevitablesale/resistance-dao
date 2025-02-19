@@ -820,22 +820,6 @@ const ThesisSubmission = () => {
               "bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden",
               formErrors && Object.keys(formErrors).length > 0 ? "border-red-500/20" : ""
             )}>
-              <motion.div 
-                className="border-b border-white/5"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <div className="p-6 space-y-3">
-                  <p className="text-xl text-gradient bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
-                    Ready to revolutionize how accounting practices are acquired?
-                  </p>
-                  <p className="text-gray-400">
-                    Present your vision to our community of forward-thinking investors through a structured investment thesis.
-                  </p>
-                </div>
-              </motion.div>
-
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeStep}
@@ -848,10 +832,10 @@ const ThesisSubmission = () => {
                   {activeStep === 'thesis' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
-                        <Label className="text-lg font-medium">Thesis Title</Label>
+                        <Label className="text-lg font-medium text-white">Thesis Title</Label>
                         <Input 
                           placeholder="Enter a clear, descriptive title"
-                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12 focus:border-yellow-500/50"
                           value={formData.title}
                           onChange={e => handleFormDataChange('title', e.target.value)}
                         />
@@ -873,10 +857,10 @@ const ThesisSubmission = () => {
                       />
 
                       <div className="space-y-4">
-                        <Label className="text-lg font-medium">Investment Drivers</Label>
+                        <Label className="text-lg font-medium text-white">Investment Drivers</Label>
                         <textarea
                           placeholder="Describe the key drivers behind this investment thesis..."
-                          className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none"
+                          className="w-full h-32 bg-black/50 border border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none focus:border-yellow-500/50"
                           value={formData.investment.drivers}
                           onChange={e => handleFormDataChange('investment.drivers', e.target.value)}
                         />
@@ -902,18 +886,20 @@ const ThesisSubmission = () => {
                     />
                   )}
 
-                  {activeStep === 'approval' && (
+                  {activeStep === 'terms' && (
                     <>
                       <PaymentTermsSection
                         formData={formData}
                         formErrors={formErrors}
                         onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
                       />
-                      <StrategiesSection
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={(category, value) => handleStrategyChange(category, value)}
-                      />
+                      <div className="mt-8">
+                        <StrategiesSection
+                          formData={formData}
+                          formErrors={formErrors}
+                          onChange={(category, value) => handleStrategyChange(category, value)}
+                        />
+                      </div>
                     </>
                   )}
 
@@ -926,7 +912,7 @@ const ThesisSubmission = () => {
                       >
                         <Check className="w-8 h-8 text-white" />
                       </motion.div>
-                      <h3 className="text-2xl font-semibold">
+                      <h3 className="text-2xl font-semibold text-white">
                         {submissionComplete 
                           ? "Investment Thesis Submitted!"
                           : "Ready to Submit"
