@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
@@ -5,7 +6,7 @@ import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS, LGR_PRICE_USD } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { StoredProposal, ProposalMetadata } from "@/types/proposals";
@@ -37,18 +38,7 @@ const ProposalDetails = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const formatUSDAmount = (lgrAmount: string | ethers.BigNumber): string => {
-    const amount = typeof lgrAmount === 'string' 
-      ? parseFloat(lgrAmount)
-      : parseFloat(ethers.utils.formatEther(lgrAmount));
-    if (isNaN(amount)) return "$0.00";
-    const usdAmount = amount * LGR_PRICE_USD;
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(usdAmount);
-  };
-
+  // Check LGR balance when wallet is connected
   useEffect(() => {
     const checkLGRBalance = async () => {
       if (!isConnected || !address) {
@@ -99,12 +89,14 @@ const ProposalDetails = () => {
     checkLGRBalance();
   }, [isConnected, address, getProvider]);
 
+  // Only load IPFS data after wallet connection and LGR balance verification
   useEffect(() => {
     if (tokenId && isConnected && hasMinimumLGR === true) {
       loadIPFSData();
     }
   }, [tokenId, isConnected, hasMinimumLGR]);
 
+  // Load chain data after IPFS data is loaded
   useEffect(() => {
     if (isConnected && hasMinimumLGR && proposalDetails && !proposalDetails.onChainData) {
       loadChainData();
@@ -124,40 +116,27 @@ const ProposalDetails = () => {
         walletProvider.provider
       );
 
-      const [tokenUri, pledgedAmount, backers] = await Promise.all([
-        contract.tokenURI(tokenId),
-        contract.pledgedAmount(tokenId),
-        contract.getProposalBackers(tokenId)
-      ]);
+      // Get the tokenURI from the contract
+      const tokenUri = await contract.tokenURI(tokenId);
+      console.log('NFT metadata URI:', tokenUri);
 
-      console.log('Contract data fetched:', {
-        tokenUri,
-        pledgedAmount: ethers.utils.formatEther(pledgedAmount),
-        backersCount: backers.length
-      });
-
-      if (!tokenUri) {
+      if (!tokenUri || !tokenUri.startsWith('ipfs://')) {
         throw new Error('Invalid token URI format');
       }
 
-      const ipfsHash = tokenUri.replace('ipfs://', '');
-      console.log('Fetching IPFS metadata from hash:', ipfsHash);
+      console.log('Fetching IPFS metadata from:', tokenUri);
+      const metadata = await getFromIPFS<ProposalMetadata>(
+        tokenUri.replace('ipfs://', ''),
+        'proposal'
+      );
       
-      const metadata = await getFromIPFS<ProposalMetadata>(ipfsHash, 'proposal');
       console.log('Processed IPFS metadata:', metadata);
-
-      const votingEndsAt = metadata.submissionTimestamp / 1000 + metadata.votingDuration;
-      
       setProposalDetails({
         metadata,
-        onChainData: {
-          pledgedAmount,
-          votingEndsAt,
-          backers
-        }
+        onChainData: undefined
       });
     } catch (error: any) {
-      console.error("Error loading proposal data:", error);
+      console.error("Error loading IPFS data:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to load proposal details",
@@ -320,6 +299,20 @@ const ProposalDetails = () => {
             Back to Proposals
           </Button>
 
+          {!isConnected && (
+            <Card className="bg-yellow-500/10 border-yellow-500/20 mb-6">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <p className="text-yellow-200">Connect your wallet to view on-chain data and interact with this proposal</p>
+                  <Button onClick={connect} className="bg-yellow-500 hover:bg-yellow-600">
+                    <Wallet className="w-4 h-4 mr-2" />
+                    Connect Wallet
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="grid gap-8">
             <Card className="bg-black/40 border-white/10">
               <CardHeader>
@@ -355,34 +348,8 @@ const ProposalDetails = () => {
                         <div>
                           <p className="text-sm text-white/60">Target Capital</p>
                           <p className="text-xl font-bold text-white">
-                            {metadata.investment.targetCapital} LGR
-                            <span className="text-white/40 text-sm ml-1">
-                              ({formatUSDAmount(metadata.investment.targetCapital)})
-                            </span>
+                            {ethers.utils.formatEther(metadata.investment.targetCapital)} LGR
                           </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-white/5 border-white/10">
-                    <CardContent className="pt-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
-                          <HandCoins className="w-5 h-5 text-yellow-400" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-white/60">Pledged Amount</p>
-                          {isLoadingChainData ? (
-                            <Skeleton className="h-4 w-24" />
-                          ) : (
-                            <p className="text-xl font-bold text-white">
-                              {onChainData ? ethers.utils.formatEther(onChainData.pledgedAmount) : '0'} LGR
-                              <span className="text-white/40 text-sm ml-1">
-                                ({formatUSDAmount(onChainData?.pledgedAmount || '0')})
-                              </span>
-                            </p>
-                          )}
                         </div>
                       </div>
                     </CardContent>
@@ -400,7 +367,27 @@ const ProposalDetails = () => {
                             <Skeleton className="h-4 w-16" />
                           ) : (
                             <p className="text-xl font-bold text-white">
-                              {onChainData?.backers.length ?? 0}
+                              {onChainData?.backers.length ?? 'Connect Wallet'}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white/5 border-white/10">
+                    <CardContent className="pt-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                          <Clock className="w-5 h-5 text-yellow-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-white/60">Voting Ends</p>
+                          {isLoadingChainData ? (
+                            <Skeleton className="h-4 w-24" />
+                          ) : (
+                            <p className="text-xl font-bold text-white">
+                              {onChainData ? new Date(onChainData.votingEndsAt * 1000).toLocaleDateString() : 'Connect Wallet'}
                             </p>
                           )}
                         </div>
