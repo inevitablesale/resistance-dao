@@ -1,10 +1,18 @@
-
 import { ProposalsHistory } from "@/components/proposals/ProposalsHistory";
 import { Button } from "@/components/ui/button";
 import { FileText, Plus, Building2, HandCoins, TrendingUp, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
+import { Link } from "react-router-dom";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const Proposals = () => {
   const navigate = useNavigate();
@@ -39,11 +47,24 @@ const Proposals = () => {
 
   return (
     <div className="min-h-screen bg-black">
-      {/* Hero Section with gradients matching index page */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-purple-500/10 to-pink-500/10 animate-gradient" />
         
         <div className="container mx-auto px-4 pt-32 pb-20">
+          <Breadcrumb className="mb-8">
+            <BreadcrumbList className="text-white/60">
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/" className="hover:text-white">Home</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="text-white/40" />
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-white">Proposals</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+
           <div className="text-center mb-12">
             <div className="mb-8">
               <Building2 className="w-20 h-20 mx-auto text-yellow-500 animate-cosmic-pulse" />
@@ -60,7 +81,6 @@ const Proposals = () => {
             </Button>
           </div>
 
-          {/* How It Works Section */}
           <div className="mb-20">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-white mb-4">Supporting Investment Proposals</h2>
@@ -94,7 +114,6 @@ const Proposals = () => {
             </div>
           </div>
 
-          {/* Proposals List Section */}
           <div className="mb-16">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
@@ -113,7 +132,6 @@ const Proposals = () => {
         </div>
       </div>
 
-      {/* LGR Floating Widget */}
       <LGRFloatingWidget />
     </div>
   );

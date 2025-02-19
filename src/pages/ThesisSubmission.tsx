@@ -41,6 +41,15 @@ import {
   ProposalConfig
 } from "@/types/proposals";
 import { WalletConnectionOverlay } from "@/components/thesis/WalletConnectionOverlay";
+import { Link } from "react-router-dom";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -795,21 +804,27 @@ const ThesisSubmission = () => {
       <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-teal-500/5 to-yellow-500/5 animate-gradient" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-black to-black" />
 
-      <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
-        <div className="container mx-auto px-4 py-4">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between"
-          >
-            <h1 className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
-              Transform Accounting Firm Ownership
-            </h1>
-          </motion.div>
-        </div>
-      </div>
+      <div className="container mx-auto px-4 relative z-10">
+        <Breadcrumb className="pt-8 mb-8">
+          <BreadcrumbList className="text-white/60">
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/" className="hover:text-white">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="text-white/40" />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/proposals" className="hover:text-white">Proposals</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="text-white/40" />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-white">Submit Proposal</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
-      <div className="container mx-auto px-4 pt-32 pb-20">
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-3">
             <div className="sticky top-32 space-y-4">
