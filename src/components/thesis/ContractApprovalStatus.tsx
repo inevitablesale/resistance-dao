@@ -1,9 +1,10 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
-import { Check, AlertTriangle, Loader2, Wallet } from "lucide-react";
+import { Check, AlertTriangle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -13,7 +14,6 @@ import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { transactionQueue } from "@/services/transactionQueueService";
 import { getContractStatus } from "@/services/proposalContractService";
-import { cn } from "@/lib/utils";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const TESTER_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
@@ -53,9 +53,9 @@ export const ContractApprovalStatus = ({
 
   const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
   
-  const hasRequiredBalance = (isTesterWallet && contractTestMode) || tokenBalances?.some(token => 
+  const hasRequiredBalance = (isTesterWallet && contractTestMode) || tokenBalances?.find(token => 
     token.symbol === "LGR" && ethers.BigNumber.from(token.balance || "0").gte(requiredAmountBN)
-  ) || false;
+  );
 
   useEffect(() => {
     const checkWalletStatus = async () => {
@@ -235,7 +235,7 @@ export const ContractApprovalStatus = ({
 
   if (!isWalletReady) {
     return (
-      <Card className="neo-blur p-4">
+      <Card className="bg-black/40 border-white/10 p-4">
         <div className="flex items-center justify-center space-x-2 text-white/60">
           <Loader2 className="w-4 h-4 animate-spin" />
           <span>Initializing wallet...</span>
@@ -245,7 +245,7 @@ export const ContractApprovalStatus = ({
   }
 
   return (
-    <Card className="neo-blur">
+    <Card className="bg-black/40 border-white/10 p-4">
       {currentTxId && (
         <TransactionStatus
           transactionId={currentTxId}
@@ -255,53 +255,28 @@ export const ContractApprovalStatus = ({
       )}
       
       {!currentTxId && (
-        <div className="p-6 space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1.5">
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-                  Contract Approval
-                </h3>
-                <p className="text-sm text-white/60">
-                  {isTesterWallet && contractTestMode 
-                    ? "Test Mode: Approval will be simulated"
-                    : "Approve LGR tokens for contract interaction"
-                  }
-                </p>
-              </div>
-              {isApproved ? (
-                <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                  <Check className="w-5 h-5 text-green-500" />
-                </div>
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5 text-yellow-500" />
-                </div>
-              )}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h3 className="text-lg font-medium">Contract Approval</h3>
+              <p className="text-sm text-gray-400">
+                {isTesterWallet && contractTestMode 
+                  ? "Test Mode: Approval will be simulated"
+                  : "Approve LGR tokens for contract interaction"
+                }
+              </p>
             </div>
-
-            <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-white/60">Required Amount</span>
-                <span className="font-medium text-white">
-                  {ethers.utils.formatEther(requiredAmount)} LGR
-                </span>
-              </div>
-            </div>
+            {isApproved ? (
+              <Check className="w-5 h-5 text-green-500" />
+            ) : (
+              <AlertTriangle className="w-5 h-5 text-yellow-500" />
+            )}
           </div>
 
           <Button
             onClick={handleApprove}
             disabled={isApproving || isApproved || !isWalletReady}
-            className={cn(
-              "w-full h-12",
-              "bg-gradient-to-r from-yellow-500 to-teal-500",
-              "hover:from-yellow-600 hover:to-teal-600",
-              "text-white font-medium",
-              "transition-all duration-300",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              "rounded-lg"
-            )}
+            className="w-full"
           >
             {isApproving ? (
               <div className="flex items-center gap-2">
@@ -309,33 +284,11 @@ export const ContractApprovalStatus = ({
                 <span>Approving...</span>
               </div>
             ) : isApproved ? (
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4" />
-                <span>Approved</span>
-              </div>
+              "Approved"
             ) : (
-              <div className="flex items-center gap-2">
-                <Wallet className="w-4 h-4" />
-                <span>Approve Contract</span>
-              </div>
+              "Approve Contract"
             )}
           </Button>
-
-          {!hasRequiredBalance && (
-            <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-red-500">
-                    Insufficient LGR Balance
-                  </p>
-                  <p className="text-xs text-red-400/80">
-                    You need at least {ethers.utils.formatEther(requiredAmount)} LGR tokens to submit a thesis
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </Card>
