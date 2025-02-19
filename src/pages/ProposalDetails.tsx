@@ -587,21 +587,6 @@ const ProposalDetails = () => {
                       </Badge>
                     </div>
                   </div>
-
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-4">Payment Terms</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {metadata.paymentTerms.map((term, index) => (
-                        <Badge 
-                          key={index}
-                          variant="outline" 
-                          className="text-purple-400 border-purple-400"
-                        >
-                          {getPaymentTermLabel(term)}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
