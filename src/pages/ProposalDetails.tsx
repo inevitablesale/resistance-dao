@@ -151,15 +151,12 @@ const ProposalDetails = () => {
       const tokenUri = await contract.tokenURI(tokenId);
       console.log('NFT metadata URI:', tokenUri);
 
-      if (!tokenUri || !tokenUri.startsWith('ipfs://')) {
-        throw new Error('Invalid token URI format');
+      if (!tokenUri) {
+        throw new Error('No token URI returned from contract');
       }
 
       console.log('Fetching IPFS metadata from:', tokenUri);
-      const metadata = await getFromIPFS<ProposalMetadata>(
-        tokenUri.replace('ipfs://', ''),
-        'proposal'
-      );
+      const metadata = await getFromIPFS<ProposalMetadata>(tokenUri, 'proposal');
       
       console.log('Processed IPFS metadata:', metadata);
       setProposalDetails({
