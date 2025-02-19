@@ -1,128 +1,89 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  FirmSize,
-  DealType,
-  GeographicFocus,
-  PaymentTerm,
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
+import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
+import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
+import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
+import { ethers } from "ethers";
+import { uploadMetadataToPinata } from "@/services/pinataService";
+import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
+import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
+import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
+import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
+import { LGRWalletDisplay } from "@/components/thesis/LGRWalletDisplay";
+import { TransactionStatus } from "@/components/thesis/TransactionStatus";
+import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
+import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
+import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
+import { motion, AnimatePresence } from "framer-motion";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Switch } from "@/components/ui/switch";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { subscribeToProposalEvents, waitForProposalCreation, EventConfig } from "@/services/eventListenerService";
+import { 
+  FirmSize, 
+  DealType, 
+  GeographicFocus, 
+  PaymentTerm, 
   OperationalStrategy,
   GrowthStrategy,
   IntegrationStrategy,
   ProposalMetadata,
+  StoredProposal,
+  ProposalConfig
 } from "@/types/proposals";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
-import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { ethers } from "ethers";
-import { ProposalConfig } from "@/types/proposals";
-import { gasOptimizer } from "@/services/gasOptimizationService";
-import { useToast } from "@/hooks/use-toast";
-import { TransactionStatus } from "@/components/thesis/TransactionStatus";
-import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
-import {
-  createProposal,
-  getContractStatus,
-} from "@/services/proposalContractService";
-import { handleDynamicError } from "@/services/dynamicErrorHandler";
-import {
-  subscribeToProposalEvents,
-  waitForProposalCreation,
-} from "@/services/eventListenerService";
-import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { HelpCircle } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { cn } from "@/lib/utils";
 
+const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
+const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
+const FACTORY_ABI = ["function createProposal(string memory ipfsMetadata, uint256 targetCapital, uint256 votingDuration) external returns (address)", "function submissionFee() public view returns (uint256)", "event ProposalCreated(uint256 indexed tokenId, address proposalContract, address creator, bool isTest)"];
+const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000");
+const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000");
 const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
 const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
+const SUBMISSION_FEE = ethers.utils.parseEther("250");
+const VOTING_FEE = ethers.utils.parseEther("10");
+const MAX_STRATEGIES_PER_CATEGORY = 3;
+const MAX_SUMMARY_LENGTH = 500;
+const MAX_PAYMENT_TERMS = 5;
 
-const formSchema = z.object({
-  title: z.string().min(2, {
-    message: "Proposal title must be at least 2 characters.",
-  }),
-  firmSize: z.nativeEnum(FirmSize, {
-    errorMap: () => ({ message: "Please select a firm size." }),
-  }),
-  location: z.string().min(2, {
-    message: "Location must be at least 2 characters.",
-  }),
-  dealType: z.nativeEnum(DealType, {
-    errorMap: () => ({ message: "Please select a deal type." }),
-  }),
-  geographicFocus: z.nativeEnum(GeographicFocus, {
-    errorMap: () => ({ message: "Please select a geographic focus." }),
-  }),
-  paymentTerms: z.array(z.nativeEnum(PaymentTerm)).nonempty({
-    message: "Please select at least one payment term.",
-  }),
-  operationalStrategies: z.array(z.nativeEnum(OperationalStrategy)).nonempty({
-    message: "Please select at least one operational strategy.",
-  }),
-  growthStrategies: z.array(z.nativeEnum(GrowthStrategy)).nonempty({
-    message: "Please select at least one growth strategy.",
-  }),
-  integrationStrategies: z.array(z.nativeEnum(IntegrationStrategy)).nonempty({
-    message: "Please select at least one integration strategy.",
-  }),
-  targetCapital: z
-    .string()
-    .min(1, { message: "Target capital is required." })
-    .refine((value) => {
-      try {
-        // Attempt to parse the value as a number
-        const numValue = parseFloat(value);
-        // Check if the parsed value is a valid number and is greater than zero
-        return !isNaN(numValue) && numValue > 0;
-      } catch (e) {
-        return false; // Parsing failed, so it's not a valid number
-      }
-    }, "Target capital must be a valid number greater than zero."),
-  investmentDrivers: z.string().min(10, {
-    message: "Investment drivers must be at least 10 characters.",
-  }),
-  additionalCriteria: z.string().min(10, {
-    message: "Additional criteria must be at least 10 characters.",
-  }),
-  votingDuration: z.number().min(MIN_VOTING_DURATION, {
-    message: "Voting duration must be at least 7 days.",
-  }),
-  linkedInURL: z.string().url({ message: "Invalid LinkedIn URL" }),
-});
+interface SubmissionStep {
+  id: string;
+  title: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  description: string;
+}
+
+const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
+
+const SUBMISSION_STEPS: SubmissionStep[] = [{
+  id: 'thesis',
+  title: 'Investment Thesis',
+  status: 'pending',
+  description: 'Fill out your investment thesis details'
+}, {
+  id: 'strategy',
+  title: 'Strategy Selection',
+  status: 'pending',
+  description: 'Select your post-acquisition strategies'
+}, {
+  id: 'approval',
+  title: 'Token Approval',
+  status: 'pending',
+  description: 'Approve LGR tokens for submission'
+}, {
+  id: 'submission',
+  title: 'Thesis Submission',
+  status: 'pending',
+  description: 'Submit your thesis to the blockchain'
+}];
 
 const TEST_FORM_DATA: ProposalMetadata = {
   title: "Test Proposal - Automated Backend Services Firm",
@@ -130,899 +91,850 @@ const TEST_FORM_DATA: ProposalMetadata = {
     size: FirmSize.BELOW_1M,
     location: "California",
     dealType: DealType.ACQUISITION,
-    geographicFocus: GeographicFocus.LOCAL,
+    geographicFocus: GeographicFocus.LOCAL
   },
   paymentTerms: [
     PaymentTerm.CASH,
     PaymentTerm.SELLER_FINANCING,
-    PaymentTerm.EARNOUT,
+    PaymentTerm.EARNOUT
   ],
   strategies: {
     operational: [
       OperationalStrategy.TECH_MODERNIZATION,
-      OperationalStrategy.PROCESS_STANDARDIZATION,
+      OperationalStrategy.PROCESS_STANDARDIZATION
     ],
-    growth: [GrowthStrategy.SERVICE_EXPANSION, GrowthStrategy.CLIENT_GROWTH],
+    growth: [
+      GrowthStrategy.SERVICE_EXPANSION,
+      GrowthStrategy.CLIENT_GROWTH
+    ],
     integration: [
       IntegrationStrategy.MERGING_OPERATIONS,
-      IntegrationStrategy.SYSTEMS_CONSOLIDATION,
-    ],
+      IntegrationStrategy.SYSTEMS_CONSOLIDATION
+    ]
   },
   investment: {
     targetCapital: "2500000",
-    drivers:
-      "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
-    additionalCriteria:
-      "Preference for firms with existing cloud infrastructure and established compliance frameworks.",
+    drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
+    additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
   },
   votingDuration: MIN_VOTING_DURATION,
-  votingEnds: Math.floor(Date.now() / 1000) + MIN_VOTING_DURATION,
   linkedInURL: "",
   isTestMode: true,
   submissionTimestamp: Date.now(),
-  submitter: "",
+  submitter: ""
 };
 
-const ContractApprovalStatus = ({
-  onApprovalComplete,
-  requiredAmount,
-  currentFormData,
-}: {
-  onApprovalComplete: () => void;
-  requiredAmount: ethers.BigNumber;
-  currentFormData: ProposalMetadata;
-}) => {
-  const { approveLGR } = useWalletConnection();
-  const { toast } = useToast();
-  const [isApproving, setIsApproving] = useState(false);
-
-  const handleApprove = async () => {
-    setIsApproving(true);
-    try {
-      const approvalTx = await approveLGR(
-        requiredAmount.toString(),
-        currentFormData.isTestMode
-      );
-      if (approvalTx) {
-        toast({
-          title: "Approval Transaction Sent",
-          description: "Waiting for confirmation...",
-        });
-        await approvalTx.wait();
-        toast({
-          title: "Approval Successful",
-          description: "You can now proceed with creating the proposal.",
-        });
-        onApprovalComplete();
-      } else {
-        throw new Error("Approval transaction failed or was not properly sent.");
-      }
-    } catch (error) {
-      console.error("Approval error:", error);
-      const proposalError = handleDynamicError(error);
-      toast({
-        title: "Approval Failed",
-        description: proposalError.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsApproving(false);
-    }
-  };
-
-  return (
-    <Card className="bg-white/5 border-white/10">
-      <CardHeader>
-        <CardTitle className="text-white">
-          Approve LGR Tokens for Proposal
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-gray-400">
-          To create a proposal, you need to approve the transfer of LGR tokens
-          to the treasury.
-        </p>
-        <Button
-          onClick={handleApprove}
-          disabled={isApproving}
-          className="w-full"
-        >
-          {isApproving ? "Approving..." : "Approve LGR Tokens"}
-        </Button>
-      </CardContent>
-    </Card>
-  );
-};
-
-const ProposalConfirmation = ({
-  proposalConfig,
-  onConfirm,
-  onCancel,
-}: {
-  proposalConfig: ProposalConfig;
-  onConfirm: () => void;
-  onCancel: () => void;
-}) => {
-  return (
-    <Card className="bg-white/5 border-white/10">
-      <CardHeader>
-        <CardTitle className="text-white">Confirm Proposal Details</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-gray-400">
-          Please review the details below before submitting your proposal.
-        </p>
-        <div className="flex justify-between">
-          <span className="text-gray-400">Title:</span>
-          <span className="text-white">{proposalConfig.metadata.title}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-400">Target Capital:</span>
-          <span className="text-white">
-            {ethers.utils.formatEther(proposalConfig.targetCapital)} LGR
-          </span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-400">Voting Duration:</span>
-          <span className="text-white">
-            {proposalConfig.metadata.votingDuration / (24 * 60 * 60)} days
-          </span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-400">LinkedIn URL:</span>
-          <a
-            href={proposalConfig.linkedInURL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-polygon-primary hover:underline"
-          >
-            View Profile
-          </a>
-        </div>
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button onClick={onConfirm}>Confirm & Submit</Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
+const isValidLinkedInURL = (url: string): boolean => {
+  return url.startsWith('https://www.linkedin.com/') || url.startsWith('https://linkedin.com/');
 };
 
 const ThesisSubmission = () => {
   const navigate = useNavigate();
-  const { isConnected, address } = useWalletConnection();
-  const [step, setStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [proposalConfig, setProposalConfig] = useState<ProposalConfig | null>(
-    null
-  );
-  const [transactionId, setTransactionId] = useState<string | null>(null);
-  const [submissionError, setSubmissionError] = useState<string | null>(null);
   const { toast } = useToast();
-  const [isTestModeEnabled, setIsTestModeEnabled] = useState(false);
-  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
-    useState(false);
-  const [currentFormData, setCurrentFormData] = useState<ProposalMetadata>(
-    {} as ProposalMetadata
-  );
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      firmSize: FirmSize.BELOW_1M,
-      location: "",
-      dealType: DealType.ACQUISITION,
-      geographicFocus: GeographicFocus.LOCAL,
-      paymentTerms: [PaymentTerm.CASH],
-      operationalStrategies: [OperationalStrategy.TECH_MODERNIZATION],
-      growthStrategies: [GrowthStrategy.SERVICE_EXPANSION],
-      integrationStrategies: [IntegrationStrategy.MERGING_OPERATIONS],
-      targetCapital: "",
-      investmentDrivers: "",
-      additionalCriteria: "",
-      votingDuration: MIN_VOTING_DURATION,
-      linkedInURL: "",
-    },
+  const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
+  const { user } = useDynamicContext();
+  const { tokenBalances } = useTokenBalances({
+    networkId: 137,
+    accountAddress: address,
+    includeFiat: false,
+    includeNativeBalance: false,
+    tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const { setValue, getValues } = form;
+  const [isTestMode, setIsTestMode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionComplete, setSubmissionComplete] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
+  const [activeStep, setActiveStep] = useState<string>('thesis');
+  const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
+  const [currentTxHash, setCurrentTxHash] = useState<string | null>(null);
+  const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
+  const [formData, setFormData] = useState<ProposalMetadata>({
+    title: "",
+    firmCriteria: {
+      size: FirmSize.BELOW_1M,
+      location: "",
+      dealType: DealType.ACQUISITION,
+      geographicFocus: GeographicFocus.LOCAL
+    },
+    paymentTerms: [],
+    strategies: {
+      operational: [],
+      growth: [],
+      integration: []
+    },
+    investment: {
+      targetCapital: "",
+      drivers: "",
+      additionalCriteria: ""
+    },
+    votingDuration: MIN_VOTING_DURATION,
+    linkedInURL: "",
+    isTestMode: false
+  });
 
   useEffect(() => {
-    if (isTestModeEnabled) {
-      Object.entries(TEST_FORM_DATA).forEach(([key, value]) => {
-        if (key === "votingDuration") {
-          setValue(key as "votingDuration", value as number);
-        } else if (
-          key === "firmCriteria" &&
-          typeof value === "object" &&
-          value !== null
-        ) {
-          Object.entries(value).forEach(([nestedKey, nestedValue]) => {
-            setValue(nestedKey as keyof z.infer<typeof formSchema>, nestedValue);
-          });
-        } else if (key === "strategies" && typeof value === "object") {
-          Object.entries(value).forEach(([strategyKey, strategyValue]) => {
-            if (Array.isArray(strategyValue)) {
-              setValue(strategyKey as keyof z.infer<typeof formSchema>, strategyValue);
-            }
-          });
-        } else if (key !== "isTestMode") {
-          setValue(key as keyof z.infer<typeof formSchema>, value);
-        }
+    if (isTestMode) {
+      console.log("Setting test form data:", TEST_FORM_DATA);
+      setFormData({
+        ...TEST_FORM_DATA,
+        linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
+        submissionTimestamp: Date.now(),
+        submitter: address
       });
     }
-  }, [isTestModeEnabled, setValue]);
+  }, [isTestMode, user, address]);
 
   useEffect(() => {
-    if (!isConnected) {
-      navigate("/");
-    }
-  }, [isConnected, navigate]);
-
-  const targetCapitalBN = ethers.utils.parseEther(
-    form.getValues("targetCapital") || "0"
-  );
-
-  const steps = [
-    {
-      id: "form",
-      title: "Fill Proposal Details",
-      status: step > 1 ? "completed" : "pending",
-      description: "Provide all the necessary information for your proposal.",
-    },
-    {
-      id: "approve",
-      title: "Approve LGR Tokens",
-      status: step > 2 ? "completed" : step === 2 ? "processing" : "pending",
-      description: "Approve the transfer of LGR tokens for proposal creation.",
-    },
-    {
-      id: "confirm",
-      title: "Confirm Proposal",
-      status: step > 3 ? "completed" : "pending",
-      description: "Confirm all the details before submitting your proposal.",
-    },
-    {
-      id: "submit",
-      title: "Submit Proposal",
-      status:
-        transactionId && !submissionError
-          ? "processing"
-          : submissionError
-          ? "failed"
-          : "pending",
-      description: "Submit your proposal to the blockchain.",
-    },
-  ];
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      setCurrentFormData({
-        title: values.title,
-        firmCriteria: {
-          size: values.firmSize,
-          location: values.location,
-          dealType: values.dealType,
-          geographicFocus: values.geographicFocus,
-        },
-        paymentTerms: values.paymentTerms,
-        strategies: {
-          operational: values.operationalStrategies,
-          growth: values.growthStrategies,
-          integration: values.integrationStrategies,
-        },
-        investment: {
-          targetCapital: values.targetCapital,
-          drivers: values.investmentDrivers,
-          additionalCriteria: values.additionalCriteria,
-        },
-        votingDuration: values.votingDuration,
-        votingEnds: Math.floor(Date.now() / 1000) + values.votingDuration,
-        linkedInURL: values.linkedInURL,
-        isTestMode: isTestModeEnabled,
-      });
-      setStep(2);
-    } catch (error) {
-      console.error("Form submission error:", error);
-      const proposalError = handleDynamicError(error);
+    const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
+    if (!linkedInURL && isConnected) {
       toast({
-        title: "Form Submission Failed",
-        description: proposalError.message,
-        variant: "destructive",
+        title: "LinkedIn Profile Required",
+        description: "Please add your LinkedIn URL in your wallet settings to submit a thesis",
+        variant: "default"
       });
     }
+  }, [user, isConnected, toast]);
+
+  const validateLinkedInURL = (): boolean => {
+    const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
+    if (!linkedInURL) {
+      setFormErrors(prev => ({
+        ...prev,
+        linkedInURL: ['LinkedIn URL is required. Please add it in your wallet settings.']
+      }));
+      return false;
+    }
+    if (!isValidLinkedInURL(linkedInURL)) {
+      setFormErrors(prev => ({
+        ...prev,
+        linkedInURL: ['Invalid LinkedIn URL format. Please update it in your wallet settings.']
+      }));
+      return false;
+    }
+    return true;
   };
 
-  const handleApprovalComplete = () => {
-    setStep(3);
+  const updateStepStatus = (stepId: string, status: SubmissionStep['status']) => {
+    setSteps(prev => prev.map(step => step.id === stepId ? {
+      ...step,
+      status
+    } : step));
   };
 
-  const handleConfirm = async () => {
-    setIsConfirmationDialogOpen(false);
-    setStep(4);
+  const validateStrategies = (category: keyof typeof formData.strategies) => {
+    const strategies = formData.strategies[category];
+    if (!Array.isArray(strategies)) return false;
+    return strategies.length <= MAX_STRATEGIES_PER_CATEGORY;
+  };
 
-    const values = getValues();
-    const metadata: ProposalMetadata = {
-      title: values.title,
-      firmCriteria: {
-        size: values.firmSize,
-        location: values.location,
-        dealType: values.dealType,
-        geographicFocus: values.geographicFocus,
-      },
-      paymentTerms: values.paymentTerms,
+  const validatePaymentTerms = () => {
+    if (!Array.isArray(formData.paymentTerms)) return false;
+    return formData.paymentTerms.length <= 5;
+  };
+
+  const handleStrategyChange = (
+    category: "operational" | "growth" | "integration",
+    values: (OperationalStrategy | GrowthStrategy | IntegrationStrategy)[]
+  ) => {
+    setFormData(prev => ({
+      ...prev,
       strategies: {
-        operational: values.operationalStrategies,
-        growth: values.growthStrategies,
-        integration: values.integrationStrategies,
-      },
-      investment: {
-        targetCapital: values.targetCapital,
-        drivers: values.investmentDrivers,
-        additionalCriteria: values.additionalCriteria,
-      },
-      votingDuration: values.votingDuration,
-      votingEnds: Math.floor(Date.now() / 1000) + values.votingDuration,
-      linkedInURL: values.linkedInURL,
-      isTestMode: isTestModeEnabled,
-    };
+        ...prev.strategies,
+        [category]: values
+      }
+    }));
+  };
 
-    const proposalConfig: ProposalConfig = {
-      targetCapital: targetCapitalBN,
-      votingDuration: values.votingDuration,
-      ipfsHash: "test_ipfs_hash", // Replace with actual IPFS hash
-      metadata: metadata,
-      linkedInURL: values.linkedInURL,
-    };
-    setProposalConfig(proposalConfig);
+  const handleFormDataChange = (field: string, value: any) => {
+    setFormData(prev => {
+      const newData = { ...prev };
+      const fields = field.split('.');
+      let current: any = newData;
+      
+      for (let i = 0; i < fields.length - 1; i++) {
+        if (!current[fields[i]]) {
+          current[fields[i]] = {};
+        }
+        current = current[fields[i]];
+      }
+      
+      const lastField = fields[fields.length - 1];
+      
+      if (field === 'firmCriteria.size') {
+        current[lastField] = Number(value) as FirmSize;
+      } else if (field === 'firmCriteria.dealType') {
+        current[lastField] = Number(value) as DealType;
+      } else if (field === 'firmCriteria.geographicFocus') {
+        current[lastField] = Number(value) as GeographicFocus;
+      } else if (field.startsWith('strategies.')) {
+        current[lastField] = value;
+      } else {
+        current[lastField] = value;
+      }
+      
+      return newData;
+    });
+  };
 
-    setIsSubmitting(true);
-    setSubmissionError(null);
+  const handleVotingDurationChange = (value: number[]) => {
+    setVotingDuration(value[0]);
+  };
 
-    try {
-      const contractStatus = await getContractStatus();
-      const optimizedGas = await gasOptimizer.getOptimizedGasPrice(
-        contractStatus.provider
-      );
-
-      const tx = await createProposal(
-        proposalConfig,
-        optimizedGas,
-        isTestModeEnabled
-      );
-
-      setTransactionId(tx.id);
-    } catch (error) {
-      console.error("Error during proposal submission:", error);
-      const proposalError = handleDynamicError(error);
-      setSubmissionError(proposalError.message);
-      toast({
-        title: "Proposal Submission Failed",
-        description: proposalError.message,
-        variant: "destructive",
-      });
-      setIsSubmitting(false);
+  const getButtonText = () => {
+    if (isSubmitting) {
+      return <div className="flex items-center justify-center">
+          <span className="mr-2">Submitting...</span>
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+        </div>;
+    }
+    switch (activeStep) {
+      case 'thesis':
+        return "Continue to Firm Details";
+      case 'strategy':
+        return "Continue to Terms";
+      case 'terms':
+        return "Submit Investment Thesis";
+      default:
+        return "Continue";
     }
   };
 
-  const handleCancelConfirmation = () => {
-    setIsConfirmationDialogOpen(false);
-    setStep(3);
+  const validateBasicsTab = (): boolean => {
+    const errors: Record<string, string[]> = {};
+    if (!formData.title || formData.title.trim().length < 10) {
+      errors.title = ['Title must be at least 10 characters long'];
+    }
+    if (!formData.investment.targetCapital) {
+      errors['investment.targetCapital'] = ['Target capital is required'];
+    } else {
+      try {
+        const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
+        if (targetCapitalWei.lt(MIN_TARGET_CAPITAL)) {
+          errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} ETH`];
+        }
+        if (targetCapitalWei.gt(MAX_TARGET_CAPITAL)) {
+          errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} ETH`];
+        }
+      } catch (error) {
+        errors['investment.targetCapital'] = ['Invalid target capital amount'];
+      }
+    }
+    if (votingDuration < MIN_VOTING_DURATION) {
+      errors.votingDuration = ['Minimum voting duration is 7 days'];
+    }
+    if (votingDuration > MAX_VOTING_DURATION) {
+      errors.votingDuration = ['Maximum voting duration is 90 days'];
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  const handleProposalEvent = useCallback(
-    (event) => {
-      console.log("Proposal created event:", event);
+  const validateFirmTab = (): boolean => {
+    const errors: Record<string, string[]> = {};
+    if (!formData.firmCriteria.size) {
+      errors['firmCriteria.size'] = ['Please select a firm size'];
+    }
+    if (!formData.firmCriteria.location) {
+      errors['firmCriteria.location'] = ['Please select a location'];
+    }
+    if (!formData.firmCriteria.dealType) {
+      errors['firmCriteria.dealType'] = ['Please select a deal type'];
+    }
+    if (!formData.firmCriteria.geographicFocus) {
+      errors['firmCriteria.geographicFocus'] = ['Please select a geographic focus'];
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateStrategyTab = (): boolean => {
+    const errors: Record<string, string[]> = {};
+    if (!formData.strategies.operational.length) {
+      errors['strategies.operational'] = ['Please select at least one operational strategy'];
+    }
+    if (!formData.strategies.growth.length) {
+      errors['strategies.growth'] = ['Please select at least one growth strategy'];
+    }
+    if (!formData.strategies.integration.length) {
+      errors['strategies.integration'] = ['Please select at least one integration strategy'];
+    }
+    if (!formData.investment.drivers || formData.investment.drivers.trim().length < 50) {
+      errors['investment.drivers'] = ['Investment drivers must be at least 50 characters long'];
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateTermsTab = (): boolean => {
+    const errors: Record<string, string[]> = {};
+    if (!formData.paymentTerms.length) {
+      errors.paymentTerms = ['Please select at least one payment term'];
+    }
+    if (formData.paymentTerms.length > MAX_PAYMENT_TERMS) {
+      errors.paymentTerms = [`Maximum of ${MAX_PAYMENT_TERMS} payment terms allowed`];
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleContinue = (e: React.MouseEvent<HTMLButtonElement>) => {
+    let isValid = false;
+    switch (activeStep) {
+      case 'thesis':
+        isValid = validateBasicsTab();
+        if (isValid) setActiveStep('firm');
+        break;
+      case 'firm':
+        isValid = validateFirmTab();
+        if (isValid) setActiveStep('strategy');
+        break;
+      case 'strategy':
+        isValid = validateStrategyTab();
+        if (isValid) setActiveStep('terms');
+        break;
+      case 'terms':
+        isValid = validateTermsTab();
+        handleSubmit(e);
+        break;
+    }
+    if (!isValid) {
       toast({
-        title: "Proposal Created",
-        description: `Proposal created with token ID: ${event.tokenId}`,
+        title: "Validation Error",
+        description: "Please fill in all required fields correctly before proceeding.",
+        variant: "destructive"
       });
-      setIsSubmitting(false);
-      navigate(`/proposals/${event.tokenId}`);
-    },
-    [navigate, toast]
-  );
+    }
+  };
 
-  useEffect(() => {
-    if (transactionId) {
-      const subscribe = async () => {
-        try {
-          const contractStatus = await getContractStatus();
+  const handleSubmit = async (e: React.FormEvent, formData?: ProposalMetadata, isTestMode?: boolean) => {
+    e.preventDefault();
+    if (!isConnected) {
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your wallet to submit a thesis",
+        variant: "destructive"
+      });
+      connect();
+      return;
+    }
 
-          waitForProposalCreation(
-            {
-              provider: contractStatus.provider,
-              contractAddress: contractStatus.contractAddress,
-              abi: contractStatus.contractInterface.fragments.map((fragment) =>
-                fragment.format(ethers.utils.FormatTypes.full)
-              ),
-              eventName: "ProposalCreated",
-            },
-            transactionId,
-            300000
-          )
-            .then((event) => {
-              handleProposalEvent(event);
-            })
-            .catch((error) => {
-              console.error("Error waiting for proposal creation:", error);
-              const proposalError = handleDynamicError(error);
-              setSubmissionError(proposalError.message);
-              toast({
-                title: "Proposal Submission Failed",
-                description: proposalError.message,
-                variant: "destructive",
-              });
-              setIsSubmitting(false);
-            });
-        } catch (error) {
-          console.error("Error setting up event listener:", error);
-          const proposalError = handleDynamicError(error);
-          setSubmissionError(proposalError.message);
-          toast({
-            title: "Event Listener Setup Failed",
-            description: proposalError.message,
-            variant: "destructive",
-          });
-          setIsSubmitting(false);
-        }
+    try {
+      setIsSubmitting(true);
+      setFormErrors({});
+
+      if (!validateLinkedInURL()) {
+        throw new Error("Please add a valid LinkedIn URL in your wallet settings");
+      }
+
+      updateStepStatus('thesis', 'completed');
+      updateStepStatus('strategy', 'completed');
+      updateStepStatus('approval', 'completed');
+      setActiveStep('submission');
+
+      if (!wallet) {
+        throw new Error("No wallet connected");
+      }
+
+      const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
+      console.log('Retrieved LinkedIn URL:', linkedInURL);
+
+      const updatedFormData = {
+        ...formData || formData,
+        votingDuration,
+        linkedInURL,
+        submissionTimestamp: Date.now(),
+        submitter: address
       };
 
-      subscribe();
+      console.log('Uploading metadata to IPFS...', { isTestMode });
+      const ipfsUri = await uploadMetadataToPinata(updatedFormData);
+      const ipfsHash = ipfsUri.replace('ipfs://', '');
+      
+      if (!validateIPFSHash(ipfsHash)) {
+        throw new Error("Invalid IPFS hash format");
+      }
+
+      console.log('Estimating gas for proposal creation...', { isTestMode });
+      const targetCapitalWei = ethers.utils.parseEther(
+        isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData?.investment.targetCapital || ""
+      );
+
+      const proposalConfig: ProposalConfig = {
+        targetCapital: targetCapitalWei,
+        votingDuration,
+        ipfsHash,
+        metadata: updatedFormData,
+        linkedInURL
+      };
+
+      const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
+      console.log('Creating proposal...', proposalConfig);
+      const result = await createProposal(proposalConfig, wallet);
+
+      const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
+      const newProposal: StoredProposal = {
+        hash: result.hash,
+        ipfsHash,
+        timestamp: new Date().toISOString(),
+        title: isTestMode ? TEST_FORM_DATA.title : formData?.title || "",
+        targetCapital: targetCapitalWei.toString(),
+        status: 'pending'
+      };
+      userProposals.push(newProposal);
+      localStorage.setItem('userProposals', JSON.stringify(userProposals));
+
+      updateStepStatus('submission', 'completed');
+      toast({
+        title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
+        description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
+      });
+
+    } catch (error) {
+      console.error("Submission error:", error);
+      updateStepStatus(activeStep, 'failed');
+      toast({
+        title: "Submission Failed",
+        description: error instanceof Error ? error.message : "Failed to submit thesis",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-  }, [transactionId, handleProposalEvent, toast]);
+  };
+
+  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => {
+    try {
+      setIsSubmitting(true);
+      setFormErrors({});
+
+      if (!validateLinkedInURL()) {
+        throw new Error("Please add a valid LinkedIn URL in your wallet settings");
+      }
+
+      updateStepStatus('thesis', 'completed');
+      updateStepStatus('strategy', 'completed');
+      updateStepStatus('approval', 'completed');
+      setActiveStep('submission');
+
+      if (!wallet) {
+        throw new Error("No wallet connected");
+      }
+
+      const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
+      console.log('Retrieved LinkedIn URL:', linkedInURL);
+
+      const effectiveFormData = isTestMode ? {
+        ...TEST_FORM_DATA,
+        linkedInURL,
+        submissionTimestamp: Date.now(),
+        submitter: address
+      } : formData;
+
+      console.log('Preparing data for IPFS submission:', { 
+        isTestMode,
+        effectiveFormData,
+        linkedInURL,
+        submitter: address,
+        timestamp: Date.now()
+      });
+      
+      const ipfsUri = await uploadMetadataToPinata(effectiveFormData);
+      console.log('IPFS upload result:', {
+        ipfsUri,
+        submittedData: effectiveFormData
+      });
+
+      const ipfsHash = ipfsUri.replace('ipfs://', '');
+      
+      if (!validateIPFSHash(ipfsHash)) {
+        throw new Error("Invalid IPFS hash format");
+      }
+
+      const targetCapitalWei = ethers.utils.parseEther(
+        isTestMode ? TEST_FORM_DATA.investment.targetCapital : effectiveFormData.investment.targetCapital
+      );
+
+      const proposalConfig: ProposalConfig = {
+        targetCapital: targetCapitalWei,
+        votingDuration,
+        ipfsHash,
+        metadata: effectiveFormData,
+        linkedInURL
+      };
+
+      const result = await createProposal(proposalConfig, wallet);
+      console.log('Proposal creation result:', result);
+      setCurrentTxHash(result.hash);
+
+      const provider = new ethers.providers.Web3Provider(await wallet.getWalletClient() as any);
+      const receipt = await result.wait();
+      console.log('Transaction receipt received:', receipt);
+
+      if (receipt.status === 1) { // Transaction successful
+        setSubmissionComplete(true);
+        updateStepStatus('submission', 'completed');
+
+        toast({
+          title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
+          description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
+        });
+
+        // Store proposal in local storage
+        const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
+        const newProposal: StoredProposal = {
+          hash: result.hash,
+          ipfsHash,
+          timestamp: new Date().toISOString(),
+          title: isTestMode ? TEST_FORM_DATA.title : effectiveFormData.title,
+          targetCapital: targetCapitalWei.toString(),
+          status: 'pending'
+        };
+        userProposals.push(newProposal);
+        localStorage.setItem('userProposals', JSON.stringify(userProposals));
+
+        // Redirect after a short delay to allow the user to see the success state
+        setTimeout(() => {
+          navigate('/proposals');
+        }, 2000);
+      } else {
+        throw new Error('Transaction failed');
+      }
+
+    } catch (error) {
+      console.error("Submission error:", error);
+      updateStepStatus(activeStep, 'failed');
+      toast({
+        title: "Submission Failed",
+        description: error instanceof Error ? error.message : "Failed to submit thesis",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(SUBMISSION_FEE));
+
+  const renderContinueButton = (
+    onClick: () => void,
+    isLastSection: boolean = false
+  ) => (
+    <Button 
+      onClick={onClick} 
+      disabled={isSubmitting}
+      className={cn(
+        "h-12 px-6 min-w-[200px] mt-6",
+        "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+        "hover:from-polygon-secondary hover:to-polygon-primary",
+        "text-white font-medium",
+        "transition-all duration-300",
+        "disabled:opacity-50",
+        "flex items-center justify-center gap-2"
+      )}
+    >
+      {isSubmitting ? (
+        <>
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+          <span>Processing...</span>
+        </>
+      ) : (
+        <>
+          <span>{isLastSection ? 'Submit Thesis' : 'Continue'}</span>
+          <ArrowRight className="w-4 h-4" />
+        </>
+      )}
+    </Button>
+  );
+
+  const handleRentAdSpace = (frequency: 'week' | 'month') => {
+    // Implement ad space rental logic here
+  };
+
+  const handleTestModeToggle = async (enabled: boolean) => {
+    if (!isConnected) {
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your wallet to toggle test mode",
+        variant: "destructive"
+      });
+      connect();
+      return;
+    }
+    
+    setIsTestMode(enabled);
+    if (enabled) {
+      setFormData(TEST_FORM_DATA);
+    } else {
+      setFormData({
+        title: "",
+        firmCriteria: {
+          size: FirmSize.BELOW_1M,
+          location: "",
+          dealType: DealType.ACQUISITION,
+          geographicFocus: GeographicFocus.LOCAL
+        },
+        paymentTerms: [],
+        strategies: {
+          operational: [],
+          growth: [],
+          integration: []
+        },
+        investment: {
+          targetCapital: "",
+          drivers: "",
+          additionalCriteria: ""
+        },
+        votingDuration: MIN_VOTING_DURATION,
+        linkedInURL: "",
+        isTestMode: false,
+        submissionTimestamp: Date.now(),
+        submitter: address
+      });
+    }
+  };
+
+  const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
+    // Implement promotion selection logic here
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="container mx-auto px-4 pt-24 pb-16">
-        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-300 to-yellow-400 mb-8">
-          Submit Your Thesis
-        </h1>
+      <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
+        <div className="container mx-auto px-4 py-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-between"
+          >
+            <h1 className="text-3xl font-bold">
+              Transform Accounting Firm Ownership
+            </h1>
+          </motion.div>
+        </div>
+      </div>
 
-        <SubmissionProgress steps={steps} currentStepId={steps[step - 1].id} />
-
-        {step === 1 && (
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader>
-              <CardTitle className="text-white">Proposal Details</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-8"
+      <div className="container mx-auto px-4 pt-32 pb-20">
+        <div className="grid grid-cols-12 gap-8">
+          <div className="col-span-3">
+            <div className="sticky top-32 space-y-4">
+              {SUBMISSION_STEPS.map((step, index) => (
+                <div 
+                  key={step.id}
+                  className={cn(
+                    "relative",
+                    index !== SUBMISSION_STEPS.length - 1 && "pb-8 after:absolute after:left-5 after:top-8 after:h-full after:w-0.5",
+                    step.status === 'completed' ? "after:bg-green-500" : "after:bg-white/10"
+                  )}
                 >
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Proposal Title</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Name of the firm" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                  <button
+                    onClick={() => setActiveStep(step.id)}
+                    className={cn(
+                      "flex items-start gap-4 w-full rounded-lg p-4 transition-colors",
+                      step.id === activeStep ? "bg-white/5" : "hover:bg-white/5"
                     )}
-                  />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="firmSize"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Firm Size</FormLabel>
-                          <FormControl>
-                            <select
-                              defaultValue={FirmSize.BELOW_1M}
-                              {...field}
-                              className="bg-black/40 border border-white/10 rounded-md px-4 py-2 w-full"
-                            >
-                              <option value={FirmSize.BELOW_1M}>Below $1M</option>
-                              <option value={FirmSize.ONE_TO_FIVE_M}>
-                                $1M - $5M
-                              </option>
-                              <option value={FirmSize.FIVE_TO_TEN_M}>
-                                $5M - $10M
-                              </option>
-                              <option value={FirmSize.TEN_PLUS}>$10M+</option>
-                            </select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
+                  >
+                    <div className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                      step.status === 'completed' ? "bg-green-500 text-white" :
+                      step.status === 'processing' ? "bg-polygon-primary text-white animate-pulse" :
+                      step.id === activeStep ? "bg-polygon-primary/20 text-polygon-secondary border border-polygon-secondary" :
+                      "bg-white/5 text-white/40"
+                    )}>
+                      {step.status === 'completed' ? (
+                        <Check className="w-5 h-5" />
+                      ) : (
+                        index + 1
                       )}
-                    />
+                    </div>
+                    <div className="text-left">
+                      <p className={cn(
+                        "font-medium",
+                        step.id === activeStep ? "text-white" : "text-white/60"
+                      )}>
+                        {step.title}
+                      </p>
+                      <p className="text-sm text-white/40">
+                        {step.description}
+                      </p>
+                    </div>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
 
-                    <FormField
-                      control={form.control}
-                      name="location"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Location</FormLabel>
-                          <FormControl>
-                            <Input placeholder="e.g., California" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+          <div className="col-span-6 space-y-6">
+            <Card className="bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden">
+              <motion.div 
+                className="border-b border-white/5"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="p-6 space-y-3">
+                  <p className="text-xl text-white/90">
+                    Ready to revolutionize how accounting practices are acquired?
+                  </p>
+                  <p className="text-gray-400">
+                    Present your vision to our community of forward-thinking investors through a structured investment thesis.
+                  </p>
+                </div>
+              </motion.div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="dealType"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Deal Type</FormLabel>
-                          <FormControl>
-                            <select
-                              defaultValue={DealType.ACQUISITION}
-                              {...field}
-                              className="bg-black/40 border border-white/10 rounded-md px-4 py-2 w-full"
-                            >
-                              <option value={DealType.ACQUISITION}>
-                                Acquisition
-                              </option>
-                              <option value={DealType.MERGER}>Merger</option>
-                              <option value={DealType.EQUITY_BUYOUT}>
-                                Equity Buyout
-                              </option>
-                              <option value={DealType.FRANCHISE}>
-                                Franchise
-                              </option>
-                              <option value={DealType.SUCCESSION}>
-                                Succession
-                              </option>
-                            </select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeStep}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className="p-6"
+                >
+                  {activeStep === 'thesis' && (
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <Label className="text-lg font-medium">Thesis Title</Label>
+                        <Input 
+                          placeholder="Enter a clear, descriptive title"
+                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12"
+                          value={formData.title}
+                          onChange={e => handleFormDataChange('title', e.target.value)}
+                        />
+                        {formErrors.title && (
+                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                        )}
+                      </div>
 
-                    <FormField
-                      control={form.control}
-                      name="geographicFocus"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Geographic Focus</FormLabel>
-                          <FormControl>
-                            <select
-                              defaultValue={GeographicFocus.LOCAL}
-                              {...field}
-                              className="bg-black/40 border border-white/10 rounded-md px-4 py-2 w-full"
-                            >
-                              <option value={GeographicFocus.LOCAL}>Local</option>
-                              <option value={GeographicFocus.REGIONAL}>
-                                Regional
-                              </option>
-                              <option value={GeographicFocus.NATIONAL}>
-                                National
-                              </option>
-                              <option value={GeographicFocus.REMOTE}>
-                                Remote
-                              </option>
-                            </select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                      <TargetCapitalInput 
+                        value={formData.investment.targetCapital}
+                        onChange={value => handleFormDataChange('investment.targetCapital', value)}
+                        error={formErrors['investment.targetCapital']}
+                      />
 
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="payment-terms">
-                      <AccordionTrigger>
-                        Payment Terms
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-4">
-                          {Object.values(PaymentTerm).map((term) => (
-                            <FormField
-                              key={term}
-                              control={form.control}
-                              name="paymentTerms"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={term}
-                                    className="flex flex-row items-center space-x-2 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value?.includes(term)}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([...field.value, term])
-                                            : field.onChange(
-                                                field.value?.filter(
-                                                  (value) => value !== term
-                                                )
-                                              );
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">
-                                      {PaymentTerm[term]}
-                                    </FormLabel>
-                                  </FormItem>
-                                );
-                              }}
-                            />
-                          ))}
-                        </div>
-                        <FormMessage />
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
+                      <VotingDurationInput
+                        value={votingDuration}
+                        onChange={handleVotingDurationChange}
+                        error={formErrors.votingDuration}
+                      />
 
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="operational-strategies">
-                      <AccordionTrigger>
-                        Operational Strategies
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-4">
-                          {Object.values(OperationalStrategy).map((strategy) => (
-                            <FormField
-                              key={strategy}
-                              control={form.control}
-                              name="operationalStrategies"
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(strategy)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([
-                                              ...field.value,
-                                              strategy,
-                                            ])
-                                          : field.onChange(
-                                              field.value?.filter(
-                                                (value) => value !== strategy
-                                              )
-                                            );
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal">
-                                    {OperationalStrategy[strategy]}
-                                  </FormLabel>
-                                </FormItem>
-                              )}
-                            />
-                          ))}
-                        </div>
-                        <FormMessage />
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
+                      <div className="space-y-4">
+                        <Label className="text-lg font-medium">Investment Drivers</Label>
+                        <textarea
+                          placeholder="Describe the key drivers behind this investment thesis..."
+                          className="w-full h-32 bg-black/50 border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none"
+                          value={formData.investment.drivers}
+                          onChange={e => handleFormDataChange('investment.drivers', e.target.value)}
+                        />
+                        {formErrors['investment.drivers'] && (
+                          <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="growth-strategies">
-                      <AccordionTrigger>
-                        Growth Strategies
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-4">
-                          {Object.values(GrowthStrategy).map((strategy) => (
-                            <FormField
-                              key={strategy}
-                              control={form.control}
-                              name="growthStrategies"
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(strategy)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([
-                                              ...field.value,
-                                              strategy,
-                                            ])
-                                          : field.onChange(
-                                              field.value?.filter(
-                                                (value) => value !== strategy
-                                              )
-                                            );
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal">
-                                    {GrowthStrategy[strategy]}
-                                  </FormLabel>
-                                </FormItem>
-                              )}
-                            />
-                          ))}
-                        </div>
-                        <FormMessage />
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="integration-strategies">
-                      <AccordionTrigger>
-                        Integration Strategies
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-4">
-                          {Object.values(IntegrationStrategy).map((strategy) => (
-                            <FormField
-                              key={strategy}
-                              control={form.control}
-                              name="integrationStrategies"
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(strategy)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([
-                                              ...field.value,
-                                              strategy,
-                                            ])
-                                          : field.onChange(
-                                              field.value?.filter(
-                                                (value) => value !== strategy
-                                              )
-                                            );
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal">
-                                    {IntegrationStrategy[strategy]}
-                                  </FormLabel>
-                                </FormItem>
-                              )}
-                            />
-                          ))}
-                        </div>
-                        <FormMessage />
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-
-                  <FormField
-                    control={form.control}
-                    name="targetCapital"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Target Capital (LGR)</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., 1000000"
-                            {...field}
-                            type="number"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="investmentDrivers"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Investment Drivers</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Why should the community invest in this firm?"
-                            className="resize-none"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="additionalCriteria"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Additional Criteria</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Any additional criteria for the firm?"
-                            className="resize-none"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="linkedInURL"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          LinkedIn Profile
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <HelpCircle className="h-4 w-4 text-gray-400" />
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                Provide a link to your LinkedIn profile to
-                                verify your professional experience.
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., linkedin.com/in/yourprofile"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <VotingDurationInput
-                    value={form.getValues("votingDuration")}
-                    onChange={(value) => {
-                      form.setValue("votingDuration", value[0]);
-                    }}
-                    error={form.formState.errors.votingDuration?.message
-                      ? [form.formState.errors.votingDuration?.message]
-                      : undefined}
-                  />
-
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="terms"
-                      checked={isTestModeEnabled}
-                      onCheckedChange={(checked) => {
-                        setIsTestModeEnabled(checked || false);
+                  {activeStep === 'strategy' && (
+                    <FirmCriteriaSection
+                      formData={{
+                        firmCriteria: {
+                          size: formData.firmCriteria.size,
+                          location: formData.firmCriteria.location,
+                          dealType: formData.firmCriteria.dealType,
+                          geographicFocus: formData.firmCriteria.geographicFocus
+                        }
                       }}
+                      formErrors={formErrors}
+                      onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
                     />
-                    <label
-                      htmlFor="terms"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Enable Test Mode
-                    </label>
-                  </div>
+                  )}
 
-                  <Button type="submit">Submit Proposal</Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        )}
+                  {activeStep === 'approval' && (
+                    <>
+                      <PaymentTermsSection
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
+                      />
+                      <StrategiesSection
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={(category, value) => handleStrategyChange(category, value)}
+                      />
+                    </>
+                  )}
 
-        {step === 2 && (
-          <ContractApprovalStatus
-            onApprovalComplete={handleApprovalComplete}
-            requiredAmount={targetCapitalBN}
-            currentFormData={currentFormData}
-          />
-        )}
+                  {activeStep === 'submission' && (
+                    <div className="space-y-6 text-center py-8">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
+                      >
+                        <Check className="w-8 h-8 text-white" />
+                      </motion.div>
+                      <h3 className="text-2xl font-semibold">
+                        {submissionComplete 
+                          ? "Investment Thesis Submitted!"
+                          : "Ready to Submit"
+                        }
+                      </h3>
+                      <p className="text-gray-400">
+                        {submissionComplete
+                          ? "Your investment thesis has been successfully submitted to the community"
+                          : "Your investment thesis is ready to be submitted to the community"
+                        }
+                      </p>
+                      {currentTxHash && (
+                        <a
+                          href={`https://polygonscan.com/tx/${currentTxHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-polygon-primary hover:underline"
+                        >
+                          View transaction on PolygonScan
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
 
-        {step === 3 && (
-          <Dialog open={isConfirmationDialogOpen} onOpenChange={setIsConfirmationDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={() => setIsConfirmationDialogOpen(true)}>
-                Review and Confirm
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg
+              <div className="border-t border-white/5 p-6">
+                <Button 
+                  onClick={handleContinue}
+                  disabled={isSubmitting}
+                  className="w-full h-12"
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Processing...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <span>{getButtonText()}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
+                  )}
+                </Button>
+              </div>
+            </Card>
+          </div>
+
+          <div className="col-span-3">
+            <div className="sticky top-32 space-y-4">
+              <ContractApprovalStatus
+                onApprovalComplete={handleApprovalComplete}
+                requiredAmount={SUBMISSION_FEE}
+                isTestMode={isTestMode}
+                currentFormData={formData}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
