@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { getWorkingProvider, getLgrTokenContract, getPresaleContract, fetchPresaleMaticPrice, purchaseTokens } from "@/services/presaleContractService";
+import { getDynamicProvider, getLgrTokenContract, getPresaleContract, fetchPresaleMaticPrice, purchaseTokens } from "@/services/presaleContractService";
 import { ethers } from "ethers";
 import { Coins, Info } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -32,7 +31,7 @@ export const LGRFloatingWidget = () => {
       if (!address) return;
 
       try {
-        const provider = await getWorkingProvider();
+        const provider = await getDynamicProvider();
         const [lgrContract, presaleContract, maticBal] = await Promise.all([
           getLgrTokenContract(provider),
           getPresaleContract(provider),
@@ -100,7 +99,7 @@ export const LGRFloatingWidget = () => {
     if (!address || !purchaseAmount) return;
 
     try {
-      const provider = await getWorkingProvider();
+      const provider = await getDynamicProvider();
       const signer = provider.getSigner(address);
       
       const result = await purchaseTokens(signer, purchaseAmount);
@@ -135,7 +134,6 @@ export const LGRFloatingWidget = () => {
         </PopoverTrigger>
         <PopoverContent className="w-80 p-4 bg-black/90 backdrop-blur-lg border border-white/10">
           <div className="space-y-4">
-            {/* Balance Display */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
@@ -159,7 +157,6 @@ export const LGRFloatingWidget = () => {
               </div>
             </div>
 
-            {/* MATIC Balance */}
             <div className="flex items-center justify-between py-2 border-t border-white/10">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
@@ -222,7 +219,6 @@ export const LGRFloatingWidget = () => {
         </PopoverContent>
       </Popover>
 
-      {/* Instructions Dialog */}
       <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
         <DialogContent className="bg-black/95 border border-yellow-500/20 max-w-2xl">
           <DialogHeader>
@@ -308,7 +304,6 @@ export const LGRFloatingWidget = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Purchase Confirmation Dialog */}
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogContent className="bg-black/95 border border-yellow-500/20">
           <DialogHeader>

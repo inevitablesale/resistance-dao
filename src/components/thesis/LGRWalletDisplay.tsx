@@ -26,7 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
-import { getWorkingProvider, getLgrTokenContract, getPresaleContract, fetchPresaleMaticPrice, purchaseTokens } from "@/services/presaleContractService";
+import { getDynamicProvider, getLgrTokenContract, getPresaleContract, fetchPresaleMaticPrice, purchaseTokens } from "@/services/presaleContractService";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useOnramp } from "@dynamic-labs/sdk-react-core";
@@ -71,7 +71,7 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
       if (!walletAddress) return;
 
       try {
-        const provider = await getWorkingProvider();
+        const provider = await getDynamicProvider();
         const [lgrContract, maticBal] = await Promise.all([
           getLgrTokenContract(provider),
           provider.getBalance(walletAddress)
@@ -156,7 +156,7 @@ export const LGRWalletDisplay = ({ submissionFee, currentBalance, walletAddress,
     if (!walletAddress || !purchaseAmount) return;
 
     try {
-      const provider = await getWorkingProvider();
+      const provider = await getDynamicProvider();
       const signer = provider.getSigner(walletAddress);
       
       const result = await purchaseTokens(signer, purchaseAmount);
