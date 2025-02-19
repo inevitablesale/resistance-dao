@@ -1,25 +1,40 @@
 
 import { ProposalsHistory } from "@/components/proposals/ProposalsHistory";
 import { Button } from "@/components/ui/button";
-import { FileText, Plus, Trophy, Building2, Users, Shield, Rocket } from "lucide-react";
+import { FileText, Plus, Building2, HandCoins, TrendingUp, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 
 const Proposals = () => {
   const navigate = useNavigate();
-  const boardMembers = [{
-    role: "Managing Partners",
-    description: "Led multiple successful accounting firms through growth and acquisition phases.",
-    icon: Trophy
+  const processSteps = [{
+    icon: HandCoins,
+    title: "Soft Pledge Support",
+    description: "Back promising proposals with soft pledges. No immediate investment required - just a 10 LGR voting fee to show genuine interest.",
+    points: [
+      "Discover potential investments",
+      "Support with soft pledges",
+      "Track proposal progress"
+    ]
   }, {
-    role: "Operations Experts",
-    description: "Streamlined practice operations across multiple firms.",
-    icon: Shield
+    icon: TrendingUp,
+    title: "Watch Proposals Grow",
+    description: "Monitor how proposals gain community support. Each pledge brings the proposal closer to its funding goal.",
+    points: [
+      "View funding progress",
+      "See community backing",
+      "Alerts about progress"
+    ]
   }, {
-    role: "Technology Leaders",
-    description: "Transformed practices through strategic technology adoption.",
-    icon: Rocket
+    icon: MessageSquare,
+    title: "Move to Investment",
+    description: "When funding goals are met, proposal creators coordinate with supporters to complete the investment process.",
+    points: [
+      "Direct communication",
+      "AML/KYC and Accredited investor",
+      "SPV formation"
+    ]
   }];
 
   return (
@@ -45,6 +60,40 @@ const Proposals = () => {
             </Button>
           </div>
 
+          {/* How It Works Section */}
+          <div className="mb-20">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-white mb-4">Supporting Investment Proposals</h2>
+              <p className="text-lg text-white/60 max-w-2xl mx-auto">
+                Understand how to participate in and support investment proposals through our community-driven process.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {processSteps.map((step, index) => {
+                const Icon = step.icon;
+                return (
+                  <Card key={index} className="p-6 bg-black/50 backdrop-blur-sm border-white/10 hover:border-white/20 transition-colors">
+                    <div className="flex flex-col h-full">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-yellow-500/10 mb-6 mx-auto">
+                        <Icon className="w-6 h-6 text-yellow-500" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-3 text-center">{step.title}</h3>
+                      <p className="text-white/60 mb-6 text-center">{step.description}</p>
+                      <ul className="space-y-2 mt-auto">
+                        {step.points.map((point, pointIndex) => (
+                          <li key={pointIndex} className="flex items-center text-white/80">
+                            <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-2" />
+                            {point}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Proposals List Section */}
           <div className="mb-16">
             <div className="flex items-center justify-between mb-8">
@@ -60,22 +109,6 @@ const Proposals = () => {
               </Button>
             </div>
             <ProposalsHistory />
-          </div>
-
-          {/* Board Members Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {boardMembers.map((member, index) => {
-              const Icon = member.icon;
-              return (
-                <Card key={index} className="p-6 bg-black/50 backdrop-blur-sm border-white/10">
-                  <div className="flex flex-col items-center text-center">
-                    <Icon className="w-12 h-12 text-yellow-500 mb-4" />
-                    <h3 className="text-xl font-bold text-white mb-2">{member.role}</h3>
-                    <p className="text-white/60">{member.description}</p>
-                  </div>
-                </Card>
-              );
-            })}
           </div>
         </div>
       </div>
