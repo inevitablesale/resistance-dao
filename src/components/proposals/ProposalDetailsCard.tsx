@@ -259,30 +259,18 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
     setIsPledging(true);
     try {
       const walletProvider = await getProvider();
-      const pledgeAmount = ethers.utils.parseEther(pledgeInput);
-      const totalNeeded = pledgeAmount.add(VOTING_FEE);
+      const signer = walletProvider.provider.getSigner();
 
-      console.log('Checking balance for pledge:', {
-        pledgeAmount: ethers.utils.formatEther(pledgeAmount),
-        votingFee: ethers.utils.formatEther(VOTING_FEE),
-        totalNeeded: ethers.utils.formatEther(totalNeeded)
-      });
-
+      console.log('Checking balance for voting fee');
       const balance = await getTokenBalance(
         walletProvider.provider,
         LGR_TOKEN_ADDRESS,
         address!
       );
       const userBalance = ethers.utils.parseEther(balance);
-
-      console.log('User balance check:', {
-        userBalance: balance,
-        hasEnough: userBalance.gte(totalNeeded)
-      });
-
-      if (userBalance.lt(totalNeeded)) {
-        const shortfall = ethers.utils.formatEther(totalNeeded.sub(userBalance));
-        throw new Error(`Insufficient LGR balance. You need ${shortfall} more LGR to complete this transaction (including 10 LGR voting fee)`);
+      
+      if (userBalance.lt(VOTING_FEE)) {
+        throw new Error("Insufficient LGR balance. You need 10 LGR to cover the voting fee.");
       }
 
       const factoryContract = new ethers.Contract(
@@ -291,17 +279,28 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         walletProvider.provider.getSigner()
       );
 
-      const tx = await factoryContract.vote(tokenId, pledgeAmount);
+      const lgrToken = new ethers.Contract(
+        LGR_TOKEN_ADDRESS,
+        ["function approve(address spender, uint256 amount) returns (bool)"],
+        signer
+      );
+      
+      console.log('Approving voting fee:', ethers.utils.formatEther(VOTING_FEE));
+      const approveTx = await lgrToken.approve(FACTORY_ADDRESS, VOTING_FEE);
+      await approveTx.wait();
+
+      const pledgeAmountBN = ethers.utils.parseEther(pledgeInput);
+      const tx = await factoryContract.vote(tokenId, pledgeAmountBN);
       await tx.wait();
 
       toast({
-        title: "Support Pledged",
-        description: `Successfully pledged ${pledgeInput} LGR to back this proposal`,
+        title: "Support Pledged Successfully",
+        description: `Your commitment of ${pledgeInput} LGR has been recorded. The 10 LGR voting fee has been processed.`,
       });
 
       setPledgedAmount(prev => {
         const currentAmount = ethers.utils.parseEther(prev);
-        const newAmount = currentAmount.add(pledgeAmount);
+        const newAmount = currentAmount.add(pledgeAmountBN);
         return ethers.utils.formatEther(newAmount);
       });
       
@@ -411,11 +410,11 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               <div>
                 <h3 className="text-2xl font-semibold text-white mb-2 flex items-center gap-2">
                   <Coins className="w-6 h-6 text-yellow-500" />
-                  Back This Proposal
+                  Support This Proposal
                 </h3>
                 <p className="text-white/60 text-sm flex items-center gap-1">
                   <Info className="w-4 h-4" />
-                  Pledge LGR tokens to show your support
+                  Make a soft commitment to show your interest
                 </p>
               </div>
               <div className="text-center md:text-right">
@@ -424,7 +423,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                     {pledgedAmount} LGR
                   </p>
                   <span className="text-sm text-white/60 border-l border-white/10 pl-2">
-                    {backerCount} backer{backerCount !== 1 ? 's' : ''}
+                    {backerCount} supporter{backerCount !== 1 ? 's' : ''}
                   </span>
                 </div>
               </div>
@@ -432,7 +431,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
             <div className="mb-8">
               <div className="flex justify-between text-sm text-white/60 mb-2">
-                <span>Progress</span>
+                <span>Total Commitments Progress</span>
                 <span>{progressPercentage.toFixed(1)}%</span>
               </div>
               <Progress 
@@ -445,19 +444,19 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               <div className="bg-white/5 p-4 rounded-lg border border-white/10 mb-4">
                 <h4 className="text-white font-medium mb-2 flex items-center gap-2">
                   <Info className="w-5 h-5 text-yellow-500" />
-                  About Soft Pledges
+                  About Supporting Proposals
                 </h4>
                 <p className="text-sm text-white/80 leading-relaxed">
-                  This is a soft pledge - no money is taken from your wallet. You're showing support for the proposal 
-                  and helping it gain traction. If the proposal reaches its funding goal through soft pledges, 
-                  the proposal creator will reach out to coordinate the actual investment.
+                  Express your interest by making a soft commitment. This is not an actual investment - 
+                  only a 10 LGR voting fee will be charged to record your support. Your pledged amount shows how much 
+                  you're potentially interested in investing later.
                 </p>
               </div>
               
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                   <Label htmlFor="pledgeAmount" className="text-white/60 mb-2 block">
-                    Pledge Amount
+                    Commitment Amount
                   </Label>
                   <Input
                     id="pledgeAmount"
@@ -466,12 +465,12 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                     step="0.1"
                     value={pledgeInput}
                     onChange={(e) => setPledgeInput(e.target.value)}
-                    placeholder="Enter LGR amount"
+                    placeholder="Enter amount you're interested in"
                     className="bg-black/40 border-white/10 text-white h-12"
                   />
                   <p className="text-sm text-white/60 mt-2 flex items-center gap-2">
                     <Info className="w-4 h-4" />
-                    There is a 10 LGR voting fee required to pledge support
+                    Only a 10 LGR voting fee is required in your wallet
                   </p>
                 </div>
                 <Button
@@ -481,26 +480,26 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold transition-all duration-300 transform hover:scale-105 h-12 mt-8 md:mt-0"
                 >
                   {isPledging ? (
-                    "Pledging..."
+                    "Recording..."
                   ) : (
                     <>
                       <Coins className="w-5 h-5 mr-2" />
-                      Soft Pledge Support
+                      Record Support
                     </>
                   )}
                 </Button>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-white/40">
-                  Current pledged: {pledgedAmount} LGR ({formatUSDAmount(pledgedAmount)})
+                  Total commitments so far: {pledgedAmount} LGR ({formatUSDAmount(pledgedAmount)})
                 </p>
                 {pledgeInput && (
                   <div className="space-y-1">
                     <p className="text-sm text-yellow-500/80">
-                      Total required: {Number(pledgeInput) + 10} LGR ({formatUSDAmount((Number(pledgeInput) + 10).toString())})
+                      Required in wallet: 10 LGR ({formatUSDAmount("10")}) voting fee
                     </p>
                     <p className="text-xs text-white/40">
-                      Breakdown: {pledgeInput} LGR pledge ({formatUSDAmount(pledgeInput)}) + 10 LGR voting fee ({formatUSDAmount("10")})
+                      Your commitment of {pledgeInput} LGR ({formatUSDAmount(pledgeInput)}) will be recorded without transfer
                     </p>
                   </div>
                 )}
