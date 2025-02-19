@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -32,11 +33,13 @@ interface ProposalEvent {
   metadata?: ProposalMetadata;
   nftMetadata?: NFTMetadata;
   pledgedAmount?: string;
+  isLoading?: boolean;
+  error?: string;
 }
 
 export const ProposalsHistory = () => {
   const [proposalEvents, setProposalEvents] = useState<ProposalEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [loadingStateIndex, setLoadingStateIndex] = useState(0);
   const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
   const { isConnected, connect, address } = useWalletConnection();
@@ -54,10 +57,60 @@ export const ProposalsHistory = () => {
     }).format(usdAmount);
   };
 
+  // Update a single proposal's data
+  const updateProposalData = (tokenId: string, updates: Partial<ProposalEvent>) => {
+    setProposalEvents(current =>
+      current.map(event =>
+        event.tokenId === tokenId
+          ? { ...event, ...updates }
+          : event
+      )
+    );
+  };
+
+  // Fetch metadata for a single proposal
+  const fetchProposalMetadata = async (proposal: ProposalEvent, contract: ethers.Contract) => {
+    try {
+      console.log(`\n--- Processing token #${proposal.tokenId} ---`);
+      
+      // Update loading state
+      updateProposalData(proposal.tokenId, { isLoading: true });
+
+      const [tokenUri, pledgedAmount] = await Promise.all([
+        contract.tokenURI(proposal.tokenId),
+        contract.pledgedAmount(proposal.tokenId)
+      ]);
+
+      console.log(`NFT metadata URI for token #${proposal.tokenId}:`, tokenUri);
+      console.log(`Pledged amount for token #${proposal.tokenId}:`, ethers.utils.formatEther(pledgedAmount));
+
+      let metadata: ProposalMetadata | undefined;
+      if (tokenUri) {
+        const ipfsHash = tokenUri.replace('ipfs://', '');
+        metadata = await getFromIPFS<ProposalMetadata>(ipfsHash, 'proposal');
+        console.log(`Successfully fetched IPFS data for token #${proposal.tokenId}:`, metadata);
+      }
+
+      // Update proposal with fetched data
+      updateProposalData(proposal.tokenId, {
+        metadata,
+        pledgedAmount: ethers.utils.formatEther(pledgedAmount),
+        isLoading: false
+      });
+
+    } catch (error: any) {
+      console.error(`Error processing token #${proposal.tokenId}:`, error);
+      updateProposalData(proposal.tokenId, {
+        isLoading: false,
+        error: error.message
+      });
+    }
+  };
+
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
-    if (isLoading) {
+    if (isInitialLoading) {
       const cycleLoadingStates = () => {
         setLoadingStateIndex(prev => {
           if (prev < loadingStates.length - 1) {
@@ -74,7 +127,7 @@ export const ProposalsHistory = () => {
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [isLoading]);
+  }, [isInitialLoading]);
 
   useEffect(() => {
     const checkLGRBalance = async () => {
@@ -120,7 +173,7 @@ export const ProposalsHistory = () => {
       if (!isConnected || !hasMinimumLGR) return;
 
       try {
-        setIsLoading(true);
+        setIsInitialLoading(true);
         const walletProvider = await getProvider();
         console.log('Initializing contract to fetch proposals...');
         
@@ -134,88 +187,33 @@ export const ProposalsHistory = () => {
         const events = await contract.queryFilter(filter);
         console.log('Found proposal events:', events.length);
 
-        const proposalsWithMetadata = await Promise.all(
-          events.map(async (event) => {
-            const tokenId = event.args?.tokenId.toString();
-            console.log(`\n--- Processing token #${tokenId} ---`);
-            console.log(`Fetching proposal data for token #${tokenId}`);
+        // Initialize proposals with basic data
+        const initialProposals = events.map(event => ({
+          tokenId: event.args?.tokenId.toString(),
+          creator: event.args?.creator,
+          blockNumber: event.blockNumber,
+          transactionHash: event.transactionHash,
+          isLoading: true
+        }));
 
-            try {
-              console.log(`Getting tokenURI and pledged amount for #${tokenId}...`);
-              const [tokenUri, pledgedAmount] = await Promise.all([
-                contract.tokenURI(tokenId),
-                contract.pledgedAmount(tokenId)
-              ]);
+        // Sort by block number (newest first) and set initial state
+        initialProposals.sort((a, b) => b.blockNumber - a.blockNumber);
+        setProposalEvents(initialProposals);
+        setIsInitialLoading(false);
 
-              console.log(`NFT metadata URI for token #${tokenId}:`, tokenUri);
-              console.log(`Pledged amount for token #${tokenId}:`, ethers.utils.formatEther(pledgedAmount));
+        // Fetch metadata for each proposal individually
+        for (const proposal of initialProposals) {
+          await fetchProposalMetadata(proposal, contract);
+        }
 
-              let metadata: ProposalMetadata | undefined;
-              if (tokenUri) {
-                try {
-                  console.log(`Starting IPFS fetch for token #${tokenId}`);
-                  const ipfsHash = tokenUri.replace('ipfs://', '');
-                  console.log(`IPFS hash for token #${tokenId}:`, ipfsHash);
-                  
-                  metadata = await getFromIPFS<ProposalMetadata>(
-                    ipfsHash,
-                    'proposal'
-                  );
-                  console.log(`Successfully fetched IPFS data for token #${tokenId}:`, metadata);
-                } catch (ipfsError: any) {
-                  console.error(`Error fetching IPFS metadata for proposal #${tokenId}:`, {
-                    error: ipfsError,
-                    message: ipfsError.message,
-                    stack: ipfsError.stack
-                  });
-                }
-              } else {
-                console.warn(`No tokenURI found for token #${tokenId}`);
-              }
-
-              const proposalEvent: ProposalEvent = {
-                tokenId,
-                creator: event.args?.creator,
-                blockNumber: event.blockNumber,
-                transactionHash: event.transactionHash,
-                metadata,
-                pledgedAmount: ethers.utils.formatEther(pledgedAmount)
-              };
-
-              console.log(`Completed processing token #${tokenId}:`, proposalEvent);
-              return proposalEvent;
-            } catch (error: any) {
-              console.error(`Error processing token #${tokenId}:`, {
-                error,
-                message: error.message,
-                stack: error.stack
-              });
-              return {
-                tokenId,
-                creator: event.args?.creator,
-                blockNumber: event.blockNumber,
-                transactionHash: event.transactionHash
-              };
-            }
-          })
-        );
-
-        console.log('All proposals processed. Final result:', proposalsWithMetadata);
-        proposalsWithMetadata.sort((a, b) => b.blockNumber - a.blockNumber);
-        setProposalEvents(proposalsWithMetadata);
       } catch (error: any) {
-        console.error("Error fetching proposals:", {
-          error,
-          message: error.message,
-          stack: error.stack
-        });
+        console.error("Error fetching proposals:", error);
         toast({
           title: "Error",
           description: "Failed to load proposals. Please try again.",
           variant: "destructive",
         });
-      } finally {
-        setIsLoading(false);
+        setIsInitialLoading(false);
       }
     };
 
@@ -245,7 +243,7 @@ export const ProposalsHistory = () => {
     );
   }
 
-  if (isLoading) {
+  if (isInitialLoading) {
     return <ProposalLoadingCard loadingState={loadingStates[loadingStateIndex]} />;
   }
 
@@ -278,9 +276,12 @@ export const ProposalsHistory = () => {
             pledgedAmount={event.pledgedAmount}
             blockNumber={event.blockNumber}
             formatUSDAmount={formatUSDAmount}
+            isLoading={event.isLoading}
+            error={event.error}
           />
         ))}
       </div>
     </div>
   );
 };
+
