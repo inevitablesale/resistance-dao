@@ -85,7 +85,7 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
   description: 'Submit your thesis to the blockchain'
 }];
 
-const TEST_FORM_DATA: ProposalMetadata = {
+const TEST_FORM_DATA = (address: string | undefined): ProposalMetadata => ({
   title: "Test Proposal - Automated Backend Services Firm",
   firmCriteria: {
     size: FirmSize.BELOW_1M,
@@ -123,7 +123,7 @@ const TEST_FORM_DATA: ProposalMetadata = {
   isTestMode: true,
   submissionTimestamp: Date.now(),
   submitter: address || ""
-};
+});
 
 const isValidLinkedInURL = (url: string): boolean => {
   return url.startsWith('https://www.linkedin.com/') || url.startsWith('https://linkedin.com/');
@@ -179,12 +179,12 @@ const ThesisSubmission = () => {
 
   useEffect(() => {
     if (isTestMode) {
-      console.log("Setting test form data:", TEST_FORM_DATA);
+      console.log("Setting test form data:", TEST_FORM_DATA(address));
       setFormData({
-        ...TEST_FORM_DATA,
+        ...TEST_FORM_DATA(address),
         linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
         submissionTimestamp: Date.now(),
-        submitter: address
+        submitter: address || ""
       });
     }
   }, [isTestMode, user, address]);
@@ -277,7 +277,10 @@ const ThesisSubmission = () => {
         current[lastField] = value;
       }
       
-      return newData;
+      return {
+        ...newData,
+        votingEnds: Math.floor(Date.now() / 1000) + newData.votingDuration
+      };
     });
   };
 
@@ -673,7 +676,7 @@ const ThesisSubmission = () => {
     
     setIsTestMode(enabled);
     if (enabled) {
-      setFormData(TEST_FORM_DATA);
+      setFormData(TEST_FORM_DATA(address));
     } else {
       setFormData({
         title: "",
