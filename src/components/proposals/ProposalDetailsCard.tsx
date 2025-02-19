@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -139,27 +140,34 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
         );
         setLoadingProgress(40);
 
-        console.log(`Getting proposal data for token #${tokenId}`);
-        const [proposal, pledged] = await Promise.all([
-          factoryContract.getProposal(tokenId),
+        console.log(`Getting tokenURI and pledged amount for token #${tokenId}`);
+        const [tokenUri, pledged] = await Promise.all([
+          factoryContract.tokenURI(tokenId),
           factoryContract.pledgedAmount(tokenId)
         ]);
         setLoadingProgress(60);
 
-        console.log('Proposal data:', proposal);
+        console.log('Token URI:', tokenUri);
         console.log('Pledged amount:', ethers.utils.formatEther(pledged));
         setPledgedAmount(ethers.utils.formatEther(pledged));
 
-        if (!proposal.ipfsMetadata) {
-          throw new Error('No IPFS metadata found for proposal');
+        if (tokenUri) {
+          console.log('Starting IPFS fetch for metadata');
+          const ipfsHash = tokenUri.replace('ipfs://', '');
+          console.log('IPFS hash:', ipfsHash);
+          
+          const metadata = await getFromIPFS<ProposalMetadata>(
+            ipfsHash,
+            'proposal'
+          );
+          console.log('Successfully fetched IPFS data:', metadata);
+          setProposalDetails(metadata);
+        } else {
+          console.warn('No tokenURI found for this proposal');
+          throw new Error('No metadata found for this proposal');
         }
-
-        console.log('Fetching IPFS metadata:', proposal.ipfsMetadata);
-        const metadata = await getFromIPFS<ProposalMetadata>(proposal.ipfsMetadata, "proposal");
-        setLoadingProgress(90);
-
-        console.log('Proposal metadata:', metadata);
-        setProposalDetails(metadata);
+        
+        setLoadingProgress(100);
       } catch (error: any) {
         console.error("Error fetching proposal details:", error);
         toast({
@@ -169,7 +177,6 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
         });
       } finally {
         setIsLoading(false);
-        setLoadingProgress(100);
       }
     };
 
