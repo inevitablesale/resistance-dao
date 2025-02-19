@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
@@ -17,7 +18,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { 
   ChevronLeft, 
   Wallet, 
-  Loader2
+  Loader2,
+  ExternalLink
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
@@ -39,14 +41,18 @@ const ProposalDetails = () => {
     setLoadingProgress(20);
 
     try {
-      const provider = await getProvider();
-      const factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+      const walletProvider = await getProvider();
+      const factoryContract = new ethers.Contract(
+        FACTORY_ADDRESS, 
+        FACTORY_ABI, 
+        walletProvider.provider
+      );
       setLoadingProgress(40);
 
       const proposal = await factoryContract.proposals(tokenId);
       setLoadingProgress(60);
 
-      const metadata = await getFromIPFS<ProposalMetadata>(proposal.ipfsMetadata);
+      const metadata = await getFromIPFS<ProposalMetadata>(proposal.ipfsMetadata, "proposal");
       setLoadingProgress(90);
 
       return metadata;
@@ -127,55 +133,51 @@ const ProposalDetails = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Description</h3>
-                    <p className="text-white/80">{proposalDetails.description}</p>
-                  </div>
+                  {proposalDetails.investment && (
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold">Investment Details</h3>
+                      <p className="text-white/80">{proposalDetails.investment.drivers}</p>
+                      <p className="text-white/80">{proposalDetails.investment.additionalCriteria}</p>
+                    </div>
+                  )}
 
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Details</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <strong>Firm Size:</strong>{" "}
-                        {proposalDetails.firmSize}
-                      </div>
-                      <div>
-                        <strong>Deal Type:</strong>{" "}
-                        {proposalDetails.dealType}
-                      </div>
-                      <div>
-                        <strong>Geographic Focus:</strong>{" "}
-                        {proposalDetails.geographicFocus}
-                      </div>
-                      <div>
-                        <strong>Payment Term:</strong>{" "}
-                        {proposalDetails.paymentTerm}
+                  {proposalDetails.firmCriteria && (
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold">Firm Details</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <strong>Firm Size:</strong>{" "}
+                          {proposalDetails.firmCriteria.size}
+                        </div>
+                        <div>
+                          <strong>Deal Type:</strong>{" "}
+                          {proposalDetails.firmCriteria.dealType}
+                        </div>
+                        <div>
+                          <strong>Geographic Focus:</strong>{" "}
+                          {proposalDetails.firmCriteria.geographicFocus}
+                        </div>
+                        <div>
+                          <strong>Payment Terms:</strong>{" "}
+                          {proposalDetails.paymentTerms?.join(", ")}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Team</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <strong>Name:</strong> {proposalDetails.team.name}
-                      </div>
-                      <div>
-                        <strong>Email:</strong> {proposalDetails.team.email}
-                      </div>
-                      <div>
-                        <strong>LinkedIn:</strong>{" "}
-                        <a 
-                          href={proposalDetails.team.linkedin} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline"
-                        >
-                          View Profile <ExternalLink className="inline-block w-4 h-4 ml-1" />
-                        </a>
-                      </div>
+                  {proposalDetails.linkedInURL && (
+                    <div className="mt-4">
+                      <a 
+                        href={proposalDetails.linkedInURL} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline inline-flex items-center"
+                      >
+                        View LinkedIn Profile 
+                        <ExternalLink className="w-4 h-4 ml-1" />
+                      </a>
                     </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
