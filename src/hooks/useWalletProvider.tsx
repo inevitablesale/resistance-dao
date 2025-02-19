@@ -17,7 +17,7 @@ interface WalletProvider {
 
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 1000;
-const INITIALIZATION_TIMEOUT = 10000; // 10 seconds timeout
+const INITIALIZATION_TIMEOUT = 10000;
 
 export const useWalletProvider = () => {
   const { primaryWallet } = useDynamicContext();
@@ -41,6 +41,33 @@ export const useWalletProvider = () => {
     }
   };
 
+  const validateTransactionSupport = async (provider: ethers.providers.Web3Provider) => {
+    try {
+      const signer = provider.getSigner();
+      const address = await signer.getAddress();
+      
+      // Check if the provider supports transactions
+      const code = await provider.getCode(address);
+      console.log('[Transaction Support] Wallet code check completed');
+      
+      // Verify the signer can perform transactions
+      const network = await provider.getNetwork();
+      console.log('[Transaction Support] Network verification completed:', network.name);
+      
+      // Validate the signer's capabilities
+      const signerNetwork = await signer.provider?.getNetwork();
+      if (!signerNetwork) {
+        throw new Error('Signer network validation failed');
+      }
+      
+      console.log('[Transaction Support] Signer validation completed');
+      return true;
+    } catch (error) {
+      console.error('[Transaction Support] Validation failed:', error);
+      return false;
+    }
+  };
+
   const initializeProvider = useCallback(async (
     walletClient: any, 
     retryCount: number = 0
@@ -53,8 +80,15 @@ export const useWalletProvider = () => {
         throw new Error('WalletClient is undefined');
       }
 
-      // Create provider and immediately test it
-      const provider = new ethers.providers.Web3Provider(walletClient);
+      // Create provider and test it
+      const provider = new ethers.providers.Web3Provider(walletClient, "any");
+      
+      // Validate transaction support
+      const hasTransactionSupport = await validateTransactionSupport(provider);
+      if (!hasTransactionSupport) {
+        throw new Error('Wallet does not support transactions');
+      }
+
       const network = await provider.getNetwork();
       console.log('[Provider] Successfully connected to network:', network.chainId);
       
@@ -128,7 +162,14 @@ export const useWalletProvider = () => {
 
   const getProvider = useCallback(async (): Promise<WalletProvider> => {
     if (providerRef.current) {
-      return providerRef.current;
+      // Validate the existing provider
+      try {
+        await validateTransactionSupport(providerRef.current.provider);
+        return providerRef.current;
+      } catch (error) {
+        console.log('[Provider] Existing provider validation failed, reinitializing...');
+        providerRef.current = null;
+      }
     }
 
     if (initializingRef.current) {
@@ -140,7 +181,7 @@ export const useWalletProvider = () => {
             clearInterval(checkInterval);
             resolve(providerRef.current);
           }
-          if (attempts > 50) { // 5 seconds max wait
+          if (attempts > 50) {
             clearInterval(checkInterval);
             reject(new Error('Initialization timeout'));
           }
@@ -150,7 +191,6 @@ export const useWalletProvider = () => {
 
     initializingRef.current = true;
     
-    // Set initialization timeout
     initTimeoutRef.current = setTimeout(() => {
       if (initializingRef.current) {
         initializingRef.current = false;
@@ -202,6 +242,14 @@ export const useWalletProvider = () => {
         getSigner: () => ethersProvider.getSigner()
       };
       providerRef.current = provider;
+      
+      // Add success toast
+      toast({
+        title: "Wallet Connected",
+        description: "Your wallet is ready for transactions",
+        variant: "default"
+      });
+      
       return provider;
     } catch (error) {
       console.error('[Provider] Initialization failed:', error);
@@ -218,7 +266,7 @@ export const useWalletProvider = () => {
       clearInitializationTimeout();
       initializingRef.current = false;
     }
-  }, [primaryWallet, toast, initializeProvider, validateWalletClient]);
+  }, [primaryWallet, toast, initializeProvider]);
 
   // Reset provider cache when wallet changes
   useEffect(() => {
