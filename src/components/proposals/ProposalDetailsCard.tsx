@@ -492,12 +492,17 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-white/40">
-                  Current value: {formatUSDAmount(pledgedAmount)}
+                  Current pledged: {pledgedAmount} LGR ({formatUSDAmount(pledgedAmount)})
                 </p>
                 {pledgeInput && (
-                  <p className="text-sm text-yellow-500/80">
-                    Total required: {Number(pledgeInput) + 10} LGR ({Number(pledgeInput)} LGR pledge + 10 LGR voting fee)
-                  </p>
+                  <div className="space-y-1">
+                    <p className="text-sm text-yellow-500/80">
+                      Total required: {Number(pledgeInput) + 10} LGR ({formatUSDAmount((Number(pledgeInput) + 10).toString())})
+                    </p>
+                    <p className="text-xs text-white/40">
+                      Breakdown: {pledgeInput} LGR pledge ({formatUSDAmount(pledgeInput)}) + 10 LGR voting fee ({formatUSDAmount("10")})
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
