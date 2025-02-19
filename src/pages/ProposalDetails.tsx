@@ -27,6 +27,9 @@ interface ProposalDetails {
     pledgedAmount: ethers.BigNumber;
     votingEndsAt: number;
     backers: string[];
+    creator: string | null;
+    blockNumber: number;
+    transactionHash: string;
   };
 }
 
@@ -235,15 +238,12 @@ const ProposalDetails = () => {
         walletProvider.provider
       );
 
-      console.log('Contract initialized, checking if proposal exists...');
+      console.log('Getting creation event for token:', tokenId);
+      const filter = contract.filters.ProposalCreated(tokenId);
+      const events = await contract.queryFilter(filter);
       
-      try {
-        const tokenExists = await contract.ownerOf(tokenId);
-        if (!tokenExists) {
-          throw new Error('Proposal not found');
-        }
-      } catch (error) {
-        console.error('Proposal does not exist:', error);
+      if (events.length === 0) {
+        console.error('No creation event found for token:', tokenId);
         toast({
           title: "Proposal Not Found",
           description: "This proposal does not exist or has been removed.",
@@ -252,8 +252,10 @@ const ProposalDetails = () => {
         return;
       }
 
-      console.log('Fetching on-chain data for token:', tokenId);
-      
+      const event = events[0];
+      console.log('Found creation event:', event);
+
+      console.log('Fetching current state for token:', tokenId);
       let pledgedAmount = ethers.BigNumber.from(0);
       let backers: string[] = [];
 
@@ -262,7 +264,6 @@ const ProposalDetails = () => {
         console.log('Pledged amount retrieved:', ethers.utils.formatEther(pledgedAmount));
       } catch (error) {
         console.warn('Failed to fetch pledged amount:', error);
-        // Continue execution - we'll show 0 as the pledged amount
       }
 
       try {
@@ -270,7 +271,6 @@ const ProposalDetails = () => {
         console.log('Backers retrieved:', backers.length);
       } catch (error) {
         console.warn('Failed to fetch backers:', error);
-        // Continue execution - we'll show empty backers list
       }
 
       if (proposalDetails) {
@@ -280,14 +280,19 @@ const ProposalDetails = () => {
         const onChainData = {
           pledgedAmount,
           votingEndsAt,
-          backers
+          backers,
+          creator: event.args?.creator,
+          blockNumber: event.blockNumber,
+          transactionHash: event.transactionHash
         };
 
-        console.log('Final on-chain data:', {
+        console.log('Final combined data:', {
           pledgedAmount: ethers.utils.formatEther(pledgedAmount),
           votingEndsAt: new Date(votingEndsAt * 1000).toLocaleString(),
           backersCount: backers.length,
-          backers
+          creator: event.args?.creator,
+          blockNumber: event.blockNumber,
+          transactionHash: event.transactionHash
         });
 
         setProposalDetails({
