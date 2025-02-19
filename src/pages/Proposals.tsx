@@ -1,9 +1,11 @@
+
 import { ProposalsHistory } from "@/components/proposals/ProposalsHistory";
 import { Button } from "@/components/ui/button";
 import { FileText, Plus, Trophy, Building2, Users, Shield, Rocket } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
+
 const Proposals = () => {
   const navigate = useNavigate();
   const boardMembers = [{
@@ -19,7 +21,9 @@ const Proposals = () => {
     description: "Transformed practices through strategic technology adoption.",
     icon: Rocket
   }];
-  return <div className="min-h-screen bg-black">
+
+  return (
+    <div className="min-h-screen bg-black">
       {/* Hero Section with gradients matching index page */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-purple-500/10 to-pink-500/10 animate-gradient" />
@@ -44,9 +48,17 @@ const Proposals = () => {
           {/* Board Members Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             {boardMembers.map((member, index) => {
-            const Icon = member.icon;
-            return;
-          })}
+              const Icon = member.icon;
+              return (
+                <Card key={index} className="p-6 bg-black/50 backdrop-blur-sm border-white/10">
+                  <div className="flex flex-col items-center text-center">
+                    <Icon className="w-12 h-12 text-yellow-500 mb-4" />
+                    <h3 className="text-xl font-bold text-white mb-2">{member.role}</h3>
+                    <p className="text-white/60">{member.description}</p>
+                  </div>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -70,6 +82,8 @@ const Proposals = () => {
 
       {/* LGR Floating Widget */}
       <LGRFloatingWidget />
-    </div>;
+    </div>
+  );
 };
+
 export default Proposals;

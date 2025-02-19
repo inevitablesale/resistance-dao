@@ -52,7 +52,7 @@ const Nav = () => {
               <Linked className="w-5 h-5" />
             </a>
             <div className="relative">
-              <DynamicWidget dropdownVariant="detached" />
+              <DynamicWidget />
             </div>
           </div>
         </div>
