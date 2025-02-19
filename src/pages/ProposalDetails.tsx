@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
@@ -191,7 +192,7 @@ const ProposalDetails = () => {
       console.log('Contract initialized, fetching on-chain data for token:', tokenId);
       const [pledgedAmount, backers] = await Promise.all([
         contract.pledgedAmount(tokenId),
-        contract.getProposalBackers(tokenId)
+        contract.proposalVoters(tokenId)  // Changed from getProposalBackers to proposalVoters
       ]);
 
       console.log('On-chain data received:', {
