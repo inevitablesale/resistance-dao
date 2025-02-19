@@ -85,6 +85,11 @@ const getPaymentTermLabel = (term: PaymentTerm): string => {
   }
 };
 
+const formatLGRAmount = (amount: string): string => {
+  const number = parseFloat(amount);
+  return `${number.toLocaleString(undefined, { maximumFractionDigits: 2 })} LGR`;
+};
+
 interface ProposalDetailsCardProps {
   tokenId?: string;
   view?: 'overview' | 'details' | 'investment';
@@ -456,7 +461,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               <div className="text-center md:text-right">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm">
                   <p className="text-2xl font-bold text-white">
-                    {pledgedAmount} LGR
+                    {formatLGRAmount(pledgedAmount)}
                   </p>
                   <span className="text-sm text-white/60 border-l border-white/10 pl-2">
                     {backerCount} supporter{backerCount !== 1 ? 's' : ''}
@@ -540,15 +545,15 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-white/40">
-                  Total commitments so far: {pledgedAmount} LGR ({formatUSDAmount(pledgedAmount)})
+                  Total commitments so far: {formatLGRAmount(pledgedAmount)} ({formatUSDAmount(pledgedAmount)})
                 </p>
                 {pledgeInput && (
                   <div className="space-y-1">
                     <p className="text-sm text-yellow-500/80">
-                      Required in wallet: 10 LGR ({formatUSDAmount("10")}) voting fee
+                      Required in wallet: {formatLGRAmount("10")} ({formatUSDAmount("10")}) voting fee
                     </p>
                     <p className="text-xs text-white/40">
-                      Your commitment of {pledgeInput} LGR ({formatUSDAmount(pledgeInput)}) will be recorded without transfer
+                      Your commitment of {formatLGRAmount(pledgeInput)} ({formatUSDAmount(pledgeInput)}) will be recorded without transfer
                     </p>
                   </div>
                 )}
@@ -681,3 +686,5 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
   return null;
 };
+
+export default ProposalDetailsCard;

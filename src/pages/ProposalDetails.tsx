@@ -5,15 +5,6 @@ import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { ProposalDetailsCard } from "@/components/proposals/ProposalDetailsCard";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "react-router-dom";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 
 const ProposalDetails = () => {
   const { tokenId } = useParams();
@@ -26,26 +17,6 @@ const ProposalDetails = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-black to-black" />
         
         <div className="container mx-auto px-4 pt-24 pb-20 relative z-10 max-w-6xl">
-          <Breadcrumb className="mb-8">
-            <BreadcrumbList className="text-white/60">
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to="/" className="hover:text-white">Home</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-white/40" />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to="/proposals" className="hover:text-white">Proposals</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-white/40" />
-              <BreadcrumbItem>
-                <BreadcrumbPage className="text-white">Proposal Details</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
