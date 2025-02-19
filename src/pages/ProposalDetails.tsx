@@ -17,7 +17,7 @@ import {
 } from "@/types/proposals";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HandCoins, Clock, Users, ChevronLeft, Wallet, AlertCircle } from "lucide-react";
+import { HandCoins, Clock, Users, ChevronLeft, Wallet, AlertCircle, AlertTriangle } from "lucide-react";
 import { getTokenBalance } from "@/services/tokenService";
 import { Progress } from "@/components/ui/progress";
 
@@ -235,17 +235,43 @@ const ProposalDetails = () => {
         walletProvider.provider
       );
 
-      console.log('Contract initialized, fetching on-chain data for token:', tokenId);
-      const [pledgedAmount, backers] = await Promise.all([
-        contract.pledgedAmount(tokenId),
-        contract.proposalVoters(tokenId)
-      ]);
+      console.log('Contract initialized, checking if proposal exists...');
+      
+      try {
+        const tokenExists = await contract.ownerOf(tokenId);
+        if (!tokenExists) {
+          throw new Error('Proposal not found');
+        }
+      } catch (error) {
+        console.error('Proposal does not exist:', error);
+        toast({
+          title: "Proposal Not Found",
+          description: "This proposal does not exist or has been removed.",
+          variant: "destructive",
+        });
+        return;
+      }
 
-      console.log('On-chain data received:', {
-        pledgedAmount: ethers.utils.formatEther(pledgedAmount),
-        backers,
-        tokenId
-      });
+      console.log('Fetching on-chain data for token:', tokenId);
+      
+      let pledgedAmount = ethers.BigNumber.from(0);
+      let backers: string[] = [];
+
+      try {
+        pledgedAmount = await contract.pledgedAmount(tokenId);
+        console.log('Pledged amount retrieved:', ethers.utils.formatEther(pledgedAmount));
+      } catch (error) {
+        console.warn('Failed to fetch pledged amount:', error);
+        // Continue execution - we'll show 0 as the pledged amount
+      }
+
+      try {
+        backers = await contract.proposalVoters(tokenId);
+        console.log('Backers retrieved:', backers.length);
+      } catch (error) {
+        console.warn('Failed to fetch backers:', error);
+        // Continue execution - we'll show empty backers list
+      }
 
       if (proposalDetails) {
         const votingEndsAt = proposalDetails.metadata.submissionTimestamp / 1000 + proposalDetails.metadata.votingDuration;
@@ -272,9 +298,9 @@ const ProposalDetails = () => {
     } catch (error: any) {
       console.error("Error loading chain data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load on-chain data. Please try again.",
-        variant: "destructive",
+        title: "Chain Data Load Warning",
+        description: "Some proposal details couldn't be loaded. You can still view the basic information.",
+        variant: "default",
       });
     } finally {
       setIsLoadingChainData(false);
@@ -380,6 +406,32 @@ const ProposalDetails = () => {
 
   const { metadata, onChainData } = proposalDetails;
 
+  const renderChainData = () => {
+    if (isLoadingChainData) {
+      return <Skeleton className="h-4 w-24" />;
+    }
+
+    if (!proposalDetails?.onChainData) {
+      return (
+        <div className="flex items-center gap-2 text-yellow-500">
+          <AlertTriangle className="w-4 h-4" />
+          <span className="text-sm">Chain data unavailable</span>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <p className="text-xl font-bold text-white">
+          {proposalDetails.onChainData.backers.length}
+        </p>
+        <div className="mt-1 text-sm text-white/60">
+          Total Backers
+        </div>
+      </>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-black">
       <div className="relative overflow-hidden">
@@ -469,13 +521,7 @@ const ProposalDetails = () => {
                         </div>
                         <div>
                           <p className="text-sm text-white/60">Backers</p>
-                          {isLoadingChainData ? (
-                            <Skeleton className="h-4 w-16" />
-                          ) : (
-                            <p className="text-xl font-bold text-white">
-                              {onChainData?.backers.length ?? 'Connect Wallet'}
-                            </p>
-                          )}
+                          {renderChainData()}
                         </div>
                       </div>
                     </CardContent>
