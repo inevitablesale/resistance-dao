@@ -151,7 +151,6 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  // Make isTestMode a constant since we always want to use the test contract
   const isTestMode = true;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
@@ -838,4 +837,19 @@ const ThesisSubmission = () => {
                           onChange={e => handleFormDataChange('title', e.target.value)}
                         />
                         {formErrors.title && (
-                          <p className="text-red-400 text-sm">{form
+                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
