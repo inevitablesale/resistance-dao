@@ -33,6 +33,7 @@ declare module "@dynamic-labs/sdk-react-core" {
         openWallet?: (options: { view: 'send' | 'deposit' }) => void;  // Added for ZeroDev compatibility
       };
     } | null;
+    isInitialized: boolean;  // Added this line to fix the type error
     setShowAuthFlow?: (show: boolean) => void;
     setShowOnRamp?: (
       show: boolean,
@@ -124,4 +125,3 @@ declare module "@dynamic-labs/sdk-react-core" {
     stack?: string;
   }
 }
-
