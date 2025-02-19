@@ -295,12 +295,17 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
 
   if (!isConnected) {
     return (
-      <Card className="w-full bg-black/40 border-white/10">
+      <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
         <CardContent className="p-6 text-center">
-          <p className="text-white/60 mb-4">Connect your wallet to view proposal details</p>
-          <Button onClick={connect} className="bg-purple-500 hover:bg-purple-600">
-            Connect Wallet
-          </Button>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <p className="text-white/60 mb-4">Connect your wallet to view proposal details</p>
+            <Button onClick={connect} className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700">
+              Connect Wallet
+            </Button>
+          </motion.div>
         </CardContent>
       </Card>
     );
@@ -308,9 +313,15 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
 
   if (hasMinimumLGR === false) {
     return (
-      <Card className="w-full bg-black/40 border-white/10">
-        <CardContent className="p-6 text-center text-white/60">
-          <p>You need at least {MIN_LGR_REQUIRED} LGR to view proposal details</p>
+      <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
+        <CardContent className="p-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-white/60"
+          >
+            <p>You need at least {MIN_LGR_REQUIRED} LGR to view proposal details</p>
+          </motion.div>
         </CardContent>
       </Card>
     );
@@ -318,7 +329,7 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
 
   if (isLoading) {
     return (
-      <Card className="w-full bg-black/40 border-white/10">
+      <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-white">
             Loading Proposal Details
@@ -336,7 +347,7 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
 
   if (!proposalDetails) {
     return (
-      <Card className="w-full bg-black/40 border-white/10">
+      <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-white">
             Proposal Not Found
@@ -349,15 +360,22 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
     );
   }
 
+  const progressPercentage = proposalDetails?.investment?.targetCapital
+    ? (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100
+    : 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.2 }}
+      className="space-y-6"
     >
-      <div className="mb-8 space-y-6">
-        <div className="bg-gradient-to-br from-purple-500/10 via-transparent to-yellow-500/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+      <div className="relative bg-gradient-to-br from-purple-500/10 via-transparent to-yellow-500/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+        <div className="absolute inset-0 bg-black/20 rounded-2xl backdrop-blur-sm" />
+        
+        <div className="relative">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-xl font-semibold text-white mb-2 flex items-center gap-2">
@@ -377,6 +395,17 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
                 from {backerCount} backer{backerCount !== 1 ? 's' : ''}
               </p>
             </div>
+          </div>
+
+          <div className="mb-6">
+            <div className="flex justify-between text-sm text-white/60 mb-2">
+              <span>Progress</span>
+              <span>{progressPercentage.toFixed(1)}%</span>
+            </div>
+            <Progress 
+              value={progressPercentage} 
+              className="h-2 bg-white/5"
+            />
           </div>
 
           <div className="space-y-4">
@@ -400,7 +429,7 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
                 onClick={handlePledge}
                 disabled={isPledging || !pledgeInput}
                 size="lg"
-                className="self-end bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold"
+                className="self-end bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold transition-all duration-300 transform hover:scale-105"
               >
                 {isPledging ? (
                   "Pledging..."
@@ -419,19 +448,19 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
         </div>
       </div>
 
-      <Card className="w-full bg-black/40 border-white/10">
+      <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-white">
+          <CardTitle className="text-2xl font-bold text-white bg-clip-text">
             {proposalDetails?.title}
           </CardTitle>
-          <div className="flex items-center gap-4 text-sm text-white/60 mt-2">
+          <div className="flex items-center gap-4 text-sm text-white/60 mt-2 flex-wrap">
             {proposalDetails?.submissionTimestamp && (
-              <span>
+              <span className="bg-white/5 px-3 py-1 rounded-full">
                 Submitted on {format(proposalDetails.submissionTimestamp, 'PPP')}
               </span>
             )}
             {proposalDetails?.investment?.targetCapital && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
                 <Target className="w-4 h-4" />
                 <span>
                   {proposalDetails.investment.targetCapital} LGR Target
@@ -442,7 +471,7 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
               </div>
             )}
             {pledgedAmount && Number(pledgedAmount) > 0 && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
                 <Users className="w-4 h-4" />
                 <span>
                   {pledgedAmount} LGR Pledged
@@ -456,49 +485,70 @@ export const ProposalDetailsCard = ({ tokenId }: ProposalDetailsCardProps) => {
         </CardHeader>
         <CardContent className="space-y-6">
           {proposalDetails?.investment && (
-            <div className="space-y-2">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="space-y-2"
+            >
               <h3 className="text-lg font-semibold text-white">Investment Details</h3>
-              <p className="text-white/80">{proposalDetails.investment.drivers}</p>
-              <p className="text-white/80">{proposalDetails.investment.additionalCriteria}</p>
-            </div>
+              <p className="text-white/80 bg-white/5 p-4 rounded-lg backdrop-blur-sm">
+                {proposalDetails.investment.drivers}
+              </p>
+              <p className="text-white/80 bg-white/5 p-4 rounded-lg backdrop-blur-sm">
+                {proposalDetails.investment.additionalCriteria}
+              </p>
+            </motion.div>
           )}
 
           {proposalDetails?.firmCriteria && (
-            <div className="space-y-2">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="space-y-2"
+            >
               <h3 className="text-lg font-semibold text-white">Firm Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-white/80">
-                <div>
-                  <strong>Firm Size:</strong>{" "}
-                  {getFirmSizeLabel(proposalDetails.firmCriteria.size)}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white/5 p-4 rounded-lg backdrop-blur-sm hover:bg-white/10 transition-colors">
+                  <strong className="text-purple-400">Firm Size:</strong>{" "}
+                  <span className="text-white/80">{getFirmSizeLabel(proposalDetails.firmCriteria.size)}</span>
                 </div>
-                <div>
-                  <strong>Deal Type:</strong>{" "}
-                  {getDealTypeLabel(proposalDetails.firmCriteria.dealType)}
+                <div className="bg-white/5 p-4 rounded-lg backdrop-blur-sm hover:bg-white/10 transition-colors">
+                  <strong className="text-purple-400">Deal Type:</strong>{" "}
+                  <span className="text-white/80">{getDealTypeLabel(proposalDetails.firmCriteria.dealType)}</span>
                 </div>
-                <div>
-                  <strong>Geographic Focus:</strong>{" "}
-                  {getGeographicFocusLabel(proposalDetails.firmCriteria.geographicFocus)}
+                <div className="bg-white/5 p-4 rounded-lg backdrop-blur-sm hover:bg-white/10 transition-colors">
+                  <strong className="text-purple-400">Geographic Focus:</strong>{" "}
+                  <span className="text-white/80">{getGeographicFocusLabel(proposalDetails.firmCriteria.geographicFocus)}</span>
                 </div>
-                <div>
-                  <strong>Payment Terms:</strong>{" "}
-                  {proposalDetails.paymentTerms?.map(term => getPaymentTermLabel(term)).join(", ")}
+                <div className="bg-white/5 p-4 rounded-lg backdrop-blur-sm hover:bg-white/10 transition-colors">
+                  <strong className="text-purple-400">Payment Terms:</strong>{" "}
+                  <span className="text-white/80">
+                    {proposalDetails.paymentTerms?.map(term => getPaymentTermLabel(term)).join(", ")}
+                  </span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {proposalDetails?.linkedInURL && (
-            <div className="mt-4">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mt-4"
+            >
               <a 
                 href={proposalDetails.linkedInURL} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-purple-400 hover:text-purple-300 inline-flex items-center"
+                className="inline-flex items-center px-4 py-2 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors"
               >
                 View LinkedIn Profile 
-                <ExternalLink className="w-4 h-4 ml-1" />
+                <ExternalLink className="w-4 h-4 ml-2" />
               </a>
-            </div>
+            </motion.div>
           )}
         </CardContent>
       </Card>
