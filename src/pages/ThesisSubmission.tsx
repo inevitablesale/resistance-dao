@@ -85,48 +85,37 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
   description: 'Submit your thesis to the blockchain'
 }];
 
-const getTestFormData = (address: string | undefined): ProposalMetadata => ({
-  title: "Test Proposal - Automated Backend Services Firm",
-  firmCriteria: {
-    size: FirmSize.BELOW_1M,
-    location: "California",
-    dealType: DealType.ACQUISITION,
-    geographicFocus: GeographicFocus.LOCAL
-  },
-  paymentTerms: [
-    PaymentTerm.CASH,
-    PaymentTerm.SELLER_FINANCING,
-    PaymentTerm.EARNOUT
-  ],
-  strategies: {
-    operational: [
-      OperationalStrategy.TECH_MODERNIZATION,
-      OperationalStrategy.PROCESS_STANDARDIZATION
-    ],
-    growth: [
-      GrowthStrategy.SERVICE_EXPANSION,
-      GrowthStrategy.CLIENT_GROWTH
-    ],
-    integration: [
-      IntegrationStrategy.MERGING_OPERATIONS,
-      IntegrationStrategy.SYSTEMS_CONSOLIDATION
-    ]
-  },
-  investment: {
-    targetCapital: "2500000",
-    drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
-    additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
-  },
-  votingDuration: MIN_VOTING_DURATION,
-  votingEnds: Math.floor(Date.now() / 1000) + MIN_VOTING_DURATION,
-  linkedInURL: "",
-  isTestMode: true,
-  submissionTimestamp: Date.now(),
-  submitter: address || ""
-});
-
 const isValidLinkedInURL = (url: string): boolean => {
   return url.startsWith('https://www.linkedin.com/') || url.startsWith('https://linkedin.com/');
+};
+
+const validateBasicsTab = (formData: ProposalMetadata): Record<string, string[]> => {
+  const errors: Record<string, string[]> = {};
+  if (!formData.title || formData.title.trim().length < 10) {
+    errors.title = ['Title must be at least 10 characters long'];
+  }
+  if (!formData.investment.targetCapital) {
+    errors['investment.targetCapital'] = ['Target capital is required'];
+  } else {
+    try {
+      const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
+      if (targetCapitalWei.lt(MIN_TARGET_CAPITAL)) {
+        errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} ETH`];
+      }
+      if (targetCapitalWei.gt(MAX_TARGET_CAPITAL)) {
+        errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} ETH`];
+      }
+    } catch (error) {
+      errors['investment.targetCapital'] = ['Invalid target capital amount'];
+    }
+  }
+  if (formData.votingDuration < MIN_VOTING_DURATION) {
+    errors.votingDuration = ['Minimum voting duration is 7 days'];
+  }
+  if (formData.votingDuration > MAX_VOTING_DURATION) {
+    errors.votingDuration = ['Maximum voting duration is 90 days'];
+  }
+  return errors;
 };
 
 const ThesisSubmission = () => {
@@ -142,7 +131,6 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const [isTestMode, setIsTestMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
@@ -176,19 +164,6 @@ const ThesisSubmission = () => {
     submissionTimestamp: Date.now(),
     submitter: address || ""
   });
-
-  useEffect(() => {
-    if (isTestMode) {
-      const testData = getTestFormData(address);
-      console.log("Setting test form data:", testData);
-      setFormData({
-        ...testData,
-        linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
-        submissionTimestamp: Date.now(),
-        submitter: address || ""
-      });
-    }
-  }, [isTestMode, user, address]);
 
   useEffect(() => {
     const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
@@ -313,36 +288,6 @@ const ThesisSubmission = () => {
     }
   };
 
-  const validateBasicsTab = (): boolean => {
-    const errors: Record<string, string[]> = {};
-    if (!formData.title || formData.title.trim().length < 10) {
-      errors.title = ['Title must be at least 10 characters long'];
-    }
-    if (!formData.investment.targetCapital) {
-      errors['investment.targetCapital'] = ['Target capital is required'];
-    } else {
-      try {
-        const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
-        if (targetCapitalWei.lt(MIN_TARGET_CAPITAL)) {
-          errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} ETH`];
-        }
-        if (targetCapitalWei.gt(MAX_TARGET_CAPITAL)) {
-          errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} ETH`];
-        }
-      } catch (error) {
-        errors['investment.targetCapital'] = ['Invalid target capital amount'];
-      }
-    }
-    if (votingDuration < MIN_VOTING_DURATION) {
-      errors.votingDuration = ['Minimum voting duration is 7 days'];
-    }
-    if (votingDuration > MAX_VOTING_DURATION) {
-      errors.votingDuration = ['Maximum voting duration is 90 days'];
-    }
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
   const validateFirmTab = (): boolean => {
     const errors: Record<string, string[]> = {};
     if (!formData.firmCriteria.size) {
@@ -395,7 +340,9 @@ const ThesisSubmission = () => {
     let isValid = false;
     switch (activeStep) {
       case 'thesis':
-        isValid = validateBasicsTab();
+        const thesisErrors = validateBasicsTab(formData);
+        setFormErrors(thesisErrors);
+        isValid = Object.keys(thesisErrors).length === 0;
         if (isValid) setActiveStep('firm');
         break;
       case 'firm':
@@ -420,7 +367,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent, formData?: ProposalMetadata, isTestMode?: boolean) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isConnected) {
       toast({
@@ -453,14 +400,14 @@ const ThesisSubmission = () => {
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
       const updatedFormData = {
-        ...formData || formData,
+        ...formData,
         votingDuration,
         linkedInURL,
         submissionTimestamp: Date.now(),
         submitter: address
       };
 
-      console.log('Uploading metadata to IPFS...', { isTestMode });
+      console.log('Uploading metadata to IPFS...');
       const ipfsUri = await uploadMetadataToPinata(updatedFormData);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
       
@@ -468,10 +415,8 @@ const ThesisSubmission = () => {
         throw new Error("Invalid IPFS hash format");
       }
 
-      console.log('Estimating gas for proposal creation...', { isTestMode });
-      const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData?.investment.targetCapital || ""
-      );
+      console.log('Estimating gas for proposal creation...');
+      const targetCapitalWei = ethers.utils.parseEther(formData?.investment.targetCapital || "");
 
       const proposalConfig: ProposalConfig = {
         targetCapital: targetCapitalWei,
@@ -490,7 +435,7 @@ const ThesisSubmission = () => {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
-        title: isTestMode ? TEST_FORM_DATA.title : formData?.title || "",
+        title: formData?.title || "",
         targetCapital: targetCapitalWei.toString(),
         status: 'pending'
       };
@@ -499,8 +444,8 @@ const ThesisSubmission = () => {
 
       updateStepStatus('submission', 'completed');
       toast({
-        title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
-        description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
+        title: `Proposal Submitted`,
+        description: `Your investment thesis has been submitted successfully!`
       });
 
     } catch (error) {
@@ -516,7 +461,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => {
+  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction) => {
     try {
       setIsSubmitting(true);
       setFormErrors({});
@@ -537,15 +482,14 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
-      const effectiveFormData = isTestMode ? {
-        ...TEST_FORM_DATA,
+      const effectiveFormData = {
+        ...formData,
         linkedInURL,
         submissionTimestamp: Date.now(),
         submitter: address
-      } : formData;
+      };
 
       console.log('Preparing data for IPFS submission:', { 
-        isTestMode,
         effectiveFormData,
         linkedInURL,
         submitter: address,
@@ -564,9 +508,7 @@ const ThesisSubmission = () => {
         throw new Error("Invalid IPFS hash format");
       }
 
-      const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : effectiveFormData.investment.targetCapital
-      );
+      const targetCapitalWei = ethers.utils.parseEther(effectiveFormData.investment.targetCapital);
 
       const proposalConfig: ProposalConfig = {
         targetCapital: targetCapitalWei,
@@ -589,8 +531,8 @@ const ThesisSubmission = () => {
         updateStepStatus('submission', 'completed');
 
         toast({
-          title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
-          description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
+          title: `Proposal Submitted`,
+          description: `Your investment thesis has been submitted successfully!`
         });
 
         // Store proposal in local storage
@@ -599,7 +541,7 @@ const ThesisSubmission = () => {
           hash: result.hash,
           ipfsHash,
           timestamp: new Date().toISOString(),
-          title: isTestMode ? TEST_FORM_DATA.title : effectiveFormData.title,
+          title: effectiveFormData.title,
           targetCapital: targetCapitalWei.toString(),
           status: 'pending'
         };
@@ -662,50 +604,6 @@ const ThesisSubmission = () => {
 
   const handleRentAdSpace = (frequency: 'week' | 'month') => {
     // Implement ad space rental logic here
-  };
-
-  const handleTestModeToggle = async (enabled: boolean) => {
-    if (!isConnected) {
-      toast({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to toggle test mode",
-        variant: "destructive"
-      });
-      connect();
-      return;
-    }
-    
-    setIsTestMode(enabled);
-    if (enabled) {
-      setFormData(getTestFormData(address));
-    } else {
-      setFormData({
-        title: "",
-        firmCriteria: {
-          size: FirmSize.BELOW_1M,
-          location: "",
-          dealType: DealType.ACQUISITION,
-          geographicFocus: GeographicFocus.LOCAL
-        },
-        paymentTerms: [],
-        strategies: {
-          operational: [],
-          growth: [],
-          integration: []
-        },
-        investment: {
-          targetCapital: "",
-          drivers: "",
-          additionalCriteria: ""
-        },
-        votingDuration: MIN_VOTING_DURATION,
-        votingEnds: Math.floor(Date.now() / 1000) + MIN_VOTING_DURATION,
-        linkedInURL: "",
-        isTestMode: false,
-        submissionTimestamp: Date.now(),
-        submitter: address
-      });
-    }
   };
 
   const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
@@ -940,8 +838,6 @@ const ThesisSubmission = () => {
               <ContractApprovalStatus
                 onApprovalComplete={handleApprovalComplete}
                 requiredAmount={SUBMISSION_FEE}
-                isTestMode={isTestMode}
-                currentFormData={formData}
               />
             </div>
           </div>
