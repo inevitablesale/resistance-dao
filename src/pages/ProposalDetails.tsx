@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
@@ -68,7 +69,9 @@ const getDealTypeLabel = (type: DealType): string => {
     [DealType.MERGER]: "Merger",
     [DealType.EQUITY_BUYOUT]: "Equity Buyout",
     [DealType.FRANCHISE]: "Franchise",
-    return typeMap[type] || "Unknown";
+    [DealType.SUCCESSION]: "Succession"
+  };
+  return typeMap[type] || "Unknown";
 };
 
 const getGeographicFocusLabel = (focus: GeographicFocus): string => {
@@ -854,3 +857,4 @@ const ProposalDetails = () => {
 };
 
 export default ProposalDetails;
+
