@@ -457,6 +457,10 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                     placeholder="Enter LGR amount"
                     className="bg-black/40 border-white/10 text-white h-12"
                   />
+                  <p className="text-sm text-white/60 mt-2 flex items-center gap-2">
+                    <Info className="w-4 h-4" />
+                    There is a 10 LGR voting fee required to pledge support
+                  </p>
                 </div>
                 <Button
                   onClick={handlePledge}
@@ -474,9 +478,16 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   )}
                 </Button>
               </div>
-              <p className="text-sm text-white/40">
-                Current value: {formatUSDAmount(pledgedAmount)}
-              </p>
+              <div className="space-y-1">
+                <p className="text-sm text-white/40">
+                  Current value: {formatUSDAmount(pledgedAmount)}
+                </p>
+                {pledgeInput && (
+                  <p className="text-sm text-yellow-500/80">
+                    Total required: {Number(pledgeInput) + 10} LGR ({Number(pledgeInput)} LGR pledge + 10 LGR voting fee)
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>
