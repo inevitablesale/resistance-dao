@@ -9,7 +9,7 @@ import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata, FirmSize, DealType, GeographicFocus, PaymentTerm } from "@/types/proposals";
-import { ExternalLink, Users, Target, Coins, Info, Clock } from "lucide-react";
+import { ExternalLink, Users, Target, Coins, Info, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
@@ -17,6 +17,7 @@ import { getTokenBalance } from "@/services/tokenService";
 import { format, formatDistanceToNow, isPast } from "date-fns";
 import { loadingStates } from "./LoadingStates";
 import { ProposalLoadingCard } from "./ProposalLoadingCard";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const MIN_LGR_REQUIRED = "1";
 
@@ -103,6 +104,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
   const [isPledging, setIsPledging] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [isVotingEnded, setIsVotingEnded] = useState(false);
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   const VOTING_FEE = ethers.utils.parseEther("10");
 
   const formatUSDAmount = (lgrAmount: string): string => {
@@ -276,8 +278,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
           setTimeRemaining("Voting ended");
         } else {
           setIsVotingEnded(false);
-          const timeLeft = formatDistanceToNow(endDate);
-          setTimeRemaining(`Proposal ends in ${timeLeft}`);
+          setTimeRemaining(`ends in ${formatDistanceToNow(endDate)}`);
         }
       };
 
@@ -451,10 +452,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                     </span>
                   </div>
                 </div>
-                <p className="text-white/60 text-sm flex items-center gap-1">
-                  <Info className="w-4 h-4" />
-                  Make a soft commitment to show your interest
-                </p>
               </div>
               <div className="text-center md:text-right">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm">
@@ -471,26 +468,39 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
             <div className="mb-8">
               <div className="flex justify-between text-sm text-white/60 mb-2">
                 <span>Total Commitments Progress</span>
-                <span>{progressPercentage.toFixed(1)}%</span>
+                <span>{proposalDetails?.investment?.targetCapital ? ((Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100).toFixed(1) : 0}%</span>
               </div>
               <Progress 
-                value={progressPercentage} 
+                value={proposalDetails?.investment?.targetCapital ? (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100 : 0}
                 className="h-3 bg-white/5"
               />
             </div>
 
             <div className="space-y-4">
-              <div className="bg-white/5 p-4 rounded-lg border border-white/10 mb-4">
-                <h4 className="text-white font-medium mb-2 flex items-center gap-2">
-                  <Info className="w-5 h-5 text-yellow-500" />
-                  About Supporting Proposals
-                </h4>
-                <p className="text-sm text-white/80 leading-relaxed">
-                  Express your interest by making a soft commitment. This is not an actual investment - 
-                  only a 10 LGR voting fee will be charged to record your support. Your pledged amount shows how much 
-                  you're potentially interested in investing later.
-                </p>
-              </div>
+              <Collapsible>
+                <div className="bg-white/5 p-4 rounded-lg border border-white/10 mb-4">
+                  <CollapsibleTrigger 
+                    className="flex items-center justify-between w-full text-white"
+                  >
+                    <h4 className="font-medium flex items-center gap-2">
+                      <Info className="w-5 h-5 text-yellow-500" />
+                      About Supporting Proposals
+                    </h4>
+                    {isInfoExpanded ? (
+                      <ChevronUp className="w-5 h-5 text-white/60" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-white/60" />
+                    )}
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-2">
+                    <p className="text-sm text-white/80 leading-relaxed">
+                      Express your interest by making a soft commitment. This is not an actual investment - 
+                      only a 10 LGR voting fee will be charged to record your support. Your pledged amount shows how much 
+                      you're potentially interested in investing later.
+                    </p>
+                  </CollapsibleContent>
+                </div>
+              </Collapsible>
               
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
