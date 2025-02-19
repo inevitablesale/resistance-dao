@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Calendar, Users, Target } from "lucide-react";
@@ -216,7 +217,7 @@ export const ProposalsHistory = () => {
     return (
       <Card className="bg-black/40 border-white/10">
         <CardContent className="p-6 text-center text-white/60">
-          <p>You need at least {MIN_LGR_REQUIRED} LGR to view proposals.</p>
+          <p>You need at least {MIN_LGR_REQUIRED} LGR to view proposals</p>
         </CardContent>
       </Card>
     );
