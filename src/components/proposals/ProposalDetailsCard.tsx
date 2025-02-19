@@ -307,7 +307,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
             <Button 
               onClick={connect} 
               size="lg"
-              className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
+              className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold"
             >
               Connect Wallet
             </Button>
@@ -378,7 +378,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         transition={{ duration: 0.2 }}
         className="space-y-6"
       >
-        <div className="relative bg-gradient-to-br from-purple-500/10 via-transparent to-yellow-500/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+        <div className="relative bg-gradient-to-br from-yellow-500/10 via-transparent to-teal-500/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
           <div className="absolute inset-0 bg-black/20 rounded-2xl backdrop-blur-sm" />
           
           <div className="relative">
@@ -458,7 +458,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
         <Card className="bg-black/40 border-white/10 backdrop-blur-sm overflow-hidden">
           <CardHeader className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-yellow-500/5 animate-gradient" />
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 to-teal-500/5 animate-gradient" />
             <CardTitle className="text-2xl font-bold text-white relative">
               {proposalDetails?.title}
             </CardTitle>
@@ -498,9 +498,9 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group"
+                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group border border-teal-500/10"
               >
-                <strong className="text-purple-400 block mb-2">Firm Size</strong>
+                <strong className="text-teal-400 block mb-2">Firm Size</strong>
                 <span className="text-white/80 text-lg">
                   {getFirmSizeLabel(proposalDetails.firmCriteria.size)}
                 </span>
@@ -510,9 +510,9 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group"
+                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group border border-yellow-500/10"
               >
-                <strong className="text-purple-400 block mb-2">Deal Type</strong>
+                <strong className="text-yellow-400 block mb-2">Deal Type</strong>
                 <span className="text-white/80 text-lg">
                   {getDealTypeLabel(proposalDetails.firmCriteria.dealType)}
                 </span>
@@ -522,9 +522,9 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group"
+                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group border border-teal-500/10"
               >
-                <strong className="text-purple-400 block mb-2">Geographic Focus</strong>
+                <strong className="text-teal-400 block mb-2">Geographic Focus</strong>
                 <span className="text-white/80 text-lg">
                   {getGeographicFocusLabel(proposalDetails.firmCriteria.geographicFocus)}
                 </span>
@@ -534,9 +534,9 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 }}
-                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group"
+                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group border border-yellow-500/10"
               >
-                <strong className="text-purple-400 block mb-2">Payment Terms</strong>
+                <strong className="text-yellow-400 block mb-2">Payment Terms</strong>
                 <span className="text-white/80 text-lg">
                   {proposalDetails.paymentTerms?.map(term => getPaymentTermLabel(term)).join(", ")}
                 </span>
@@ -561,14 +561,14 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               <>
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold text-white">Investment Drivers</h3>
-                  <p className="text-white/80 bg-white/5 p-6 rounded-xl backdrop-blur-sm leading-relaxed">
+                  <p className="text-white/80 bg-white/5 p-6 rounded-xl backdrop-blur-sm leading-relaxed border border-yellow-500/10">
                     {proposalDetails.investment.drivers}
                   </p>
                 </div>
 
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold text-white">Additional Criteria</h3>
-                  <p className="text-white/80 bg-white/5 p-6 rounded-xl backdrop-blur-sm leading-relaxed">
+                  <p className="text-white/80 bg-white/5 p-6 rounded-xl backdrop-blur-sm leading-relaxed border border-teal-500/10">
                     {proposalDetails.investment.additionalCriteria}
                   </p>
                 </div>
@@ -585,7 +585,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   href={proposalDetails.linkedInURL} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-6 py-3 rounded-xl bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors text-lg"
+                  className="inline-flex items-center px-6 py-3 rounded-xl bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition-colors text-lg"
                 >
                   View LinkedIn Profile 
                   <ExternalLink className="w-5 h-5 ml-2" />
