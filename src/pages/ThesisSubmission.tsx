@@ -1,3 +1,4 @@
+<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -95,45 +96,6 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
   description: 'Submit your thesis to the blockchain'
 }];
 
-const TEST_FORM_DATA: ProposalMetadata = {
-  title: "Test Proposal - Automated Backend Services Firm",
-  firmCriteria: {
-    size: FirmSize.BELOW_1M,
-    location: "California",
-    dealType: DealType.ACQUISITION,
-    geographicFocus: GeographicFocus.LOCAL
-  },
-  paymentTerms: [
-    PaymentTerm.CASH,
-    PaymentTerm.SELLER_FINANCING,
-    PaymentTerm.EARNOUT
-  ],
-  strategies: {
-    operational: [
-      OperationalStrategy.TECH_MODERNIZATION,
-      OperationalStrategy.PROCESS_STANDARDIZATION
-    ],
-    growth: [
-      GrowthStrategy.SERVICE_EXPANSION,
-      GrowthStrategy.CLIENT_GROWTH
-    ],
-    integration: [
-      IntegrationStrategy.MERGING_OPERATIONS,
-      IntegrationStrategy.SYSTEMS_CONSOLIDATION
-    ]
-  },
-  investment: {
-    targetCapital: "2500000",
-    drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
-    additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
-  },
-  votingDuration: MIN_VOTING_DURATION,
-  linkedInURL: "",
-  isTestMode: true,
-  submissionTimestamp: Date.now(),
-  submitter: ""
-};
-
 const isValidLinkedInURL = (url: string): boolean => {
   return url.startsWith('https://www.linkedin.com/') || url.startsWith('https://linkedin.com/');
 };
@@ -151,7 +113,7 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const [isTestMode, setIsTestMode] = useState(false);
+  const isTestMode = true;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
@@ -182,18 +144,6 @@ const ThesisSubmission = () => {
     linkedInURL: "",
     isTestMode: false
   });
-
-  useEffect(() => {
-    if (isTestMode) {
-      console.log("Setting test form data:", TEST_FORM_DATA);
-      setFormData({
-        ...TEST_FORM_DATA,
-        linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
-        submissionTimestamp: Date.now(),
-        submitter: address
-      });
-    }
-  }, [isTestMode, user, address]);
 
   useEffect(() => {
     const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
@@ -557,7 +507,7 @@ const ThesisSubmission = () => {
 
       console.log('Estimating gas for proposal creation...', { isTestMode });
       const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData?.investment.targetCapital || ""
+        isTestMode ? "2500000" : formData?.investment.targetCapital || ""
       );
 
       const proposalConfig: ProposalConfig = {
@@ -577,7 +527,7 @@ const ThesisSubmission = () => {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
-        title: isTestMode ? TEST_FORM_DATA.title : formData?.title || "",
+        title: isTestMode ? "Test Proposal - Automated Backend Services Firm" : formData?.title || "",
         targetCapital: targetCapitalWei.toString(),
         status: 'pending'
       };
@@ -625,10 +575,42 @@ const ThesisSubmission = () => {
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
       const effectiveFormData = isTestMode ? {
-        ...TEST_FORM_DATA,
-        linkedInURL,
+        title: "Test Proposal - Automated Backend Services Firm",
+        firmCriteria: {
+          size: FirmSize.BELOW_1M,
+          location: "California",
+          dealType: DealType.ACQUISITION,
+          geographicFocus: GeographicFocus.LOCAL
+        },
+        paymentTerms: [
+          PaymentTerm.CASH,
+          PaymentTerm.SELLER_FINANCING,
+          PaymentTerm.EARNOUT
+        ],
+        strategies: {
+          operational: [
+            OperationalStrategy.TECH_MODERNIZATION,
+            OperationalStrategy.PROCESS_STANDARDIZATION
+          ],
+          growth: [
+            GrowthStrategy.SERVICE_EXPANSION,
+            GrowthStrategy.CLIENT_GROWTH
+          ],
+          integration: [
+            IntegrationStrategy.MERGING_OPERATIONS,
+            IntegrationStrategy.SYSTEMS_CONSOLIDATION
+          ]
+        },
+        investment: {
+          targetCapital: "2500000",
+          drivers: "Strong recurring revenue from established client base. High potential for automation and scalability. Strategic alignment with emerging tech markets.",
+          additionalCriteria: "Preference for firms with existing cloud infrastructure and established compliance frameworks."
+        },
+        votingDuration: MIN_VOTING_DURATION,
+        linkedInURL: "",
+        isTestMode: true,
         submissionTimestamp: Date.now(),
-        submitter: address
+        submitter: ""
       } : formData;
 
       console.log('Preparing data for IPFS submission:', { 
@@ -652,7 +634,7 @@ const ThesisSubmission = () => {
       }
 
       const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : effectiveFormData.investment.targetCapital
+        isTestMode ? "2500000" : effectiveFormData.investment.targetCapital
       );
 
       const proposalConfig: ProposalConfig = {
@@ -686,7 +668,7 @@ const ThesisSubmission = () => {
           hash: result.hash,
           ipfsHash,
           timestamp: new Date().toISOString(),
-          title: isTestMode ? TEST_FORM_DATA.title : effectiveFormData.title,
+          title: isTestMode ? "Test Proposal - Automated Backend Services Firm" : effectiveFormData.title,
           targetCapital: targetCapitalWei.toString(),
           status: 'pending'
         };
@@ -749,49 +731,6 @@ const ThesisSubmission = () => {
 
   const handleRentAdSpace = (frequency: 'week' | 'month') => {
     // Implement ad space rental logic here
-  };
-
-  const handleTestModeToggle = async (enabled: boolean) => {
-    if (!isConnected) {
-      toast({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to toggle test mode",
-        variant: "destructive"
-      });
-      connect();
-      return;
-    }
-    
-    setIsTestMode(enabled);
-    if (enabled) {
-      setFormData(TEST_FORM_DATA);
-    } else {
-      setFormData({
-        title: "",
-        firmCriteria: {
-          size: FirmSize.BELOW_1M,
-          location: "",
-          dealType: DealType.ACQUISITION,
-          geographicFocus: GeographicFocus.LOCAL
-        },
-        paymentTerms: [],
-        strategies: {
-          operational: [],
-          growth: [],
-          integration: []
-        },
-        investment: {
-          targetCapital: "",
-          drivers: "",
-          additionalCriteria: ""
-        },
-        votingDuration: MIN_VOTING_DURATION,
-        linkedInURL: "",
-        isTestMode: false,
-        submissionTimestamp: Date.now(),
-        submitter: address
-      });
-    }
   };
 
   const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
@@ -882,148 +821,3 @@ const ThesisSubmission = () => {
                         {formErrors.title && (
                           <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
                         )}
-                      </div>
-
-                      <TargetCapitalInput 
-                        value={formData.investment.targetCapital}
-                        onChange={value => handleFormDataChange('investment.targetCapital', value)}
-                        error={formErrors['investment.targetCapital']}
-                      />
-
-                      <VotingDurationInput
-                        value={votingDuration}
-                        onChange={handleVotingDurationChange}
-                        error={formErrors.votingDuration}
-                      />
-
-                      <div className="space-y-4">
-                        <Label className="text-lg font-medium text-white">Investment Drivers</Label>
-                        <textarea
-                          placeholder="Describe the key drivers behind this investment thesis..."
-                          className="w-full h-32 bg-black/50 border border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none focus:border-yellow-500/50"
-                          value={formData.investment.drivers}
-                          onChange={e => handleFormDataChange('investment.drivers', e.target.value)}
-                        />
-                        {formErrors['investment.drivers'] && (
-                          <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {activeStep === 'strategy' && (
-                    <FirmCriteriaSection
-                      formData={{
-                        firmCriteria: {
-                          size: formData.firmCriteria.size,
-                          location: formData.firmCriteria.location,
-                          dealType: formData.firmCriteria.dealType,
-                          geographicFocus: formData.firmCriteria.geographicFocus
-                        }
-                      }}
-                      formErrors={formErrors}
-                      onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
-                    />
-                  )}
-
-                  {activeStep === 'terms' && (
-                    <>
-                      <PaymentTermsSection
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
-                      />
-                      <div className="mt-8">
-                        <StrategiesSection
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={(category, value) => handleStrategyChange(category, value)}
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {activeStep === 'submission' && (
-                    <div className="space-y-6 text-center py-8">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
-                      >
-                        <Check className="w-8 h-8 text-white" />
-                      </motion.div>
-                      <h3 className="text-2xl font-semibold text-white">
-                        {submissionComplete 
-                          ? "Investment Thesis Submitted!"
-                          : "Ready to Submit"
-                        }
-                      </h3>
-                      <p className="text-gray-400">
-                        {submissionComplete
-                          ? "Your investment thesis has been successfully submitted to the community"
-                          : "Your investment thesis is ready to be submitted to the community"
-                        }
-                      </p>
-                      {currentTxHash && (
-                        <a
-                          href={`https://polygonscan.com/tx/${currentTxHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-polygon-primary hover:underline"
-                        >
-                          View transaction on PolygonScan
-                        </a>
-                      )}
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-
-              <div className="border-t border-white/5 p-6">
-                <Button 
-                  onClick={handleContinue}
-                  disabled={isSubmitting}
-                  className={cn(
-                    "w-full h-12",
-                    "bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600",
-                    "text-white font-medium",
-                    "transition-all duration-300",
-                    "disabled:opacity-50",
-                    "flex items-center justify-center gap-2"
-                  )}
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Processing...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-2">
-                      <span>{getButtonText()}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  )}
-                </Button>
-              </div>
-            </Card>
-          </div>
-
-          <div className="col-span-3">
-            <div className="sticky top-32 space-y-4">
-              <ContractApprovalStatus
-                onApprovalComplete={handleApprovalComplete}
-                requiredAmount={SUBMISSION_FEE}
-                isTestMode={isTestMode}
-                currentFormData={formData}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <LGRFloatingWidget />
-    </div>
-  );
-};
-
-export default ThesisSubmission;
