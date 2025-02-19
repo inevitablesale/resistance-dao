@@ -700,6 +700,9 @@ const ThesisSubmission = () => {
 
   return (
     <div className="min-h-screen bg-black relative">
+      <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-teal-500/5 to-yellow-500/5 animate-gradient" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-black to-black" />
+
       <div className="fixed top-16 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
         <div className="container mx-auto px-4 py-4">
           <motion.div 
@@ -707,7 +710,7 @@ const ThesisSubmission = () => {
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center justify-between"
           >
-            <h1 className="text-3xl font-bold">
+            <h1 className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
               Transform Accounting Firm Ownership
             </h1>
           </motion.div>
@@ -724,7 +727,7 @@ const ThesisSubmission = () => {
                   className={cn(
                     "relative",
                     index !== SUBMISSION_STEPS.length - 1 && "pb-8 after:absolute after:left-5 after:top-8 after:h-full after:w-0.5",
-                    step.status === 'completed' ? "after:bg-green-500" : "after:bg-white/10"
+                    step.status === 'completed' ? "after:bg-yellow-500" : "after:bg-white/10"
                   )}
                 >
                   <button
@@ -736,9 +739,9 @@ const ThesisSubmission = () => {
                   >
                     <div className={cn(
                       "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
-                      step.status === 'completed' ? "bg-green-500 text-white" :
-                      step.status === 'processing' ? "bg-polygon-primary text-white animate-pulse" :
-                      step.id === activeStep ? "bg-polygon-primary/20 text-polygon-secondary border border-polygon-secondary" :
+                      step.status === 'completed' ? "bg-yellow-500 text-white" :
+                      step.status === 'processing' ? "bg-teal-500 text-white animate-pulse" :
+                      step.id === activeStep ? "bg-yellow-500/20 text-yellow-500 border border-yellow-500" :
                       "bg-white/5 text-white/40"
                     )}>
                       {step.status === 'completed' ? (
@@ -773,7 +776,7 @@ const ThesisSubmission = () => {
                 transition={{ delay: 0.2 }}
               >
                 <div className="p-6 space-y-3">
-                  <p className="text-xl text-white/90">
+                  <p className="text-xl text-gradient bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
                     Ready to revolutionize how accounting practices are acquired?
                   </p>
                   <p className="text-gray-400">
@@ -903,7 +906,14 @@ const ThesisSubmission = () => {
                 <Button 
                   onClick={handleContinue}
                   disabled={isSubmitting}
-                  className="w-full h-12"
+                  className={cn(
+                    "w-full h-12",
+                    "bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600",
+                    "text-white font-medium",
+                    "transition-all duration-300",
+                    "disabled:opacity-50",
+                    "flex items-center justify-center gap-2"
+                  )}
                 >
                   {isSubmitting ? (
                     <div className="flex items-center justify-center gap-2">
