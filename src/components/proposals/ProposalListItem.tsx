@@ -29,7 +29,7 @@ export const ProposalListItem = ({
   const navigate = useNavigate();
 
   const handleClick = () => {
-    console.log('Navigating to proposal:', tokenId);
+    console.log('Navigating to investment strategy:', tokenId);
     navigate(`/proposals/${tokenId}`);
   };
 
@@ -45,14 +45,14 @@ export const ProposalListItem = ({
         <div className="flex items-center justify-center h-full">
           <div className="flex items-center gap-3 text-white/60">
             <Loader2 className="w-5 h-5 animate-spin" />
-            <span>Loading proposal details...</span>
+            <span>Loading strategy details...</span>
           </div>
         </div>
       ) : error ? (
         <div className="flex items-center justify-center h-full">
           <div className="flex items-center gap-3 text-red-400">
             <AlertTriangle className="w-5 h-5" />
-            <span>Failed to load proposal details</span>
+            <span>Failed to load strategy details</span>
           </div>
         </div>
       ) : (
@@ -65,7 +65,7 @@ export const ProposalListItem = ({
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <h3 className="font-medium text-white">
-                    {metadata?.title || `Proposal #${tokenId}`}
+                    {metadata?.title || `Investment Strategy #${tokenId}`}
                   </h3>
                 </div>
                 <div className="flex items-center gap-4 text-sm text-white/60 flex-wrap">
@@ -108,4 +108,3 @@ export const ProposalListItem = ({
     </motion.div>
   );
 };
-

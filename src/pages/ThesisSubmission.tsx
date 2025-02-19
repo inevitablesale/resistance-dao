@@ -820,10 +820,19 @@ const ThesisSubmission = () => {
             </BreadcrumbItem>
             <BreadcrumbSeparator className="text-white/40" />
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-white">Submit Proposal</BreadcrumbPage>
+              <BreadcrumbPage className="text-white">Share Investment Strategy</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+
+        <div className="max-w-4xl mx-auto mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-teal-500 mb-4">
+            Share Your Investment Strategy
+          </h1>
+          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+            Present your acquisition strategy to find co-investors who share your vision. Define your target profile, growth plans, and execution approach.
+          </p>
+        </div>
 
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-3">
