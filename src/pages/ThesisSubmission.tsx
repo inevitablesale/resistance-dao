@@ -820,30 +820,30 @@ const ThesisSubmission = () => {
             </BreadcrumbItem>
             <BreadcrumbSeparator className="text-white/40" />
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-white">Share Investment Strategy</BreadcrumbPage>
+              <BreadcrumbPage className="text-white">Test Your Investment Thesis</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="max-w-4xl mx-auto mb-12 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-teal-500 mb-4">
-            Share Your Investment Strategy
+            Test Your Investment Thesis
           </h1>
           <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Present your acquisition strategy to find co-investors who share your vision. Define your target profile, growth plans, and execution approach.
+            Share your acquisition strategy to validate market interest and find aligned co-investors before committing resources to fund formation.
           </p>
           <div className="mt-6 flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-white/60">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-yellow-500" />
-              <span>Gauge interest before firm identification</span>
+              <span>Validate your strategy risk-free</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-teal-500" />
-              <span>Connect with aligned co-investors</span>
+              <span>Find aligned co-investors early</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-purple-500" />
-              <span>Collect soft commitments</span>
+              <span>Build momentum before launch</span>
             </div>
           </div>
         </div>
