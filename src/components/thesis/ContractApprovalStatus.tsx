@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
-import { Check, AlertTriangle, Loader2 } from "lucide-react";
+import { Check, AlertTriangle, Loader2, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -14,7 +14,6 @@ import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { transactionQueue } from "@/services/transactionQueueService";
 import { getContractStatus } from "@/services/proposalContractService";
 import { cn } from "@/lib/utils";
-import { Wallet } from "@/components/ui/wallet";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const TESTER_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
@@ -54,9 +53,9 @@ export const ContractApprovalStatus = ({
 
   const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
   
-  const hasRequiredBalance = (isTesterWallet && contractTestMode) || tokenBalances?.find(token => 
+  const hasRequiredBalance = (isTesterWallet && contractTestMode) || tokenBalances?.some(token => 
     token.symbol === "LGR" && ethers.BigNumber.from(token.balance || "0").gte(requiredAmountBN)
-  );
+  ) || false;
 
   useEffect(() => {
     const checkWalletStatus = async () => {
@@ -322,7 +321,7 @@ export const ContractApprovalStatus = ({
             )}
           </Button>
 
-          {hasRequiredBalance === false && (
+          {!hasRequiredBalance && (
             <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
