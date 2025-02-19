@@ -151,7 +151,8 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const [isTestMode] = useState(true);
+  // Make isTestMode a constant since we always want to use the test contract
+  const isTestMode = true;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
@@ -547,7 +548,7 @@ const ThesisSubmission = () => {
         isTestMode: true
       };
 
-      console.log('Uploading metadata to IPFS...', { isTestMode: true });
+      console.log('Uploading metadata to IPFS...', { isTestMode });
       const ipfsUri = await uploadMetadataToPinata(updatedFormData);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
       
@@ -751,49 +752,6 @@ const ThesisSubmission = () => {
     // Implement ad space rental logic here
   };
 
-  const handleTestModeToggle = async (enabled: boolean) => {
-    if (!isConnected) {
-      toast({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to toggle test mode",
-        variant: "destructive"
-      });
-      connect();
-      return;
-    }
-    
-    setIsTestMode(enabled);
-    if (enabled) {
-      setFormData(TEST_FORM_DATA);
-    } else {
-      setFormData({
-        title: "",
-        firmCriteria: {
-          size: FirmSize.BELOW_1M,
-          location: "",
-          dealType: DealType.ACQUISITION,
-          geographicFocus: GeographicFocus.LOCAL
-        },
-        paymentTerms: [],
-        strategies: {
-          operational: [],
-          growth: [],
-          integration: []
-        },
-        investment: {
-          targetCapital: "",
-          drivers: "",
-          additionalCriteria: ""
-        },
-        votingDuration: MIN_VOTING_DURATION,
-        linkedInURL: "",
-        isTestMode: false,
-        submissionTimestamp: Date.now(),
-        submitter: address
-      });
-    }
-  };
-
   const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
     // Implement promotion selection logic here
   };
@@ -880,150 +838,4 @@ const ThesisSubmission = () => {
                           onChange={e => handleFormDataChange('title', e.target.value)}
                         />
                         {formErrors.title && (
-                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                        )}
-                      </div>
-
-                      <TargetCapitalInput 
-                        value={formData.investment.targetCapital}
-                        onChange={value => handleFormDataChange('investment.targetCapital', value)}
-                        error={formErrors['investment.targetCapital']}
-                      />
-
-                      <VotingDurationInput
-                        value={votingDuration}
-                        onChange={handleVotingDurationChange}
-                        error={formErrors.votingDuration}
-                      />
-
-                      <div className="space-y-4">
-                        <Label className="text-lg font-medium text-white">Investment Drivers</Label>
-                        <textarea
-                          placeholder="Describe the key drivers behind this investment thesis..."
-                          className="w-full h-32 bg-black/50 border border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none focus:border-yellow-500/50"
-                          value={formData.investment.drivers}
-                          onChange={e => handleFormDataChange('investment.drivers', e.target.value)}
-                        />
-                        {formErrors['investment.drivers'] && (
-                          <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {activeStep === 'strategy' && (
-                    <FirmCriteriaSection
-                      formData={{
-                        firmCriteria: {
-                          size: formData.firmCriteria.size,
-                          location: formData.firmCriteria.location,
-                          dealType: formData.firmCriteria.dealType,
-                          geographicFocus: formData.firmCriteria.geographicFocus
-                        }
-                      }}
-                      formErrors={formErrors}
-                      onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
-                    />
-                  )}
-
-                  {activeStep === 'terms' && (
-                    <>
-                      <PaymentTermsSection
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
-                      />
-                      <div className="mt-8">
-                        <StrategiesSection
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={(category, value) => handleStrategyChange(category, value)}
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {activeStep === 'submission' && (
-                    <div className="space-y-6 text-center py-8">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
-                      >
-                        <Check className="w-8 h-8 text-white" />
-                      </motion.div>
-                      <h3 className="text-2xl font-semibold text-white">
-                        {submissionComplete 
-                          ? "Investment Thesis Submitted!"
-                          : "Ready to Submit"
-                        }
-                      </h3>
-                      <p className="text-gray-400">
-                        {submissionComplete
-                          ? "Your investment thesis has been successfully submitted to the community"
-                          : "Your investment thesis is ready to be submitted to the community"
-                        }
-                      </p>
-                      {currentTxHash && (
-                        <a
-                          href={`https://polygonscan.com/tx/${currentTxHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-polygon-primary hover:underline"
-                        >
-                          View transaction on PolygonScan
-                        </a>
-                      )}
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-
-              <div className="border-t border-white/5 p-6">
-                <Button 
-                  onClick={handleContinue}
-                  disabled={isSubmitting}
-                  className={cn(
-                    "w-full h-12",
-                    "bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600",
-                    "text-white font-medium",
-                    "transition-all duration-300",
-                    "disabled:opacity-50",
-                    "flex items-center justify-center gap-2"
-                  )}
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Processing...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-2">
-                      <span>{getButtonText()}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  )}
-                </Button>
-              </div>
-            </Card>
-          </div>
-
-          <div className="col-span-3">
-            <div className="sticky top-32 space-y-4">
-              <ContractApprovalStatus
-                onApprovalComplete={handleApprovalComplete}
-                requiredAmount={SUBMISSION_FEE}
-                isTestMode={isTestMode}
-                currentFormData={formData}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <LGRFloatingWidget />
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+                          <p className="text-red-400 text-sm">{form
