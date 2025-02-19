@@ -31,7 +31,7 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
     if (!pledgeAmount) {
       toast({
         title: "Enter Pledge Amount",
-        description: "Please enter how much LGR you want to pledge",
+        description: "Please enter how much LGR you want to pledge as a commitment",
         variant: "destructive",
       });
       return;
@@ -45,44 +45,68 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
       console.log('Got wallet provider');
 
       const signer = walletProvider.provider.getSigner();
+      const userAddress = await signer.getAddress();
+
+      // Initialize contracts
       const lgrToken = new ethers.Contract(
         LGR_TOKEN_ADDRESS,
-        ["function approve(address spender, uint256 amount) returns (bool)"],
+        ["function balanceOf(address) view returns (uint256)", "function approve(address spender, uint256 amount) returns (bool)"],
         signer
       );
-
       const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
+
+      // Get voting fee
       const votingFee = await factory.VOTING_FEE();
       console.log('Voting fee:', ethers.utils.formatEther(votingFee));
 
-      const pledgeAmountWei = ethers.utils.parseEther(pledgeAmount);
-      const totalNeeded = pledgeAmountWei.add(votingFee);
-      console.log('Total needed:', ethers.utils.formatEther(totalNeeded));
+      // Check user's LGR balance
+      const balance = await lgrToken.balanceOf(userAddress);
+      if (balance.lt(votingFee)) {
+        toast({
+          title: "Insufficient LGR Balance",
+          description: "You need at least 10 LGR tokens to cover the voting fee",
+          variant: "destructive",
+        });
+        return;
+      }
 
-      console.log('Approving LGR tokens...');
-      const approveTx = await lgrToken.approve(FACTORY_ADDRESS, totalNeeded);
+      // Only approve the voting fee amount
+      console.log('Approving voting fee:', ethers.utils.formatEther(votingFee), 'LGR');
+      const approveTx = await lgrToken.approve(FACTORY_ADDRESS, votingFee);
       await approveTx.wait();
-      console.log('LGR tokens approved');
+      console.log('Voting fee approved');
 
-      console.log('Submitting vote...');
-      const voteTx = await factory.vote(tokenId, pledgeAmountWei, {
-        gasLimit: 500000 // Explicit gas limit for better handling
+      // Submit vote with pledge amount (not transferred, just recorded)
+      console.log('Submitting vote with pledge amount:', pledgeAmount, 'LGR');
+      const voteTx = await factory.vote(tokenId, ethers.utils.parseEther(pledgeAmount), {
+        gasLimit: 500000
       });
       
       const receipt = await voteTx.wait();
       console.log('Vote confirmed in block:', receipt.blockNumber);
 
       toast({
-        title: "Vote Submitted",
-        description: `Successfully pledged ${pledgeAmount} LGR to this proposal`,
+        title: "Vote Submitted Successfully",
+        description: `Pledged ${pledgeAmount} LGR (commitment only). Paid 10 LGR voting fee.`,
       });
 
       setPledgeAmount("");
     } catch (error: any) {
       console.error('Error voting:', error);
+      
+      // Provide more specific error messages
+      let errorMessage = "Failed to submit your vote. Please try again.";
+      if (error.message.includes("Voting fee transfer failed")) {
+        errorMessage = "Failed to transfer voting fee. Please ensure you have 10 LGR available.";
+      } else if (error.message.includes("Already voted")) {
+        errorMessage = "You have already voted on this proposal.";
+      } else if (error.message.includes("Voting period ended")) {
+        errorMessage = "The voting period for this proposal has ended.";
+      }
+
       toast({
         title: "Error Voting",
-        description: error.message || "Failed to submit your vote. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -114,10 +138,15 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
             placeholder="Enter LGR amount"
             className="bg-black/40 border-white/10 text-white"
           />
-          <p className="text-sm text-white/60 flex items-center gap-2">
-            <Info className="w-4 h-4" />
-            There is a 10 LGR voting fee required to pledge support
-          </p>
+          <div className="space-y-1">
+            <p className="text-sm text-white/60 flex items-center gap-2">
+              <Info className="w-4 h-4" />
+              A 10 LGR voting fee will be charged to submit your vote
+            </p>
+            <p className="text-sm text-white/60 flex items-center gap-2 pl-6">
+              Your pledged amount is a commitment and will not be transferred
+            </p>
+          </div>
         </div>
 
         <div className="flex justify-center gap-4">
@@ -129,7 +158,7 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
             disabled={isVoting}
           >
             <ThumbsUp className="w-5 h-5" />
-            {isVoting ? "Pledging..." : "Pledge Support"}
+            {isVoting ? "Submitting..." : "Submit Vote"}
           </Button>
           <Button
             variant="outline"
