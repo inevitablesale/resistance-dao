@@ -297,8 +297,8 @@ const IndexContent = () => {
           <div className="space-y-6">
             <div className="flex justify-center gap-4">
               <button 
-                onClick={() => navigate('/thesis')}
-                className="px-12 py-6 bg-white/10 text-white rounded-lg font-bold text-2xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
+                onClick={() => navigate('/proposals')}
+                className="px-12 py-6 bg-yellow-500 text-black rounded-lg font-bold text-2xl hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
               >
                 Create Fund Proposal
               </button>
@@ -427,7 +427,7 @@ const IndexContent = () => {
       </section>
 
       {/* Social Proof Section */}
-      <section className="py-12 relative z-10 bg-black/30 backdrop-blur-sm border-t border-white/5">
+      <section className="py-12 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
             <NewsletterSubscription />
