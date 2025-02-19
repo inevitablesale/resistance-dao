@@ -40,6 +40,7 @@ import {
   StoredProposal,
   ProposalConfig
 } from "@/types/proposals";
+import { WalletConnectionOverlay } from "@/components/thesis/WalletConnectionOverlay";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -790,6 +791,7 @@ const ThesisSubmission = () => {
 
   return (
     <div className="min-h-screen bg-black relative">
+      {!isConnected && <WalletConnectionOverlay requiredAmount={SUBMISSION_FEE} />}
       <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-teal-500/5 to-yellow-500/5 animate-gradient" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-black to-black" />
 
