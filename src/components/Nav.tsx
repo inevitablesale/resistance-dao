@@ -19,7 +19,6 @@ const Nav = () => {
   const hasWallet = !!primaryWallet?.address;
   
   const hideHomeRoutes = ['/', '/thesis'];
-  const shouldShowProposals = location.pathname !== '/';
 
   const getBreadcrumbs = () => {
     const path = location.pathname;
@@ -99,12 +98,14 @@ const Nav = () => {
       <div className="container h-full mx-auto px-4 relative">
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-4">
-            {hideHomeRoutes.includes(location.pathname) ? (
-              <Link to="/" className="text-white/80 hover:text-white transition-colors">
-                Home
-              </Link>
-            ) : (
-              getBreadcrumbs()
+            {location.pathname === '/' ? null : (
+              hideHomeRoutes.includes(location.pathname) ? (
+                <Link to="/" className="text-white/80 hover:text-white transition-colors">
+                  Home
+                </Link>
+              ) : (
+                getBreadcrumbs()
+              )
             )}
           </div>
 
