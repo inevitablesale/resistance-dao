@@ -121,7 +121,7 @@ const ProposalDetails = () => {
       const proposalURI = await factoryContract.uri(tokenId);
       setLoadingProgress(80);
 
-      const metadata = await getFromIPFS<ProposalMetadata>(proposalURI, "json");
+      const metadata = await getFromIPFS<ProposalMetadata>(proposalURI, "proposal");
       setLoadingProgress(90);
 
       return { 
