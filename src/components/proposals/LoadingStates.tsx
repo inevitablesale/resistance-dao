@@ -22,7 +22,7 @@ export const loadingStates: LoadingState[] = [
     icon: Shield
   },
   {
-    message: "Syncing Support Status",
+    message: "Syncing Secure Wallet",
     subtitle: "Calculating Commitments",
     progress: 80,
     icon: Server
