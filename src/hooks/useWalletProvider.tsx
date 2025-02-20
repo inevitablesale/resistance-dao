@@ -1,3 +1,4 @@
+
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
@@ -33,6 +34,20 @@ export const useWalletProvider = () => {
     return isZeroDev ? 'zerodev' : 'regular';
   };
 
+  const getLinkedInUrl = () => {
+    // Try getting from verifications first (post-verification state)
+    const urlFromVerifications = user?.verifications?.customFields?.["LinkedIn Profile URL"];
+    // Fallback to metadata (initial onboarding state)
+    const urlFromMetadata = user?.metadata?.["LinkedIn Profile URL"];
+    
+    return {
+      url: urlFromVerifications || urlFromMetadata || null,
+      source: urlFromVerifications ? 'verifications' : 
+             urlFromMetadata ? 'metadata' : 
+             'not_found'
+    };
+  };
+
   const clearInitializationTimeout = () => {
     if (initTimeoutRef.current) {
       clearTimeout(initTimeoutRef.current);
@@ -56,14 +71,30 @@ export const useWalletProvider = () => {
       const provider = new ethers.providers.Web3Provider(walletClient);
       const network = await provider.getNetwork();
       console.log('[Provider] Successfully connected to network:', network.chainId);
-      // Log full user object when network connection is successful
+
+      // Get LinkedIn URL with source information
+      const linkedInInfo = getLinkedInUrl();
+      
+      // Enhanced user object logging
       console.log('[Provider] Current user object:', {
-        user,
-        metadata: user?.metadata,
-        verifications: user?.verifications,
-        customFields: user?.verifications?.customFields,
-        linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"],
-        walletAddress: primaryWallet?.address
+        userExists: !!user,
+        userId: user?.id,
+        walletAddress: primaryWallet?.address,
+        linkedInUrl: {
+          value: linkedInInfo.url,
+          source: linkedInInfo.source
+        },
+        metadata: {
+          exists: !!user?.metadata,
+          keys: user?.metadata ? Object.keys(user.metadata) : [],
+          linkedInUrl: user?.metadata?.["LinkedIn Profile URL"]
+        },
+        verifications: {
+          exists: !!user?.verifications,
+          customFieldsExist: !!user?.verifications?.customFields,
+          keys: user?.verifications?.customFields ? Object.keys(user.verifications.customFields) : [],
+          linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"]
+        }
       });
       
       return provider;
@@ -268,6 +299,7 @@ export const useWalletProvider = () => {
       }
     },
     getWalletType,
+    getLinkedInUrl, // Expose the LinkedIn URL getter
     isConnected: !!primaryWallet?.isConnected?.()
   };
 };
