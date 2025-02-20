@@ -1,7 +1,7 @@
 
 import { useEffect } from "react";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FirmSize, DealType, GeographicFocus } from "@/types/proposals";
 import { US_STATES } from "@/lib/constants/states";
@@ -77,7 +77,11 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           <Building2 className="h-5 w-5 text-yellow-500" />
           <Label className="text-lg font-medium text-white">Preferred Firm Size (Revenue)</Label>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <RadioGroup 
+          value={String(formData.firmCriteria.size)}
+          onValueChange={(value) => onChange('firmCriteria.size', Number(value))}
+          className="grid grid-cols-1 md:grid-cols-2 gap-3"
+        >
           {[
             { value: FirmSize.BELOW_1M, label: "Below $1M" },
             { value: FirmSize.ONE_TO_FIVE_M, label: "$1M–$5M" },
@@ -89,20 +93,20 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
               className={`
                 flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
                 cursor-pointer transition-all duration-200
+                data-[state=checked]:border-yellow-500/50 data-[state=checked]:bg-yellow-500/10
                 hover:bg-white/5
-                ${formData.firmCriteria.size === option.value ? 'border-yellow-500/50 bg-yellow-500/10' : ''}
+                ${String(formData.firmCriteria.size) === String(option.value) ? 'border-yellow-500/50 bg-yellow-500/10' : ''}
               `}
             >
-              <Checkbox 
+              <RadioGroupItem 
+                value={String(option.value)} 
                 id={`size-${option.value}`}
-                checked={formData.firmCriteria.size === option.value}
-                onCheckedChange={() => onChange('firmCriteria.size', option.value)}
                 className="text-yellow-500 border-white/30"
               />
               <span className="text-white">{option.label}</span>
             </Label>
           ))}
-        </div>
+        </RadioGroup>
         {formErrors['firmCriteria.size'] && (
           <p className="mt-2 text-sm text-red-400">{formErrors['firmCriteria.size'][0]}</p>
         )}
@@ -113,7 +117,11 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           <Globe2 className="h-5 w-5 text-teal-500" />
           <Label className="text-lg font-medium text-white">Geographic Focus</Label>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <RadioGroup 
+          value={String(formData.firmCriteria.geographicFocus)}
+          onValueChange={(value) => onChange('firmCriteria.geographicFocus', Number(value))}
+          className="grid grid-cols-1 md:grid-cols-2 gap-3"
+        >
           {[
             { value: GeographicFocus.LOCAL, label: "Local" },
             { value: GeographicFocus.REGIONAL, label: "Regional" },
@@ -125,20 +133,20 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
               className={`
                 flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
                 cursor-pointer transition-all duration-200
+                data-[state=checked]:border-teal-500/50 data-[state=checked]:bg-teal-500/10
                 hover:bg-white/5
-                ${formData.firmCriteria.geographicFocus === option.value ? 'border-teal-500/50 bg-teal-500/10' : ''}
+                ${String(formData.firmCriteria.geographicFocus) === String(option.value) ? 'border-teal-500/50 bg-teal-500/10' : ''}
               `}
             >
-              <Checkbox 
+              <RadioGroupItem 
+                value={String(option.value)} 
                 id={`geo-${option.value}`}
-                checked={formData.firmCriteria.geographicFocus === option.value}
-                onCheckedChange={() => onChange('firmCriteria.geographicFocus', option.value)}
                 className="text-teal-500 border-white/30"
               />
               <span className="text-white">{option.label}</span>
             </Label>
           ))}
-        </div>
+        </RadioGroup>
         {formErrors['firmCriteria.geographicFocus'] && (
           <p className="mt-2 text-sm text-red-400">{formErrors['firmCriteria.geographicFocus'][0]}</p>
         )}
@@ -178,7 +186,11 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           <Briefcase className="h-5 w-5 text-rose-500" />
           <Label className="text-lg font-medium text-white">Deal Type</Label>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <RadioGroup 
+          value={String(formData.firmCriteria.dealType)}
+          onValueChange={(value) => onChange('firmCriteria.dealType', Number(value))}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
+        >
           {[
             { value: DealType.ACQUISITION, label: "Acquisition" },
             { value: DealType.MERGER, label: "Merger" },
@@ -191,20 +203,20 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
               className={`
                 flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
                 cursor-pointer transition-all duration-200
+                data-[state=checked]:border-rose-500/50 data-[state=checked]:bg-rose-500/10
                 hover:bg-white/5
-                ${formData.firmCriteria.dealType === option.value ? 'border-rose-500/50 bg-rose-500/10' : ''}
+                ${String(formData.firmCriteria.dealType) === String(option.value) ? 'border-rose-500/50 bg-rose-500/10' : ''}
               `}
             >
-              <Checkbox 
+              <RadioGroupItem 
+                value={String(option.value)} 
                 id={`deal-${option.value}`}
-                checked={formData.firmCriteria.dealType === option.value}
-                onCheckedChange={() => onChange('firmCriteria.dealType', option.value)}
                 className="text-rose-500 border-white/30"
               />
               <span className="text-white">{option.label}</span>
             </Label>
           ))}
-        </div>
+        </RadioGroup>
         {formErrors['firmCriteria.dealType'] && (
           <p className="mt-2 text-sm text-red-400">{formErrors['firmCriteria.dealType'][0]}</p>
         )}

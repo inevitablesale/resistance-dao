@@ -16,7 +16,7 @@ export const WalletConnectionOverlay = ({ requiredAmount }: WalletConnectionOver
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
     >
       <div className="container mx-auto px-4 h-full flex items-center justify-center">
         <motion.div
