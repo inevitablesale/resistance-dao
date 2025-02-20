@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
@@ -23,6 +24,7 @@ export interface StrategiesSectionProps {
 }
 
 type StrategyCategory = keyof ProposalMetadata['strategies'];
+type Strategy = OperationalStrategy | GrowthStrategy | IntegrationStrategy;
 
 export const StrategiesSection = ({ formData, formErrors, onChange }: StrategiesSectionProps) => {
   const handleStrategyChange = <T extends StrategyCategory>(
@@ -38,8 +40,8 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
     onChange(category, updatedStrategies as ProposalMetadata['strategies'][T]);
   };
 
-  const isStrategySelected = (category: StrategyCategory, strategyId: StrategyType) => {
-    const strategies = formData.strategies[category] as StrategyType[];
+  const isStrategySelected = (category: StrategyCategory, strategyId: Strategy) => {
+    const strategies = formData.strategies[category] as Strategy[];
     return strategies.includes(strategyId);
   };
 
