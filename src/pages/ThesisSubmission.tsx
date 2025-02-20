@@ -1,3 +1,4 @@
+<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +17,6 @@ import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
 import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
 import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
-import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
 import { LGRWalletDisplay } from "@/components/thesis/LGRWalletDisplay";
 import { TransactionStatus } from "@/components/thesis/TransactionStatus";
@@ -50,6 +50,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { CoverSlide } from "@/components/thesis/CoverSlide";
+import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -182,6 +184,8 @@ const ThesisSubmission = () => {
     linkedInURL: "",
     isTestMode: false
   });
+  
+  const [showCover, setShowCover] = useState(true);
 
   useEffect(() => {
     if (isTestMode) {
@@ -859,118 +863,4 @@ const ThesisSubmission = () => {
                 </div>
               </div>
               <Button
-                onClick={handleContinue}
-                className="mt-6 w-full bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white"
-              >
-                Continue to Firm Details
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </CardContent>
-          </Card>
-        );
-      case 'firm':
-        return (
-          <Card className="w-full bg-black/40 border-white/10">
-            <CardContent className="p-6">
-              <FirmCriteriaSection
-                formData={formData}
-                formErrors={formErrors}
-                onChange={handleFormDataChange}
-              />
-              <Button
-                onClick={handleContinue}
-                className="mt-6 w-full bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white"
-              >
-                Continue to Strategy Selection
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </CardContent>
-          </Card>
-        );
-      case 'strategy':
-        return (
-          <Card className="w-full bg-black/40 border-white/10">
-            <CardContent className="p-6">
-              <StrategiesSection
-                formData={formData}
-                formErrors={formErrors}
-                onChange={handleStrategyChange}
-              />
-              <Button
-                onClick={handleContinue}
-                className="mt-6 w-full bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white"
-              >
-                Continue to Payment Terms
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </CardContent>
-          </Card>
-        );
-      case 'terms':
-        return (
-          <Card className="w-full bg-black/40 border-white/10">
-            <CardContent className="p-6">
-              <PaymentTermsSection
-                formData={formData}
-                formErrors={formErrors}
-                onChange={handleFormDataChange}
-              />
-              <Button
-                onClick={handleContinue}
-                className="mt-6 w-full bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white"
-              >
-                Submit Investment Thesis
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </CardContent>
-          </Card>
-        );
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-black relative">
-      {!isConnected && <WalletConnectionOverlay requiredAmount={SUBMISSION_FEE} />}
-      <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-teal-500/5 to-yellow-500/5 animate-gradient" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-black to-black" />
-
-      <div className="container mx-auto px-4 relative z-10">
-        <Breadcrumb className="pt-8 mb-8">
-          <BreadcrumbList className="text-white/60">
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/" className="hover:text-white">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="text-white/40" />
-            <BreadcrumbItem>
-              <BreadcrumbPage className="text-white">Test Your Investment Thesis</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
-        <div className="max-w-4xl mx-auto mb-12 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-teal-500 mb-4">
-            Test Your Investment Thesis
-          </h1>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Share your acquisition strategy to validate market interest and find aligned co-investors before committing resources to fund formation.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-[300px,1fr] gap-8">
-          <div className="space-y-4">
-            {renderSteps()}
-          </div>
-          <div>
-            {renderCurrentStep()}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ThesisSubmission;
+                
