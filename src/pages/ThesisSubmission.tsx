@@ -802,10 +802,13 @@ const ThesisSubmission = () => {
   return (
     <div className="min-h-screen bg-black relative">
       {!isConnected && <WalletConnectionOverlay requiredAmount={SUBMISSION_FEE} />}
-      <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-teal-500/5 to-yellow-500/5 animate-gradient" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-black to-black" />
+      
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-teal-500/5 to-yellow-500/5 animate-gradient" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-black to-black" />
+      </div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 relative z-20">
         <Breadcrumb className="pt-8 mb-8">
           <BreadcrumbList className="text-white/60">
             <BreadcrumbItem>
@@ -837,14 +840,14 @@ const ThesisSubmission = () => {
 
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-3">
-            <div className="sticky top-32 space-y-4">
+            <div className="sticky top-32 space-y-4 relative z-20">
               {renderSteps()}
             </div>
           </div>
 
-          <div className="col-span-6 space-y-6">
+          <div className="col-span-6 space-y-6 relative z-30">
             <Card className={cn(
-              "bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden",
+              "bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden relative",
               formErrors && Object.keys(formErrors).length > 0 ? "border-red-500/20" : ""
             )}>
               <AnimatePresence mode="wait">
@@ -854,7 +857,7 @@ const ThesisSubmission = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.2 }}
-                  className="p-6"
+                  className="p-6 relative z-20"
                 >
                   {activeStep === 'thesis' && (
                     <div className="space-y-6">
@@ -959,7 +962,7 @@ const ThesisSubmission = () => {
                 </motion.div>
               </AnimatePresence>
 
-              <div className="border-t border-white/5 p-6">
+              <div className="border-t border-white/5 p-6 relative z-20">
                 <Button 
                   onClick={handleContinue}
                   disabled={isSubmitting}
@@ -989,7 +992,7 @@ const ThesisSubmission = () => {
           </div>
 
           <div className="col-span-3">
-            <div className="sticky top-32 space-y-4">
+            <div className="sticky top-32 space-y-4 relative z-20">
               <ContractApprovalStatus
                 onApprovalComplete={handleApprovalComplete}
                 requiredAmount={SUBMISSION_FEE}
