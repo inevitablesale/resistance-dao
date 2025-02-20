@@ -716,6 +716,83 @@ const ThesisSubmission = () => {
 
   const hasRequiredBalance = (tokenBalances?.find(token => token.symbol === "LGR")?.balance || 0) >= Number(ethers.utils.formatEther(SUBMISSION_FEE));
 
+  const renderStepContent = () => {
+    switch (activeStep) {
+      case 'thesis':
+        return (
+          <div className="space-y-6">
+            <div>
+              <Label className="text-lg font-medium text-white mb-2">Title</Label>
+              <Input
+                placeholder="Enter your investment thesis title"
+                value={formData.title}
+                onChange={(e) => handleFormDataChange('title', e.target.value)}
+                className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
+              />
+              {formErrors.title && (
+                <p className="mt-1 text-sm text-red-500">{formErrors.title[0]}</p>
+              )}
+            </div>
+
+            <TargetCapitalInput
+              value={formData.investment.targetCapital}
+              onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+              error={formErrors['investment.targetCapital']}
+            />
+
+            <VotingDurationInput
+              value={votingDuration}
+              onChange={handleVotingDurationChange}
+              error={formErrors.votingDuration}
+            />
+
+            <div>
+              <Label className="text-lg font-medium text-white mb-2">Investment Drivers</Label>
+              <textarea
+                placeholder="Describe the key drivers behind your investment thesis..."
+                value={formData.investment.drivers}
+                onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
+                className="w-full min-h-[120px] bg-black/50 border-white/10 rounded-md p-3 text-white placeholder:text-gray-500"
+              />
+              {formErrors['investment.drivers'] && (
+                <p className="mt-1 text-sm text-red-500">{formErrors['investment.drivers'][0]}</p>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'firm':
+        return (
+          <FirmCriteriaSection
+            formData={formData}
+            formErrors={formErrors}
+            onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
+          />
+        );
+
+      case 'strategy':
+        return (
+          <StrategiesSection
+            formData={formData}
+            formErrors={formErrors}
+            onChange={handleStrategyChange}
+          />
+        );
+
+      case 'terms':
+        return (
+          <PaymentTermsSection
+            formData={formData}
+            formErrors={formErrors}
+            onChange={(field, value) => handleFormDataChange(field, value)}
+          />
+        );
+
+      default:
+        return null;
+    }
+  };
+
   const renderContinueButton = (
     onClick: () => void,
     isLastSection: boolean = false
@@ -857,6 +934,78 @@ const ThesisSubmission = () => {
           </motion.div>
         </div>
       </div>
+
+      <div className="grid grid-cols-12 gap-8">
+        {/* Left Sidebar - Progress Steps */}
+        <div className="col-span-3">
+          <div className="sticky top-32 space-y-4">
+            {renderSteps()}
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="col-span-6 space-y-6">
+          <Card className={cn(
+            "bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden",
+            "group hover:border-white/10 transition-colors duration-300",
+            formErrors && Object.keys(formErrors).length > 0 ? "border-red-500/20" : ""
+          )}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeStep}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="p-6"
+              >
+                {renderStepContent()}
+              </motion.div>
+            </AnimatePresence>
+
+            <div className="border-t border-white/5 p-6">
+              <Button 
+                onClick={handleContinue}
+                disabled={isSubmitting}
+                className={cn(
+                  "w-full h-12",
+                  "bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600",
+                  "text-white font-medium",
+                  "transition-all duration-300",
+                  "disabled:opacity-50",
+                  "flex items-center justify-center gap-2"
+                )}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Processing...</span>
+                  </div>
+                ) : (
+                  <>
+                    <span>{getButtonText()}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </Button>
+            </div>
+          </Card>
+        </div>
+
+        {/* Right Sidebar - Wallet Status */}
+        <div className="col-span-3">
+          <div className="sticky top-32 space-y-4">
+            <ContractApprovalStatus
+              onApprovalComplete={handleApprovalComplete}
+              requiredAmount={SUBMISSION_FEE}
+              isTestMode={isTestMode}
+              currentFormData={formData}
+            />
+          </div>
+        </div>
+      </div>
+
+      <LGRFloatingWidget />
     </div>
   );
 };
