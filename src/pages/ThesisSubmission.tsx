@@ -74,15 +74,24 @@ const ThesisSubmission = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
 
-  // Add debug logging
-  console.log("Dynamic Auth Debug:", {
-    user,
-    metadata: user?.metadata,
-    verifications: user?.verifications,
-    customFields: user?.verifications?.customFields,
-    linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"]
-  });
+  const getLinkedInUrl = () => {
+    // Try getting from metadata first
+    const urlFromMetadata = user?.metadata?.["LinkedIn Profile URL"];
+    // Fallback to verifications if not in metadata
+    const urlFromVerifications = user?.verifications?.customFields?.["LinkedIn Profile URL"];
+    
+    const url = urlFromMetadata || urlFromVerifications;
+    
+    console.log("[LinkedIn] URL Resolution:", {
+      fromMetadata: urlFromMetadata,
+      fromVerifications: urlFromVerifications,
+      finalUrl: url
+    });
+    
+    return url || "";
+  };
 
+  // Initialize form with LinkedIn URL from metadata
   const form = useForm<ProposalMetadata>({
     resolver: zodResolver(thesisFormSchema),
     defaultValues: {
@@ -105,7 +114,7 @@ const ThesisSubmission = () => {
         integration: []
       },
       votingDuration: 7 * 24 * 60 * 60,
-      linkedInURL: user?.verifications?.customFields?.["LinkedIn Profile URL"] || ""
+      linkedInURL: getLinkedInUrl()
     }
   });
 
@@ -136,12 +145,20 @@ const ThesisSubmission = () => {
       return;
     }
 
-    const linkedInUrl = user?.verifications?.customFields?.["LinkedIn Profile URL"];
-    console.log("User's LinkedIn URL:", linkedInUrl);
+    const linkedInUrl = getLinkedInUrl();
+    console.log("LinkedIn URL for submission:", linkedInUrl);
+
+    if (!linkedInUrl) {
+      toast({
+        title: "LinkedIn URL Required",
+        description: "Please ensure your LinkedIn profile is connected",
+        variant: "destructive"
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      // Convert target capital to wei before submission
       let targetCapitalWei;
       try {
         targetCapitalWei = convertUSDToLGRWei(data.investment.targetCapital);
@@ -158,7 +175,7 @@ const ThesisSubmission = () => {
 
       const metadataWithLinkedIn = {
         ...data,
-        linkedInURL: linkedInUrl || ""
+        linkedInURL: linkedInUrl
       };
       
       console.log("Uploading form data to IPFS:", metadataWithLinkedIn);
@@ -170,7 +187,7 @@ const ThesisSubmission = () => {
         votingDuration: data.votingDuration,
         ipfsHash,
         metadata: metadataWithLinkedIn,
-        linkedInURL: linkedInUrl || ""
+        linkedInURL: linkedInUrl
       };
 
       console.log("Creating proposal with config:", config);
