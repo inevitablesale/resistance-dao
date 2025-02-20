@@ -2,8 +2,10 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { Check, AlertTriangle, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { executeTransaction } from "@/services/transactionManager";
@@ -12,10 +14,9 @@ import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { transactionQueue } from "@/services/transactionQueueService";
 import { getContractStatus } from "@/services/proposalContractService";
-import { getTokenBalance } from "@/services/tokenService";
-import { getWorkingProvider } from "@/services/presaleContractService";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
+const TESTER_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
 interface ContractApprovalStatusProps {
   onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => void;
@@ -36,46 +37,25 @@ export const ContractApprovalStatus = ({
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
+  const [isTesterWallet, setIsTesterWallet] = useState(false);
   const [contractTestMode, setContractTestMode] = useState(false);
   const [isWalletReady, setIsWalletReady] = useState(false);
-  const [lgrBalance, setLgrBalance] = useState<string>("0");
-  const [isLoadingBalance, setIsLoadingBalance] = useState(true);
-  const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
   const approvalCompletedRef = useRef(false);
   const { toast } = useToast();
 
+  const { tokenBalances } = useTokenBalances({
+    networkId: 137,
+    accountAddress: address,
+    includeFiat: false,
+    includeNativeBalance: false,
+    tokenAddresses: [LGR_TOKEN_ADDRESS]
+  });
+
   const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
-  const hasRequiredBalance = contractTestMode || 
-    ethers.BigNumber.from(ethers.utils.parseUnits(lgrBalance || "0", 18)).gte(requiredAmountBN);
-
-  useEffect(() => {
-    const checkBalance = async () => {
-      if (!address || !isWalletReady) {
-        console.log("Wallet not ready for balance check");
-        return;
-      }
-
-      try {
-        setIsLoadingBalance(true);
-        console.log("Checking LGR balance for address:", address);
-        const provider = await getWorkingProvider();
-        const balance = await getTokenBalance(provider, LGR_TOKEN_ADDRESS, address);
-        console.log("LGR balance retrieved:", balance);
-        setLgrBalance(balance);
-      } catch (error) {
-        console.error("Error checking LGR balance:", error);
-        toast({
-          title: "Balance Check Failed",
-          description: "Unable to verify your LGR balance",
-          variant: "destructive"
-        });
-      } finally {
-        setIsLoadingBalance(false);
-      }
-    };
-
-    checkBalance();
-  }, [address, isWalletReady, toast]);
+  
+  const hasRequiredBalance = (isTesterWallet && contractTestMode) || tokenBalances?.find(token => 
+    token.symbol === "LGR" && ethers.BigNumber.from(token.balance || "0").gte(requiredAmountBN)
+  );
 
   useEffect(() => {
     const checkWalletStatus = async () => {
@@ -83,16 +63,6 @@ export const ContractApprovalStatus = ({
         try {
           const isConnected = await wallet.isConnected();
           setIsWalletReady(isConnected);
-          
-          if (isConnected) {
-            const contractStatus = await getContractStatus(wallet);
-            setTreasuryAddress(contractStatus.treasury);
-            setContractTestMode(contractStatus.isTestMode);
-            console.log("Contract status:", {
-              treasury: contractStatus.treasury,
-              isTestMode: contractStatus.isTestMode
-            });
-          }
         } catch (error) {
           console.error("Error checking wallet connection:", error);
           setIsWalletReady(false);
@@ -105,47 +75,60 @@ export const ContractApprovalStatus = ({
     checkWalletStatus();
   }, [wallet, isInitializing]);
 
+  useEffect(() => {
+    const checkTestMode = async () => {
+      if (!isWalletReady || !wallet || !address) {
+        console.log("Wallet not ready for test mode check");
+        return;
+      }
+
+      try {
+        console.log("Checking test mode status...");
+        const contractStatus = await getContractStatus(wallet);
+        const isTester = address.toLowerCase() === TESTER_ADDRESS.toLowerCase();
+        setIsTesterWallet(isTester);
+        setContractTestMode(contractStatus.isTestMode);
+        console.log("Test mode status:", {
+          isTesterWallet: isTester,
+          contractTestMode: contractStatus.isTestMode,
+          walletAddress: address,
+          testerAddress: TESTER_ADDRESS
+        });
+      } catch (error) {
+        console.error("Error checking test mode:", error);
+      }
+    };
+
+    checkTestMode();
+  }, [wallet, address, isWalletReady]);
+
   const handleApprove = async () => {
     if (isApproving || isApproved || !isWalletReady || approvalCompletedRef.current) return;
-    
-    if (!hasRequiredBalance && !contractTestMode) {
-      toast({
-        title: "Insufficient Balance",
-        description: `You need ${ethers.utils.formatEther(requiredAmountBN)} LGR tokens to proceed`,
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!treasuryAddress) {
-      toast({
-        title: "Approval Failed",
-        description: "Treasury address not available",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsApproving(true);
     try {
       console.log("Starting approval process...", {
         walletAddress: address,
+        testerAddress: TESTER_ADDRESS,
+        isTesterWallet,
         contractTestMode,
         isTestMode,
-        currentFormData,
-        lgrBalance,
-        treasuryAddress
+        currentFormData
       });
       
       if (wallet) {
         const contractStatus = await getContractStatus(wallet);
         console.log("Contract status:", {
           isTestMode: contractStatus.isTestMode,
-          treasury: contractStatus.treasury
+          testerAddress: contractStatus.tester,
+          connectedAddress: address,
+          isTesterWallet: address?.toLowerCase() === contractStatus.tester.toLowerCase()
         });
       }
       
-      if (contractTestMode) {
+      const effectiveTestMode = isTesterWallet && contractTestMode;
+      console.log("Effective test mode:", effectiveTestMode);
+      
+      if (effectiveTestMode) {
         console.log("Test mode active - bypassing LGR approval");
         const txId = await transactionQueue.addTransaction({
           type: 'token',
@@ -164,7 +147,7 @@ export const ContractApprovalStatus = ({
         if (!approvalCompletedRef.current) {
           approvalCompletedRef.current = true;
           setIsApproved(true);
-          onApprovalComplete(currentFormData, undefined, contractTestMode);
+          onApprovalComplete(currentFormData, undefined, effectiveTestMode);
         }
         return;
       }
@@ -186,7 +169,7 @@ export const ContractApprovalStatus = ({
       const transaction = await executeTransaction(
         async () => {
           console.log("Executing LGR approval transaction...");
-          return approveLGR(requiredAmount.toString(), contractTestMode);
+          return approveLGR(requiredAmount.toString(), effectiveTestMode);
         },
         {
           type: 'token',
@@ -196,9 +179,9 @@ export const ContractApprovalStatus = ({
           backoffMs: 5000,
           tokenConfig: {
             tokenAddress: LGR_TOKEN_ADDRESS,
+            spenderAddress: address!,
             amount: requiredAmount.toString(),
-            isTestMode: contractTestMode,
-            treasuryAddress // Add the treasury address here
+            isTestMode: effectiveTestMode
           },
           walletType
         },
@@ -209,7 +192,7 @@ export const ContractApprovalStatus = ({
       if (!approvalCompletedRef.current) {
         approvalCompletedRef.current = true;
         setIsApproved(true);
-        onApprovalComplete(currentFormData, transaction, contractTestMode);
+        onApprovalComplete(currentFormData, transaction, effectiveTestMode);
       }
     } catch (error) {
       console.error("Approval error:", error);
@@ -229,7 +212,7 @@ export const ContractApprovalStatus = ({
     if (!approvalCompletedRef.current) {
       approvalCompletedRef.current = true;
       setIsApproved(true);
-      onApprovalComplete(currentFormData, undefined, contractTestMode);
+      onApprovalComplete(currentFormData, undefined, isTesterWallet && contractTestMode);
     }
   };
 
@@ -277,23 +260,11 @@ export const ContractApprovalStatus = ({
             <div className="space-y-1">
               <h3 className="text-lg font-medium">Contract Approval</h3>
               <p className="text-sm text-gray-400">
-                {contractTestMode 
+                {isTesterWallet && contractTestMode 
                   ? "Test Mode: Approval will be simulated"
                   : "Approve LGR tokens for contract interaction"
                 }
               </p>
-              {!contractTestMode && (
-                <p className="text-sm text-gray-400">
-                  {isLoadingBalance ? (
-                    <span className="flex items-center gap-2">
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                      Loading balance...
-                    </span>
-                  ) : (
-                    <>Balance: {parseFloat(lgrBalance).toFixed(2)} LGR</>
-                  )}
-                </p>
-              )}
             </div>
             {isApproved ? (
               <Check className="w-5 h-5 text-green-500" />
@@ -304,7 +275,7 @@ export const ContractApprovalStatus = ({
 
           <Button
             onClick={handleApprove}
-            disabled={isApproving || isApproved || !isWalletReady || (!hasRequiredBalance && !contractTestMode)}
+            disabled={isApproving || isApproved || !isWalletReady}
             className="w-full"
           >
             {isApproving ? (
@@ -314,8 +285,6 @@ export const ContractApprovalStatus = ({
               </div>
             ) : isApproved ? (
               "Approved"
-            ) : !hasRequiredBalance && !contractTestMode ? (
-              `Insufficient Balance (Need ${ethers.utils.formatEther(requiredAmountBN)} LGR)`
             ) : (
               "Approve Contract"
             )}

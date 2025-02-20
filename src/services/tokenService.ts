@@ -1,36 +1,22 @@
 
 import { ethers } from "ethers";
-import { ProposalError } from "./errorHandlingService";
+
+const ERC20_ABI = [
+  "function allowance(address owner, address spender) view returns (uint256)",
+  "function balanceOf(address owner) view returns (uint256)"
+];
 
 export const checkTokenAllowance = async (
-  provider: ethers.providers.Web3Provider,
+  provider: ethers.providers.Provider,
   tokenAddress: string,
   ownerAddress: string,
   spenderAddress: string,
   requiredAmount: string
 ): Promise<boolean> => {
   try {
-    if (!ethers.utils.isAddress(spenderAddress)) {
-      throw new ProposalError({
-        category: 'token',
-        message: 'Invalid spender address',
-        recoverySteps: ['Contact support']
-      });
-    }
-
-    console.log('Checking token allowance:', {
-      token: tokenAddress,
-      owner: ownerAddress,
-      spender: spenderAddress,
-      required: ethers.utils.formatEther(requiredAmount)
-    });
-
     const tokenContract = new ethers.Contract(
       tokenAddress,
-      [
-        "function allowance(address owner, address spender) view returns (uint256)",
-        "function balanceOf(address account) view returns (uint256)"
-      ],
+      ERC20_ABI,
       provider
     );
 
@@ -39,63 +25,53 @@ export const checkTokenAllowance = async (
       tokenContract.balanceOf(ownerAddress)
     ]);
 
-    console.log('Token check results:', {
-      currentAllowance: ethers.utils.formatEther(allowance),
-      currentBalance: ethers.utils.formatEther(balance),
-      requiredAmount: ethers.utils.formatEther(requiredAmount)
-    });
-
-    if (balance.lt(requiredAmount)) {
-      throw new ProposalError({
-        category: 'token',
-        message: `Insufficient balance. Required: ${ethers.utils.formatEther(requiredAmount)} LGR, Current: ${ethers.utils.formatEther(balance)} LGR`,
-        recoverySteps: ['Get more LGR tokens']
-      });
-    }
-
-    if (allowance.lt(requiredAmount)) {
-      console.log('Insufficient allowance:', {
-        current: ethers.utils.formatEther(allowance),
-        required: ethers.utils.formatEther(requiredAmount),
-        spender: spenderAddress
-      });
-      return false;
-    }
-
-    return true;
+    const requiredAmountBN = ethers.utils.parseUnits(requiredAmount, 18);
+    
+    // Check both allowance and balance
+    return allowance.gte(requiredAmountBN) && balance.gte(requiredAmountBN);
   } catch (error) {
-    console.error('Token allowance check error:', error);
-    if (error instanceof ProposalError) {
-      throw error;
-    }
-    throw new ProposalError({
-      category: 'token',
-      message: 'Failed to check token allowance',
-      recoverySteps: ['Try again', 'Check your wallet connection']
-    });
+    console.error('Error checking token allowance:', error);
+    return false;
+  }
+};
+
+export const getTokenAllowance = async (
+  provider: ethers.providers.Provider,
+  tokenAddress: string,
+  ownerAddress: string,
+  spenderAddress: string
+): Promise<string> => {
+  try {
+    const tokenContract = new ethers.Contract(
+      tokenAddress,
+      ERC20_ABI,
+      provider
+    );
+
+    const allowance = await tokenContract.allowance(ownerAddress, spenderAddress);
+    return ethers.utils.formatUnits(allowance, 18);
+  } catch (error) {
+    console.error('Error getting token allowance:', error);
+    return '0';
   }
 };
 
 export const getTokenBalance = async (
   provider: ethers.providers.Provider,
   tokenAddress: string,
-  accountAddress: string
+  ownerAddress: string
 ): Promise<string> => {
   try {
     const tokenContract = new ethers.Contract(
       tokenAddress,
-      ["function balanceOf(address account) view returns (uint256)"],
+      ERC20_ABI,
       provider
     );
 
-    const balance = await tokenContract.balanceOf(accountAddress);
-    return ethers.utils.formatEther(balance);
+    const balance = await tokenContract.balanceOf(ownerAddress);
+    return ethers.utils.formatUnits(balance, 18);
   } catch (error) {
-    console.error('Get token balance error:', error);
-    throw new ProposalError({
-      category: 'token',
-      message: 'Failed to fetch token balance',
-      recoverySteps: ['Try again', 'Check your wallet connection']
-    });
+    console.error('Error getting token balance:', error);
+    return '0';
   }
 };
