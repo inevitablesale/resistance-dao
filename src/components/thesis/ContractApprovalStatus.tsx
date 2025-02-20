@@ -224,9 +224,10 @@ export const ContractApprovalStatus = ({
           backoffMs: 5000,
           tokenConfig: {
             tokenAddress: LGR_TOKEN_ADDRESS,
-            spenderAddress: treasuryAddress, // Now using treasury address as spender
+            spenderAddress: treasuryAddress,
             amount: requiredAmount.toString(),
-            isTestMode: false
+            isTestMode: false,
+            isApproval: true // Add this flag to indicate it's an approval transaction
           },
           walletType
         },
@@ -367,4 +368,3 @@ export const ContractApprovalStatus = ({
     </Card>
   );
 };
-

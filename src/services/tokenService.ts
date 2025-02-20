@@ -20,15 +20,10 @@ export const checkTokenAllowance = async (
       provider
     );
 
-    const [allowance, balance] = await Promise.all([
-      tokenContract.allowance(ownerAddress, spenderAddress),
-      tokenContract.balanceOf(ownerAddress)
-    ]);
-
+    const allowance = await tokenContract.allowance(ownerAddress, spenderAddress);
     const requiredAmountBN = ethers.utils.parseUnits(requiredAmount, 18);
     
-    // Check both allowance and balance
-    return allowance.gte(requiredAmountBN) && balance.gte(requiredAmountBN);
+    return allowance.gte(requiredAmountBN);
   } catch (error) {
     console.error('Error checking token allowance:', error);
     return false;
@@ -75,3 +70,4 @@ export const getTokenBalance = async (
     return '0';
   }
 };
+

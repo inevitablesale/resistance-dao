@@ -18,6 +18,7 @@ export interface TransactionConfig {
     spenderAddress: string;
     amount: string;
     isTestMode?: boolean;
+    isApproval?: boolean;
   };
   nftConfig?: {
     tokenAddress: string;
@@ -68,8 +69,8 @@ export const executeTransaction = async (
     });
   }
 
-  // Check allowance if it's a token transaction AND NOT in test mode
-  if (config.type === 'token' && config.tokenConfig && provider && !config.tokenConfig.isTestMode) {
+  // Skip allowance check for approval transactions
+  if (config.type === 'token' && config.tokenConfig && provider && !config.tokenConfig.isTestMode && !config.tokenConfig.isApproval) {
     console.log('Checking token allowance...');
     const signerAddress = await provider.getSigner().getAddress();
     
@@ -166,3 +167,4 @@ export const executeTransaction = async (
 
   return result.transaction;
 };
+
