@@ -511,6 +511,7 @@ const ThesisSubmission = () => {
 
   const handleSubmit = async (e: React.FormEvent, isTestMode: boolean = false) => {
     e.preventDefault();
+    
     if (!isConnected) {
       toast({
         title: "Connect Wallet",
@@ -525,9 +526,7 @@ const ThesisSubmission = () => {
       setIsSubmitting(true);
       setFormErrors({});
 
-      const effectiveFormData = isTestMode ? TEST_FORM_DATA : formData;
-      await handleApprovalComplete(effectiveFormData, undefined, isTestMode);
-
+      await handleApprovalComplete(formData, undefined, isTestMode);
     } catch (error) {
       console.error("Submission error:", error);
       updateStepStatus(activeStep, 'failed');
@@ -550,51 +549,29 @@ const ThesisSubmission = () => {
         throw new Error("Please add a valid LinkedIn URL in your wallet settings");
       }
 
+      if (!wallet) {
+        throw new Error("No wallet connected");
+      }
+
       updateStepStatus('thesis', 'completed');
       updateStepStatus('firm', 'completed');
       updateStepStatus('strategy', 'completed');
       updateStepStatus('terms', 'completed');
       setActiveStep('submission');
 
-      if (!wallet) {
-        throw new Error("No wallet connected");
-      }
-
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
-      console.log('Retrieved LinkedIn URL:', linkedInURL);
+      console.log('Using LinkedIn URL:', linkedInURL);
 
-      // Create complete proposal metadata
       const completeMetadata: ProposalMetadata = {
-        title: isTestMode ? TEST_FORM_DATA.title : formData.title,
-        firmCriteria: {
-          size: isTestMode ? TEST_FORM_DATA.firmCriteria.size : formData.firmCriteria.size,
-          location: isTestMode ? TEST_FORM_DATA.firmCriteria.location : formData.firmCriteria.location,
-          dealType: isTestMode ? TEST_FORM_DATA.firmCriteria.dealType : formData.firmCriteria.dealType,
-          geographicFocus: isTestMode ? TEST_FORM_DATA.firmCriteria.geographicFocus : formData.firmCriteria.geographicFocus
-        },
-        paymentTerms: isTestMode ? TEST_FORM_DATA.paymentTerms : formData.paymentTerms,
-        strategies: {
-          operational: isTestMode ? TEST_FORM_DATA.strategies.operational : formData.strategies.operational,
-          growth: isTestMode ? TEST_FORM_DATA.strategies.growth : formData.strategies.growth,
-          integration: isTestMode ? TEST_FORM_DATA.strategies.integration : formData.strategies.integration
-        },
-        investment: {
-          targetCapital: isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData.investment.targetCapital,
-          drivers: isTestMode ? TEST_FORM_DATA.investment.drivers : formData.investment.drivers,
-          additionalCriteria: isTestMode ? TEST_FORM_DATA.investment.additionalCriteria : formData.investment.additionalCriteria
-        },
-        votingDuration,
+        ...formData,
         linkedInURL,
-        isTestMode,
+        isTestMode: Boolean(isTestMode),
         submissionTimestamp: Date.now(),
         submitter: address
       };
 
-      console.log('Uploading metadata to IPFS...', { 
-        isTestMode,
-        metadata: completeMetadata 
-      });
-      
+      console.log('Complete metadata prepared:', completeMetadata);
+
       const ipfsUri = await uploadMetadataToPinata(completeMetadata);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
       
@@ -602,15 +579,19 @@ const ThesisSubmission = () => {
         throw new Error("Invalid IPFS hash format");
       }
 
-      console.log('Estimating gas for proposal creation...', { 
-        isTestMode,
-        ipfsHash,
-        targetCapital: completeMetadata.investment.targetCapital
-      });
-
-      const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : completeMetadata.investment.targetCapital
-      );
+      let targetCapitalWei: ethers.BigNumber;
+      try {
+        const rawValue = completeMetadata.investment.targetCapital;
+        if (!rawValue || isNaN(parseFloat(rawValue))) {
+          targetCapitalWei = ethers.BigNumber.from(0);
+        } else {
+          const wholeLGRAmount = Math.floor(parseFloat(rawValue)).toString();
+          targetCapitalWei = ethers.utils.parseUnits(wholeLGRAmount, 18);
+        }
+      } catch (error) {
+        console.error('Error converting target capital:', error);
+        targetCapitalWei = ethers.BigNumber.from(0);
+      }
 
       const proposalConfig: ProposalConfig = {
         targetCapital: targetCapitalWei,
@@ -620,18 +601,23 @@ const ThesisSubmission = () => {
         linkedInURL
       };
 
-      const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
-      console.log('Creating proposal...', proposalConfig);
+      console.log('Creating proposal with config:', {
+        ...proposalConfig,
+        targetCapital: targetCapitalWei.toString()
+      });
+
       const result = await createProposal(proposalConfig, wallet);
+      console.log('Proposal created:', result);
 
       const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
       const newProposal: StoredProposal = {
         hash: result.hash,
         ipfsHash,
         timestamp: new Date().toISOString(),
-        title: isTestMode ? TEST_FORM_DATA.title : completeMetadata.title,
+        title: completeMetadata.title,
         targetCapital: targetCapitalWei.toString(),
-        status: 'pending'
+        status: 'pending',
+        isTestMode: completeMetadata.isTestMode
       };
       userProposals.push(newProposal);
       localStorage.setItem('userProposals', JSON.stringify(userProposals));
