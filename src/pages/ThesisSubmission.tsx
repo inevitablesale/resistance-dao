@@ -249,8 +249,20 @@ const ThesisSubmission = () => {
             </p>
           </div>
 
+          {/* Move ContractApprovalStatus to the top, before the form */}
+          <Card className="bg-black/40 border-white/10 p-6 mb-8">
+            <h2 className="text-lg font-medium text-white mb-4">Step 1: Approve Contract</h2>
+            <ContractApprovalStatus
+              onApprovalComplete={handleApprovalComplete}
+              requiredAmount={SUBMISSION_FEE}
+              isTestMode={false}
+              currentFormData={form.getValues()}
+            />
+          </Card>
+
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <Card className="bg-black/40 border-white/10 p-6">
+              <h2 className="text-lg font-medium text-white mb-4">Step 2: Investment Details</h2>
               <div className="space-y-4">
                 <div>
                   <label className="text-lg font-medium text-white">Title</label>
@@ -291,6 +303,7 @@ const ThesisSubmission = () => {
             </Card>
 
             <Card className="bg-black/40 border-white/10 p-6">
+              <h2 className="text-lg font-medium text-white mb-4">Step 3: Investment Parameters</h2>
               <div className="space-y-6">
                 <TargetCapitalInput
                   value={form.watch("investment.targetCapital")}
@@ -328,13 +341,6 @@ const ThesisSubmission = () => {
               onChange={(category, value) => {
                 form.setValue(`strategies.${category}` as const, value, { shouldValidate: true });
               }}
-            />
-
-            <ContractApprovalStatus
-              onApprovalComplete={handleApprovalComplete}
-              requiredAmount={SUBMISSION_FEE}
-              isTestMode={false}
-              currentFormData={form.getValues()}
             />
 
             <Button 
