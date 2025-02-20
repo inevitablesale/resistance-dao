@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTe
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
-import { ProposalMetadata } from "@/types/proposals";
+import { ProposalMetadata, FirmSize, DealType, GeographicFocus } from "@/types/proposals";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -25,6 +25,33 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+// Define the form schema using Zod
+const thesisFormSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  investment: z.object({
+    targetCapital: z.string().min(1, "Target capital is required"),
+    drivers: z.string(),
+    additionalCriteria: z.string()
+  }),
+  firmCriteria: z.object({
+    size: z.number(),
+    location: z.string(),
+    dealType: z.number(),
+    geographicFocus: z.number()
+  }),
+  paymentTerms: z.array(z.number()),
+  strategies: z.object({
+    operational: z.array(z.number()),
+    growth: z.array(z.number()),
+    integration: z.array(z.number())
+  }),
+  votingDuration: z.number(),
+  linkedInURL: z.string().url("Please enter a valid LinkedIn URL").or(z.string().length(0))
+});
 
 const ThesisSubmission = () => {
   const navigate = useNavigate();
@@ -32,65 +59,34 @@ const ThesisSubmission = () => {
   const { isConnected, address } = useWalletConnection();
   const { user } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
-  const [votingDuration, setVotingDuration] = useState(0);
-  const [formData, setFormData] = useState<ProposalMetadata>({
-    title: "",
-    investment: {
-      targetCapital: "",
-      drivers: "",
-      additionalCriteria: ""
-    },
-    firmCriteria: {
-      size: 0,
-      location: "",
-      dealType: 0,
-      geographicFocus: 0
-    },
-    paymentTerms: [],
-    strategies: {
-      operational: [],
-      growth: [],
-      integration: []
-    },
-    votingDuration: 0,
-    linkedInURL: ""
+
+  const form = useForm<ProposalMetadata>({
+    resolver: zodResolver(thesisFormSchema),
+    defaultValues: {
+      title: "",
+      investment: {
+        targetCapital: "",
+        drivers: "",
+        additionalCriteria: ""
+      },
+      firmCriteria: {
+        size: FirmSize.BELOW_1M,
+        location: "",
+        dealType: DealType.ACQUISITION,
+        geographicFocus: GeographicFocus.LOCAL
+      },
+      paymentTerms: [],
+      strategies: {
+        operational: [],
+        growth: [],
+        integration: []
+      },
+      votingDuration: 0,
+      linkedInURL: ""
+    }
   });
 
-  const handleFormDataChange = (field: string, value: any) => {
-    setFormData(prev => {
-      const newData = { ...prev };
-      const fields = field.split('.');
-      let current: any = newData;
-      
-      for (let i = 0; i < fields.length - 1; i++) {
-        if (!current[fields[i]]) {
-          current[fields[i]] = {};
-        }
-        current = current[fields[i]];
-      }
-      
-      current[fields[fields.length - 1]] = value;
-      return newData;
-    });
-  };
-
-  const handleStrategyChange = (category: string, values: any[]) => {
-    setFormData(prev => ({
-      ...prev,
-      strategies: {
-        ...prev.strategies,
-        [category]: values
-      }
-    }));
-  };
-
-  const handleVotingDurationChange = (value: number[]) => {
-    setVotingDuration(value[0]);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: ProposalMetadata) => {
     if (!isConnected) {
       toast({
         title: "Connect Wallet",
@@ -101,8 +97,24 @@ const ThesisSubmission = () => {
     }
 
     setIsSubmitting(true);
-    // Add your submission logic here
-    setIsSubmitting(false);
+    try {
+      console.log("Form data:", data);
+      // Add your submission logic here
+      toast({
+        title: "Success",
+        description: "Your thesis has been submitted successfully",
+      });
+      navigate("/proposals");
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to submit thesis. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -143,42 +155,42 @@ const ThesisSubmission = () => {
             </p>
           </div>
 
-          <div className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <ContractApprovalStatus
               onApprovalComplete={() => {}}
               requiredAmount={0}
               isTestMode={false}
-              currentFormData={formData}
+              currentFormData={form.getValues()}
             />
 
             <Card className={cn(
               "bg-black/40 border-white/5 backdrop-blur-sm",
-              formErrors && Object.keys(formErrors).length > 0 ? "border-red-500/20" : ""
+              Object.keys(form.formState.errors).length > 0 ? "border-red-500/20" : ""
             )}>
               <div className="p-6 space-y-8">
                 <PaymentTermsSection
-                  formData={formData}
-                  formErrors={formErrors}
-                  onChange={(field, value) => handleFormDataChange('paymentTerms', value)}
+                  formData={form.getValues()}
+                  formErrors={form.formState.errors}
+                  onChange={(field, value) => form.setValue('paymentTerms', value, { shouldValidate: true })}
                 />
 
                 <FirmCriteriaSection
-                  formData={formData}
-                  formErrors={formErrors}
-                  onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
+                  formData={form.getValues()}
+                  formErrors={form.formState.errors}
+                  onChange={(field, value) => form.setValue(`firmCriteria.${field}`, value, { shouldValidate: true })}
                 />
 
                 <StrategiesSection
-                  formData={formData}
-                  formErrors={formErrors}
-                  onChange={(category, value) => handleStrategyChange(category, value)}
+                  formData={form.getValues()}
+                  formErrors={form.formState.errors}
+                  onChange={(category, value) => form.setValue(`strategies.${category}`, value, { shouldValidate: true })}
                 />
               </div>
 
               <div className="border-t border-white/5 p-6">
                 <Button 
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
+                  type="submit"
+                  disabled={isSubmitting || !form.formState.isValid}
                   className={cn(
                     "w-full h-12",
                     "bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600",
@@ -202,7 +214,7 @@ const ThesisSubmission = () => {
                 </Button>
               </div>
             </Card>
-          </div>
+          </form>
         </div>
       </div>
 
