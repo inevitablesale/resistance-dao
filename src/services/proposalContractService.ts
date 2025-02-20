@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -94,24 +93,19 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
 
 function sanitizeString(str: string): string {
   return str
-    .replace(/[^\w\s.,'-]/g, '') // Only allow alphanumeric, spaces, periods, commas, apostrophes, and hyphens
-    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-    .trim(); // Remove leading/trailing whitespace
+    .replace(/[^\w\s.,'-]/g, '') 
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function processText(text: string): string {
   if (!text || typeof text !== 'string') {
-    return ''; // Return empty string for null/undefined/non-string values
+    return '';
   }
-  const sanitized = sanitizeString(text);
-  // Convert to bytes to ensure proper UTF-8 handling
-  const textBytes = ethers.utils.toUtf8Bytes(sanitized);
-  // Convert back to string to ensure proper encoding
-  return ethers.utils.toUtf8String(textBytes);
+  return sanitizeString(text);
 }
 
 function validateTextLength(text: string, field: string, min?: number, max?: number): void {
-  // Get byte length for proper UTF-8 handling
   const bytes = ethers.utils.toUtf8Bytes(text);
   const length = bytes.length;
   
@@ -123,28 +117,42 @@ function validateTextLength(text: string, field: string, min?: number, max?: num
   }
 }
 
+function encodeProposalInput(input: ProposalContractInput): any {
+  return {
+    ...input,
+    title: ethers.utils.toUtf8Bytes(input.title),
+    investmentDrivers: ethers.utils.toUtf8Bytes(input.investmentDrivers),
+    additionalCriteria: ethers.utils.toUtf8Bytes(input.additionalCriteria || ''),
+    location: ethers.utils.toUtf8Bytes(input.location),
+    firmSize: input.firmSize,
+    dealType: input.dealType,
+    geographicFocus: input.geographicFocus,
+    paymentTerms: input.paymentTerms,
+    operationalStrategies: input.operationalStrategies,
+    growthStrategies: input.growthStrategies,
+    integrationStrategies: input.integrationStrategies,
+    targetCapital: input.targetCapital,
+    votingDuration: input.votingDuration,
+    ipfsMetadata: input.ipfsMetadata
+  };
+}
+
 function validateProposalInput(input: ProposalContractInput) {
   try {
-    // Title validation (10-100 bytes)
     validateTextLength(input.title, "Title", 10, 100);
-
-    // IPFS hash validation
+    
     if (!input.ipfsMetadata || input.ipfsMetadata.length === 0) {
       throw new Error("IPFS metadata hash is required");
     }
 
-    // Investment drivers validation (50-500 bytes)
     validateTextLength(input.investmentDrivers, "Investment drivers", 50, 500);
-
-    // Additional criteria validation (max 500 bytes)
+    
     if (input.additionalCriteria) {
       validateTextLength(input.additionalCriteria, "Additional criteria", undefined, 500);
     }
 
-    // Location validation (max 100 bytes)
     validateTextLength(input.location, "Location", 1, 100);
 
-    // Array validations with detailed error messages
     if (!input.paymentTerms.length) {
       throw new Error("At least one payment term is required");
     }
@@ -167,7 +175,6 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
   console.log("Transforming config to contract input:", config);
   
   try {
-    // Process and encode text fields
     const title = processText(config.metadata.title);
     const investmentDrivers = processText(config.metadata.investment.drivers);
     const additionalCriteria = config.metadata.investment.additionalCriteria 
@@ -175,7 +182,6 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
       : "";
     const location = processText(config.metadata.firmCriteria.location);
     
-    // Ensure arrays are valid
     const paymentTerms = Array.isArray(config.metadata.paymentTerms) ? config.metadata.paymentTerms : [];
     const operationalStrategies = Array.isArray(config.metadata.strategies.operational) ? config.metadata.strategies.operational : [];
     const growthStrategies = Array.isArray(config.metadata.strategies.growth) ? config.metadata.strategies.growth : [];
@@ -198,17 +204,11 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
       integrationStrategies
     };
 
-    // Log the byte lengths for debugging
     console.log("String lengths in bytes:", {
       title: ethers.utils.toUtf8Bytes(title).length,
       investmentDrivers: ethers.utils.toUtf8Bytes(investmentDrivers).length,
       additionalCriteria: ethers.utils.toUtf8Bytes(additionalCriteria).length,
       location: ethers.utils.toUtf8Bytes(location).length
-    });
-
-    console.log("Transformed contract input:", {
-      ...contractInput,
-      targetCapital: contractInput.targetCapital.toString()
     });
     
     return contractInput;
@@ -242,19 +242,12 @@ export const createProposal = async (
       targetCapital: contractInput.targetCapital.toString(),
     });
     
-    // Ensure the contract methods exist
     if (!factory.createProposal) {
       throw new Error("Contract method 'createProposal' not found");
     }
 
-    // Properly encode all strings for the contract call
-    const encodedInput = {
-      ...contractInput,
-      title: ethers.utils.toUtf8Bytes(contractInput.title),
-      investmentDrivers: ethers.utils.toUtf8Bytes(contractInput.investmentDrivers),
-      additionalCriteria: ethers.utils.toUtf8Bytes(contractInput.additionalCriteria),
-      location: ethers.utils.toUtf8Bytes(contractInput.location)
-    };
+    const encodedInput = encodeProposalInput(contractInput);
+    console.log("Encoded contract input:", encodedInput);
 
     return await executeTransaction(
       () => factory.createProposal(encodedInput, config.linkedInURL),
@@ -289,7 +282,6 @@ export const setTestMode = async (
   const signerAddress = await provider.getSigner().getAddress();
   const status = await getContractStatus(wallet);
   
-  // Check if signer is the tester address
   if (signerAddress.toLowerCase() !== status.tester.toLowerCase()) {
     throw new Error("Not authorized - must be the tester address");
   }
