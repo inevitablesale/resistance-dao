@@ -1,12 +1,11 @@
 
 import { useEffect } from "react";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FirmSize, DealType, GeographicFocus, ProposalMetadata } from "@/types/proposals";
 import { US_STATES } from "@/lib/constants/states";
 import { motion } from "framer-motion";
-import { Building2, Globe2, MapPin, Briefcase } from "lucide-react";
+import { Building2, Globe2, MapPin, Briefcase, Check } from "lucide-react";
 import { FieldErrors } from "react-hook-form";
 
 interface FirmCriteriaSectionProps {
@@ -34,24 +33,6 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       onChange('geographicFocus', GeographicFocus.LOCAL);
     }
   }, []);
-
-  const handleSizeChange = (value: FirmSize, checked: boolean) => {
-    if (checked) {
-      onChange('size', value);
-    }
-  };
-
-  const handleGeoFocusChange = (value: GeographicFocus, checked: boolean) => {
-    if (checked) {
-      onChange('geographicFocus', value);
-    }
-  };
-
-  const handleDealTypeChange = (value: DealType, checked: boolean) => {
-    if (checked) {
-      onChange('dealType', value);
-    }
-  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -102,31 +83,38 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             { value: FirmSize.FIVE_TO_TEN_M, label: "$5M–$10M", color: "yellow" },
             { value: FirmSize.TEN_PLUS, label: "$10M+", color: "yellow" }
           ].map((option) => (
-            <div
+            <button
               key={option.value}
-              className={`
-                relative group cursor-pointer rounded-lg border
-                ${formData.firmCriteria.size === option.value 
-                  ? `bg-${option.color}-500/10 border-${option.color}-500/50` 
-                  : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'}
-                transition-all duration-200 p-4
-              `}
+              type="button"
+              className="relative group w-full text-left"
+              onClick={() => onChange('size', option.value)}
             >
-              <div className="flex items-center gap-3">
-                <div className={`h-8 w-8 rounded-lg bg-${option.color}-500/20 flex items-center justify-center`}>
-                  <Building2 className={`h-4 w-4 text-${option.color}-500`} />
+              <div
+                className={`
+                  relative group rounded-lg border transition-all duration-200 p-4
+                  ${formData.firmCriteria.size === option.value 
+                    ? `bg-${option.color}-500/10 border-${option.color}-500/50` 
+                    : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'}
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`h-8 w-8 rounded-lg bg-${option.color}-500/20 flex items-center justify-center`}>
+                    <Building2 className={`h-4 w-4 text-${option.color}-500`} />
+                  </div>
+                  <div className="flex-1">
+                    <Label className="text-white font-medium">{option.label}</Label>
+                  </div>
+                  <div className={`
+                    h-5 w-5 rounded border transition-all duration-200 flex items-center justify-center
+                    ${formData.firmCriteria.size === option.value 
+                      ? `bg-${option.color}-500 border-${option.color}-500` 
+                      : 'border-white/30 bg-white/5'}
+                  `}>
+                    {formData.firmCriteria.size === option.value && <Check className="h-3 w-3 text-white" />}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <Label className="text-white font-medium">{option.label}</Label>
-                </div>
-                <Checkbox
-                  id={`size-${option.value}`}
-                  checked={formData.firmCriteria.size === option.value}
-                  onCheckedChange={(checked) => handleSizeChange(option.value, checked as boolean)}
-                  className={`data-[state=checked]:bg-${option.color}-500 data-[state=checked]:border-${option.color}-500`}
-                />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </motion.div>
@@ -143,31 +131,38 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             { value: GeographicFocus.NATIONAL, label: "National", color: "teal" },
             { value: GeographicFocus.REMOTE, label: "Remote", color: "teal" }
           ].map((option) => (
-            <div
+            <button
               key={option.value}
-              className={`
-                relative group cursor-pointer rounded-lg border
-                ${formData.firmCriteria.geographicFocus === option.value 
-                  ? `bg-${option.color}-500/10 border-${option.color}-500/50` 
-                  : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'}
-                transition-all duration-200 p-4
-              `}
+              type="button"
+              className="relative group w-full text-left"
+              onClick={() => onChange('geographicFocus', option.value)}
             >
-              <div className="flex items-center gap-3">
-                <div className={`h-8 w-8 rounded-lg bg-${option.color}-500/20 flex items-center justify-center`}>
-                  <Globe2 className={`h-4 w-4 text-${option.color}-500`} />
+              <div
+                className={`
+                  relative group rounded-lg border transition-all duration-200 p-4
+                  ${formData.firmCriteria.geographicFocus === option.value 
+                    ? `bg-${option.color}-500/10 border-${option.color}-500/50` 
+                    : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'}
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`h-8 w-8 rounded-lg bg-${option.color}-500/20 flex items-center justify-center`}>
+                    <Globe2 className={`h-4 w-4 text-${option.color}-500`} />
+                  </div>
+                  <div className="flex-1">
+                    <Label className="text-white font-medium">{option.label}</Label>
+                  </div>
+                  <div className={`
+                    h-5 w-5 rounded border transition-all duration-200 flex items-center justify-center
+                    ${formData.firmCriteria.geographicFocus === option.value 
+                      ? `bg-${option.color}-500 border-${option.color}-500` 
+                      : 'border-white/30 bg-white/5'}
+                  `}>
+                    {formData.firmCriteria.geographicFocus === option.value && <Check className="h-3 w-3 text-white" />}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <Label className="text-white font-medium">{option.label}</Label>
-                </div>
-                <Checkbox
-                  id={`geo-${option.value}`}
-                  checked={formData.firmCriteria.geographicFocus === option.value}
-                  onCheckedChange={(checked) => handleGeoFocusChange(option.value, checked as boolean)}
-                  className={`data-[state=checked]:bg-${option.color}-500 data-[state=checked]:border-${option.color}-500`}
-                />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </motion.div>
@@ -211,31 +206,38 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             { value: DealType.FRANCHISE, label: "Franchise", color: "rose" },
             { value: DealType.SUCCESSION, label: "Succession", color: "rose" }
           ].map((option) => (
-            <div
+            <button
               key={option.value}
-              className={`
-                relative group cursor-pointer rounded-lg border
-                ${formData.firmCriteria.dealType === option.value 
-                  ? `bg-${option.color}-500/10 border-${option.color}-500/50` 
-                  : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'}
-                transition-all duration-200 p-4
-              `}
+              type="button"
+              className="relative group w-full text-left"
+              onClick={() => onChange('dealType', option.value)}
             >
-              <div className="flex items-center gap-3">
-                <div className={`h-8 w-8 rounded-lg bg-${option.color}-500/20 flex items-center justify-center`}>
-                  <Briefcase className={`h-4 w-4 text-${option.color}-500`} />
+              <div
+                className={`
+                  relative group rounded-lg border transition-all duration-200 p-4
+                  ${formData.firmCriteria.dealType === option.value 
+                    ? `bg-${option.color}-500/10 border-${option.color}-500/50` 
+                    : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'}
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`h-8 w-8 rounded-lg bg-${option.color}-500/20 flex items-center justify-center`}>
+                    <Briefcase className={`h-4 w-4 text-${option.color}-500`} />
+                  </div>
+                  <div className="flex-1">
+                    <Label className="text-white font-medium">{option.label}</Label>
+                  </div>
+                  <div className={`
+                    h-5 w-5 rounded border transition-all duration-200 flex items-center justify-center
+                    ${formData.firmCriteria.dealType === option.value 
+                      ? `bg-${option.color}-500 border-${option.color}-500` 
+                      : 'border-white/30 bg-white/5'}
+                  `}>
+                    {formData.firmCriteria.dealType === option.value && <Check className="h-3 w-3 text-white" />}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <Label className="text-white font-medium">{option.label}</Label>
-                </div>
-                <Checkbox
-                  id={`deal-${option.value}`}
-                  checked={formData.firmCriteria.dealType === option.value}
-                  onCheckedChange={(checked) => handleDealTypeChange(option.value, checked as boolean)}
-                  className={`data-[state=checked]:bg-${option.color}-500 data-[state=checked]:border-${option.color}-500`}
-                />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </motion.div>
