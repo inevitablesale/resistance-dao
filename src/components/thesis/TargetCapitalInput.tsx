@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -97,11 +98,9 @@ export const TargetCapitalInput = ({
           Target Capital (LGR)
           <HelpCircle className="h-4 w-4 text-gray-400" />
         </Label>
-        {value && (
-          <div className="text-sm bg-white/5 px-3 py-1.5 rounded-full text-teal-500 font-medium border border-teal-500/20 animate-fade-in">
-            ≈ ${calculateUSDAmount(value)} USD
-          </div>
-        )}
+        <div className="text-sm text-gray-400">
+          {value && `≈ $${calculateUSDAmount(value)} USD`}
+        </div>
       </div>
       <div className="relative">
         <Input
