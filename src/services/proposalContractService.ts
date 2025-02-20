@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
-import { ProposalMetadata, ProposalConfig, FirmSize, DealType, GeographicFocus, PaymentTerm, OperationalStrategy, GrowthStrategy, IntegrationStrategy } from "@/types/proposals";
+import { ProposalMetadata, ProposalConfig, ProposalInput, FirmSize, DealType, GeographicFocus, PaymentTerm, OperationalStrategy, GrowthStrategy, IntegrationStrategy } from "@/types/proposals";
 
 export interface ContractStatus {
   submissionFee: ethers.BigNumber;
@@ -171,17 +171,18 @@ export const createProposal = async (
       fits_uint128: config.targetCapital.lte(ethers.BigNumber.from(2).pow(128).sub(1))
     },
     votingDuration: config.votingDuration,
-    ipfsHash: config.ipfsHash
+    ipfsHash: config.ipfsHash,
+    linkedInURL: config.linkedInURL
   });
   
-  // Create contract input matching the struct exactly
-  const input = {
+  // Create contract input matching the struct exactly as defined in the smart contract
+  const input: ProposalInput = {
     title: config.metadata.title,
     ipfsMetadata: config.ipfsHash,
     targetCapital: config.targetCapital,
     votingDuration: config.votingDuration,
     investmentDrivers: config.metadata.investment.drivers,
-    additionalCriteria: config.metadata.investment.additionalCriteria,
+    additionalCriteria: config.metadata.investment.additionalCriteria || "",
     firmSize: config.metadata.firmCriteria.size,
     location: config.metadata.firmCriteria.location,
     dealType: config.metadata.firmCriteria.dealType,
