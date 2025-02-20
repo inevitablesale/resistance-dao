@@ -114,25 +114,6 @@ function validateTextLength(text: string, field: string, min?: number, max?: num
   }
 }
 
-function prepareContractInput(input: ProposalContractInput): any {
-  return {
-    title: input.title,
-    ipfsMetadata: input.ipfsMetadata,
-    targetCapital: input.targetCapital,
-    votingDuration: input.votingDuration,
-    investmentDrivers: input.investmentDrivers,
-    additionalCriteria: input.additionalCriteria || '',
-    firmSize: input.firmSize,
-    location: input.location,
-    dealType: input.dealType,
-    geographicFocus: input.geographicFocus,
-    paymentTerms: input.paymentTerms,
-    operationalStrategies: input.operationalStrategies,
-    growthStrategies: input.growthStrategies,
-    integrationStrategies: input.integrationStrategies
-  };
-}
-
 function validateProposalInput(input: ProposalContractInput) {
   try {
     validateTextLength(input.title, "Title", 10, 100);
@@ -162,7 +143,6 @@ function validateProposalInput(input: ProposalContractInput) {
       throw new Error("At least one integration strategy is required");
     }
 
-    // Validate array values are within uint8 range (0-255)
     const validateUint8Array = (arr: number[], fieldName: string) => {
       arr.forEach((value, index) => {
         if (value < 0 || value > 255) {
@@ -255,11 +235,8 @@ export const createProposal = async (
       throw new Error("Contract method 'createProposal' not found");
     }
 
-    const preparedInput = prepareContractInput(contractInput);
-    console.log("Prepared contract input:", preparedInput);
-
     return await executeTransaction(
-      () => factory.createProposal(preparedInput, config.linkedInURL),
+      () => factory.createProposal(contractInput, config.linkedInURL),
       {
         type: 'nft',
         description: `Creating proposal with target capital ${ethers.utils.formatEther(config.targetCapital)} LGR`,
