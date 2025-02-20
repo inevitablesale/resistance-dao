@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -37,7 +36,9 @@ import {
   OperationalStrategy,
   GrowthStrategy,
   IntegrationStrategy,
-  ProposalMetadata
+  ProposalMetadata,
+  ProposalConfig,
+  StoredProposal
 } from "@/types/proposals";
 import { WalletConnectionOverlay } from "@/components/thesis/WalletConnectionOverlay";
 import { Link } from "react-router-dom";
