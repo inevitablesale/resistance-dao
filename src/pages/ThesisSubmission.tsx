@@ -191,8 +191,10 @@ const ThesisSubmission = () => {
   });
 
   const resetForm = () => {
-    console.log("🔄 Resetting form - Current form data:", formData);
-    setFormData({
+    const currentFormData = { ...formData };
+    console.log("🔄 Resetting form - Current form data:", currentFormData);
+    
+    const emptyForm = {
       title: "",
       firmCriteria: {
         size: FirmSize.BELOW_1M,
@@ -214,8 +216,10 @@ const ThesisSubmission = () => {
       votingDuration: MIN_VOTING_DURATION,
       linkedInURL: "",
       isTestMode: false
-    });
-    console.log("✅ Form reset complete - Form cleared to empty state");
+    };
+    
+    setFormData(emptyForm);
+    console.log("✅ Form reset complete - Form cleared to empty state:", emptyForm);
   };
 
   useEffect(() => {
@@ -244,25 +248,18 @@ const ThesisSubmission = () => {
           message: status.isTestMode ? "CONTRACT IN TEST MODE" : "CONTRACT IN LIVE MODE"
         });
         
-        setContractTestMode(status.isTestMode);
-        
         const isTesterWallet = status.tester.toLowerCase() === address?.toLowerCase();
-        const shouldEnableTestMode = isTesterWallet && status.isTestMode;
-        
         console.log("🔍 Test Mode Check:", {
           isTesterWallet,
           contractTestMode: status.isTestMode,
           walletAddress: address,
           testerAddress: status.tester,
-          willAutoFill: status.isTestMode
+          willAutoFill: status.isTestMode && isTesterWallet
         });
 
-        setIsTestMode(shouldEnableTestMode);
-        
-        if (!status.isTestMode) {
-          console.log("⚠️ Contract in live mode - Auto-fill disabled");
-          console.log("🧹 Clearing form data...");
-          resetForm();
+        if (mounted) {
+          setContractTestMode(status.isTestMode);
+          setIsTestMode(isTesterWallet && status.isTestMode);
         }
       } catch (error) {
         console.error("❌ Error checking test mode:", error);
@@ -289,6 +286,10 @@ const ThesisSubmission = () => {
         submissionTimestamp: Date.now(),
         submitter: address
       });
+    } else {
+      console.log("⚠️ Contract in live mode - Auto-fill disabled");
+      console.log("🧹 Clearing form data...");
+      resetForm();
     }
   }, [contractTestMode, user, address]);
 
