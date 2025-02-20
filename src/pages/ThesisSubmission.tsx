@@ -491,6 +491,9 @@ const ThesisSubmission = () => {
 
     switch (activeStep) {
       case 'thesis':
+        handleStepChange('firm');
+        break;
+      case 'firm':
         handleStepChange('strategy');
         break;
       case 'strategy':
