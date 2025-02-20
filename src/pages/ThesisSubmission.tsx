@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -858,6 +859,13 @@ const ThesisSubmission = () => {
                   />
                 </div>
               </div>
+              <Button
+                onClick={handleContinue}
+                className="mt-6 w-full bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white"
+              >
+                Continue to Firm Details
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </CardContent>
           </Card>
         );
@@ -870,6 +878,13 @@ const ThesisSubmission = () => {
                 formErrors={formErrors}
                 onChange={handleFormDataChange}
               />
+              <Button
+                onClick={handleContinue}
+                className="mt-6 w-full bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white"
+              >
+                Continue to Strategy Selection
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </CardContent>
           </Card>
         );
@@ -882,6 +897,13 @@ const ThesisSubmission = () => {
                 formErrors={formErrors}
                 onChange={handleStrategyChange}
               />
+              <Button
+                onClick={handleContinue}
+                className="mt-6 w-full bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white"
+              >
+                Continue to Payment Terms
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </CardContent>
           </Card>
         );
@@ -894,6 +916,13 @@ const ThesisSubmission = () => {
                 formErrors={formErrors}
                 onChange={handleFormDataChange}
               />
+              <Button
+                onClick={handleContinue}
+                className="mt-6 w-full bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white"
+              >
+                Submit Investment Thesis
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </CardContent>
           </Card>
         );
