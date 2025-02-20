@@ -24,6 +24,7 @@ export const useWalletProvider = () => {
   const providerRef = useRef<WalletProvider | null>(null);
   const initializingRef = useRef<boolean>(false);
   const initTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasLoggedRef = useRef<boolean>(false);
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -34,12 +35,44 @@ export const useWalletProvider = () => {
   };
 
   const getLinkedInUrl = () => {
-    // We now know the URL is only in metadata
-    const linkedInUrl = user?.metadata?.["LinkedIn Profile URL"];
+    // Try getting from verifications first (post-verification state)
+    const urlFromVerifications = user?.verifications?.customFields?.["LinkedIn Profile URL"];
+    // Fallback to metadata (initial onboarding state)
+    const urlFromMetadata = user?.metadata?.["LinkedIn Profile URL"];
+    
     return {
-      url: linkedInUrl || null,
-      source: linkedInUrl ? 'metadata' : 'not_found'
+      url: urlFromVerifications || urlFromMetadata || null,
+      source: urlFromVerifications ? 'verifications' : 
+             urlFromMetadata ? 'metadata' : 
+             'not_found'
     };
+  };
+
+  const logUserDetails = () => {
+    // Only log if we haven't logged before and both wallet and user are available
+    if (!hasLoggedRef.current && primaryWallet?.isConnected?.() && user) {
+      const linkedInInfo = getLinkedInUrl();
+      console.log('[Provider] Current user object:', {
+        userExists: !!user,
+        walletAddress: primaryWallet?.address,
+        linkedInUrl: {
+          value: linkedInInfo.url,
+          source: linkedInInfo.source
+        },
+        metadata: {
+          exists: !!user?.metadata,
+          keys: user?.metadata ? Object.keys(user.metadata) : [],
+          linkedInUrl: user?.metadata?.["LinkedIn Profile URL"]
+        },
+        verifications: {
+          exists: !!user?.verifications,
+          customFieldsExist: !!user?.verifications?.customFields,
+          keys: user?.verifications?.customFields ? Object.keys(user.verifications.customFields) : [],
+          linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"]
+        }
+      });
+      hasLoggedRef.current = true;
+    }
   };
 
   const clearInitializationTimeout = () => {
@@ -227,13 +260,22 @@ export const useWalletProvider = () => {
     }
   }, [primaryWallet, toast, initializeProvider, validateWalletClient]);
 
+  // Reset provider cache when wallet changes
   useEffect(() => {
     providerRef.current = null;
+    hasLoggedRef.current = false; // Reset logging flag when wallet changes
     return () => {
       clearInitializationTimeout();
       providerRef.current = null;
     };
   }, [primaryWallet]);
+
+  // Log user details when both wallet and user are ready
+  useEffect(() => {
+    if (primaryWallet?.isConnected?.() && user) {
+      logUserDetails();
+    }
+  }, [user, primaryWallet]);
 
   return {
     getProvider,

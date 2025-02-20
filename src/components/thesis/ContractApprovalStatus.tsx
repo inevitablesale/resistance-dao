@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -57,25 +58,6 @@ export const ContractApprovalStatus = ({
         try {
           const isConnected = await wallet.isConnected();
           setIsWalletReady(isConnected);
-          
-          // Log LinkedIn URL details if connected
-          if (isConnected) {
-            console.log('[Wallet Status] LinkedIn URL Info:', {
-              userExists: !!wallet.user,
-              walletAddress: wallet.address,
-              linkedInUrl: wallet.user?.metadata?.["LinkedIn Profile URL"],
-              metadata: {
-                exists: !!wallet.user?.metadata,
-                keys: wallet.user?.metadata ? Object.keys(wallet.user.metadata) : [],
-                fullMetadata: wallet.user?.metadata || {}
-              },
-              fullUser: {
-                metadata: wallet.user?.metadata || {},
-                linkedInUrl: wallet.user?.metadata?.["LinkedIn Profile URL"],
-                userVerifications: wallet.user?.verifications
-              }
-            });
-          }
         } catch (error) {
           console.error("Error checking wallet connection:", error);
           setIsWalletReady(false);
