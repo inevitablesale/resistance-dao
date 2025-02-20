@@ -50,9 +50,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { NetworkContext } from "@/components/thesis/spatial/NetworkContext";
-import { FormSection3D } from "@/components/thesis/spatial/FormSection3D";
-import { TransactionFlow } from "@/components/thesis/spatial/TransactionFlow";
 
 const FACTORY_ADDRESS = "0xF3a201c101bfefDdB3C840a135E1573B1b8e7765";
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
@@ -82,20 +79,20 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
   status: 'pending',
   description: 'Fill out your investment thesis details'
 }, {
+  id: 'firm',
+  title: 'Firm Details',
+  status: 'pending',
+  description: 'Specify target firm criteria'
+}, {
   id: 'strategy',
   title: 'Strategy Selection',
   status: 'pending',
   description: 'Select your post-acquisition strategies'
 }, {
-  id: 'approval',
-  title: 'Token Approval',
+  id: 'terms',
+  title: 'Payment Terms',
   status: 'pending',
-  description: 'Approve LGR tokens for submission'
-}, {
-  id: 'submission',
-  title: 'Thesis Submission',
-  status: 'pending',
-  description: 'Submit your thesis to the blockchain'
+  description: 'Define payment terms and confirm'
 }];
 
 const TEST_FORM_DATA: ProposalMetadata = {
@@ -304,7 +301,7 @@ const ThesisSubmission = () => {
     switch (activeStep) {
       case 'thesis':
         return "Continue to Firm Details";
-      case 'strategy':
+      case 'firm':
         return "Continue to Terms";
       case 'terms':
         return "Submit Investment Thesis";
@@ -348,15 +345,16 @@ const ThesisSubmission = () => {
 
   const validateFirmTab = (): boolean => {
     const errors: Record<string, string[]> = {};
-    if (!formData.firmCriteria.size) {
-      errors['firmCriteria.size'] = ['Please select a firm size'];
+    
+    // Remove size check since it has a default value
+    // Remove dealType check since it has a default value
+    // Remove geographicFocus check since it has a default value
+    
+    // Only validate location if required (you mentioned it's optional)
+    if (formData.firmCriteria.location && !US_STATES.includes(formData.firmCriteria.location)) {
+      errors['firmCriteria.location'] = ['Please select a valid state'];
     }
-    if (!formData.firmCriteria.dealType) {
-      errors['firmCriteria.dealType'] = ['Please select a deal type'];
-    }
-    if (!formData.firmCriteria.geographicFocus) {
-      errors['firmCriteria.geographicFocus'] = ['Please select a geographic focus'];
-    }
+    
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -414,17 +412,23 @@ const ThesisSubmission = () => {
   };
 
   const handleStepChange = (newStep: string) => {
-    const currentValidator = getCurrentValidator();
-    if (currentValidator()) {
-      updateStepStatus(activeStep, 'completed');
-      setActiveStep(newStep);
-    } else {
-      toast({
-        title: "Validation Error",
-        description: "Please complete all required fields before proceeding",
-        variant: "destructive"
-      });
+    const currentStepIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
+    const newStepIndex = SUBMISSION_STEPS.findIndex(step => step.id === newStep);
+    
+    if (newStepIndex > currentStepIndex) {
+      const currentValidator = getCurrentValidator();
+      if (!currentValidator()) {
+        toast({
+          title: "Validation Error",
+          description: "Please complete all required fields before proceeding",
+          variant: "destructive"
+        });
+        return;
+      }
     }
+    
+    updateStepStatus(activeStep, 'completed');
+    setActiveStep(newStep);
   };
 
   const renderSteps = () => (
@@ -802,11 +806,13 @@ const ThesisSubmission = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-black to-black" />
-      
-      <div className="container mx-auto px-4 relative z-10 pt-8">
-        <Breadcrumb className="mb-8">
+    <div className="min-h-screen bg-black relative">
+      {!isConnected && <WalletConnectionOverlay requiredAmount={SUBMISSION_FEE} />}
+      <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-teal-500/5 to-yellow-500/5 animate-gradient" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-black to-black" />
+
+      <div className="container mx-auto px-4 relative z-10">
+        <Breadcrumb className="pt-8 mb-8">
           <BreadcrumbList className="text-white/60">
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
@@ -826,78 +832,140 @@ const ThesisSubmission = () => {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <NetworkContext />
-
-        <div className="flex gap-8">
-          <div className="w-2/3 space-y-6">
-            <AnimatePresence mode="wait">
-              {activeStep === 'thesis' && (
-                <FormSection3D isActive={true}>
-                  <div className="space-y-6">
-                    <div className="space-y-4">
-                      <Label className="text-lg font-medium text-white">Thesis Title</Label>
-                      <Input 
-                        placeholder="Enter a clear, descriptive title"
-                        className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12 focus:border-yellow-500/50"
-                        value={formData.title}
-                        onChange={e => handleFormDataChange('title', e.target.value)}
-                      />
-                      {formErrors.title && (
-                        <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                      )}
-                    </div>
-
-                    <TargetCapitalInput 
-                      value={formData.investment.targetCapital}
-                      onChange={value => handleFormDataChange('investment.targetCapital', value)}
-                      error={formErrors['investment.targetCapital']}
-                    />
-
-                    <VotingDurationInput
-                      value={votingDuration}
-                      onChange={handleVotingDurationChange}
-                      error={formErrors.votingDuration}
-                    />
-
-                    <div className="space-y-4">
-                      <Label className="text-lg font-medium text-white">Investment Drivers</Label>
-                      <textarea
-                        placeholder="Describe the key drivers behind this investment thesis..."
-                        className="w-full h-32 bg-black/50 border border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none focus:border-yellow-500/50"
-                        value={formData.investment.drivers}
-                        onChange={e => handleFormDataChange('investment.drivers', e.target.value)}
-                      />
-                      {formErrors['investment.drivers'] && (
-                        <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
-                      )}
-                    </div>
-                  </div>
-                </FormSection3D>
-              )}
-
-              {/* Similar FormSection3D components for other steps */}
-            </AnimatePresence>
-          </div>
-
-          <div className="w-1/3">
-            <div className="sticky top-32">
-              <ContractApprovalStatus
-                onApprovalComplete={handleApprovalComplete}
-                requiredAmount={SUBMISSION_FEE}
-                isTestMode={isTestMode}
-                currentFormData={formData}
-              />
+        <div className="max-w-4xl mx-auto mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-teal-500 mb-4">
+            Test Your Investment Thesis
+          </h1>
+          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+            Share your acquisition strategy to validate market interest and find aligned co-investors before committing resources to fund formation.
+          </p>
+          <div className="mt-6 flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-white/60">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-yellow-500" />
+              <span>Validate your strategy risk-free</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-yellow-500" />
+              <span>Test your thesis with real market feedback</span>
             </div>
           </div>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 max-w-7xl mx-auto">
+          <div className="md:col-span-4">
+            <div className="space-y-4">
+              {renderSteps()}
+            </div>
+          </div>
+
+          <div className="md:col-span-8">
+            <Card className="p-6 bg-black/50 border-white/10">
+              {activeStep === 'thesis' && (
+                <div className="space-y-6">
+                  <div>
+                    <Label htmlFor="title">Thesis Title</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => handleFormDataChange('title', e.target.value)}
+                      placeholder="Enter a descriptive title for your investment thesis"
+                      className="mt-2"
+                    />
+                    {formErrors.title && (
+                      <p className="text-sm text-red-500 mt-1">{formErrors.title[0]}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="targetCapital">Target Capital (LGR)</Label>
+                    <TargetCapitalInput
+                      value={formData.investment.targetCapital}
+                      onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+                      error={formErrors['investment.targetCapital']?.[0] ? [formErrors['investment.targetCapital'][0]] : undefined}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="drivers">Investment Drivers</Label>
+                    <textarea
+                      id="drivers"
+                      value={formData.investment.drivers}
+                      onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
+                      placeholder="Explain the key factors driving this investment opportunity..."
+                      className="mt-2 w-full min-h-[120px] px-3 py-2 rounded-md border bg-transparent text-white border-white/10 focus:border-white/20 focus:ring-0 placeholder:text-white/20"
+                    />
+                    {formErrors['investment.drivers'] && (
+                      <p className="text-sm text-red-500 mt-1">{formErrors['investment.drivers'][0]}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="additionalCriteria">Additional Investment Criteria</Label>
+                    <textarea
+                      id="additionalCriteria"
+                      value={formData.investment.additionalCriteria}
+                      onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
+                      placeholder="Any additional criteria or preferences for the investment..."
+                      className="mt-2 w-full min-h-[80px] px-3 py-2 rounded-md border bg-transparent text-white border-white/10 focus:border-white/20 focus:ring-0 placeholder:text-white/20"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Voting Duration</Label>
+                    <VotingDurationInput
+                      value={votingDuration}
+                      onChange={(value) => handleVotingDurationChange(value)}
+                      error={formErrors.votingDuration}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {activeStep === 'firm' && (
+                <FirmCriteriaSection
+                  formData={formData}
+                  formErrors={formErrors}
+                  onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
+                />
+              )}
+
+              {activeStep === 'strategy' && (
+                <StrategiesSection
+                  formData={formData}
+                  formErrors={formErrors}
+                  onChange={handleStrategyChange}
+                />
+              )}
+
+              {activeStep === 'terms' && (
+                <PaymentTermsSection
+                  formData={formData}
+                  formErrors={formErrors}
+                  onChange={(field, value) => handleFormDataChange('paymentTerms', value)}
+                />
+              )}
+
+              <div className="mt-6 flex justify-end">
+                <Button
+                  onClick={handleContinue}
+                  disabled={isSubmitting}
+                  className={cn(
+                    "h-12 px-6",
+                    "bg-gradient-to-r from-yellow-500 to-yellow-600",
+                    "hover:from-yellow-600 hover:to-yellow-700",
+                    "text-white font-medium",
+                    "transition-all duration-300",
+                    "disabled:opacity-50",
+                    "flex items-center gap-2"
+                  )}
+                >
+                  {getButtonText()}
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </div>
       </div>
-
-      <TransactionFlow 
-        steps={SUBMISSION_STEPS}
-        activeStep={activeStep}
-      />
-
-      <LGRFloatingWidget />
     </div>
   );
 };
