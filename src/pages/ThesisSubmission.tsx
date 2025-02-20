@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -815,37 +815,23 @@ const ThesisSubmission = () => {
             <BreadcrumbSeparator className="text-white/40" />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/proposals" className="hover:text-white">All Fund Proposals</Link>
+                <Link to="/proposals" className="hover:text-white">Proposals</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="text-white/40" />
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-white">Test Your Investment Thesis</BreadcrumbPage>
+              <BreadcrumbPage className="text-white">Share Investment Strategy</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="max-w-4xl mx-auto mb-12 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-teal-500 mb-4">
-            Test Your Investment Thesis
+            Share Your Investment Strategy
           </h1>
           <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Share your acquisition strategy to validate market interest and find aligned co-investors before committing resources to fund formation.
+            Present your acquisition strategy to find co-investors who share your vision. Define your target profile, growth plans, and execution approach.
           </p>
-          <div className="mt-6 flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-white/60">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-yellow-500" />
-              <span>Validate your strategy risk-free</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-teal-500" />
-              <span>Find aligned co-investors early</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-purple-500" />
-              <span>Build momentum before launch</span>
-            </div>
-          </div>
         </div>
 
         <div className="grid grid-cols-12 gap-8">
@@ -874,8 +860,6 @@ const ThesisSubmission = () => {
                       <div className="space-y-4">
                         <Label className="text-lg font-medium text-white">Thesis Title</Label>
                         <Input 
-                          id="thesis-title"
-                          name="thesis-title"
                           placeholder="Enter a clear, descriptive title"
                           className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12 focus:border-yellow-500/50"
                           value={formData.title}
@@ -901,8 +885,6 @@ const ThesisSubmission = () => {
                       <div className="space-y-4">
                         <Label className="text-lg font-medium text-white">Investment Drivers</Label>
                         <textarea
-                          id="investment-drivers"
-                          name="investment-drivers"
                           placeholder="Describe the key drivers behind this investment thesis..."
                           className="w-full h-32 bg-black/50 border border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none focus:border-yellow-500/50"
                           value={formData.investment.drivers}
