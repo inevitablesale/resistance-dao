@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -116,7 +115,6 @@ function validateTextLength(text: string, field: string, min?: number, max?: num
 }
 
 function prepareContractInput(input: ProposalContractInput): any {
-  // Create a new object with the exact structure the contract expects
   return {
     title: input.title,
     ipfsMetadata: input.ipfsMetadata,
@@ -257,7 +255,6 @@ export const createProposal = async (
       throw new Error("Contract method 'createProposal' not found");
     }
 
-    // Prepare the input in the exact format the contract expects
     const preparedInput = prepareContractInput(contractInput);
     console.log("Prepared contract input:", preparedInput);
 
