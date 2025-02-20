@@ -60,21 +60,39 @@ export const ContractApprovalStatus = ({
       return "";
     }
     
-    // First try metadata
-    const urlFromMetadata = user.metadata?.["LinkedIn Profile URL"];
-    if (urlFromMetadata) {
-      console.log("[LinkedIn] URL found in metadata:", urlFromMetadata);
-      return urlFromMetadata;
+    // Log the full object structure for debugging
+    console.log("[LinkedIn] Full user data structure:", {
+      url: user.metadata?.["LinkedIn Profile URL"],
+      fromMetadata: user.metadata?.["LinkedIn Profile URL"],
+      fromVerifications: user.verifications?.customFields?.["LinkedIn Profile URL"],
+      directUrl: user.url,
+      rawMetadata: user.metadata
+    });
+
+    // Try getting from direct url property
+    if (user.url && user.url.includes('linkedin.com')) {
+      console.log("[LinkedIn] Using direct URL property:", user.url);
+      return user.url;
     }
     
-    // Then try verifications
-    const urlFromVerifications = user.verifications?.customFields?.["LinkedIn Profile URL"];
-    if (urlFromVerifications) {
-      console.log("[LinkedIn] URL found in verifications:", urlFromVerifications);
-      return urlFromVerifications;
+    // Try getting from metadata
+    if (user.metadata?.["LinkedIn Profile URL"]) {
+      console.log("[LinkedIn] Using URL from metadata:", user.metadata["LinkedIn Profile URL"]);
+      return user.metadata["LinkedIn Profile URL"];
     }
     
-    console.log("[LinkedIn] No URL found in either location");
+    // Try getting from verifications
+    if (user.verifications?.customFields?.["LinkedIn Profile URL"]) {
+      console.log("[LinkedIn] Using URL from verifications:", user.verifications.customFields["LinkedIn Profile URL"]);
+      return user.verifications.customFields["LinkedIn Profile URL"];
+    }
+    
+    // If no URL is found, log the failure
+    console.log("[LinkedIn] No valid URL found in any location", {
+      metadata: user.metadata,
+      verifications: user.verifications,
+      url: user.url
+    });
     return "";
   };
 
