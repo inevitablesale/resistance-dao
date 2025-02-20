@@ -603,7 +603,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => {
+  const handleApprovalComplete = async (submissionFormData: ProposalMetadata, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => {
     try {
       setIsSubmitting(true);
       setFormErrors({});
@@ -624,20 +624,28 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
-      const effectiveFormData = isTestMode ? {
-        ...TEST_FORM_DATA,
-        linkedInURL,
-        submissionTimestamp: Date.now(),
-        submitter: address
-      } : formData;
+      // Use the current component's form data
+      const currentFormData = isTestMode ? TEST_FORM_DATA : formData;
+      
+      // Validate form data before submission
+      if (!currentFormData.investment.targetCapital) {
+        throw new Error("Target capital is required");
+      }
 
       console.log('Preparing data for IPFS submission:', { 
         isTestMode,
-        effectiveFormData,
+        formData: currentFormData,
         linkedInURL,
         submitter: address,
         timestamp: Date.now()
       });
+
+      const effectiveFormData = {
+        ...currentFormData,
+        linkedInURL,
+        submissionTimestamp: Date.now(),
+        submitter: address
+      };
       
       const ipfsUri = await uploadMetadataToPinata(effectiveFormData);
       console.log('IPFS upload result:', {
@@ -671,7 +679,7 @@ const ThesisSubmission = () => {
       const receipt = await result.wait();
       console.log('Transaction receipt received:', receipt);
 
-      if (receipt.status === 1) { // Transaction successful
+      if (receipt.status === 1) {
         setSubmissionComplete(true);
         updateStepStatus('submission', 'completed');
 
@@ -693,7 +701,7 @@ const ThesisSubmission = () => {
         userProposals.push(newProposal);
         localStorage.setItem('userProposals', JSON.stringify(userProposals));
 
-        // Redirect after a short delay to allow the user to see the success state
+        // Redirect after a short delay
         setTimeout(() => {
           navigate('/proposals');
         }, 2000);
@@ -846,170 +854,3 @@ const ThesisSubmission = () => {
               "bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden",
               formErrors && Object.keys(formErrors).length > 0 ? "border-red-500/20" : ""
             )}>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeStep}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2 }}
-                  className="p-6"
-                >
-                  {activeStep === 'thesis' && (
-                    <div className="space-y-6">
-                      <div className="space-y-4">
-                        <Label className="text-lg font-medium text-white">Thesis Title</Label>
-                        <Input 
-                          placeholder="Enter a clear, descriptive title"
-                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12 focus:border-yellow-500/50"
-                          value={formData.title}
-                          onChange={e => handleFormDataChange('title', e.target.value)}
-                        />
-                        {formErrors.title && (
-                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
-                        )}
-                      </div>
-
-                      <TargetCapitalInput 
-                        value={formData.investment.targetCapital}
-                        onChange={value => handleFormDataChange('investment.targetCapital', value)}
-                        error={formErrors['investment.targetCapital']}
-                      />
-
-                      <VotingDurationInput
-                        value={votingDuration}
-                        onChange={handleVotingDurationChange}
-                        error={formErrors.votingDuration}
-                      />
-
-                      <div className="space-y-4">
-                        <Label className="text-lg font-medium text-white">Investment Drivers</Label>
-                        <textarea
-                          placeholder="Describe the key drivers behind this investment thesis..."
-                          className="w-full h-32 bg-black/50 border border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none focus:border-yellow-500/50"
-                          value={formData.investment.drivers}
-                          onChange={e => handleFormDataChange('investment.drivers', e.target.value)}
-                        />
-                        {formErrors['investment.drivers'] && (
-                          <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {activeStep === 'strategy' && (
-                    <FirmCriteriaSection
-                      formData={{
-                        firmCriteria: {
-                          size: formData.firmCriteria.size,
-                          location: formData.firmCriteria.location,
-                          dealType: formData.firmCriteria.dealType,
-                          geographicFocus: formData.firmCriteria.geographicFocus
-                        }
-                      }}
-                      formErrors={formErrors}
-                      onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
-                    />
-                  )}
-
-                  {activeStep === 'terms' && (
-                    <>
-                      <PaymentTermsSection
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
-                      />
-                      <div className="mt-8">
-                        <StrategiesSection
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={(category, value) => handleStrategyChange(category, value)}
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {activeStep === 'submission' && (
-                    <div className="space-y-6 text-center py-8">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
-                      >
-                        <Check className="w-8 h-8 text-white" />
-                      </motion.div>
-                      <h3 className="text-2xl font-semibold text-white">
-                        {submissionComplete 
-                          ? "Investment Thesis Submitted!"
-                          : "Ready to Submit"
-                        }
-                      </h3>
-                      <p className="text-gray-400">
-                        {submissionComplete
-                          ? "Your investment thesis has been successfully submitted to the community"
-                          : "Your investment thesis is ready to be submitted to the community"
-                        }
-                      </p>
-                      {currentTxHash && (
-                        <a
-                          href={`https://polygonscan.com/tx/${currentTxHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-polygon-primary hover:underline"
-                        >
-                          View transaction on PolygonScan
-                        </a>
-                      )}
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-
-              <div className="border-t border-white/5 p-6">
-                <Button 
-                  onClick={handleContinue}
-                  disabled={isSubmitting}
-                  className={cn(
-                    "w-full h-12",
-                    "bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600",
-                    "text-white font-medium",
-                    "transition-all duration-300",
-                    "disabled:opacity-50",
-                    "flex items-center justify-center gap-2"
-                  )}
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Processing...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-2">
-                      <span>{getButtonText()}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  )}
-                </Button>
-              </div>
-            </Card>
-          </div>
-
-          <div className="col-span-3">
-            <div className="sticky top-32 space-y-4">
-              <ContractApprovalStatus
-                onApprovalComplete={handleApprovalComplete}
-                requiredAmount={SUBMISSION_FEE}
-                isTestMode={isTestMode}
-                currentFormData={formData}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <LGRFloatingWidget />
-    </div>
-  );
-};
-
-export default ThesisSubmission;

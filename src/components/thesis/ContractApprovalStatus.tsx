@@ -182,7 +182,7 @@ export const ContractApprovalStatus = ({
         isTesterWallet,
         contractTestMode: false,
         isTestMode: false,
-        currentFormData
+        formData: currentFormData // Log the form data being used
       });
       
       if (wallet) {
@@ -227,7 +227,7 @@ export const ContractApprovalStatus = ({
             spenderAddress: treasuryAddress,
             amount: requiredAmount.toString(),
             isTestMode: false,
-            isApproval: true // Add this flag to indicate it's an approval transaction
+            isApproval: true
           },
           walletType
         },
@@ -238,6 +238,7 @@ export const ContractApprovalStatus = ({
       if (!approvalCompletedRef.current) {
         approvalCompletedRef.current = true;
         setIsApproved(true);
+        // Pass the currentFormData instead of the parameter
         onApprovalComplete(currentFormData, transaction, false);
       }
     } catch (error) {
