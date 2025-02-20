@@ -411,17 +411,23 @@ const ThesisSubmission = () => {
   };
 
   const handleStepChange = (newStep: string) => {
-    const currentValidator = getCurrentValidator();
-    if (currentValidator()) {
-      updateStepStatus(activeStep, 'completed');
-      setActiveStep(newStep);
-    } else {
-      toast({
-        title: "Validation Error",
-        description: "Please complete all required fields before proceeding",
-        variant: "destructive"
-      });
+    const currentStepIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
+    const newStepIndex = SUBMISSION_STEPS.findIndex(step => step.id === newStep);
+    
+    if (newStepIndex > currentStepIndex) {
+      const currentValidator = getCurrentValidator();
+      if (!currentValidator()) {
+        toast({
+          title: "Validation Error",
+          description: "Please complete all required fields before proceeding",
+          variant: "destructive"
+        });
+        return;
+      }
     }
+    
+    updateStepStatus(activeStep, 'completed');
+    setActiveStep(newStep);
   };
 
   const renderSteps = () => (
