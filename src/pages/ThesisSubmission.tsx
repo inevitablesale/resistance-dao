@@ -503,13 +503,13 @@ const ThesisSubmission = () => {
         break;
       case 'terms':
         if (validateTermsTab()) {
-          handleSubmit(e);
+          handleSubmit(e as any, isTestMode);
         }
         break;
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent, formData?: ProposalMetadata, isTestMode?: boolean) => {
+  const handleSubmit = async (e: React.FormEvent, isTestMode: boolean = false) => {
     e.preventDefault();
     if (!isConnected) {
       toast({
@@ -525,73 +525,8 @@ const ThesisSubmission = () => {
       setIsSubmitting(true);
       setFormErrors({});
 
-      if (!validateLinkedInURL()) {
-        throw new Error("Please add a valid LinkedIn URL in your wallet settings");
-      }
-
-      updateStepStatus('thesis', 'completed');
-      updateStepStatus('firm', 'completed');
-      updateStepStatus('strategy', 'completed');
-      updateStepStatus('terms', 'completed');
-      setActiveStep('submission');
-
-      if (!wallet) {
-        throw new Error("No wallet connected");
-      }
-
-      const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
-      console.log('Retrieved LinkedIn URL:', linkedInURL);
-
-      const updatedFormData = {
-        ...formData || formData,
-        votingDuration,
-        linkedInURL,
-        submissionTimestamp: Date.now(),
-        submitter: address
-      };
-
-      console.log('Uploading metadata to IPFS...', { isTestMode });
-      const ipfsUri = await uploadMetadataToPinata(updatedFormData);
-      const ipfsHash = ipfsUri.replace('ipfs://', '');
-      
-      if (!validateIPFSHash(ipfsHash)) {
-        throw new Error("Invalid IPFS hash format");
-      }
-
-      console.log('Estimating gas for proposal creation...', { isTestMode });
-      const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData?.investment.targetCapital || ""
-      );
-
-      const proposalConfig: ProposalConfig = {
-        targetCapital: targetCapitalWei,
-        votingDuration,
-        ipfsHash,
-        metadata: updatedFormData,
-        linkedInURL
-      };
-
-      const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
-      console.log('Creating proposal...', proposalConfig);
-      const result = await createProposal(proposalConfig, wallet);
-
-      const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
-      const newProposal: StoredProposal = {
-        hash: result.hash,
-        ipfsHash,
-        timestamp: new Date().toISOString(),
-        title: isTestMode ? TEST_FORM_DATA.title : formData?.title || "",
-        targetCapital: targetCapitalWei.toString(),
-        status: 'pending'
-      };
-      userProposals.push(newProposal);
-      localStorage.setItem('userProposals', JSON.stringify(userProposals));
-
-      updateStepStatus('submission', 'completed');
-      toast({
-        title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
-        description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
-      });
+      const effectiveFormData = isTestMode ? TEST_FORM_DATA : formData;
+      await handleApprovalComplete(effectiveFormData, undefined, isTestMode);
 
     } catch (error) {
       console.error("Submission error:", error);
@@ -606,7 +541,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => {
+  const handleApprovalComplete = async (formData: ProposalMetadata, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => {
     try {
       setIsSubmitting(true);
       setFormErrors({});
@@ -628,82 +563,84 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
-      const effectiveFormData = isTestMode ? {
-        ...TEST_FORM_DATA,
+      // Create complete proposal metadata
+      const completeMetadata: ProposalMetadata = {
+        title: isTestMode ? TEST_FORM_DATA.title : formData.title,
+        firmCriteria: {
+          size: isTestMode ? TEST_FORM_DATA.firmCriteria.size : formData.firmCriteria.size,
+          location: isTestMode ? TEST_FORM_DATA.firmCriteria.location : formData.firmCriteria.location,
+          dealType: isTestMode ? TEST_FORM_DATA.firmCriteria.dealType : formData.firmCriteria.dealType,
+          geographicFocus: isTestMode ? TEST_FORM_DATA.firmCriteria.geographicFocus : formData.firmCriteria.geographicFocus
+        },
+        paymentTerms: isTestMode ? TEST_FORM_DATA.paymentTerms : formData.paymentTerms,
+        strategies: {
+          operational: isTestMode ? TEST_FORM_DATA.strategies.operational : formData.strategies.operational,
+          growth: isTestMode ? TEST_FORM_DATA.strategies.growth : formData.strategies.growth,
+          integration: isTestMode ? TEST_FORM_DATA.strategies.integration : formData.strategies.integration
+        },
+        investment: {
+          targetCapital: isTestMode ? TEST_FORM_DATA.investment.targetCapital : formData.investment.targetCapital,
+          drivers: isTestMode ? TEST_FORM_DATA.investment.drivers : formData.investment.drivers,
+          additionalCriteria: isTestMode ? TEST_FORM_DATA.investment.additionalCriteria : formData.investment.additionalCriteria
+        },
+        votingDuration,
         linkedInURL,
+        isTestMode,
         submissionTimestamp: Date.now(),
         submitter: address
-      } : formData;
+      };
 
-      console.log('Preparing data for IPFS submission:', { 
+      console.log('Uploading metadata to IPFS...', { 
         isTestMode,
-        effectiveFormData,
-        linkedInURL,
-        submitter: address,
-        timestamp: Date.now()
+        metadata: completeMetadata 
       });
       
-      const ipfsUri = await uploadMetadataToPinata(effectiveFormData);
-      console.log('IPFS upload result:', {
-        ipfsUri,
-        submittedData: effectiveFormData
-      });
-
+      const ipfsUri = await uploadMetadataToPinata(completeMetadata);
       const ipfsHash = ipfsUri.replace('ipfs://', '');
       
       if (!validateIPFSHash(ipfsHash)) {
         throw new Error("Invalid IPFS hash format");
       }
 
+      console.log('Estimating gas for proposal creation...', { 
+        isTestMode,
+        ipfsHash,
+        targetCapital: completeMetadata.investment.targetCapital
+      });
+
       const targetCapitalWei = ethers.utils.parseEther(
-        isTestMode ? TEST_FORM_DATA.investment.targetCapital : effectiveFormData.investment.targetCapital
+        isTestMode ? TEST_FORM_DATA.investment.targetCapital : completeMetadata.investment.targetCapital
       );
 
       const proposalConfig: ProposalConfig = {
         targetCapital: targetCapitalWei,
         votingDuration,
         ipfsHash,
-        metadata: effectiveFormData,
+        metadata: completeMetadata,
         linkedInURL
       };
 
+      const gasEstimate = await estimateProposalGas(proposalConfig, wallet);
+      console.log('Creating proposal...', proposalConfig);
       const result = await createProposal(proposalConfig, wallet);
-      console.log('Proposal creation result:', result);
-      setCurrentTxHash(result.hash);
 
-      const provider = new ethers.providers.Web3Provider(await wallet.getWalletClient() as any);
-      const receipt = await result.wait();
-      console.log('Transaction receipt received:', receipt);
+      const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
+      const newProposal: StoredProposal = {
+        hash: result.hash,
+        ipfsHash,
+        timestamp: new Date().toISOString(),
+        title: isTestMode ? TEST_FORM_DATA.title : completeMetadata.title,
+        targetCapital: targetCapitalWei.toString(),
+        status: 'pending'
+      };
+      userProposals.push(newProposal);
+      localStorage.setItem('userProposals', JSON.stringify(userProposals));
 
-      if (receipt.status === 1) { // Transaction successful
-        setSubmissionComplete(true);
-        updateStepStatus('submission', 'completed');
-
-        toast({
-          title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
-          description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
-        });
-
-        // Store proposal in local storage
-        const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
-        const newProposal: StoredProposal = {
-          hash: result.hash,
-          ipfsHash,
-          timestamp: new Date().toISOString(),
-          title: isTestMode ? TEST_FORM_DATA.title : effectiveFormData.title,
-          targetCapital: targetCapitalWei.toString(),
-          status: 'pending'
-        };
-        userProposals.push(newProposal);
-        localStorage.setItem('userProposals', JSON.stringify(userProposals));
-
-        // Redirect after a short delay to allow the user to see the success state
-        setTimeout(() => {
-          navigate('/proposals');
-        }, 2000);
-      } else {
-        throw new Error('Transaction failed');
-      }
+      updateStepStatus('submission', 'completed');
+      toast({
+        title: `${isTestMode ? 'Test Proposal' : 'Proposal'} Submitted`,
+        description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
+      });
 
     } catch (error) {
       console.error("Submission error:", error);
