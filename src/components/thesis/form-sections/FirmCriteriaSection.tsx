@@ -1,7 +1,7 @@
 
 import { useEffect } from "react";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FirmSize, DealType, GeographicFocus } from "@/types/proposals";
 import { US_STATES } from "@/lib/constants/states";
@@ -34,6 +34,24 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       onChange('firmCriteria.geographicFocus', GeographicFocus.LOCAL);
     }
   }, []);
+
+  const handleSizeChange = (value: FirmSize, checked: boolean) => {
+    if (checked) {
+      onChange('firmCriteria.size', value);
+    }
+  };
+
+  const handleGeoFocusChange = (value: GeographicFocus, checked: boolean) => {
+    if (checked) {
+      onChange('firmCriteria.geographicFocus', value);
+    }
+  };
+
+  const handleDealTypeChange = (value: DealType, checked: boolean) => {
+    if (checked) {
+      onChange('firmCriteria.dealType', value);
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -77,36 +95,29 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           <Building2 className="h-5 w-5 text-yellow-500" />
           <Label className="text-lg font-medium text-white">Preferred Firm Size (Revenue)</Label>
         </div>
-        <RadioGroup 
-          value={String(formData.firmCriteria.size)}
-          onValueChange={(value) => onChange('firmCriteria.size', Number(value))}
-          className="grid grid-cols-1 md:grid-cols-2 gap-3"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
             { value: FirmSize.BELOW_1M, label: "Below $1M" },
             { value: FirmSize.ONE_TO_FIVE_M, label: "$1M–$5M" },
             { value: FirmSize.FIVE_TO_TEN_M, label: "$5M–$10M" },
             { value: FirmSize.TEN_PLUS, label: "$10M+" }
           ].map((option) => (
-            <Label
-              key={option.value}
-              className={`
-                flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
-                cursor-pointer transition-all duration-200
-                data-[state=checked]:border-yellow-500/50 data-[state=checked]:bg-yellow-500/10
-                hover:bg-white/5
-                ${String(formData.firmCriteria.size) === String(option.value) ? 'border-yellow-500/50 bg-yellow-500/10' : ''}
-              `}
-            >
-              <RadioGroupItem 
-                value={String(option.value)} 
+            <div key={option.value} className="flex items-center space-x-2">
+              <Checkbox
                 id={`size-${option.value}`}
-                className="text-yellow-500 border-white/30"
+                checked={formData.firmCriteria.size === option.value}
+                onCheckedChange={(checked) => handleSizeChange(option.value, checked as boolean)}
+                className="data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500"
               />
-              <span className="text-white">{option.label}</span>
-            </Label>
+              <Label
+                htmlFor={`size-${option.value}`}
+                className="text-white font-medium cursor-pointer"
+              >
+                {option.label}
+              </Label>
+            </div>
           ))}
-        </RadioGroup>
+        </div>
         {formErrors['firmCriteria.size'] && (
           <p className="mt-2 text-sm text-red-400">{formErrors['firmCriteria.size'][0]}</p>
         )}
@@ -117,36 +128,29 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           <Globe2 className="h-5 w-5 text-teal-500" />
           <Label className="text-lg font-medium text-white">Geographic Focus</Label>
         </div>
-        <RadioGroup 
-          value={String(formData.firmCriteria.geographicFocus)}
-          onValueChange={(value) => onChange('firmCriteria.geographicFocus', Number(value))}
-          className="grid grid-cols-1 md:grid-cols-2 gap-3"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
             { value: GeographicFocus.LOCAL, label: "Local" },
             { value: GeographicFocus.REGIONAL, label: "Regional" },
             { value: GeographicFocus.NATIONAL, label: "National" },
             { value: GeographicFocus.REMOTE, label: "Remote" }
           ].map((option) => (
-            <Label
-              key={option.value}
-              className={`
-                flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
-                cursor-pointer transition-all duration-200
-                data-[state=checked]:border-teal-500/50 data-[state=checked]:bg-teal-500/10
-                hover:bg-white/5
-                ${String(formData.firmCriteria.geographicFocus) === String(option.value) ? 'border-teal-500/50 bg-teal-500/10' : ''}
-              `}
-            >
-              <RadioGroupItem 
-                value={String(option.value)} 
+            <div key={option.value} className="flex items-center space-x-2">
+              <Checkbox
                 id={`geo-${option.value}`}
-                className="text-teal-500 border-white/30"
+                checked={formData.firmCriteria.geographicFocus === option.value}
+                onCheckedChange={(checked) => handleGeoFocusChange(option.value, checked as boolean)}
+                className="data-[state=checked]:bg-teal-500 data-[state=checked]:border-teal-500"
               />
-              <span className="text-white">{option.label}</span>
-            </Label>
+              <Label
+                htmlFor={`geo-${option.value}`}
+                className="text-white font-medium cursor-pointer"
+              >
+                {option.label}
+              </Label>
+            </div>
           ))}
-        </RadioGroup>
+        </div>
         {formErrors['firmCriteria.geographicFocus'] && (
           <p className="mt-2 text-sm text-red-400">{formErrors['firmCriteria.geographicFocus'][0]}</p>
         )}
@@ -186,11 +190,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           <Briefcase className="h-5 w-5 text-rose-500" />
           <Label className="text-lg font-medium text-white">Deal Type</Label>
         </div>
-        <RadioGroup 
-          value={String(formData.firmCriteria.dealType)}
-          onValueChange={(value) => onChange('firmCriteria.dealType', Number(value))}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {[
             { value: DealType.ACQUISITION, label: "Acquisition" },
             { value: DealType.MERGER, label: "Merger" },
@@ -198,25 +198,22 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             { value: DealType.FRANCHISE, label: "Franchise" },
             { value: DealType.SUCCESSION, label: "Succession" }
           ].map((option) => (
-            <Label
-              key={option.value}
-              className={`
-                flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
-                cursor-pointer transition-all duration-200
-                data-[state=checked]:border-rose-500/50 data-[state=checked]:bg-rose-500/10
-                hover:bg-white/5
-                ${String(formData.firmCriteria.dealType) === String(option.value) ? 'border-rose-500/50 bg-rose-500/10' : ''}
-              `}
-            >
-              <RadioGroupItem 
-                value={String(option.value)} 
+            <div key={option.value} className="flex items-center space-x-2">
+              <Checkbox
                 id={`deal-${option.value}`}
-                className="text-rose-500 border-white/30"
+                checked={formData.firmCriteria.dealType === option.value}
+                onCheckedChange={(checked) => handleDealTypeChange(option.value, checked as boolean)}
+                className="data-[state=checked]:bg-rose-500 data-[state=checked]:border-rose-500"
               />
-              <span className="text-white">{option.label}</span>
-            </Label>
+              <Label
+                htmlFor={`deal-${option.value}`}
+                className="text-white font-medium cursor-pointer"
+              >
+                {option.label}
+              </Label>
+            </div>
           ))}
-        </RadioGroup>
+        </div>
         {formErrors['firmCriteria.dealType'] && (
           <p className="mt-2 text-sm text-red-400">{formErrors['firmCriteria.dealType'][0]}</p>
         )}
