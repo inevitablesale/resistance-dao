@@ -25,9 +25,9 @@ export interface StrategiesSectionProps {
 type StrategyCategory = keyof ProposalMetadata['strategies'];
 
 export const StrategiesSection = ({ formData, formErrors, onChange }: StrategiesSectionProps) => {
-  const handleStrategyChange = (
-    category: StrategyCategory,
-    value: OperationalStrategy | GrowthStrategy | IntegrationStrategy,
+  const handleStrategyChange = <T extends StrategyCategory>(
+    category: T,
+    value: ProposalMetadata['strategies'][T][number],
     checked: boolean
   ) => {
     const currentStrategies = [...formData.strategies[category]];
@@ -35,7 +35,7 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
       ? [...currentStrategies, value]
       : currentStrategies.filter(s => s !== value);
     
-    onChange(category, updatedStrategies);
+    onChange(category, updatedStrategies as ProposalMetadata['strategies'][T]);
   };
 
   const isStrategySelected = (category: StrategyCategory, strategyId: StrategyType) => {

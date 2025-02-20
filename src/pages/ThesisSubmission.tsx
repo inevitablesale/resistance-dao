@@ -168,14 +168,15 @@ const ThesisSubmission = () => {
                 <PaymentTermsSection
                   formData={form.getValues()}
                   formErrors={form.formState.errors}
-                  onChange={(_, value) => form.setValue('paymentTerms', value)}
+                  register={form.register}
+                  onChange={(_, value) => form.setValue('paymentTerms', value, { shouldValidate: true })}
                 />
 
                 <FirmCriteriaSection
                   formData={form.getValues()}
                   formErrors={form.formState.errors}
                   onChange={(field, value) => {
-                    form.setValue(`firmCriteria.${String(field)}`, value);
+                    form.setValue(`firmCriteria.${field}`, value, { shouldValidate: true });
                   }}
                 />
 
@@ -183,8 +184,7 @@ const ThesisSubmission = () => {
                   formData={form.getValues()}
                   formErrors={form.formState.errors}
                   onChange={(category, value) => {
-                    const path = `strategies.${String(category)}` as const;
-                    form.setValue(path, value);
+                    form.setValue(`strategies.${category}`, value, { shouldValidate: true });
                   }}
                 />
               </div>

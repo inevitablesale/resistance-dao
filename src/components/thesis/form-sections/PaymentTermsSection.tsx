@@ -1,17 +1,19 @@
+
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProposalMetadata, PaymentTerm } from "@/types/proposals";
 import { motion } from "framer-motion";
 import { CreditCard, Briefcase, ChartBar, Users2, Building2 } from "lucide-react";
-import { FieldErrors } from "react-hook-form";
+import { FieldErrors, UseFormRegister } from "react-hook-form";
 
 export interface PaymentTermsSectionProps {
   formData: ProposalMetadata;
   formErrors: FieldErrors<ProposalMetadata>;
+  register: UseFormRegister<ProposalMetadata>;
   onChange: (field: string, value: PaymentTerm[]) => void;
 }
 
-export const PaymentTermsSection = ({ formData, formErrors, onChange }: PaymentTermsSectionProps) => {
+export const PaymentTermsSection = ({ formData, formErrors, register, onChange }: PaymentTermsSectionProps) => {
   const handleTermChange = (term: PaymentTerm, checked: boolean) => {
     const newTerms = checked 
       ? [...formData.paymentTerms, term]
@@ -88,6 +90,7 @@ export const PaymentTermsSection = ({ formData, formErrors, onChange }: PaymentT
                   <Label className="text-white font-medium">{label}</Label>
                 </div>
                 <Checkbox
+                  {...register('paymentTerms')}
                   id={`term-${term}`}
                   checked={formData.paymentTerms.includes(term)}
                   onCheckedChange={(checked) => handleTermChange(term, checked as boolean)}
