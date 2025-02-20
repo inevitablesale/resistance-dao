@@ -10,6 +10,14 @@ export const checkTokenAllowance = async (
   requiredAmount: string
 ): Promise<boolean> => {
   try {
+    if (!ethers.utils.isAddress(spenderAddress)) {
+      throw new ProposalError({
+        category: 'token',
+        message: 'Invalid spender address',
+        recoverySteps: ['Contact support']
+      });
+    }
+
     console.log('Checking token allowance:', {
       token: tokenAddress,
       owner: ownerAddress,
@@ -45,7 +53,16 @@ export const checkTokenAllowance = async (
       });
     }
 
-    return allowance.gte(requiredAmount);
+    if (allowance.lt(requiredAmount)) {
+      console.log('Insufficient allowance:', {
+        current: ethers.utils.formatEther(allowance),
+        required: ethers.utils.formatEther(requiredAmount),
+        spender: spenderAddress
+      });
+      return false;
+    }
+
+    return true;
   } catch (error) {
     console.error('Token allowance check error:', error);
     if (error instanceof ProposalError) {

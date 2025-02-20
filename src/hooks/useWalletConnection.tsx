@@ -59,9 +59,9 @@ export const useWalletConnection = () => {
       console.log("Getting contract status for treasury address...");
       const status = await getContractStatus(primaryWallet!);
       
-      if (!status.treasury) {
-        console.error("No treasury address found in contract status");
-        throw new Error("Treasury address not available");
+      if (!status.treasury || !ethers.utils.isAddress(status.treasury)) {
+        console.error("Invalid or missing treasury address:", status.treasury);
+        throw new Error("Valid treasury address not available");
       }
 
       console.log("Contract status:", {
@@ -75,39 +75,39 @@ export const useWalletConnection = () => {
         return {} as ethers.ContractTransaction;
       }
 
+      const signer = walletProvider.provider.getSigner();
+      const signerAddress = await signer.getAddress();
+      
       console.log("Approving LGR tokens for treasury:", {
         treasury: status.treasury,
-        amount: ethers.utils.formatEther(amount),
-        walletType: walletProvider.type
+        signer: signerAddress,
+        amount: ethers.utils.formatEther(amount)
       });
 
-      const signer = walletProvider.provider.getSigner();
       const lgrToken = new ethers.Contract(
         LGR_TOKEN_ADDRESS,
-        ["function approve(address spender, uint256 amount) returns (bool)"],
+        [
+          "function approve(address spender, uint256 amount) returns (bool)",
+          "function allowance(address owner, address spender) view returns (uint256)"
+        ],
         signer
       );
 
-      // Check current allowance first
-      const currentAllowance = await lgrToken.allowance(
-        await signer.getAddress(),
-        status.treasury
-      );
-
-      console.log("Current allowance:", {
+      // Check current allowance
+      const currentAllowance = await lgrToken.allowance(signerAddress, status.treasury);
+      console.log("Current treasury allowance:", {
         amount: ethers.utils.formatEther(currentAllowance),
         required: ethers.utils.formatEther(amount)
       });
 
       if (currentAllowance.gte(amount)) {
-        console.log("Sufficient allowance already exists");
+        console.log("Sufficient treasury allowance already exists");
         return {} as ethers.ContractTransaction;
       }
 
-      console.log("Calling approve with parameters:", {
+      console.log("Calling approve for treasury:", {
         treasury: status.treasury,
-        amount: ethers.utils.formatEther(amount),
-        isTestMode
+        amount: ethers.utils.formatEther(amount)
       });
 
       return await lgrToken.approve(status.treasury, amount);

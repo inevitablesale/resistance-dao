@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -14,10 +15,10 @@ export interface TransactionConfig {
   type: 'proposal' | 'token' | 'contract' | 'nft' | 'approval';
   tokenConfig?: {
     tokenAddress: string;
-    spenderAddress: string;
+    spenderAddress?: string;
     amount: string;
     isTestMode?: boolean;
-    treasuryAddress?: string;
+    treasuryAddress: string;  // Make treasury address required
   };
   nftConfig?: {
     tokenAddress: string;
@@ -44,20 +45,24 @@ export const executeTransaction = async (
   if (config.type === 'token' && config.tokenConfig) {
     console.log('Token transaction config:', {
       ...config.tokenConfig,
-      amount: ethers.utils.formatEther(config.tokenConfig.amount),
-      treasuryAddress: config.tokenConfig.treasuryAddress
+      amount: ethers.utils.formatEther(config.tokenConfig.amount)
     });
 
-    if (config.tokenConfig.treasuryAddress) {
-      if (!ethers.utils.isAddress(config.tokenConfig.treasuryAddress)) {
-        throw new ProposalError({
-          category: 'token',
-          message: 'Invalid treasury address',
-          recoverySteps: ['Contact support']
-        });
-      }
-      config.tokenConfig.spenderAddress = config.tokenConfig.treasuryAddress;
+    if (!config.tokenConfig.treasuryAddress || !ethers.utils.isAddress(config.tokenConfig.treasuryAddress)) {
+      throw new ProposalError({
+        category: 'token',
+        message: 'Invalid or missing treasury address',
+        recoverySteps: ['Contact support']
+      });
     }
+
+    // Always use treasury address as spender
+    config.tokenConfig.spenderAddress = config.tokenConfig.treasuryAddress;
+    
+    console.log('Using treasury as spender:', {
+      treasury: config.tokenConfig.treasuryAddress,
+      amount: ethers.utils.formatEther(config.tokenConfig.amount)
+    });
   }
 
   if (config.type === 'nft' && config.nftConfig) {
@@ -88,28 +93,29 @@ export const executeTransaction = async (
         tokenAddress: config.tokenConfig.tokenAddress,
         ownerAddress: signerAddress,
         spenderAddress: config.tokenConfig.spenderAddress,
-        requiredAmount: config.tokenConfig.amount
+        requiredAmount: config.tokenConfig.amount,
+        treasury: config.tokenConfig.treasuryAddress
       });
 
       const hasAllowance = await checkTokenAllowance(
         provider,
         config.tokenConfig.tokenAddress,
         signerAddress,
-        config.tokenConfig.spenderAddress,
+        config.tokenConfig.treasuryAddress, // Always use treasury address for allowance check
         config.tokenConfig.amount
       );
 
       if (!hasAllowance) {
         throw new ProposalError({
           category: 'token',
-          message: 'Insufficient token allowance',
+          message: 'Insufficient token allowance for treasury',
           recoverySteps: [
-            'Approve the token spending',
+            'Approve token spending for the treasury',
             'Try the transaction again after approval'
           ]
         });
       }
-      console.log('Token allowance check passed');
+      console.log('Token allowance check passed for treasury');
     } catch (error) {
       console.error('Allowance check error:', error);
       throw error;
