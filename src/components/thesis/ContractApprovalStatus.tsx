@@ -40,6 +40,7 @@ export const ContractApprovalStatus = ({
   const [isWalletReady, setIsWalletReady] = useState(false);
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [isLoadingBalance, setIsLoadingBalance] = useState(true);
+  const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
   const approvalCompletedRef = useRef(false);
   const { toast } = useToast();
 
@@ -82,6 +83,16 @@ export const ContractApprovalStatus = ({
         try {
           const isConnected = await wallet.isConnected();
           setIsWalletReady(isConnected);
+          
+          if (isConnected) {
+            const contractStatus = await getContractStatus(wallet);
+            setTreasuryAddress(contractStatus.treasury);
+            setContractTestMode(contractStatus.isTestMode);
+            console.log("Contract status:", {
+              treasury: contractStatus.treasury,
+              isTestMode: contractStatus.isTestMode
+            });
+          }
         } catch (error) {
           console.error("Error checking wallet connection:", error);
           setIsWalletReady(false);
@@ -93,26 +104,6 @@ export const ContractApprovalStatus = ({
 
     checkWalletStatus();
   }, [wallet, isInitializing]);
-
-  useEffect(() => {
-    const checkTestMode = async () => {
-      if (!isWalletReady || !wallet) {
-        console.log("Wallet not ready for test mode check");
-        return;
-      }
-
-      try {
-        console.log("Checking contract test mode status...");
-        const contractStatus = await getContractStatus(wallet);
-        setContractTestMode(contractStatus.isTestMode);
-        console.log("Contract test mode status:", contractStatus.isTestMode);
-      } catch (error) {
-        console.error("Error checking test mode:", error);
-      }
-    };
-
-    checkTestMode();
-  }, [wallet, isWalletReady]);
 
   const handleApprove = async () => {
     if (isApproving || isApproved || !isWalletReady || approvalCompletedRef.current) return;
@@ -126,6 +117,15 @@ export const ContractApprovalStatus = ({
       return;
     }
 
+    if (!treasuryAddress) {
+      toast({
+        title: "Approval Failed",
+        description: "Treasury address not available",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsApproving(true);
     try {
       console.log("Starting approval process...", {
@@ -133,13 +133,15 @@ export const ContractApprovalStatus = ({
         contractTestMode,
         isTestMode,
         currentFormData,
-        lgrBalance
+        lgrBalance,
+        treasuryAddress
       });
       
       if (wallet) {
         const contractStatus = await getContractStatus(wallet);
         console.log("Contract status:", {
-          isTestMode: contractStatus.isTestMode
+          isTestMode: contractStatus.isTestMode,
+          treasury: contractStatus.treasury
         });
       }
       
@@ -194,9 +196,9 @@ export const ContractApprovalStatus = ({
           backoffMs: 5000,
           tokenConfig: {
             tokenAddress: LGR_TOKEN_ADDRESS,
-            spenderAddress: address!,
             amount: requiredAmount.toString(),
-            isTestMode: contractTestMode
+            isTestMode: contractTestMode,
+            treasuryAddress // Add the treasury address here
           },
           walletType
         },
