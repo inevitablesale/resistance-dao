@@ -1,4 +1,10 @@
 import { ethers } from "ethers";
+import { ProposalError, handleError } from "./errorHandlingService";
+import { EventConfig, waitForProposalCreation } from "./eventListenerService";
+import { transactionQueue } from "./transactionQueueService";
+import { checkTokenAllowance } from "./tokenService";
+import { WalletType } from "@/hooks/useWalletProvider";
+
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
@@ -93,6 +99,9 @@ function sanitizeString(str: string): string {
 }
 
 function processText(text: string): string {
+  if (!text || typeof text !== 'string') {
+    return ''; // Return empty string for null/undefined/non-string values
+  }
   const sanitized = sanitizeString(text);
   // Convert to bytes to ensure proper UTF-8 handling
   const textBytes = ethers.utils.toUtf8Bytes(sanitized);
@@ -165,9 +174,15 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
       : "";
     const location = processText(config.metadata.firmCriteria.location);
     
+    // Ensure arrays are valid
+    const paymentTerms = Array.isArray(config.metadata.paymentTerms) ? config.metadata.paymentTerms : [];
+    const operationalStrategies = Array.isArray(config.metadata.strategies.operational) ? config.metadata.strategies.operational : [];
+    const growthStrategies = Array.isArray(config.metadata.strategies.growth) ? config.metadata.strategies.growth : [];
+    const integrationStrategies = Array.isArray(config.metadata.strategies.integration) ? config.metadata.strategies.integration : [];
+
     const contractInput: ProposalContractInput = {
       title,
-      ipfsMetadata: config.ipfsHash,
+      ipfsMetadata: config.ipfsHash || '',
       targetCapital: config.targetCapital,
       votingDuration: config.votingDuration,
       investmentDrivers,
@@ -176,10 +191,10 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
       location,
       dealType: config.metadata.firmCriteria.dealType,
       geographicFocus: config.metadata.firmCriteria.geographicFocus,
-      paymentTerms: config.metadata.paymentTerms,
-      operationalStrategies: config.metadata.strategies.operational,
-      growthStrategies: config.metadata.strategies.growth,
-      integrationStrategies: config.metadata.strategies.integration
+      paymentTerms,
+      operationalStrategies,
+      growthStrategies,
+      integrationStrategies
     };
 
     // Log the byte lengths for debugging
@@ -198,7 +213,15 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
     return contractInput;
   } catch (error) {
     console.error("Error transforming config:", error);
-    throw new Error(`Failed to transform proposal config: ${error.message}`);
+    throw new ProposalError({
+      category: 'transformation',
+      message: `Failed to transform proposal config: ${error.message}`,
+      recoverySteps: [
+        'Check that all text fields contain valid string data',
+        'Ensure all required fields are provided',
+        'Try submitting the form again'
+      ]
+    });
   }
 }
 
