@@ -16,8 +16,13 @@ interface TargetCapitalInputProps {
 const MIN_TARGET_CAPITAL_LGR = 1000;
 const MAX_TARGET_CAPITAL_LGR = 25000000;
 
+// Helper to ensure the value fits in uint128
+const MAX_UINT128 = ethers.BigNumber.from(2).pow(128).sub(1);
+
 export const convertUSDToLGRWei = (lgrAmount: string): ethers.BigNumber => {
-  if (!lgrAmount || isNaN(parseFloat(lgrAmount))) return ethers.BigNumber.from(0);
+  if (!lgrAmount || isNaN(parseFloat(lgrAmount))) {
+    throw new Error("Invalid amount");
+  }
   
   // Convert string to number and validate
   const lgrValue = parseFloat(lgrAmount);
@@ -32,10 +37,30 @@ export const convertUSDToLGRWei = (lgrAmount: string): ethers.BigNumber => {
   
   try {
     // Convert the whole LGR amount to wei (18 decimals)
-    return ethers.utils.parseUnits(wholeLGRAmount.toString(), 18);
+    const weiValue = ethers.utils.parseUnits(wholeLGRAmount.toString(), 18);
+    
+    // Validate that the value fits in uint128
+    if (weiValue.gt(MAX_UINT128)) {
+      console.error("Value exceeds uint128 max:", {
+        weiValue: weiValue.toString(),
+        maxUint128: MAX_UINT128.toString()
+      });
+      throw new Error("Amount too large for contract (exceeds uint128)");
+    }
+
+    // Log the conversion details
+    console.log("Target capital conversion:", {
+      inputAmount: lgrAmount,
+      wholeLGRAmount,
+      weiValueDecimal: weiValue.toString(),
+      weiValueHex: weiValue.toHexString(),
+      fits_uint128: weiValue.lte(MAX_UINT128)
+    });
+
+    return weiValue;
   } catch (error) {
     console.error("Error converting to wei:", error);
-    return ethers.BigNumber.from(0);
+    throw error;
   }
 };
 

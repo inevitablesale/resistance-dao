@@ -92,6 +92,18 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
+  // Log input values before contract call
+  console.log("Creating proposal with parameters:", {
+    title: config.metadata.title,
+    targetCapital: {
+      decimal: config.targetCapital.toString(),
+      hex: config.targetCapital.toHexString(),
+      fits_uint128: config.targetCapital.lte(ethers.BigNumber.from(2).pow(128).sub(1))
+    },
+    votingDuration: config.votingDuration,
+    ipfsHash: config.ipfsHash
+  });
+  
   const input = {
     title: config.metadata.title,
     ipfsMetadata: config.ipfsHash,
@@ -108,6 +120,15 @@ export const createProposal = async (
     growthStrategies: config.metadata.strategies.growth,
     integrationStrategies: config.metadata.strategies.integration
   };
+
+  // Try to estimate gas first to catch any potential errors
+  try {
+    const gasEstimate = await factory.estimateGas.createProposal(input, config.linkedInURL);
+    console.log("Gas estimation successful:", gasEstimate.toString());
+  } catch (error) {
+    console.error("Gas estimation failed:", error);
+    throw error;
+  }
   
   return await executeTransaction(
     () => factory.createProposal(input, config.linkedInURL),
