@@ -224,24 +224,25 @@ const ThesisSubmission = () => {
 
   useEffect(() => {
     let mounted = true;
+    let initCheckTimeout: NodeJS.Timeout;
 
     const checkTestMode = async () => {
       if (!wallet) {
-        console.log("⚠️ Wallet not available for test mode check");
-        return;
+        console.log("⚠️ Wallet not available yet, waiting for initialization...");
+        return false;
       }
 
       try {
         const walletClient = await wallet.getWalletClient();
         if (!walletClient || !mounted) {
           console.log("⚠️ Wallet client not ready or component unmounted");
-          return;
+          return false;
         }
 
         console.log("✅ Wallet client ready, checking test mode status...");
-        
         const status = await getContractStatus(wallet);
-        if (!mounted) return;
+        
+        if (!mounted) return false;
 
         console.log("📊 Contract Mode Status:", {
           isTestMode: status.isTestMode,
@@ -261,19 +262,55 @@ const ThesisSubmission = () => {
           setContractTestMode(status.isTestMode);
           setIsTestMode(isTesterWallet && status.isTestMode);
         }
+        
+        return true;
       } catch (error) {
         console.error("❌ Error checking test mode:", error);
         if (mounted) {
           setIsTestMode(false);
           setContractTestMode(false);
         }
+        return false;
       }
     };
 
-    checkTestMode();
+    const initializeWithRetry = async () => {
+      let attempts = 0;
+      const maxAttempts = 10;
+      const retryDelay = 1000; // 1 second
+
+      while (attempts < maxAttempts) {
+        console.log(`Attempt ${attempts + 1}/${maxAttempts} to initialize test mode...`);
+        const success = await checkTestMode();
+        
+        if (success) {
+          console.log("✅ Test mode initialization successful");
+          return;
+        }
+        
+        attempts++;
+        if (attempts < maxAttempts) {
+          console.log(`Retrying in ${retryDelay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+      }
+      
+      console.error("❌ Failed to initialize test mode after maximum attempts");
+    };
+
+    initializeWithRetry();
+
+    initCheckTimeout = setTimeout(() => {
+      if (mounted) {
+        console.error("⚠️ Test mode initialization timed out");
+        setIsTestMode(false);
+        setContractTestMode(false);
+      }
+    }, 30000); // 30 seconds timeout
 
     return () => {
       mounted = false;
+      clearTimeout(initCheckTimeout);
     };
   }, [wallet, address]);
 
