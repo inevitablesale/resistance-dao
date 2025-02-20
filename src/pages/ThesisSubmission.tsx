@@ -70,39 +70,22 @@ const ThesisSubmission = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isConnected, address, wallet } = useWalletConnection();
-  const { user, isInitialized } = useDynamicContext();
+  const { user } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
 
   const getLinkedInUrl = () => {
-    if (!isInitialized || !user) {
-      console.log("[LinkedIn] Dynamic SDK not initialized or user not available:", {
-        isInitialized,
-        userExists: !!user
-      });
-      return "";
-    }
-
-    // Log the full user object for debugging
-    console.log("[LinkedIn] Full user object:", {
-      userExists: !!user,
-      metadata: user.metadata,
-      verifications: user.verifications,
-      customFields: user.verifications?.customFields
-    });
-
     // Try getting from metadata first
-    const urlFromMetadata = user.metadata?.["LinkedIn Profile URL"];
+    const urlFromMetadata = user?.metadata?.["LinkedIn Profile URL"];
     // Fallback to verifications if not in metadata
-    const urlFromVerifications = user.verifications?.customFields?.["LinkedIn Profile URL"];
+    const urlFromVerifications = user?.verifications?.customFields?.["LinkedIn Profile URL"];
     
     const url = urlFromMetadata || urlFromVerifications;
     
     console.log("[LinkedIn] URL Resolution:", {
       fromMetadata: urlFromMetadata,
       fromVerifications: urlFromVerifications,
-      finalUrl: url,
-      source: urlFromMetadata ? 'metadata' : urlFromVerifications ? 'verifications' : 'not_found'
+      finalUrl: url
     });
     
     return url || "";
@@ -131,18 +114,9 @@ const ThesisSubmission = () => {
         integration: []
       },
       votingDuration: 7 * 24 * 60 * 60,
-      linkedInURL: ""
+      linkedInURL: getLinkedInUrl()
     }
   });
-
-  // Update form when user data becomes available
-  useEffect(() => {
-    if (isInitialized && user) {
-      const linkedInUrl = getLinkedInUrl();
-      console.log("[LinkedIn] Updating form with URL:", linkedInUrl);
-      form.setValue('linkedInURL', linkedInUrl);
-    }
-  }, [isInitialized, user]);
 
   const handleApprovalComplete = () => {
     setIsApproved(true);
@@ -171,17 +145,8 @@ const ThesisSubmission = () => {
       return;
     }
 
-    if (!isInitialized || !user) {
-      toast({
-        title: "Initialization Required",
-        description: "Please wait for wallet initialization to complete",
-        variant: "destructive"
-      });
-      return;
-    }
-
     const linkedInUrl = getLinkedInUrl();
-    console.log("[LinkedIn] URL for submission:", linkedInUrl);
+    console.log("LinkedIn URL for submission:", linkedInUrl);
 
     if (!linkedInUrl) {
       toast({
