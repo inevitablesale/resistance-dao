@@ -823,7 +823,10 @@ const ThesisSubmission = () => {
   };
 
   const handleTestModeToggle = async (enabled: boolean) => {
+    console.log("Test mode toggle requested:", { enabled });
+    
     if (!isConnected) {
+      console.log("Wallet not connected, prompting connection");
       toast({
         title: "Connect Wallet",
         description: "Please connect your wallet to toggle test mode",
@@ -835,10 +838,20 @@ const ThesisSubmission = () => {
     
     try {
       if (wallet) {
+        console.log("Checking contract status for test mode toggle...");
         const status = await getContractStatus(wallet);
         const isTesterWallet = status.tester.toLowerCase() === address?.toLowerCase();
         
+        console.log("Test mode toggle authorization check:", {
+          isTesterWallet,
+          currentTestMode: status.isTestMode,
+          requestedState: enabled,
+          walletAddress: address,
+          testerAddress: status.tester
+        });
+        
         if (!isTesterWallet) {
+          console.log("Unauthorized wallet attempting to toggle test mode");
           toast({
             title: "Not Authorized",
             description: "Your wallet is not authorized for test mode",
@@ -848,12 +861,14 @@ const ThesisSubmission = () => {
         }
 
         if (enabled && !status.isTestMode) {
+          console.log("Enabling contract test mode...");
           await setTestMode(true, wallet);
           toast({
             title: "Test Mode Enabled",
             description: "Contract test mode has been enabled"
           });
         } else if (!enabled && status.isTestMode) {
+          console.log("Disabling contract test mode...");
           await setTestMode(false, wallet);
           toast({
             title: "Test Mode Disabled",
@@ -861,16 +876,29 @@ const ThesisSubmission = () => {
           });
         }
 
+        // Recheck test mode status after toggle
         const newStatus = await getContractStatus(wallet);
+        console.log("Updated contract status after toggle:", {
+          previousTestMode: status.isTestMode,
+          newTestMode: newStatus.isTestMode,
+          isTesterWallet
+        });
+        
         setContractTestMode(newStatus.isTestMode);
         setIsTestMode(newStatus.isTestMode && isTesterWallet);
         
+        console.log("Local state updated:", {
+          contractTestMode: newStatus.isTestMode,
+          isTestMode: newStatus.isTestMode && isTesterWallet
+        });
+        
         if (!newStatus.isTestMode || !isTesterWallet) {
+          console.log("Resetting form due to test mode being disabled");
           resetForm();
         }
       }
     } catch (error) {
-      console.error("Error toggling test mode:", error);
+      console.error("Error in test mode toggle:", error);
       toast({
         title: "Error",
         description: "Failed to toggle test mode",
