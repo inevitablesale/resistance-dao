@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -862,7 +863,61 @@ const ThesisSubmission = () => {
             <Card className="p-6 bg-black/50 border-white/10">
               {activeStep === 'thesis' && (
                 <div className="space-y-6">
-                  {/* ... keep existing code (thesis form fields) */}
+                  <div>
+                    <Label htmlFor="title">Thesis Title</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => handleFormDataChange('title', e.target.value)}
+                      placeholder="Enter a descriptive title for your investment thesis"
+                      className="mt-2"
+                    />
+                    {formErrors.title && (
+                      <p className="text-sm text-red-500 mt-1">{formErrors.title[0]}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="targetCapital">Target Capital (LGR)</Label>
+                    <TargetCapitalInput
+                      value={formData.investment.targetCapital}
+                      onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
+                      error={formErrors['investment.targetCapital']?.[0]}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="drivers">Investment Drivers</Label>
+                    <textarea
+                      id="drivers"
+                      value={formData.investment.drivers}
+                      onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
+                      placeholder="Explain the key factors driving this investment opportunity..."
+                      className="mt-2 w-full min-h-[120px] px-3 py-2 rounded-md border bg-transparent text-white border-white/10 focus:border-white/20 focus:ring-0 placeholder:text-white/20"
+                    />
+                    {formErrors['investment.drivers'] && (
+                      <p className="text-sm text-red-500 mt-1">{formErrors['investment.drivers'][0]}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="additionalCriteria">Additional Investment Criteria</Label>
+                    <textarea
+                      id="additionalCriteria"
+                      value={formData.investment.additionalCriteria}
+                      onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
+                      placeholder="Any additional criteria or preferences for the investment..."
+                      className="mt-2 w-full min-h-[80px] px-3 py-2 rounded-md border bg-transparent text-white border-white/10 focus:border-white/20 focus:ring-0 placeholder:text-white/20"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Voting Duration</Label>
+                    <VotingDurationInput
+                      value={[votingDuration]}
+                      onValueChange={handleVotingDurationChange}
+                    />
+                  </div>
                 </div>
               )}
 
