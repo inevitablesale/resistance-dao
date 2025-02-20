@@ -34,16 +34,11 @@ export const useWalletProvider = () => {
   };
 
   const getLinkedInUrl = () => {
-    // Try getting from verifications first (post-verification state)
-    const urlFromVerifications = user?.verifications?.customFields?.["LinkedIn Profile URL"];
-    // Fallback to metadata (initial onboarding state)
-    const urlFromMetadata = user?.metadata?.["LinkedIn Profile URL"];
-    
+    // We now know the URL is only in metadata
+    const linkedInUrl = user?.metadata?.["LinkedIn Profile URL"];
     return {
-      url: urlFromVerifications || urlFromMetadata || null,
-      source: urlFromVerifications ? 'verifications' : 
-             urlFromMetadata ? 'metadata' : 
-             'not_found'
+      url: linkedInUrl || null,
+      source: linkedInUrl ? 'metadata' : 'not_found'
     };
   };
 

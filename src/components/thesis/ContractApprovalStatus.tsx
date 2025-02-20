@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -64,18 +63,16 @@ export const ContractApprovalStatus = ({
             console.log('[Wallet Status] LinkedIn URL Info:', {
               userExists: !!wallet.user,
               walletAddress: wallet.address,
-              linkedInUrl: {
-                fromVerifications: wallet.user?.verifications?.customFields?.["LinkedIn Profile URL"],
-                fromMetadata: wallet.user?.metadata?.["LinkedIn Profile URL"]
-              },
+              linkedInUrl: wallet.user?.metadata?.["LinkedIn Profile URL"],
               metadata: {
                 exists: !!wallet.user?.metadata,
-                keys: wallet.user?.metadata ? Object.keys(wallet.user.metadata) : []
+                keys: wallet.user?.metadata ? Object.keys(wallet.user.metadata) : [],
+                fullMetadata: wallet.user?.metadata || {}
               },
-              verifications: {
-                exists: !!wallet.user?.verifications,
-                customFieldsExist: !!wallet.user?.verifications?.customFields,
-                keys: wallet.user?.verifications?.customFields ? Object.keys(wallet.user.verifications.customFields) : []
+              fullUser: {
+                metadata: wallet.user?.metadata || {},
+                linkedInUrl: wallet.user?.metadata?.["LinkedIn Profile URL"],
+                userVerifications: wallet.user?.verifications
               }
             });
           }
