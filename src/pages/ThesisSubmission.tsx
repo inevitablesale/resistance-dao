@@ -624,10 +624,8 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
-      // Use the current component's form data
       const currentFormData = isTestMode ? TEST_FORM_DATA : formData;
       
-      // Validate form data before submission
       if (!currentFormData.investment.targetCapital) {
         throw new Error("Target capital is required");
       }
@@ -688,7 +686,6 @@ const ThesisSubmission = () => {
           description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
         });
 
-        // Store proposal in local storage
         const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
         const newProposal: StoredProposal = {
           hash: result.hash,
@@ -701,7 +698,6 @@ const ThesisSubmission = () => {
         userProposals.push(newProposal);
         localStorage.setItem('userProposals', JSON.stringify(userProposals));
 
-        // Redirect after a short delay
         setTimeout(() => {
           navigate('/proposals');
         }, 2000);
@@ -854,3 +850,50 @@ const ThesisSubmission = () => {
               "bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden",
               formErrors && Object.keys(formErrors).length > 0 ? "border-red-500/20" : ""
             )}>
+              <div className="p-6">
+                {activeStep === 'thesis' && (
+                  <FirmCriteriaSection
+                    formData={formData}
+                    onFormDataChange={handleFormDataChange}
+                    formErrors={formErrors}
+                  />
+                )}
+                {activeStep === 'strategy' && (
+                  <StrategiesSection
+                    formData={formData}
+                    onFormDataChange={handleFormDataChange}
+                    formErrors={formErrors}
+                  />
+                )}
+                {activeStep === 'terms' && (
+                  <PaymentTermsSection
+                    formData={formData}
+                    onFormDataChange={handleFormDataChange}
+                    formErrors={formErrors}
+                  />
+                )}
+                {activeStep === 'submission' && (
+                  <ContractApprovalStatus
+                    onApprovalComplete={handleApprovalComplete}
+                    requiredAmount={SUBMISSION_FEE}
+                    isTestMode={isTestMode}
+                    currentFormData={formData}
+                  />
+                )}
+              </div>
+            </Card>
+          </div>
+
+          <div className="col-span-3">
+            <div className="sticky top-32 space-y-4">
+              <LGRWalletDisplay />
+              {renderContinueButton(() => handleContinue, activeStep === 'terms')}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
