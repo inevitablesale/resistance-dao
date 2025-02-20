@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -29,8 +30,9 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Preferred Firm Size (Revenue)</Label>
         <RadioGroup 
+          defaultValue={String(FirmSize.BELOW_1M)}
           value={String(formData.firmCriteria.size)}
-          onValueChange={(value) => onChange('size', Number(value))}
+          onValueChange={(value) => onChange('firmCriteria.size', Number(value))}
           className="flex flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
@@ -67,15 +69,16 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
         </RadioGroup>
         {formErrors['firmCriteria.size'] && (
-          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.size'][0]}</p>
+          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.size']}</p>
         )}
       </div>
 
       <div>
         <Label className="text-white mb-2 block">Geographic Focus</Label>
         <RadioGroup 
+          defaultValue={String(GeographicFocus.LOCAL)}
           value={String(formData.firmCriteria.geographicFocus)}
-          onValueChange={(value) => onChange('geographicFocus', Number(value))}
+          onValueChange={(value) => onChange('firmCriteria.geographicFocus', Number(value))}
           className="flex flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
@@ -112,7 +115,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
         </RadioGroup>
         {formErrors['firmCriteria.geographicFocus'] && (
-          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.geographicFocus'][0]}</p>
+          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.geographicFocus']}</p>
         )}
       </div>
 
@@ -120,7 +123,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
         <Label className="text-white mb-2 block">Primary State (Optional)</Label>
         <Select 
           value={formData.firmCriteria.location}
-          onValueChange={(value) => onChange('location', value)}
+          onValueChange={(value) => onChange('firmCriteria.location', value)}
         >
           <SelectTrigger className="bg-black/50 border-white/10 text-white">
             <SelectValue placeholder="Select a state" />
@@ -132,15 +135,16 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </SelectContent>
         </Select>
         {formErrors['firmCriteria.location'] && (
-          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.location'][0]}</p>
+          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.location']}</p>
         )}
       </div>
 
       <div>
         <Label className="text-white mb-2 block">Deal Type</Label>
         <RadioGroup 
+          defaultValue={String(DealType.ACQUISITION)}
           value={String(formData.firmCriteria.dealType)}
-          onValueChange={(value) => onChange('dealType', Number(value))}
+          onValueChange={(value) => onChange('firmCriteria.dealType', Number(value))}
           className="flex flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
@@ -185,9 +189,10 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
           </div>
         </RadioGroup>
         {formErrors['firmCriteria.dealType'] && (
-          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.dealType'][0]}</p>
+          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.dealType']}</p>
         )}
       </div>
     </div>
   );
 };
+
