@@ -252,8 +252,22 @@ const ThesisSubmission = () => {
         return;
       }
 
-      console.log("[IPFS] Uploading form data:", data);
-      const ipfsHash = await uploadToIPFS<ProposalMetadata>(data);
+      const cleanedData: ProposalMetadata = {
+        ...data,
+        title: data.title.trim(),
+        investment: {
+          ...data.investment,
+          drivers: data.investment.drivers.trim(),
+          additionalCriteria: data.investment.additionalCriteria?.trim() || ""
+        },
+        firmCriteria: {
+          ...data.firmCriteria,
+          location: data.firmCriteria.location.trim()
+        }
+      };
+
+      console.log("[IPFS] Uploading form data:", cleanedData);
+      const ipfsHash = await uploadToIPFS<ProposalMetadata>(cleanedData);
       console.log("[IPFS] Upload successful, hash:", ipfsHash);
 
       const config: ProposalConfig = {
@@ -261,7 +275,7 @@ const ThesisSubmission = () => {
         votingDuration: data.votingDuration,
         ipfsHash,
         metadata: {
-          ...data,
+          ...cleanedData,
           linkedInURL: linkedInUrl
         },
         linkedInURL: linkedInUrl

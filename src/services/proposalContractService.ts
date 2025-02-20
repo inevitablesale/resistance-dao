@@ -85,11 +85,27 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
   }
 };
 
+function processText(text: string): string {
+  return text
+    .replace(/\n/g, ' ') // Replace newlines with spaces
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    .trim(); // Remove leading/trailing whitespace
+}
+
+function validateTextLength(text: string, field: string, min?: number, max?: number): void {
+  const length = Buffer.from(text).length; // Get byte length for proper UTF-8 handling
+  
+  if (min !== undefined && length < min) {
+    throw new Error(`${field} must be at least ${min} characters`);
+  }
+  if (max !== undefined && length > max) {
+    throw new Error(`${field} must not exceed ${max} characters`);
+  }
+}
+
 function validateProposalInput(input: ProposalContractInput) {
   // Title validation (10-100 chars)
-  if (!input.title || input.title.length < 10 || input.title.length > 100) {
-    throw new Error("Title must be between 10 and 100 characters");
-  }
+  validateTextLength(input.title, "Title", 10, 100);
 
   // IPFS hash validation
   if (!input.ipfsMetadata || input.ipfsMetadata.length === 0) {
@@ -97,15 +113,11 @@ function validateProposalInput(input: ProposalContractInput) {
   }
 
   // Investment drivers validation (50-500 chars)
-  if (!input.investmentDrivers || 
-      input.investmentDrivers.length < 50 || 
-      input.investmentDrivers.length > 500) {
-    throw new Error("Investment drivers must be between 50 and 500 characters");
-  }
+  validateTextLength(input.investmentDrivers, "Investment drivers", 50, 500);
 
   // Additional criteria validation (max 500 chars)
-  if (input.additionalCriteria && input.additionalCriteria.length > 500) {
-    throw new Error("Additional criteria must not exceed 500 characters");
+  if (input.additionalCriteria) {
+    validateTextLength(input.additionalCriteria, "Additional criteria", undefined, 500);
   }
 
   // Array validations
@@ -126,15 +138,23 @@ function validateProposalInput(input: ProposalContractInput) {
 function transformConfigToContractInput(config: ProposalConfig): ProposalContractInput {
   console.log("Transforming config to contract input:", config);
   
+  // Process text fields to ensure proper formatting
+  const title = processText(config.metadata.title);
+  const investmentDrivers = processText(config.metadata.investment.drivers);
+  const additionalCriteria = config.metadata.investment.additionalCriteria 
+    ? processText(config.metadata.investment.additionalCriteria)
+    : "";
+  const location = processText(config.metadata.firmCriteria.location);
+  
   const contractInput: ProposalContractInput = {
-    title: config.metadata.title,
+    title,
     ipfsMetadata: config.ipfsHash,
     targetCapital: config.targetCapital,
     votingDuration: config.votingDuration,
-    investmentDrivers: config.metadata.investment.drivers,
-    additionalCriteria: config.metadata.investment.additionalCriteria || "",
+    investmentDrivers,
+    additionalCriteria,
     firmSize: config.metadata.firmCriteria.size,
-    location: config.metadata.firmCriteria.location,
+    location,
     dealType: config.metadata.firmCriteria.dealType,
     geographicFocus: config.metadata.firmCriteria.geographicFocus,
     paymentTerms: config.metadata.paymentTerms,
@@ -143,7 +163,11 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
     integrationStrategies: config.metadata.strategies.integration
   };
 
-  console.log("Transformed contract input:", contractInput);
+  console.log("Transformed contract input:", {
+    ...contractInput,
+    targetCapital: contractInput.targetCapital.toString()
+  });
+  
   return contractInput;
 }
 
