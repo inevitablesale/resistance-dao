@@ -55,13 +55,27 @@ export const ContractApprovalStatus = ({
   const hasRequiredBalance = ethers.utils.parseEther(balance).gte(requiredAmountBN);
 
   const getLinkedInUrl = () => {
-    if (!user) return "";
-    // Try getting from verifications first (post-verification state)
-    const urlFromVerifications = user.verifications?.customFields?.["LinkedIn Profile URL"];
-    // Fallback to metadata (initial onboarding state)
-    const urlFromMetadata = user.metadata?.["LinkedIn Profile URL"];
+    if (!user) {
+      console.log("[LinkedIn] No user found");
+      return "";
+    }
     
-    return urlFromVerifications || urlFromMetadata || "";
+    // First try metadata
+    const urlFromMetadata = user.metadata?.["LinkedIn Profile URL"];
+    if (urlFromMetadata) {
+      console.log("[LinkedIn] URL found in metadata:", urlFromMetadata);
+      return urlFromMetadata;
+    }
+    
+    // Then try verifications
+    const urlFromVerifications = user.verifications?.customFields?.["LinkedIn Profile URL"];
+    if (urlFromVerifications) {
+      console.log("[LinkedIn] URL found in verifications:", urlFromVerifications);
+      return urlFromVerifications;
+    }
+    
+    console.log("[LinkedIn] No URL found in either location");
+    return "";
   };
 
   useEffect(() => {
@@ -75,9 +89,10 @@ export const ContractApprovalStatus = ({
             const linkedInUrl = getLinkedInUrl();
             console.log('[LinkedIn] Profile URL Info:', {
               url: linkedInUrl,
-              fromVerifications: user.verifications?.customFields?.["LinkedIn Profile URL"],
               fromMetadata: user.metadata?.["LinkedIn Profile URL"],
-              userData: user
+              fromVerifications: user.verifications?.customFields?.["LinkedIn Profile URL"],
+              fullMetadata: user.metadata,
+              fullUser: user
             });
           }
         } catch (error) {
@@ -191,12 +206,25 @@ export const ContractApprovalStatus = ({
     if (isApproving || isApproved || !isWalletReady || approvalCompletedRef.current || !treasuryAddress) return;
     setIsApproving(true);
     try {
+      // Get LinkedIn URL early to ensure we have it
       const linkedInUrl = getLinkedInUrl();
+      console.log("[LinkedIn] Starting approval process with URL:", linkedInUrl);
+      
+      if (!linkedInUrl) {
+        console.warn("[LinkedIn] No LinkedIn URL found for user");
+      }
+      
+      // Create form data with LinkedIn URL immediately
+      const formDataWithLinkedIn = {
+        ...currentFormData,
+        linkedInURL: linkedInUrl
+      };
+      
       console.log("Starting approval process...", {
         walletAddress: address,
         linkedInUrl,
         treasuryAddress,
-        currentFormData
+        formData: formDataWithLinkedIn
       });
       
       if (wallet) {
@@ -251,11 +279,7 @@ export const ContractApprovalStatus = ({
       if (!approvalCompletedRef.current) {
         approvalCompletedRef.current = true;
         setIsApproved(true);
-        const formDataWithLinkedIn = {
-          ...currentFormData,
-          linkedInURL: linkedInUrl
-        };
-        console.log("Submitting form data with LinkedIn:", formDataWithLinkedIn);
+        console.log("Submitting final form data with LinkedIn:", formDataWithLinkedIn);
         onApprovalComplete(formDataWithLinkedIn, transaction, false);
       }
     } catch (error) {
