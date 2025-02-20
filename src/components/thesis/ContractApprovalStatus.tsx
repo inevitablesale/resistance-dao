@@ -13,7 +13,7 @@ import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { transactionQueue } from "@/services/transactionQueueService";
 import { getContractStatus } from "@/services/proposalContractService";
 import { getTokenBalance } from "@/services/tokenService";
-import { useDynamicContext } from "@/hooks/useDynamicContext";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const TESTER_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
