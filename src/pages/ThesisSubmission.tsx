@@ -874,6 +874,8 @@ const ThesisSubmission = () => {
                       <div className="space-y-4">
                         <Label className="text-lg font-medium text-white">Thesis Title</Label>
                         <Input 
+                          id="thesis-title"
+                          name="thesis-title"
                           placeholder="Enter a clear, descriptive title"
                           className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12 focus:border-yellow-500/50"
                           value={formData.title}
@@ -899,6 +901,8 @@ const ThesisSubmission = () => {
                       <div className="space-y-4">
                         <Label className="text-lg font-medium text-white">Investment Drivers</Label>
                         <textarea
+                          id="investment-drivers"
+                          name="investment-drivers"
                           placeholder="Describe the key drivers behind this investment thesis..."
                           className="w-full h-32 bg-black/50 border border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none focus:border-yellow-500/50"
                           value={formData.investment.drivers}
