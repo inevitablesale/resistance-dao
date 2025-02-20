@@ -16,7 +16,7 @@ import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTe
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
-import { ProposalMetadata, FirmSize, DealType, GeographicFocus, ProposalConfig, PaymentTerm, OperationalStrategy, GrowthStrategy, IntegrationStrategy } from "@/types/proposals";
+import { ProposalMetadata, FirmSize, DealType, GeographicFocus, PaymentTerm, OperationalStrategy, GrowthStrategy, IntegrationStrategy } from "@/types/proposals";
 import { SUBMISSION_FEE } from "@/lib/constants";
 import { uploadToIPFS } from "@/services/ipfsService";
 import { createProposal } from "@/services/proposalContractService";
@@ -162,8 +162,30 @@ const ThesisSubmission = () => {
       },
       votingDuration: 7 * 24 * 60 * 60,
       linkedInURL: ""
-    }
+    },
+    mode: "onChange"
   });
+
+  const isFormValid = form.formState.isValid;
+  const errors = form.formState.errors;
+
+  const handleInvalidSubmit = () => {
+    const errorMessages = [];
+    if (errors.title) errorMessages.push(errors.title.message);
+    if (errors.investment?.drivers) errorMessages.push(errors.investment.drivers.message);
+    if (errors.investment?.targetCapital) errorMessages.push(errors.investment.targetCapital.message);
+    if (errors.firmCriteria?.location) errorMessages.push(errors.firmCriteria.location.message);
+    if (errors.paymentTerms) errorMessages.push("Please select at least one payment term");
+    if (errors.strategies?.operational) errorMessages.push("Please select at least one operational strategy");
+    if (errors.strategies?.growth) errorMessages.push("Please select at least one growth strategy");
+    if (errors.strategies?.integration) errorMessages.push("Please select at least one integration strategy");
+
+    toast({
+      title: "Invalid Form",
+      description: errorMessages.join("\n"),
+      variant: "destructive"
+    });
+  };
 
   useEffect(() => {
     const linkedInUrl = getLinkedInUrl();
@@ -350,7 +372,7 @@ const ThesisSubmission = () => {
             />
           </Card>
 
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit, handleInvalidSubmit)} className="space-y-8">
             <Card className="bg-black/40 border-white/10 p-6">
               <h2 className="text-lg font-medium text-white mb-4">Step 2: Investment Details</h2>
               <div className="space-y-4">
@@ -359,10 +381,13 @@ const ThesisSubmission = () => {
                   <Input
                     {...form.register("title")}
                     placeholder="Enter a descriptive title for your investment thesis"
-                    className="mt-2"
+                    className={cn(
+                      "mt-2",
+                      errors.title && "border-red-500"
+                    )}
                   />
-                  {form.formState.errors.title && (
-                    <p className="text-sm text-red-400 mt-1">{form.formState.errors.title.message}</p>
+                  {errors.title && (
+                    <p className="text-sm text-red-400 mt-1">{errors.title.message}</p>
                   )}
                 </div>
 
@@ -371,10 +396,13 @@ const ThesisSubmission = () => {
                   <Textarea
                     {...form.register("investment.drivers")}
                     placeholder="Describe the key drivers behind this investment opportunity..."
-                    className="mt-2 min-h-[100px]"
+                    className={cn(
+                      "mt-2 min-h-[100px]",
+                      errors.investment?.drivers && "border-red-500"
+                    )}
                   />
-                  {form.formState.errors.investment?.drivers && (
-                    <p className="text-sm text-red-400 mt-1">{form.formState.errors.investment.drivers.message}</p>
+                  {errors.investment?.drivers && (
+                    <p className="text-sm text-red-400 mt-1">{errors.investment.drivers.message}</p>
                   )}
                 </div>
 
@@ -383,10 +411,13 @@ const ThesisSubmission = () => {
                   <Textarea
                     {...form.register("investment.additionalCriteria")}
                     placeholder="Any additional investment criteria or preferences..."
-                    className="mt-2"
+                    className={cn(
+                      "mt-2",
+                      errors.investment?.additionalCriteria && "border-red-500"
+                    )}
                   />
-                  {form.formState.errors.investment?.additionalCriteria && (
-                    <p className="text-sm text-red-400 mt-1">{form.formState.errors.investment.additionalCriteria.message}</p>
+                  {errors.investment?.additionalCriteria && (
+                    <p className="text-sm text-red-400 mt-1">{errors.investment.additionalCriteria.message}</p>
                   )}
                 </div>
               </div>
@@ -435,7 +466,7 @@ const ThesisSubmission = () => {
 
             <Button 
               type="submit"
-              disabled={isSubmitting || !form.formState.isValid || !isApproved}
+              disabled={isSubmitting || !isFormValid || !isApproved}
               className={cn(
                 "w-full h-12",
                 "bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600",
