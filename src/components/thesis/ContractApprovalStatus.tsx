@@ -16,7 +16,6 @@ import { transactionQueue } from "@/services/transactionQueueService";
 import { getContractStatus } from "@/services/proposalContractService";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
-const TESTER_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
 interface ContractApprovalStatusProps {
   onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => void;
@@ -37,7 +36,6 @@ export const ContractApprovalStatus = ({
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
-  const [isTesterWallet, setIsTesterWallet] = useState(false);
   const [contractTestMode, setContractTestMode] = useState(false);
   const [isWalletReady, setIsWalletReady] = useState(false);
   const approvalCompletedRef = useRef(false);
@@ -53,7 +51,7 @@ export const ContractApprovalStatus = ({
 
   const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
   
-  const hasRequiredBalance = (isTesterWallet && contractTestMode) || tokenBalances?.find(token => 
+  const hasRequiredBalance = contractTestMode || tokenBalances?.find(token => 
     token.symbol === "LGR" && ethers.BigNumber.from(token.balance || "0").gte(requiredAmountBN)
   );
 
@@ -77,30 +75,23 @@ export const ContractApprovalStatus = ({
 
   useEffect(() => {
     const checkTestMode = async () => {
-      if (!isWalletReady || !wallet || !address) {
+      if (!isWalletReady || !wallet) {
         console.log("Wallet not ready for test mode check");
         return;
       }
 
       try {
-        console.log("Checking test mode status...");
+        console.log("Checking contract test mode status...");
         const contractStatus = await getContractStatus(wallet);
-        const isTester = address.toLowerCase() === TESTER_ADDRESS.toLowerCase();
-        setIsTesterWallet(isTester);
         setContractTestMode(contractStatus.isTestMode);
-        console.log("Test mode status:", {
-          isTesterWallet: isTester,
-          contractTestMode: contractStatus.isTestMode,
-          walletAddress: address,
-          testerAddress: TESTER_ADDRESS
-        });
+        console.log("Contract test mode status:", contractStatus.isTestMode);
       } catch (error) {
         console.error("Error checking test mode:", error);
       }
     };
 
     checkTestMode();
-  }, [wallet, address, isWalletReady]);
+  }, [wallet, isWalletReady]);
 
   const handleApprove = async () => {
     if (isApproving || isApproved || !isWalletReady || approvalCompletedRef.current) return;
@@ -108,8 +99,6 @@ export const ContractApprovalStatus = ({
     try {
       console.log("Starting approval process...", {
         walletAddress: address,
-        testerAddress: TESTER_ADDRESS,
-        isTesterWallet,
         contractTestMode,
         isTestMode,
         currentFormData
@@ -118,17 +107,11 @@ export const ContractApprovalStatus = ({
       if (wallet) {
         const contractStatus = await getContractStatus(wallet);
         console.log("Contract status:", {
-          isTestMode: contractStatus.isTestMode,
-          testerAddress: contractStatus.tester,
-          connectedAddress: address,
-          isTesterWallet: address?.toLowerCase() === contractStatus.tester.toLowerCase()
+          isTestMode: contractStatus.isTestMode
         });
       }
       
-      const effectiveTestMode = isTesterWallet && contractTestMode;
-      console.log("Effective test mode:", effectiveTestMode);
-      
-      if (effectiveTestMode) {
+      if (contractTestMode) {
         console.log("Test mode active - bypassing LGR approval");
         const txId = await transactionQueue.addTransaction({
           type: 'token',
@@ -147,7 +130,7 @@ export const ContractApprovalStatus = ({
         if (!approvalCompletedRef.current) {
           approvalCompletedRef.current = true;
           setIsApproved(true);
-          onApprovalComplete(currentFormData, undefined, effectiveTestMode);
+          onApprovalComplete(currentFormData, undefined, contractTestMode);
         }
         return;
       }
@@ -169,7 +152,7 @@ export const ContractApprovalStatus = ({
       const transaction = await executeTransaction(
         async () => {
           console.log("Executing LGR approval transaction...");
-          return approveLGR(requiredAmount.toString(), effectiveTestMode);
+          return approveLGR(requiredAmount.toString(), contractTestMode);
         },
         {
           type: 'token',
@@ -181,7 +164,7 @@ export const ContractApprovalStatus = ({
             tokenAddress: LGR_TOKEN_ADDRESS,
             spenderAddress: address!,
             amount: requiredAmount.toString(),
-            isTestMode: effectiveTestMode
+            isTestMode: contractTestMode
           },
           walletType
         },
@@ -192,7 +175,7 @@ export const ContractApprovalStatus = ({
       if (!approvalCompletedRef.current) {
         approvalCompletedRef.current = true;
         setIsApproved(true);
-        onApprovalComplete(currentFormData, transaction, effectiveTestMode);
+        onApprovalComplete(currentFormData, transaction, contractTestMode);
       }
     } catch (error) {
       console.error("Approval error:", error);
@@ -212,7 +195,7 @@ export const ContractApprovalStatus = ({
     if (!approvalCompletedRef.current) {
       approvalCompletedRef.current = true;
       setIsApproved(true);
-      onApprovalComplete(currentFormData, undefined, isTesterWallet && contractTestMode);
+      onApprovalComplete(currentFormData, undefined, contractTestMode);
     }
   };
 
@@ -260,7 +243,7 @@ export const ContractApprovalStatus = ({
             <div className="space-y-1">
               <h3 className="text-lg font-medium">Contract Approval</h3>
               <p className="text-sm text-gray-400">
-                {isTesterWallet && contractTestMode 
+                {contractTestMode 
                   ? "Test Mode: Approval will be simulated"
                   : "Approve LGR tokens for contract interaction"
                 }
@@ -294,3 +277,4 @@ export const ContractApprovalStatus = ({
     </Card>
   );
 };
+
