@@ -2,7 +2,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { Check, AlertTriangle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -14,9 +13,11 @@ import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { transactionQueue } from "@/services/transactionQueueService";
 import { getContractStatus } from "@/services/proposalContractService";
+import { getTokenBalance } from "@/services/tokenService";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const TESTER_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
+const BALANCE_REFRESH_INTERVAL = 10000; // 10 seconds
 
 interface ContractApprovalStatusProps {
   onApprovalComplete: (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => void;
@@ -33,33 +34,25 @@ export const ContractApprovalStatus = ({
 }: ContractApprovalStatusProps) => {
   const { approveLGR, address, wallet } = useWalletConnection();
   const { getProvider, getWalletType } = useWalletProvider();
-  const { isInitializing } = useDynamicUtils();
+  const { isInitializing, isDynamicReady } = useDynamicUtils();
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
   const [isTesterWallet, setIsTesterWallet] = useState(false);
   const [contractTestMode, setContractTestMode] = useState(false);
   const [isWalletReady, setIsWalletReady] = useState(false);
+  const [balance, setBalance] = useState<string>("0");
   const approvalCompletedRef = useRef(false);
+  const balanceInterval = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
-  const { tokenBalances } = useTokenBalances({
-    networkId: 137,
-    accountAddress: address,
-    includeFiat: false,
-    includeNativeBalance: false,
-    tokenAddresses: [LGR_TOKEN_ADDRESS]
-  });
-
   const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
-  
-  const hasRequiredBalance = tokenBalances?.find(token => 
-    token.symbol === "LGR" && ethers.BigNumber.from(token.balance || "0").gte(requiredAmountBN)
-  );
+  const hasRequiredBalance = ethers.utils.parseEther(balance).gte(requiredAmountBN);
 
+  // Initial wallet status check
   useEffect(() => {
     const checkWalletStatus = async () => {
-      if (wallet && !isInitializing) {
+      if (wallet && !isInitializing && isDynamicReady) {
         try {
           const isConnected = await wallet.isConnected();
           setIsWalletReady(isConnected);
@@ -73,8 +66,49 @@ export const ContractApprovalStatus = ({
     };
 
     checkWalletStatus();
-  }, [wallet, isInitializing]);
+  }, [wallet, isInitializing, isDynamicReady]);
 
+  // Balance checking
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (!isWalletReady || !wallet || !address || !isDynamicReady) {
+        console.log("Wallet not ready for balance check");
+        return;
+      }
+
+      try {
+        const provider = await getProvider();
+        const balanceAmount = await getTokenBalance(provider.provider, LGR_TOKEN_ADDRESS, address);
+        console.log("LGR Balance fetched:", {
+          balance: balanceAmount,
+          requiredAmount: ethers.utils.formatEther(requiredAmountBN),
+          hasEnough: ethers.utils.parseEther(balanceAmount).gte(requiredAmountBN)
+        });
+        setBalance(balanceAmount);
+      } catch (error) {
+        console.error("Error fetching balance:", error);
+        setBalance("0");
+      }
+    };
+
+    // Initial fetch
+    fetchBalance();
+
+    // Set up polling
+    if (isWalletReady && !balanceInterval.current) {
+      balanceInterval.current = setInterval(fetchBalance, BALANCE_REFRESH_INTERVAL);
+    }
+
+    // Cleanup
+    return () => {
+      if (balanceInterval.current) {
+        clearInterval(balanceInterval.current);
+        balanceInterval.current = null;
+      }
+    };
+  }, [isWalletReady, wallet, address, isDynamicReady, requiredAmountBN]);
+
+  // Test mode checking
   useEffect(() => {
     const checkTestMode = async () => {
       if (!isWalletReady || !wallet || !address) {
@@ -207,7 +241,7 @@ export const ContractApprovalStatus = ({
     setCurrentTxId(null);
   }, [isTestMode]);
 
-  if (!isWalletReady) {
+  if (!isWalletReady || !isDynamicReady) {
     return (
       <Card className="bg-black/40 border-white/10 p-4">
         <div className="flex items-center justify-center space-x-2 text-white/60">
@@ -248,6 +282,7 @@ export const ContractApprovalStatus = ({
             <div className="p-2 bg-red-500/10 border border-red-500/20 rounded-lg">
               <p className="text-sm text-red-400">
                 Insufficient LGR balance. You need {ethers.utils.formatEther(requiredAmountBN)} LGR tokens.
+                Current balance: {Number(balance).toFixed(2)} LGR
               </p>
             </div>
           )}
