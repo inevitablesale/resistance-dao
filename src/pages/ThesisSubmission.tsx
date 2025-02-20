@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -815,7 +815,7 @@ const ThesisSubmission = () => {
             <BreadcrumbSeparator className="text-white/40" />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/proposals" className="hover:text-white">All Fund Proposals</Link>
+                <Link to="/proposals" className="hover:text-white">Proposals</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="text-white/40" />
@@ -832,20 +832,6 @@ const ThesisSubmission = () => {
           <p className="text-lg text-white/60 max-w-2xl mx-auto">
             Present your acquisition strategy to find co-investors who share your vision. Define your target profile, growth plans, and execution approach.
           </p>
-          <div className="mt-6 flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-white/60">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-yellow-500" />
-              <span>Gauge interest before firm identification</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-teal-500" />
-              <span>Connect with aligned co-investors</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-purple-500" />
-              <span>Collect soft commitments</span>
-            </div>
-          </div>
         </div>
 
         <div className="grid grid-cols-12 gap-8">
