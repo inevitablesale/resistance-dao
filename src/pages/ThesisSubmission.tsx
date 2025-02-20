@@ -811,7 +811,7 @@ const ThesisSubmission = () => {
               <h2 className="text-2xl font-semibold text-white mb-4">Investment Thesis Details</h2>
               <div className="grid gap-4">
                 <div>
-                  <Label htmlFor="title">Investment Thesis Title</Label>
+                  <Label htmlFor="title" className="text-white">Investment Thesis Title</Label>
                   <Input
                     type="text"
                     id="title"
