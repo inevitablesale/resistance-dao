@@ -16,32 +16,32 @@ export const FloatingPanel = ({
   scale = 1,
   isActive = false
 }: FloatingPanelProps) => {
-  const mesh = useRef<Mesh>(null!);
+  const meshRef = useRef<Mesh>(null!);
 
   useFrame((state) => {
-    if (isActive) {
-      mesh.current.rotation.x = Math.sin(state.clock.getElapsedTime()) * 0.02;
-      mesh.current.rotation.y = Math.cos(state.clock.getElapsedTime()) * 0.02;
-    }
+    if (!meshRef.current || !isActive) return;
+    
+    meshRef.current.rotation.x = Math.sin(state.clock.getElapsedTime()) * 0.02;
+    meshRef.current.rotation.y = Math.cos(state.clock.getElapsedTime()) * 0.02;
   });
 
   return (
-    <mesh
-      ref={mesh}
-      position={position}
-      rotation={rotation}
-      scale={[scale * 2, scale * 1, scale * 0.1]}
-    >
-      <boxGeometry args={[1, 1, 1]} />
-      <meshPhysicalMaterial
-        color="#ffffff"
-        transparent
-        opacity={0.1}
-        metalness={0.2}
-        roughness={0.1}
-        envMapIntensity={1}
-        transmission={0.9}
-      />
-    </mesh>
+    <group>
+      <mesh
+        ref={meshRef}
+        position={position}
+        rotation={rotation}
+        scale={[scale * 2, scale * 1, scale * 0.1]}
+      >
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial
+          color="#ffffff"
+          transparent
+          opacity={0.1}
+          metalness={0.2}
+          roughness={0.1}
+        />
+      </mesh>
+    </group>
   );
 };
