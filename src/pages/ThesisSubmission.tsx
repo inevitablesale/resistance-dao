@@ -14,7 +14,7 @@ import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
-import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
+import { getContractStatus, estimateProposalGas, createProposal, setTestMode } from "@/services/proposalContractService";
 import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
