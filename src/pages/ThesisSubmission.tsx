@@ -74,6 +74,15 @@ const ThesisSubmission = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
 
+  // Add debug logging
+  console.log("Dynamic Auth Debug:", {
+    user,
+    metadata: user?.metadata,
+    verifications: user?.verifications,
+    customFields: user?.verifications?.customFields,
+    linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"]
+  });
+
   const form = useForm<ProposalMetadata>({
     resolver: zodResolver(thesisFormSchema),
     defaultValues: {
