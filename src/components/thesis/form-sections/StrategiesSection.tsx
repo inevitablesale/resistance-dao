@@ -1,6 +1,5 @@
 
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
 import { 
   Settings2, TrendingUp, UsersRound, Globe, Layers, Users, 
@@ -120,9 +119,10 @@ export const StrategiesSection = ({ formData, formErrors, register, onChange }: 
             {items.map(({ id, label, icon: Icon, color }) => {
               const isSelected = isStrategySelected(category as StrategyCategory, id);
               return (
-                <div
+                <button
                   key={id}
-                  className="relative group cursor-pointer"
+                  type="button"
+                  className="relative group w-full text-left"
                   onClick={() => handleStrategyChange(category as StrategyCategory, id, !isSelected)}
                 >
                   <div 
@@ -153,18 +153,18 @@ export const StrategiesSection = ({ formData, formErrors, register, onChange }: 
                       </div>
                     </div>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
 
-          {formErrors.strategies && formErrors.strategies[category as keyof typeof formErrors.strategies] && (
+          {formErrors.strategies?.[category as keyof typeof formErrors.strategies] && (
             <motion.p 
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-sm text-red-400 mt-2"
             >
-              {String(formErrors.strategies[category as keyof typeof formErrors.strategies]?.message)}
+              {String(formErrors.strategies[category as keyof typeof formErrors.strategies])}
             </motion.p>
           )}
         </motion.div>
