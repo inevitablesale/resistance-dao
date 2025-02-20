@@ -4,10 +4,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ProposalMetadata, PaymentTerm } from "@/types/proposals";
 import { motion } from "framer-motion";
 import { CreditCard, Briefcase, ChartBar, Users2, Building2 } from "lucide-react";
+import { FieldErrors } from "react-hook-form";
 
 export interface PaymentTermsSectionProps {
   formData: ProposalMetadata;
-  formErrors: Record<string, string[]>;
+  formErrors: FieldErrors<ProposalMetadata>;
   onChange: (field: string, value: PaymentTerm[]) => void;
 }
 

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -29,7 +28,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-// Define the form schema using Zod
 const thesisFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
   investment: z.object({
@@ -99,7 +97,6 @@ const ThesisSubmission = () => {
     setIsSubmitting(true);
     try {
       console.log("Form data:", data);
-      // Add your submission logic here
       toast({
         title: "Success",
         description: "Your thesis has been submitted successfully",
@@ -171,19 +168,23 @@ const ThesisSubmission = () => {
                 <PaymentTermsSection
                   formData={form.getValues()}
                   formErrors={form.formState.errors}
-                  onChange={(field, value) => form.setValue('paymentTerms', value, { shouldValidate: true })}
+                  onChange={(field, value) => form.setValue('paymentTerms', value)}
                 />
 
                 <FirmCriteriaSection
                   formData={form.getValues()}
                   formErrors={form.formState.errors}
-                  onChange={(field, value) => form.setValue(`firmCriteria.${field}`, value, { shouldValidate: true })}
+                  onChange={(field, value) => {
+                    form.setValue(`firmCriteria.${field}` as any, value);
+                  }}
                 />
 
                 <StrategiesSection
                   formData={form.getValues()}
                   formErrors={form.formState.errors}
-                  onChange={(category, value) => form.setValue(`strategies.${category}`, value, { shouldValidate: true })}
+                  onChange={(category, value) => {
+                    form.setValue(`strategies.${category}`, value);
+                  }}
                 />
               </div>
 

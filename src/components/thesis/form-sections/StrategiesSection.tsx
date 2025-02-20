@@ -1,24 +1,25 @@
 
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { motion } from "framer-motion";
 import { 
   Settings2, TrendingUp, UsersRound, Globe, Layers, Users, 
   Building, Network, ArrowLeftRight, Users2, ScrollText, Database 
 } from "lucide-react";
-import { motion } from "framer-motion";
 import { 
   ProposalMetadata, 
   OperationalStrategy, 
   GrowthStrategy, 
   IntegrationStrategy 
 } from "@/types/proposals";
+import { FieldErrors } from "react-hook-form";
 
 export interface StrategiesSectionProps {
   formData: ProposalMetadata;
-  formErrors: Record<string, string[]>;
-  onChange: (
-    category: "operational" | "growth" | "integration", 
-    value: (OperationalStrategy | GrowthStrategy | IntegrationStrategy)[]
+  formErrors: FieldErrors<ProposalMetadata>;
+  onChange: <T extends keyof ProposalMetadata["strategies"]>(
+    category: T,
+    value: ProposalMetadata["strategies"][T]
   ) => void;
 }
 

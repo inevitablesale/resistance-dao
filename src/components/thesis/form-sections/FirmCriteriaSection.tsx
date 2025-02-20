@@ -7,6 +7,7 @@ import { FirmSize, DealType, GeographicFocus } from "@/types/proposals";
 import { US_STATES } from "@/lib/constants/states";
 import { motion } from "framer-motion";
 import { Building2, Globe2, MapPin, Briefcase } from "lucide-react";
+import { FieldErrors } from "react-hook-form";
 
 interface FirmCriteriaSectionProps {
   formData: {
@@ -17,8 +18,8 @@ interface FirmCriteriaSectionProps {
       geographicFocus: GeographicFocus;
     };
   };
-  formErrors: Record<string, string[]>;
-  onChange: (field: string, value: any) => void;
+  formErrors: FieldErrors<ProposalMetadata>;
+  onChange: (field: keyof typeof formData.firmCriteria, value: any) => void;
 }
 
 export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCriteriaSectionProps) => {
