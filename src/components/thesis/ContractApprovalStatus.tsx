@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -62,18 +61,10 @@ export const ContractApprovalStatus = ({
     
     // Log the full object structure for debugging
     console.log("[LinkedIn] Full user data structure:", {
-      url: user.metadata?.["LinkedIn Profile URL"],
       fromMetadata: user.metadata?.["LinkedIn Profile URL"],
       fromVerifications: user.verifications?.customFields?.["LinkedIn Profile URL"],
-      directUrl: user.url,
-      rawMetadata: user.metadata
+      fullMetadata: user.metadata
     });
-
-    // Try getting from direct url property
-    if (user.url && user.url.includes('linkedin.com')) {
-      console.log("[LinkedIn] Using direct URL property:", user.url);
-      return user.url;
-    }
     
     // Try getting from metadata
     if (user.metadata?.["LinkedIn Profile URL"]) {
@@ -90,8 +81,7 @@ export const ContractApprovalStatus = ({
     // If no URL is found, log the failure
     console.log("[LinkedIn] No valid URL found in any location", {
       metadata: user.metadata,
-      verifications: user.verifications,
-      url: user.url
+      verifications: user.verifications
     });
     return "";
   };
