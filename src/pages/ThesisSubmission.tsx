@@ -236,8 +236,8 @@ const ThesisSubmission = () => {
 
           setIsTestMode(shouldEnableTestMode);
           
-          if (!shouldEnableTestMode) {
-            console.log("Test mode disabled - resetting form");
+          if (!status.isTestMode) {
+            console.log("Contract in live mode - resetting form");
             resetForm();
           }
         } catch (error) {
@@ -252,7 +252,7 @@ const ThesisSubmission = () => {
   }, [wallet, address]);
 
   useEffect(() => {
-    if (isTestMode && contractTestMode) {
+    if (contractTestMode) {
       console.log("Setting test form data:", TEST_FORM_DATA);
       setFormData({
         ...TEST_FORM_DATA,
@@ -261,7 +261,7 @@ const ThesisSubmission = () => {
         submitter: address
       });
     }
-  }, [isTestMode, contractTestMode, user, address]);
+  }, [contractTestMode, user, address]);
 
   const validateLinkedInURL = (): boolean => {
     const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
