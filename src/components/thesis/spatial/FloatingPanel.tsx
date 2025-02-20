@@ -2,7 +2,6 @@
 import { useRef } from "react";
 import { Mesh } from "three";
 import { useFrame } from "@react-three/fiber";
-import { Float } from "@react-three/drei";
 
 interface FloatingPanelProps {
   position?: [number, number, number];
@@ -27,29 +26,22 @@ export const FloatingPanel = ({
   });
 
   return (
-    <Float
-      speed={2}
-      rotationIntensity={0.2}
-      floatIntensity={0.5}
-      floatingRange={[-0.1, 0.1]}
+    <mesh
+      ref={mesh}
+      position={position}
+      rotation={rotation}
+      scale={[scale * 2, scale * 1, scale * 0.1]}
     >
-      <mesh
-        ref={mesh}
-        position={position}
-        rotation={rotation}
-        scale={[scale * 2, scale * 1, scale * 0.1]}
-      >
-        <boxGeometry args={[1, 1, 1]} />
-        <meshPhysicalMaterial
-          color="#ffffff"
-          transparent
-          opacity={0.1}
-          metalness={0.2}
-          roughness={0.1}
-          envMapIntensity={1}
-          transmission={0.9}
-        />
-      </mesh>
-    </Float>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshPhysicalMaterial
+        color="#ffffff"
+        transparent
+        opacity={0.1}
+        metalness={0.2}
+        roughness={0.1}
+        envMapIntensity={1}
+        transmission={0.9}
+      />
+    </mesh>
   );
 };

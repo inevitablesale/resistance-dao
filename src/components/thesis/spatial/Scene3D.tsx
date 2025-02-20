@@ -1,6 +1,6 @@
 
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Float, useAspect } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { ReactNode } from "react";
 
 interface Scene3DProps {
@@ -13,7 +13,6 @@ export const Scene3D = ({ children }: Scene3DProps) => {
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75 }}
         gl={{ antialias: true }}
-        dpr={[1, 2]}
       >
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
