@@ -1,13 +1,25 @@
 
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Settings2, TrendingUp, UsersRound, Globe, Layers, Users, Building, Network, ArrowLeftRight, Users2, ScrollText, Database } from "lucide-react";
-import { ProposalMetadata, OperationalStrategy, GrowthStrategy, IntegrationStrategy } from "@/types/proposals";
+import { 
+  Settings2, TrendingUp, UsersRound, Globe, Layers, Users, 
+  Building, Network, ArrowLeftRight, Users2, ScrollText, Database 
+} from "lucide-react";
+import { motion } from "framer-motion";
+import { 
+  ProposalMetadata, 
+  OperationalStrategy, 
+  GrowthStrategy, 
+  IntegrationStrategy 
+} from "@/types/proposals";
 
 export interface StrategiesSectionProps {
   formData: ProposalMetadata;
   formErrors: Record<string, string[]>;
-  onChange: (category: "operational" | "growth" | "integration", value: (OperationalStrategy | GrowthStrategy | IntegrationStrategy)[]) => void;
+  onChange: (
+    category: "operational" | "growth" | "integration", 
+    value: (OperationalStrategy | GrowthStrategy | IntegrationStrategy)[]
+  ) => void;
 }
 
 type StrategyType = OperationalStrategy | GrowthStrategy | IntegrationStrategy;
@@ -38,89 +50,122 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
 
   const strategies = {
     operational: [
-      { id: OperationalStrategy.TECH_MODERNIZATION, label: 'Technology Modernization', icon: Settings2 },
-      { id: OperationalStrategy.PROCESS_STANDARDIZATION, label: 'Process Standardization', icon: ScrollText },
-      { id: OperationalStrategy.STAFF_RETENTION, label: 'Staff Retention/Development', icon: UsersRound }
+      { id: OperationalStrategy.TECH_MODERNIZATION, label: 'Technology Modernization', icon: Settings2, color: 'yellow' },
+      { id: OperationalStrategy.PROCESS_STANDARDIZATION, label: 'Process Standardization', icon: ScrollText, color: 'teal' },
+      { id: OperationalStrategy.STAFF_RETENTION, label: 'Staff Retention/Development', icon: UsersRound, color: 'purple' }
     ],
     growth: [
-      { id: GrowthStrategy.GEOGRAPHIC_EXPANSION, label: 'Geographic Expansion', icon: Globe },
-      { id: GrowthStrategy.SERVICE_EXPANSION, label: 'Service Line Expansion', icon: Layers },
-      { id: GrowthStrategy.CLIENT_GROWTH, label: 'Client Base Growth', icon: TrendingUp }
+      { id: GrowthStrategy.GEOGRAPHIC_EXPANSION, label: 'Geographic Expansion', icon: Globe, color: 'indigo' },
+      { id: GrowthStrategy.SERVICE_EXPANSION, label: 'Service Line Expansion', icon: Layers, color: 'rose' },
+      { id: GrowthStrategy.CLIENT_GROWTH, label: 'Client Base Growth', icon: TrendingUp, color: 'amber' }
     ],
     integration: [
-      { id: IntegrationStrategy.MERGING_OPERATIONS, label: 'Merging Operations', icon: ArrowLeftRight },
-      { id: IntegrationStrategy.CULTURE_INTEGRATION, label: 'Culture Integration', icon: Users2 },
-      { id: IntegrationStrategy.SYSTEMS_CONSOLIDATION, label: 'Systems Consolidation', icon: Database }
+      { id: IntegrationStrategy.MERGING_OPERATIONS, label: 'Merging Operations', icon: ArrowLeftRight, color: 'cyan' },
+      { id: IntegrationStrategy.CULTURE_INTEGRATION, label: 'Culture Integration', icon: Users2, color: 'emerald' },
+      { id: IntegrationStrategy.SYSTEMS_CONSOLIDATION, label: 'Systems Consolidation', icon: Database, color: 'fuchsia' }
     ]
   };
 
-  const categoryIcons = {
-    operational: Settings2,
-    growth: TrendingUp,
-    integration: Building
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.4 }
+    }
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between border-b border-white/10 pb-2">
-        <div className="flex items-center gap-2">
-          <Network className="w-5 h-5 text-purple-400" />
-          <h2 className="text-lg font-semibold text-white">Post-Acquisition Strategy</h2>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="space-y-8"
+    >
+      <motion.div variants={itemVariants} className="flex items-center gap-3 mb-6">
+        <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center">
+          <Network className="h-5 w-5 text-purple-500" />
         </div>
-      </div>
-      
-      <div className="grid gap-4">
-        {Object.entries(strategies).map(([category, items]) => {
-          const CategoryIcon = categoryIcons[category as keyof typeof categoryIcons];
-          return (
-            <div key={category}>
-              <div className="flex items-center gap-2 mb-2">
-                <CategoryIcon className="w-4 h-4 text-purple-400" />
-                <h3 className="text-sm font-medium text-gray-200 capitalize">
-                  {category} Strategies
-                </h3>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                {items.map(({ id, label, icon: Icon }) => (
-                  <div 
-                    key={id}
-                    className="flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-white/5"
-                  >
-                    <Checkbox 
-                      id={String(id)}
-                      className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-                      checked={isStrategySelected(category as StrategyCategory, id)}
-                      onCheckedChange={(checked) => {
-                        handleStrategyChange(
-                          category as StrategyCategory,
-                          id,
-                          checked as boolean
-                        );
-                      }}
-                    />
-                    <div className="flex items-center gap-1.5">
-                      <Icon className="w-3.5 h-3.5 text-purple-400/70" />
-                      <Label 
-                        htmlFor={String(id)}
-                        className="text-sm text-gray-200 cursor-pointer hover:text-white transition-colors"
-                      >
-                        {label}
-                      </Label>
-                    </div>
-                  </div>
-                ))}
-              </div>
+        <h2 className="text-2xl font-semibold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+          Post-Acquisition Strategy
+        </h2>
+      </motion.div>
 
-              {formErrors[`strategies.${category}`] && (
-                <p className="text-xs text-red-500 mt-1">
-                  {formErrors[`strategies.${category}`][0]}
-                </p>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
+      {Object.entries(strategies).map(([category, items]) => (
+        <motion.div 
+          key={category}
+          variants={itemVariants}
+          className="space-y-4 bg-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            {category === 'operational' && <Settings2 className="h-5 w-5 text-yellow-500" />}
+            {category === 'growth' && <TrendingUp className="h-5 w-5 text-rose-500" />}
+            {category === 'integration' && <Building className="h-5 w-5 text-teal-500" />}
+            <Label className="text-lg font-medium text-white capitalize">
+              {category} Strategies
+            </Label>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {items.map(({ id, label, icon: Icon, color }) => (
+              <div
+                key={id}
+                className="relative group"
+              >
+                <div 
+                  className={`
+                    p-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm
+                    hover:bg-white/10 transition-all duration-200
+                    ${isStrategySelected(category as StrategyCategory, id) ? `border-${color}-500/50 bg-${color}-500/10` : ''}
+                  `}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`h-8 w-8 rounded-lg bg-${color}-500/20 flex items-center justify-center`}>
+                      <Icon className={`h-4 w-4 text-${color}-500`} />
+                    </div>
+                    <div className="flex-1">
+                      <Label className="text-white font-medium">{label}</Label>
+                    </div>
+                    <Checkbox
+                      checked={isStrategySelected(category as StrategyCategory, id)}
+                      onCheckedChange={(checked) => 
+                        handleStrategyChange(category as StrategyCategory, id, checked as boolean)
+                      }
+                      className={`
+                        h-5 w-5 rounded border-white/30
+                        data-[state=checked]:border-${color}-500 data-[state=checked]:bg-${color}-500
+                        transition-all duration-200
+                      `}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {formErrors[`strategies.${category}`] && (
+            <motion.p 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-sm text-red-400 mt-2"
+            >
+              {formErrors[`strategies.${category}`][0]}
+            </motion.p>
+          )}
+        </motion.div>
+      ))}
+    </motion.div>
   );
 };
