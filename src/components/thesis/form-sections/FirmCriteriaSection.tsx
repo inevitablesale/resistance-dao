@@ -5,6 +5,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FirmSize, DealType, GeographicFocus } from "@/types/proposals";
 import { US_STATES } from "@/lib/constants/states";
+import { motion } from "framer-motion";
+import { Building2, Globe2, MapPin, Briefcase } from "lucide-react";
 
 interface FirmCriteriaSectionProps {
   formData: {
@@ -22,187 +24,215 @@ interface FirmCriteriaSectionProps {
 export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCriteriaSectionProps) => {
   useEffect(() => {
     console.log("Initializing firm criteria values...");
-    // Set initial values if they're not already set
     if (formData.firmCriteria.size === undefined) {
-      console.log("Setting initial firm size");
       onChange('firmCriteria.size', FirmSize.BELOW_1M);
     }
     if (formData.firmCriteria.dealType === undefined) {
-      console.log("Setting initial deal type");
       onChange('firmCriteria.dealType', DealType.ACQUISITION);
     }
     if (formData.firmCriteria.geographicFocus === undefined) {
-      console.log("Setting initial geographic focus");
       onChange('firmCriteria.geographicFocus', GeographicFocus.LOCAL);
     }
   }, []);
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.4 }
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-white">Target Firm Criteria</h2>
-      
-      <div>
-        <Label className="text-white mb-2 block">Preferred Firm Size (Revenue)</Label>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="space-y-8"
+    >
+      <motion.div variants={itemVariants} className="flex items-center gap-3 mb-6">
+        <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center">
+          <Building2 className="h-5 w-5 text-yellow-500" />
+        </div>
+        <h2 className="text-2xl font-semibold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+          Target Firm Criteria
+        </h2>
+      </motion.div>
+
+      <motion.div variants={itemVariants} className="space-y-4 bg-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10">
+        <div className="flex items-center gap-2 mb-4">
+          <Building2 className="h-5 w-5 text-yellow-500" />
+          <Label className="text-lg font-medium text-white">Preferred Firm Size (Revenue)</Label>
+        </div>
         <RadioGroup 
           value={String(formData.firmCriteria.size)}
           onValueChange={(value) => onChange('firmCriteria.size', Number(value))}
-          className="flex flex-wrap gap-4"
+          className="grid grid-cols-1 md:grid-cols-2 gap-3"
         >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(FirmSize.BELOW_1M)}
-              id="below-1m" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="below-1m" className="text-white">Below $1M</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(FirmSize.ONE_TO_FIVE_M)}
-              id="1m-5m" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="1m-5m" className="text-white">$1M–$5M</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(FirmSize.FIVE_TO_TEN_M)}
-              id="5m-10m" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="5m-10m" className="text-white">$5M–$10M</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(FirmSize.TEN_PLUS)}
-              id="10m-plus" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="10m-plus" className="text-white">$10M+</Label>
-          </div>
+          {[
+            { value: FirmSize.BELOW_1M, label: "Below $1M" },
+            { value: FirmSize.ONE_TO_FIVE_M, label: "$1M–$5M" },
+            { value: FirmSize.FIVE_TO_TEN_M, label: "$5M–$10M" },
+            { value: FirmSize.TEN_PLUS, label: "$10M+" }
+          ].map((option) => (
+            <div 
+              key={option.value}
+              className="relative"
+            >
+              <RadioGroupItem
+                value={String(option.value)}
+                id={`size-${option.value}`}
+                className="peer sr-only"
+              />
+              <Label
+                htmlFor={`size-${option.value}`}
+                className="flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
+                         cursor-pointer transition-all duration-200
+                         peer-data-[state=checked]:border-yellow-500/50 peer-data-[state=checked]:bg-yellow-500/10
+                         hover:bg-white/5"
+              >
+                <div className="h-4 w-4 rounded-full border border-white/30 peer-data-[state=checked]:border-yellow-500
+                              peer-data-[state=checked]:bg-yellow-500 transition-all duration-200" />
+                <span className="text-white">{option.label}</span>
+              </Label>
+            </div>
+          ))}
         </RadioGroup>
         {formErrors['firmCriteria.size'] && (
-          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.size'][0]}</p>
+          <p className="mt-2 text-sm text-red-400">{formErrors['firmCriteria.size'][0]}</p>
         )}
-      </div>
+      </motion.div>
 
-      <div>
-        <Label className="text-white mb-2 block">Geographic Focus</Label>
+      <motion.div variants={itemVariants} className="space-y-4 bg-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10">
+        <div className="flex items-center gap-2 mb-4">
+          <Globe2 className="h-5 w-5 text-teal-500" />
+          <Label className="text-lg font-medium text-white">Geographic Focus</Label>
+        </div>
         <RadioGroup 
           value={String(formData.firmCriteria.geographicFocus)}
           onValueChange={(value) => onChange('firmCriteria.geographicFocus', Number(value))}
-          className="flex flex-wrap gap-4"
+          className="grid grid-cols-1 md:grid-cols-2 gap-3"
         >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(GeographicFocus.LOCAL)}
-              id="local" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="local" className="text-white">Local</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(GeographicFocus.REGIONAL)}
-              id="regional" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="regional" className="text-white">Regional</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(GeographicFocus.NATIONAL)}
-              id="national" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="national" className="text-white">National</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(GeographicFocus.REMOTE)}
-              id="remote" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="remote" className="text-white">Remote</Label>
-          </div>
+          {[
+            { value: GeographicFocus.LOCAL, label: "Local" },
+            { value: GeographicFocus.REGIONAL, label: "Regional" },
+            { value: GeographicFocus.NATIONAL, label: "National" },
+            { value: GeographicFocus.REMOTE, label: "Remote" }
+          ].map((option) => (
+            <div 
+              key={option.value}
+              className="relative"
+            >
+              <RadioGroupItem
+                value={String(option.value)}
+                id={`geo-${option.value}`}
+                className="peer sr-only"
+              />
+              <Label
+                htmlFor={`geo-${option.value}`}
+                className="flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
+                         cursor-pointer transition-all duration-200
+                         peer-data-[state=checked]:border-teal-500/50 peer-data-[state=checked]:bg-teal-500/10
+                         hover:bg-white/5"
+              >
+                <div className="h-4 w-4 rounded-full border border-white/30 peer-data-[state=checked]:border-teal-500
+                              peer-data-[state=checked]:bg-teal-500 transition-all duration-200" />
+                <span className="text-white">{option.label}</span>
+              </Label>
+            </div>
+          ))}
         </RadioGroup>
         {formErrors['firmCriteria.geographicFocus'] && (
-          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.geographicFocus'][0]}</p>
+          <p className="mt-2 text-sm text-red-400">{formErrors['firmCriteria.geographicFocus'][0]}</p>
         )}
-      </div>
+      </motion.div>
 
-      <div>
-        <Label className="text-white mb-2 block">Primary State (Optional)</Label>
+      <motion.div variants={itemVariants} className="space-y-4 bg-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10">
+        <div className="flex items-center gap-2 mb-4">
+          <MapPin className="h-5 w-5 text-purple-500" />
+          <Label className="text-lg font-medium text-white">Primary State (Optional)</Label>
+        </div>
         <Select 
           value={formData.firmCriteria.location}
           onValueChange={(value) => onChange('firmCriteria.location', value)}
         >
-          <SelectTrigger className="bg-black/50 border-white/10 text-white">
+          <SelectTrigger className="bg-black/20 border-white/10 text-white h-12">
             <SelectValue placeholder="Select a state" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="max-h-[300px] bg-black/90 border-white/10">
             {US_STATES.map(state => (
-              <SelectItem key={state} value={state}>{state}</SelectItem>
+              <SelectItem 
+                key={state} 
+                value={state}
+                className="text-white focus:bg-white/10 focus:text-white"
+              >
+                {state}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
         {formErrors['firmCriteria.location'] && (
-          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.location'][0]}</p>
+          <p className="mt-2 text-sm text-red-400">{formErrors['firmCriteria.location'][0]}</p>
         )}
-      </div>
+      </motion.div>
 
-      <div>
-        <Label className="text-white mb-2 block">Deal Type</Label>
+      <motion.div variants={itemVariants} className="space-y-4 bg-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10">
+        <div className="flex items-center gap-2 mb-4">
+          <Briefcase className="h-5 w-5 text-rose-500" />
+          <Label className="text-lg font-medium text-white">Deal Type</Label>
+        </div>
         <RadioGroup 
           value={String(formData.firmCriteria.dealType)}
           onValueChange={(value) => onChange('firmCriteria.dealType', Number(value))}
-          className="flex flex-wrap gap-4"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
         >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(DealType.ACQUISITION)}
-              id="acquisition" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="acquisition" className="text-white">Acquisition</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(DealType.MERGER)}
-              id="merger" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="merger" className="text-white">Merger</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(DealType.EQUITY_BUYOUT)}
-              id="equity-buyout" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="equity-buyout" className="text-white">Equity Buyout</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(DealType.FRANCHISE)}
-              id="franchise" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="franchise" className="text-white">Franchise</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem 
-              value={String(DealType.SUCCESSION)}
-              id="succession" 
-              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
-            />
-            <Label htmlFor="succession" className="text-white">Succession</Label>
-          </div>
+          {[
+            { value: DealType.ACQUISITION, label: "Acquisition" },
+            { value: DealType.MERGER, label: "Merger" },
+            { value: DealType.EQUITY_BUYOUT, label: "Equity Buyout" },
+            { value: DealType.FRANCHISE, label: "Franchise" },
+            { value: DealType.SUCCESSION, label: "Succession" }
+          ].map((option) => (
+            <div 
+              key={option.value}
+              className="relative"
+            >
+              <RadioGroupItem
+                value={String(option.value)}
+                id={`deal-${option.value}`}
+                className="peer sr-only"
+              />
+              <Label
+                htmlFor={`deal-${option.value}`}
+                className="flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
+                         cursor-pointer transition-all duration-200
+                         peer-data-[state=checked]:border-rose-500/50 peer-data-[state=checked]:bg-rose-500/10
+                         hover:bg-white/5"
+              >
+                <div className="h-4 w-4 rounded-full border border-white/30 peer-data-[state=checked]:border-rose-500
+                              peer-data-[state=checked]:bg-rose-500 transition-all duration-200" />
+                <span className="text-white">{option.label}</span>
+              </Label>
+            </div>
+          ))}
         </RadioGroup>
         {formErrors['firmCriteria.dealType'] && (
-          <p className="mt-1 text-sm text-red-500">{formErrors['firmCriteria.dealType'][0]}</p>
+          <p className="mt-2 text-sm text-red-400">{formErrors['firmCriteria.dealType'][0]}</p>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
