@@ -48,7 +48,7 @@ export const convertUSDToLGRWei = (lgrAmount: string): ethers.BigNumber => {
     return result;
   } catch (error) {
     console.error("[TargetCapital] Error converting to wei:", error);
-    return ethers.BigNumber.from(0);
+    throw error; // Let the error propagate up to handle validation
   }
 };
 
@@ -73,7 +73,7 @@ export const TargetCapitalInput = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatValue(e.target.value);
     console.log("[TargetCapital] Formatted input value:", formattedValue);
-    onChange(formattedValue);
+    onChange(formattedValue || "0"); // Ensure we always have a valid string number
   };
 
   const calculateUSDAmount = (lgrAmount: string): string => {
@@ -132,4 +132,3 @@ export const TargetCapitalInput = ({
     </div>
   );
 };
-
