@@ -1,10 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
@@ -16,6 +15,7 @@ import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTe
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
+import { ProposalMetadata } from "@/types/proposals";
 import {
   Breadcrumb,
   BreadcrumbItem,
