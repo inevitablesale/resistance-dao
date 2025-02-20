@@ -26,39 +26,39 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Preferred Firm Size (Revenue)</Label>
         <RadioGroup 
-          value={formData.firmCriteria.size !== null ? String(formData.firmCriteria.size) : undefined}
-          onValueChange={(value) => onChange('size', Number(value))}
+          value={formData.firmCriteria.size?.toString()}
+          onValueChange={(value) => onChange('firmCriteria.size', Number(value))}
           className="flex flex-wrap gap-4"
         >
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(FirmSize.BELOW_1M)}
               id="below-1m" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="below-1m" className="text-white cursor-pointer">Below $1M</Label>
           </div>
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(FirmSize.ONE_TO_FIVE_M)}
               id="1m-5m" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="1m-5m" className="text-white cursor-pointer">$1M–$5M</Label>
           </div>
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(FirmSize.FIVE_TO_TEN_M)}
               id="5m-10m" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="5m-10m" className="text-white cursor-pointer">$5M–$10M</Label>
           </div>
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(FirmSize.TEN_PLUS)}
               id="10m-plus" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="10m-plus" className="text-white cursor-pointer">$10M+</Label>
           </div>
@@ -71,39 +71,39 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Geographic Focus</Label>
         <RadioGroup 
-          value={formData.firmCriteria.geographicFocus !== null ? String(formData.firmCriteria.geographicFocus) : undefined}
-          onValueChange={(value) => onChange('geographicFocus', Number(value))}
+          value={formData.firmCriteria.geographicFocus?.toString()}
+          onValueChange={(value) => onChange('firmCriteria.geographicFocus', Number(value))}
           className="flex flex-wrap gap-4"
         >
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(GeographicFocus.LOCAL)}
               id="local" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="local" className="text-white cursor-pointer">Local</Label>
           </div>
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(GeographicFocus.REGIONAL)}
               id="regional" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="regional" className="text-white cursor-pointer">Regional</Label>
           </div>
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(GeographicFocus.NATIONAL)}
               id="national" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="national" className="text-white cursor-pointer">National</Label>
           </div>
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(GeographicFocus.REMOTE)}
               id="remote" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="remote" className="text-white cursor-pointer">Remote</Label>
           </div>
@@ -117,9 +117,9 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
         <Label className="text-white mb-2 block">Primary State (Optional)</Label>
         <Select 
           value={formData.firmCriteria.location}
-          onValueChange={(value) => onChange('location', value)}
+          onValueChange={(value) => onChange('firmCriteria.location', value)}
         >
-          <SelectTrigger className="bg-black/50 border-white/10 text-white cursor-pointer">
+          <SelectTrigger className="bg-black/50 border-white/10 text-white">
             <SelectValue placeholder="Select a state" />
           </SelectTrigger>
           <SelectContent className="bg-black border-white/10">
@@ -127,7 +127,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
               <SelectItem 
                 key={state} 
                 value={state}
-                className="cursor-pointer text-white hover:bg-white/10"
+                className="text-white hover:bg-white/10"
               >
                 {state}
               </SelectItem>
@@ -142,47 +142,47 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Deal Type</Label>
         <RadioGroup 
-          value={formData.firmCriteria.dealType !== null ? String(formData.firmCriteria.dealType) : undefined}
-          onValueChange={(value) => onChange('dealType', Number(value))}
+          value={formData.firmCriteria.dealType?.toString()}
+          onValueChange={(value) => onChange('firmCriteria.dealType', Number(value))}
           className="flex flex-wrap gap-4"
         >
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(DealType.ACQUISITION)}
               id="acquisition" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="acquisition" className="text-white cursor-pointer">Acquisition</Label>
           </div>
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(DealType.MERGER)}
               id="merger" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="merger" className="text-white cursor-pointer">Merger</Label>
           </div>
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(DealType.EQUITY_BUYOUT)}
               id="equity-buyout" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="equity-buyout" className="text-white cursor-pointer">Equity Buyout</Label>
           </div>
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(DealType.FRANCHISE)}
               id="franchise" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="franchise" className="text-white cursor-pointer">Franchise</Label>
           </div>
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem 
               value={String(DealType.SUCCESSION)}
               id="succession" 
-              className="cursor-pointer border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+              className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
             />
             <Label htmlFor="succession" className="text-white cursor-pointer">Succession</Label>
           </div>
