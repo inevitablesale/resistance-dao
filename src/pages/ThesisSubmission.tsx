@@ -74,20 +74,25 @@ interface SubmissionStep {
 const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
 
 const SUBMISSION_STEPS: SubmissionStep[] = [{
-  id: 'thesis',
+  id: 'basics',
   title: 'Investment Thesis',
   status: 'pending',
   description: 'Fill out your investment thesis details'
+}, {
+  id: 'firm',
+  title: 'Firm Details',
+  status: 'pending',
+  description: 'Define target firm criteria'
 }, {
   id: 'strategy',
   title: 'Strategy Selection',
   status: 'pending',
   description: 'Select your post-acquisition strategies'
 }, {
-  id: 'approval',
-  title: 'Token Approval',
+  id: 'terms',
+  title: 'Payment Terms',
   status: 'pending',
-  description: 'Approve LGR tokens for submission'
+  description: 'Define payment and transaction terms'
 }, {
   id: 'submission',
   title: 'Thesis Submission',
@@ -155,7 +160,7 @@ const ThesisSubmission = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
-  const [activeStep, setActiveStep] = useState<string>('thesis');
+  const [activeStep, setActiveStep] = useState<string>('basics');
   const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
   const [currentTxHash, setCurrentTxHash] = useState<string | null>(null);
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
@@ -299,9 +304,9 @@ const ThesisSubmission = () => {
         </div>;
     }
     switch (activeStep) {
-      case 'thesis':
+      case 'basics':
         return "Continue to Firm Details";
-      case 'strategy':
+      case 'firm':
         return "Continue to Terms";
       case 'terms':
         return "Submit Investment Thesis";
@@ -397,7 +402,7 @@ const ThesisSubmission = () => {
 
   const getCurrentValidator = () => {
     switch (activeStep) {
-      case 'thesis':
+      case 'basics':
         return validateBasicsTab;
       case 'firm':
         return validateFirmTab;
@@ -490,7 +495,7 @@ const ThesisSubmission = () => {
     }
 
     switch (activeStep) {
-      case 'thesis':
+      case 'basics':
         handleStepChange('firm');
         break;
       case 'firm':
@@ -527,7 +532,8 @@ const ThesisSubmission = () => {
         throw new Error("Please add a valid LinkedIn URL in your wallet settings");
       }
 
-      updateStepStatus('thesis', 'completed');
+      updateStepStatus('basics', 'completed');
+      updateStepStatus('firm', 'completed');
       updateStepStatus('strategy', 'completed');
       updateStepStatus('approval', 'completed');
       setActiveStep('submission');
@@ -612,7 +618,8 @@ const ThesisSubmission = () => {
         throw new Error("Please add a valid LinkedIn URL in your wallet settings");
       }
 
-      updateStepStatus('thesis', 'completed');
+      updateStepStatus('basics', 'completed');
+      updateStepStatus('firm', 'completed');
       updateStepStatus('strategy', 'completed');
       updateStepStatus('approval', 'completed');
       setActiveStep('submission');
@@ -855,7 +862,7 @@ const ThesisSubmission = () => {
                   transition={{ duration: 0.2 }}
                   className="p-6"
                 >
-                  {activeStep === 'thesis' && (
+                  {activeStep === 'basics' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
                         <Label className="text-lg font-medium text-white">Thesis Title</Label>
@@ -897,7 +904,7 @@ const ThesisSubmission = () => {
                     </div>
                   )}
 
-                  {activeStep === 'strategy' && (
+                  {activeStep === 'firm' && (
                     <FirmCriteriaSection
                       formData={{
                         firmCriteria: {
@@ -912,21 +919,20 @@ const ThesisSubmission = () => {
                     />
                   )}
 
+                  {activeStep === 'strategy' && (
+                    <StrategiesSection
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={(category, value) => handleStrategyChange(category, value)}
+                    />
+                  )}
+
                   {activeStep === 'terms' && (
-                    <>
-                      <PaymentTermsSection
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
-                      />
-                      <div className="mt-8">
-                        <StrategiesSection
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={(category, value) => handleStrategyChange(category, value)}
-                        />
-                      </div>
-                    </>
+                    <PaymentTermsSection
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
+                    />
                   )}
 
                   {activeStep === 'submission' && (
