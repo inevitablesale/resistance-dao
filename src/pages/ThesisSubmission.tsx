@@ -1,4 +1,3 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -266,7 +265,7 @@ const ThesisSubmission = () => {
       const fields = field.split('.');
       let current: any = newData;
       
-      for (let i = 0; i < fields.length - 1; i++) {
+      for (let i = 0 < fields.length - 1; i++) {
         if (!current[fields[i]]) {
           current[fields[i]] = {};
         }
@@ -863,4 +862,4 @@ const ThesisSubmission = () => {
                 </div>
               </div>
               <Button
-                
+                onClick={handleContinue}
