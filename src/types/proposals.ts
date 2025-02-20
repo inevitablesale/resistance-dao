@@ -125,8 +125,3 @@ export interface ProposalInput {
   growthStrategies: GrowthStrategy[];
   integrationStrategies: IntegrationStrategy[];
 }
-
-export interface ValidationResult {
-  isValid: boolean;
-  errors: Record<string, string[]>;
-}
