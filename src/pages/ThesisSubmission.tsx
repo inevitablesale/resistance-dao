@@ -1,10 +1,8 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
@@ -413,9 +411,11 @@ const ThesisSubmission = () => {
   };
 
   const handleStepChange = (newStep: string) => {
+    // Find the indices of current and new steps
     const currentStepIndex = SUBMISSION_STEPS.findIndex(step => step.id === activeStep);
     const newStepIndex = SUBMISSION_STEPS.findIndex(step => step.id === newStep);
     
+    // Only validate when moving forward
     if (newStepIndex > currentStepIndex) {
       const currentValidator = getCurrentValidator();
       if (!currentValidator()) {
@@ -428,6 +428,7 @@ const ThesisSubmission = () => {
       }
     }
     
+    // Allow moving backwards without validation
     updateStepStatus(activeStep, 'completed');
     setActiveStep(newStep);
   };
@@ -846,4 +847,3 @@ const ThesisSubmission = () => {
               <span>Validate your strategy risk-free</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2
