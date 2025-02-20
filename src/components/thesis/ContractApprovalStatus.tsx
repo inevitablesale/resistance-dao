@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -14,6 +13,7 @@ import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { transactionQueue } from "@/services/transactionQueueService";
 import { getContractStatus } from "@/services/proposalContractService";
 import { getTokenBalance } from "@/services/tokenService";
+import { useDynamicContext } from "@/hooks/useDynamicContext";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 const TESTER_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
@@ -35,6 +35,8 @@ export const ContractApprovalStatus = ({
   const { approveLGR, address, wallet } = useWalletConnection();
   const { getProvider, getWalletType } = useWalletProvider();
   const { isInitializing, isDynamicReady } = useDynamicUtils();
+  const { user } = useDynamicContext();
+
   const [isApproving, setIsApproving] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
   const [currentTxId, setCurrentTxId] = useState<string | null>(null);
@@ -51,13 +53,22 @@ export const ContractApprovalStatus = ({
   const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
   const hasRequiredBalance = ethers.utils.parseEther(balance).gte(requiredAmountBN);
 
-  // Initial wallet status check
   useEffect(() => {
     const checkWalletStatus = async () => {
       if (wallet && !isInitializing && isDynamicReady) {
         try {
           const isConnected = await wallet.isConnected();
           setIsWalletReady(isConnected);
+          
+          if (isConnected && user) {
+            const linkedInUrl = user.metadata?.["LinkedIn Profile URL"];
+            console.log('[LinkedIn] Profile URL Info:', {
+              url: linkedInUrl,
+              userMetadata: user.metadata,
+              fullName: `${user.firstName} ${user.lastName}`,
+              email: user.email
+            });
+          }
         } catch (error) {
           console.error("Error checking wallet connection:", error);
           setIsWalletReady(false);
@@ -68,9 +79,8 @@ export const ContractApprovalStatus = ({
     };
 
     checkWalletStatus();
-  }, [wallet, isInitializing, isDynamicReady]);
+  }, [wallet, isInitializing, isDynamicReady, user]);
 
-  // Treasury address fetching
   useEffect(() => {
     const fetchTreasuryAddress = async () => {
       if (!isWalletReady || !wallet || !isDynamicReady) {
@@ -103,7 +113,6 @@ export const ContractApprovalStatus = ({
     fetchTreasuryAddress();
   }, [wallet, isWalletReady, isDynamicReady, toast]);
 
-  // Balance checking
   useEffect(() => {
     const fetchBalance = async () => {
       if (!isWalletReady || !wallet || !address || !isDynamicReady) {
@@ -126,15 +135,12 @@ export const ContractApprovalStatus = ({
       }
     };
 
-    // Initial fetch
     fetchBalance();
 
-    // Set up polling
     if (isWalletReady && !balanceInterval.current) {
       balanceInterval.current = setInterval(fetchBalance, BALANCE_REFRESH_INTERVAL);
     }
 
-    // Cleanup
     return () => {
       if (balanceInterval.current) {
         clearInterval(balanceInterval.current);
@@ -143,7 +149,6 @@ export const ContractApprovalStatus = ({
     };
   }, [isWalletReady, wallet, address, isDynamicReady, requiredAmountBN]);
 
-  // Test mode checking
   useEffect(() => {
     const checkTestMode = async () => {
       if (!isWalletReady || !wallet || !address) {
@@ -156,7 +161,7 @@ export const ContractApprovalStatus = ({
         const contractStatus = await getContractStatus(wallet);
         const isTester = address.toLowerCase() === TESTER_ADDRESS.toLowerCase();
         setIsTesterWallet(isTester);
-        setContractTestMode(false); // Force test mode to false
+        setContractTestMode(false);
         console.log("Test mode status:", {
           isTesterWallet: isTester,
           contractTestMode: false,
@@ -177,11 +182,8 @@ export const ContractApprovalStatus = ({
     try {
       console.log("Starting approval process...", {
         walletAddress: address,
-        testerAddress: TESTER_ADDRESS,
+        linkedInUrl: user?.metadata?.["LinkedIn Profile URL"],
         treasuryAddress,
-        isTesterWallet,
-        contractTestMode: false,
-        isTestMode: false,
         currentFormData
       });
       
@@ -196,7 +198,6 @@ export const ContractApprovalStatus = ({
         });
       }
       
-      // Always proceed with real LGR approval
       const walletProvider = await getProvider();
       const walletType = getWalletType();
       const network = await walletProvider.getNetwork();
@@ -227,7 +228,7 @@ export const ContractApprovalStatus = ({
             spenderAddress: treasuryAddress,
             amount: requiredAmount.toString(),
             isTestMode: false,
-            isApproval: true // Add this flag to indicate it's an approval transaction
+            isApproval: true
           },
           walletType
         },
@@ -238,7 +239,11 @@ export const ContractApprovalStatus = ({
       if (!approvalCompletedRef.current) {
         approvalCompletedRef.current = true;
         setIsApproved(true);
-        onApprovalComplete(currentFormData, transaction, false);
+        const formDataWithLinkedIn = {
+          ...currentFormData,
+          linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || ""
+        };
+        onApprovalComplete(formDataWithLinkedIn, transaction, false);
       }
     } catch (error) {
       console.error("Approval error:", error);
