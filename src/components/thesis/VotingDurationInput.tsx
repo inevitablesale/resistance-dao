@@ -2,7 +2,7 @@
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { motion, AnimatePresence } from "framer-motion";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, Clock } from "lucide-react";
 import { formAnimationVariants } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 
@@ -12,8 +12,8 @@ interface VotingDurationInputProps {
   error?: string[];
 }
 
-const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
-const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
+const MIN_VOTING_DURATION = 7 * 24 * 60 * 60;
+const MAX_VOTING_DURATION = 90 * 24 * 60 * 60;
 
 const DURATION_PRESETS = [
   { label: "1 week", value: 7 * 24 * 60 * 60 },
@@ -40,82 +40,93 @@ export const VotingDurationInput = ({
 
   return (
     <motion.div 
-      className="space-y-4"
       variants={formAnimationVariants.field}
       initial="initial"
       animate="animate"
+      className="relative"
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <Label className="text-lg font-medium text-white flex items-center gap-2">
-            Voting Duration
-            <HelpCircle className="h-4 w-4 text-gray-400" />
-          </Label>
-          <p className="text-sm text-gray-400">Set how long the community can vote on your thesis</p>
+      <div className="space-y-6 p-6 rounded-2xl bg-[#1A1325]/10 backdrop-blur-lg border border-[#8247E5]/20 
+        hover:border-[#8247E5]/40 transition-all duration-300">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label className="text-lg font-semibold bg-gradient-to-r from-[#8247E5] to-[#A379FF] 
+                bg-clip-text text-transparent flex items-center gap-2">
+                Voting Duration
+                <HelpCircle className="h-4 w-4 text-[#8247E5]/60" />
+              </Label>
+              <p className="text-sm text-white/60">Set how long the community can vote on your thesis</p>
+            </div>
+            <AnimatePresence mode="wait">
+              <motion.div 
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-black/20 border border-[#8247E5]/20"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                key={value}
+              >
+                <Clock className="w-4 h-4 text-[#8247E5]" />
+                <span className="text-xl font-bold text-white">
+                  {getDurationText(value)}
+                </span>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
+        
+        <div className="space-y-6">
+          <div className="grid grid-cols-5 gap-2">
+            {DURATION_PRESETS.map((preset) => (
+              <motion.button
+                key={preset.value}
+                onClick={() => onChange([preset.value])}
+                className={cn(
+                  "p-4 rounded-xl text-sm transition-all duration-300",
+                  "border-2 hover:scale-[1.02]",
+                  value === preset.value 
+                    ? "bg-gradient-to-br from-[#8247E5] to-[#A379FF] text-white border-transparent" 
+                    : "bg-black/20 text-white/60 border-[#8247E5]/20 hover:border-[#8247E5]/40"
+                )}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {preset.label}
+              </motion.button>
+            ))}
+          </div>
+
+          <div className="space-y-4">
+            <Slider
+              value={[value]}
+              min={MIN_VOTING_DURATION}
+              max={MAX_VOTING_DURATION}
+              step={24 * 60 * 60}
+              className="w-full"
+              onValueChange={onChange}
+              defaultValue={[MAX_VOTING_DURATION]}
+            />
+            
+            <div className="flex justify-between text-sm text-white/40">
+              <span>7 days (min)</span>
+              <span>90 days (max)</span>
+            </div>
+          </div>
+        </div>
+
         <AnimatePresence mode="wait">
-          <motion.div 
-            className="text-right"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            key={value}
-          >
-            <span className="text-2xl font-bold text-white">
-              {getDurationText(value)}
-            </span>
-          </motion.div>
+          {error && (
+            <motion.p 
+              className="flex items-center gap-2 text-sm text-[#FF3B3B]"
+              variants={formAnimationVariants.error}
+              initial="initial"
+              animate="animate"
+              exit={{ opacity: 0, height: 0 }}
+            >
+              <AlertTriangle className="w-4 h-4" />
+              {error[0]}
+            </motion.p>
+          )}
         </AnimatePresence>
       </div>
-      
-      <div className="space-y-6">
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2">
-          {DURATION_PRESETS.map((preset) => (
-            <motion.button
-              key={preset.value}
-              onClick={() => onChange([preset.value])}
-              className={cn(
-                "px-4 py-2 rounded-full text-sm whitespace-nowrap transition-all",
-                value === preset.value 
-                  ? "bg-yellow-500 text-black font-medium" 
-                  : "bg-white/5 text-white/60 hover:bg-white/10"
-              )}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {preset.label}
-            </motion.button>
-          ))}
-        </div>
-
-        <Slider
-          value={[value]}
-          min={MIN_VOTING_DURATION}
-          max={MAX_VOTING_DURATION}
-          step={24 * 60 * 60} // 1 day steps
-          className="w-full"
-          onValueChange={onChange}
-          defaultValue={[MAX_VOTING_DURATION]}
-        />
-      </div>
-
-      <div className="flex justify-between text-sm text-gray-400">
-        <span>7 days (min)</span>
-        <span>90 days (max)</span>
-      </div>
-
-      <AnimatePresence mode="wait">
-        {error && (
-          <motion.p 
-            className="text-sm text-red-500"
-            variants={formAnimationVariants.error}
-            initial="initial"
-            animate="animate"
-            exit={{ opacity: 0, height: 0 }}
-          >
-            {error[0]}
-          </motion.p>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 };
