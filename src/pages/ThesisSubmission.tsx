@@ -111,23 +111,26 @@ const ThesisSubmission = () => {
   const [isApproved, setIsApproved] = useState(false);
 
   const getLinkedInUrl = () => {
-    // Try getting from metadata first
-    const urlFromMetadata = user?.metadata?.["LinkedIn Profile URL"];
-    // Fallback to verifications if not in metadata
-    const urlFromVerifications = user?.verifications?.customFields?.["LinkedIn Profile URL"];
+    if (!user) {
+      console.log("[LinkedIn] No user data available");
+      return "";
+    }
+
+    const urlFromMetadata = user.metadata?.["LinkedIn Profile URL"];
+    const urlFromVerifications = user.verifications?.customFields?.["LinkedIn Profile URL"];
     
     const url = urlFromMetadata || urlFromVerifications;
     
     console.log("[LinkedIn] URL Resolution:", {
       fromMetadata: urlFromMetadata,
       fromVerifications: urlFromVerifications,
-      finalUrl: url
+      finalUrl: url,
+      user: user
     });
     
     return url || "";
   };
 
-  // Initialize form with proper default values
   const form = useForm<ProposalMetadata>({
     resolver: zodResolver(thesisFormSchema),
     defaultValues: {
@@ -150,19 +153,52 @@ const ThesisSubmission = () => {
         integration: []
       },
       votingDuration: 7 * 24 * 60 * 60,
-      linkedInURL: getLinkedInUrl()
+      linkedInURL: ""
     }
   });
 
-  const handleApprovalComplete = () => {
-    setIsApproved(true);
-    toast({
-      title: "Approval Complete",
-      description: "You can now submit your investment thesis",
-    });
+  useEffect(() => {
+    const linkedInUrl = getLinkedInUrl();
+    console.log("[LinkedIn] Setting form LinkedIn URL:", linkedInUrl);
+    if (linkedInUrl) {
+      form.setValue("linkedInURL", linkedInUrl, { shouldValidate: true });
+    }
+  }, [user]);
+
+  const validateStrategies = (data: ProposalMetadata): boolean => {
+    const { operational, growth, integration } = data.strategies;
+    
+    if (!operational.length || !growth.length || !integration.length) {
+      const missing = [];
+      if (!operational.length) missing.push("operational");
+      if (!growth.length) missing.push("growth");
+      if (!integration.length) missing.push("integration");
+      
+      toast({
+        title: "Missing Strategies",
+        description: `Please select at least one ${missing.join(", ")} strategy`,
+        variant: "destructive"
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const validateLinkedInUrl = (url: string): boolean => {
+    if (!url) {
+      toast({
+        title: "LinkedIn URL Required",
+        description: "Please ensure your LinkedIn profile is connected",
+        variant: "destructive"
+      });
+      return false;
+    }
+    return true;
   };
 
   const onSubmit = async (data: ProposalMetadata) => {
+    console.log("[Form] Starting submission with data:", data);
+
     if (!isConnected || !wallet) {
       toast({
         title: "Connect Wallet",
@@ -181,45 +217,14 @@ const ThesisSubmission = () => {
       return;
     }
 
-    // Validate enums before submission
-    const validations = [
-      {
-        value: data.firmCriteria.size,
-        max: Object.keys(FirmSize).length / 2 - 1,
-        name: "Firm Size"
-      },
-      {
-        value: data.firmCriteria.dealType,
-        max: Object.keys(DealType).length / 2 - 1,
-        name: "Deal Type"
-      },
-      {
-        value: data.firmCriteria.geographicFocus,
-        max: Object.keys(GeographicFocus).length / 2 - 1,
-        name: "Geographic Focus"
-      }
-    ];
-
-    for (const validation of validations) {
-      if (validation.value < 0 || validation.value > validation.max) {
-        toast({
-          title: `Invalid ${validation.name}`,
-          description: `Please select a valid ${validation.name.toLowerCase()}`,
-          variant: "destructive"
-        });
-        return;
-      }
+    if (!validateStrategies(data)) {
+      return;
     }
 
     const linkedInUrl = getLinkedInUrl();
     console.log("[LinkedIn] URL for submission:", linkedInUrl);
-
-    if (!linkedInUrl) {
-      toast({
-        title: "LinkedIn URL Required",
-        description: "Please ensure your LinkedIn profile is connected",
-        variant: "destructive"
-      });
+    
+    if (!validateLinkedInUrl(linkedInUrl)) {
       return;
     }
 
@@ -315,7 +320,6 @@ const ThesisSubmission = () => {
             </p>
           </div>
 
-          {/* Move ContractApprovalStatus to the top, before the form */}
           <Card className="bg-black/40 border-white/10 p-6 mb-8">
             <h2 className="text-lg font-medium text-white mb-4">Step 1: Approve Contract</h2>
             <ContractApprovalStatus

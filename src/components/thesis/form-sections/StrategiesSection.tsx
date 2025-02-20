@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 import { 
@@ -12,6 +11,7 @@ import {
   IntegrationStrategy 
 } from "@/types/proposals";
 import { FieldErrors, UseFormRegister } from "react-hook-form";
+import { useToast } from "@/hooks/use-toast";
 
 export interface StrategiesSectionProps {
   formData: ProposalMetadata;
@@ -27,6 +27,8 @@ type StrategyCategory = keyof ProposalMetadata['strategies'];
 type Strategy = OperationalStrategy | GrowthStrategy | IntegrationStrategy;
 
 export const StrategiesSection = ({ formData, formErrors, register, onChange }: StrategiesSectionProps) => {
+  const { toast } = useToast();
+
   const handleStrategyChange = <T extends StrategyCategory>(
     category: T,
     value: ProposalMetadata['strategies'][T][number],
@@ -36,6 +38,16 @@ export const StrategiesSection = ({ formData, formErrors, register, onChange }: 
     const updatedStrategies = checked
       ? [...currentStrategies, value]
       : currentStrategies.filter(s => s !== value);
+    
+    // Don't allow removing the last item if it's the only one
+    if (!checked && currentStrategies.length === 1) {
+      toast({
+        title: "Strategy Required",
+        description: `At least one ${category} strategy must be selected`,
+        variant: "destructive"
+      });
+      return;
+    }
     
     onChange(category, updatedStrategies as ProposalMetadata['strategies'][T]);
   };
