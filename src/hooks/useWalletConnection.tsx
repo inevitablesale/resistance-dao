@@ -71,8 +71,11 @@ export const useWalletConnection = () => {
       });
 
       if (isTestMode && status.isTestMode) {
-        console.log("Test mode is enabled, skipping LGR approval");
-        return {} as ethers.ContractTransaction;
+        console.log("Test mode is enabled, returning mock transaction");
+        return {
+          wait: async () => ({ status: 1 }),
+          hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+        } as ethers.ContractTransaction;
       }
 
       const signer = walletProvider.provider.getSigner();
@@ -88,7 +91,8 @@ export const useWalletConnection = () => {
         LGR_TOKEN_ADDRESS,
         [
           "function approve(address spender, uint256 amount) returns (bool)",
-          "function allowance(address owner, address spender) view returns (uint256)"
+          "function allowance(address owner, address spender) view returns (uint256)",
+          "function transfer(address to, uint256 amount) returns (bool)"
         ],
         signer
       );
@@ -101,8 +105,8 @@ export const useWalletConnection = () => {
       });
 
       if (currentAllowance.gte(amount)) {
-        console.log("Sufficient treasury allowance already exists");
-        return {} as ethers.ContractTransaction;
+        console.log("Sufficient treasury allowance exists, proceeding with transfer");
+        return await lgrToken.transfer(status.treasury, amount);
       }
 
       console.log("Calling approve for treasury:", {
