@@ -90,7 +90,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
         </h2>
       </motion.div>
 
-      <motion.div variants={itemVariants} className="space-y-4 bg-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10">
+      <motion.div variants={itemVariants} className="group cursor-pointer space-y-4 bg-white/5 hover:bg-white/10 rounded-xl p-6 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-200">
         <div className="flex items-center gap-2 mb-4">
           <Building2 className="h-5 w-5 text-yellow-500" />
           <Label className="text-lg font-medium text-white">Preferred Firm Size (Revenue)</Label>
@@ -123,7 +123,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
         )}
       </motion.div>
 
-      <motion.div variants={itemVariants} className="space-y-4 bg-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10">
+      <motion.div variants={itemVariants} className="group cursor-pointer space-y-4 bg-white/5 hover:bg-white/10 rounded-xl p-6 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-200">
         <div className="flex items-center gap-2 mb-4">
           <Globe2 className="h-5 w-5 text-teal-500" />
           <Label className="text-lg font-medium text-white">Geographic Focus</Label>
@@ -156,7 +156,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
         )}
       </motion.div>
 
-      <motion.div variants={itemVariants} className="space-y-4 bg-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10">
+      <motion.div variants={itemVariants} className="group cursor-pointer space-y-4 bg-white/5 hover:bg-white/10 rounded-xl p-6 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-200">
         <div className="flex items-center gap-2 mb-4">
           <MapPin className="h-5 w-5 text-purple-500" />
           <Label className="text-lg font-medium text-white">Primary State (Optional)</Label>
@@ -185,7 +185,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
         )}
       </motion.div>
 
-      <motion.div variants={itemVariants} className="space-y-4 bg-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10">
+      <motion.div variants={itemVariants} className="group cursor-pointer space-y-4 bg-white/5 hover:bg-white/10 rounded-xl p-6 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-200">
         <div className="flex items-center gap-2 mb-4">
           <Briefcase className="h-5 w-5 text-rose-500" />
           <Label className="text-lg font-medium text-white">Deal Type</Label>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -35,7 +34,7 @@ const ThesisSubmission = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
   const [votingDuration, setVotingDuration] = useState(0);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     investment: {
       targetCapital: "",
@@ -53,7 +52,9 @@ const ThesisSubmission = () => {
       operational: [],
       growth: [],
       integration: []
-    }
+    },
+    votingDuration: 0,
+    linkedInURL: ""
   });
 
   const handleFormDataChange = (field: string, value: any) => {
