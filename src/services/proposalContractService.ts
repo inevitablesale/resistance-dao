@@ -85,90 +85,121 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
   }
 };
 
-function processText(text: string): string {
-  return text
-    .replace(/\n/g, ' ') // Replace newlines with spaces
+function sanitizeString(str: string): string {
+  return str
+    .replace(/[^\w\s.,'-]/g, '') // Only allow alphanumeric, spaces, periods, commas, apostrophes, and hyphens
     .replace(/\s+/g, ' ') // Replace multiple spaces with single space
     .trim(); // Remove leading/trailing whitespace
 }
 
+function processText(text: string): string {
+  const sanitized = sanitizeString(text);
+  // Convert to bytes to ensure proper UTF-8 handling
+  const textBytes = ethers.utils.toUtf8Bytes(sanitized);
+  // Convert back to string to ensure proper encoding
+  return ethers.utils.toUtf8String(textBytes);
+}
+
 function validateTextLength(text: string, field: string, min?: number, max?: number): void {
-  const length = Buffer.from(text).length; // Get byte length for proper UTF-8 handling
+  // Get byte length for proper UTF-8 handling
+  const bytes = ethers.utils.toUtf8Bytes(text);
+  const length = bytes.length;
   
   if (min !== undefined && length < min) {
-    throw new Error(`${field} must be at least ${min} characters`);
+    throw new Error(`${field} must be at least ${min} bytes (current: ${length} bytes)`);
   }
   if (max !== undefined && length > max) {
-    throw new Error(`${field} must not exceed ${max} characters`);
+    throw new Error(`${field} must not exceed ${max} bytes (current: ${length} bytes)`);
   }
 }
 
 function validateProposalInput(input: ProposalContractInput) {
-  // Title validation (10-100 chars)
-  validateTextLength(input.title, "Title", 10, 100);
+  try {
+    // Title validation (10-100 bytes)
+    validateTextLength(input.title, "Title", 10, 100);
 
-  // IPFS hash validation
-  if (!input.ipfsMetadata || input.ipfsMetadata.length === 0) {
-    throw new Error("IPFS metadata hash is required");
-  }
+    // IPFS hash validation
+    if (!input.ipfsMetadata || input.ipfsMetadata.length === 0) {
+      throw new Error("IPFS metadata hash is required");
+    }
 
-  // Investment drivers validation (50-500 chars)
-  validateTextLength(input.investmentDrivers, "Investment drivers", 50, 500);
+    // Investment drivers validation (50-500 bytes)
+    validateTextLength(input.investmentDrivers, "Investment drivers", 50, 500);
 
-  // Additional criteria validation (max 500 chars)
-  if (input.additionalCriteria) {
-    validateTextLength(input.additionalCriteria, "Additional criteria", undefined, 500);
-  }
+    // Additional criteria validation (max 500 bytes)
+    if (input.additionalCriteria) {
+      validateTextLength(input.additionalCriteria, "Additional criteria", undefined, 500);
+    }
 
-  // Array validations
-  if (!input.paymentTerms.length) {
-    throw new Error("At least one payment term is required");
-  }
-  if (!input.operationalStrategies.length) {
-    throw new Error("At least one operational strategy is required");
-  }
-  if (!input.growthStrategies.length) {
-    throw new Error("At least one growth strategy is required");
-  }
-  if (!input.integrationStrategies.length) {
-    throw new Error("At least one integration strategy is required");
+    // Location validation (max 100 bytes)
+    validateTextLength(input.location, "Location", 1, 100);
+
+    // Array validations with detailed error messages
+    if (!input.paymentTerms.length) {
+      throw new Error("At least one payment term is required");
+    }
+    if (!input.operationalStrategies.length) {
+      throw new Error("At least one operational strategy is required");
+    }
+    if (!input.growthStrategies.length) {
+      throw new Error("At least one growth strategy is required");
+    }
+    if (!input.integrationStrategies.length) {
+      throw new Error("At least one integration strategy is required");
+    }
+  } catch (error) {
+    console.error("Validation error:", error);
+    throw error;
   }
 }
 
 function transformConfigToContractInput(config: ProposalConfig): ProposalContractInput {
   console.log("Transforming config to contract input:", config);
   
-  // Process text fields to ensure proper formatting
-  const title = processText(config.metadata.title);
-  const investmentDrivers = processText(config.metadata.investment.drivers);
-  const additionalCriteria = config.metadata.investment.additionalCriteria 
-    ? processText(config.metadata.investment.additionalCriteria)
-    : "";
-  const location = processText(config.metadata.firmCriteria.location);
-  
-  const contractInput: ProposalContractInput = {
-    title,
-    ipfsMetadata: config.ipfsHash,
-    targetCapital: config.targetCapital,
-    votingDuration: config.votingDuration,
-    investmentDrivers,
-    additionalCriteria,
-    firmSize: config.metadata.firmCriteria.size,
-    location,
-    dealType: config.metadata.firmCriteria.dealType,
-    geographicFocus: config.metadata.firmCriteria.geographicFocus,
-    paymentTerms: config.metadata.paymentTerms,
-    operationalStrategies: config.metadata.strategies.operational,
-    growthStrategies: config.metadata.strategies.growth,
-    integrationStrategies: config.metadata.strategies.integration
-  };
+  try {
+    // Process and encode text fields
+    const title = processText(config.metadata.title);
+    const investmentDrivers = processText(config.metadata.investment.drivers);
+    const additionalCriteria = config.metadata.investment.additionalCriteria 
+      ? processText(config.metadata.investment.additionalCriteria)
+      : "";
+    const location = processText(config.metadata.firmCriteria.location);
+    
+    const contractInput: ProposalContractInput = {
+      title,
+      ipfsMetadata: config.ipfsHash,
+      targetCapital: config.targetCapital,
+      votingDuration: config.votingDuration,
+      investmentDrivers,
+      additionalCriteria,
+      firmSize: config.metadata.firmCriteria.size,
+      location,
+      dealType: config.metadata.firmCriteria.dealType,
+      geographicFocus: config.metadata.firmCriteria.geographicFocus,
+      paymentTerms: config.metadata.paymentTerms,
+      operationalStrategies: config.metadata.strategies.operational,
+      growthStrategies: config.metadata.strategies.growth,
+      integrationStrategies: config.metadata.strategies.integration
+    };
 
-  console.log("Transformed contract input:", {
-    ...contractInput,
-    targetCapital: contractInput.targetCapital.toString()
-  });
-  
-  return contractInput;
+    // Log the byte lengths for debugging
+    console.log("String lengths in bytes:", {
+      title: ethers.utils.toUtf8Bytes(title).length,
+      investmentDrivers: ethers.utils.toUtf8Bytes(investmentDrivers).length,
+      additionalCriteria: ethers.utils.toUtf8Bytes(additionalCriteria).length,
+      location: ethers.utils.toUtf8Bytes(location).length
+    });
+
+    console.log("Transformed contract input:", {
+      ...contractInput,
+      targetCapital: contractInput.targetCapital.toString()
+    });
+    
+    return contractInput;
+  } catch (error) {
+    console.error("Error transforming config:", error);
+    throw new Error(`Failed to transform proposal config: ${error.message}`);
+  }
 }
 
 export const createProposal = async (
@@ -178,39 +209,50 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
-  const contractInput = transformConfigToContractInput(config);
-  validateProposalInput(contractInput);
-  
-  console.log("Creating proposal with contract input:", {
-    ...contractInput,
-    targetCapital: contractInput.targetCapital.toString(),
-  });
-  
   try {
-    const gasEstimate = await factory.estimateGas.createProposal(contractInput, config.linkedInURL);
-    console.log("Gas estimation successful:", gasEstimate.toString());
+    const contractInput = transformConfigToContractInput(config);
+    validateProposalInput(contractInput);
+    
+    console.log("Creating proposal with contract input:", {
+      ...contractInput,
+      targetCapital: contractInput.targetCapital.toString(),
+    });
+    
+    // Ensure the contract methods exist
+    if (!factory.createProposal) {
+      throw new Error("Contract method 'createProposal' not found");
+    }
+
+    // Properly encode all strings for the contract call
+    const encodedInput = {
+      ...contractInput,
+      title: ethers.utils.toUtf8Bytes(contractInput.title),
+      investmentDrivers: ethers.utils.toUtf8Bytes(contractInput.investmentDrivers),
+      additionalCriteria: ethers.utils.toUtf8Bytes(contractInput.additionalCriteria),
+      location: ethers.utils.toUtf8Bytes(contractInput.location)
+    };
+
+    return await executeTransaction(
+      () => factory.createProposal(encodedInput, config.linkedInURL),
+      {
+        type: 'nft',
+        description: `Creating proposal with target capital ${ethers.utils.formatEther(config.targetCapital)} LGR`,
+        timeout: 180000,
+        maxRetries: 3,
+        backoffMs: 5000,
+        nftConfig: {
+          tokenAddress: FACTORY_ADDRESS,
+          amount: 1,
+          standard: "ERC721",
+          symbol: "LFP",
+          name: "LedgerFren Proposal"
+        }
+      }
+    );
   } catch (error) {
-    console.error("Gas estimation failed:", error);
+    console.error("Error creating proposal:", error);
     throw error;
   }
-  
-  return await executeTransaction(
-    () => factory.createProposal(contractInput, config.linkedInURL),
-    {
-      type: 'nft',
-      description: `Creating proposal with target capital ${ethers.utils.formatEther(config.targetCapital)} LGR`,
-      timeout: 180000,
-      maxRetries: 3,
-      backoffMs: 5000,
-      nftConfig: {
-        tokenAddress: FACTORY_ADDRESS,
-        amount: 1,
-        standard: "ERC721",
-        symbol: "LFP",
-        name: "LedgerFren Proposal"
-      }
-    }
-  );
 };
 
 export const setTestMode = async (
