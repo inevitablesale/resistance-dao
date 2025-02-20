@@ -19,6 +19,11 @@ export interface FirmCriteriaSectionProps {
 }
 
 export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCriteriaSectionProps) => {
+  const handleRadioChange = (field: string, value: string) => {
+    // Ensure we're converting the string value to a number before setting it
+    onChange(field, value ? Number(value) : null);
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-white">Target Firm Criteria</h2>
@@ -26,8 +31,8 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Preferred Firm Size (Revenue)</Label>
         <RadioGroup 
-          value={formData.firmCriteria.size?.toString()}
-          onValueChange={(value) => onChange('firmCriteria.size', Number(value))}
+          value={formData.firmCriteria.size?.toString() || ""}
+          onValueChange={(value) => handleRadioChange('firmCriteria.size', value)}
           className="flex flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
@@ -71,8 +76,8 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Geographic Focus</Label>
         <RadioGroup 
-          value={formData.firmCriteria.geographicFocus?.toString()}
-          onValueChange={(value) => onChange('firmCriteria.geographicFocus', Number(value))}
+          value={formData.firmCriteria.geographicFocus?.toString() || ""}
+          onValueChange={(value) => handleRadioChange('firmCriteria.geographicFocus', value)}
           className="flex flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
@@ -142,8 +147,8 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Deal Type</Label>
         <RadioGroup 
-          value={formData.firmCriteria.dealType?.toString()}
-          onValueChange={(value) => onChange('firmCriteria.dealType', Number(value))}
+          value={formData.firmCriteria.dealType?.toString() || ""}
+          onValueChange={(value) => handleRadioChange('firmCriteria.dealType', value)}
           className="flex flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
@@ -194,4 +199,3 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
     </div>
   );
 };
-
