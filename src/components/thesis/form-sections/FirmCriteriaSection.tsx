@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -29,6 +30,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Preferred Firm Size (Revenue)</Label>
         <RadioGroup 
+          defaultValue={String(FirmSize.BELOW_1M)}
           value={String(formData.firmCriteria.size)}
           onValueChange={(value) => onChange('size', Number(value))}
           className="flex flex-wrap gap-4"
@@ -74,6 +76,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Geographic Focus</Label>
         <RadioGroup 
+          defaultValue={String(GeographicFocus.LOCAL)}
           value={String(formData.firmCriteria.geographicFocus)}
           onValueChange={(value) => onChange('geographicFocus', Number(value))}
           className="flex flex-wrap gap-4"
@@ -139,6 +142,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Deal Type</Label>
         <RadioGroup 
+          defaultValue={String(DealType.ACQUISITION)}
           value={String(formData.firmCriteria.dealType)}
           onValueChange={(value) => onChange('dealType', Number(value))}
           className="flex flex-wrap gap-4"
