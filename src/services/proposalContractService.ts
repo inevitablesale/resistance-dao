@@ -270,7 +270,7 @@ export const createProposal = async (
     console.log("Transformed contract tuple:", contractTuple);
 
     return await executeTransaction(
-      () => factory.createProposal([contractTuple], config.linkedInURL),
+      () => factory.createProposal(contractTuple, config.linkedInURL),
       {
         type: 'nft',
         description: `Creating proposal with target capital ${ethers.utils.formatEther(config.targetCapital)} LGR`,
