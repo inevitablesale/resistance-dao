@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -882,7 +881,7 @@ const ThesisSubmission = () => {
                     <TargetCapitalInput
                       value={formData.investment.targetCapital}
                       onChange={(value) => handleFormDataChange('investment.targetCapital', value)}
-                      error={formErrors['investment.targetCapital']?.[0]}
+                      error={formErrors['investment.targetCapital']?.[0] ? [formErrors['investment.targetCapital'][0]] : undefined}
                     />
                   </div>
 
@@ -914,8 +913,9 @@ const ThesisSubmission = () => {
                   <div>
                     <Label>Voting Duration</Label>
                     <VotingDurationInput
-                      value={[votingDuration]}
-                      onValueChange={handleVotingDurationChange}
+                      value={votingDuration}
+                      onChange={(value) => handleVotingDurationChange(value)}
+                      error={formErrors.votingDuration}
                     />
                   </div>
                 </div>
