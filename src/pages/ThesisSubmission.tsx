@@ -1,4 +1,3 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -846,4 +845,4 @@ const ThesisSubmission = () => {
               <span>Validate your strategy risk-free</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2
+              <div className="w-2 h-2 rounded-full
