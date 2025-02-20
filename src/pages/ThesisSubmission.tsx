@@ -16,7 +16,7 @@ import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTe
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
-import { ProposalMetadata, FirmSize, DealType, GeographicFocus, PaymentTerm, OperationalStrategy, GrowthStrategy, IntegrationStrategy } from "@/types/proposals";
+import { ProposalMetadata, ProposalConfig, FirmSize, DealType, GeographicFocus, PaymentTerm, OperationalStrategy, GrowthStrategy, IntegrationStrategy } from "@/types/proposals";
 import { SUBMISSION_FEE } from "@/lib/constants";
 import { uploadToIPFS } from "@/services/ipfsService";
 import { createProposal } from "@/services/proposalContractService";
@@ -37,7 +37,11 @@ import * as z from "zod";
 const thesisFormSchema = z.object({
   title: z.string()
     .min(10, "Title must be at least 10 characters")
-    .max(100, "Title must be less than 100 characters"),
+    .max(100, "Title must be less than 100 characters")
+    .refine(
+      (title) => title.toLowerCase().includes(title.toLowerCase()),
+      "Title should match the location mentioned"
+    ),
   investment: z.object({
     targetCapital: z.string()
       .min(1, "Target capital is required")
@@ -50,9 +54,17 @@ const thesisFormSchema = z.object({
       ),
     drivers: z.string()
       .min(50, "Investment drivers must be at least 50 characters")
-      .max(500, "Investment drivers must be less than 500 characters"),
+      .max(500, "Investment drivers must be less than 500 characters")
+      .refine(
+        (text) => !text.includes("Tech Modernization") || !text.includes("Process Standardization"),
+        "Investment drivers should not contain strategy descriptions"
+      ),
     additionalCriteria: z.string()
       .max(500, "Additional criteria must be less than 500 characters")
+      .refine(
+        (text) => text !== form.getValues().investment?.drivers,
+        "Additional criteria should not be identical to investment drivers"
+      )
   }),
   firmCriteria: z.object({
     size: z.number()
