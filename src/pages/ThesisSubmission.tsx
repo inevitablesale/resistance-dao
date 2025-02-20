@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
-import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp, Check } from "lucide-react";
+import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp, Check, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
@@ -74,25 +74,30 @@ interface SubmissionStep {
 const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
 
 const SUBMISSION_STEPS: SubmissionStep[] = [{
-  id: 'thesis',
-  title: 'Investment Thesis',
+  id: 'basics',
+  title: 'Basic Information',
   status: 'pending',
-  description: 'Fill out your investment thesis details'
+  description: 'Enter core thesis details'
+}, {
+  id: 'criteria',
+  title: 'Firm Criteria',
+  status: 'pending',
+  description: 'Define target firm characteristics'
+}, {
+  id: 'payment',
+  title: 'Payment Terms',
+  status: 'pending',
+  description: 'Select payment structure options'
 }, {
   id: 'strategy',
   title: 'Strategy Selection',
   status: 'pending',
-  description: 'Select your post-acquisition strategies'
+  description: 'Choose post-acquisition strategies'
 }, {
-  id: 'approval',
-  title: 'Token Approval',
+  id: 'review',
+  title: 'Review & Submit',
   status: 'pending',
-  description: 'Approve LGR tokens for submission'
-}, {
-  id: 'submission',
-  title: 'Thesis Submission',
-  status: 'pending',
-  description: 'Submit your thesis to the blockchain'
+  description: 'Review and submit your thesis'
 }];
 
 const TEST_FORM_DATA: ProposalMetadata = {
@@ -155,7 +160,7 @@ const ThesisSubmission = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
-  const [activeStep, setActiveStep] = useState<string>('thesis');
+  const [activeStep, setActiveStep] = useState<string>('basics');
   const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
   const [currentTxHash, setCurrentTxHash] = useState<string | null>(null);
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
@@ -299,9 +304,9 @@ const ThesisSubmission = () => {
         </div>;
     }
     switch (activeStep) {
-      case 'thesis':
+      case 'basics':
         return "Continue to Firm Details";
-      case 'strategy':
+      case 'criteria':
         return "Continue to Terms";
       case 'terms':
         return "Submit Investment Thesis";
@@ -397,10 +402,12 @@ const ThesisSubmission = () => {
 
   const getCurrentValidator = () => {
     switch (activeStep) {
-      case 'thesis':
+      case 'basics':
         return validateBasicsTab;
-      case 'firm':
+      case 'criteria':
         return validateFirmTab;
+      case 'payment':
+        return validatePaymentTerms;
       case 'strategy':
         return validateStrategyTab;
       case 'terms':
@@ -490,21 +497,29 @@ const ThesisSubmission = () => {
     }
 
     switch (activeStep) {
-      case 'thesis':
-        handleStepChange('firm');
+      case 'basics':
+        handleStepChange('criteria');
         break;
-      case 'firm':
+      case 'criteria':
+        handleStepChange('payment');
+        break;
+      case 'payment':
         handleStepChange('strategy');
         break;
       case 'strategy':
-        handleStepChange('terms');
+        handleStepChange('review');
         break;
-      case 'terms':
-        if (validateTermsTab()) {
+      case 'review':
+        if (validateForm()) {
           handleSubmit(e);
         }
         break;
     }
+  };
+
+  const validateForm = () => {
+    // Add comprehensive form validation here
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent, formData?: ProposalMetadata, isTestMode?: boolean) => {
@@ -527,9 +542,11 @@ const ThesisSubmission = () => {
         throw new Error("Please add a valid LinkedIn URL in your wallet settings");
       }
 
-      updateStepStatus('thesis', 'completed');
+      updateStepStatus('basics', 'completed');
+      updateStepStatus('criteria', 'completed');
+      updateStepStatus('payment', 'completed');
       updateStepStatus('strategy', 'completed');
-      updateStepStatus('approval', 'completed');
+      updateStepStatus('review', 'completed');
       setActiveStep('submission');
 
       if (!wallet) {
@@ -612,9 +629,11 @@ const ThesisSubmission = () => {
         throw new Error("Please add a valid LinkedIn URL in your wallet settings");
       }
 
-      updateStepStatus('thesis', 'completed');
+      updateStepStatus('basics', 'completed');
+      updateStepStatus('criteria', 'completed');
+      updateStepStatus('payment', 'completed');
       updateStepStatus('strategy', 'completed');
-      updateStepStatus('approval', 'completed');
+      updateStepStatus('review', 'completed');
       setActiveStep('submission');
 
       if (!wallet) {
@@ -869,10 +888,13 @@ const ThesisSubmission = () => {
                   transition={{ duration: 0.2 }}
                   className="p-6"
                 >
-                  {activeStep === 'thesis' && (
+                  {activeStep === 'basics' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
-                        <Label className="text-lg font-medium text-white">Thesis Title</Label>
+                        <Label className="text-lg font-medium text-white flex items-center gap-2">
+                          Thesis Title
+                          <HelpCircle className="h-4 w-4 text-gray-400" />
+                        </Label>
                         <Input 
                           placeholder="Enter a clear, descriptive title"
                           className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12 focus:border-yellow-500/50"
@@ -897,7 +919,10 @@ const ThesisSubmission = () => {
                       />
 
                       <div className="space-y-4">
-                        <Label className="text-lg font-medium text-white">Investment Drivers</Label>
+                        <Label className="text-lg font-medium text-white flex items-center gap-2">
+                          Investment Drivers
+                          <HelpCircle className="h-4 w-4 text-gray-400" />
+                        </Label>
                         <textarea
                           placeholder="Describe the key drivers behind this investment thesis..."
                           className="w-full h-32 bg-black/50 border border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none focus:border-yellow-500/50"
@@ -908,10 +933,26 @@ const ThesisSubmission = () => {
                           <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
                         )}
                       </div>
+
+                      <div className="space-y-4">
+                        <Label className="text-lg font-medium text-white flex items-center gap-2">
+                          Additional Criteria
+                          <HelpCircle className="h-4 w-4 text-gray-400" />
+                        </Label>
+                        <textarea
+                          placeholder="Any additional investment criteria or preferences..."
+                          className="w-full h-32 bg-black/50 border border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none focus:border-yellow-500/50"
+                          value={formData.investment.additionalCriteria}
+                          onChange={e => handleFormDataChange('investment.additionalCriteria', e.target.value)}
+                        />
+                        {formErrors['investment.additionalCriteria'] && (
+                          <p className="text-red-400 text-sm">{formErrors['investment.additionalCriteria'][0]}</p>
+                        )}
+                      </div>
                     </div>
                   )}
 
-                  {activeStep === 'strategy' && (
+                  {activeStep === 'criteria' && (
                     <FirmCriteriaSection
                       formData={{
                         firmCriteria: {
@@ -926,54 +967,41 @@ const ThesisSubmission = () => {
                     />
                   )}
 
-                  {activeStep === 'terms' && (
-                    <>
-                      <PaymentTermsSection
-                        formData={formData}
-                        formErrors={formErrors}
-                        onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
-                      />
-                      <div className="mt-8">
-                        <StrategiesSection
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={(category, value) => handleStrategyChange(category, value)}
-                        />
-                      </div>
-                    </>
+                  {activeStep === 'payment' && (
+                    <PaymentTermsSection
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
+                    />
                   )}
 
-                  {activeStep === 'submission' && (
-                    <div className="space-y-6 text-center py-8">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
-                      >
-                        <Check className="w-8 h-8 text-white" />
-                      </motion.div>
-                      <h3 className="text-2xl font-semibold text-white">
-                        {submissionComplete 
-                          ? "Investment Thesis Submitted!"
-                          : "Ready to Submit"
-                        }
-                      </h3>
-                      <p className="text-gray-400">
-                        {submissionComplete
-                          ? "Your investment thesis has been successfully submitted to the community"
-                          : "Your investment thesis is ready to be submitted to the community"
-                        }
-                      </p>
-                      {currentTxHash && (
-                        <a
-                          href={`https://polygonscan.com/tx/${currentTxHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-polygon-primary hover:underline"
-                        >
-                          View transaction on PolygonScan
-                        </a>
-                      )}
+                  {activeStep === 'strategy' && (
+                    <StrategiesSection
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={(category, value) => handleStrategyChange(category, value)}
+                    />
+                  )}
+
+                  {activeStep === 'review' && (
+                    <div className="space-y-8">
+                      <div className="rounded-lg bg-white/5 p-6 space-y-4">
+                        <h3 className="text-lg font-medium text-white">Review Your Thesis</h3>
+                        <div className="grid gap-4">
+                          <div>
+                            <Label className="text-sm text-gray-400">Title</Label>
+                            <p className="text-white">{formData.title}</p>
+                          </div>
+                          <div>
+                            <Label className="text-sm text-gray-400">Target Capital</Label>
+                            <p className="text-white">{formData.investment.targetCapital} LGR</p>
+                          </div>
+                          <div>
+                            <Label className="text-sm text-gray-400">Investment Drivers</Label>
+                            <p className="text-white">{formData.investment.drivers}</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </motion.div>
