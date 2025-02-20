@@ -1,22 +1,28 @@
 
 import { ethers } from "ethers";
-
-const ERC20_ABI = [
-  "function allowance(address owner, address spender) view returns (uint256)",
-  "function balanceOf(address owner) view returns (uint256)"
-];
+import { ProposalError } from "./errorHandlingService";
 
 export const checkTokenAllowance = async (
-  provider: ethers.providers.Provider,
+  provider: ethers.providers.Web3Provider,
   tokenAddress: string,
   ownerAddress: string,
   spenderAddress: string,
   requiredAmount: string
 ): Promise<boolean> => {
   try {
+    console.log('Checking token allowance:', {
+      token: tokenAddress,
+      owner: ownerAddress,
+      spender: spenderAddress,
+      required: ethers.utils.formatEther(requiredAmount)
+    });
+
     const tokenContract = new ethers.Contract(
       tokenAddress,
-      ERC20_ABI,
+      [
+        "function allowance(address owner, address spender) view returns (uint256)",
+        "function balanceOf(address account) view returns (uint256)"
+      ],
       provider
     );
 
@@ -25,53 +31,54 @@ export const checkTokenAllowance = async (
       tokenContract.balanceOf(ownerAddress)
     ]);
 
-    const requiredAmountBN = ethers.utils.parseUnits(requiredAmount, 18);
-    
-    // Check both allowance and balance
-    return allowance.gte(requiredAmountBN) && balance.gte(requiredAmountBN);
-  } catch (error) {
-    console.error('Error checking token allowance:', error);
-    return false;
-  }
-};
+    console.log('Token check results:', {
+      currentAllowance: ethers.utils.formatEther(allowance),
+      currentBalance: ethers.utils.formatEther(balance),
+      requiredAmount: ethers.utils.formatEther(requiredAmount)
+    });
 
-export const getTokenAllowance = async (
-  provider: ethers.providers.Provider,
-  tokenAddress: string,
-  ownerAddress: string,
-  spenderAddress: string
-): Promise<string> => {
-  try {
-    const tokenContract = new ethers.Contract(
-      tokenAddress,
-      ERC20_ABI,
-      provider
-    );
+    if (balance.lt(requiredAmount)) {
+      throw new ProposalError({
+        category: 'token',
+        message: `Insufficient balance. Required: ${ethers.utils.formatEther(requiredAmount)} LGR, Current: ${ethers.utils.formatEther(balance)} LGR`,
+        recoverySteps: ['Get more LGR tokens']
+      });
+    }
 
-    const allowance = await tokenContract.allowance(ownerAddress, spenderAddress);
-    return ethers.utils.formatUnits(allowance, 18);
+    return allowance.gte(requiredAmount);
   } catch (error) {
-    console.error('Error getting token allowance:', error);
-    return '0';
+    console.error('Token allowance check error:', error);
+    if (error instanceof ProposalError) {
+      throw error;
+    }
+    throw new ProposalError({
+      category: 'token',
+      message: 'Failed to check token allowance',
+      recoverySteps: ['Try again', 'Check your wallet connection']
+    });
   }
 };
 
 export const getTokenBalance = async (
   provider: ethers.providers.Provider,
   tokenAddress: string,
-  ownerAddress: string
+  accountAddress: string
 ): Promise<string> => {
   try {
     const tokenContract = new ethers.Contract(
       tokenAddress,
-      ERC20_ABI,
+      ["function balanceOf(address account) view returns (uint256)"],
       provider
     );
 
-    const balance = await tokenContract.balanceOf(ownerAddress);
-    return ethers.utils.formatUnits(balance, 18);
+    const balance = await tokenContract.balanceOf(accountAddress);
+    return ethers.utils.formatEther(balance);
   } catch (error) {
-    console.error('Error getting token balance:', error);
-    return '0';
+    console.error('Get token balance error:', error);
+    throw new ProposalError({
+      category: 'token',
+      message: 'Failed to fetch token balance',
+      recoverySteps: ['Try again', 'Check your wallet connection']
+    });
   }
 };

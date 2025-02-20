@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -18,6 +17,7 @@ export interface TransactionConfig {
     spenderAddress: string;
     amount: string;
     isTestMode?: boolean;
+    treasuryAddress?: string;
   };
   nftConfig?: {
     tokenAddress: string;
@@ -31,7 +31,7 @@ export interface TransactionConfig {
 }
 
 const DEFAULT_CONFIG: Omit<TransactionConfig, 'description' | 'type'> = {
-  timeout: 120000, // 2 minutes
+  timeout: 120000,
   maxRetries: 3,
   backoffMs: 5000
 };
@@ -45,7 +45,19 @@ export const executeTransaction = async (
     console.log('Token transaction config:', {
       ...config.tokenConfig,
       amount: ethers.utils.formatEther(config.tokenConfig.amount),
+      treasuryAddress: config.tokenConfig.treasuryAddress
     });
+
+    if (config.tokenConfig.treasuryAddress) {
+      if (!ethers.utils.isAddress(config.tokenConfig.treasuryAddress)) {
+        throw new ProposalError({
+          category: 'token',
+          message: 'Invalid treasury address',
+          recoverySteps: ['Contact support']
+        });
+      }
+      config.tokenConfig.spenderAddress = config.tokenConfig.treasuryAddress;
+    }
   }
 
   if (config.type === 'nft' && config.nftConfig) {
@@ -59,7 +71,6 @@ export const executeTransaction = async (
     });
   }
 
-  // Log network info
   if (provider) {
     const network = await provider.getNetwork();
     console.log('Current network:', {
@@ -68,33 +79,43 @@ export const executeTransaction = async (
     });
   }
 
-  // Check allowance if it's a token transaction AND NOT in test mode
   if (config.type === 'token' && config.tokenConfig && provider && !config.tokenConfig.isTestMode) {
     console.log('Checking token allowance...');
     const signerAddress = await provider.getSigner().getAddress();
     
-    const hasAllowance = await checkTokenAllowance(
-      provider,
-      config.tokenConfig.tokenAddress,
-      signerAddress,
-      config.tokenConfig.spenderAddress,
-      config.tokenConfig.amount
-    );
-
-    if (!hasAllowance) {
-      throw new ProposalError({
-        category: 'token',
-        message: 'Insufficient token allowance',
-        recoverySteps: [
-          'Approve the token spending',
-          'Try the transaction again after approval'
-        ]
+    try {
+      console.log('Allowance check parameters:', {
+        tokenAddress: config.tokenConfig.tokenAddress,
+        ownerAddress: signerAddress,
+        spenderAddress: config.tokenConfig.spenderAddress,
+        requiredAmount: config.tokenConfig.amount
       });
+
+      const hasAllowance = await checkTokenAllowance(
+        provider,
+        config.tokenConfig.tokenAddress,
+        signerAddress,
+        config.tokenConfig.spenderAddress,
+        config.tokenConfig.amount
+      );
+
+      if (!hasAllowance) {
+        throw new ProposalError({
+          category: 'token',
+          message: 'Insufficient token allowance',
+          recoverySteps: [
+            'Approve the token spending',
+            'Try the transaction again after approval'
+          ]
+        });
+      }
+      console.log('Token allowance check passed');
+    } catch (error) {
+      console.error('Allowance check error:', error);
+      throw error;
     }
-    console.log('Token allowance check passed');
   }
 
-  // Add to queue first
   const txId = await transactionQueue.addTransaction({
     type: config.type,
     description: config.description
