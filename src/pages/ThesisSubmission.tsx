@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -109,6 +109,14 @@ const ThesisSubmission = () => {
   const { user } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
+
+  const handleApprovalComplete = () => {
+    setIsApproved(true);
+    toast({
+      title: "Approval Complete",
+      description: "You can now submit your investment thesis"
+    });
+  };
 
   const getLinkedInUrl = () => {
     if (!user) {
