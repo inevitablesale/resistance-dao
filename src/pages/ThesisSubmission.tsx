@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +15,7 @@ import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
-import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
+import { getContractStatus, createProposal } from "@/services/proposalContractService";
 import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
@@ -27,7 +28,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { subscribeToProposalEvents, waitForProposalCreation } from "@/services/eventListenerService";
+import { subscribeToProposalEvents } from "@/services/eventListenerService";
 import { 
   FirmSize, 
   DealType, 
