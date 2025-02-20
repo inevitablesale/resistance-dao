@@ -1,4 +1,3 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -850,4 +849,16 @@ const ThesisSubmission = () => {
           
           <motion.div 
             className="mt-6 flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-white/60"
-            initial={{ opacity
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            {/* Additional content */}
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
