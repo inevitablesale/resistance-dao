@@ -127,7 +127,7 @@ export const LGRFloatingWidget = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
+    <div className="fixed bottom-4 right-4 z-30 flex flex-col items-end">
       <div className="mb-2 px-3 py-1 bg-black/90 rounded-lg backdrop-blur-sm border border-white/10">
         <span className="text-yellow-500 text-sm font-medium">LGR Wallet</span>
       </div>
@@ -137,7 +137,7 @@ export const LGRFloatingWidget = () => {
             <Coins className="w-6 h-6 text-yellow-500" />
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-4 bg-black/90 backdrop-blur-lg border border-white/10">
+        <PopoverContent className="w-80 p-4 bg-black/90 backdrop-blur-lg border border-white/10 z-40">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -225,7 +225,7 @@ export const LGRFloatingWidget = () => {
       </Popover>
 
       <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
-        <DialogContent className="bg-black/95 border border-yellow-500/20 max-w-2xl">
+        <DialogContent className="bg-black/95 border border-yellow-500/20 max-w-2xl z-51">
           <DialogHeader>
             <DialogTitle className="text-yellow-500">How to Buy LGR Tokens</DialogTitle>
             <DialogDescription>
@@ -310,7 +310,7 @@ export const LGRFloatingWidget = () => {
       </Dialog>
 
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <DialogContent className="bg-black/95 border border-yellow-500/20">
+        <DialogContent className="bg-black/95 border border-yellow-500/20 z-51">
           <DialogHeader>
             <DialogTitle className="text-yellow-500">Confirm LGR Purchase</DialogTitle>
             <DialogDescription>

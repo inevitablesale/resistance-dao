@@ -31,8 +31,8 @@ const RadioGroupItem = React.forwardRef<
         "ring-offset-background focus:outline-none focus-visible:ring-2",
         "focus-visible:ring-ring focus-visible:ring-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        "relative z-50", // Added z-50 and relative positioning
-        "pointer-events-auto", // Ensure pointer events work
+        "relative z-20", // Updated to z-20 for form interactive elements
+        "pointer-events-auto",
         className
       )}
       {...props}
