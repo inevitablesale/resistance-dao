@@ -53,7 +53,7 @@ export const ContractApprovalStatus = ({
 
   const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
   
-  const hasRequiredBalance = (isTesterWallet && contractTestMode) || tokenBalances?.find(token => 
+  const hasRequiredBalance = tokenBalances?.find(token => 
     token.symbol === "LGR" && ethers.BigNumber.from(token.balance || "0").gte(requiredAmountBN)
   );
 
@@ -87,10 +87,10 @@ export const ContractApprovalStatus = ({
         const contractStatus = await getContractStatus(wallet);
         const isTester = address.toLowerCase() === TESTER_ADDRESS.toLowerCase();
         setIsTesterWallet(isTester);
-        setContractTestMode(contractStatus.isTestMode);
+        setContractTestMode(false); // Force test mode to false
         console.log("Test mode status:", {
           isTesterWallet: isTester,
-          contractTestMode: contractStatus.isTestMode,
+          contractTestMode: false,
           walletAddress: address,
           testerAddress: TESTER_ADDRESS
         });
@@ -110,48 +110,22 @@ export const ContractApprovalStatus = ({
         walletAddress: address,
         testerAddress: TESTER_ADDRESS,
         isTesterWallet,
-        contractTestMode,
-        isTestMode,
+        contractTestMode: false, // Always false now
+        isTestMode: false, // Always false now
         currentFormData
       });
       
       if (wallet) {
         const contractStatus = await getContractStatus(wallet);
         console.log("Contract status:", {
-          isTestMode: contractStatus.isTestMode,
+          isTestMode: false,
           testerAddress: contractStatus.tester,
           connectedAddress: address,
           isTesterWallet: address?.toLowerCase() === contractStatus.tester.toLowerCase()
         });
       }
       
-      const effectiveTestMode = isTesterWallet && contractTestMode;
-      console.log("Effective test mode:", effectiveTestMode);
-      
-      if (effectiveTestMode) {
-        console.log("Test mode active - bypassing LGR approval");
-        const txId = await transactionQueue.addTransaction({
-          type: 'token',
-          description: 'Test Mode: Simulating LGR approval'
-        });
-        setCurrentTxId(txId);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        await transactionQueue.processTransaction(txId, async () => {
-          return {
-            success: true,
-            transaction: {} as ethers.ContractTransaction,
-            receipt: {} as ethers.ContractReceipt
-          };
-        });
-        console.log("Test mode transaction completed with form data:", currentFormData);
-        if (!approvalCompletedRef.current) {
-          approvalCompletedRef.current = true;
-          setIsApproved(true);
-          onApprovalComplete(currentFormData, undefined, effectiveTestMode);
-        }
-        return;
-      }
-
+      // Always proceed with real LGR approval
       const walletProvider = await getProvider();
       const walletType = getWalletType();
       const network = await walletProvider.getNetwork();
@@ -168,8 +142,8 @@ export const ContractApprovalStatus = ({
 
       const transaction = await executeTransaction(
         async () => {
-          console.log("Executing LGR approval transaction...");
-          return approveLGR(requiredAmount.toString(), effectiveTestMode);
+          console.log("Executing real LGR approval transaction...");
+          return approveLGR(requiredAmount.toString(), false); // Always false for real approval
         },
         {
           type: 'token',
@@ -181,7 +155,7 @@ export const ContractApprovalStatus = ({
             tokenAddress: LGR_TOKEN_ADDRESS,
             spenderAddress: address!,
             amount: requiredAmount.toString(),
-            isTestMode: effectiveTestMode
+            isTestMode: false // Always false for real approval
           },
           walletType
         },
@@ -192,7 +166,7 @@ export const ContractApprovalStatus = ({
       if (!approvalCompletedRef.current) {
         approvalCompletedRef.current = true;
         setIsApproved(true);
-        onApprovalComplete(currentFormData, transaction, effectiveTestMode);
+        onApprovalComplete(currentFormData, transaction, false); // Always false for real tx
       }
     } catch (error) {
       console.error("Approval error:", error);
@@ -212,7 +186,7 @@ export const ContractApprovalStatus = ({
     if (!approvalCompletedRef.current) {
       approvalCompletedRef.current = true;
       setIsApproved(true);
-      onApprovalComplete(currentFormData, undefined, isTesterWallet && contractTestMode);
+      onApprovalComplete(currentFormData, undefined, false); // Always false for real tx
     }
   };
 
@@ -258,12 +232,9 @@ export const ContractApprovalStatus = ({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h3 className="text-lg font-medium text-white">Contract Approval</h3>
+              <h3 className="text-lg font-medium text-white">Real Contract Approval</h3>
               <p className="text-sm text-white">
-                {isTesterWallet && contractTestMode 
-                  ? "Test Mode: Approval will be simulated"
-                  : "Approve LGR tokens for contract interaction"
-                }
+                Approve {ethers.utils.formatEther(requiredAmountBN)} LGR tokens for contract interaction
               </p>
             </div>
             {isApproved ? (
@@ -273,9 +244,17 @@ export const ContractApprovalStatus = ({
             )}
           </div>
 
+          {!hasRequiredBalance && (
+            <div className="p-2 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <p className="text-sm text-red-400">
+                Insufficient LGR balance. You need {ethers.utils.formatEther(requiredAmountBN)} LGR tokens.
+              </p>
+            </div>
+          )}
+
           <Button
             onClick={handleApprove}
-            disabled={isApproving || isApproved || !isWalletReady}
+            disabled={isApproving || isApproved || !isWalletReady || !hasRequiredBalance}
             className="w-full"
           >
             {isApproving ? (
@@ -286,7 +265,7 @@ export const ContractApprovalStatus = ({
             ) : isApproved ? (
               "Approved"
             ) : (
-              "Approve Contract"
+              `Approve ${ethers.utils.formatEther(requiredAmountBN)} LGR`
             )}
           </Button>
         </div>
@@ -294,3 +273,4 @@ export const ContractApprovalStatus = ({
     </Card>
   );
 };
+
