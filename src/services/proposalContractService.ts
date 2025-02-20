@@ -8,7 +8,19 @@ import { WalletType } from "@/hooks/useWalletProvider";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
-import { ProposalMetadata, ProposalConfig, ProposalContractInput } from "@/types/proposals";
+import { 
+  ProposalMetadata, 
+  ProposalConfig, 
+  ProposalContractInput,
+  ProposalContractTuple,
+  FirmSize,
+  DealType,
+  GeographicFocus,
+  PaymentTerm,
+  OperationalStrategy,
+  GrowthStrategy,
+  IntegrationStrategy
+} from "@/types/proposals";
 
 export interface ContractStatus {
   submissionFee: ethers.BigNumber;
@@ -162,6 +174,25 @@ function validateProposalInput(input: ProposalContractInput) {
   }
 }
 
+function transformToContractTuple(input: ProposalContractInput): ProposalContractTuple {
+  return {
+    title: input.title,
+    ipfsMetadata: input.ipfsMetadata,
+    targetCapital: input.targetCapital.toString(),
+    votingDuration: input.votingDuration,
+    investmentDrivers: input.investmentDrivers,
+    additionalCriteria: input.additionalCriteria || '',
+    firmSize: Number(input.firmSize),
+    location: input.location,
+    dealType: Number(input.dealType),
+    geographicFocus: Number(input.geographicFocus),
+    paymentTerms: input.paymentTerms.map(term => Number(term)),
+    operationalStrategies: input.operationalStrategies.map(strategy => Number(strategy)),
+    growthStrategies: input.growthStrategies.map(strategy => Number(strategy)),
+    integrationStrategies: input.integrationStrategies.map(strategy => Number(strategy))
+  };
+}
+
 function transformConfigToContractInput(config: ProposalConfig): ProposalContractInput {
   console.log("Transforming config to contract input:", config);
   
@@ -235,8 +266,11 @@ export const createProposal = async (
       throw new Error("Contract method 'createProposal' not found");
     }
 
+    const contractTuple = transformToContractTuple(contractInput);
+    console.log("Transformed contract tuple:", contractTuple);
+
     return await executeTransaction(
-      () => factory.createProposal(contractInput, config.linkedInURL),
+      () => factory.createProposal([contractTuple], config.linkedInURL),
       {
         type: 'nft',
         description: `Creating proposal with target capital ${ethers.utils.formatEther(config.targetCapital)} LGR`,

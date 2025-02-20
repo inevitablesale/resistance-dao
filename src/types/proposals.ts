@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 
 export enum FirmSize {
@@ -142,3 +143,22 @@ export interface ProposalContractInput {
   growthStrategies: GrowthStrategy[];
   integrationStrategies: IntegrationStrategy[];
 }
+
+// New type that exactly matches contract tuple structure
+export interface ProposalContractTuple {
+  title: string;
+  ipfsMetadata: string;
+  targetCapital: string;  // uint128 as string
+  votingDuration: number;
+  investmentDrivers: string;
+  additionalCriteria: string;
+  firmSize: number;      // uint8
+  location: string;
+  dealType: number;      // uint8
+  geographicFocus: number; // uint8
+  paymentTerms: number[];  // uint8[]
+  operationalStrategies: number[]; // uint8[]
+  growthStrategies: number[];     // uint8[]
+  integrationStrategies: number[]; // uint8[]
+}
+
