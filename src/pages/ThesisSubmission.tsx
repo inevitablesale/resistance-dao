@@ -162,10 +162,10 @@ const ThesisSubmission = () => {
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     firmCriteria: {
-      size: FirmSize.BELOW_1M, // Set default value
+      size: FirmSize.BELOW_1M,
       location: "",
-      dealType: DealType.ACQUISITION, // Set default value
-      geographicFocus: GeographicFocus.LOCAL // Set default value
+      dealType: DealType.ACQUISITION,
+      geographicFocus: GeographicFocus.LOCAL
     },
     paymentTerms: [],
     strategies: {
@@ -845,4 +845,74 @@ const ThesisSubmission = () => {
               <span>Validate your strategy risk-free</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full
+              <div className="w-2 h-2 rounded-full bg-yellow-500" />
+              <span>Test your thesis with real market feedback</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 max-w-7xl mx-auto">
+          <div className="md:col-span-4">
+            <div className="space-y-4">
+              {renderSteps()}
+            </div>
+          </div>
+
+          <div className="md:col-span-8">
+            <Card className="p-6 bg-black/50 border-white/10">
+              {activeStep === 'thesis' && (
+                <div className="space-y-6">
+                  {/* ... keep existing code (thesis form fields) */}
+                </div>
+              )}
+
+              {activeStep === 'firm' && (
+                <FirmCriteriaSection
+                  formData={formData}
+                  formErrors={formErrors}
+                  onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
+                />
+              )}
+
+              {activeStep === 'strategy' && (
+                <StrategiesSection
+                  formData={formData}
+                  formErrors={formErrors}
+                  onChange={handleStrategyChange}
+                />
+              )}
+
+              {activeStep === 'terms' && (
+                <PaymentTermsSection
+                  formData={formData}
+                  formErrors={formErrors}
+                  onChange={(field, value) => handleFormDataChange('paymentTerms', value)}
+                />
+              )}
+
+              <div className="mt-6 flex justify-end">
+                <Button
+                  onClick={handleContinue}
+                  disabled={isSubmitting}
+                  className={cn(
+                    "h-12 px-6",
+                    "bg-gradient-to-r from-yellow-500 to-yellow-600",
+                    "hover:from-yellow-600 hover:to-yellow-700",
+                    "text-white font-medium",
+                    "transition-all duration-300",
+                    "disabled:opacity-50",
+                    "flex items-center gap-2"
+                  )}
+                >
+                  {getButtonText()}
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
