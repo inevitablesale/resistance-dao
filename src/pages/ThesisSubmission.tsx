@@ -87,7 +87,7 @@ const ThesisSubmission = () => {
         integration: []
       },
       votingDuration: 7 * 24 * 60 * 60,
-      linkedInURL: user?.linkedAccounts?.find(account => account.provider === 'linkedin')?.profileUrl || ""
+      linkedInURL: user?.verifications?.customFields?.["LinkedIn Profile URL"] || ""
     }
   });
 
@@ -118,7 +118,7 @@ const ThesisSubmission = () => {
       return;
     }
 
-    const linkedInUrl = user?.linkedAccounts?.find(account => account.provider === 'linkedin')?.profileUrl;
+    const linkedInUrl = user?.verifications?.customFields?.["LinkedIn Profile URL"];
     console.log("User's LinkedIn URL:", linkedInUrl);
 
     setIsSubmitting(true);
