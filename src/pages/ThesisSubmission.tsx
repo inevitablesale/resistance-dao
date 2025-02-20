@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -825,7 +824,7 @@ const ThesisSubmission = () => {
                   ))}
                 </div>
                 <div>
-                  <Label htmlFor="targetCapital">Target Capital (LGR)</Label>
+                  <Label htmlFor="targetCapital" className="text-white">Target Capital (LGR)</Label>
                   <Input
                     type="number"
                     id="targetCapital"
@@ -838,7 +837,7 @@ const ThesisSubmission = () => {
                   ))}
                 </div>
                 <div>
-                  <Label htmlFor="drivers">Investment Drivers</Label>
+                  <Label htmlFor="drivers" className="text-white">Investment Drivers</Label>
                   <Input
                     id="drivers"
                     value={formData.investment.drivers}
@@ -850,7 +849,7 @@ const ThesisSubmission = () => {
                   ))}
                 </div>
                 <div>
-                  <Label htmlFor="additionalCriteria">Additional Criteria</Label>
+                  <Label htmlFor="additionalCriteria" className="text-white">Additional Criteria</Label>
                   <Input
                     id="additionalCriteria"
                     value={formData.investment.additionalCriteria}
