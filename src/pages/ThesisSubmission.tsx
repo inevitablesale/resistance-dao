@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -166,6 +166,7 @@ const ThesisSubmission = () => {
   const [isTestMode, setIsTestMode] = useState(false);
   const [contractTestMode, setContractTestMode] = useState(false);
   const [hasInitialStatus, setHasInitialStatus] = useState(false);
+  const initialCheckRef = useRef(false);
 
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
@@ -228,10 +229,13 @@ const ThesisSubmission = () => {
     let initCheckTimeout: NodeJS.Timeout;
 
     const checkTestMode = async () => {
-      if (!wallet) {
-        console.log("⚠️ Wallet not available yet, waiting for initialization...");
+      if (!wallet || initialCheckRef.current) {
+        console.log("⚠️ Wallet not available or check already in progress");
         return false;
       }
+
+      initialCheckRef.current = true;
+      console.log("🔄 Starting test mode check");
 
       try {
         const walletClient = await wallet.getWalletClient();
@@ -268,52 +272,52 @@ const ThesisSubmission = () => {
           setHasInitialStatus(true);
         }
         return false;
+      } finally {
+        initialCheckRef.current = false;
       }
     };
 
     const initializeWithRetry = async () => {
       let attempts = 0;
-      const maxAttempts = 10;
-      const retryDelay = 1000; // 1 second
+      const maxAttempts = 3;
+      const retryDelay = 2000;
 
-      while (attempts < maxAttempts && mounted) {
-        console.log(`Attempt ${attempts + 1}/${maxAttempts} to initialize test mode...`);
-        const success = await checkTestMode();
-        
-        if (success) {
-          console.log("✅ Test mode initialization successful");
-          return;
-        }
-        
-        attempts++;
-        if (attempts < maxAttempts) {
-          console.log(`Retrying in ${retryDelay}ms...`);
+      while (attempts < maxAttempts && mounted && !hasInitialStatus) {
+        if (attempts > 0) {
+          console.log(`Retrying test mode check (${attempts + 1}/${maxAttempts})...`);
           await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
+
+        const success = await checkTestMode();
+        if (success || !mounted) return;
+        
+        attempts++;
       }
       
-      if (mounted) {
+      if (mounted && !hasInitialStatus) {
         console.error("❌ Failed to initialize test mode after maximum attempts");
         setHasInitialStatus(true);
       }
     };
 
-    initializeWithRetry();
+    if (!hasInitialStatus) {
+      initializeWithRetry();
 
-    initCheckTimeout = setTimeout(() => {
-      if (mounted) {
-        console.error("⚠️ Test mode initialization timed out");
-        setIsTestMode(false);
-        setContractTestMode(false);
-        setHasInitialStatus(true);
-      }
-    }, 30000); // 30 seconds timeout
+      initCheckTimeout = setTimeout(() => {
+        if (mounted && !hasInitialStatus) {
+          console.error("⚠️ Test mode initialization timed out");
+          setIsTestMode(false);
+          setContractTestMode(false);
+          setHasInitialStatus(true);
+        }
+      }, 10000);
+    }
 
     return () => {
       mounted = false;
       clearTimeout(initCheckTimeout);
     };
-  }, [wallet, address]);
+  }, [wallet, address, hasInitialStatus]);
 
   useEffect(() => {
     if (!hasInitialStatus) {
