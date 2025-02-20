@@ -331,18 +331,6 @@ const ThesisSubmission = () => {
     }
     if (!formData.investment.targetCapital) {
       errors['investment.targetCapital'] = ['Target capital is required'];
-    } else {
-      try {
-        const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
-        if (targetCapitalWei.lt(MIN_TARGET_CAPITAL)) {
-          errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} LGR`];
-        }
-        if (targetCapitalWei.gt(MAX_TARGET_CAPITAL)) {
-          errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} LGR`];
-        }
-      } catch (error) {
-        errors['investment.targetCapital'] = ['Invalid target capital amount'];
-      }
     }
     if (!formData.investment.drivers || formData.investment.drivers.trim().length < 50) {
       errors['investment.drivers'] = ['Investment drivers must be at least 50 characters'];
@@ -863,6 +851,73 @@ const ThesisSubmission = () => {
             )}>
               <div className="p-6">
                 {activeStep === 'thesis' && (
+                  <div className="space-y-6">
+                    <h2 className="text-xl font-semibold text-white">Investment Thesis Details</h2>
+                    
+                    <div>
+                      <Label htmlFor="title" className="text-white mb-2 block">Thesis Title</Label>
+                      <Input
+                        id="title"
+                        value={formData.title}
+                        onChange={(e) => handleFormDataChange('title', e.target.value)}
+                        className="bg-black/50 border-white/10 text-white"
+                        placeholder="Enter your investment thesis title"
+                      />
+                      {formErrors['title'] && (
+                        <p className="mt-1 text-sm text-red-500">{formErrors['title'][0]}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <Label htmlFor="targetCapital" className="text-white mb-2 block">Target Capital (LGR)</Label>
+                      <Input
+                        id="targetCapital"
+                        type="number"
+                        value={formData.investment.targetCapital}
+                        onChange={(e) => handleFormDataChange('investment.targetCapital', e.target.value)}
+                        className="bg-black/50 border-white/10 text-white"
+                        placeholder="Enter target capital amount"
+                        min={ethers.utils.formatEther(MIN_TARGET_CAPITAL)}
+                        max={ethers.utils.formatEther(MAX_TARGET_CAPITAL)}
+                      />
+                      {formErrors['investment.targetCapital'] && (
+                        <p className="mt-1 text-sm text-red-500">{formErrors['investment.targetCapital'][0]}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <Label htmlFor="drivers" className="text-white mb-2 block">Investment Drivers</Label>
+                      <textarea
+                        id="drivers"
+                        value={formData.investment.drivers}
+                        onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
+                        className="w-full min-h-[100px] bg-black/50 border-white/10 text-white rounded-md p-3"
+                        placeholder="Describe the key drivers for this investment"
+                      />
+                      {formErrors['investment.drivers'] && (
+                        <p className="mt-1 text-sm text-red-500">{formErrors['investment.drivers'][0]}</p>
+                      )}
+                      <p className="text-sm text-white/60 mt-1">
+                        {formData.investment.drivers.length}/500 characters
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="additionalCriteria" className="text-white mb-2 block">Additional Criteria (Optional)</Label>
+                      <textarea
+                        id="additionalCriteria"
+                        value={formData.investment.additionalCriteria}
+                        onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
+                        className="w-full min-h-[100px] bg-black/50 border-white/10 text-white rounded-md p-3"
+                        placeholder="Any additional criteria or requirements"
+                      />
+                      <p className="text-sm text-white/60 mt-1">
+                        {formData.investment.additionalCriteria.length}/500 characters
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {activeStep === 'firm' && (
                   <FirmCriteriaSection
                     formData={formData}
                     onChange={handleFormDataChange}
