@@ -17,21 +17,11 @@ const MIN_TARGET_CAPITAL_LGR = 1000;
 const MAX_TARGET_CAPITAL_LGR = 25000000;
 
 export const convertUSDToLGRWei = (lgrAmount: string): ethers.BigNumber => {
-  console.log("[TargetCapital] Input value:", lgrAmount, "Type:", typeof lgrAmount);
-  
-  if (!lgrAmount || isNaN(parseFloat(lgrAmount))) {
-    console.log("[TargetCapital] Invalid input, returning 0");
-    return ethers.BigNumber.from(0);
-  }
+  if (!lgrAmount || isNaN(parseFloat(lgrAmount))) return ethers.BigNumber.from(0);
   
   // Convert string to number and validate
   const lgrValue = parseFloat(lgrAmount);
   const wholeLGRAmount = Math.floor(lgrValue);
-  console.log("[TargetCapital] Parsed values:", {
-    original: lgrAmount,
-    parsed: lgrValue,
-    floored: wholeLGRAmount
-  });
   
   if (wholeLGRAmount < MIN_TARGET_CAPITAL_LGR) {
     throw new Error(`Minimum target capital is ${MIN_TARGET_CAPITAL_LGR.toLocaleString()} LGR ($${(MIN_TARGET_CAPITAL_LGR * LGR_PRICE_USD).toLocaleString()} USD)`);
@@ -42,13 +32,10 @@ export const convertUSDToLGRWei = (lgrAmount: string): ethers.BigNumber => {
   
   try {
     // Convert the whole LGR amount to wei (18 decimals)
-    console.log("[TargetCapital] Converting to wei:", wholeLGRAmount.toString());
-    const result = ethers.utils.parseUnits(wholeLGRAmount.toString(), 18);
-    console.log("[TargetCapital] Converted wei value:", result.toString());
-    return result;
+    return ethers.utils.parseUnits(wholeLGRAmount.toString(), 18);
   } catch (error) {
-    console.error("[TargetCapital] Error converting to wei:", error);
-    throw error; // Let the error propagate up to handle validation
+    console.error("Error converting to wei:", error);
+    return ethers.BigNumber.from(0);
   }
 };
 
@@ -72,8 +59,7 @@ export const TargetCapitalInput = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatValue(e.target.value);
-    console.log("[TargetCapital] Formatted input value:", formattedValue);
-    onChange(formattedValue || "0"); // Ensure we always have a valid string number
+    onChange(formattedValue);
   };
 
   const calculateUSDAmount = (lgrAmount: string): string => {

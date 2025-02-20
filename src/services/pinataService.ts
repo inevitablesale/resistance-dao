@@ -9,8 +9,6 @@ interface PinataResponse {
 
 export const uploadMetadataToPinata = async (metadata: any): Promise<string> => {
   try {
-    console.log('Uploading metadata to Pinata:', JSON.stringify(metadata, null, 2));
-    
     const { data: { PINATA_API_KEY, PINATA_API_SECRET } } = await supabase
       .functions.invoke('get-pinata-credentials');
 
