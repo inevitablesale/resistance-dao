@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -214,7 +215,7 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
   } catch (error) {
     console.error("Error transforming config:", error);
     throw new ProposalError({
-      category: 'transformation',
+      category: 'validation',
       message: `Failed to transform proposal config: ${error.message}`,
       recoverySteps: [
         'Check that all text fields contain valid string data',
