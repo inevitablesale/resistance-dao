@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -106,34 +107,31 @@ function processText(text: string): string {
 }
 
 function validateTextLength(text: string, field: string, min?: number, max?: number): void {
-  const bytes = ethers.utils.toUtf8Bytes(text);
-  const length = bytes.length;
-  
-  if (min !== undefined && length < min) {
-    throw new Error(`${field} must be at least ${min} bytes (current: ${length} bytes)`);
+  if (min !== undefined && text.length < min) {
+    throw new Error(`${field} must be at least ${min} characters (current: ${text.length})`);
   }
-  if (max !== undefined && length > max) {
-    throw new Error(`${field} must not exceed ${max} bytes (current: ${length} bytes)`);
+  if (max !== undefined && text.length > max) {
+    throw new Error(`${field} must not exceed ${max} characters (current: ${text.length})`);
   }
 }
 
-function encodeProposalInput(input: ProposalContractInput): any {
+function prepareContractInput(input: ProposalContractInput): any {
+  // Create a new object with the exact structure the contract expects
   return {
-    ...input,
-    title: ethers.utils.toUtf8Bytes(input.title),
-    investmentDrivers: ethers.utils.toUtf8Bytes(input.investmentDrivers),
-    additionalCriteria: ethers.utils.toUtf8Bytes(input.additionalCriteria || ''),
-    location: ethers.utils.toUtf8Bytes(input.location),
+    title: input.title,
+    ipfsMetadata: input.ipfsMetadata,
+    targetCapital: input.targetCapital,
+    votingDuration: input.votingDuration,
+    investmentDrivers: input.investmentDrivers,
+    additionalCriteria: input.additionalCriteria || '',
     firmSize: input.firmSize,
+    location: input.location,
     dealType: input.dealType,
     geographicFocus: input.geographicFocus,
     paymentTerms: input.paymentTerms,
     operationalStrategies: input.operationalStrategies,
     growthStrategies: input.growthStrategies,
-    integrationStrategies: input.integrationStrategies,
-    targetCapital: input.targetCapital,
-    votingDuration: input.votingDuration,
-    ipfsMetadata: input.ipfsMetadata
+    integrationStrategies: input.integrationStrategies
   };
 }
 
@@ -165,6 +163,21 @@ function validateProposalInput(input: ProposalContractInput) {
     if (!input.integrationStrategies.length) {
       throw new Error("At least one integration strategy is required");
     }
+
+    // Validate array values are within uint8 range (0-255)
+    const validateUint8Array = (arr: number[], fieldName: string) => {
+      arr.forEach((value, index) => {
+        if (value < 0 || value > 255) {
+          throw new Error(`${fieldName}[${index}] must be between 0 and 255`);
+        }
+      });
+    };
+
+    validateUint8Array(input.paymentTerms, "Payment terms");
+    validateUint8Array(input.operationalStrategies, "Operational strategies");
+    validateUint8Array(input.growthStrategies, "Growth strategies");
+    validateUint8Array(input.integrationStrategies, "Integration strategies");
+
   } catch (error) {
     console.error("Validation error:", error);
     throw error;
@@ -204,11 +217,9 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
       integrationStrategies
     };
 
-    console.log("String lengths in bytes:", {
-      title: ethers.utils.toUtf8Bytes(title).length,
-      investmentDrivers: ethers.utils.toUtf8Bytes(investmentDrivers).length,
-      additionalCriteria: ethers.utils.toUtf8Bytes(additionalCriteria).length,
-      location: ethers.utils.toUtf8Bytes(location).length
+    console.log("Contract input prepared:", {
+      ...contractInput,
+      targetCapital: contractInput.targetCapital.toString(),
     });
     
     return contractInput;
@@ -246,11 +257,12 @@ export const createProposal = async (
       throw new Error("Contract method 'createProposal' not found");
     }
 
-    const encodedInput = encodeProposalInput(contractInput);
-    console.log("Encoded contract input:", encodedInput);
+    // Prepare the input in the exact format the contract expects
+    const preparedInput = prepareContractInput(contractInput);
+    console.log("Prepared contract input:", preparedInput);
 
     return await executeTransaction(
-      () => factory.createProposal(encodedInput, config.linkedInURL),
+      () => factory.createProposal(preparedInput, config.linkedInURL),
       {
         type: 'nft',
         description: `Creating proposal with target capital ${ethers.utils.formatEther(config.targetCapital)} LGR`,
