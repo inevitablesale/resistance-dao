@@ -258,8 +258,8 @@ export const ContractApprovalStatus = ({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h3 className="text-lg font-medium">Contract Approval</h3>
-              <p className="text-sm text-gray-400">
+              <h3 className="text-lg font-medium text-white">Contract Approval</h3>
+              <p className="text-sm text-white">
                 {isTesterWallet && contractTestMode 
                   ? "Test Mode: Approval will be simulated"
                   : "Approve LGR tokens for contract interaction"
