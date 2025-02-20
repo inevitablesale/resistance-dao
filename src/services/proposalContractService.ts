@@ -98,7 +98,7 @@ export const createProposal = async (
     targetCapital: config.targetCapital,
     votingDuration: config.votingDuration,
     investmentDrivers: config.metadata.investment.drivers,
-    additionalCriteria: config.metadata.investment.additionalCriteria,
+    additionalCriteria: config.metadata.investment.additionalCriteria || "",
     firmSize: config.metadata.firmCriteria.size,
     location: config.metadata.firmCriteria.location,
     dealType: config.metadata.firmCriteria.dealType,
@@ -108,12 +108,21 @@ export const createProposal = async (
     growthStrategies: config.metadata.strategies.growth,
     integrationStrategies: config.metadata.strategies.integration
   };
+
+  console.log("Creating proposal with input:", {
+    ...input,
+    targetCapital: input.targetCapital.toString(),
+    paymentTerms: input.paymentTerms.map(term => Number(term)),
+    operationalStrategies: input.operationalStrategies.map(s => Number(s)),
+    growthStrategies: input.growthStrategies.map(s => Number(s)),
+    integrationStrategies: input.integrationStrategies.map(s => Number(s))
+  });
   
   return await executeTransaction(
     () => factory.createProposal(input, config.linkedInURL),
     {
       type: 'nft',
-      description: `Creating proposal with target capital ${ethers.utils.formatEther(config.targetCapital)} LGR`,
+      description: `Creating proposal: ${input.title}`,
       timeout: 180000,
       maxRetries: 3,
       backoffMs: 5000,
@@ -174,7 +183,7 @@ export const estimateProposalGas = async (
     targetCapital: config.targetCapital,
     votingDuration: config.votingDuration,
     investmentDrivers: config.metadata.investment.drivers,
-    additionalCriteria: config.metadata.investment.additionalCriteria,
+    additionalCriteria: config.metadata.investment.additionalCriteria || "",
     firmSize: config.metadata.firmCriteria.size,
     location: config.metadata.firmCriteria.location,
     dealType: config.metadata.firmCriteria.dealType,
@@ -192,4 +201,45 @@ export const estimateProposalGas = async (
     console.error("Gas estimation error:", error);
     throw error;
   }
+};
+
+export const validateContractParameters = (
+  config: { targetCapital: ethers.BigNumber; votingDuration: number },
+  status: ContractStatus
+): ValidationResult => {
+  const errors: Record<string, string[]> = {};
+
+  // Convert MIN/MAX values to BigNumber for comparison
+  const minTargetCapital = ethers.utils.parseUnits("1000", 18);
+  const maxTargetCapital = ethers.utils.parseUnits("25000000", 18);
+
+  if (!config.targetCapital) {
+    errors.targetCapital = ['Target capital is required'];
+  } else {
+    if (config.targetCapital.lt(minTargetCapital)) {
+      errors.targetCapital = [`Target capital must be at least 1,000 LGR`];
+    }
+    if (config.targetCapital.gt(maxTargetCapital)) {
+      errors.targetCapital = [`Target capital must not exceed 25,000,000 LGR`];
+    }
+  }
+
+  const minDuration = 7 * 24 * 60 * 60; // 7 days in seconds
+  const maxDuration = 90 * 24 * 60 * 60; // 90 days in seconds
+
+  if (!config.votingDuration) {
+    errors.votingDuration = ['Voting duration is required'];
+  } else {
+    if (config.votingDuration < minDuration) {
+      errors.votingDuration = [`Voting duration must be at least 7 days`];
+    }
+    if (config.votingDuration > maxDuration) {
+      errors.votingDuration = [`Voting duration must not exceed 90 days`];
+    }
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
 };

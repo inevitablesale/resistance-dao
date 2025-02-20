@@ -64,8 +64,9 @@ export const useWalletConnection = () => {
         throw new Error("Treasury address not available in contract status");
       }
 
-      if (isTestMode && status.isTestMode) {
-        console.log("Test mode is enabled, skipping LGR approval");
+      // Don't proceed with approval if test mode is enabled and user is tester
+      if (isTestMode && status.isTestMode && primaryWallet?.address?.toLowerCase() === status.tester.toLowerCase()) {
+        console.log("Test mode is enabled for tester, skipping LGR approval");
         return {} as ethers.ContractTransaction;
       }
 
@@ -77,8 +78,11 @@ export const useWalletConnection = () => {
         signer
       );
 
-      console.log("Calling approve with amount:", amount, "isTestMode:", isTestMode);
-      return await lgrToken.approve(status.treasury, amount);
+      // Convert amount to proper format (18 decimals)
+      const approvalAmount = ethers.utils.parseUnits(amount, 18);
+      console.log("Calling approve with amount:", approvalAmount.toString());
+      
+      return await lgrToken.approve(status.treasury, approvalAmount);
     } catch (error) {
       console.error("Approval error in useWalletConnection:", error);
       throw error;
