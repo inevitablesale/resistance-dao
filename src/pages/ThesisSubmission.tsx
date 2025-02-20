@@ -53,7 +53,7 @@ const thesisFormSchema = z.object({
   firmCriteria: z.object({
     size: z.number(),
     location: z.string().min(1, "Location is required"),
-    dealType: z.number(),
+    dealType: z.number().min(0).max(4, "Invalid deal type"), // Update validation range
     geographicFocus: z.number()
   }),
   paymentTerms: z.array(z.number()).min(1, "At least one payment term is required"),
@@ -91,7 +91,7 @@ const ThesisSubmission = () => {
     return url || "";
   };
 
-  // Initialize form with LinkedIn URL from metadata
+  // Initialize form with proper default values
   const form = useForm<ProposalMetadata>({
     resolver: zodResolver(thesisFormSchema),
     defaultValues: {
@@ -104,7 +104,7 @@ const ThesisSubmission = () => {
       firmCriteria: {
         size: FirmSize.BELOW_1M,
         location: "",
-        dealType: DealType.ACQUISITION,
+        dealType: DealType.ACQUISITION, // Ensure we start with a valid enum value
         geographicFocus: GeographicFocus.LOCAL
       },
       paymentTerms: [],
@@ -145,8 +145,18 @@ const ThesisSubmission = () => {
       return;
     }
 
+    // Validate deal type before submission
+    if (data.firmCriteria.dealType < 0 || data.firmCriteria.dealType > 4) {
+      toast({
+        title: "Invalid Deal Type",
+        description: "Please select a valid deal type",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const linkedInUrl = getLinkedInUrl();
-    console.log("LinkedIn URL for submission:", linkedInUrl);
+    console.log("[LinkedIn] URL for submission:", linkedInUrl);
 
     if (!linkedInUrl) {
       toast({
