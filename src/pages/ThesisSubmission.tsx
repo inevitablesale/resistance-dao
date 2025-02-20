@@ -151,7 +151,10 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const lgrBalance = tokenBalances?.find(token => token.tokenAddress?.toLowerCase() === LGR_TOKEN_ADDRESS.toLowerCase())?.balance || "0";
+  const lgrToken = tokenBalances?.find(token => 
+    token.address?.toLowerCase() === LGR_TOKEN_ADDRESS.toLowerCase()
+  );
+  const lgrBalance = lgrToken?.balance?.toString() || "0";
 
   const [isTestMode, setIsTestMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
