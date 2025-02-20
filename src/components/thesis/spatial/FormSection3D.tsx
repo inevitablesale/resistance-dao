@@ -1,7 +1,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Float } from "@react-three/drei";
-import { motion } from "framer-motion-3d";
+import { motion } from "framer-motion"; // Changed from framer-motion-3d
 import { ReactNode } from "react";
 
 interface FormSection3DProps {

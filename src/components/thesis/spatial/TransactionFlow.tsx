@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 interface Step {
   id: string;
   title: string;
-  status: 'pending' | 'active' | 'completed';
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'active';  // Added 'processing' and 'failed'
 }
 
 interface TransactionFlowProps {
@@ -27,6 +27,8 @@ export const TransactionFlow = ({ steps, activeStep }: TransactionFlowProps) => 
               flex items-center gap-2
               ${step.status === 'completed' ? 'text-green-500' : 
                 step.status === 'active' ? 'text-yellow-500' : 
+                step.status === 'failed' ? 'text-red-500' :
+                step.status === 'processing' ? 'text-blue-500' :
                 'text-white/40'}
             `}>
               {step.status === 'completed' ? (
@@ -34,7 +36,10 @@ export const TransactionFlow = ({ steps, activeStep }: TransactionFlowProps) => 
               ) : (
                 <div className={`
                   w-5 h-5 rounded-full border-2
-                  ${step.status === 'active' ? 'border-yellow-500' : 'border-white/40'}
+                  ${step.status === 'active' ? 'border-yellow-500' : 
+                    step.status === 'failed' ? 'border-red-500' :
+                    step.status === 'processing' ? 'border-blue-500' :
+                    'border-white/40'}
                 `} />
               )}
               <span className="text-sm font-medium">{step.title}</span>
