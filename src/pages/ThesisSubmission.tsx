@@ -1,4 +1,3 @@
-<lov-code>
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -803,48 +802,66 @@ const ThesisSubmission = () => {
     // Implement promotion selection logic here
   };
 
-  return (
-    <div className="min-h-screen bg-black relative">
-      {!isConnected && <WalletConnectionOverlay requiredAmount={SUBMISSION_FEE} />}
-      <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-teal-500/5 to-yellow-500/5 animate-gradient" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-black to-black" />
-
-      <div className="container mx-auto px-4 relative z-10">
-        <Breadcrumb className="pt-8 mb-8">
-          <BreadcrumbList className="text-white/60">
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/" className="hover:text-white">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="text-white/40" />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/proposals" className="hover:text-white">All Fund Proposals</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="text-white/40" />
-            <BreadcrumbItem>
-              <BreadcrumbPage className="text-white">Test Your Investment Thesis</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
-        <div className="max-w-4xl mx-auto mb-12 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-teal-500 mb-4">
-            Test Your Investment Thesis
-          </h1>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Share your acquisition strategy to validate market interest and find aligned co-investors before committing resources to fund formation.
-          </p>
-          <div className="mt-6 flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-white/60">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-yellow-500" />
-              <span>Validate your strategy risk-free</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-teal-500" />
-              <span>Find aligned co-investors early</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-
+  const renderCurrentStep = () => {
+    switch (activeStep) {
+      case 'thesis':
+        return (
+          <Card className="w-full">
+            <Card className="mb-4">
+              <div className="p-6">
+                <h2 className="text-2xl font-semibold text-white mb-4">Investment Thesis Details</h2>
+                <div className="grid gap-4">
+                  <div>
+                    <Label htmlFor="title">Investment Thesis Title</Label>
+                    <Input
+                      type="text"
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => handleFormDataChange('title', e.target.value)}
+                      placeholder="e.g., Acquisition of High-Growth SaaS Company"
+                    />
+                    {formErrors.title && formErrors.title.map((error, index) => (
+                      <p key={index} className="text-red-500 text-sm mt-1">{error}</p>
+                    ))}
+                  </div>
+                  <div>
+                    <Label htmlFor="targetCapital">Target Capital (LGR)</Label>
+                    <Input
+                      type="number"
+                      id="targetCapital"
+                      value={formData.investment.targetCapital}
+                      onChange={(e) => handleFormDataChange('investment.targetCapital', e.target.value)}
+                      placeholder="e.g., 2500000"
+                    />
+                    {formErrors['investment.targetCapital'] && formErrors['investment.targetCapital'].map((error, index) => (
+                      <p key={index} className="text-red-500 text-sm mt-1">{error}</p>
+                    ))}
+                  </div>
+                  <div>
+                    <Label htmlFor="drivers">Investment Drivers</Label>
+                    <Input
+                      id="drivers"
+                      value={formData.investment.drivers}
+                      onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
+                      placeholder="e.g., Strong recurring revenue, high potential for automation"
+                    />
+                    {formErrors['investment.drivers'] && formErrors['investment.drivers'].map((error, index) => (
+                      <p key={index} className="text-red-500 text-sm mt-1">{error}</p>
+                    ))}
+                  </div>
+                  <div>
+                    <Label htmlFor="additionalCriteria">Additional Criteria</Label>
+                    <Input
+                      id="additionalCriteria"
+                      value={formData.investment.additionalCriteria}
+                      onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
+                      placeholder="e.g., Preference for firms with existing cloud infrastructure"
+                    />
+                  </div>
+                </div>
+              </div>
+            </Card>
+            <Card className="mb-4">
+              <div className="p-6">
+                <h2 className="text-2xl font-semibold text-white mb-4">Voting Duration</h2>
+                <p className="text-white/60 mb-
