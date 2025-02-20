@@ -151,6 +151,8 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
+  const lgrBalance = tokenBalances?.find(token => token.tokenAddress?.toLowerCase() === LGR_TOKEN_ADDRESS.toLowerCase())?.balance || "0";
+
   const [isTestMode, setIsTestMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
@@ -855,21 +857,21 @@ const ThesisSubmission = () => {
                   <FirmCriteriaSection
                     formData={formData}
                     onChange={handleFormDataChange}
-                    errors={formErrors}
+                    formErrors={formErrors}
                   />
                 )}
                 {activeStep === 'strategy' && (
                   <StrategiesSection
                     formData={formData}
                     onChange={handleFormDataChange}
-                    errors={formErrors}
+                    formErrors={formErrors}
                   />
                 )}
                 {activeStep === 'terms' && (
                   <PaymentTermsSection
                     formData={formData}
                     onChange={handleFormDataChange}
-                    errors={formErrors}
+                    formErrors={formErrors}
                   />
                 )}
                 {activeStep === 'submission' && (
@@ -888,7 +890,7 @@ const ThesisSubmission = () => {
             <div className="sticky top-32 space-y-4">
               <LGRWalletDisplay 
                 submissionFee={SUBMISSION_FEE}
-                currentBalance={currentBalance}
+                currentBalance={lgrBalance}
                 walletAddress={address}
               />
               {renderContinueButton(() => handleContinue, activeStep === 'terms')}

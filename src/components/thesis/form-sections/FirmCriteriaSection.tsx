@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FirmSize, DealType, GeographicFocus } from "@/types/proposals";
 import { US_STATES } from "@/lib/constants/states";
 
-interface FirmCriteriaSectionProps {
+export interface FirmCriteriaSectionProps {
   formData: {
     firmCriteria: {
       size: FirmSize;
