@@ -1,4 +1,3 @@
-
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
@@ -20,7 +19,7 @@ const RETRY_DELAY = 1000;
 const INITIALIZATION_TIMEOUT = 10000; // 10 seconds timeout
 
 export const useWalletProvider = () => {
-  const { primaryWallet } = useDynamicContext();
+  const { primaryWallet, user } = useDynamicContext();
   const { toast } = useToast();
   const providerRef = useRef<WalletProvider | null>(null);
   const initializingRef = useRef<boolean>(false);
@@ -57,6 +56,15 @@ export const useWalletProvider = () => {
       const provider = new ethers.providers.Web3Provider(walletClient);
       const network = await provider.getNetwork();
       console.log('[Provider] Successfully connected to network:', network.chainId);
+      // Log full user object when network connection is successful
+      console.log('[Provider] Current user object:', {
+        user,
+        metadata: user?.metadata,
+        verifications: user?.verifications,
+        customFields: user?.verifications?.customFields,
+        linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"],
+        walletAddress: primaryWallet?.address
+      });
       
       return provider;
     } catch (error) {
@@ -78,7 +86,7 @@ export const useWalletProvider = () => {
         ]
       });
     }
-  }, []);
+  }, [user, primaryWallet]);
 
   const validateWalletClient = useCallback(async (attempts: number = 0): Promise<any> => {
     if (!primaryWallet) {
