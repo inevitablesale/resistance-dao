@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
-import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
+import { TargetCapitalInput, convertUSDToLGRWei } from "@/components/thesis/TargetCapitalInput";
 import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -37,7 +38,15 @@ import * as z from "zod";
 const thesisFormSchema = z.object({
   title: z.string().min(10, "Title must be at least 10 characters").max(100, "Title must be less than 100 characters"),
   investment: z.object({
-    targetCapital: z.string().min(1, "Target capital is required"),
+    targetCapital: z.string()
+      .min(1, "Target capital is required")
+      .refine(
+        (val) => {
+          const num = parseFloat(val);
+          return num >= 1000 && num <= 25000000;
+        },
+        "Target capital must be between 1,000 and 25,000,000 LGR"
+      ),
     drivers: z.string().min(50, "Investment drivers must be at least 50 characters").max(500, "Investment drivers must be less than 500 characters"),
     additionalCriteria: z.string().max(500, "Additional criteria must be less than 500 characters")
   }),
@@ -123,6 +132,21 @@ const ThesisSubmission = () => {
 
     setIsSubmitting(true);
     try {
+      // Convert target capital to wei before submission
+      let targetCapitalWei;
+      try {
+        targetCapitalWei = convertUSDToLGRWei(data.investment.targetCapital);
+        console.log("Target capital in wei:", targetCapitalWei.toString());
+      } catch (error) {
+        console.error("Target capital conversion error:", error);
+        toast({
+          title: "Invalid Target Capital",
+          description: error instanceof Error ? error.message : "Please enter a valid target capital amount",
+          variant: "destructive"
+        });
+        return;
+      }
+
       const metadataWithLinkedIn = {
         ...data,
         linkedInURL: linkedInUrl || ""
@@ -133,7 +157,7 @@ const ThesisSubmission = () => {
       console.log("IPFS upload successful, hash:", ipfsHash);
 
       const config: ProposalConfig = {
-        targetCapital: ethers.utils.parseEther(data.investment.targetCapital),
+        targetCapital: targetCapitalWei,
         votingDuration: data.votingDuration,
         ipfsHash,
         metadata: metadataWithLinkedIn,
