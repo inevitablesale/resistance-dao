@@ -165,6 +165,7 @@ const ThesisSubmission = () => {
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
   const [isTestMode, setIsTestMode] = useState(false);
   const [contractTestMode, setContractTestMode] = useState(false);
+  const [hasInitialStatus, setHasInitialStatus] = useState(false);
 
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
@@ -244,23 +245,18 @@ const ThesisSubmission = () => {
         
         if (!mounted) return false;
 
-        console.log("📊 Contract Mode Status:", {
-          isTestMode: status.isTestMode,
-          message: status.isTestMode ? "CONTRACT IN TEST MODE" : "CONTRACT IN LIVE MODE"
-        });
-        
         const isTesterWallet = status.tester.toLowerCase() === address?.toLowerCase();
-        console.log("🔍 Test Mode Check:", {
+        console.log("Test mode status:", {
           isTesterWallet,
           contractTestMode: status.isTestMode,
           walletAddress: address,
-          testerAddress: status.tester,
-          willAutoFill: status.isTestMode && isTesterWallet
+          testerAddress: status.tester
         });
 
         if (mounted) {
           setContractTestMode(status.isTestMode);
           setIsTestMode(isTesterWallet && status.isTestMode);
+          setHasInitialStatus(true);
         }
         
         return true;
@@ -269,6 +265,7 @@ const ThesisSubmission = () => {
         if (mounted) {
           setIsTestMode(false);
           setContractTestMode(false);
+          setHasInitialStatus(true);
         }
         return false;
       }
@@ -279,7 +276,7 @@ const ThesisSubmission = () => {
       const maxAttempts = 10;
       const retryDelay = 1000; // 1 second
 
-      while (attempts < maxAttempts) {
+      while (attempts < maxAttempts && mounted) {
         console.log(`Attempt ${attempts + 1}/${maxAttempts} to initialize test mode...`);
         const success = await checkTestMode();
         
@@ -295,7 +292,10 @@ const ThesisSubmission = () => {
         }
       }
       
-      console.error("❌ Failed to initialize test mode after maximum attempts");
+      if (mounted) {
+        console.error("❌ Failed to initialize test mode after maximum attempts");
+        setHasInitialStatus(true);
+      }
     };
 
     initializeWithRetry();
@@ -305,6 +305,7 @@ const ThesisSubmission = () => {
         console.error("⚠️ Test mode initialization timed out");
         setIsTestMode(false);
         setContractTestMode(false);
+        setHasInitialStatus(true);
       }
     }, 30000); // 30 seconds timeout
 
@@ -315,6 +316,11 @@ const ThesisSubmission = () => {
   }, [wallet, address]);
 
   useEffect(() => {
+    if (!hasInitialStatus) {
+      console.log("⏳ Waiting for initial test mode status...");
+      return;
+    }
+
     if (contractTestMode) {
       console.log("🔄 Contract in test mode - Auto-filling form with test data:", TEST_FORM_DATA);
       setFormData({
@@ -328,7 +334,7 @@ const ThesisSubmission = () => {
       console.log("🧹 Clearing form data...");
       resetForm();
     }
-  }, [contractTestMode, user, address]);
+  }, [contractTestMode, user, address, hasInitialStatus]);
 
   const validateLinkedInURL = (): boolean => {
     const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
