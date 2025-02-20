@@ -79,20 +79,20 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
   status: 'pending',
   description: 'Fill out your investment thesis details'
 }, {
+  id: 'firm',
+  title: 'Firm Details',
+  status: 'pending',
+  description: 'Select your target firm criteria'
+}, {
   id: 'strategy',
   title: 'Strategy Selection',
   status: 'pending',
   description: 'Select your post-acquisition strategies'
 }, {
-  id: 'approval',
-  title: 'Token Approval',
+  id: 'terms',
+  title: 'Payment Terms',
   status: 'pending',
-  description: 'Approve LGR tokens for submission'
-}, {
-  id: 'submission',
-  title: 'Thesis Submission',
-  status: 'pending',
-  description: 'Submit your thesis to the blockchain'
+  description: 'Define your payment preferences'
 }];
 
 const TEST_FORM_DATA: ProposalMetadata = {
@@ -301,7 +301,7 @@ const ThesisSubmission = () => {
     switch (activeStep) {
       case 'thesis':
         return "Continue to Firm Details";
-      case 'strategy':
+      case 'firm':
         return "Continue to Terms";
       case 'terms':
         return "Submit Investment Thesis";
@@ -411,6 +411,7 @@ const ThesisSubmission = () => {
   };
 
   const handleStepChange = (newStep: string) => {
+    console.log('Changing step to:', newStep); // Debug log
     const currentValidator = getCurrentValidator();
     if (currentValidator()) {
       updateStepStatus(activeStep, 'completed');
@@ -897,16 +898,9 @@ const ThesisSubmission = () => {
                     </div>
                   )}
 
-                  {activeStep === 'strategy' && (
+                  {activeStep === 'firm' && (
                     <FirmCriteriaSection
-                      formData={{
-                        firmCriteria: {
-                          size: formData.firmCriteria.size,
-                          location: formData.firmCriteria.location,
-                          dealType: formData.firmCriteria.dealType,
-                          geographicFocus: formData.firmCriteria.geographicFocus
-                        }
-                      }}
+                      formData={formData}
                       formErrors={formErrors}
                       onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
                     />
