@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -17,8 +16,11 @@ import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTe
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
-import { ProposalMetadata, FirmSize, DealType, GeographicFocus } from "@/types/proposals";
+import { ProposalMetadata, FirmSize, DealType, GeographicFocus, ProposalConfig } from "@/types/proposals";
 import { SUBMISSION_FEE } from "@/lib/constants";
+import { uploadToIPFS } from "@/services/ipfsService";
+import { createProposal } from "@/services/proposalContractService";
+import { ethers } from "ethers";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -59,9 +61,10 @@ const thesisFormSchema = z.object({
 const ThesisSubmission = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isConnected, address } = useWalletConnection();
+  const { isConnected, address, wallet } = useWalletConnection();
   const { user } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
 
   const form = useForm<ProposalMetadata>({
     resolver: zodResolver(thesisFormSchema),
@@ -84,13 +87,21 @@ const ThesisSubmission = () => {
         growth: [],
         integration: []
       },
-      votingDuration: 7 * 24 * 60 * 60, // 7 days in seconds
+      votingDuration: 7 * 24 * 60 * 60,
       linkedInURL: ""
     }
   });
 
+  const handleApprovalComplete = () => {
+    setIsApproved(true);
+    toast({
+      title: "Approval Complete",
+      description: "You can now submit your investment thesis",
+    });
+  };
+
   const onSubmit = async (data: ProposalMetadata) => {
-    if (!isConnected) {
+    if (!isConnected || !wallet) {
       toast({
         title: "Connect Wallet",
         description: "Please connect your wallet to submit a thesis",
@@ -99,9 +110,33 @@ const ThesisSubmission = () => {
       return;
     }
 
+    if (!isApproved) {
+      toast({
+        title: "Approval Required",
+        description: "Please approve the contract to submit your thesis",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      console.log("Form data:", data);
+      console.log("Uploading form data to IPFS:", data);
+      const ipfsHash = await uploadToIPFS<ProposalMetadata>(data);
+      console.log("IPFS upload successful, hash:", ipfsHash);
+
+      const config: ProposalConfig = {
+        targetCapital: ethers.utils.parseEther(data.investment.targetCapital),
+        votingDuration: data.votingDuration,
+        ipfsHash,
+        metadata: data,
+        linkedInURL: data.linkedInURL
+      };
+
+      console.log("Creating proposal with config:", config);
+      const tx = await createProposal(config, wallet);
+      console.log("Proposal created successfully:", tx);
+
       toast({
         title: "Success",
         description: "Your thesis has been submitted successfully",
@@ -111,7 +146,7 @@ const ThesisSubmission = () => {
       console.error("Submission error:", error);
       toast({
         title: "Error",
-        description: "Failed to submit thesis. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to submit thesis. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -158,7 +193,6 @@ const ThesisSubmission = () => {
           </div>
 
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* Title and Investment Details */}
             <Card className="bg-black/40 border-white/10 p-6">
               <div className="space-y-4">
                 <div>
@@ -199,7 +233,6 @@ const ThesisSubmission = () => {
               </div>
             </Card>
 
-            {/* Target Capital and Timeline */}
             <Card className="bg-black/40 border-white/10 p-6">
               <div className="space-y-6">
                 <TargetCapitalInput
@@ -216,7 +249,6 @@ const ThesisSubmission = () => {
               </div>
             </Card>
 
-            {/* LinkedIn URL */}
             <Card className="bg-black/40 border-white/10 p-6">
               <div>
                 <label className="text-lg font-medium text-white">LinkedIn Profile URL</label>
@@ -256,7 +288,7 @@ const ThesisSubmission = () => {
             />
 
             <ContractApprovalStatus
-              onApprovalComplete={() => {}}
+              onApprovalComplete={handleApprovalComplete}
               requiredAmount={SUBMISSION_FEE}
               isTestMode={false}
               currentFormData={form.getValues()}
@@ -264,7 +296,7 @@ const ThesisSubmission = () => {
 
             <Button 
               type="submit"
-              disabled={isSubmitting || !form.formState.isValid}
+              disabled={isSubmitting || !form.formState.isValid || !isApproved}
               className={cn(
                 "w-full h-12",
                 "bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600",
@@ -296,4 +328,3 @@ const ThesisSubmission = () => {
 };
 
 export default ThesisSubmission;
-
