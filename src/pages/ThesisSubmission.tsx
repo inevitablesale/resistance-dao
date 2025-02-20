@@ -241,9 +241,9 @@ const ThesisSubmission = () => {
       let targetCapitalWei;
       try {
         targetCapitalWei = convertUSDToLGRWei(data.investment.targetCapital);
-        console.log("Target capital in wei:", targetCapitalWei.toString());
+        console.log("[Contract] Target capital in wei:", targetCapitalWei.toString());
       } catch (error) {
-        console.error("Target capital conversion error:", error);
+        console.error("[Contract] Target capital conversion error:", error);
         toast({
           title: "Invalid Target Capital",
           description: error instanceof Error ? error.message : "Please enter a valid target capital amount",
@@ -252,26 +252,24 @@ const ThesisSubmission = () => {
         return;
       }
 
-      const metadataWithLinkedIn = {
-        ...data,
-        linkedInURL: linkedInUrl
-      };
-      
-      console.log("Uploading form data to IPFS:", metadataWithLinkedIn);
-      const ipfsHash = await uploadToIPFS<ProposalMetadata>(metadataWithLinkedIn);
-      console.log("IPFS upload successful, hash:", ipfsHash);
+      console.log("[IPFS] Uploading form data:", data);
+      const ipfsHash = await uploadToIPFS<ProposalMetadata>(data);
+      console.log("[IPFS] Upload successful, hash:", ipfsHash);
 
       const config: ProposalConfig = {
         targetCapital: targetCapitalWei,
         votingDuration: data.votingDuration,
         ipfsHash,
-        metadata: metadataWithLinkedIn,
+        metadata: {
+          ...data,
+          linkedInURL: linkedInUrl
+        },
         linkedInURL: linkedInUrl
       };
 
-      console.log("Creating proposal with config:", config);
+      console.log("[Contract] Creating proposal with config:", config);
       const tx = await createProposal(config, wallet);
-      console.log("Proposal created successfully:", tx);
+      console.log("[Contract] Proposal created successfully:", tx);
 
       toast({
         title: "Success",
@@ -279,7 +277,7 @@ const ThesisSubmission = () => {
       });
       navigate("/proposals");
     } catch (error) {
-      console.error("Submission error:", error);
+      console.error("[Contract] Submission error:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to submit thesis. Please try again.",
