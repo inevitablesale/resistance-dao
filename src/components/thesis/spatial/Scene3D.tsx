@@ -13,13 +13,12 @@ export const Scene3D = ({ children }: Scene3DProps) => {
     <div className="absolute inset-0 -z-10">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75 }}
-        gl={{ antialias: true }}
-        shadows
-        legacy
-        onCreated={({ gl }) => {
-          gl.toneMapping = THREE.NoToneMapping;
-          gl.outputEncoding = THREE.sRGBEncoding;
+        gl={{ 
+          antialias: true,
+          outputColorSpace: "srgb",
+          toneMapping: THREE.NoToneMapping
         }}
+        shadows
       >
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} />

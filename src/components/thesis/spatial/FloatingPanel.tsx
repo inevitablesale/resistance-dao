@@ -26,22 +26,20 @@ export const FloatingPanel = ({
   });
 
   return (
-    <group>
-      <mesh
-        ref={meshRef}
-        position={position}
-        rotation={rotation}
-        scale={[scale * 2, scale * 1, scale * 0.1]}
-      >
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial
-          color="#ffffff"
-          transparent
-          opacity={0.1}
-          metalness={0.2}
-          roughness={0.1}
-        />
-      </mesh>
-    </group>
+    <mesh
+      ref={meshRef}
+      position={position}
+      rotation={rotation}
+      scale={[scale * 2, scale * 1, scale * 0.1]}
+    >
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial
+        color="#ffffff"
+        transparent
+        opacity={0.1}
+        metalness={0.2}
+        roughness={0.1}
+      />
+    </mesh>
   );
 };
