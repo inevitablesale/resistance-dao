@@ -156,7 +156,6 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  const [isTestMode, setIsTestMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
@@ -164,6 +163,9 @@ const ThesisSubmission = () => {
   const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
   const [currentTxHash, setCurrentTxHash] = useState<string | null>(null);
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
+  const [isTestMode, setIsTestMode] = useState(false);
+  const [contractTestMode, setContractTestMode] = useState(false);
+
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     firmCriteria: {
@@ -188,8 +190,69 @@ const ThesisSubmission = () => {
     isTestMode: false
   });
 
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      firmCriteria: {
+        size: FirmSize.BELOW_1M,
+        location: "",
+        dealType: DealType.ACQUISITION,
+        geographicFocus: GeographicFocus.LOCAL
+      },
+      paymentTerms: [],
+      strategies: {
+        operational: [],
+        growth: [],
+        integration: []
+      },
+      investment: {
+        targetCapital: "",
+        drivers: "",
+        additionalCriteria: ""
+      },
+      votingDuration: MIN_VOTING_DURATION,
+      linkedInURL: "",
+      isTestMode: false
+    });
+  };
+
   useEffect(() => {
-    if (isTestMode) {
+    const checkTestMode = async () => {
+      if (wallet) {
+        try {
+          const status = await getContractStatus(wallet);
+          console.log("Contract test mode status:", status.isTestMode);
+          setContractTestMode(status.isTestMode);
+          
+          const isTesterWallet = status.tester.toLowerCase() === address?.toLowerCase();
+          const shouldEnableTestMode = isTesterWallet && status.isTestMode;
+          
+          console.log("Test mode check:", {
+            isTesterWallet,
+            contractTestMode: status.isTestMode,
+            walletAddress: address,
+            testerAddress: status.tester
+          });
+
+          setIsTestMode(shouldEnableTestMode);
+          
+          if (!shouldEnableTestMode) {
+            console.log("Test mode disabled - resetting form");
+            resetForm();
+          }
+        } catch (error) {
+          console.error("Error checking test mode:", error);
+          setIsTestMode(false);
+          setContractTestMode(false);
+        }
+      }
+    };
+
+    checkTestMode();
+  }, [wallet, address]);
+
+  useEffect(() => {
+    if (isTestMode && contractTestMode) {
       console.log("Setting test form data:", TEST_FORM_DATA);
       setFormData({
         ...TEST_FORM_DATA,
@@ -198,18 +261,7 @@ const ThesisSubmission = () => {
         submitter: address
       });
     }
-  }, [isTestMode, user, address]);
-
-  useEffect(() => {
-    const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
-    if (!linkedInURL && isConnected) {
-      toast({
-        title: "LinkedIn Profile Required",
-        description: "Please add your LinkedIn URL in your wallet settings to submit a thesis",
-        variant: "default"
-      });
-    }
-  }, [user, isConnected, toast]);
+  }, [isTestMode, contractTestMode, user, address]);
 
   const validateLinkedInURL = (): boolean => {
     const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
@@ -781,34 +833,48 @@ const ThesisSubmission = () => {
       return;
     }
     
-    setIsTestMode(enabled);
-    if (enabled) {
-      setFormData(TEST_FORM_DATA);
-    } else {
-      setFormData({
-        title: "",
-        firmCriteria: {
-          size: FirmSize.BELOW_1M,
-          location: "",
-          dealType: DealType.ACQUISITION,
-          geographicFocus: GeographicFocus.LOCAL
-        },
-        paymentTerms: [],
-        strategies: {
-          operational: [],
-          growth: [],
-          integration: []
-        },
-        investment: {
-          targetCapital: "",
-          drivers: "",
-          additionalCriteria: ""
-        },
-        votingDuration: MIN_VOTING_DURATION,
-        linkedInURL: "",
-        isTestMode: false,
-        submissionTimestamp: Date.now(),
-        submitter: address
+    try {
+      if (wallet) {
+        const status = await getContractStatus(wallet);
+        const isTesterWallet = status.tester.toLowerCase() === address?.toLowerCase();
+        
+        if (!isTesterWallet) {
+          toast({
+            title: "Not Authorized",
+            description: "Your wallet is not authorized for test mode",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        if (enabled && !status.isTestMode) {
+          await setTestMode(true, wallet);
+          toast({
+            title: "Test Mode Enabled",
+            description: "Contract test mode has been enabled"
+          });
+        } else if (!enabled && status.isTestMode) {
+          await setTestMode(false, wallet);
+          toast({
+            title: "Test Mode Disabled",
+            description: "Contract test mode has been disabled"
+          });
+        }
+
+        const newStatus = await getContractStatus(wallet);
+        setContractTestMode(newStatus.isTestMode);
+        setIsTestMode(newStatus.isTestMode && isTesterWallet);
+        
+        if (!newStatus.isTestMode || !isTesterWallet) {
+          resetForm();
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling test mode:", error);
+      toast({
+        title: "Error",
+        description: "Failed to toggle test mode",
+        variant: "destructive"
       });
     }
   };
