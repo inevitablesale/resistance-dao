@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
-import { ArrowRight, AlertTriangle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -18,7 +18,6 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { ProposalMetadata, FirmSize, DealType, GeographicFocus } from "@/types/proposals";
-import { SUBMISSION_FEE } from "@/lib/constants";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -52,16 +51,16 @@ const thesisFormSchema = z.object({
     integration: z.array(z.number())
   }),
   votingDuration: z.number().min(7 * 24 * 60 * 60, "Minimum voting duration is 7 days")
-    .max(90 * 24 * 60 * 60, "Maximum voting duration is 90 days")
+    .max(90 * 24 * 60 * 60, "Maximum voting duration is 90 days"),
+  linkedInURL: z.string().url("Please enter a valid LinkedIn URL").max(200, "LinkedIn URL must be less than 200 characters")
 });
 
 const ThesisSubmission = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isConnected, address } = useWalletConnection();
-  const { user, handleLogOut, setShowAuthFlow } = useDynamicContext();
+  const { user } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const linkedInURL = user?.verifications?.customFields?.["LinkedIn Profile URL"];
 
   const form = useForm<ProposalMetadata>({
     resolver: zodResolver(thesisFormSchema),
@@ -85,7 +84,7 @@ const ThesisSubmission = () => {
         integration: []
       },
       votingDuration: 7 * 24 * 60 * 60, // 7 days in seconds
-      linkedInURL: linkedInURL || ""
+      linkedInURL: ""
     }
   });
 
@@ -99,18 +98,9 @@ const ThesisSubmission = () => {
       return;
     }
 
-    if (!linkedInURL) {
-      toast({
-        title: "LinkedIn Verification Required",
-        description: "Please verify your LinkedIn profile in your wallet settings before submitting",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsSubmitting(true);
     try {
-      console.log("Form data:", { ...data, linkedInURL });
+      console.log("Form data:", data);
       toast({
         title: "Success",
         description: "Your thesis has been submitted successfully",
@@ -127,34 +117,6 @@ const ThesisSubmission = () => {
       setIsSubmitting(false);
     }
   };
-
-  if (!linkedInURL) {
-    return (
-      <div className="min-h-screen bg-black">
-        <div className="fixed inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-teal-500/5 to-yellow-500/5 animate-gradient" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-black to-black" />
-        </div>
-        <div className="container mx-auto px-4 py-8">
-          <Card className="max-w-lg mx-auto p-6 bg-black/40 border-white/10">
-            <div className="flex flex-col items-center gap-4 text-center">
-              <AlertTriangle className="w-12 h-12 text-yellow-500" />
-              <h2 className="text-2xl font-bold text-white">LinkedIn Verification Required</h2>
-              <p className="text-white/60">
-                To submit an investment thesis, you need to verify your LinkedIn profile in your wallet settings.
-              </p>
-              <Button
-                onClick={() => setShowAuthFlow?.(true)}
-                className="bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600"
-              >
-                Verify LinkedIn Profile
-              </Button>
-            </div>
-          </Card>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-black">
@@ -294,7 +256,7 @@ const ThesisSubmission = () => {
 
             <ContractApprovalStatus
               onApprovalComplete={() => {}}
-              requiredAmount={SUBMISSION_FEE}
+              requiredAmount={0}
               isTestMode={false}
               currentFormData={form.getValues()}
             />
@@ -333,4 +295,3 @@ const ThesisSubmission = () => {
 };
 
 export default ThesisSubmission;
-
