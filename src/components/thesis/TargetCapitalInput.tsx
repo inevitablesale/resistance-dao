@@ -12,35 +12,30 @@ interface TargetCapitalInputProps {
   error?: string[];
 }
 
-// Constants from the contract (in LGR tokens)
+// Constants in LGR terms
 const MIN_TARGET_CAPITAL_LGR = 1000;
 const MAX_TARGET_CAPITAL_LGR = 25000000;
 
 export const convertUSDToLGRWei = (lgrAmount: string): ethers.BigNumber => {
-  // Return 0 if empty or invalid
-  if (!lgrAmount || isNaN(parseFloat(lgrAmount))) {
-    throw new Error(`Please enter a valid number between ${MIN_TARGET_CAPITAL_LGR.toLocaleString()} and ${MAX_TARGET_CAPITAL_LGR.toLocaleString()} LGR`);
-  }
+  if (!lgrAmount || isNaN(parseFloat(lgrAmount))) return ethers.BigNumber.from(0);
   
   // Convert string to number and validate
   const lgrValue = parseFloat(lgrAmount);
+  const wholeLGRAmount = Math.floor(lgrValue);
   
-  // Ensure the value is within bounds
-  if (lgrValue < MIN_TARGET_CAPITAL_LGR) {
+  if (wholeLGRAmount < MIN_TARGET_CAPITAL_LGR) {
     throw new Error(`Minimum target capital is ${MIN_TARGET_CAPITAL_LGR.toLocaleString()} LGR ($${(MIN_TARGET_CAPITAL_LGR * LGR_PRICE_USD).toLocaleString()} USD)`);
   }
-  if (lgrValue > MAX_TARGET_CAPITAL_LGR) {
+  if (wholeLGRAmount > MAX_TARGET_CAPITAL_LGR) {
     throw new Error(`Maximum target capital is ${MAX_TARGET_CAPITAL_LGR.toLocaleString()} LGR ($${(MAX_TARGET_CAPITAL_LGR * LGR_PRICE_USD).toLocaleString()} USD)`);
   }
   
   try {
-    // Convert to string with no decimals (contract expects whole LGR amounts)
-    const wholeLGRAmount = Math.floor(lgrValue).toString();
-    // Convert to Wei (18 decimals)
-    return ethers.utils.parseUnits(wholeLGRAmount, 18);
+    // Convert the whole LGR amount to wei (18 decimals)
+    return ethers.utils.parseUnits(wholeLGRAmount.toString(), 18);
   } catch (error) {
     console.error("Error converting to wei:", error);
-    throw new Error("Invalid amount format");
+    return ethers.BigNumber.from(0);
   }
 };
 
@@ -105,7 +100,7 @@ export const TargetCapitalInput = ({
       <div className="relative">
         <Input
           type="text"
-          placeholder={`Enter amount in LGR (min: ${MIN_TARGET_CAPITAL_LGR.toLocaleString()})`}
+          placeholder="Enter amount in LGR"
           className={cn(
             "bg-black/50 border-white/10 text-white placeholder:text-gray-500 pl-12",
             error ? "border-red-500" : ""
