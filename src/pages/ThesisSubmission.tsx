@@ -545,7 +545,6 @@ export const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
-      // Properly merge form data with required fields
       const updatedFormData: ProposalMetadata = {
         ...formData,  // Include all existing form data
         votingDuration,
@@ -895,7 +894,7 @@ export const ThesisSubmission = () => {
               </div>
               {activeStep === 'submission' && (
                 <div className="flex items-center gap-4">
-                  {renderContinueButton(handleSubmit, true)}
+                  {renderContinueButton(() => handleSubmit(new Event('submit') as unknown as React.FormEvent), true)}
                 </div>
               )}
             </div>
