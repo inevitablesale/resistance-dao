@@ -42,6 +42,8 @@ export const ContractApprovalStatus = ({
   const [contractTestMode, setContractTestMode] = useState(false);
   const [isWalletReady, setIsWalletReady] = useState(false);
   const [balance, setBalance] = useState<string>("0");
+  const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
+  const [isFetchingTreasury, setIsFetchingTreasury] = useState(false);
   const approvalCompletedRef = useRef(false);
   const balanceInterval = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
@@ -67,6 +69,39 @@ export const ContractApprovalStatus = ({
 
     checkWalletStatus();
   }, [wallet, isInitializing, isDynamicReady]);
+
+  // Treasury address fetching
+  useEffect(() => {
+    const fetchTreasuryAddress = async () => {
+      if (!isWalletReady || !wallet || !isDynamicReady) {
+        console.log("Wallet not ready for treasury fetch");
+        return;
+      }
+
+      try {
+        setIsFetchingTreasury(true);
+        console.log("Fetching treasury address...");
+        const contractStatus = await getContractStatus(wallet);
+        console.log("Contract status received:", {
+          treasury: contractStatus.treasury,
+          isTestMode: contractStatus.isTestMode
+        });
+        setTreasuryAddress(contractStatus.treasury);
+      } catch (error) {
+        console.error("Error fetching treasury address:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch treasury address. Please try again.",
+          variant: "destructive"
+        });
+        setTreasuryAddress(null);
+      } finally {
+        setIsFetchingTreasury(false);
+      }
+    };
+
+    fetchTreasuryAddress();
+  }, [wallet, isWalletReady, isDynamicReady, toast]);
 
   // Balance checking
   useEffect(() => {
@@ -137,15 +172,16 @@ export const ContractApprovalStatus = ({
   }, [wallet, address, isWalletReady]);
 
   const handleApprove = async () => {
-    if (isApproving || isApproved || !isWalletReady || approvalCompletedRef.current) return;
+    if (isApproving || isApproved || !isWalletReady || approvalCompletedRef.current || !treasuryAddress) return;
     setIsApproving(true);
     try {
       console.log("Starting approval process...", {
         walletAddress: address,
         testerAddress: TESTER_ADDRESS,
+        treasuryAddress,
         isTesterWallet,
-        contractTestMode: false, // Always false now
-        isTestMode: false, // Always false now
+        contractTestMode: false,
+        isTestMode: false,
         currentFormData
       });
       
@@ -154,6 +190,7 @@ export const ContractApprovalStatus = ({
         console.log("Contract status:", {
           isTestMode: false,
           testerAddress: contractStatus.tester,
+          treasuryAddress: contractStatus.treasury,
           connectedAddress: address,
           isTesterWallet: address?.toLowerCase() === contractStatus.tester.toLowerCase()
         });
@@ -177,7 +214,7 @@ export const ContractApprovalStatus = ({
       const transaction = await executeTransaction(
         async () => {
           console.log("Executing real LGR approval transaction...");
-          return approveLGR(requiredAmount.toString(), false); // Always false for real approval
+          return approveLGR(requiredAmount.toString(), false);
         },
         {
           type: 'token',
@@ -187,9 +224,9 @@ export const ContractApprovalStatus = ({
           backoffMs: 5000,
           tokenConfig: {
             tokenAddress: LGR_TOKEN_ADDRESS,
-            spenderAddress: address!,
+            spenderAddress: treasuryAddress, // Now using treasury address as spender
             amount: requiredAmount.toString(),
-            isTestMode: false // Always false for real approval
+            isTestMode: false
           },
           walletType
         },
@@ -200,7 +237,7 @@ export const ContractApprovalStatus = ({
       if (!approvalCompletedRef.current) {
         approvalCompletedRef.current = true;
         setIsApproved(true);
-        onApprovalComplete(currentFormData, transaction, false); // Always false for real tx
+        onApprovalComplete(currentFormData, transaction, false);
       }
     } catch (error) {
       console.error("Approval error:", error);
@@ -220,7 +257,7 @@ export const ContractApprovalStatus = ({
     if (!approvalCompletedRef.current) {
       approvalCompletedRef.current = true;
       setIsApproved(true);
-      onApprovalComplete(currentFormData, undefined, false); // Always false for real tx
+      onApprovalComplete(currentFormData, undefined, false);
     }
   };
 
@@ -247,6 +284,28 @@ export const ContractApprovalStatus = ({
         <div className="flex items-center justify-center space-x-2 text-white/60">
           <Loader2 className="w-4 h-4 animate-spin" />
           <span>Initializing wallet...</span>
+        </div>
+      </Card>
+    );
+  }
+
+  if (isFetchingTreasury) {
+    return (
+      <Card className="bg-black/40 border-white/10 p-4">
+        <div className="flex items-center justify-center space-x-2 text-white/60">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span>Fetching contract status...</span>
+        </div>
+      </Card>
+    );
+  }
+
+  if (!treasuryAddress) {
+    return (
+      <Card className="bg-black/40 border-white/10 p-4">
+        <div className="flex items-center justify-center space-x-2 text-red-400">
+          <AlertTriangle className="w-4 h-4" />
+          <span>Failed to fetch treasury address. Please refresh and try again.</span>
         </div>
       </Card>
     );
@@ -289,7 +348,7 @@ export const ContractApprovalStatus = ({
 
           <Button
             onClick={handleApprove}
-            disabled={isApproving || isApproved || !isWalletReady || !hasRequiredBalance}
+            disabled={isApproving || isApproved || !isWalletReady || !hasRequiredBalance || !treasuryAddress}
             className="w-full"
           >
             {isApproving ? (
