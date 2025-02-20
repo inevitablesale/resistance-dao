@@ -51,6 +51,19 @@ export const ContractApprovalStatus = ({
   const balanceInterval = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
+  const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
+  const hasRequiredBalance = ethers.utils.parseEther(balance).gte(requiredAmountBN);
+
+  const getLinkedInUrl = () => {
+    if (!user) return "";
+    // Try getting from verifications first (post-verification state)
+    const urlFromVerifications = user.verifications?.customFields?.["LinkedIn Profile URL"];
+    // Fallback to metadata (initial onboarding state)
+    const urlFromMetadata = user.metadata?.["LinkedIn Profile URL"];
+    
+    return urlFromVerifications || urlFromMetadata || "";
+  };
+
   useEffect(() => {
     const checkWalletStatus = async () => {
       if (wallet && !isInitializing && isDynamicReady) {
@@ -59,12 +72,12 @@ export const ContractApprovalStatus = ({
           setIsWalletReady(isConnected);
           
           if (isConnected && user) {
-            const linkedInUrl = user.metadata?.["LinkedIn Profile URL"];
+            const linkedInUrl = getLinkedInUrl();
             console.log('[LinkedIn] Profile URL Info:', {
               url: linkedInUrl,
-              userMetadata: user.metadata,
-              displayName: user.displayName,
-              email: user.email
+              fromVerifications: user.verifications?.customFields?.["LinkedIn Profile URL"],
+              fromMetadata: user.metadata?.["LinkedIn Profile URL"],
+              userData: user
             });
           }
         } catch (error) {
@@ -178,7 +191,7 @@ export const ContractApprovalStatus = ({
     if (isApproving || isApproved || !isWalletReady || approvalCompletedRef.current || !treasuryAddress) return;
     setIsApproving(true);
     try {
-      const linkedInUrl = user?.metadata?.["LinkedIn Profile URL"] || "";
+      const linkedInUrl = getLinkedInUrl();
       console.log("Starting approval process...", {
         walletAddress: address,
         linkedInUrl,
