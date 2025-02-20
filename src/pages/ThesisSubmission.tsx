@@ -54,8 +54,7 @@ const thesisFormSchema = z.object({
     integration: z.array(z.number())
   }),
   votingDuration: z.number().min(7 * 24 * 60 * 60, "Minimum voting duration is 7 days")
-    .max(90 * 24 * 60 * 60, "Maximum voting duration is 90 days"),
-  linkedInURL: z.string().url("Please enter a valid LinkedIn URL").max(200, "LinkedIn URL must be less than 200 characters")
+    .max(90 * 24 * 60 * 60, "Maximum voting duration is 90 days")
 });
 
 const ThesisSubmission = () => {
@@ -88,7 +87,7 @@ const ThesisSubmission = () => {
         integration: []
       },
       votingDuration: 7 * 24 * 60 * 60,
-      linkedInURL: ""
+      linkedInURL: user?.linkedAccounts?.find(account => account.provider === 'linkedin')?.profileUrl || ""
     }
   });
 
@@ -119,18 +118,26 @@ const ThesisSubmission = () => {
       return;
     }
 
+    const linkedInUrl = user?.linkedAccounts?.find(account => account.provider === 'linkedin')?.profileUrl;
+    console.log("User's LinkedIn URL:", linkedInUrl);
+
     setIsSubmitting(true);
     try {
-      console.log("Uploading form data to IPFS:", data);
-      const ipfsHash = await uploadToIPFS<ProposalMetadata>(data);
+      const metadataWithLinkedIn = {
+        ...data,
+        linkedInURL: linkedInUrl || ""
+      };
+      
+      console.log("Uploading form data to IPFS:", metadataWithLinkedIn);
+      const ipfsHash = await uploadToIPFS<ProposalMetadata>(metadataWithLinkedIn);
       console.log("IPFS upload successful, hash:", ipfsHash);
 
       const config: ProposalConfig = {
         targetCapital: ethers.utils.parseEther(data.investment.targetCapital),
         votingDuration: data.votingDuration,
         ipfsHash,
-        metadata: data,
-        linkedInURL: data.linkedInURL
+        metadata: metadataWithLinkedIn,
+        linkedInURL: linkedInUrl || ""
       };
 
       console.log("Creating proposal with config:", config);
@@ -246,20 +253,6 @@ const ThesisSubmission = () => {
                   onChange={(value) => form.setValue("votingDuration", value[0], { shouldValidate: true })}
                   error={form.formState.errors.votingDuration?.message?.split(",")}
                 />
-              </div>
-            </Card>
-
-            <Card className="bg-black/40 border-white/10 p-6">
-              <div>
-                <label className="text-lg font-medium text-white">LinkedIn Profile URL</label>
-                <Input
-                  {...form.register("linkedInURL")}
-                  placeholder="https://linkedin.com/in/your-profile"
-                  className="mt-2"
-                />
-                {form.formState.errors.linkedInURL && (
-                  <p className="text-sm text-red-400 mt-1">{form.formState.errors.linkedInURL.message}</p>
-                )}
               </div>
             </Card>
 
