@@ -219,36 +219,54 @@ const ThesisSubmission = () => {
   };
 
   useEffect(() => {
-    const checkTestMode = async () => {
-      if (wallet) {
-        try {
-          const status = await getContractStatus(wallet);
-          console.log("📊 Contract Mode Status:", {
-            isTestMode: status.isTestMode,
-            message: status.isTestMode ? "CONTRACT IN TEST MODE" : "CONTRACT IN LIVE MODE"
-          });
-          setContractTestMode(status.isTestMode);
-          
-          const isTesterWallet = status.tester.toLowerCase() === address?.toLowerCase();
-          const shouldEnableTestMode = isTesterWallet && status.isTestMode;
-          
-          console.log("🔍 Test Mode Check:", {
-            isTesterWallet,
-            contractTestMode: status.isTestMode,
-            walletAddress: address,
-            testerAddress: status.tester,
-            willAutoFill: status.isTestMode
-          });
+    let mounted = true;
 
-          setIsTestMode(shouldEnableTestMode);
-          
-          if (!status.isTestMode) {
-            console.log("⚠️ Contract in live mode - Auto-fill disabled");
-            console.log("🧹 Clearing form data...");
-            resetForm();
-          }
-        } catch (error) {
-          console.error("❌ Error checking test mode:", error);
+    const checkTestMode = async () => {
+      if (!wallet) {
+        console.log("⚠️ Wallet not available for test mode check");
+        return;
+      }
+
+      try {
+        const walletClient = await wallet.getWalletClient();
+        if (!walletClient || !mounted) {
+          console.log("⚠️ Wallet client not ready or component unmounted");
+          return;
+        }
+
+        console.log("✅ Wallet client ready, checking test mode status...");
+        
+        const status = await getContractStatus(wallet);
+        if (!mounted) return;
+
+        console.log("📊 Contract Mode Status:", {
+          isTestMode: status.isTestMode,
+          message: status.isTestMode ? "CONTRACT IN TEST MODE" : "CONTRACT IN LIVE MODE"
+        });
+        
+        setContractTestMode(status.isTestMode);
+        
+        const isTesterWallet = status.tester.toLowerCase() === address?.toLowerCase();
+        const shouldEnableTestMode = isTesterWallet && status.isTestMode;
+        
+        console.log("🔍 Test Mode Check:", {
+          isTesterWallet,
+          contractTestMode: status.isTestMode,
+          walletAddress: address,
+          testerAddress: status.tester,
+          willAutoFill: status.isTestMode
+        });
+
+        setIsTestMode(shouldEnableTestMode);
+        
+        if (!status.isTestMode) {
+          console.log("⚠️ Contract in live mode - Auto-fill disabled");
+          console.log("🧹 Clearing form data...");
+          resetForm();
+        }
+      } catch (error) {
+        console.error("❌ Error checking test mode:", error);
+        if (mounted) {
           setIsTestMode(false);
           setContractTestMode(false);
         }
@@ -256,6 +274,10 @@ const ThesisSubmission = () => {
     };
 
     checkTestMode();
+
+    return () => {
+      mounted = false;
+    };
   }, [wallet, address]);
 
   useEffect(() => {
