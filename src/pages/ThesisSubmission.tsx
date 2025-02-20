@@ -79,20 +79,20 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
   status: 'pending',
   description: 'Fill out your investment thesis details'
 }, {
+  id: 'firm',
+  title: 'Firm Details',
+  status: 'pending',
+  description: 'Specify target firm criteria'
+}, {
   id: 'strategy',
   title: 'Strategy Selection',
   status: 'pending',
   description: 'Select your post-acquisition strategies'
 }, {
-  id: 'approval',
-  title: 'Token Approval',
+  id: 'terms',
+  title: 'Payment Terms',
   status: 'pending',
-  description: 'Approve LGR tokens for submission'
-}, {
-  id: 'submission',
-  title: 'Thesis Submission',
-  status: 'pending',
-  description: 'Submit your thesis to the blockchain'
+  description: 'Define payment terms and confirm'
 }];
 
 const TEST_FORM_DATA: ProposalMetadata = {
@@ -301,7 +301,7 @@ const ThesisSubmission = () => {
     switch (activeStep) {
       case 'thesis':
         return "Continue to Firm Details";
-      case 'strategy':
+      case 'firm':
         return "Continue to Terms";
       case 'terms':
         return "Submit Investment Thesis";
@@ -911,7 +911,7 @@ const ThesisSubmission = () => {
                     </div>
                   )}
 
-                  {activeStep === 'strategy' && (
+                  {activeStep === 'firm' && (
                     <FirmCriteriaSection
                       formData={{
                         firmCriteria: {
@@ -926,6 +926,14 @@ const ThesisSubmission = () => {
                     />
                   )}
 
+                  {activeStep === 'strategy' && (
+                    <StrategiesSection
+                      formData={formData}
+                      formErrors={formErrors}
+                      onChange={(category, value) => handleStrategyChange(category, value)}
+                    />
+                  )}
+
                   {activeStep === 'terms' && (
                     <>
                       <PaymentTermsSection
@@ -933,13 +941,6 @@ const ThesisSubmission = () => {
                         formErrors={formErrors}
                         onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
                       />
-                      <div className="mt-8">
-                        <StrategiesSection
-                          formData={formData}
-                          formErrors={formErrors}
-                          onChange={(category, value) => handleStrategyChange(category, value)}
-                        />
-                      </div>
                     </>
                   )}
 
