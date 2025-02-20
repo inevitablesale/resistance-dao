@@ -45,52 +45,41 @@ export const VotingDurationInput = ({
       animate="animate"
       className="relative"
     >
-      <div className="space-y-6 p-6 rounded-2xl bg-[#1A1325]/10 backdrop-blur-lg border border-[#8247E5]/20 
-        hover:border-[#8247E5]/40 transition-all duration-300">
+      <div className="space-y-6 p-6 rounded-xl bg-[#1A1F2C] border border-[#9b87f5]/20">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <Label className="text-lg font-semibold bg-gradient-to-r from-[#8247E5] to-[#A379FF] 
-                bg-clip-text text-transparent flex items-center gap-2">
+              <Label className="text-lg font-semibold bg-gradient-to-r from-[#9b87f5] to-[#6E59A5] bg-clip-text text-transparent flex items-center gap-2">
                 Voting Duration
-                <HelpCircle className="h-4 w-4 text-[#8247E5]/60" />
+                <HelpCircle className="h-4 w-4 text-[#9b87f5]/60" />
               </Label>
-              <p className="text-sm text-white/60">Set how long the community can vote on your thesis</p>
+              <p className="text-[#9b87f5]/60 text-sm">Set how long the community can vote on your thesis</p>
             </div>
-            <AnimatePresence mode="wait">
-              <motion.div 
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-black/20 border border-[#8247E5]/20"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                key={value}
-              >
-                <Clock className="w-4 h-4 text-[#8247E5]" />
-                <span className="text-xl font-bold text-white">
-                  {getDurationText(value)}
-                </span>
-              </motion.div>
-            </AnimatePresence>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#221F26] border border-[#9b87f5]/20">
+              <Clock className="w-4 h-4 text-[#9b87f5]" />
+              <span className="text-xl font-medium text-white">
+                {getDurationText(value)}
+              </span>
+            </div>
           </div>
         </div>
         
         <div className="space-y-6">
           <div className="grid grid-cols-5 gap-2">
             {DURATION_PRESETS.map((preset) => (
-              <motion.button
+              <button
                 key={preset.value}
                 onClick={() => onChange([preset.value])}
                 className={cn(
                   "p-4 rounded-xl text-sm transition-all duration-300",
-                  "border-2 hover:scale-[1.02]",
+                  "border-2",
                   value === preset.value 
-                    ? "bg-gradient-to-br from-[#8247E5] to-[#A379FF] text-white border-transparent" 
-                    : "bg-black/20 text-white/60 border-[#8247E5]/20 hover:border-[#8247E5]/40"
+                    ? "bg-[#9b87f5] text-white border-transparent" 
+                    : "bg-[#221F26] text-[#9b87f5]/60 border-[#9b87f5]/20 hover:border-[#9b87f5]/40"
                 )}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
               >
                 {preset.label}
-              </motion.button>
+              </button>
             ))}
           </div>
 
@@ -105,7 +94,7 @@ export const VotingDurationInput = ({
               defaultValue={[MAX_VOTING_DURATION]}
             />
             
-            <div className="flex justify-between text-sm text-white/40">
+            <div className="flex justify-between text-sm text-[#9b87f5]/60">
               <span>7 days (min)</span>
               <span>90 days (max)</span>
             </div>
@@ -115,7 +104,7 @@ export const VotingDurationInput = ({
         <AnimatePresence mode="wait">
           {error && (
             <motion.p 
-              className="flex items-center gap-2 text-sm text-[#FF3B3B]"
+              className="flex items-center gap-2 text-sm text-red-500"
               variants={formAnimationVariants.error}
               initial="initial"
               animate="animate"

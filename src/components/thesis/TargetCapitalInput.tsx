@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { formAnimationVariants } from "@/lib/animations";
-import { LGR_PRICE_USD } from "@/lib/constants";
 
 interface TargetCapitalInputProps {
   value: string;
@@ -44,32 +43,34 @@ export const TargetCapitalInput = ({
       className="space-y-4"
     >
       <div className="flex items-center gap-2">
-        <Label className="text-lg text-[#A379FF] flex items-center gap-2">
+        <Label className="text-lg flex items-center gap-2 bg-gradient-to-r from-[#9b87f5] to-[#6E59A5] bg-clip-text text-transparent font-semibold">
           Target Capital
-          <HelpCircle className="h-4 w-4 text-[#8247E5]/60" />
+          <HelpCircle className="h-4 w-4 text-[#9b87f5]/60" />
         </Label>
       </div>
 
-      <div className="space-y-6 rounded-xl bg-[#0A0B0D]/80 border border-[#8247E5]/20 p-6">
+      <div className="space-y-6 rounded-xl bg-[#1A1F2C] border border-[#9b87f5]/20 p-6">
         <div className="relative">
           <Input
             type="text"
             placeholder="Enter amount in LGR"
             className={cn(
-              "h-14 px-16 text-xl font-medium bg-black/40 border transition-all duration-300",
+              "h-14 px-16 text-xl font-medium",
+              "bg-[#221F26] border-2 transition-all duration-300",
               "placeholder:text-white/20 rounded-lg",
-              error ? "border-[#FF3B3B]" : "border-[#8247E5]/20",
-              "focus:border-[#8247E5]/40 focus:ring-0"
+              error ? "border-red-500" : "border-[#9b87f5]/20",
+              "focus:border-[#9b87f5] focus:ring-1 focus:ring-[#9b87f5]/50",
+              "hover:border-[#9b87f5]/40"
             )}
             value={value}
             onChange={handleChange}
           />
-          <span className="absolute left-6 top-1/2 -translate-y-1/2 text-white/40">
+          <span className="absolute left-6 top-1/2 -translate-y-1/2 text-[#9b87f5]/60 font-medium">
             LGR
           </span>
         </div>
 
-        <div className="flex justify-between text-sm text-white/40">
+        <div className="flex justify-between text-sm text-[#9b87f5]/60">
           <span>Min: {MIN_TARGET_CAPITAL_LGR.toLocaleString()} LGR</span>
           <span>Max: {MAX_TARGET_CAPITAL_LGR.toLocaleString()} LGR</span>
         </div>
