@@ -4,7 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
 import { 
   Settings2, TrendingUp, UsersRound, Globe, Layers, Users, 
-  Building, Network, ArrowLeftRight, Users2, ScrollText, Database 
+  Building, Network, ArrowLeftRight, Users2, ScrollText, Database, Check 
 } from "lucide-react";
 import { 
   ProposalMetadata, 
@@ -12,11 +12,12 @@ import {
   GrowthStrategy, 
   IntegrationStrategy 
 } from "@/types/proposals";
-import { FieldErrors } from "react-hook-form";
+import { FieldErrors, UseFormRegister } from "react-hook-form";
 
 export interface StrategiesSectionProps {
   formData: ProposalMetadata;
   formErrors: FieldErrors<ProposalMetadata>;
+  register: UseFormRegister<ProposalMetadata>;
   onChange: (
     category: keyof ProposalMetadata['strategies'],
     value: OperationalStrategy[] | GrowthStrategy[] | IntegrationStrategy[]
@@ -26,7 +27,7 @@ export interface StrategiesSectionProps {
 type StrategyCategory = keyof ProposalMetadata['strategies'];
 type Strategy = OperationalStrategy | GrowthStrategy | IntegrationStrategy;
 
-export const StrategiesSection = ({ formData, formErrors, onChange }: StrategiesSectionProps) => {
+export const StrategiesSection = ({ formData, formErrors, register, onChange }: StrategiesSectionProps) => {
   const handleStrategyChange = <T extends StrategyCategory>(
     category: T,
     value: ProposalMetadata['strategies'][T][number],
@@ -116,49 +117,54 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {items.map(({ id, label, icon: Icon, color }) => (
-              <div
-                key={id}
-                className="relative group"
-              >
-                <div 
-                  className={`
-                    p-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm
-                    hover:bg-white/10 transition-all duration-200
-                    ${isStrategySelected(category as StrategyCategory, id) ? `border-${color}-500/50 bg-${color}-500/10` : ''}
-                  `}
+            {items.map(({ id, label, icon: Icon, color }) => {
+              const isSelected = isStrategySelected(category as StrategyCategory, id);
+              return (
+                <div
+                  key={id}
+                  className="relative group cursor-pointer"
+                  onClick={() => handleStrategyChange(category as StrategyCategory, id, !isSelected)}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`h-8 w-8 rounded-lg bg-${color}-500/20 flex items-center justify-center`}>
-                      <Icon className={`h-4 w-4 text-${color}-500`} />
+                  <div 
+                    className={`
+                      p-4 rounded-xl border transition-all duration-200
+                      ${isSelected 
+                        ? `border-${color}-500 bg-${color}-500/10 shadow-[0_0_15px_rgba(0,0,0,0.1)]` 
+                        : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'}
+                    `}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`
+                        h-8 w-8 rounded-lg flex items-center justify-center
+                        ${isSelected ? `bg-${color}-500` : `bg-${color}-500/20`}
+                      `}>
+                        <Icon className={`h-4 w-4 ${isSelected ? 'text-white' : `text-${color}-500`}`} />
+                      </div>
+                      <div className="flex-1">
+                        <Label className="text-white font-medium">{label}</Label>
+                      </div>
+                      <div className={`
+                        h-5 w-5 rounded border transition-all duration-200 flex items-center justify-center
+                        ${isSelected 
+                          ? `bg-${color}-500 border-${color}-500` 
+                          : 'border-white/30 bg-white/5'}
+                      `}>
+                        {isSelected && <Check className="h-3 w-3 text-white" />}
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <Label className="text-white font-medium">{label}</Label>
-                    </div>
-                    <Checkbox
-                      checked={isStrategySelected(category as StrategyCategory, id)}
-                      onCheckedChange={(checked) => 
-                        handleStrategyChange(category as StrategyCategory, id, checked as boolean)
-                      }
-                      className={`
-                        h-5 w-5 rounded border-white/30
-                        data-[state=checked]:border-${color}-500 data-[state=checked]:bg-${color}-500
-                        transition-all duration-200
-                      `}
-                    />
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          {formErrors[`strategies.${category}`] && (
+          {formErrors.strategies && formErrors.strategies[category as keyof typeof formErrors.strategies] && (
             <motion.p 
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-sm text-red-400 mt-2"
             >
-              {formErrors[`strategies.${category}`][0]}
+              {String(formErrors.strategies[category as keyof typeof formErrors.strategies]?.message)}
             </motion.p>
           )}
         </motion.div>

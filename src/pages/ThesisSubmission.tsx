@@ -176,15 +176,17 @@ const ThesisSubmission = () => {
                   formData={form.getValues()}
                   formErrors={form.formState.errors}
                   onChange={(field, value) => {
-                    form.setValue(`firmCriteria.${field}`, value, { shouldValidate: true });
+                    form.setValue(`firmCriteria.${String(field)}`, value, { shouldValidate: true });
                   }}
                 />
 
                 <StrategiesSection
                   formData={form.getValues()}
                   formErrors={form.formState.errors}
+                  register={form.register}
                   onChange={(category, value) => {
-                    form.setValue(`strategies.${category}`, value, { shouldValidate: true });
+                    const path = `strategies.${String(category)}` as const;
+                    form.setValue(path, value, { shouldValidate: true });
                   }}
                 />
               </div>
