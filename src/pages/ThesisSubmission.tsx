@@ -98,10 +98,10 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
 const TEST_FORM_DATA: ProposalMetadata = {
   title: "Test Proposal - Automated Backend Services Firm",
   firmCriteria: {
-    size: FirmSize.BELOW_1M,
-    location: "California",
-    dealType: DealType.ACQUISITION,
-    geographicFocus: GeographicFocus.LOCAL
+    size: null,
+    location: "",
+    dealType: null,
+    geographicFocus: null
   },
   paymentTerms: [
     PaymentTerm.CASH,
@@ -173,10 +173,10 @@ const ThesisSubmission = () => {
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     firmCriteria: {
-      size: FirmSize.BELOW_1M,
+      size: null,
       location: "",
-      dealType: DealType.ACQUISITION,
-      geographicFocus: GeographicFocus.LOCAL
+      dealType: null,
+      geographicFocus: null
     },
     paymentTerms: [],
     strategies: {
@@ -191,7 +191,9 @@ const ThesisSubmission = () => {
     },
     votingDuration: MIN_VOTING_DURATION,
     linkedInURL: "",
-    isTestMode: false
+    isTestMode: false,
+    submissionTimestamp: Date.now(),
+    submitter: address
   });
 
   useEffect(() => {
@@ -759,10 +761,10 @@ const ThesisSubmission = () => {
       setFormData({
         title: "",
         firmCriteria: {
-          size: FirmSize.BELOW_1M,
+          size: null,
           location: "",
-          dealType: DealType.ACQUISITION,
-          geographicFocus: GeographicFocus.LOCAL
+          dealType: null,
+          geographicFocus: null
         },
         paymentTerms: [],
         strategies: {
