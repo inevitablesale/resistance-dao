@@ -1,12 +1,12 @@
+
 import { ethers } from "ethers";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
-import { ProposalMetadata, ProposalConfig } from "@/types/proposals";
+import { ProposalMetadata, ProposalConfig, ValidationResult } from "@/types/proposals";
 
 export interface ContractStatus {
   submissionFee: ethers.BigNumber;
-  isPaused: boolean;
   isTestMode: boolean;
   treasury: string;
   minTargetCapital: ethers.BigNumber;
@@ -39,7 +39,6 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
   try {
     const [
       submissionFee,
-      isPaused,
       isTestMode,
       treasury,
       minTargetCapital,
@@ -52,7 +51,6 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
       tester
     ] = await Promise.all([
       factory.submissionFee(),
-      factory.paused(),
       factory.testModeEnabled(),
       factory.treasury(),
       factory.MIN_TARGET_CAPITAL(),
@@ -67,7 +65,6 @@ export const getContractStatus = async (wallet: NonNullable<DynamicContextType['
 
     return {
       submissionFee,
-      isPaused,
       isTestMode,
       treasury,
       minTargetCapital,
@@ -92,6 +89,17 @@ export const createProposal = async (
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
   
+  // First validate all input parameters
+  const validation = validateContractParameters(
+    { targetCapital: config.targetCapital, votingDuration: config.votingDuration },
+    await getContractStatus(wallet)
+  );
+
+  if (!validation.isValid) {
+    throw new Error(`Invalid parameters: ${Object.values(validation.errors).flat().join(", ")}`);
+  }
+
+  // Structure the input according to the contract's expectations
   const input = {
     title: config.metadata.title,
     ipfsMetadata: config.ipfsHash,
@@ -103,19 +111,15 @@ export const createProposal = async (
     location: config.metadata.firmCriteria.location,
     dealType: config.metadata.firmCriteria.dealType,
     geographicFocus: config.metadata.firmCriteria.geographicFocus,
-    paymentTerms: config.metadata.paymentTerms,
-    operationalStrategies: config.metadata.strategies.operational,
-    growthStrategies: config.metadata.strategies.growth,
-    integrationStrategies: config.metadata.strategies.integration
+    paymentTerms: config.metadata.paymentTerms.map(term => Number(term)),
+    operationalStrategies: config.metadata.strategies.operational.map(s => Number(s)),
+    growthStrategies: config.metadata.strategies.growth.map(s => Number(s)),
+    integrationStrategies: config.metadata.strategies.integration.map(s => Number(s))
   };
 
   console.log("Creating proposal with input:", {
     ...input,
     targetCapital: input.targetCapital.toString(),
-    paymentTerms: input.paymentTerms.map(term => Number(term)),
-    operationalStrategies: input.operationalStrategies.map(s => Number(s)),
-    growthStrategies: input.growthStrategies.map(s => Number(s)),
-    integrationStrategies: input.integrationStrategies.map(s => Number(s))
   });
   
   return await executeTransaction(
@@ -137,104 +141,31 @@ export const createProposal = async (
   );
 };
 
-export const setTestMode = async (
-  enabled: boolean,
-  wallet: NonNullable<DynamicContextType['primaryWallet']>
-): Promise<ethers.ContractTransaction> => {
-  const provider = await getProvider(wallet);
-  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
-  
-  const signerAddress = await provider.getSigner().getAddress();
-  const status = await getContractStatus(wallet);
-  
-  // Check if signer is the tester address
-  if (signerAddress.toLowerCase() !== status.tester.toLowerCase()) {
-    throw new Error("Not authorized - must be the tester address");
-  }
-
-  console.log('Setting test mode with tester wallet:', {
-    signerAddress,
-    testerAddress: status.tester,
-    enabled
-  });
-
-  return await executeTransaction(
-    () => factory.setTestMode(enabled),
-    {
-      type: 'contract',
-      description: `Setting test mode to ${enabled}`,
-      timeout: 60000,
-      maxRetries: 2,
-      backoffMs: 3000
-    }
-  );
-};
-
-export const estimateProposalGas = async (
-  config: ProposalConfig,
-  wallet: NonNullable<DynamicContextType['primaryWallet']>
-): Promise<ethers.BigNumber> => {
-  const provider = await getProvider(wallet);
-  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
-  
-  const input = {
-    title: config.metadata.title,
-    ipfsMetadata: config.ipfsHash,
-    targetCapital: config.targetCapital,
-    votingDuration: config.votingDuration,
-    investmentDrivers: config.metadata.investment.drivers,
-    additionalCriteria: config.metadata.investment.additionalCriteria || "",
-    firmSize: config.metadata.firmCriteria.size,
-    location: config.metadata.firmCriteria.location,
-    dealType: config.metadata.firmCriteria.dealType,
-    geographicFocus: config.metadata.firmCriteria.geographicFocus,
-    paymentTerms: config.metadata.paymentTerms,
-    operationalStrategies: config.metadata.strategies.operational,
-    growthStrategies: config.metadata.strategies.growth,
-    integrationStrategies: config.metadata.strategies.integration
-  };
-  
-  try {
-    const gasEstimate = await factory.estimateGas.createProposal(input, config.linkedInURL);
-    return gasEstimate.mul(120).div(100); // Add 20% buffer
-  } catch (error) {
-    console.error("Gas estimation error:", error);
-    throw error;
-  }
-};
-
 export const validateContractParameters = (
   config: { targetCapital: ethers.BigNumber; votingDuration: number },
   status: ContractStatus
 ): ValidationResult => {
   const errors: Record<string, string[]> = {};
-
-  // Convert MIN/MAX values to BigNumber for comparison
-  const minTargetCapital = ethers.utils.parseUnits("1000", 18);
-  const maxTargetCapital = ethers.utils.parseUnits("25000000", 18);
-
+  
   if (!config.targetCapital) {
     errors.targetCapital = ['Target capital is required'];
   } else {
-    if (config.targetCapital.lt(minTargetCapital)) {
-      errors.targetCapital = [`Target capital must be at least 1,000 LGR`];
+    if (config.targetCapital.lt(status.minTargetCapital)) {
+      errors.targetCapital = [`Target capital must be at least ${ethers.utils.formatEther(status.minTargetCapital)} LGR`];
     }
-    if (config.targetCapital.gt(maxTargetCapital)) {
-      errors.targetCapital = [`Target capital must not exceed 25,000,000 LGR`];
+    if (config.targetCapital.gt(status.maxTargetCapital)) {
+      errors.targetCapital = [`Target capital must not exceed ${ethers.utils.formatEther(status.maxTargetCapital)} LGR`];
     }
   }
-
-  const minDuration = 7 * 24 * 60 * 60; // 7 days in seconds
-  const maxDuration = 90 * 24 * 60 * 60; // 90 days in seconds
 
   if (!config.votingDuration) {
     errors.votingDuration = ['Voting duration is required'];
   } else {
-    if (config.votingDuration < minDuration) {
-      errors.votingDuration = [`Voting duration must be at least 7 days`];
+    if (config.votingDuration < status.minVotingDuration) {
+      errors.votingDuration = [`Voting duration must be at least ${status.minVotingDuration / (24 * 60 * 60)} days`];
     }
-    if (config.votingDuration > maxDuration) {
-      errors.votingDuration = [`Voting duration must not exceed 90 days`];
+    if (config.votingDuration > status.maxVotingDuration) {
+      errors.votingDuration = [`Voting duration must not exceed ${status.maxVotingDuration / (24 * 60 * 60)} days`];
     }
   }
 
