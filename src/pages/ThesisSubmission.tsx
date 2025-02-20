@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +16,7 @@ import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTe
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
-import { ProposalMetadata, FirmSize, DealType, GeographicFocus, ProposalConfig } from "@/types/proposals";
+import { ProposalMetadata, FirmSize, DealType, GeographicFocus, ProposalConfig, PaymentTerm, OperationalStrategy, GrowthStrategy, IntegrationStrategy } from "@/types/proposals";
 import { SUBMISSION_FEE } from "@/lib/constants";
 import { uploadToIPFS } from "@/services/ipfsService";
 import { createProposal } from "@/services/proposalContractService";
@@ -36,7 +35,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 const thesisFormSchema = z.object({
-  title: z.string().min(10, "Title must be at least 10 characters").max(100, "Title must be less than 100 characters"),
+  title: z.string()
+    .min(10, "Title must be at least 10 characters")
+    .max(100, "Title must be less than 100 characters"),
   investment: z.object({
     targetCapital: z.string()
       .min(1, "Target capital is required")
@@ -47,23 +48,58 @@ const thesisFormSchema = z.object({
         },
         "Target capital must be between 1,000 and 25,000,000 LGR"
       ),
-    drivers: z.string().min(50, "Investment drivers must be at least 50 characters").max(500, "Investment drivers must be less than 500 characters"),
-    additionalCriteria: z.string().max(500, "Additional criteria must be less than 500 characters")
+    drivers: z.string()
+      .min(50, "Investment drivers must be at least 50 characters")
+      .max(500, "Investment drivers must be less than 500 characters"),
+    additionalCriteria: z.string()
+      .max(500, "Additional criteria must be less than 500 characters")
   }),
   firmCriteria: z.object({
-    size: z.number(),
-    location: z.string().min(1, "Location is required"),
-    dealType: z.number().min(0).max(4, "Invalid deal type"), // Update validation range
+    size: z.number()
+      .min(0)
+      .max(Object.keys(FirmSize).length / 2 - 1, "Invalid firm size"),
+    location: z.string()
+      .min(1, "Location is required")
+      .max(100, "Location must be less than 100 characters"),
+    dealType: z.number()
+      .min(0)
+      .max(Object.keys(DealType).length / 2 - 1, "Invalid deal type"),
     geographicFocus: z.number()
+      .min(0)
+      .max(Object.keys(GeographicFocus).length / 2 - 1, "Invalid geographic focus")
   }),
-  paymentTerms: z.array(z.number()).min(1, "At least one payment term is required"),
+  paymentTerms: z.array(z.number())
+    .min(1, "At least one payment term is required")
+    .refine(
+      (terms) => terms.every(t => t >= 0 && t < Object.keys(PaymentTerm).length / 2),
+      "Invalid payment term selected"
+    ),
   strategies: z.object({
-    operational: z.array(z.number()),
-    growth: z.array(z.number()),
+    operational: z.array(z.number())
+      .min(1, "At least one operational strategy is required")
+      .refine(
+        (ops) => ops.every(o => o >= 0 && o < Object.keys(OperationalStrategy).length / 2),
+        "Invalid operational strategy selected"
+      ),
+    growth: z.array(z.number())
+      .min(1, "At least one growth strategy is required")
+      .refine(
+        (growth) => growth.every(g => g >= 0 && g < Object.keys(GrowthStrategy).length / 2),
+        "Invalid growth strategy selected"
+      ),
     integration: z.array(z.number())
+      .min(1, "At least one integration strategy is required")
+      .refine(
+        (ints) => ints.every(i => i >= 0 && i < Object.keys(IntegrationStrategy).length / 2),
+        "Invalid integration strategy selected"
+      )
   }),
-  votingDuration: z.number().min(7 * 24 * 60 * 60, "Minimum voting duration is 7 days")
-    .max(90 * 24 * 60 * 60, "Maximum voting duration is 90 days")
+  votingDuration: z.number()
+    .min(7 * 24 * 60 * 60, "Minimum voting duration is 7 days")
+    .max(90 * 24 * 60 * 60, "Maximum voting duration is 90 days"),
+  linkedInURL: z.string()
+    .min(1, "LinkedIn URL is required")
+    .max(200, "LinkedIn URL must be less than 200 characters")
 });
 
 const ThesisSubmission = () => {
@@ -104,7 +140,7 @@ const ThesisSubmission = () => {
       firmCriteria: {
         size: FirmSize.BELOW_1M,
         location: "",
-        dealType: DealType.ACQUISITION, // Ensure we start with a valid enum value
+        dealType: DealType.ACQUISITION,
         geographicFocus: GeographicFocus.LOCAL
       },
       paymentTerms: [],
@@ -145,14 +181,34 @@ const ThesisSubmission = () => {
       return;
     }
 
-    // Validate deal type before submission
-    if (data.firmCriteria.dealType < 0 || data.firmCriteria.dealType > 4) {
-      toast({
-        title: "Invalid Deal Type",
-        description: "Please select a valid deal type",
-        variant: "destructive"
-      });
-      return;
+    // Validate enums before submission
+    const validations = [
+      {
+        value: data.firmCriteria.size,
+        max: Object.keys(FirmSize).length / 2 - 1,
+        name: "Firm Size"
+      },
+      {
+        value: data.firmCriteria.dealType,
+        max: Object.keys(DealType).length / 2 - 1,
+        name: "Deal Type"
+      },
+      {
+        value: data.firmCriteria.geographicFocus,
+        max: Object.keys(GeographicFocus).length / 2 - 1,
+        name: "Geographic Focus"
+      }
+    ];
+
+    for (const validation of validations) {
+      if (validation.value < 0 || validation.value > validation.max) {
+        toast({
+          title: `Invalid ${validation.name}`,
+          description: `Please select a valid ${validation.name.toLowerCase()}`,
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     const linkedInUrl = getLinkedInUrl();
