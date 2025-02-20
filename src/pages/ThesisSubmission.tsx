@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,13 @@ import { Label } from "@/components/ui/label";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
 import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
-import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp, Check, HelpCircle } from "lucide-react";
+import { FileText, AlertTriangle, Clock, CreditCard, Wallet, Building2, Target, Briefcase, ArrowRight, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useTokenBalances } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "@/services/pinataService";
-import { getContractStatus, estimateProposalGas, createProposal, setTestMode } from "@/services/proposalContractService";
+import { getContractStatus, estimateProposalGas, createProposal } from "@/services/proposalContractService";
 import { validateProposalMetadata, validateIPFSHash } from "@/services/proposalValidationService";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { SubmissionProgress } from "@/components/thesis/SubmissionProgress";
@@ -74,30 +74,25 @@ interface SubmissionStep {
 const US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
 
 const SUBMISSION_STEPS: SubmissionStep[] = [{
-  id: 'basics',
-  title: 'Basic Information',
+  id: 'thesis',
+  title: 'Investment Thesis',
   status: 'pending',
-  description: 'Enter core thesis details'
-}, {
-  id: 'criteria',
-  title: 'Firm Criteria',
-  status: 'pending',
-  description: 'Define target firm characteristics'
-}, {
-  id: 'payment',
-  title: 'Payment Terms',
-  status: 'pending',
-  description: 'Select payment structure options'
+  description: 'Fill out your investment thesis details'
 }, {
   id: 'strategy',
   title: 'Strategy Selection',
   status: 'pending',
-  description: 'Choose post-acquisition strategies'
+  description: 'Select your post-acquisition strategies'
 }, {
-  id: 'review',
-  title: 'Review & Submit',
+  id: 'approval',
+  title: 'Token Approval',
   status: 'pending',
-  description: 'Review and submit your thesis'
+  description: 'Approve LGR tokens for submission'
+}, {
+  id: 'submission',
+  title: 'Thesis Submission',
+  status: 'pending',
+  description: 'Submit your thesis to the blockchain'
 }];
 
 const TEST_FORM_DATA: ProposalMetadata = {
@@ -156,18 +151,14 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
+  const [isTestMode, setIsTestMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
-  const [activeStep, setActiveStep] = useState<string>('basics');
+  const [activeStep, setActiveStep] = useState<string>('thesis');
   const [steps, setSteps] = useState<SubmissionStep[]>(SUBMISSION_STEPS);
   const [currentTxHash, setCurrentTxHash] = useState<string | null>(null);
   const [votingDuration, setVotingDuration] = useState<number>(MIN_VOTING_DURATION);
-  const [isTestMode, setIsTestMode] = useState(false);
-  const [contractTestMode, setContractTestMode] = useState(false);
-  const [hasInitialStatus, setHasInitialStatus] = useState(false);
-  const initialCheckRef = useRef(false);
-
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     firmCriteria: {
@@ -192,153 +183,28 @@ const ThesisSubmission = () => {
     isTestMode: false
   });
 
-  const resetForm = () => {
-    const currentFormData = { ...formData };
-    console.log("🔄 Resetting form - Current form data:", currentFormData);
-    
-    const emptyForm = {
-      title: "",
-      firmCriteria: {
-        size: FirmSize.BELOW_1M,
-        location: "",
-        dealType: DealType.ACQUISITION,
-        geographicFocus: GeographicFocus.LOCAL
-      },
-      paymentTerms: [],
-      strategies: {
-        operational: [],
-        growth: [],
-        integration: []
-      },
-      investment: {
-        targetCapital: "",
-        drivers: "",
-        additionalCriteria: ""
-      },
-      votingDuration: MIN_VOTING_DURATION,
-      linkedInURL: "",
-      isTestMode: false
-    };
-    
-    setFormData(emptyForm);
-    console.log("✅ Form reset complete - Form cleared to empty state:", emptyForm);
-  };
-
   useEffect(() => {
-    let mounted = true;
-    let initCheckTimeout: NodeJS.Timeout;
-
-    const checkTestMode = async () => {
-      if (!wallet || initialCheckRef.current) {
-        console.log("⚠️ Wallet not available or check already in progress");
-        return false;
-      }
-
-      initialCheckRef.current = true;
-      console.log("🔄 Starting test mode check");
-
-      try {
-        const walletClient = await wallet.getWalletClient();
-        if (!walletClient || !mounted) {
-          console.log("⚠️ Wallet client not ready or component unmounted");
-          return false;
-        }
-
-        console.log("✅ Wallet client ready, checking test mode status...");
-        const status = await getContractStatus(wallet);
-        
-        if (!mounted) return false;
-
-        const isTesterWallet = status.tester.toLowerCase() === address?.toLowerCase();
-        console.log("Test mode status:", {
-          isTesterWallet,
-          contractTestMode: status.isTestMode,
-          walletAddress: address,
-          testerAddress: status.tester
-        });
-
-        if (mounted) {
-          setContractTestMode(status.isTestMode);
-          setIsTestMode(isTesterWallet && status.isTestMode);
-          setHasInitialStatus(true);
-        }
-        
-        return true;
-      } catch (error) {
-        console.error("❌ Error checking test mode:", error);
-        if (mounted) {
-          setIsTestMode(false);
-          setContractTestMode(false);
-          setHasInitialStatus(true);
-        }
-        return false;
-      } finally {
-        initialCheckRef.current = false;
-      }
-    };
-
-    const initializeWithRetry = async () => {
-      let attempts = 0;
-      const maxAttempts = 3;
-      const retryDelay = 2000;
-
-      while (attempts < maxAttempts && mounted && !hasInitialStatus) {
-        if (attempts > 0) {
-          console.log(`Retrying test mode check (${attempts + 1}/${maxAttempts})...`);
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
-        }
-
-        const success = await checkTestMode();
-        if (success || !mounted) return;
-        
-        attempts++;
-      }
-      
-      if (mounted && !hasInitialStatus) {
-        console.error("❌ Failed to initialize test mode after maximum attempts");
-        setHasInitialStatus(true);
-      }
-    };
-
-    if (!hasInitialStatus) {
-      initializeWithRetry();
-
-      initCheckTimeout = setTimeout(() => {
-        if (mounted && !hasInitialStatus) {
-          console.error("⚠️ Test mode initialization timed out");
-          setIsTestMode(false);
-          setContractTestMode(false);
-          setHasInitialStatus(true);
-        }
-      }, 10000);
-    }
-
-    return () => {
-      mounted = false;
-      clearTimeout(initCheckTimeout);
-    };
-  }, [wallet, address, hasInitialStatus]);
-
-  useEffect(() => {
-    if (!hasInitialStatus) {
-      console.log("⏳ Waiting for initial test mode status...");
-      return;
-    }
-
-    if (contractTestMode) {
-      console.log("🔄 Contract in test mode - Auto-filling form with test data:", TEST_FORM_DATA);
+    if (isTestMode) {
+      console.log("Setting test form data:", TEST_FORM_DATA);
       setFormData({
         ...TEST_FORM_DATA,
         linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
         submissionTimestamp: Date.now(),
         submitter: address
       });
-    } else {
-      console.log("⚠️ Contract in live mode - Auto-fill disabled");
-      console.log("🧹 Clearing form data...");
-      resetForm();
     }
-  }, [contractTestMode, user, address, hasInitialStatus]);
+  }, [isTestMode, user, address]);
+
+  useEffect(() => {
+    const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
+    if (!linkedInURL && isConnected) {
+      toast({
+        title: "LinkedIn Profile Required",
+        description: "Please add your LinkedIn URL in your wallet settings to submit a thesis",
+        variant: "default"
+      });
+    }
+  }, [user, isConnected, toast]);
 
   const validateLinkedInURL = (): boolean => {
     const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
@@ -433,9 +299,9 @@ const ThesisSubmission = () => {
         </div>;
     }
     switch (activeStep) {
-      case 'basics':
+      case 'thesis':
         return "Continue to Firm Details";
-      case 'criteria':
+      case 'strategy':
         return "Continue to Terms";
       case 'terms':
         return "Submit Investment Thesis";
@@ -531,12 +397,10 @@ const ThesisSubmission = () => {
 
   const getCurrentValidator = () => {
     switch (activeStep) {
-      case 'basics':
+      case 'thesis':
         return validateBasicsTab;
-      case 'criteria':
+      case 'firm':
         return validateFirmTab;
-      case 'payment':
-        return validatePaymentTerms;
       case 'strategy':
         return validateStrategyTab;
       case 'terms':
@@ -626,29 +490,21 @@ const ThesisSubmission = () => {
     }
 
     switch (activeStep) {
-      case 'basics':
-        handleStepChange('criteria');
+      case 'thesis':
+        handleStepChange('firm');
         break;
-      case 'criteria':
-        handleStepChange('payment');
-        break;
-      case 'payment':
+      case 'firm':
         handleStepChange('strategy');
         break;
       case 'strategy':
-        handleStepChange('review');
+        handleStepChange('terms');
         break;
-      case 'review':
-        if (validateForm()) {
+      case 'terms':
+        if (validateTermsTab()) {
           handleSubmit(e);
         }
         break;
     }
-  };
-
-  const validateForm = () => {
-    // Add comprehensive form validation here
-    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent, formData?: ProposalMetadata, isTestMode?: boolean) => {
@@ -671,11 +527,9 @@ const ThesisSubmission = () => {
         throw new Error("Please add a valid LinkedIn URL in your wallet settings");
       }
 
-      updateStepStatus('basics', 'completed');
-      updateStepStatus('criteria', 'completed');
-      updateStepStatus('payment', 'completed');
+      updateStepStatus('thesis', 'completed');
       updateStepStatus('strategy', 'completed');
-      updateStepStatus('review', 'completed');
+      updateStepStatus('approval', 'completed');
       setActiveStep('submission');
 
       if (!wallet) {
@@ -758,11 +612,9 @@ const ThesisSubmission = () => {
         throw new Error("Please add a valid LinkedIn URL in your wallet settings");
       }
 
-      updateStepStatus('basics', 'completed');
-      updateStepStatus('criteria', 'completed');
-      updateStepStatus('payment', 'completed');
+      updateStepStatus('thesis', 'completed');
       updateStepStatus('strategy', 'completed');
-      updateStepStatus('review', 'completed');
+      updateStepStatus('approval', 'completed');
       setActiveStep('submission');
 
       if (!wallet) {
@@ -900,10 +752,7 @@ const ThesisSubmission = () => {
   };
 
   const handleTestModeToggle = async (enabled: boolean) => {
-    console.log("Test mode toggle requested:", { enabled });
-    
     if (!isConnected) {
-      console.log("Wallet not connected, prompting connection");
       toast({
         title: "Connect Wallet",
         description: "Please connect your wallet to toggle test mode",
@@ -913,73 +762,34 @@ const ThesisSubmission = () => {
       return;
     }
     
-    try {
-      if (wallet) {
-        console.log("Checking contract status for test mode toggle...");
-        const status = await getContractStatus(wallet);
-        const isTesterWallet = status.tester.toLowerCase() === address?.toLowerCase();
-        
-        console.log("Test mode toggle authorization check:", {
-          isTesterWallet,
-          currentTestMode: status.isTestMode,
-          requestedState: enabled,
-          walletAddress: address,
-          testerAddress: status.tester
-        });
-        
-        if (!isTesterWallet) {
-          console.log("Unauthorized wallet attempting to toggle test mode");
-          toast({
-            title: "Not Authorized",
-            description: "Your wallet is not authorized for test mode",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        if (enabled && !status.isTestMode) {
-          console.log("Enabling contract test mode...");
-          await setTestMode(true, wallet);
-          toast({
-            title: "Test Mode Enabled",
-            description: "Contract test mode has been enabled"
-          });
-        } else if (!enabled && status.isTestMode) {
-          console.log("Disabling contract test mode...");
-          await setTestMode(false, wallet);
-          toast({
-            title: "Test Mode Disabled",
-            description: "Contract test mode has been disabled"
-          });
-        }
-
-        // Recheck test mode status after toggle
-        const newStatus = await getContractStatus(wallet);
-        console.log("Updated contract status after toggle:", {
-          previousTestMode: status.isTestMode,
-          newTestMode: newStatus.isTestMode,
-          isTesterWallet
-        });
-        
-        setContractTestMode(newStatus.isTestMode);
-        setIsTestMode(newStatus.isTestMode && isTesterWallet);
-        
-        console.log("Local state updated:", {
-          contractTestMode: newStatus.isTestMode,
-          isTestMode: newStatus.isTestMode && isTesterWallet
-        });
-        
-        if (!newStatus.isTestMode || !isTesterWallet) {
-          console.log("Resetting form due to test mode being disabled");
-          resetForm();
-        }
-      }
-    } catch (error) {
-      console.error("Error in test mode toggle:", error);
-      toast({
-        title: "Error",
-        description: "Failed to toggle test mode",
-        variant: "destructive"
+    setIsTestMode(enabled);
+    if (enabled) {
+      setFormData(TEST_FORM_DATA);
+    } else {
+      setFormData({
+        title: "",
+        firmCriteria: {
+          size: FirmSize.BELOW_1M,
+          location: "",
+          dealType: DealType.ACQUISITION,
+          geographicFocus: GeographicFocus.LOCAL
+        },
+        paymentTerms: [],
+        strategies: {
+          operational: [],
+          growth: [],
+          integration: []
+        },
+        investment: {
+          targetCapital: "",
+          drivers: "",
+          additionalCriteria: ""
+        },
+        votingDuration: MIN_VOTING_DURATION,
+        linkedInURL: "",
+        isTestMode: false,
+        submissionTimestamp: Date.now(),
+        submitter: address
       });
     }
   };
@@ -1059,13 +869,10 @@ const ThesisSubmission = () => {
                   transition={{ duration: 0.2 }}
                   className="p-6"
                 >
-                  {activeStep === 'basics' && (
+                  {activeStep === 'thesis' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
-                        <Label className="text-lg font-medium text-white flex items-center gap-2">
-                          Thesis Title
-                          <HelpCircle className="h-4 w-4 text-gray-400" />
-                        </Label>
+                        <Label className="text-lg font-medium text-white">Thesis Title</Label>
                         <Input 
                           placeholder="Enter a clear, descriptive title"
                           className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12 focus:border-yellow-500/50"
@@ -1090,10 +897,7 @@ const ThesisSubmission = () => {
                       />
 
                       <div className="space-y-4">
-                        <Label className="text-lg font-medium text-white flex items-center gap-2">
-                          Investment Drivers
-                          <HelpCircle className="h-4 w-4 text-gray-400" />
-                        </Label>
+                        <Label className="text-lg font-medium text-white">Investment Drivers</Label>
                         <textarea
                           placeholder="Describe the key drivers behind this investment thesis..."
                           className="w-full h-32 bg-black/50 border border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none focus:border-yellow-500/50"
@@ -1104,26 +908,10 @@ const ThesisSubmission = () => {
                           <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
                         )}
                       </div>
-
-                      <div className="space-y-4">
-                        <Label className="text-lg font-medium text-white flex items-center gap-2">
-                          Additional Criteria
-                          <HelpCircle className="h-4 w-4 text-gray-400" />
-                        </Label>
-                        <textarea
-                          placeholder="Any additional investment criteria or preferences..."
-                          className="w-full h-32 bg-black/50 border border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none focus:border-yellow-500/50"
-                          value={formData.investment.additionalCriteria}
-                          onChange={e => handleFormDataChange('investment.additionalCriteria', e.target.value)}
-                        />
-                        {formErrors['investment.additionalCriteria'] && (
-                          <p className="text-red-400 text-sm">{formErrors['investment.additionalCriteria'][0]}</p>
-                        )}
-                      </div>
                     </div>
                   )}
 
-                  {activeStep === 'criteria' && (
+                  {activeStep === 'strategy' && (
                     <FirmCriteriaSection
                       formData={{
                         firmCriteria: {
@@ -1138,41 +926,54 @@ const ThesisSubmission = () => {
                     />
                   )}
 
-                  {activeStep === 'payment' && (
-                    <PaymentTermsSection
-                      formData={formData}
-                      formErrors={formErrors}
-                      onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
-                    />
-                  )}
-
-                  {activeStep === 'strategy' && (
-                    <StrategiesSection
-                      formData={formData}
-                      formErrors={formErrors}
-                      onChange={(category, value) => handleStrategyChange(category, value)}
-                    />
-                  )}
-
-                  {activeStep === 'review' && (
-                    <div className="space-y-8">
-                      <div className="rounded-lg bg-white/5 p-6 space-y-4">
-                        <h3 className="text-lg font-medium text-white">Review Your Thesis</h3>
-                        <div className="grid gap-4">
-                          <div>
-                            <Label className="text-sm text-gray-400">Title</Label>
-                            <p className="text-white">{formData.title}</p>
-                          </div>
-                          <div>
-                            <Label className="text-sm text-gray-400">Target Capital</Label>
-                            <p className="text-white">{formData.investment.targetCapital} LGR</p>
-                          </div>
-                          <div>
-                            <Label className="text-sm text-gray-400">Investment Drivers</Label>
-                            <p className="text-white">{formData.investment.drivers}</p>
-                          </div>
-                        </div>
+                  {activeStep === 'terms' && (
+                    <>
+                      <PaymentTermsSection
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
+                      />
+                      <div className="mt-8">
+                        <StrategiesSection
+                          formData={formData}
+                          formErrors={formErrors}
+                          onChange={(category, value) => handleStrategyChange(category, value)}
+                        />
                       </div>
+                    </>
+                  )}
+
+                  {activeStep === 'submission' && (
+                    <div className="space-y-6 text-center py-8">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
+                      >
+                        <Check className="w-8 h-8 text-white" />
+                      </motion.div>
+                      <h3 className="text-2xl font-semibold text-white">
+                        {submissionComplete 
+                          ? "Investment Thesis Submitted!"
+                          : "Ready to Submit"
+                        }
+                      </h3>
+                      <p className="text-gray-400">
+                        {submissionComplete
+                          ? "Your investment thesis has been successfully submitted to the community"
+                          : "Your investment thesis is ready to be submitted to the community"
+                        }
+                      </p>
+                      {currentTxHash && (
+                        <a
+                          href={`https://polygonscan.com/tx/${currentTxHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-polygon-primary hover:underline"
+                        >
+                          View transaction on PolygonScan
+                        </a>
+                      )}
                     </div>
                   )}
                 </motion.div>
