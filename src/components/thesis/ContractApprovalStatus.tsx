@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -50,9 +51,6 @@ export const ContractApprovalStatus = ({
   const balanceInterval = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
-  const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
-  const hasRequiredBalance = ethers.utils.parseEther(balance).gte(requiredAmountBN);
-
   useEffect(() => {
     const checkWalletStatus = async () => {
       if (wallet && !isInitializing && isDynamicReady) {
@@ -65,7 +63,7 @@ export const ContractApprovalStatus = ({
             console.log('[LinkedIn] Profile URL Info:', {
               url: linkedInUrl,
               userMetadata: user.metadata,
-              fullName: `${user.firstName} ${user.lastName}`,
+              displayName: user.displayName,
               email: user.email
             });
           }
@@ -180,9 +178,10 @@ export const ContractApprovalStatus = ({
     if (isApproving || isApproved || !isWalletReady || approvalCompletedRef.current || !treasuryAddress) return;
     setIsApproving(true);
     try {
+      const linkedInUrl = user?.metadata?.["LinkedIn Profile URL"] || "";
       console.log("Starting approval process...", {
         walletAddress: address,
-        linkedInUrl: user?.metadata?.["LinkedIn Profile URL"],
+        linkedInUrl,
         treasuryAddress,
         currentFormData
       });
@@ -241,8 +240,9 @@ export const ContractApprovalStatus = ({
         setIsApproved(true);
         const formDataWithLinkedIn = {
           ...currentFormData,
-          linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || ""
+          linkedInURL: linkedInUrl
         };
+        console.log("Submitting form data with LinkedIn:", formDataWithLinkedIn);
         onApprovalComplete(formDataWithLinkedIn, transaction, false);
       }
     } catch (error) {
