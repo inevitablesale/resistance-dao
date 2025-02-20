@@ -98,10 +98,10 @@ const SUBMISSION_STEPS: SubmissionStep[] = [{
 const TEST_FORM_DATA: ProposalMetadata = {
   title: "Test Proposal - Automated Backend Services Firm",
   firmCriteria: {
-    size: null,
-    location: "",
-    dealType: null,
-    geographicFocus: null
+    size: FirmSize.BELOW_1M,
+    location: "California",
+    dealType: DealType.ACQUISITION,
+    geographicFocus: GeographicFocus.LOCAL
   },
   paymentTerms: [
     PaymentTerm.CASH,
@@ -151,17 +151,6 @@ const ThesisSubmission = () => {
     tokenAddresses: [LGR_TOKEN_ADDRESS]
   });
 
-  console.log("Token balances:", tokenBalances);
-  
-  const lgrToken = tokenBalances?.find(token => {
-    console.log("Checking token:", token);
-    return token.address?.toLowerCase() === LGR_TOKEN_ADDRESS.toLowerCase();
-  });
-  console.log("Found LGR token:", lgrToken);
-  
-  const lgrBalance = lgrToken?.balance?.toString() || "0";
-  console.log("LGR balance:", lgrBalance);
-
   const [isTestMode, setIsTestMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
@@ -173,10 +162,10 @@ const ThesisSubmission = () => {
   const [formData, setFormData] = useState<ProposalMetadata>({
     title: "",
     firmCriteria: {
-      size: null,
+      size: FirmSize.BELOW_1M,
       location: "",
-      dealType: null,
-      geographicFocus: null
+      dealType: DealType.ACQUISITION,
+      geographicFocus: GeographicFocus.LOCAL
     },
     paymentTerms: [],
     strategies: {
@@ -191,9 +180,7 @@ const ThesisSubmission = () => {
     },
     votingDuration: MIN_VOTING_DURATION,
     linkedInURL: "",
-    isTestMode: false,
-    submissionTimestamp: Date.now(),
-    submitter: address
+    isTestMode: false
   });
 
   useEffect(() => {
@@ -305,9 +292,22 @@ const ThesisSubmission = () => {
   };
 
   const getButtonText = () => {
-    if (isSubmitting) return "Submitting...";
-    if (activeStep === 'terms') return "Submit Thesis";
-    return "Next Step";
+    if (isSubmitting) {
+      return <div className="flex items-center justify-center">
+          <span className="mr-2">Submitting...</span>
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+        </div>;
+    }
+    switch (activeStep) {
+      case 'thesis':
+        return "Continue to Firm Details";
+      case 'strategy':
+        return "Continue to Terms";
+      case 'terms':
+        return "Submit Investment Thesis";
+      default:
+        return "Continue";
+    }
   };
 
   const validateBasicsTab = (): boolean => {
@@ -320,6 +320,18 @@ const ThesisSubmission = () => {
     }
     if (!formData.investment.targetCapital) {
       errors['investment.targetCapital'] = ['Target capital is required'];
+    } else {
+      try {
+        const targetCapitalWei = ethers.utils.parseEther(formData.investment.targetCapital);
+        if (targetCapitalWei.lt(MIN_TARGET_CAPITAL)) {
+          errors['investment.targetCapital'] = [`Minimum target capital is ${ethers.utils.formatEther(MIN_TARGET_CAPITAL)} LGR`];
+        }
+        if (targetCapitalWei.gt(MAX_TARGET_CAPITAL)) {
+          errors['investment.targetCapital'] = [`Maximum target capital is ${ethers.utils.formatEther(MAX_TARGET_CAPITAL)} LGR`];
+        }
+      } catch (error) {
+        errors['investment.targetCapital'] = ['Invalid target capital amount'];
+      }
     }
     if (!formData.investment.drivers || formData.investment.drivers.trim().length < 50) {
       errors['investment.drivers'] = ['Investment drivers must be at least 50 characters'];
@@ -489,7 +501,7 @@ const ThesisSubmission = () => {
         break;
       case 'terms':
         if (validateTermsTab()) {
-          handleSubmit(new Event('submit') as any);
+          handleSubmit(e);
         }
         break;
     }
@@ -591,7 +603,7 @@ const ThesisSubmission = () => {
     }
   };
 
-  const handleApprovalComplete = async (submissionFormData: ProposalMetadata, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => {
+  const handleApprovalComplete = async (formData: any, approvalTx?: ethers.ContractTransaction, isTestMode?: boolean) => {
     try {
       setIsSubmitting(true);
       setFormErrors({});
@@ -612,26 +624,20 @@ const ThesisSubmission = () => {
       const linkedInURL = user?.metadata?.["LinkedIn Profile URL"] as string;
       console.log('Retrieved LinkedIn URL:', linkedInURL);
 
-      const currentFormData = isTestMode ? TEST_FORM_DATA : formData;
-      
-      if (!currentFormData.investment.targetCapital) {
-        throw new Error("Target capital is required");
-      }
+      const effectiveFormData = isTestMode ? {
+        ...TEST_FORM_DATA,
+        linkedInURL,
+        submissionTimestamp: Date.now(),
+        submitter: address
+      } : formData;
 
       console.log('Preparing data for IPFS submission:', { 
         isTestMode,
-        formData: currentFormData,
+        effectiveFormData,
         linkedInURL,
         submitter: address,
         timestamp: Date.now()
       });
-
-      const effectiveFormData = {
-        ...currentFormData,
-        linkedInURL,
-        submissionTimestamp: Date.now(),
-        submitter: address
-      };
       
       const ipfsUri = await uploadMetadataToPinata(effectiveFormData);
       console.log('IPFS upload result:', {
@@ -665,7 +671,7 @@ const ThesisSubmission = () => {
       const receipt = await result.wait();
       console.log('Transaction receipt received:', receipt);
 
-      if (receipt.status === 1) {
+      if (receipt.status === 1) { // Transaction successful
         setSubmissionComplete(true);
         updateStepStatus('submission', 'completed');
 
@@ -674,6 +680,7 @@ const ThesisSubmission = () => {
           description: `Your ${isTestMode ? 'test ' : ''}investment thesis has been submitted successfully!`
         });
 
+        // Store proposal in local storage
         const userProposals: StoredProposal[] = JSON.parse(localStorage.getItem('userProposals') || '[]');
         const newProposal: StoredProposal = {
           hash: result.hash,
@@ -686,6 +693,7 @@ const ThesisSubmission = () => {
         userProposals.push(newProposal);
         localStorage.setItem('userProposals', JSON.stringify(userProposals));
 
+        // Redirect after a short delay to allow the user to see the success state
         setTimeout(() => {
           navigate('/proposals');
         }, 2000);
@@ -761,10 +769,10 @@ const ThesisSubmission = () => {
       setFormData({
         title: "",
         firmCriteria: {
-          size: null,
+          size: FirmSize.BELOW_1M,
           location: "",
-          dealType: null,
-          geographicFocus: null
+          dealType: DealType.ACQUISITION,
+          geographicFocus: GeographicFocus.LOCAL
         },
         paymentTerms: [],
         strategies: {
@@ -788,39 +796,6 @@ const ThesisSubmission = () => {
 
   const handlePromotionSelect = (frequency: 'weekly' | 'monthly') => {
     // Implement promotion selection logic here
-  };
-
-  const handleNextStep = () => {
-    let isValid = false;
-    
-    switch (activeStep) {
-      case 'thesis':
-        isValid = validateBasicsTab();
-        if (isValid) setActiveStep('firm');
-        break;
-      case 'firm':
-        isValid = validateFirmTab();
-        if (isValid) setActiveStep('strategy');
-        break;
-      case 'strategy':
-        isValid = validateStrategyTab();
-        if (isValid) setActiveStep('terms');
-        break;
-      case 'terms':
-        isValid = validateTermsTab();
-        if (isValid) {
-          handleSubmit(new Event('submit') as any);
-        }
-        break;
-    }
-
-    if (!isValid) {
-      toast({
-        title: "Validation Error",
-        description: "Please complete all required fields before proceeding",
-        variant: "destructive"
-      });
-    }
   };
 
   return (
@@ -871,112 +846,132 @@ const ThesisSubmission = () => {
               "bg-black/40 border-white/5 backdrop-blur-sm overflow-hidden",
               formErrors && Object.keys(formErrors).length > 0 ? "border-red-500/20" : ""
             )}>
-              <div className="p-6">
-                {activeStep === 'thesis' && (
-                  <div className="space-y-6">
-                    <h2 className="text-xl font-semibold text-white">Investment Thesis Details</h2>
-                    
-                    <div>
-                      <Label htmlFor="title" className="text-white mb-2 block">Thesis Title</Label>
-                      <Input
-                        id="title"
-                        value={formData.title}
-                        onChange={(e) => handleFormDataChange('title', e.target.value)}
-                        className="bg-black/50 border-white/10 text-white"
-                        placeholder="Enter your investment thesis title"
-                      />
-                      {formErrors['title'] && (
-                        <p className="mt-1 text-sm text-red-500">{formErrors['title'][0]}</p>
-                      )}
-                    </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeStep}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className="p-6"
+                >
+                  {activeStep === 'thesis' && (
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <Label className="text-lg font-medium text-white">Thesis Title</Label>
+                        <Input 
+                          placeholder="Enter a clear, descriptive title"
+                          className="bg-black/50 border-white/10 text-white placeholder:text-white/40 h-12 focus:border-yellow-500/50"
+                          value={formData.title}
+                          onChange={e => handleFormDataChange('title', e.target.value)}
+                        />
+                        {formErrors.title && (
+                          <p className="text-red-400 text-sm">{formErrors.title[0]}</p>
+                        )}
+                      </div>
 
-                    <div>
-                      <Label htmlFor="targetCapital" className="text-white mb-2 block">Target Capital (LGR)</Label>
-                      <Input
-                        id="targetCapital"
-                        type="number"
+                      <TargetCapitalInput 
                         value={formData.investment.targetCapital}
-                        onChange={(e) => handleFormDataChange('investment.targetCapital', e.target.value)}
-                        className="bg-black/50 border-white/10 text-white"
-                        placeholder="Enter target capital amount"
-                        min={ethers.utils.formatEther(MIN_TARGET_CAPITAL)}
-                        max={ethers.utils.formatEther(MAX_TARGET_CAPITAL)}
+                        onChange={value => handleFormDataChange('investment.targetCapital', value)}
+                        error={formErrors['investment.targetCapital']}
                       />
-                      {formErrors['investment.targetCapital'] && (
-                        <p className="mt-1 text-sm text-red-500">{formErrors['investment.targetCapital'][0]}</p>
+
+                      <VotingDurationInput
+                        value={votingDuration}
+                        onChange={handleVotingDurationChange}
+                        error={formErrors.votingDuration}
+                      />
+
+                      <div className="space-y-4">
+                        <Label className="text-lg font-medium text-white">Investment Drivers</Label>
+                        <textarea
+                          placeholder="Describe the key drivers behind this investment thesis..."
+                          className="w-full h-32 bg-black/50 border border-white/10 text-white placeholder:text-white/40 rounded-md p-3 resize-none focus:border-yellow-500/50"
+                          value={formData.investment.drivers}
+                          onChange={e => handleFormDataChange('investment.drivers', e.target.value)}
+                        />
+                        {formErrors['investment.drivers'] && (
+                          <p className="text-red-400 text-sm">{formErrors['investment.drivers'][0]}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {activeStep === 'strategy' && (
+                    <FirmCriteriaSection
+                      formData={{
+                        firmCriteria: {
+                          size: formData.firmCriteria.size,
+                          location: formData.firmCriteria.location,
+                          dealType: formData.firmCriteria.dealType,
+                          geographicFocus: formData.firmCriteria.geographicFocus
+                        }
+                      }}
+                      formErrors={formErrors}
+                      onChange={(field, value) => handleFormDataChange(`firmCriteria.${field}`, value)}
+                    />
+                  )}
+
+                  {activeStep === 'terms' && (
+                    <>
+                      <PaymentTermsSection
+                        formData={formData}
+                        formErrors={formErrors}
+                        onChange={(field, value) => handleFormDataChange('paymentTerms', value as PaymentTerm[])}
+                      />
+                      <div className="mt-8">
+                        <StrategiesSection
+                          formData={formData}
+                          formErrors={formErrors}
+                          onChange={(category, value) => handleStrategyChange(category, value)}
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {activeStep === 'submission' && (
+                    <div className="space-y-6 text-center py-8">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-16 h-16 mx-auto rounded-full bg-green-500 flex items-center justify-center"
+                      >
+                        <Check className="w-8 h-8 text-white" />
+                      </motion.div>
+                      <h3 className="text-2xl font-semibold text-white">
+                        {submissionComplete 
+                          ? "Investment Thesis Submitted!"
+                          : "Ready to Submit"
+                        }
+                      </h3>
+                      <p className="text-gray-400">
+                        {submissionComplete
+                          ? "Your investment thesis has been successfully submitted to the community"
+                          : "Your investment thesis is ready to be submitted to the community"
+                        }
+                      </p>
+                      {currentTxHash && (
+                        <a
+                          href={`https://polygonscan.com/tx/${currentTxHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-polygon-primary hover:underline"
+                        >
+                          View transaction on PolygonScan
+                        </a>
                       )}
                     </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
 
-                    <div>
-                      <Label htmlFor="drivers" className="text-white mb-2 block">Investment Drivers</Label>
-                      <textarea
-                        id="drivers"
-                        value={formData.investment.drivers}
-                        onChange={(e) => handleFormDataChange('investment.drivers', e.target.value)}
-                        className="w-full min-h-[100px] bg-black/50 border-white/10 text-white rounded-md p-3"
-                        placeholder="Describe the key drivers for this investment"
-                      />
-                      {formErrors['investment.drivers'] && (
-                        <p className="mt-1 text-sm text-red-500">{formErrors['investment.drivers'][0]}</p>
-                      )}
-                      <p className="text-sm text-white/60 mt-1">
-                        {formData.investment.drivers.length}/500 characters
-                      </p>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="additionalCriteria" className="text-white mb-2 block">Additional Criteria (Optional)</Label>
-                      <textarea
-                        id="additionalCriteria"
-                        value={formData.investment.additionalCriteria}
-                        onChange={(e) => handleFormDataChange('investment.additionalCriteria', e.target.value)}
-                        className="w-full min-h-[100px] bg-black/50 border-white/10 text-white rounded-md p-3"
-                        placeholder="Any additional criteria or requirements"
-                      />
-                      <p className="text-sm text-white/60 mt-1">
-                        {formData.investment.additionalCriteria.length}/500 characters
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {activeStep === 'firm' && (
-                  <FirmCriteriaSection
-                    formData={formData}
-                    onChange={handleFormDataChange}
-                    formErrors={formErrors}
-                  />
-                )}
-                {activeStep === 'strategy' && (
-                  <StrategiesSection
-                    formData={formData}
-                    onChange={handleFormDataChange}
-                    formErrors={formErrors}
-                  />
-                )}
-                {activeStep === 'terms' && (
-                  <PaymentTermsSection
-                    formData={formData}
-                    onChange={handleFormDataChange}
-                    formErrors={formErrors}
-                  />
-                )}
-                {activeStep === 'submission' && (
-                  <ContractApprovalStatus
-                    onApprovalComplete={handleApprovalComplete}
-                    requiredAmount={SUBMISSION_FEE}
-                    isTestMode={isTestMode}
-                    currentFormData={formData}
-                  />
-                )}
-              </div>
-              <div className="p-6 border-t border-white/5">
-                <Button
-                  onClick={handleNextStep}
+              <div className="border-t border-white/5 p-6">
+                <Button 
+                  onClick={handleContinue}
                   disabled={isSubmitting}
                   className={cn(
                     "w-full h-12",
-                    "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
-                    "hover:from-polygon-secondary hover:to-polygon-primary",
+                    "bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600",
                     "text-white font-medium",
                     "transition-all duration-300",
                     "disabled:opacity-50",
@@ -984,15 +979,15 @@ const ThesisSubmission = () => {
                   )}
                 >
                   {isSubmitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       <span>Processing...</span>
-                    </>
+                    </div>
                   ) : (
-                    <>
+                    <div className="flex items-center justify-center gap-2">
                       <span>{getButtonText()}</span>
                       <ArrowRight className="w-4 h-4" />
-                    </>
+                    </div>
                   )}
                 </Button>
               </div>
@@ -1001,15 +996,18 @@ const ThesisSubmission = () => {
 
           <div className="col-span-3">
             <div className="sticky top-32 space-y-4">
-              <LGRWalletDisplay 
-                submissionFee={SUBMISSION_FEE}
-                currentBalance={lgrBalance}
-                walletAddress={address}
+              <ContractApprovalStatus
+                onApprovalComplete={handleApprovalComplete}
+                requiredAmount={SUBMISSION_FEE}
+                isTestMode={isTestMode}
+                currentFormData={formData}
               />
             </div>
           </div>
         </div>
       </div>
+
+      <LGRFloatingWidget />
     </div>
   );
 };

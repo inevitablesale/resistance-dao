@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProposalMetadata, PaymentTerm } from "@/types/proposals";
@@ -27,28 +26,51 @@ export const PaymentTermsSection = ({ formData, formErrors, onChange }: PaymentT
       </div>
 
       <div className="space-y-3">
-        {[
-          { id: PaymentTerm.CASH, label: 'Cash' },
-          { id: PaymentTerm.SELLER_FINANCING, label: 'Seller Financing' },
-          { id: PaymentTerm.EARNOUT, label: 'Earnout' },
-          { id: PaymentTerm.EQUITY_ROLLOVER, label: 'Equity Rollover' },
-          { id: PaymentTerm.BANK_FINANCING, label: 'Bank Financing' }
-        ].map(({ id, label }) => (
-          <div key={id} className="flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-white/5">
-            <Checkbox 
-              id={id.toString()} 
-              className="border-white/70 data-[state=checked]:bg-white data-[state=checked]:text-black"
-              checked={formData.paymentTerms.includes(id)}
-              onCheckedChange={(checked) => handleTermChange(id, checked as boolean)}
-            />
-            <Label 
-              htmlFor={id.toString()} 
-              className="text-gray-200 cursor-pointer select-none"
-            >
-              {label}
-            </Label>
-          </div>
-        ))}
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="cash" 
+            className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+            checked={formData.paymentTerms.includes(PaymentTerm.CASH)}
+            onCheckedChange={(checked) => handleTermChange(PaymentTerm.CASH, checked as boolean)}
+          />
+          <Label htmlFor="cash" className="text-gray-200">Cash</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="seller-financing" 
+            className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+            checked={formData.paymentTerms.includes(PaymentTerm.SELLER_FINANCING)}
+            onCheckedChange={(checked) => handleTermChange(PaymentTerm.SELLER_FINANCING, checked as boolean)}
+          />
+          <Label htmlFor="seller-financing" className="text-gray-200">Seller Financing</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="earnout" 
+            className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+            checked={formData.paymentTerms.includes(PaymentTerm.EARNOUT)}
+            onCheckedChange={(checked) => handleTermChange(PaymentTerm.EARNOUT, checked as boolean)}
+          />
+          <Label htmlFor="earnout" className="text-gray-200">Earnout</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="equity-rollover" 
+            className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+            checked={formData.paymentTerms.includes(PaymentTerm.EQUITY_ROLLOVER)}
+            onCheckedChange={(checked) => handleTermChange(PaymentTerm.EQUITY_ROLLOVER, checked as boolean)}
+          />
+          <Label htmlFor="equity-rollover" className="text-gray-200">Equity Rollover</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="bank-financing" 
+            className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
+            checked={formData.paymentTerms.includes(PaymentTerm.BANK_FINANCING)}
+            onCheckedChange={(checked) => handleTermChange(PaymentTerm.BANK_FINANCING, checked as boolean)}
+          />
+          <Label htmlFor="bank-financing" className="text-gray-200">Bank Financing</Label>
+        </div>
       </div>
 
       {formErrors.paymentTerms && (

@@ -14,30 +14,26 @@ type StrategyType = OperationalStrategy | GrowthStrategy | IntegrationStrategy;
 type StrategyCategory = "operational" | "growth" | "integration";
 
 export const StrategiesSection = ({ formData, formErrors, onChange }: StrategiesSectionProps) => {
-  // Debug logs
-  console.log("Current strategies:", formData.strategies);
-
-  const handleCheckboxClick = (
-    category: StrategyCategory,
-    value: StrategyType
+  const handleStrategyChange = (
+    category: StrategyCategory, 
+    value: StrategyType, 
+    checked: boolean
   ) => {
-    console.log(`Checkbox clicked for ${category}:`, value);
-    const currentStrategies = formData.strategies[category] || [];
-    console.log("Current strategies for category:", currentStrategies);
-    
+    const currentStrategies = [...formData.strategies[category]];
     let updatedStrategies: StrategyType[];
-    if (currentStrategies.includes(value)) {
-      updatedStrategies = currentStrategies.filter(s => s !== value);
-    } else {
+    
+    if (checked) {
       updatedStrategies = [...currentStrategies, value];
+    } else {
+      updatedStrategies = currentStrategies.filter(s => s !== value);
     }
     
-    console.log("Updated strategies:", updatedStrategies);
     onChange(category, updatedStrategies);
   };
 
   const isStrategySelected = (category: StrategyCategory, strategyId: StrategyType) => {
-    return formData.strategies[category]?.includes(strategyId) || false;
+    const strategies = formData.strategies[category] as StrategyType[];
+    return strategies.includes(strategyId);
   };
 
   const strategies = {
@@ -86,31 +82,34 @@ export const StrategiesSection = ({ formData, formErrors, onChange }: Strategies
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                {items.map(({ id, label, icon: Icon }) => {
-                  const isChecked = isStrategySelected(category as StrategyCategory, id);
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => handleCheckboxClick(category as StrategyCategory, id)}
-                      className={`flex items-center gap-2 p-3 rounded-lg transition-all cursor-pointer text-left
-                        ${isChecked ? 'bg-white/10 border-purple-400/50' : 'bg-black/20 hover:bg-white/5'}
-                        border border-white/10 hover:border-purple-400/30`}
-                    >
-                      <Checkbox 
-                        checked={isChecked}
-                        className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white"
-                        onCheckedChange={() => handleCheckboxClick(category as StrategyCategory, id)}
-                      />
-                      <div className="flex items-center gap-1.5">
-                        <Icon className="w-3.5 h-3.5 text-purple-400/70" />
-                        <span className="text-sm text-gray-200">
-                          {label}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
+                {items.map(({ id, label, icon: Icon }) => (
+                  <div 
+                    key={id}
+                    className="flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-white/5"
+                  >
+                    <Checkbox 
+                      id={String(id)}
+                      className="border-white/70 text-black data-[state=checked]:bg-white data-[state=checked]:border-white" 
+                      checked={isStrategySelected(category as StrategyCategory, id)}
+                      onCheckedChange={(checked) => {
+                        handleStrategyChange(
+                          category as StrategyCategory,
+                          id,
+                          checked as boolean
+                        );
+                      }}
+                    />
+                    <div className="flex items-center gap-1.5">
+                      <Icon className="w-3.5 h-3.5 text-purple-400/70" />
+                      <Label 
+                        htmlFor={String(id)}
+                        className="text-sm text-gray-200 cursor-pointer hover:text-white transition-colors"
+                      >
+                        {label}
+                      </Label>
+                    </div>
+                  </div>
+                ))}
               </div>
 
               {formErrors[`strategies.${category}`] && (
