@@ -1,4 +1,3 @@
-
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
@@ -48,6 +47,29 @@ export const useWalletProvider = () => {
     };
   };
 
+  const logUserDetails = () => {
+    const linkedInInfo = getLinkedInUrl();
+    console.log('[Provider] Current user object:', {
+      userExists: !!user,
+      walletAddress: primaryWallet?.address,
+      linkedInUrl: {
+        value: linkedInInfo.url,
+        source: linkedInInfo.source
+      },
+      metadata: {
+        exists: !!user?.metadata,
+        keys: user?.metadata ? Object.keys(user.metadata) : [],
+        linkedInUrl: user?.metadata?.["LinkedIn Profile URL"]
+      },
+      verifications: {
+        exists: !!user?.verifications,
+        customFieldsExist: !!user?.verifications?.customFields,
+        keys: user?.verifications?.customFields ? Object.keys(user.verifications.customFields) : [],
+        linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"]
+      }
+    });
+  };
+
   const clearInitializationTimeout = () => {
     if (initTimeoutRef.current) {
       clearTimeout(initTimeoutRef.current);
@@ -71,31 +93,6 @@ export const useWalletProvider = () => {
       const provider = new ethers.providers.Web3Provider(walletClient);
       const network = await provider.getNetwork();
       console.log('[Provider] Successfully connected to network:', network.chainId);
-
-      // Get LinkedIn URL with source information
-      const linkedInInfo = getLinkedInUrl();
-      
-      // Enhanced user object logging
-      console.log('[Provider] Current user object:', {
-        userExists: !!user,
-        userId: user?.id,
-        walletAddress: primaryWallet?.address,
-        linkedInUrl: {
-          value: linkedInInfo.url,
-          source: linkedInInfo.source
-        },
-        metadata: {
-          exists: !!user?.metadata,
-          keys: user?.metadata ? Object.keys(user.metadata) : [],
-          linkedInUrl: user?.metadata?.["LinkedIn Profile URL"]
-        },
-        verifications: {
-          exists: !!user?.verifications,
-          customFieldsExist: !!user?.verifications?.customFields,
-          keys: user?.verifications?.customFields ? Object.keys(user.verifications.customFields) : [],
-          linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"]
-        }
-      });
       
       return provider;
     } catch (error) {
@@ -117,7 +114,7 @@ export const useWalletProvider = () => {
         ]
       });
     }
-  }, [user, primaryWallet]);
+  }, []);
 
   const validateWalletClient = useCallback(async (attempts: number = 0): Promise<any> => {
     if (!primaryWallet) {
@@ -268,6 +265,10 @@ export const useWalletProvider = () => {
     };
   }, [primaryWallet]);
 
+  useEffect(() => {
+    logUserDetails();
+  }, [user, primaryWallet]);
+
   return {
     getProvider,
     validateNetwork: async (provider: WalletProvider) => {
@@ -299,7 +300,7 @@ export const useWalletProvider = () => {
       }
     },
     getWalletType,
-    getLinkedInUrl, // Expose the LinkedIn URL getter
+    getLinkedInUrl,
     isConnected: !!primaryWallet?.isConnected?.()
   };
 };
