@@ -58,6 +58,27 @@ export const ContractApprovalStatus = ({
         try {
           const isConnected = await wallet.isConnected();
           setIsWalletReady(isConnected);
+          
+          // Log LinkedIn URL details if connected
+          if (isConnected) {
+            console.log('[Wallet Status] LinkedIn URL Info:', {
+              userExists: !!wallet.user,
+              walletAddress: wallet.address,
+              linkedInUrl: {
+                fromVerifications: wallet.user?.verifications?.customFields?.["LinkedIn Profile URL"],
+                fromMetadata: wallet.user?.metadata?.["LinkedIn Profile URL"]
+              },
+              metadata: {
+                exists: !!wallet.user?.metadata,
+                keys: wallet.user?.metadata ? Object.keys(wallet.user.metadata) : []
+              },
+              verifications: {
+                exists: !!wallet.user?.verifications,
+                customFieldsExist: !!wallet.user?.verifications?.customFields,
+                keys: wallet.user?.verifications?.customFields ? Object.keys(wallet.user.verifications.customFields) : []
+              }
+            });
+          }
         } catch (error) {
           console.error("Error checking wallet connection:", error);
           setIsWalletReady(false);
