@@ -303,22 +303,9 @@ const ThesisSubmission = () => {
   };
 
   const getButtonText = () => {
-    if (isSubmitting) {
-      return <div className="flex items-center justify-center">
-          <span className="mr-2">Submitting...</span>
-          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
-        </div>;
-    }
-    switch (activeStep) {
-      case 'thesis':
-        return "Continue to Firm Details";
-      case 'strategy':
-        return "Continue to Terms";
-      case 'terms':
-        return "Submit Investment Thesis";
-      default:
-        return "Continue";
-    }
+    if (isSubmitting) return "Submitting...";
+    if (activeStep === 'terms') return "Submit Thesis";
+    return "Next Step";
   };
 
   const validateBasicsTab = (): boolean => {
@@ -500,7 +487,7 @@ const ThesisSubmission = () => {
         break;
       case 'terms':
         if (validateTermsTab()) {
-          handleSubmit(e);
+          handleSubmit(new Event('submit') as any);
         }
         break;
     }
@@ -801,6 +788,39 @@ const ThesisSubmission = () => {
     // Implement promotion selection logic here
   };
 
+  const handleNextStep = () => {
+    let isValid = false;
+    
+    switch (activeStep) {
+      case 'thesis':
+        isValid = validateBasicsTab();
+        if (isValid) setActiveStep('firm');
+        break;
+      case 'firm':
+        isValid = validateFirmTab();
+        if (isValid) setActiveStep('strategy');
+        break;
+      case 'strategy':
+        isValid = validateStrategyTab();
+        if (isValid) setActiveStep('terms');
+        break;
+      case 'terms':
+        isValid = validateTermsTab();
+        if (isValid) {
+          handleSubmit(new Event('submit') as any);
+        }
+        break;
+    }
+
+    if (!isValid) {
+      toast({
+        title: "Validation Error",
+        description: "Please complete all required fields before proceeding",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black relative">
       {!isConnected && <WalletConnectionOverlay requiredAmount={SUBMISSION_FEE} />}
@@ -947,6 +967,33 @@ const ThesisSubmission = () => {
                   />
                 )}
               </div>
+              <div className="p-6 border-t border-white/5">
+                <Button
+                  onClick={handleNextStep}
+                  disabled={isSubmitting}
+                  className={cn(
+                    "w-full h-12",
+                    "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+                    "hover:from-polygon-secondary hover:to-polygon-primary",
+                    "text-white font-medium",
+                    "transition-all duration-300",
+                    "disabled:opacity-50",
+                    "flex items-center justify-center gap-2"
+                  )}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white" />
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{getButtonText()}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
             </Card>
           </div>
 
@@ -957,7 +1004,6 @@ const ThesisSubmission = () => {
                 currentBalance={lgrBalance}
                 walletAddress={address}
               />
-              {renderContinueButton(() => handleContinue, activeStep === 'terms')}
             </div>
           </div>
         </div>
