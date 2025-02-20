@@ -1,3 +1,5 @@
+
+import { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,6 +24,23 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
     e.stopPropagation();
   };
 
+  useEffect(() => {
+    console.log("Initializing firm criteria values...");
+    // Set initial values if they're not already set
+    if (formData.firmCriteria.size === undefined) {
+      console.log("Setting initial firm size");
+      onChange('firmCriteria.size', FirmSize.BELOW_1M);
+    }
+    if (formData.firmCriteria.dealType === undefined) {
+      console.log("Setting initial deal type");
+      onChange('firmCriteria.dealType', DealType.ACQUISITION);
+    }
+    if (formData.firmCriteria.geographicFocus === undefined) {
+      console.log("Setting initial geographic focus");
+      onChange('firmCriteria.geographicFocus', GeographicFocus.LOCAL);
+    }
+  }, []);
+
   return (
     <div className="space-y-6" onClick={handleClick}>
       <h2 className="text-xl font-semibold text-white">Target Firm Criteria</h2>
@@ -30,7 +49,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
         <Label className="text-white mb-2 block">Preferred Firm Size (Revenue)</Label>
         <RadioGroup 
           value={String(formData.firmCriteria.size)}
-          onValueChange={(value) => onChange('size', Number(value))}
+          onValueChange={(value) => onChange('firmCriteria.size', Number(value))}
           className="flex flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
@@ -75,7 +94,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
         <Label className="text-white mb-2 block">Geographic Focus</Label>
         <RadioGroup 
           value={String(formData.firmCriteria.geographicFocus)}
-          onValueChange={(value) => onChange('geographicFocus', Number(value))}
+          onValueChange={(value) => onChange('firmCriteria.geographicFocus', Number(value))}
           className="flex flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
@@ -120,7 +139,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
         <Label className="text-white mb-2 block">Primary State (Optional)</Label>
         <Select 
           value={formData.firmCriteria.location}
-          onValueChange={(value) => onChange('location', value)}
+          onValueChange={(value) => onChange('firmCriteria.location', value)}
         >
           <SelectTrigger className="bg-black/50 border-white/10 text-white">
             <SelectValue placeholder="Select a state" />
@@ -140,7 +159,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
         <Label className="text-white mb-2 block">Deal Type</Label>
         <RadioGroup 
           value={String(formData.firmCriteria.dealType)}
-          onValueChange={(value) => onChange('dealType', Number(value))}
+          onValueChange={(value) => onChange('firmCriteria.dealType', Number(value))}
           className="flex flex-wrap gap-4"
         >
           <div className="flex items-center space-x-2">
