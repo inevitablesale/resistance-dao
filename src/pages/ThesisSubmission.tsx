@@ -18,6 +18,7 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { ProposalMetadata, FirmSize, DealType, GeographicFocus } from "@/types/proposals";
+import { SUBMISSION_FEE } from "@/lib/constants";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -256,7 +257,7 @@ const ThesisSubmission = () => {
 
             <ContractApprovalStatus
               onApprovalComplete={() => {}}
-              requiredAmount={0}
+              requiredAmount={SUBMISSION_FEE}
               isTestMode={false}
               currentFormData={form.getValues()}
             />
@@ -295,3 +296,4 @@ const ThesisSubmission = () => {
 };
 
 export default ThesisSubmission;
+
