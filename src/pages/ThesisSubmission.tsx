@@ -854,22 +854,22 @@ const ThesisSubmission = () => {
                 {activeStep === 'thesis' && (
                   <FirmCriteriaSection
                     formData={formData}
-                    onFormDataChange={handleFormDataChange}
-                    formErrors={formErrors}
+                    onChange={handleFormDataChange}
+                    errors={formErrors}
                   />
                 )}
                 {activeStep === 'strategy' && (
                   <StrategiesSection
                     formData={formData}
-                    onFormDataChange={handleFormDataChange}
-                    formErrors={formErrors}
+                    onChange={handleFormDataChange}
+                    errors={formErrors}
                   />
                 )}
                 {activeStep === 'terms' && (
                   <PaymentTermsSection
                     formData={formData}
-                    onFormDataChange={handleFormDataChange}
-                    formErrors={formErrors}
+                    onChange={handleFormDataChange}
+                    errors={formErrors}
                   />
                 )}
                 {activeStep === 'submission' && (
@@ -886,7 +886,11 @@ const ThesisSubmission = () => {
 
           <div className="col-span-3">
             <div className="sticky top-32 space-y-4">
-              <LGRWalletDisplay />
+              <LGRWalletDisplay 
+                submissionFee={SUBMISSION_FEE}
+                currentBalance={currentBalance}
+                walletAddress={address}
+              />
               {renderContinueButton(() => handleContinue, activeStep === 'terms')}
             </div>
           </div>
