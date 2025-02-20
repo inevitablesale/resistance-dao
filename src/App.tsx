@@ -6,6 +6,7 @@ import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
 import { Analytics } from '@vercel/analytics/react';
 import Nav from "./components/Nav";
+import { ScrollToTop } from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import GovernanceVoting from "./pages/GovernanceVoting";
@@ -158,6 +159,7 @@ function App() {
   return (
     <DynamicContextProvider settings={dynamicSettings}>
       <Router>
+        <ScrollToTop />
         <Layout />
       </Router>
       <Toaster />

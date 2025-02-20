@@ -9,7 +9,7 @@ import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata, FirmSize, DealType, GeographicFocus, PaymentTerm } from "@/types/proposals";
-import { ExternalLink, Users, Target, Coins, Info, Clock, ChevronDown, ChevronUp, CheckCircle } from "lucide-react";
+import { ExternalLink, Users, Target, Coins, Info, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
@@ -85,6 +85,11 @@ const getPaymentTermLabel = (term: PaymentTerm): string => {
   }
 };
 
+const formatLGRAmount = (amount: string): string => {
+  const number = parseFloat(amount);
+  return `${number.toLocaleString(undefined, { maximumFractionDigits: 2 })} LGR`;
+};
+
 interface ProposalDetailsCardProps {
   tokenId?: string;
   view?: 'overview' | 'details' | 'investment';
@@ -105,8 +110,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [isVotingEnded, setIsVotingEnded] = useState(false);
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
-  const [hasUserVoted, setHasUserVoted] = useState(false);
-  const [userVoteAmount, setUserVoteAmount] = useState<string>("0");
   const VOTING_FEE = ethers.utils.parseEther("10");
 
   const formatUSDAmount = (lgrAmount: string): string => {
@@ -178,8 +181,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
     console.log('Proposal details effect running...', {
       tokenId,
       isConnected,
-      hasMinimumLGR,
-      address
+      hasMinimumLGR
     });
 
     if (!tokenId) {
@@ -230,20 +232,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         const filter = factoryContract.filters.ProposalVoted(tokenId, null);
         const events = await factoryContract.queryFilter(filter);
         
-        if (address) {
-          const userFilter = factoryContract.filters.ProposalVoted(tokenId, address);
-          const userVoteEvents = await factoryContract.queryFilter(userFilter);
-          const hasVoted = userVoteEvents.length > 0;
-          setHasUserVoted(hasVoted);
-          
-          if (hasVoted && userVoteEvents[0]) {
-            const votedAmount = userVoteEvents[0].args?.pledgeAmount;
-            if (votedAmount) {
-              setUserVoteAmount(ethers.utils.formatEther(votedAmount));
-            }
-          }
-        }
-        
         console.log('Token URI:', tokenUri);
         console.log('Pledged amount:', ethers.utils.formatEther(pledged));
         console.log('Vote events count:', events.length);
@@ -282,7 +270,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
     };
 
     fetchProposalDetails();
-  }, [tokenId, isConnected, hasMinimumLGR, getProvider, toast, address]);
+  }, [tokenId, isConnected, hasMinimumLGR, getProvider, toast]);
 
   useEffect(() => {
     if (proposalDetails?.submissionTimestamp && proposalDetails?.votingDuration) {
@@ -357,8 +345,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       });
       
       setBackerCount(prev => prev + 1);
-      setHasUserVoted(true);
-      setUserVoteAmount(pledgeInput);
       setPledgeInput("");
     } catch (error: any) {
       console.error("Pledging error:", error);
@@ -475,7 +461,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               <div className="text-center md:text-right">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm">
                   <p className="text-2xl font-bold text-white">
-                    {pledgedAmount} LGR
+                    {formatLGRAmount(pledgedAmount)}
                   </p>
                   <span className="text-sm text-white/60 border-l border-white/10 pl-2">
                     {backerCount} supporter{backerCount !== 1 ? 's' : ''}
@@ -500,7 +486,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 <div className="bg-white/5 p-4 rounded-lg border border-white/10 mb-4">
                   <CollapsibleTrigger 
                     className="flex items-center justify-between w-full text-white"
-                    onClick={() => setIsInfoExpanded(!isInfoExpanded)}
                   >
                     <h4 className="font-medium flex items-center gap-2">
                       <Info className="w-5 h-5 text-yellow-500" />
@@ -523,71 +508,52 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               </Collapsible>
               
               <div className="flex flex-col md:flex-row gap-4">
-                {hasUserVoted ? (
-                  <div className="flex-1">
-                    <div className="bg-yellow-500/10 p-6 rounded-lg border border-yellow-500/20">
-                      <div className="flex items-center gap-3 mb-4">
-                        <CheckCircle className="w-6 h-6 text-yellow-500" />
-                        <h4 className="text-lg font-medium text-yellow-500">Support Recorded</h4>
-                      </div>
-                      <p className="text-white/80 mb-2">
-                        You've pledged your support for this proposal
-                      </p>
-                      <p className="text-sm text-white/60">
-                        Your commitment: {userVoteAmount} LGR ({formatUSDAmount(userVoteAmount)})
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex-1">
-                      <Label htmlFor="pledgeAmount" className="text-white/60 mb-2 block">
-                        Commitment Amount
-                      </Label>
-                      <Input
-                        id="pledgeAmount"
-                        type="number"
-                        min="0"
-                        step="0.1"
-                        value={pledgeInput}
-                        onChange={(e) => setPledgeInput(e.target.value)}
-                        placeholder="Enter amount you're interested in"
-                        className="bg-black/40 border-white/10 text-white h-12"
-                      />
-                      <p className="text-sm text-white/60 mt-2 flex items-center gap-2">
-                        <Info className="w-4 h-4" />
-                        Only a 10 LGR voting fee is required in your wallet
-                      </p>
-                    </div>
-                    <Button
-                      onClick={handlePledge}
-                      disabled={isPledging || !pledgeInput}
-                      size="lg"
-                      className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold transition-all duration-300 transform hover:scale-105 h-12 mt-8 md:mt-0"
-                    >
-                      {isPledging ? (
-                        "Recording..."
-                      ) : (
-                        <>
-                          <Coins className="w-5 h-5 mr-2" />
-                          Record Support
-                        </>
-                      )}
-                    </Button>
-                  </>
-                )}
+                <div className="flex-1">
+                  <Label htmlFor="pledgeAmount" className="text-white/60 mb-2 block">
+                    Commitment Amount
+                  </Label>
+                  <Input
+                    id="pledgeAmount"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    value={pledgeInput}
+                    onChange={(e) => setPledgeInput(e.target.value)}
+                    placeholder="Enter amount you're interested in"
+                    className="bg-black/40 border-white/10 text-white h-12"
+                  />
+                  <p className="text-sm text-white/60 mt-2 flex items-center gap-2">
+                    <Info className="w-4 h-4" />
+                    Only a 10 LGR voting fee is required in your wallet
+                  </p>
+                </div>
+                <Button
+                  onClick={handlePledge}
+                  disabled={isPledging || !pledgeInput}
+                  size="lg"
+                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold transition-all duration-300 transform hover:scale-105 h-12 mt-8 md:mt-0"
+                >
+                  {isPledging ? (
+                    "Recording..."
+                  ) : (
+                    <>
+                      <Coins className="w-5 h-5 mr-2" />
+                      Record Support
+                    </>
+                  )}
+                </Button>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-white/40">
-                  Total commitments so far: {pledgedAmount} LGR ({formatUSDAmount(pledgedAmount)})
+                  Total commitments so far: {formatLGRAmount(pledgedAmount)} ({formatUSDAmount(pledgedAmount)})
                 </p>
-                {!hasUserVoted && pledgeInput && (
+                {pledgeInput && (
                   <div className="space-y-1">
                     <p className="text-sm text-yellow-500/80">
-                      Required in wallet: 10 LGR ({formatUSDAmount("10")}) voting fee
+                      Required in wallet: {formatLGRAmount("10")} ({formatUSDAmount("10")}) voting fee
                     </p>
                     <p className="text-xs text-white/40">
-                      Your commitment of {pledgeInput} LGR ({formatUSDAmount(pledgeInput)}) will be recorded without transfer
+                      Your commitment of {formatLGRAmount(pledgeInput)} ({formatUSDAmount(pledgeInput)}) will be recorded without transfer
                     </p>
                   </div>
                 )}
@@ -720,3 +686,5 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
   return null;
 };
+
+export default ProposalDetailsCard;
