@@ -1,9 +1,9 @@
-
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { motion, AnimatePresence } from "framer-motion";
 import { HelpCircle } from "lucide-react";
 import { formAnimationVariants } from "@/lib/animations";
+import { cn } from "@/lib/utils";
 
 interface VotingDurationInputProps {
   value: number;
