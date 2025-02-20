@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProposalMetadata, PaymentTerm } from "@/types/proposals";
@@ -110,7 +109,7 @@ export const PaymentTermsSection = ({ formData, formErrors, onChange }: PaymentT
           animate={{ opacity: 1, y: 0 }}
           className="mt-2 text-sm text-red-400"
         >
-          {formErrors.paymentTerms[0]}
+          {formErrors.paymentTerms.message || "Please select at least one payment term"}
         </motion.p>
       )}
     </motion.div>

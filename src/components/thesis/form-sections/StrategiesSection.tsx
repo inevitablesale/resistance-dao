@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
@@ -17,29 +16,24 @@ import { FieldErrors } from "react-hook-form";
 export interface StrategiesSectionProps {
   formData: ProposalMetadata;
   formErrors: FieldErrors<ProposalMetadata>;
-  onChange: <T extends keyof ProposalMetadata["strategies"]>(
-    category: T,
-    value: ProposalMetadata["strategies"][T]
+  onChange: (
+    category: keyof ProposalMetadata['strategies'],
+    value: OperationalStrategy[] | GrowthStrategy[] | IntegrationStrategy[]
   ) => void;
 }
 
-type StrategyType = OperationalStrategy | GrowthStrategy | IntegrationStrategy;
-type StrategyCategory = "operational" | "growth" | "integration";
+type StrategyCategory = keyof ProposalMetadata['strategies'];
 
 export const StrategiesSection = ({ formData, formErrors, onChange }: StrategiesSectionProps) => {
   const handleStrategyChange = (
-    category: StrategyCategory, 
-    value: StrategyType, 
+    category: StrategyCategory,
+    value: OperationalStrategy | GrowthStrategy | IntegrationStrategy,
     checked: boolean
   ) => {
     const currentStrategies = [...formData.strategies[category]];
-    let updatedStrategies: StrategyType[];
-    
-    if (checked) {
-      updatedStrategies = [...currentStrategies, value];
-    } else {
-      updatedStrategies = currentStrategies.filter(s => s !== value);
-    }
+    const updatedStrategies = checked
+      ? [...currentStrategies, value]
+      : currentStrategies.filter(s => s !== value);
     
     onChange(category, updatedStrategies);
   };

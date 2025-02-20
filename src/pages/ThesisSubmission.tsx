@@ -168,14 +168,14 @@ const ThesisSubmission = () => {
                 <PaymentTermsSection
                   formData={form.getValues()}
                   formErrors={form.formState.errors}
-                  onChange={(field, value) => form.setValue('paymentTerms', value)}
+                  onChange={(_, value) => form.setValue('paymentTerms', value)}
                 />
 
                 <FirmCriteriaSection
                   formData={form.getValues()}
                   formErrors={form.formState.errors}
                   onChange={(field, value) => {
-                    form.setValue(`firmCriteria.${field}` as any, value);
+                    form.setValue(`firmCriteria.${String(field)}`, value);
                   }}
                 />
 
@@ -183,7 +183,8 @@ const ThesisSubmission = () => {
                   formData={form.getValues()}
                   formErrors={form.formState.errors}
                   onChange={(category, value) => {
-                    form.setValue(`strategies.${category}`, value);
+                    const path = `strategies.${String(category)}` as const;
+                    form.setValue(path, value);
                   }}
                 />
               </div>

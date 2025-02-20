@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FirmSize, DealType, GeographicFocus } from "@/types/proposals";
+import { FirmSize, DealType, GeographicFocus, ProposalMetadata } from "@/types/proposals";
 import { US_STATES } from "@/lib/constants/states";
 import { motion } from "framer-motion";
 import { Building2, Globe2, MapPin, Briefcase } from "lucide-react";
@@ -19,7 +19,7 @@ interface FirmCriteriaSectionProps {
     };
   };
   formErrors: FieldErrors<ProposalMetadata>;
-  onChange: (field: keyof typeof formData.firmCriteria, value: any) => void;
+  onChange: (field: 'size' | 'location' | 'dealType' | 'geographicFocus', value: any) => void;
 }
 
 export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCriteriaSectionProps) => {
