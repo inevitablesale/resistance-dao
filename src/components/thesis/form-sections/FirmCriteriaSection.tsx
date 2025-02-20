@@ -88,27 +88,23 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             { value: FirmSize.FIVE_TO_TEN_M, label: "$5M–$10M" },
             { value: FirmSize.TEN_PLUS, label: "$10M+" }
           ].map((option) => (
-            <div 
+            <Label
               key={option.value}
-              className="relative"
+              className={`
+                flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
+                cursor-pointer transition-all duration-200
+                data-[state=checked]:border-yellow-500/50 data-[state=checked]:bg-yellow-500/10
+                hover:bg-white/5
+                ${String(formData.firmCriteria.size) === String(option.value) ? 'border-yellow-500/50 bg-yellow-500/10' : ''}
+              `}
             >
-              <RadioGroupItem
-                value={String(option.value)}
+              <RadioGroupItem 
+                value={String(option.value)} 
                 id={`size-${option.value}`}
-                className="peer sr-only"
+                className="text-yellow-500 border-white/30"
               />
-              <Label
-                htmlFor={`size-${option.value}`}
-                className="flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
-                         cursor-pointer transition-all duration-200
-                         peer-data-[state=checked]:border-yellow-500/50 peer-data-[state=checked]:bg-yellow-500/10
-                         hover:bg-white/5"
-              >
-                <div className="h-4 w-4 rounded-full border border-white/30 peer-data-[state=checked]:border-yellow-500
-                              peer-data-[state=checked]:bg-yellow-500 transition-all duration-200" />
-                <span className="text-white">{option.label}</span>
-              </Label>
-            </div>
+              <span className="text-white">{option.label}</span>
+            </Label>
           ))}
         </RadioGroup>
         {formErrors['firmCriteria.size'] && (
@@ -132,27 +128,23 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             { value: GeographicFocus.NATIONAL, label: "National" },
             { value: GeographicFocus.REMOTE, label: "Remote" }
           ].map((option) => (
-            <div 
+            <Label
               key={option.value}
-              className="relative"
+              className={`
+                flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
+                cursor-pointer transition-all duration-200
+                data-[state=checked]:border-teal-500/50 data-[state=checked]:bg-teal-500/10
+                hover:bg-white/5
+                ${String(formData.firmCriteria.geographicFocus) === String(option.value) ? 'border-teal-500/50 bg-teal-500/10' : ''}
+              `}
             >
-              <RadioGroupItem
-                value={String(option.value)}
+              <RadioGroupItem 
+                value={String(option.value)} 
                 id={`geo-${option.value}`}
-                className="peer sr-only"
+                className="text-teal-500 border-white/30"
               />
-              <Label
-                htmlFor={`geo-${option.value}`}
-                className="flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
-                         cursor-pointer transition-all duration-200
-                         peer-data-[state=checked]:border-teal-500/50 peer-data-[state=checked]:bg-teal-500/10
-                         hover:bg-white/5"
-              >
-                <div className="h-4 w-4 rounded-full border border-white/30 peer-data-[state=checked]:border-teal-500
-                              peer-data-[state=checked]:bg-teal-500 transition-all duration-200" />
-                <span className="text-white">{option.label}</span>
-              </Label>
-            </div>
+              <span className="text-white">{option.label}</span>
+            </Label>
           ))}
         </RadioGroup>
         {formErrors['firmCriteria.geographicFocus'] && (
@@ -206,27 +198,23 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
             { value: DealType.FRANCHISE, label: "Franchise" },
             { value: DealType.SUCCESSION, label: "Succession" }
           ].map((option) => (
-            <div 
+            <Label
               key={option.value}
-              className="relative"
+              className={`
+                flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
+                cursor-pointer transition-all duration-200
+                data-[state=checked]:border-rose-500/50 data-[state=checked]:bg-rose-500/10
+                hover:bg-white/5
+                ${String(formData.firmCriteria.dealType) === String(option.value) ? 'border-rose-500/50 bg-rose-500/10' : ''}
+              `}
             >
-              <RadioGroupItem
-                value={String(option.value)}
+              <RadioGroupItem 
+                value={String(option.value)} 
                 id={`deal-${option.value}`}
-                className="peer sr-only"
+                className="text-rose-500 border-white/30"
               />
-              <Label
-                htmlFor={`deal-${option.value}`}
-                className="flex items-center gap-2 p-4 rounded-lg border border-white/10 bg-black/20 
-                         cursor-pointer transition-all duration-200
-                         peer-data-[state=checked]:border-rose-500/50 peer-data-[state=checked]:bg-rose-500/10
-                         hover:bg-white/5"
-              >
-                <div className="h-4 w-4 rounded-full border border-white/30 peer-data-[state=checked]:border-rose-500
-                              peer-data-[state=checked]:bg-rose-500 transition-all duration-200" />
-                <span className="text-white">{option.label}</span>
-              </Label>
-            </div>
+              <span className="text-white">{option.label}</span>
+            </Label>
           ))}
         </RadioGroup>
         {formErrors['firmCriteria.dealType'] && (
