@@ -191,6 +191,7 @@ const ThesisSubmission = () => {
   });
 
   const resetForm = () => {
+    console.log("🔄 Resetting form - Current form data:", formData);
     setFormData({
       title: "",
       firmCriteria: {
@@ -214,6 +215,7 @@ const ThesisSubmission = () => {
       linkedInURL: "",
       isTestMode: false
     });
+    console.log("✅ Form reset complete - Form cleared to empty state");
   };
 
   useEffect(() => {
@@ -221,27 +223,32 @@ const ThesisSubmission = () => {
       if (wallet) {
         try {
           const status = await getContractStatus(wallet);
-          console.log("Contract test mode status:", status.isTestMode);
+          console.log("📊 Contract Mode Status:", {
+            isTestMode: status.isTestMode,
+            message: status.isTestMode ? "CONTRACT IN TEST MODE" : "CONTRACT IN LIVE MODE"
+          });
           setContractTestMode(status.isTestMode);
           
           const isTesterWallet = status.tester.toLowerCase() === address?.toLowerCase();
           const shouldEnableTestMode = isTesterWallet && status.isTestMode;
           
-          console.log("Test mode check:", {
+          console.log("🔍 Test Mode Check:", {
             isTesterWallet,
             contractTestMode: status.isTestMode,
             walletAddress: address,
-            testerAddress: status.tester
+            testerAddress: status.tester,
+            willAutoFill: status.isTestMode
           });
 
           setIsTestMode(shouldEnableTestMode);
           
           if (!status.isTestMode) {
-            console.log("Contract in live mode - resetting form");
+            console.log("⚠️ Contract in live mode - Auto-fill disabled");
+            console.log("🧹 Clearing form data...");
             resetForm();
           }
         } catch (error) {
-          console.error("Error checking test mode:", error);
+          console.error("❌ Error checking test mode:", error);
           setIsTestMode(false);
           setContractTestMode(false);
         }
@@ -253,7 +260,7 @@ const ThesisSubmission = () => {
 
   useEffect(() => {
     if (contractTestMode) {
-      console.log("Setting test form data:", TEST_FORM_DATA);
+      console.log("🔄 Contract in test mode - Auto-filling form with test data:", TEST_FORM_DATA);
       setFormData({
         ...TEST_FORM_DATA,
         linkedInURL: user?.metadata?.["LinkedIn Profile URL"] || "",
