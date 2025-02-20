@@ -37,11 +37,7 @@ import * as z from "zod";
 const thesisFormSchema = z.object({
   title: z.string()
     .min(10, "Title must be at least 10 characters")
-    .max(100, "Title must be less than 100 characters")
-    .refine(
-      (title) => title.toLowerCase().includes(title.toLowerCase()),
-      "Title should match the location mentioned"
-    ),
+    .max(100, "Title must be less than 100 characters"),
   investment: z.object({
     targetCapital: z.string()
       .min(1, "Target capital is required")
@@ -54,17 +50,9 @@ const thesisFormSchema = z.object({
       ),
     drivers: z.string()
       .min(50, "Investment drivers must be at least 50 characters")
-      .max(500, "Investment drivers must be less than 500 characters")
-      .refine(
-        (text) => !text.includes("Tech Modernization") || !text.includes("Process Standardization"),
-        "Investment drivers should not contain strategy descriptions"
-      ),
+      .max(500, "Investment drivers must be less than 500 characters"),
     additionalCriteria: z.string()
       .max(500, "Additional criteria must be less than 500 characters")
-      .refine(
-        (text) => text !== form.getValues().investment?.drivers,
-        "Additional criteria should not be identical to investment drivers"
-      )
   }),
   firmCriteria: z.object({
     size: z.number()
