@@ -143,7 +143,7 @@ const isValidLinkedInURL = (url: string): boolean => {
   return url.startsWith('https://www.linkedin.com/') || url.startsWith('https://linkedin.com/');
 };
 
-const ThesisSubmission = () => {
+export const ThesisSubmission = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isConnected, address, connect, approveLGR, wallet } = useWalletConnection();
@@ -869,3 +869,41 @@ const ThesisSubmission = () => {
 
         <div className="max-w-4xl mx-auto mb-12 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text
+" />
+        </div>
+
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col gap-6">
+            {renderSteps()}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {activeStep !== 'submission' && (
+                  <button
+                    onClick={handleContinue}
+                    className={cn(
+                      "h-12 px-6 min-w-[200px] mt-6",
+                      "bg-gradient-to-r from-polygon-primary to-polygon-secondary",
+                      "hover:from-polygon-secondary hover:to-polygon-primary",
+                      "text-white font-medium",
+                      "transition-all duration-300",
+                      "disabled:opacity-50"
+                    )}
+                  >
+                    {getButtonText()}
+                  </button>
+                )}
+              </div>
+              {activeStep === 'submission' && (
+                <div className="flex items-center gap-4">
+                  {renderContinueButton(handleSubmit, true)}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThesisSubmission;
