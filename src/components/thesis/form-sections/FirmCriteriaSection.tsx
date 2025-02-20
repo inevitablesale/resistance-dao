@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,10 +8,10 @@ import { US_STATES } from "@/lib/constants/states";
 export interface FirmCriteriaSectionProps {
   formData: {
     firmCriteria: {
-      size: FirmSize;
+      size: FirmSize | null;
       location: string;
-      dealType: DealType;
-      geographicFocus: GeographicFocus;
+      dealType: DealType | null;
+      geographicFocus: GeographicFocus | null;
     };
   };
   formErrors: Record<string, string[]>;
@@ -29,7 +30,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Preferred Firm Size (Revenue)</Label>
         <RadioGroup 
-          value={String(formData.firmCriteria.size)}
+          value={formData.firmCriteria.size !== null ? String(formData.firmCriteria.size) : undefined}
           onValueChange={(value) => onChange('size', Number(value))}
           className="flex flex-wrap gap-4"
         >
@@ -74,7 +75,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Geographic Focus</Label>
         <RadioGroup 
-          value={String(formData.firmCriteria.geographicFocus)}
+          value={formData.firmCriteria.geographicFocus !== null ? String(formData.firmCriteria.geographicFocus) : undefined}
           onValueChange={(value) => onChange('geographicFocus', Number(value))}
           className="flex flex-wrap gap-4"
         >
@@ -139,7 +140,7 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
       <div>
         <Label className="text-white mb-2 block">Deal Type</Label>
         <RadioGroup 
-          value={String(formData.firmCriteria.dealType)}
+          value={formData.firmCriteria.dealType !== null ? String(formData.firmCriteria.dealType) : undefined}
           onValueChange={(value) => onChange('dealType', Number(value))}
           className="flex flex-wrap gap-4"
         >
@@ -191,3 +192,4 @@ export const FirmCriteriaSection = ({ formData, formErrors, onChange }: FirmCrit
     </div>
   );
 };
+
