@@ -133,7 +133,7 @@ const IndexContent = () => {
             Launch Your Web3 Idea for $25
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
-            Got a Web3 vision—token, NFT, DeFi, AI, or beyond? Don't let it die in your head. With our LedgerFren Proposal Factory, you mint a proposal NFT for just $25, pitch your idea to 1,500+ subscribers and 2,500+ LinkedIn members, and collect soft commitments to gauge real interest. No coding, no gatekeepers, no upfront fortune required.
+            Got a Web3 vision—token, NFT, DeFi, AI, or beyond? Don't let it die in your head. With our LedgerFren Proposal Factory, you mint a proposal NFT, pitch your idea to 1,500+ subscribers and 2,500+ LinkedIn members, and collect soft commitments to gauge real interest. No coding, no gatekeepers, no upfront fortune required.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
