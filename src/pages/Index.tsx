@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
 import { ReclaimControl } from "@/components/ReclaimControl";
@@ -444,12 +443,7 @@ const IndexContent = () => {
             </div>
 
             <div className="text-center mt-12">
-              <button 
-                onClick={() => navigate('/thesis')}
-                className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-teal-500 text-black font-bold text-xl rounded-lg hover:from-yellow-400 hover:to-teal-400 transition-all duration-300 transform hover:scale-105"
-              >
-                Start for $25—test your idea, tap our network, and launch without risk
-              </button>
+              
             </div>
           </div>
         </div>
