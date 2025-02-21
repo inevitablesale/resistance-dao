@@ -119,7 +119,7 @@ const Nav = () => {
               <Twitter className="w-5 h-5" />
             </a>
             <a 
-              href="https://www.linkedin.com/company/ledgerfund-dao/" 
+              href="https://www.linkedin.com/groups/12657922/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-white/60 hover:text-white transition-colors transform hover:scale-105 duration-200"
