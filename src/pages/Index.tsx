@@ -364,15 +364,15 @@ export default function Index() {
             <div className="mb-12">
               <h3 className="text-xl font-semibold mb-4">Every LGR token holder gains exclusive benefits:</h3>
               <ul className="space-y-3 text-white/80">
-                <li className="flex items-center gap-2">
+                <li className="flex items-center justify-center gap-2">
                   <Check className="w-5 h-5 text-teal-500" />
                   Priority access to mint proposal NFTs at discounted rates
                 </li>
-                <li className="flex items-center gap-2">
+                <li className="flex items-center justify-center gap-2">
                   <Check className="w-5 h-5 text-teal-500" />
                   Voting power on community-driven Web3 proposals
                 </li>
-                <li className="flex items-center gap-2">
+                <li className="flex items-center justify-center gap-2">
                   <Check className="w-5 h-5 text-teal-500" />
                   Share in the success of funded Web3 projects
                 </li>
