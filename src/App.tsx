@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
@@ -126,7 +125,7 @@ const dynamicSettings = {
         chainId: 137,
         type: "ERC721",
         standard: "ERC721",
-        decimals: 0  // Added decimals property for NFT
+        decimals: 0
       }
     ]
   }
