@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -142,13 +143,16 @@ function validateProposalInput(input: ProposalContractInput) {
 
     validateTextLength(input.location, "Location", 1, 100);
 
-    // Validate arrays are present and contain valid numbers
+    // Enhanced array validation with uint8 range check
     const validateArray = (arr: any[], name: string) => {
       if (!Array.isArray(arr) || arr.length === 0) {
         throw new Error(`${name} array is required and must not be empty`);
       }
-      if (arr.some(item => isNaN(Number(item)))) {
-        throw new Error(`${name} array contains invalid numeric values`);
+      if (arr.some(item => {
+        const num = Number(item);
+        return isNaN(num) || num < 0 || num > 255;
+      })) {
+        throw new Error(`${name} array contains invalid values (must be uint8: 0-255)`);
       }
     };
 
@@ -157,29 +161,69 @@ function validateProposalInput(input: ProposalContractInput) {
     validateArray(input.growthStrategies, "Growth strategies");
     validateArray(input.integrationStrategies, "Integration strategies");
 
+    // Validate target capital range
+    const targetCapital = ethers.utils.parseEther(input.targetCapital.toString());
+    const minCapital = ethers.utils.parseEther("1000");
+    const maxCapital = ethers.utils.parseEther("25000000");
+    
+    if (targetCapital.lt(minCapital) || targetCapital.gt(maxCapital)) {
+      throw new Error(`Target capital must be between 1,000 and 25,000,000 LGR (got ${ethers.utils.formatEther(targetCapital)} LGR)`);
+    }
+
   } catch (error) {
     console.error("Validation error:", error);
     throw error;
   }
 }
 
-function transformToContractTuple(input: ProposalContractInput): any[] {
+type ProposalTuple = [
+  string,                // title
+  string,                // ipfsMetadata
+  ethers.BigNumber,      // targetCapital (in wei)
+  number,                // votingDuration
+  string,                // investmentDrivers
+  string,                // additionalCriteria
+  number,                // firmSize
+  string,                // location
+  number,                // dealType
+  number,                // geographicFocus
+  number[],              // paymentTerms
+  number[],              // operationalStrategies
+  number[],              // growthStrategies
+  number[]               // integrationStrategies
+];
+
+function transformToContractTuple(input: ProposalContractInput): ProposalTuple {
   // Helper to ensure arrays are valid and numeric
   const toNumberArray = (arr: (number | string)[] | undefined): number[] =>
     Array.isArray(arr) ? arr.map(num => Number(num)) : [0];
+
+  // Helper to ensure number is within uint8 range
+  const toUint8 = (num: number | string | undefined): number => {
+    const value = Number(num || 0);
+    return Math.max(0, Math.min(255, value));
+  };
+
+  // Convert target capital to wei
+  const targetCapitalWei = ethers.utils.parseEther(input.targetCapital.toString());
+  console.log("Target capital conversion:", {
+    original: input.targetCapital.toString(),
+    wei: targetCapitalWei.toString(),
+    formatted: ethers.utils.formatEther(targetCapitalWei)
+  });
 
   // Create the tuple as an array in the exact order expected by the contract
   return [
     input.title || "",
     input.ipfsMetadata || "",
-    input.targetCapital.toString(),
+    targetCapitalWei,
     input.votingDuration || 604800, // Default to 7 days
     input.investmentDrivers || "",
     input.additionalCriteria || "",
-    Number(input.firmSize),
+    toUint8(input.firmSize),
     input.location || "",
-    Number(input.dealType),
-    Number(input.geographicFocus),
+    toUint8(input.dealType),
+    toUint8(input.geographicFocus),
     toNumberArray(input.paymentTerms),
     toNumberArray(input.operationalStrategies),
     toNumberArray(input.growthStrategies),
@@ -261,7 +305,16 @@ export const createProposal = async (
     }
 
     const contractTuple = transformToContractTuple(contractInput);
-    console.log("Transformed contract tuple:", contractTuple);
+    console.log("Transformed contract tuple:", {
+      ...contractTuple,
+      targetCapital: contractTuple[2].toString(),
+      arrays: {
+        paymentTerms: contractTuple[10],
+        operationalStrategies: contractTuple[11],
+        growthStrategies: contractTuple[12],
+        integrationStrategies: contractTuple[13]
+      }
+    });
 
     return await executeTransaction(
       () => factory.createProposal(contractTuple, config.linkedInURL),
