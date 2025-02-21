@@ -441,6 +441,23 @@ const IndexContent = () => {
         </div>
       </section>
 
+      <section className="py-16 relative z-10">
+        <div className="container px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
+                  Ecosystem & Partnerships
+                </span>
+              </h2>
+              <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto">
+                Join a thriving ecosystem of accounting firms, banks, technology providers, and staffing agencies supporting practice acquisitions.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <WhatWeBuilding />
       <LedgerFrens />
       <HowItWorks />
