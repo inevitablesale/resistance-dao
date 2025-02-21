@@ -32,6 +32,7 @@ import {
   Briefcase, 
   Building,
   Wallet,
+  Coins
 } from "lucide-react";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { NewsletterSubscription } from "@/components/NewsletterSubscription";
@@ -303,7 +304,7 @@ const IndexContent = () => {
           }}
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Launch Your Web3 Idea—Test, Grow, and Succeed Risk-Free
+            Got a Crypto Idea?<br />Test the Waters Before You Launch
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
             Launch a proposal for $25, gather soft commitments with $1 votes—tap our network, no big connections needed
@@ -325,6 +326,16 @@ const IndexContent = () => {
               </button>
             </div>
           </div>
+
+          <div className="fixed bottom-6 right-6 z-50">
+            <button
+              onClick={handleBuyToken}
+              className="flex items-center gap-2 px-4 py-2 bg-black/20 backdrop-blur-sm border border-yellow-500/30 rounded-full text-yellow-500 hover:bg-black/40 transition-all duration-300 animate-pulse hover:animate-none"
+            >
+              <Coins className="w-5 h-5" />
+              <span className="font-semibold">Buy LGR</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -337,10 +348,10 @@ const IndexContent = () => {
             <div className="text-center mb-16">
               <Rocket className="w-16 h-16 mx-auto text-yellow-500 mb-6 animate-cosmic-pulse" />
               <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400">
-                Unleash Your Web3 Vision—Tap Our Network to Launch Without Risk
+                Think You Can't Launch Your Crypto Project? You're Wrong
               </h2>
               <p className="text-xl text-white/80 mb-12 max-w-4xl mx-auto">
-                Whether you're a CEO, product manager, developer, marketer, or analyst—your Web3 vision deserves a shot. No network? No problem.
+                Whether you're a developer, marketer, or analyst—your Web3 vision deserves a shot. No network? No problem.
               </p>
             </div>
 
@@ -352,7 +363,7 @@ const IndexContent = () => {
                   <div className="p-2 bg-red-500/10 rounded-lg inline-block mb-6">
                     <DollarSign className="w-12 h-12 text-red-500" />
                   </div>
-                  <h3 className="text-2xl font-bold text-red-500 mb-4">Feeling Sidelined?</h3>
+                  <h3 className="text-2xl font-bold text-red-500 mb-4">Stuck on the Sidelines?</h3>
                   <ul className="space-y-4 text-white/70">
                     <li className="flex items-start gap-3">
                       <Users className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
@@ -360,11 +371,11 @@ const IndexContent = () => {
                     </li>
                     <li className="flex items-start gap-3">
                       <Clock className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                      <span>Launchpads demand steep fees and force commitments before proving interest</span>
+                      <span>No insider connections? Traditional routes keep you waiting forever</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Crown className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                      <span>Social platforms drown out fresh voices, and traditional routes demand insider networks</span>
+                      <span>Competition on launchpads, X, and Discord drowns out fresh voices like yours</span>
                     </li>
                   </ul>
                 </div>
@@ -377,19 +388,19 @@ const IndexContent = () => {
                   <div className="p-2 bg-teal-500/10 rounded-lg inline-block mb-6">
                     <Rocket className="w-12 h-12 text-teal-500" />
                   </div>
-                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Our Pre-Launch Solution</h3>
+                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Your Time to Launch</h3>
                   <ul className="space-y-4 text-white/70">
                     <li className="flex items-start gap-3">
                       <Wallet className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                      <span>Start with just $25—create a proposal NFT that tests your token, NFT, DeFi, or AI project</span>
+                      <span>Start with just $25—launch tokens, NFTs, DeFi platforms, or AI agents</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Users className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                      <span>Tap our network of 1,500 newsletter subscribers and 2,500 LinkedIn members</span>
+                      <span>Build your crew from scratch with $1 votes—no pre-existing network needed</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Shield className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                      <span>Gather soft commitments with $1 votes before investing in smart contracts</span>
+                      <span>Your project, your rules—secured by smart contracts, not gatekeepers</span>
                     </li>
                   </ul>
                 </div>
@@ -406,7 +417,7 @@ const IndexContent = () => {
                   </div>
                   <h3 className="text-xl font-bold text-yellow-500 mb-4">Non-Custodial</h3>
                   <p className="text-white/70">
-                    Your wallet, your control. Create and manage your proposal NFT directly—no intermediaries or gatekeepers involved.
+                    Your wallet, your control. Launch and manage any project type directly—no middlemen or gatekeepers in your way.
                   </p>
                 </div>
               </div>
@@ -419,7 +430,7 @@ const IndexContent = () => {
                   </div>
                   <h3 className="text-xl font-bold text-teal-500 mb-4">Decentralized</h3>
                   <p className="text-white/70">
-                    No centralized authorities—your potential supporters vote with $1 each to show interest and guide your project's direction.
+                    No suits calling shots—your crew votes with $1 each to shape your project's future. Pure democracy in action.
                   </p>
                 </div>
               </div>
@@ -432,7 +443,7 @@ const IndexContent = () => {
                   </div>
                   <h3 className="text-xl font-bold text-yellow-500 mb-4">Transparent</h3>
                   <p className="text-white/70">
-                    Track every $25 proposal, $1 vote, and soft commitment on-chain via your proposal NFT. Monitor interest in real-time.
+                    Track every vote and milestone on-chain. From $25 proposal to launch, watch your project grow in real-time.
                   </p>
                 </div>
               </div>
@@ -440,78 +451,11 @@ const IndexContent = () => {
 
             <div className="text-center mt-12">
               <button 
-                onClick={() => navigate('/thesis')}
+                onClick={() => navigate('/proposals')}
                 className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-teal-500 text-black font-bold text-xl rounded-lg hover:from-yellow-400 hover:to-teal-400 transition-all duration-300 transform hover:scale-105"
               >
-                Start for $25—test your idea, tap our network, and launch without risk
+                Start for $25—prove you can do this
               </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mint NFT Section - Right after Hero */}
-      <section className="py-16 relative z-10">
-        <div className="container px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-              <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
-                <div className="flex flex-col md:flex-row items-center gap-8">
-                  {/* Left side - NFT Animation */}
-                  <div className="w-full md:w-1/3 flex justify-center">
-                    <div className="relative w-64 h-64">
-                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 rounded-lg animate-pulse"></div>
-                      <div className="absolute inset-4 border-2 border-yellow-500/50 rounded-lg rotate-3 animate-float"></div>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Shield className="w-24 h-24 text-yellow-500 animate-cosmic-pulse" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right side - Content */}
-                  <div className="w-full md:w-2/3">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400">
-                      Mint an NFT to Launch Your Web3 Idea—Simple and Accessible
-                    </h2>
-                    <p className="text-lg text-white/80 mb-6">
-                      Use our LedgerFren Proposal Factory to mint a LedgerFren Proposal (LFP) for just $25—an NFT that lets you test any Web3 idea (token, NFT, DeFi, AI, or more) and collect soft commitments. No smart contracts or tech skills required upfront.
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                      <div className="flex items-start gap-3">
-                        <Users className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
-                        <span className="text-white/70">Join our community of 1,500 newsletter subscribers</span>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <Trophy className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                        <span className="text-white/70">Connect with 2,500 LinkedIn members</span>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <Vote className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
-                        <span className="text-white/70">Collect $1 votes as soft commitments</span>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <Shield className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                        <span className="text-white/70">Track all votes on-chain via your NFT</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-4">
-                      <button 
-                        onClick={() => navigate('/thesis')}
-                        className="px-6 py-3 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-400 transition-all duration-300"
-                      >
-                        Mint Your Proposal NFT
-                      </button>
-                      <button 
-                        onClick={() => navigate('/proposals')}
-                        className="px-6 py-3 bg-teal-500 text-black rounded-lg font-semibold hover:bg-teal-400 transition-all duration-300"
-                      >
-                        View Active Proposals
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
