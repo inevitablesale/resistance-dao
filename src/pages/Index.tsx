@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
 import { ReclaimControl } from "@/components/ReclaimControl";
@@ -15,7 +14,7 @@ import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Calculator, Clock, Calendar, DollarSign, BookOpen, BarChart2, Briefcase } from "lucide-react";
+import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Calculator, Clock, Calendar, DollarSign, BookOpen, BarChart2, Briefcase, Building } from "lucide-react";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { NewsletterSubscription } from "@/components/NewsletterSubscription";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -378,7 +377,7 @@ const IndexContent = () => {
                       <span>Pool expertise from experienced practitioners to better evaluate and manage practices</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <Building2 className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
+                      <Building className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
                       <span>Combine resources to access larger, higher-quality practices typically out of reach</span>
                     </li>
                     <li className="flex items-start gap-3">
@@ -526,7 +525,7 @@ const IndexContent = () => {
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
                   <div className="flex items-start gap-4 mb-4">
                     <div className="p-2 bg-teal-500/10 rounded-lg">
-                      <Building2 className="w-8 h-8 text-teal-500" />
+                      <Building className="w-8 h-8 text-teal-500" />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-white mb-2">Firm Valuation</h3>
@@ -570,7 +569,7 @@ const IndexContent = () => {
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
                   <div className="flex items-start gap-4 mb-4">
                     <div className="p-2 bg-yellow-500/10 rounded-lg">
-                      <Briefcase className="w-8 h-8 text-yellow-500" />
+                      <Briefcase className="w-8 h-12 text-yellow-500" />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-white mb-2">Advisory Services</h3>
