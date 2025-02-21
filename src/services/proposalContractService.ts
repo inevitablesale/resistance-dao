@@ -1,12 +1,9 @@
-
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
 import { transactionQueue } from "./transactionQueueService";
 import { checkTokenAllowance } from "./tokenService";
 import { WalletType } from "@/hooks/useWalletProvider";
-
-import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
 import { 
@@ -22,6 +19,7 @@ import {
   GrowthStrategy,
   IntegrationStrategy
 } from "@/types/proposals";
+import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 
 export interface ContractStatus {
   submissionFee: ethers.BigNumber;
@@ -161,14 +159,8 @@ function validateProposalInput(input: ProposalContractInput) {
     validateArray(input.growthStrategies, "Growth strategies");
     validateArray(input.integrationStrategies, "Integration strategies");
 
-    // Validate target capital range
-    const targetCapital = ethers.utils.parseEther(input.targetCapital.toString());
-    const minCapital = ethers.utils.parseEther("1000");
-    const maxCapital = ethers.utils.parseEther("25000000");
-    
-    if (targetCapital.lt(minCapital) || targetCapital.gt(maxCapital)) {
-      throw new Error(`Target capital must be between 1,000 and 25,000,000 LGR (got ${ethers.utils.formatEther(targetCapital)} LGR)`);
-    }
+    // Skip target capital validation here since it's already validated in TargetCapitalInput
+    // and is already in wei format
 
   } catch (error) {
     console.error("Validation error:", error);
@@ -204,19 +196,19 @@ function transformToContractTuple(input: ProposalContractInput): ProposalTuple {
     return Math.max(0, Math.min(255, value));
   };
 
-  // Convert target capital to wei
-  const targetCapitalWei = ethers.utils.parseEther(input.targetCapital.toString());
-  console.log("Target capital conversion:", {
-    original: input.targetCapital.toString(),
-    wei: targetCapitalWei.toString(),
-    formatted: ethers.utils.formatEther(targetCapitalWei)
+  // input.targetCapital is already a BigNumber in wei from TargetCapitalInput
+  const targetCapitalWei = ethers.BigNumber.from(input.targetCapital);
+  
+  console.log("Target capital processing:", {
+    inputValue: input.targetCapital.toString(),
+    weiValue: targetCapitalWei.toString(),
+    lgrValue: ethers.utils.formatUnits(targetCapitalWei, 18)
   });
 
-  // Create the tuple as an array in the exact order expected by the contract
   return [
     input.title || "",
     input.ipfsMetadata || "",
-    targetCapitalWei,
+    targetCapitalWei,  // Already in wei, no conversion needed
     input.votingDuration || 604800, // Default to 7 days
     input.investmentDrivers || "",
     input.additionalCriteria || "",
@@ -308,6 +300,7 @@ export const createProposal = async (
     console.log("Transformed contract tuple:", {
       ...contractTuple,
       targetCapital: contractTuple[2].toString(),
+      targetCapitalLGR: ethers.utils.formatUnits(contractTuple[2], 18),
       arrays: {
         paymentTerms: contractTuple[10],
         operationalStrategies: contractTuple[11],
