@@ -1,7 +1,11 @@
 
-import { PartyPopper, Trophy, Gift, ShoppingBag, Medal, Star, DollarSign, Rocket } from "lucide-react";
+import { PartyPopper, Trophy, Gift, ShoppingBag, Medal, Star, DollarSign, Rocket, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 export const LedgerFrens = () => {
+  const { setShowOnRamp } = useWalletConnection();
+
   return (
     <section className="py-16 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent" />
@@ -17,6 +21,32 @@ export const LedgerFrens = () => {
           <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
             Invest in the Future—Grow with LedgerFund DAO
           </h2>
+
+          {/* Community Stats */}
+          <div className="flex justify-center gap-8 mb-8">
+            <div className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-yellow-500" />
+              <span className="text-white/80">2,558 Community Members</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Star className="w-5 h-5 text-teal-500" />
+              <span className="text-white/80">1,545 Subscribers</span>
+            </div>
+          </div>
+
+          {/* Presale CTA */}
+          <div className="bg-gradient-to-r from-yellow-500/10 to-teal-500/10 rounded-xl p-6 mb-8 backdrop-blur-sm border border-white/10">
+            <h3 className="text-2xl font-bold text-white mb-2">LGR Token Presale Now Live</h3>
+            <p className="text-lg text-white/80 mb-4">Join early and secure your tokens at $0.10 USD per LGR</p>
+            <Button 
+              onClick={() => setShowOnRamp?.(true)}
+              className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-6 text-lg"
+            >
+              <DollarSign className="w-5 h-5 mr-2" />
+              Participate in Presale
+            </Button>
+          </div>
+
           <p className="text-xl text-white/80">
             Tap our community to fund tokens, NFTs, DeFi, and AI
           </p>
