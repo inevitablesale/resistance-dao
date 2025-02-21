@@ -1,38 +1,6 @@
 
-import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Crown, ChartPie, ArrowDownToLine, BarChart3, Orbit, CheckCircle2 } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Trophy, Award, Star, Rocket, Users, Shield, Orbit, CheckCircle2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-
-const publicSaleData = [
-  { 
-    name: 'Treasury', 
-    value: 30, 
-    color: '#14b8a6',
-    description: 'A decentralized organization where smart contracts automate investments, revenue sharing, and governance.',
-    className: 'col-span-1'
-  },
-  { 
-    name: 'Firm Investment', 
-    value: 50, 
-    color: '#14b8a6',
-    description: 'Add MATIC to your wallet to participate in the presale. You can buy MATIC directly with a CC or transfer from another wallet.',
-    className: 'col-span-1'
-  },
-  { 
-    name: 'Community Rewards', 
-    value: 10, 
-    color: '#14b8a6',
-    description: 'Bringing together decades of industry experience, professional resources, and strategic capital to drive the DAOs success through expert leadership.',
-    className: 'col-span-1'
-  },
-  { 
-    name: 'Partners', 
-    value: 10, 
-    color: '#14b8a6',
-    description: 'Strategic partnerships with banks, staffing agencies, technology providers supporting practice acquisitions.',
-    className: 'col-span-1'
-  }
-];
 
 export const WhatWeBuilding = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -156,19 +124,19 @@ export const WhatWeBuilding = () => {
               <div className="w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center mb-6">
                 <Orbit className="w-6 h-6 text-teal-500" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-4">Governance & Voting</h3>
+              <h3 className="text-xl font-bold text-white mb-4">Community Network</h3>
               <p className="text-gray-300">
-                Participate in key decisions through our decentralized voting system. Token holders shape acquisition strategies, operational improvements, and protocol development.
+                Join our thriving community of innovators and supporters. Connect, collaborate, and grow together.
               </p>
             </div>
 
             <div className="p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-all duration-300 group">
               <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center mb-6">
-                <BarChart3 className="w-6 h-6 text-yellow-500" />
+                <Shield className="w-6 h-6 text-yellow-500" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-4">Performance Tracking</h3>
+              <h3 className="text-xl font-bold text-white mb-4">Safe & Transparent</h3>
               <p className="text-gray-300">
-                Real-time analytics and reporting on firm acquisitions, revenue growth, and protocol metrics. Transparent tracking of governance decisions and their impacts.
+                Every vote and commitment is tracked on-chain. Build trust through transparency.
               </p>
             </div>
           </div>
