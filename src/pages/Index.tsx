@@ -1,3 +1,4 @@
+<lov-code>
 import { motion } from "framer-motion";
 import { Rocket, DollarSign, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -82,76 +83,95 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Project Proposal Section - NEW */}
+      {/* Project Proposal Section - Redesigned */}
       <section className="py-16 relative">
         <div className="container px-4">
-          <div className="max-w-4xl mx-auto">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-yellow-500">
-                Create Your Project Proposal
-              </h2>
-              <p className="text-xl text-white/80">
-                Share your Web3 vision with our community and gather support through a streamlined proposal process.
-              </p>
-            </motion.div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-yellow-500">
+              Create Your Project Proposal
+            </h2>
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+              Share your Web3 vision with our community and gather support through a streamlined proposal process.
+            </p>
+          </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <Card className="bg-black/30 border-white/10 p-6 hover:border-teal-500/50 transition-all duration-300">
-                <h3 className="text-2xl font-semibold text-white mb-4 flex items-center gap-2">
-                  <FileText className="w-6 h-6 text-teal-500" />
-                  Submit Your Proposal
-                </h3>
-                <ul className="space-y-3 text-white/70">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
-                    <span>Mint a Resistance Proposal NFT for just $25</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
-                    <span>Detail your project's vision, goals, and requirements</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
-                    <span>Set your target funding and timeline expectations</span>
-                  </li>
-                </ul>
-              </Card>
+          <div className="relative max-w-5xl mx-auto">
+            <div className="absolute inset-0 bg-gradient-to-b from-teal-500/10 via-yellow-500/5 to-transparent rounded-3xl blur-xl" />
+            <div className="relative grid grid-cols-12 gap-6 p-8">
+              <div className="col-span-12 lg:col-span-4 flex flex-col justify-center">
+                <div className="space-y-8">
+                  <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-start gap-4"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-6 h-6 text-teal-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Mint Your Proposal</h3>
+                      <p className="text-white/70">Create a Resistance Proposal NFT for just $25 and share your vision</p>
+                    </div>
+                  </motion.div>
 
-              <Card className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
-                <h3 className="text-2xl font-semibold text-white mb-4 flex items-center gap-2">
-                  <Users className="w-6 h-6 text-yellow-500" />
-                  Gather Community Support
-                </h3>
-                <ul className="space-y-3 text-white/70">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
-                    <span>Connect with 1,500+ subscribers and 2,500+ LinkedIn members</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
-                    <span>Collect soft commitments to validate interest</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
-                    <span>Receive feedback from experienced Web3 builders</span>
-                  </li>
-                </ul>
-              </Card>
-            </div>
+                  <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="flex items-start gap-4"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
+                      <Users className="w-6 h-6 text-yellow-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Connect & Grow</h3>
+                      <p className="text-white/70">Reach 1,500+ subscribers and 2,500+ LinkedIn members</p>
+                    </div>
+                  </motion.div>
 
-            <div className="text-center">
-              <Button
-                size="lg"
-                onClick={() => navigate('/thesis')}
-                className="bg-gradient-to-r from-teal-500 to-yellow-500 hover:from-teal-600 hover:to-yellow-600 text-black font-semibold px-8"
-              >
-                <Rocket className="w-5 h-5 mr-2" />
-                Start Your Proposal
-              </Button>
+                  <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="flex items-start gap-4"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center flex-shrink-0">
+                      <Rocket className="w-6 h-6 text-teal-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Launch With Confidence</h3>
+                      <p className="text-white/70">Validate interest through soft commitments before full launch</p>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+
+              <div className="col-span-12 lg:col-span-8 relative">
+                <div className="aspect-[16/9] rounded-2xl overflow-hidden bg-black/40 border border-white/10">
+                  <div className="absolute inset-0 bg-gradient-to-br from-teal-500/20 to-yellow-500/20" />
+                  <div className="relative h-full flex items-center justify-center p-8">
+                    <div className="space-y-6 text-center">
+                      <h3 className="text-2xl font-bold">Ready to Share Your Vision?</h3>
+                      <p className="text-lg text-white/80 max-w-md mx-auto">
+                        Start your Web3 journey today by creating a proposal and connecting with our community of builders and investors.
+                      </p>
+                      <Button
+                        size="lg"
+                        onClick={() => navigate('/thesis')}
+                        className="bg-gradient-to-r from-teal-500 to-yellow-500 hover:from-teal-600 hover:to-yellow-600 text-black font-semibold px-8"
+                      >
+                        <Rocket className="w-5 h-5 mr-2" />
+                        Start Your Proposal
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -377,58 +397,75 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Web3-Native Fundraising Section - NEW */}
-      <section className="py-16 relative">
-        <div className="container px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
-              Supporting the Future of Web3
-            </h2>
-            <p className="text-xl text-white/80 mb-8">
-              Resistance DAO is more than a platform—we're a Web3-native project using utility-driven tokenomics to build the future of decentralized investment.
-            </p>
-            
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <Card className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300 text-left">
-                <h3 className="text-xl font-semibold text-white mb-4">Every Action Supports the DAO</h3>
-                <ul className="space-y-3 text-white/70">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
-                    <span>Each $25 proposal mint strengthens our treasury</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
-                    <span>Every $1 vote contributes to DAO development</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
-                    <span>Community participation drives our growth</span>
-                  </li>
-                </ul>
-              </Card>
-
-              <Card className="bg-black/30 border-white/10 p-6 hover:border-teal-500/50 transition-all duration-300 text-left">
-                <h3 className="text-xl font-semibold text-white mb-4">Building Together</h3>
-                <ul className="space-y-3 text-white/70">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
-                    <span>Your proposals help fund our infrastructure</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
-                    <span>Voting fees support platform development</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
-                    <span>Success is shared with all participants</span>
-                  </li>
-                </ul>
-              </Card>
+      {/* Web3-Native Fundraising Section - Redesigned */}
+      <section className="py-16 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute w-[800px] h-[800px] bg-yellow-500/5 rounded-full blur-3xl -top-1/2 -right-1/4 animate-pulse" />
+          <div className="absolute w-[600px] h-[600px] bg-teal-500/5 rounded-full blur-3xl -bottom-1/4 -left-1/4 animate-pulse" />
+        </div>
+        
+        <div className="container px-4 relative">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
+                Supporting the Future of Web3
+              </h2>
+              <p className="text-xl text-white/80 max-w-3xl mx-auto">
+                Resistance DAO is more than a platform—we're a Web3-native project using utility-driven tokenomics to build the future of decentralized investment.
+              </p>
             </div>
 
-            <p className="text-lg text-white/80 italic">
-              By participating in Resistance DAO, you're not just pitching or voting on projects—you're helping build the future of decentralized investment.
-            </p>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-teal-500/10 rounded-3xl blur-xl" />
+              <div className="relative rounded-3xl border border-white/10 bg-black/40 p-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-center space-y-4"
+                  >
+                    <div className="w-16 h-16 rounded-2xl bg-yellow-500/10 flex items-center justify-center mx-auto">
+                      <DollarSign className="w-8 h-8 text-yellow-500" />
+                    </div>
+                    <h3 className="text-xl font-semibold">Proposal Minting</h3>
+                    <p className="text-white/70">Each $25 proposal mint strengthens our treasury and supports platform development</p>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-center space-y-4"
+                  >
+                    <div className="w-16 h-16 rounded-2xl bg-teal-500/10 flex items-center justify-center mx-auto">
+                      <Users className="w-8 h-8 text-teal-500" />
+                    </div>
+                    <h3 className="text-xl font-semibold">Community Voting</h3>
+                    <p className="text-white/70">$1 voting fees contribute directly to DAO growth and governance</p>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="text-center space-y-4"
+                  >
+                    <div className="w-16 h-16 rounded-2xl bg-yellow-500/10 flex items-center justify-center mx-auto">
+                      <Share2 className="w-8 h-8 text-yellow-500" />
+                    </div>
+                    <h3 className="text-xl font-semibold">Shared Success</h3>
+                    <p className="text-white/70">Your participation helps build the infrastructure for decentralized investment</p>
+                  </motion.div>
+                </div>
+
+                <div className="mt-12 text-center">
+                  <p className="text-lg text-white/80 italic max-w-3xl mx-auto">
+                    By participating in Resistance DAO, you're not just pitching or voting on projects—you're helping build the future of decentralized investment.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -567,31 +604,3 @@ export default function Index() {
               <Card key={index} className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
                 <h3 className="text-xl font-bold text-white mb-2">{phase.phase}</h3>
                 <p className="text-yellow-500 mb-4">{phase.timing}</p>
-                <ul className="space-y-2">
-                  {phase.items.map((item, itemIndex) => (
-                    <li key={itemIndex} className="flex items-start gap-2 text-white/70">
-                      <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Trump's Crypto Reforms Section */}
-      <section className="py-16 relative">
-        <div className="container px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-4xl font-bold mb-6">Why Now? Trump's Crypto Reforms (February 2025)</h2>
-            <p className="text-white/80 text-lg">
-              With President Trump's 2025 crypto reforms—promising regulatory clarity, tax breaks for Web3 investments, and a pro-innovation stance—LedgerFund DAO is poised to lead. Recent articles highlight skyrocketing investor interest, token launches, and DeFi growth, making now the perfect moment to fund visionary projects through our community-driven model.
-            </p>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
