@@ -130,10 +130,10 @@ const IndexContent = () => {
           }}
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Mint an NFT to Launch Your Web3 Idea—Simple and Accessible
+            Launch Your Web3 Idea for $25
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
-            Use our LedgerFren Proposal Factory to mint a LedgerFren Proposal (LFP) for just $25—an NFT that lets you test any Web3 idea (token, NFT, DeFi, AI, or more) and collect soft commitments. No smart contracts or tech skills required upfront.
+            Got a Web3 vision—token, NFT, DeFi, AI, or beyond? Don't let it die in your head. With our LedgerFren Proposal Factory, you mint a proposal NFT for just $25, pitch your idea to 1,500+ subscribers and 2,500+ LinkedIn members, and collect $1 soft commitments to gauge real interest. No coding, no gatekeepers, no upfront fortune required.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
