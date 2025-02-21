@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
 import { ReclaimControl } from "@/components/ReclaimControl";
@@ -32,7 +31,8 @@ import {
   BarChart2, 
   Briefcase, 
   Building,
-  Wallet
+  Wallet,
+  Coins
 } from "lucide-react";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { NewsletterSubscription } from "@/components/NewsletterSubscription";
@@ -304,10 +304,10 @@ const IndexContent = () => {
           }}
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Got a Crypto Idea?<br />Crowdsource Your Pre-ICO Crew
+            Got a Crypto Idea?<br />Test the Waters Before You Launch
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
-            Launch a proposal for $25, rally votes at $1 a pop—no connections needed
+            Launch a proposal for $25, gather soft commitments with $1 votes—tap our network, no big connections needed
           </p>
 
           <div className="space-y-6">
@@ -316,7 +316,7 @@ const IndexContent = () => {
                 onClick={() => navigate('/thesis')}
                 className="px-12 py-6 bg-yellow-500 text-black rounded-lg font-bold text-2xl hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
               >
-                Create Pool
+                Create Proposal
               </button>
               <button 
                 onClick={() => navigate('/proposals')}
@@ -325,6 +325,16 @@ const IndexContent = () => {
                 Explore Projects
               </button>
             </div>
+          </div>
+
+          <div className="fixed bottom-6 right-6 z-50">
+            <button
+              onClick={handleBuyToken}
+              className="flex items-center gap-2 px-4 py-2 bg-black/20 backdrop-blur-sm border border-yellow-500/30 rounded-full text-yellow-500 hover:bg-black/40 transition-all duration-300 animate-pulse hover:animate-none"
+            >
+              <Coins className="w-5 h-5" />
+              <span className="font-semibold">Buy LGR</span>
+            </button>
           </div>
         </div>
       </div>
