@@ -19,23 +19,14 @@ const App = () => {
         walletConnectors: [EthereumWalletConnectors, ZeroDevSmartWalletConnectors],
         walletConnectorOptions: {
           zeroDevOptions: {
-            projectId: "2ace0996-5136-4c6c-a384-6f205ad7661c", // Using the same ID for consistency
+            projectId: "2ace0996-5136-4c6c-a384-6f205ad7661c",
             bundlerRpc: "https://polygon.drpc.org",
             paymasterRpc: "https://polygon.drpc.org"
           }
         },
-        evmNetworks: [{
-          chainId: 137,
-          name: 'Polygon',
-          chainName: 'Polygon Mainnet',
-          rpcUrls: ['https://polygon-rpc.com'],
-          nativeCurrency: {
-            name: 'MATIC',
-            symbol: 'MATIC',
-            decimals: 18,
-          },
-          blockExplorerUrls: ['https://polygonscan.com/'],
-        }],
+        network: {
+          chainId: 137
+        }
       }}
     >
       <Router>
