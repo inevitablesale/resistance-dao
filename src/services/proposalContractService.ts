@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -358,9 +357,11 @@ export const createProposal = async (
       targetCapitalLGR: ethers.utils.formatUnits(tuple.targetCapital, 18)
     });
 
-    // Submit proposal
+    // Submit proposal with explicit gas settings
     return await executeTransaction(
-      () => factory.createProposal(tupleArray, metadata.linkedInURL),
+      () => factory.createProposal(tupleArray, metadata.linkedInURL, {
+        gasLimit: 1000000, // Explicit gas limit
+      }),
       {
         type: 'nft',
         description: `Creating proposal with target capital ${ethers.utils.formatUnits(tuple.targetCapital, 18)} LGR`,
@@ -378,6 +379,20 @@ export const createProposal = async (
     );
   } catch (error) {
     console.error("Error creating proposal:", error);
+    
+    // Enhanced error handling
+    if (error.message?.includes('execution reverted')) {
+      throw new ProposalError({
+        category: 'contract',
+        message: 'The proposal creation was rejected by the contract. Please check your input values.',
+        recoverySteps: [
+          'Verify all input fields are correct',
+          'Check if you have sufficient LGR tokens',
+          'Ensure your target capital is within allowed limits'
+        ]
+      });
+    }
+    
     throw error;
   }
 };
