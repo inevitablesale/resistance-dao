@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Rocket, DollarSign, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -79,6 +78,58 @@ export default function Index() {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* NEW: Soft Commitments Process Section */}
+      <section className="py-16 relative">
+        <div className="container px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
+              Test Market Interest, Then Launch With Confidence
+            </h2>
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+              Collect soft commitments from interested supporters and build your launch community before investing in development.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                  <DollarSign className="w-6 h-6 text-yellow-500" />
+                </div>
+                <h3 className="text-xl font-semibold">Collect Commitments</h3>
+              </div>
+              <p className="text-white/70">
+                Supporters vote with $1 each to show genuine interest in your project. These micro-commitments validate market demand without requiring major investment.
+              </p>
+            </Card>
+
+            <Card className="bg-black/30 border-white/10 p-6 hover:border-teal-500/50 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-teal-500" />
+                </div>
+                <h3 className="text-xl font-semibold">Build Community</h3>
+              </div>
+              <p className="text-white/70">
+                Every vote creates a direct connection with interested wallets. Build relationships with potential users and investors before launch.
+              </p>
+            </Card>
+
+            <Card className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                  <Rocket className="w-6 h-6 text-yellow-500" />
+                </div>
+                <h3 className="text-xl font-semibold">Launch With Backing</h3>
+              </div>
+              <p className="text-white/70">
+                Once you hit your soft commitment target, re-engage your supporter network for presale participation and early adoption of your project.
+              </p>
+            </Card>
           </div>
         </div>
       </section>
