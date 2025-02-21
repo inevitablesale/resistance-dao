@@ -18,10 +18,10 @@ export const LedgerFrens = () => {
             Invest in the Future—Grow with LedgerFund DAO
           </h2>
           <p className="text-xl text-white/80">
-            Tap our community to fund tokens, NFTs, DeFi, and AI—now, with Trump's crypto reforms in play.
+            Tap our community to fund tokens, NFTs, DeFi, and AI
           </p>
           <p className="mt-6 text-lg text-white/70">
-            LedgerFund DAO is transforming into a decentralized fund that invests in cutting-edge Web3 projects. With President Trump's sweeping crypto reforms set for 2025, now's the perfect time to capitalize on regulatory clarity, tax incentives, and a booming market. We use our LedgerFren Proposal Factory to mint LedgerFren Proposals (LFP) for $25, letting you test and pitch ideas, gather $1 soft commitments from our community of 1,500 newsletter subscribers and 2,500 LinkedIn members, and build momentum for investment.
+            LedgerFund DAO is transforming into a decentralized fund that invests in cutting-edge Web3 projects.
           </p>
         </div>
 
