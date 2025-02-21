@@ -732,4 +732,77 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
     ),
     "acquisition-process": (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-yellow
+        <h2 className="text-2xl font-bold text-yellow-500">13.0 Acquisition Process</h2>
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Due Diligence Framework</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">1️⃣</span>
+                  <span>Initial Screening & Valuation</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">2️⃣</span>
+                  <span>Financial & Operational Assessment</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">3️⃣</span>
+                  <span>Technology & Automation Potential</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">4️⃣</span>
+                  <span>Growth & Synergy Opportunities</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Deal Structure</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Performance-based earnouts</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Smart contract escrow mechanisms</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Transparent pricing models</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold text-teal-400 mb-4">Post-Acquisition Integration</h3>
+            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Technology implementation & automation</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Staff training & development</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">🔹</span>
+                  <span>Service expansion & optimization</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  };
+
+  return sectionContent[sectionId] || null;
+};
+
+export default SectionContent;
