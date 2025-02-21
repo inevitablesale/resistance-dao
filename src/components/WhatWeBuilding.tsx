@@ -1,6 +1,38 @@
 
-import { Trophy, Award, Star, Rocket, Users, Shield, Orbit, CheckCircle2 } from "lucide-react";
+import { Coins, Wallet, BadgeCheck, UsersRound, GanttChartSquare, Building2, ChartPie, ArrowDownToLine, BarChart3, Building, Orbit, CheckCircle2 } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEffect, useRef, useState } from "react";
+
+const publicSaleData = [
+  { 
+    name: 'Treasury', 
+    value: 30, 
+    color: '#14b8a6',
+    description: 'A decentralized organization where smart contracts automate investments, revenue sharing, and governance.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Firm Investment', 
+    value: 50, 
+    color: '#14b8a6',
+    description: 'Add MATIC to your wallet to participate in the presale. You can buy MATIC directly with a CC or transfer from another wallet.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Community Rewards', 
+    value: 10, 
+    color: '#14b8a6',
+    description: 'Bringing together decades of industry experience, professional resources, and strategic capital to drive the DAOs success through expert leadership.',
+    className: 'col-span-1'
+  },
+  { 
+    name: 'Partners', 
+    value: 10, 
+    color: '#14b8a6',
+    description: 'Strategic partnerships with banks, staffing agencies, technology providers supporting practice acquisitions.',
+    className: 'col-span-1'
+  }
+];
 
 export const WhatWeBuilding = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -99,6 +131,7 @@ export const WhatWeBuilding = () => {
       </div>
 
       <div className="container px-4 relative z-10">
+        {/* Ecosystem & Partners */}
         <div className="mt-20 pt-20">
           <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12 text-center">
             Ecosystem & Partnerships
@@ -106,17 +139,12 @@ export const WhatWeBuilding = () => {
 
           <div className="grid md:grid-cols-3 gap-8 mb-16">
             <div className="p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-all duration-300 group">
-              <div className="relative w-12 h-12 mb-6">
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-teal-500/20 rounded-full animate-cosmic-pulse" />
-                <div className="absolute inset-0 bg-black/40 rounded-full backdrop-blur-sm" />
-                <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400 animate-cosmic-pulse">
-                  $25
-                </span>
-                <div className="absolute inset-0 rounded-full glow-border" />
+              <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center mb-6">
+                <Building2 className="w-6 h-6 text-yellow-500" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-4">Launch Your Token</h3>
+              <h3 className="text-xl font-bold text-white mb-4">Centralized Services</h3>
               <p className="text-gray-300">
-                Start your crypto journey with just $25. No fancy pitch decks or VC connections needed - just your vision and our platform.
+                Strategic partnerships with leading financial institutions, compliance firms, and technology providers to support seamless practice acquisitions and management.
               </p>
             </div>
 
@@ -124,19 +152,19 @@ export const WhatWeBuilding = () => {
               <div className="w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center mb-6">
                 <Orbit className="w-6 h-6 text-teal-500" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-4">Community Network</h3>
+              <h3 className="text-xl font-bold text-white mb-4">Governance & Voting</h3>
               <p className="text-gray-300">
-                Join our thriving community of innovators and supporters. Connect, collaborate, and grow together.
+                Participate in key decisions through our decentralized voting system. Token holders shape acquisition strategies, operational improvements, and protocol development.
               </p>
             </div>
 
             <div className="p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-all duration-300 group">
               <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center mb-6">
-                <Shield className="w-6 h-6 text-yellow-500" />
+                <BarChart3 className="w-6 h-6 text-yellow-500" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-4">Safe & Transparent</h3>
+              <h3 className="text-xl font-bold text-white mb-4">Performance Tracking</h3>
               <p className="text-gray-300">
-                Every vote and commitment is tracked on-chain. Build trust through transparency.
+                Real-time analytics and reporting on firm acquisitions, revenue growth, and protocol metrics. Transparent tracking of governance decisions and their impacts.
               </p>
             </div>
           </div>

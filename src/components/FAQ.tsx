@@ -1,90 +1,147 @@
-
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 const faqCategories = [
   {
-    category: "Platform Basics",
+    category: "Platform Fundamentals",
     questions: [
       {
-        question: "What is LedgerFren Proposal Factory?",
-        answer: "LedgerFren Proposal Factory is a decentralized platform that helps you launch your Web3 ideas. By minting a proposal NFT, you can showcase your token, NFT, DeFi, or AI project to our community of 1,500+ subscribers and 2,500+ LinkedIn members to gauge interest before committing significant resources.",
+        question: "What is our vision for the future of accounting?",
+        answer: "We envision a protocol that puts accountants in charge of the industry's future. By leveraging decentralization, peer-to-peer DeFi, and creating entirely new asset classes, we're enabling unprecedented efficiency and revenue opportunities. Our framework serves a community of like-minded professionals who believe in the power of the invisible hand - where collective expertise and market forces naturally drive innovation and value creation. This protocol isn't just a platform; it's a movement to transform how accounting practices are acquired, managed, and evolved through the power of decentralized finance and community governance.",
       },
       {
-        question: "How does the proposal system work?",
-        answer: "When you create a proposal, you mint an NFT that represents your project idea. This NFT contains all the details about your vision, including the type of project, target goals, and implementation strategy. Community members can then show their support through soft commitments, helping you validate your idea before full development.",
+        question: "What is decentralization and why is it important?",
+        answer: "Decentralization is a core principle of LedgerFund that ensures no single entity controls the platform. By distributing power across our community of token holders, we create a more transparent, fair, and resilient system for acquiring and managing accounting practices. This approach eliminates traditional intermediaries and enables direct member participation in governance and value creation.",
       },
       {
-        question: "What can I propose on the platform?",
-        answer: "You can propose any Web3-related project, including but not limited to: tokens, NFT collections, DeFi protocols, AI integrations, DAOs, and other blockchain-based innovations. The platform is designed to support a wide range of Web3 initiatives.",
+        question: "How does blockchain technology power LedgerFund?",
+        answer: "Blockchain technology provides the foundation for LedgerFund's transparent and immutable operations. Smart contracts automate and enforce rules around token distribution, voting, and profit sharing, while blockchain timestamps and assets create a verifiable record of all transactions. This technology ensures trustless execution of platform functions without relying on traditional intermediaries.",
+      },
+      {
+        question: "How does the non-custodial wallet system work?",
+        answer: "When you sign up, you create a non-custodial wallet that remains fully under your control. Your assets stay in your wallet until you choose to invest. Smart contracts handle all fund movements automatically and securely, including converting and transferring funds to acquired companies' bank accounts, distributing returns to LGR LP holders, and managing reflections to LGR holders. This ensures complete transparency and security while maintaining your full control over your assets.",
       },
     ],
   },
   {
-    category: "Proposal Creation",
+    category: "Legal & Structure",
     questions: [
       {
-        question: "How do I create a proposal?",
-        answer: "Creating a proposal is simple: 1) Connect your wallet, 2) Click 'Mint Your Proposal NFT' button, 3) Fill out the proposal form with your project details, 4) Pay the $25 minting fee, and 5) Your proposal NFT will be created and listed for community review.",
+        question: "What is LedgerFund DAO?",
+        answer: "LedgerFund DAO is a decentralized autonomous organization that will be formally established in Wyoming (Q2 2025). It enables accounting professionals to collectively acquire, govern, and transform accounting practices through blockchain technology and democratic decision-making.",
       },
       {
-        question: "What should I include in my proposal?",
-        answer: "A strong proposal should include: your project's vision and goals, target market, technical approach, revenue model, and implementation timeline. The more detailed and well-thought-out your proposal is, the better chance it has of gaining community support.",
+        question: "Why establish the DAO in Wyoming?",
+        answer: "Wyoming is the first U.S. state to establish a comprehensive legal framework for DAOs, recognizing them as legal entities. This provides clear regulatory guidance, legal protection for members, and a structured framework for decentralized operations. The Wyoming DAO LLC structure also enables efficient creation of Series SPVs for individual investments.",
       },
       {
-        question: "Do I need technical knowledge to create a proposal?",
-        answer: "No technical knowledge is required to create a proposal. The platform is designed to be accessible to anyone with a Web3 vision. You can focus on describing your idea and goals, while the technical implementation can be figured out later with community support.",
+        question: "What are Special Purpose Vehicles (SPVs)?",
+        answer: "Special Purpose Vehicles are structured as Series SPVs under the Wyoming DAO LLC, which acts as the SPV manager. This structure allows individuals, trusts, and other entities to participate in alternative investments like accounting firm acquisitions while maintaining clear governance and distribution rights. Each Series SPV operates as a separate legal entity with its own assets and liabilities, providing maximum protection and flexibility for investors.",
       },
     ],
   },
   {
-    category: "Community & Support",
+    category: "Platform Operations",
     questions: [
       {
-        question: "How does community support work?",
-        answer: "Community members can review your proposal and show their support through soft commitments. These commitments help gauge genuine interest in your project without requiring immediate financial investment. Strong community support can help validate your idea and attract potential collaborators.",
+        question: "What role does the platform play in operations?",
+        answer: "The platform is designed to operate in a fully decentralized manner, utilizing smart contracts, blockchain assets, and timestamps instead of traditional databases. While we enable the infrastructure, we do not participate in decision-making, voting, or capital raising after the pre-sale stage. The platform serves purely as an enabler for member-driven activities.",
       },
       {
-        question: "What are soft commitments?",
-        answer: "Soft commitments are expressions of interest from community members who believe in your project. While they don't represent binding financial commitments, they help demonstrate market validation and potential user adoption for your idea.",
+        question: "How does tokenized ownership work?",
+        answer: "LedgerFund implements a dual-token model for ownership and investment. The LGR token represents governance rights and reflection earnings in the overall protocol, while RWA tokens represent direct ownership in specific accounting firm investments through our Series SPVs. This structure allows for both passive protocol earnings through LGR holdings and active investment participation through RWA tokens.",
       },
       {
-        question: "How do I engage with the community?",
-        answer: "Once your proposal is live, you can interact with community members through comments, updates, and our Discord channel. Regular engagement and transparency about your project's progress can help build trust and support.",
+        question: "What are RWA tokens and LGR LP tokens?",
+        answer: "Real World Asset (RWA) tokens are digital representations of ownership in physical accounting firms. When you invest in a specific firm through our liquidity pools, you receive LGR LP tokens, which are RWA tokens that represent your proportional ownership in that investment. These tokens are backed by real-world revenue streams and enable fractional ownership and automated distribution of profits.",
+      },
+      {
+        question: "How do LedgerFund's liquidity pools work?",
+        answer: "Liquidity pools are launched in Phase 3 (Q3 2025) as part of our infrastructure development. These pools enable collective investment in accounting firm acquisitions, with the first acquisitions beginning after the deployment of our Deal Thesis Framework.",
+      },
+      {
+        question: "What's the difference between LGR reflections and LP investment returns?",
+        answer: "There are two distinct ways to earn with LedgerFund: 1) All LGR token holders automatically receive 10% of firm distributions as reflections, simply for holding the token. 2) LGR LP holders who actively invest in specific firm acquisitions through our liquidity pools receive 70% of net profits from those specific firms, represented by RWA tokens. This means you can earn both passive reflections as a token holder and direct profits as an LP investor.",
       },
     ],
   },
   {
-    category: "Next Steps",
+    category: "Deal Paperwork",
     questions: [
       {
-        question: "What happens after my proposal gains support?",
-        answer: "Once your proposal gains significant community support, you can move forward with development. The platform provides resources and connections to help you transform your idea into reality, whether that's through technical partnerships, funding opportunities, or community collaboration.",
+        question: "How are Blue Sky fees handled?",
+        answer: "The platform charges a flat fee, calculated at time of investment of the total investment raised per acquisition to cover blue sky fees at a flat rate for all members.",
       },
       {
-        question: "How long do proposals stay active?",
-        answer: "Proposals remain active on the platform indefinitely, allowing time for community discovery and support. However, we recommend actively promoting your proposal and engaging with the community in the first few weeks after minting to maximize visibility.",
+        question: "How will the Reg D paperwork be filed with the SEC?",
+        answer: "We will utilize flowinc as our backbone to act as a registered agent, establish SPV's, and file the necessary Reg D 506b safe harbor exemption paperwork.",
       },
       {
-        question: "Can I update my proposal after minting?",
-        answer: "While the core NFT data remains immutable, you can add updates and additional information to your proposal through the platform's update mechanism. This allows you to share progress, respond to community feedback, and refine your project details.",
+        question: "Will I receive a K-1?",
+        answer: "Yes, you will receive a K-1 annually from LedgerFund DAO regarding investment activity for each investment which are structured as pass-through vehicles.",
       },
     ],
   },
   {
-    category: "Technical & Security",
+    category: "Token Sale & Participation",
     questions: [
       {
-        question: "How secure is the platform?",
-        answer: "Our platform is built on blockchain technology, ensuring transparency and security. All proposals are minted as NFTs on the blockchain, and all community interactions are recorded transparently. We use industry-standard security practices to protect user data and transactions.",
+        question: "Is this an investment opportunity?",
+        answer: "No, this is not an investment opportunity. We are conducting an Initial Coin Offering (ICO) where participants are funding the creation of the platform's utility features. The funds raised during pre-sale will be used to develop the infrastructure and smart contracts that enable the platform's decentralized operations.",
       },
       {
-        question: "What blockchain does the platform use?",
-        answer: "The platform operates on the Polygon network, chosen for its low transaction costs, fast confirmation times, and environmental sustainability. This ensures creating and interacting with proposals remains accessible and affordable.",
+        question: "How does the pre-sale smart contract work?",
+        answer: "The pre-sale smart contract is designed with fairness and transparency in mind. It uses a strict presale price of $0.10 per token, enforces individual purchase caps, and distributes tokens immediately upon purchase. All transactions are verifiable on-chain, and the contract includes built-in protections against price manipulation.",
       },
       {
-        question: "Do I need my own wallet?",
-        answer: "Yes, you'll need a Web3 wallet (like MetaMask) to interact with the platform. The wallet is used to mint your proposal NFT, make soft commitments, and participate in the community. If you don't have a wallet, we provide guidance on setting one up.",
+        question: "What is the total token supply?",
+        answer: "The LedgerFren token smart contract has a fixed supply of 10 million tokens, with no ability to mint additional tokens. Of this total, 5 million tokens are allocated for the pre-sale phase, making it a truly limited opportunity for early supporters.",
+      },
+      {
+        question: "When does the presale start and what are the caps?",
+        answer: "The presale launches in Q1 2025 with a soft cap of $250K. Early supporters can participate in the initial phase, followed by a hard cap target of $500K in Q2 2025.",
+      },
+      {
+        question: "How will the presale funds be used?",
+        answer: "Funds raised during the presale will be primarily allocated to platform development. The remaining funds will be held in our treasury to serve as the main DAO liquidity pool, funding ongoing operations and token buybacks.",
+      },
+      {
+        question: "What are reflection rights?",
+        answer: "Reflection rights entitle token holders to receive 10% of all future firm distributions through our liquidity pools, creating a passive income stream from the success of acquired practices.",
+      },
+    ],
+  },
+  {
+    category: "Governance",
+    questions: [
+      {
+        question: "How is governance power calculated?",
+        answer: "Our innovative governance system combines two key factors: your LGR token holdings and your professional experience 'node' generated from LinkedIn data. This dual approach ensures that both capital allocation and professional expertise contribute to governance power. The experience node analyzes factors like industry tenure, specializations, and relevant certifications, creating a comprehensive score that works alongside your token holdings to determine overall governance influence. More details about this system will be released as we approach the LedgerFren member NFT minting milestone.",
+      },
+      {
+        question: "When can I participate in governance?",
+        answer: "Community governance launches in Phase 3 (Q3 2025). As a token holder who has completed self-attestation of accreditation status, you'll be able to vote on key protocol decisions, including firm acquisitions, operational changes, and future development initiatives through our DAO structure. This attestation process ensures compliant participation in investment decisions.",
+      },
+      {
+        question: "What is the Deal Thesis Framework?",
+        answer: "The Deal Thesis Framework, launching in Phase 3, is a member-driven system where LGR token holders can submit and evaluate proposals for accounting firm acquisitions. Members create and submit detailed investment proposals to attract capital from fellow members, with clear criteria and transparent governance ensuring collective decision-making on all investments.",
+      },
+    ],
+  },
+  {
+    category: "Compliance & Eligibility",
+    questions: [
+      {
+        question: "Can I participate if I am not an accredited investor?",
+        answer: "As a member, you will have access to Regulation D 506(b) raises on the platform that will accept an unlimited number of accredited investors and up to 35 unaccredited investors per firm investment. This structure ensures inclusive participation while maintaining regulatory compliance.",
+      },
+      {
+        question: "What are the benefits of participating in the pre-sale?",
+        answer: "Early supporters who participate in the pre-sale stage will receive priority access to future investment opportunities on the platform, subject to meeting KYC/AML and eligibility requirements. This early participation establishes your status as a qualified member for accessing private capital raising opportunities once the platform launches.",
+      },
+      {
+        question: "How are accounting firms managed post-acquisition?",
+        answer: "Experienced MSP (Managed Service Provider) partners integrated into our ecosystem manage the firms. They present detailed proposals through our Deal Thesis Framework that are put on the blockchain for community voting.",
       },
     ],
   },

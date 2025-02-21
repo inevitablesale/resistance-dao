@@ -11,13 +11,11 @@ const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
 export const useWalletConnection = () => {
   const { primaryWallet, setShowAuthFlow, setShowOnRamp, user } = useDynamicContext();
-  const { getProvider, validateNetwork } = useWalletProvider();
+  const { getProvider, validateNetwork, getWalletType } = useWalletProvider();
   const [isConnecting, setIsConnecting] = useState(false);
   const { toast } = useToast();
 
   const connect = async () => {
-    if (isConnecting) return;
-
     try {
       setIsConnecting(true);
       setShowAuthFlow?.(true);
@@ -90,6 +88,7 @@ export const useWalletConnection = () => {
   useEffect(() => {
     if (primaryWallet?.isConnected?.()) {
       setShowAuthFlow(false);
+      // Log LinkedIn URL when wallet connects
       console.log("Wallet connected - User data:", {
         linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"],
         userVerifications: user?.verifications,
@@ -109,6 +108,7 @@ export const useWalletConnection = () => {
     setShowOnRamp,
     setShowAuthFlow,
     wallet: primaryWallet,
-    user
+    user // Also expose user in the hook return
   };
 };
+
