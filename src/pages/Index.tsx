@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Rocket, DollarSign, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -79,6 +78,81 @@ export default function Index() {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Project Proposal Section - NEW */}
+      <section className="py-16 relative">
+        <div className="container px-4">
+          <div className="max-w-4xl mx-auto">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-yellow-500">
+                Create Your Project Proposal
+              </h2>
+              <p className="text-xl text-white/80">
+                Share your Web3 vision with our community and gather support through a streamlined proposal process.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <Card className="bg-black/30 border-white/10 p-6 hover:border-teal-500/50 transition-all duration-300">
+                <h3 className="text-2xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <FileText className="w-6 h-6 text-teal-500" />
+                  Submit Your Proposal
+                </h3>
+                <ul className="space-y-3 text-white/70">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
+                    <span>Mint a Resistance Proposal NFT for just $25</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
+                    <span>Detail your project's vision, goals, and requirements</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
+                    <span>Set your target funding and timeline expectations</span>
+                  </li>
+                </ul>
+              </Card>
+
+              <Card className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
+                <h3 className="text-2xl font-semibold text-white mb-4 flex items-center gap-2">
+                  <Users className="w-6 h-6 text-yellow-500" />
+                  Gather Community Support
+                </h3>
+                <ul className="space-y-3 text-white/70">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                    <span>Connect with 1,500+ subscribers and 2,500+ LinkedIn members</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                    <span>Collect soft commitments to validate interest</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                    <span>Receive feedback from experienced Web3 builders</span>
+                  </li>
+                </ul>
+              </Card>
+            </div>
+
+            <div className="text-center">
+              <Button
+                size="lg"
+                onClick={() => navigate('/thesis')}
+                className="bg-gradient-to-r from-teal-500 to-yellow-500 hover:from-teal-600 hover:to-yellow-600 text-black font-semibold px-8"
+              >
+                <Rocket className="w-5 h-5 mr-2" />
+                Start Your Proposal
+              </Button>
+            </div>
           </div>
         </div>
       </section>
