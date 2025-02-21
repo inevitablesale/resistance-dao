@@ -58,10 +58,10 @@ export default function Index() {
         <div className="container px-4">
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { icon: DollarSign, label: "Mint NFT", value: "$25" },
-              { icon: Users, label: "Community Members", value: "1,500+" },
-              { icon: Share2, label: "Network Reach", value: "2,500+" },
-              { icon: Zap, label: "Soft Commitments", value: "$1 Votes" }
+              { icon: DollarSign, label: "Mint a Proposal", value: "$25" },
+              { icon: Users, label: "Community Members", value: "2,550+" },
+              { icon: Share2, label: "Newsletter Subscribers", value: "1,500+" },
+              { icon: Zap, label: "Vote on Projects", value: "$1" }
             ].map((stat, index) => (
               <motion.div
                 key={index}
