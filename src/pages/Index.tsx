@@ -292,14 +292,16 @@ const IndexContent = () => {
                 $25
               </span>
               <div className="absolute inset-0 rounded-full glow-border" />
+              <span className="token-symbol absolute -top-2 left-0 text-yellow-400 text-2xl animate-float">$</span>
+              <span className="token-symbol absolute -bottom-2 right-0 text-teal-400 text-2xl animate-float delay-1000">$</span>
             </div>
           </div>
 
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Accounting Firm<br />Ownership Simplified
+            Got a Crypto Idea?<br />Crowdsource Your Pre-ICO Crew
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
-            Start with $25 and own fractions of high-quality accounting practices. Pool resources, earn passive income, and trade firm assets on our decentralized marketplace.
+            Launch a proposal for $25, rally votes at $1 a pop—no connections needed
           </p>
 
           <div className="space-y-6">
@@ -308,13 +310,13 @@ const IndexContent = () => {
                 onClick={() => navigate('/proposals')}
                 className="px-12 py-6 bg-yellow-500 text-black rounded-lg font-bold text-2xl hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
               >
-                Create Fund Proposal
+                Create Pool
               </button>
               <button 
                 onClick={() => window.open('https://calendly.com/inevitable-sale/lgr-presale', '_blank')}
-                className="px-12 py-6 bg-white/10 text-white rounded-lg font-bold text-2xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
+                className="px-12 py-6 bg-teal-500 text-black rounded-lg font-bold text-2xl hover:bg-teal-400 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
               >
-                Request Meeting
+                Explore Projects
               </button>
             </div>
           </div>
