@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -129,7 +130,7 @@ export const LGRFloatingWidget = () => {
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
       <div className="mb-2 px-3 py-1 bg-black/90 rounded-lg backdrop-blur-sm border border-white/10">
-        <span className="text-yellow-500 text-sm font-medium">LGR Wallet</span>
+        <span className="text-yellow-500 text-sm font-medium">Resistance Wallet</span>
       </div>
       <Popover>
         <PopoverTrigger asChild>
