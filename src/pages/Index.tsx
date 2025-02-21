@@ -23,8 +23,8 @@ import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 
 const IndexContent = () => {
   const navigate = useNavigate();
-  const { primaryWallet, handleLogOut } = useDynamicContext();
-  const { setShowOnRamp, setShowAuthFlow } = useWalletConnection();
+  const { primaryWallet } = useDynamicContext();
+  const { setShowOnRamp, setShowAuthFlow, disconnect } = useWalletConnection();
   const { toast } = useToast();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -36,7 +36,7 @@ const IndexContent = () => {
     const handleExpiredProposal = async () => {
       try {
         if (primaryWallet?.isConnected?.()) {
-          await handleLogOut();
+          await disconnect();
           toast({
             title: "Session Expired",
             description: "Your wallet session has expired. Please reconnect.",
@@ -57,7 +57,7 @@ const IndexContent = () => {
     return () => {
       window.removeEventListener('unhandledrejection', handleExpiredProposal);
     };
-  }, [primaryWallet, handleLogOut, toast]);
+  }, [primaryWallet, disconnect, toast]);
 
   useEffect(() => {
     setTimeout(() => setIsLoaded(true), 100);
@@ -83,7 +83,7 @@ const IndexContent = () => {
           description: "Your wallet connection has expired. Please try again.",
           variant: "destructive",
         });
-        await handleLogOut();
+        await disconnect();
       }
     }
   };
