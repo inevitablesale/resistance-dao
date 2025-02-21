@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Roadmap } from "@/components/Roadmap";
 import { Partners } from "@/components/Partners";
@@ -23,7 +22,7 @@ import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 
 const IndexContent = () => {
   const navigate = useNavigate();
-  const { primaryWallet } = useDynamicContext();
+  const { primaryWallet, handleLogOut } = useDynamicContext();
   const { setShowOnRamp, setShowAuthFlow } = useWalletConnection();
   const { toast } = useToast();
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -33,20 +32,59 @@ const IndexContent = () => {
   const [maticPrice, setMaticPrice] = useState<string>("Loading...");
 
   useEffect(() => {
+    const handleExpiredProposal = async () => {
+      try {
+        if (primaryWallet?.isConnected?.()) {
+          await handleLogOut();
+          toast({
+            title: "Session Expired",
+            description: "Your wallet session has expired. Please reconnect.",
+            variant: "default",
+          });
+        }
+      } catch (error) {
+        console.error("Error handling expired proposal:", error);
+      }
+    };
+
+    window.addEventListener('unhandledrejection', (event) => {
+      if (event.reason?.message === 'Proposal expired') {
+        handleExpiredProposal();
+      }
+    });
+
+    return () => {
+      window.removeEventListener('unhandledrejection', handleExpiredProposal);
+    };
+  }, [primaryWallet, handleLogOut, toast]);
+
+  useEffect(() => {
     setTimeout(() => setIsLoaded(true), 100);
   }, []);
 
-  const handleBuyToken = () => {
-    if (!primaryWallet?.address) {
-      toast({
-        title: "Wallet Required",
-        description: "Please connect your wallet first.",
-        variant: "destructive",
-      });
-      setShowAuthFlow?.(true);
-      return;
+  const handleBuyToken = async () => {
+    try {
+      if (!primaryWallet?.address) {
+        toast({
+          title: "Wallet Required",
+          description: "Please connect your wallet first.",
+          variant: "destructive",
+        });
+        setShowAuthFlow?.(true);
+        return;
+      }
+      setShowOnRamp?.(true);
+    } catch (error: any) {
+      console.error("Buy token error:", error);
+      if (error.message === 'Proposal expired') {
+        toast({
+          title: "Connection Expired",
+          description: "Your wallet connection has expired. Please try again.",
+          variant: "destructive",
+        });
+        await handleLogOut();
+      }
     }
-    setShowOnRamp?.(true);
   };
 
   const handleScroll = () => {
