@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 
-export default function Index() {
+const Index = () => {
   const navigate = useNavigate();
   
   return (
@@ -582,4 +582,15 @@ export default function Index() {
             ].map((milestone, index) => (
               <Card key={index} className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
                 <div className="text-yellow-500 font-bold text-2xl mb-2">{milestone.amount}</div>
-                <h3 className="text-xl font-semibold text
+                <h3 className="text-xl font-semibold text-white mb-2">{milestone.title}</h3>
+                <p className="text-white/80">{milestone.description}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Index;
