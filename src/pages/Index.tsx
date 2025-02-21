@@ -603,4 +603,19 @@ export default function Index() {
               <Card key={index} className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
                 <h3 className="text-xl font-bold text-white mb-2">{phase.phase}</h3>
                 <p className="text-yellow-500 mb-4">{phase.timing}</p>
-                <ul
+                <ul className="space-y-2">
+                  {phase.items.map((item, itemIndex) => (
+                    <li key={itemIndex} className="text-white/70 flex items-start gap-2">
+                      <ChevronRight className="w-4 h-4 text-yellow-500 mt-1 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
