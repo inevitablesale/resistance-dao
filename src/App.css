@@ -268,9 +268,18 @@
 }
 
 @keyframes float {
-  0% { transform: translate(0, 0); opacity: 0.5; }
-  50% { transform: translate(-5px, -10px); opacity: 0.8; }
-  100% { transform: translate(0, 0); opacity: 0.5; }
+  0% { 
+    transform: translate(0, 0) rotate(0deg); 
+    opacity: 0.3; 
+  }
+  50% { 
+    transform: translate(-5px, -5px) rotate(15deg); 
+    opacity: 0.6; 
+  }
+  100% { 
+    transform: translate(0, 0) rotate(0deg); 
+    opacity: 0.3; 
+  }
 }
 
 .token-symbol {
