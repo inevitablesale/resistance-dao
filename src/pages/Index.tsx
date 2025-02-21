@@ -334,7 +334,6 @@ const IndexContent = () => {
 
       <LGRFloatingWidget />
 
-      {/* Launch Your Web3 Vision Section */}
       <section className="py-16 relative z-10">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
@@ -391,98 +390,6 @@ const IndexContent = () => {
                   <p className="text-white/70">
                     Use your LFP to prove your project's potential on-chain, gathering votes and commitments before investing in smart contracts. No upfront risks, no steep fees—just clear momentum to launch when you're ready.
                   </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mint NFT Section - Right after Hero */}
-      <section className="py-16 relative z-10">
-        <div className="container px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-              <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
-                <div className="flex flex-col md:flex-row items-center gap-8">
-                  {/* Left side - Animated Icons */}
-                  <div className="w-full md:w-1/3 flex justify-center relative">
-                    {/* Main NFT Visual */}
-                    <div className="relative w-64 h-64">
-                      {/* Floating Project Symbols */}
-                      <div className="absolute inset-0">
-                        <DollarSign className="absolute top-0 left-0 w-8 h-8 text-yellow-500 animate-float" />
-                        <Image className="absolute top-1/4 right-0 w-8 h-8 text-purple-500 animate-float-delayed" />
-                        <Settings className="absolute bottom-1/4 left-0 w-8 h-8 text-teal-500 animate-float-more-delayed" />
-                        <Brain className="absolute bottom-0 right-0 w-8 h-8 text-blue-500 animate-float-most-delayed" />
-                      </div>
-                      
-                      {/* Wallet Icon */}
-                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-yellow-500/30 rounded-full animate-pulse"></div>
-                          <Wallet className="w-16 h-16 text-yellow-500 relative z-10 animate-cosmic-pulse" />
-                        </div>
-                      </div>
-
-                      {/* Users Vote Stack */}
-                      <div className="absolute left-1/2 bottom-0 -translate-x-1/2">
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-teal-500/30 rounded-full animate-pulse"></div>
-                          <UsersRound className="w-16 h-16 text-teal-500 relative z-10 animate-vote-stack" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right side - Content */}
-                  <div className="w-full md:w-2/3">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400">
-                      Mint an NFT to Launch Your Web3 Idea—Simple and Accessible
-                    </h2>
-                    <p className="text-lg text-white/80 mb-8">
-                      Use our LedgerFren Proposal Factory to mint a LedgerFren Proposal (LFP) for just $25—an NFT that lets you test any Web3 idea (token, NFT, DeFi, AI, or more) and collect soft commitments. No smart contracts or tech skills required upfront.
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                      <div className="flex items-start gap-3">
-                        <Wallet className="w-6 h-6 text-yellow-500 mt-1 flex-shrink-0 animate-pulse" />
-                        <span className="text-white/70">Mint your proposal NFT for just $25</span>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <UsersRound className="w-6 h-6 text-teal-500 mt-1 flex-shrink-0 animate-pulse" />
-                        <span className="text-white/70">Collect $1 votes as soft commitments</span>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <Users className="w-6 h-6 text-yellow-500 mt-1 flex-shrink-0" />
-                        <span className="text-white/70">Join 1,500+ newsletter subscribers</span>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <Shield className="w-6 h-6 text-teal-500 mt-1 flex-shrink-0" />
-                        <span className="text-white/70">2,500+ LinkedIn network members</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-4">
-                      <button 
-                        onClick={() => navigate('/thesis')}
-                        className="px-6 py-3 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Wallet className="w-5 h-5" />
-                          <span>Mint Your Proposal NFT</span>
-                        </div>
-                      </button>
-                      <button 
-                        onClick={() => navigate('/proposals')}
-                        className="px-6 py-3 bg-teal-500 text-black rounded-lg font-semibold hover:bg-teal-400 transition-all duration-300 transform hover:scale-105"
-                      >
-                        <div className="flex items-center gap-2">
-                          <UsersRound className="w-5 h-5" />
-                          <span>View Active Proposals</span>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
