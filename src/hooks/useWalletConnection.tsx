@@ -14,37 +14,13 @@ export const useWalletConnection = () => {
   const { getProvider, validateNetwork } = useWalletProvider();
   const [isConnecting, setIsConnecting] = useState(false);
   const { toast } = useToast();
-  const [retryAttempt, setRetryAttempt] = useState(0);
-  const MAX_RETRIES = 3;
-  const RETRY_DELAY = 1000; // 1 second
 
   const connect = async () => {
-    if (isConnecting) return; // Prevent multiple simultaneous connection attempts
+    if (isConnecting) return;
 
     try {
       setIsConnecting(true);
-      setRetryAttempt(0); // Reset retry counter
-      
-      // Show auth flow with retry logic
-      const attemptConnection = async (attempt: number) => {
-        try {
-          setShowAuthFlow?.(true);
-        } catch (error) {
-          console.error(`Connection attempt ${attempt + 1} failed:`, error);
-          
-          if (error instanceof Error && error.message.includes('Proposal expired')) {
-            if (attempt < MAX_RETRIES) {
-              // Wait before retrying
-              await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-              setRetryAttempt(attempt + 1);
-              return attemptConnection(attempt + 1);
-            }
-          }
-          throw error; // If max retries reached or different error
-        }
-      };
-
-      await attemptConnection(0);
+      setShowAuthFlow?.(true);
     } catch (error) {
       console.error("Connection error:", error);
       const proposalError = handleDynamicError(error);
@@ -114,7 +90,6 @@ export const useWalletConnection = () => {
   useEffect(() => {
     if (primaryWallet?.isConnected?.()) {
       setShowAuthFlow(false);
-      // Log LinkedIn URL when wallet connects
       console.log("Wallet connected - User data:", {
         linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"],
         userVerifications: user?.verifications,
