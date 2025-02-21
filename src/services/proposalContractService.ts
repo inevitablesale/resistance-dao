@@ -141,7 +141,6 @@ function validateProposalInput(input: ProposalContractInput) {
 
     validateTextLength(input.location, "Location", 1, 100);
 
-    // Enhanced array validation with uint8 range check
     const validateArray = (arr: any[], name: string) => {
       if (!Array.isArray(arr) || arr.length === 0) {
         throw new Error(`${name} array is required and must not be empty`);
@@ -158,107 +157,83 @@ function validateProposalInput(input: ProposalContractInput) {
     validateArray(input.operationalStrategies, "Operational strategies");
     validateArray(input.growthStrategies, "Growth strategies");
     validateArray(input.integrationStrategies, "Integration strategies");
-
-    // Skip target capital validation here since it's already validated in TargetCapitalInput
-    // and is already in wei format
-
   } catch (error) {
     console.error("Validation error:", error);
     throw error;
   }
 }
 
-type ProposalTuple = [
-  string,                // title
-  string,                // ipfsMetadata
-  ethers.BigNumber,      // targetCapital (in wei)
-  number,                // votingDuration
-  string,                // investmentDrivers
-  string,                // additionalCriteria
-  number,                // firmSize
-  string,                // location
-  number,                // dealType
-  number,                // geographicFocus
-  number[],              // paymentTerms
-  number[],              // operationalStrategies
-  number[],              // growthStrategies
-  number[]               // integrationStrategies
-];
-
-function transformToContractTuple(input: ProposalContractInput): ProposalTuple {
-  // Helper to ensure arrays are valid and numeric
-  const toNumberArray = (arr: (number | string)[] | undefined): number[] =>
-    Array.isArray(arr) ? arr.map(num => Number(num)) : [0];
-
-  // Helper to ensure number is within uint8 range
-  const toUint8 = (num: number | string | undefined): number => {
-    const value = Number(num || 0);
-    return Math.max(0, Math.min(255, value));
+function transformToContractTuple(input: ProposalContractInput): ProposalContractTuple {
+  const toUint8Array = (arr: (number | string)[] | undefined): number[] => {
+    if (!Array.isArray(arr) || arr.length === 0) {
+      return [0];
+    }
+    return arr.map(num => Math.max(0, Math.min(255, Number(num))));
   };
 
-  // input.targetCapital is already a BigNumber in wei from TargetCapitalInput
-  const targetCapitalWei = ethers.BigNumber.from(input.targetCapital);
-  
-  console.log("Target capital processing:", {
-    inputValue: input.targetCapital.toString(),
-    weiValue: targetCapitalWei.toString(),
-    lgrValue: ethers.utils.formatUnits(targetCapitalWei, 18)
+  const targetCapitalWei = ethers.BigNumber.isBigNumber(input.targetCapital)
+    ? input.targetCapital
+    : ethers.BigNumber.from(input.targetCapital);
+
+  console.log("Creating contract tuple:", {
+    title: input.title,
+    ipfsHash: input.ipfsMetadata,
+    targetCapital: {
+      wei: targetCapitalWei.toString(),
+      lgr: ethers.utils.formatUnits(targetCapitalWei, 18)
+    },
+    arrays: {
+      paymentTerms: toUint8Array(input.paymentTerms),
+      operationalStrategies: toUint8Array(input.operationalStrategies),
+      growthStrategies: toUint8Array(input.growthStrategies),
+      integrationStrategies: toUint8Array(input.integrationStrategies)
+    }
   });
 
-  return [
-    input.title || "",
-    input.ipfsMetadata || "",
-    targetCapitalWei,  // Already in wei, no conversion needed
-    input.votingDuration || 604800, // Default to 7 days
-    input.investmentDrivers || "",
-    input.additionalCriteria || "",
-    toUint8(input.firmSize),
-    input.location || "",
-    toUint8(input.dealType),
-    toUint8(input.geographicFocus),
-    toNumberArray(input.paymentTerms),
-    toNumberArray(input.operationalStrategies),
-    toNumberArray(input.growthStrategies),
-    toNumberArray(input.integrationStrategies)
-  ];
+  return {
+    title: input.title || "",
+    ipfsMetadata: input.ipfsMetadata || "",
+    targetCapital: targetCapitalWei.toString(),
+    votingDuration: input.votingDuration || 604800,
+    investmentDrivers: input.investmentDrivers || "",
+    additionalCriteria: input.additionalCriteria || "",
+    firmSize: Number(input.firmSize),
+    location: input.location || "",
+    dealType: Number(input.dealType),
+    geographicFocus: Number(input.geographicFocus),
+    paymentTerms: toUint8Array(input.paymentTerms),
+    operationalStrategies: toUint8Array(input.operationalStrategies),
+    growthStrategies: toUint8Array(input.growthStrategies),
+    integrationStrategies: toUint8Array(input.integrationStrategies)
+  };
 }
 
 function transformConfigToContractInput(config: ProposalConfig): ProposalContractInput {
   console.log("Transforming config to contract input:", config);
   
   try {
-    const title = processText(config.metadata.title);
-    const investmentDrivers = processText(config.metadata.investment.drivers);
-    const additionalCriteria = config.metadata.investment.additionalCriteria 
-      ? processText(config.metadata.investment.additionalCriteria)
-      : "";
-    const location = processText(config.metadata.firmCriteria.location);
-    
-    const paymentTerms = Array.isArray(config.metadata.paymentTerms) ? config.metadata.paymentTerms : [];
-    const operationalStrategies = Array.isArray(config.metadata.strategies.operational) ? config.metadata.strategies.operational : [];
-    const growthStrategies = Array.isArray(config.metadata.strategies.growth) ? config.metadata.strategies.growth : [];
-    const integrationStrategies = Array.isArray(config.metadata.strategies.integration) ? config.metadata.strategies.integration : [];
-
     const contractInput: ProposalContractInput = {
-      title,
+      title: processText(config.metadata.title),
       ipfsMetadata: config.ipfsHash || '',
       targetCapital: config.targetCapital,
       votingDuration: config.votingDuration,
-      investmentDrivers,
-      additionalCriteria,
+      investmentDrivers: processText(config.metadata.investment.drivers),
+      additionalCriteria: config.metadata.investment.additionalCriteria 
+        ? processText(config.metadata.investment.additionalCriteria)
+        : "",
       firmSize: config.metadata.firmCriteria.size,
-      location,
+      location: processText(config.metadata.firmCriteria.location),
       dealType: config.metadata.firmCriteria.dealType,
       geographicFocus: config.metadata.firmCriteria.geographicFocus,
-      paymentTerms,
-      operationalStrategies,
-      growthStrategies,
-      integrationStrategies
+      paymentTerms: Array.isArray(config.metadata.paymentTerms) ? config.metadata.paymentTerms : [],
+      operationalStrategies: Array.isArray(config.metadata.strategies.operational) ? config.metadata.strategies.operational : [],
+      growthStrategies: Array.isArray(config.metadata.strategies.growth) ? config.metadata.strategies.growth : [],
+      integrationStrategies: Array.isArray(config.metadata.strategies.integration) ? config.metadata.strategies.integration : []
     };
 
     console.log("Contract input prepared:", {
       ...contractInput,
-      targetCapital: contractInput.targetCapital.toString(),
+      targetCapital: contractInput.targetCapital.toString()
     });
     
     return contractInput;
@@ -287,33 +262,36 @@ export const createProposal = async (
     const contractInput = transformConfigToContractInput(config);
     validateProposalInput(contractInput);
     
-    console.log("Creating proposal with contract input:", {
-      ...contractInput,
-      targetCapital: contractInput.targetCapital.toString(),
-    });
-    
-    if (!factory.createProposal) {
-      throw new Error("Contract method 'createProposal' not found");
-    }
-
     const contractTuple = transformToContractTuple(contractInput);
-    console.log("Transformed contract tuple:", {
-      ...contractTuple,
-      targetCapital: contractTuple[2].toString(),
-      targetCapitalLGR: ethers.utils.formatUnits(contractTuple[2], 18),
-      arrays: {
-        paymentTerms: contractTuple[10],
-        operationalStrategies: contractTuple[11],
-        growthStrategies: contractTuple[12],
-        integrationStrategies: contractTuple[13]
-      }
+    
+    const contractParams = [
+      contractTuple.title,
+      contractTuple.ipfsMetadata,
+      contractTuple.targetCapital,
+      contractTuple.votingDuration,
+      contractTuple.investmentDrivers,
+      contractTuple.additionalCriteria,
+      contractTuple.firmSize,
+      contractTuple.location,
+      contractTuple.dealType,
+      contractTuple.geographicFocus,
+      contractTuple.paymentTerms,
+      contractTuple.operationalStrategies,
+      contractTuple.growthStrategies,
+      contractTuple.integrationStrategies
+    ];
+
+    console.log("Creating proposal with parameters:", {
+      contractParams,
+      linkedInURL: config.linkedInURL,
+      targetCapitalLGR: ethers.utils.formatUnits(contractTuple.targetCapital, 18)
     });
 
     return await executeTransaction(
-      () => factory.createProposal(contractTuple, config.linkedInURL),
+      () => factory.createProposal([contractParams, config.linkedInURL]),
       {
         type: 'nft',
-        description: `Creating proposal with target capital ${ethers.utils.formatEther(config.targetCapital)} LGR`,
+        description: `Creating proposal with target capital ${ethers.utils.formatUnits(contractTuple.targetCapital, 18)} LGR`,
         timeout: 180000,
         maxRetries: 3,
         backoffMs: 5000,
