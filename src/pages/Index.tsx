@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
 import { ReclaimControl } from "@/components/ReclaimControl";
@@ -14,7 +15,7 @@ import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Building2, Calculator, Clock, Calendar, DollarSign, BookOpen, BarChart2, Briefcase } from "lucide-react";
+import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Calculator, Clock, Calendar, DollarSign, BookOpen, BarChart2, Briefcase } from "lucide-react";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { NewsletterSubscription } from "@/components/NewsletterSubscription";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -284,14 +285,22 @@ const IndexContent = () => {
             transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * -50}px)`
           }}
         >
-          <div className="mb-8">
-            <Building2 className="w-24 h-24 mx-auto text-yellow-500 animate-cosmic-pulse" />
+          <div className="mb-8 relative">
+            <div className="relative flex items-center justify-center w-32 h-32">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-teal-500/20 rounded-full animate-cosmic-pulse" />
+              <div className="absolute inset-0 bg-black/40 rounded-full backdrop-blur-sm" />
+              <span className="relative text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400 animate-cosmic-pulse">
+                $25
+              </span>
+              <div className="absolute inset-0 rounded-full glow-border" />
+            </div>
           </div>
+
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
             Accounting Firm<br />Ownership Simplified
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
-            Start with $100 and own fractions of high-quality accounting practices. Pool resources, earn passive income, and trade firm assets on our decentralized marketplace.
+            Start with $25 and own fractions of high-quality accounting practices. Pool resources, earn passive income, and trade firm assets on our decentralized marketplace.
           </p>
 
           <div className="space-y-6">
