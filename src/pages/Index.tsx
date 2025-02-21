@@ -377,52 +377,58 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Web3-Native Fundraising Section - NEW */}
       <section className="py-16 relative">
         <div className="container px-4">
-          <h2 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12">
-            Why Join the Revolution?
-          </h2>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="p-6 rounded-xl bg-black/30 backdrop-blur border border-white/10 hover:border-yellow-500/50 transition-all duration-300"
-            >
-              <Shield className="w-8 h-8 text-yellow-500 mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">Non-Custodial</h3>
-              <p className="text-white/70">
-                Your wallet, your control. Create and manage your proposal NFT directly—no intermediaries or gatekeepers involved.
-              </p>
-            </motion.div>
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
+              Supporting the Future of Web3
+            </h2>
+            <p className="text-xl text-white/80 mb-8">
+              Resistance DAO is more than a platform—we're a Web3-native project using utility-driven tokenomics to build the future of decentralized investment.
+            </p>
+            
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <Card className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300 text-left">
+                <h3 className="text-xl font-semibold text-white mb-4">Every Action Supports the DAO</h3>
+                <ul className="space-y-3 text-white/70">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                    <span>Each $25 proposal mint strengthens our treasury</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                    <span>Every $1 vote contributes to DAO development</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                    <span>Community participation drives our growth</span>
+                  </li>
+                </ul>
+              </Card>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="p-6 rounded-xl bg-black/30 backdrop-blur border border-white/10 hover:border-teal-500/50 transition-all duration-300"
-            >
-              <Users className="w-8 h-8 text-teal-500 mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">Decentralized</h3>
-              <p className="text-white/70">
-                No centralized authorities—your potential supporters vote with $1 each to show interest and guide your project's direction.
-              </p>
-            </motion.div>
+              <Card className="bg-black/30 border-white/10 p-6 hover:border-teal-500/50 transition-all duration-300 text-left">
+                <h3 className="text-xl font-semibold text-white mb-4">Building Together</h3>
+                <ul className="space-y-3 text-white/70">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
+                    <span>Your proposals help fund our infrastructure</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
+                    <span>Voting fees support platform development</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-teal-500 shrink-0 mt-0.5" />
+                    <span>Success is shared with all participants</span>
+                  </li>
+                </ul>
+              </Card>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="p-6 rounded-xl bg-black/30 backdrop-blur border border-white/10 hover:border-yellow-500/50 transition-all duration-300"
-            >
-              <FileText className="w-8 h-8 text-yellow-500 mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">Transparent</h3>
-              <p className="text-white/70">
-                Track every $25 proposal, $1 vote, and soft commitment on-chain via your proposal NFT. Monitor interest in real-time.
-              </p>
-            </motion.div>
+            <p className="text-lg text-white/80 italic">
+              By participating in Resistance DAO, you're not just pitching or voting on projects—you're helping build the future of decentralized investment.
+            </p>
           </div>
         </div>
       </section>
