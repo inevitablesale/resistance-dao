@@ -262,8 +262,8 @@ async function approveTokensIfNeeded(
     provider,
     LGR_TOKEN_ADDRESS,
     signerAddress,
-    spender,
-    amount.toString() // Convert BigNumber to string here
+    FACTORY_ADDRESS,
+    amount.toString()
   );
 
   if (!hasAllowance) {
@@ -275,16 +275,16 @@ async function approveTokensIfNeeded(
     );
 
     await executeTransaction(
-      () => lgrToken.approve(spender, amount),
+      () => lgrToken.approve(FACTORY_ADDRESS, amount),
       {
         type: 'token',
         description: `Approve ${ethers.utils.formatEther(amount)} LGR tokens`,
-        timeout: 120000, // 2 minutes
+        timeout: 120000,
         maxRetries: 3,
         backoffMs: 5000,
         tokenConfig: {
           tokenAddress: LGR_TOKEN_ADDRESS,
-          spenderAddress: spender,
+          spenderAddress: FACTORY_ADDRESS,
           amount: amount.toString(),
           isApproval: true
         }
@@ -360,7 +360,7 @@ export const createProposal = async (
     // Submit proposal with explicit gas settings
     return await executeTransaction(
       () => factory.createProposal(tupleArray, metadata.linkedInURL, {
-        gasLimit: 1000000, // Explicit gas limit
+        gasLimit: 1000000,
       }),
       {
         type: 'nft',
@@ -455,7 +455,7 @@ export const estimateProposalGas = async (
   
   try {
     const gasEstimate = await factory.estimateGas.createProposal(input, config.linkedInURL);
-    return gasEstimate.mul(120).div(100); // Add 20% buffer
+    return gasEstimate.mul(120).div(100);
   } catch (error) {
     console.error("Gas estimation error:", error);
     throw error;
