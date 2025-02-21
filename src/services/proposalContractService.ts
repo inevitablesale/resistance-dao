@@ -142,31 +142,20 @@ function validateProposalInput(input: ProposalContractInput) {
 
     validateTextLength(input.location, "Location", 1, 100);
 
-    if (!input.paymentTerms.length) {
-      throw new Error("At least one payment term is required");
-    }
-    if (!input.operationalStrategies.length) {
-      throw new Error("At least one operational strategy is required");
-    }
-    if (!input.growthStrategies.length) {
-      throw new Error("At least one growth strategy is required");
-    }
-    if (!input.integrationStrategies.length) {
-      throw new Error("At least one integration strategy is required");
-    }
-
-    const validateUint8Array = (arr: number[], fieldName: string) => {
-      arr.forEach((value, index) => {
-        if (value < 0 || value > 255) {
-          throw new Error(`${fieldName}[${index}] must be between 0 and 255`);
-        }
-      });
+    // Validate arrays are present and contain valid numbers
+    const validateArray = (arr: any[], name: string) => {
+      if (!Array.isArray(arr) || arr.length === 0) {
+        throw new Error(`${name} array is required and must not be empty`);
+      }
+      if (arr.some(item => isNaN(Number(item)))) {
+        throw new Error(`${name} array contains invalid numeric values`);
+      }
     };
 
-    validateUint8Array(input.paymentTerms, "Payment terms");
-    validateUint8Array(input.operationalStrategies, "Operational strategies");
-    validateUint8Array(input.growthStrategies, "Growth strategies");
-    validateUint8Array(input.integrationStrategies, "Integration strategies");
+    validateArray(input.paymentTerms, "Payment terms");
+    validateArray(input.operationalStrategies, "Operational strategies");
+    validateArray(input.growthStrategies, "Growth strategies");
+    validateArray(input.integrationStrategies, "Integration strategies");
 
   } catch (error) {
     console.error("Validation error:", error);
@@ -174,23 +163,28 @@ function validateProposalInput(input: ProposalContractInput) {
   }
 }
 
-function transformToContractTuple(input: ProposalContractInput): ProposalContractTuple {
-  return {
-    title: input.title,
-    ipfsMetadata: input.ipfsMetadata,
-    targetCapital: input.targetCapital.toString(),
-    votingDuration: input.votingDuration,
-    investmentDrivers: input.investmentDrivers,
-    additionalCriteria: input.additionalCriteria || '',
-    firmSize: Number(input.firmSize),
-    location: input.location,
-    dealType: Number(input.dealType),
-    geographicFocus: Number(input.geographicFocus),
-    paymentTerms: input.paymentTerms.map(term => Number(term)),
-    operationalStrategies: input.operationalStrategies.map(strategy => Number(strategy)),
-    growthStrategies: input.growthStrategies.map(strategy => Number(strategy)),
-    integrationStrategies: input.integrationStrategies.map(strategy => Number(strategy))
-  };
+function transformToContractTuple(input: ProposalContractInput): any[] {
+  // Helper to ensure arrays are valid and numeric
+  const toNumberArray = (arr: (number | string)[] | undefined): number[] =>
+    Array.isArray(arr) ? arr.map(num => Number(num)) : [0];
+
+  // Create the tuple as an array in the exact order expected by the contract
+  return [
+    input.title || "",
+    input.ipfsMetadata || "",
+    input.targetCapital.toString(),
+    input.votingDuration || 604800, // Default to 7 days
+    input.investmentDrivers || "",
+    input.additionalCriteria || "",
+    Number(input.firmSize),
+    input.location || "",
+    Number(input.dealType),
+    Number(input.geographicFocus),
+    toNumberArray(input.paymentTerms),
+    toNumberArray(input.operationalStrategies),
+    toNumberArray(input.growthStrategies),
+    toNumberArray(input.integrationStrategies)
+  ];
 }
 
 function transformConfigToContractInput(config: ProposalConfig): ProposalContractInput {
@@ -270,7 +264,7 @@ export const createProposal = async (
     console.log("Transformed contract tuple:", contractTuple);
 
     return await executeTransaction(
-      () => factory.createProposal({ input: contractTuple }, config.linkedInURL),
+      () => factory.createProposal(contractTuple, config.linkedInURL),
       {
         type: 'nft',
         description: `Creating proposal with target capital ${ethers.utils.formatEther(config.targetCapital)} LGR`,
