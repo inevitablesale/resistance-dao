@@ -1,4 +1,3 @@
-<lov-code>
 import { motion } from "framer-motion";
 import { Rocket, DollarSign, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -604,3 +603,4 @@ export default function Index() {
               <Card key={index} className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
                 <h3 className="text-xl font-bold text-white mb-2">{phase.phase}</h3>
                 <p className="text-yellow-500 mb-4">{phase.timing}</p>
+                <ul
