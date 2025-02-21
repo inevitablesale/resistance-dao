@@ -19,6 +19,13 @@ import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } 
 import { NewsletterSubscription } from "@/components/NewsletterSubscription";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
+import { Card } from "@/components/ui/card";
+import { Milestone, ChevronDown, Shield, Globe2, LineChart } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { WalletConnectModal } from "@/components/wallet/WalletConnectModal";
 
 const presaleData = [
   { 
