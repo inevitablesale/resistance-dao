@@ -19,7 +19,7 @@ export const LedgerFrens = () => {
       <div className="container px-4 relative">
         <div className="max-w-4xl mx-auto text-center mb-12">
           <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
-            Support Web3 Innovation—Join the LedgerFund DAO Presale
+            Create Your Proposal and Support LedgeFund DAO
           </h2>
 
           {/* Community Stats */}
