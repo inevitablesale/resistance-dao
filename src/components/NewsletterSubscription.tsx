@@ -49,7 +49,7 @@ export const NewsletterSubscription = () => {
         </div>
         <div className="text-left">
           <h3 className="text-2xl font-semibold text-white">Subscribe to Our Newsletter</h3>
-          <p className="text-white/70">Join 1,500+ accountants building the future of practice ownership</p>
+          <p className="text-white/70">Join 1,550+ accountants building the future of practice ownership</p>
         </div>
       </div>
       
