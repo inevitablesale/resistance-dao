@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Rocket, DollarSign, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,7 +38,7 @@ const Index = () => {
                 className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold"
               >
                 <Rocket className="w-5 h-5 mr-2" />
-                Mint Your Proposal NFT
+                Start Your Proposal
               </Button>
               <Button 
                 size="lg"

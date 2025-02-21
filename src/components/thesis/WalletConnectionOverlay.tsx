@@ -1,63 +1,131 @@
 
+import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Loader2, Wallet } from "lucide-react";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { motion } from "framer-motion";
-import { Wallet, ArrowRight, Coins } from "lucide-react";
-import { ethers } from "ethers";
+import { useState, useEffect } from "react";
+import { getTokenBalance } from "@/services/tokenService";
+import { useWalletProvider } from "@/hooks/useWalletProvider";
+import { useNavigate } from "react-router-dom";
 
-interface WalletConnectionOverlayProps {
-  requiredAmount: ethers.BigNumberish;
-}
+const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
+const REQUIRED_LGR_BALANCE = "250";
 
-export const WalletConnectionOverlay = ({ requiredAmount }: WalletConnectionOverlayProps) => {
-  const { connect } = useWalletConnection();
+export const WalletConnectionOverlay = () => {
+  const { isConnected, connect, address, setShowOnRamp } = useWalletConnection();
+  const { getProvider } = useWalletProvider();
+  const [isCheckingBalance, setIsCheckingBalance] = useState(false);
+  const [hasRequiredBalance, setHasRequiredBalance] = useState(false);
+  const navigate = useNavigate();
 
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
-    >
-      <div className="container mx-auto px-4 h-full flex items-center justify-center">
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="max-w-lg w-full bg-black/60 border border-white/10 rounded-lg p-8 backdrop-blur-sm"
-        >
-          <div className="text-center space-y-6">
-            <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-yellow-500/20 to-teal-500/20 flex items-center justify-center">
-              <Wallet className="w-8 h-8 text-yellow-500" />
+  useEffect(() => {
+    const checkBalance = async () => {
+      if (!isConnected || !address) return;
+      
+      setIsCheckingBalance(true);
+      try {
+        const provider = await getProvider();
+        const balance = await getTokenBalance(
+          provider.provider,
+          LGR_TOKEN_ADDRESS,
+          address
+        );
+        
+        const hasBalance = parseFloat(balance) >= parseFloat(REQUIRED_LGR_BALANCE);
+        setHasRequiredBalance(hasBalance);
+        
+        if (!hasBalance) {
+          setShowOnRamp(true);
+        }
+      } catch (error) {
+        console.error("Error checking LGR balance:", error);
+      } finally {
+        setIsCheckingBalance(false);
+      }
+    };
+
+    checkBalance();
+  }, [isConnected, address, getProvider, setShowOnRamp]);
+
+  if (!isConnected) {
+    return (
+      <Dialog open={true} onOpenChange={() => navigate('/')}>
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm">
+          <div className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-white/10 bg-black p-6 shadow-lg duration-200 sm:rounded-lg">
+            <div className="flex flex-col space-y-4">
+              <h2 className="text-xl font-semibold text-white">Connect Wallet</h2>
+              <p className="text-white/60">Please connect your wallet to continue creating your proposal.</p>
+              
+              <Button 
+                onClick={connect}
+                variant="outline"
+                className="w-full bg-white/5 border-white/10 hover:bg-white/10 text-white"
+              >
+                <Wallet className="mr-2 h-4 w-4" />
+                Connect Wallet
+              </Button>
+
+              <Button 
+                onClick={() => navigate('/')}
+                variant="ghost"
+                className="text-gray-400 hover:text-white"
+              >
+                Cancel
+              </Button>
             </div>
-            
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-white">Connect Your Wallet</h2>
-              <p className="text-gray-400">
-                Connect your wallet to submit an investment thesis proposal
-              </p>
-            </div>
-
-            <div className="p-4 rounded-lg bg-white/5 border border-white/10 space-y-3">
-              <div className="flex items-center gap-2 text-yellow-500">
-                <Coins className="w-5 h-5" />
-                <span className="font-medium">Submission Fee</span>
-              </div>
-              <p className="text-sm text-white/60">
-                A fee of {ethers.utils.formatEther(requiredAmount)} LGR tokens is required to submit a proposal. This helps ensure quality submissions and community engagement.
-              </p>
-            </div>
-
-            <Button
-              onClick={connect}
-              className="w-full h-12 bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600 text-white font-medium transition-all duration-300"
-            >
-              <div className="flex items-center justify-center gap-2">
-                <span>Connect Wallet</span>
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </Button>
           </div>
-        </motion.div>
-      </div>
-    </motion.div>
-  );
+        </div>
+      </Dialog>
+    );
+  }
+
+  if (isCheckingBalance) {
+    return (
+      <Dialog open={true}>
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm">
+          <div className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-white/10 bg-black p-6 shadow-lg duration-200 sm:rounded-lg">
+            <div className="flex flex-col items-center space-y-4">
+              <Loader2 className="h-8 w-8 animate-spin text-white" />
+              <p className="text-white">Checking LGR Balance...</p>
+            </div>
+          </div>
+        </div>
+      </Dialog>
+    );
+  }
+
+  if (!hasRequiredBalance) {
+    return (
+      <Dialog open={true}>
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm">
+          <div className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-white/10 bg-black p-6 shadow-lg duration-200 sm:rounded-lg">
+            <div className="flex flex-col space-y-4">
+              <h2 className="text-xl font-semibold text-white">Insufficient LGR Balance</h2>
+              <p className="text-white/60">
+                You need at least {REQUIRED_LGR_BALANCE} LGR tokens to create a proposal. 
+                Buy LGR tokens to continue.
+              </p>
+              
+              <Button 
+                onClick={() => setShowOnRamp(true)}
+                className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold"
+              >
+                Buy LGR Tokens
+              </Button>
+
+              <Button 
+                onClick={() => navigate('/')}
+                variant="ghost"
+                className="text-gray-400 hover:text-white"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Dialog>
+    );
+  }
+
+  return null;
 };
