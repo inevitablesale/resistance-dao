@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { RocketLaunch, DollarSign, Users, Share2, Shield, Zap } from "lucide-react";
+import { Rocket, DollarSign, Users, Share2, Shield, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -24,10 +24,10 @@ export default function Index() {
             className="max-w-4xl mx-auto text-center"
           >
             <h1 className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
-              Launch Your Web3 Idea for $25
+              Join the Resistance for $25
             </h1>
             <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-              Got a Web3 vision—token, NFT, DeFi, AI, or beyond? Don't let it die in your head. Mint a proposal NFT and tap into our thriving community.
+              Got a vision to challenge the status quo? Don't let it remain just an idea. Mint a proposal NFT and tap into our community of revolutionaries.
             </p>
             
             <div className="flex flex-wrap gap-4 justify-center">
@@ -36,7 +36,7 @@ export default function Index() {
                 onClick={() => navigate('/thesis')}
                 className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold"
               >
-                <RocketLaunch className="w-5 h-5 mr-2" />
+                <Rocket className="w-5 h-5 mr-2" />
                 Mint Your Proposal NFT
               </Button>
               <Button 
@@ -59,8 +59,8 @@ export default function Index() {
           <div className="grid md:grid-cols-4 gap-8">
             {[
               { icon: DollarSign, label: "Mint NFT", value: "$25" },
-              { icon: Users, label: "Newsletter Subscribers", value: "1,500+" },
-              { icon: Share2, label: "LinkedIn Network", value: "2,500+" },
+              { icon: Users, label: "Community Members", value: "1,500+" },
+              { icon: Share2, label: "Network Reach", value: "2,500+" },
               { icon: Zap, label: "Soft Commitments", value: "$1 Votes" }
             ].map((stat, index) => (
               <motion.div
@@ -86,7 +86,7 @@ export default function Index() {
       <section className="py-16 relative">
         <div className="container px-4">
           <h2 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-12">
-            Why Choose Our Platform?
+            Why Join the Resistance?
           </h2>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -99,7 +99,7 @@ export default function Index() {
               <Shield className="w-8 h-8 text-yellow-500 mb-4" />
               <h3 className="text-xl font-semibold text-white mb-2">Non-Custodial</h3>
               <p className="text-white/70">
-                Your wallet, your control. Create and manage your proposal NFT directly—no intermediaries involved.
+                Your wallet, your control. Create and manage your proposal NFT directly—no intermediaries needed.
               </p>
             </motion.div>
 
@@ -112,7 +112,7 @@ export default function Index() {
               <Users className="w-8 h-8 text-teal-500 mb-4" />
               <h3 className="text-xl font-semibold text-white mb-2">Decentralized</h3>
               <p className="text-white/70">
-                No centralized authorities—your potential supporters vote with $1 each to show interest.
+                No central authority—our community members vote with $1 each to show their support.
               </p>
             </motion.div>
 
@@ -125,7 +125,7 @@ export default function Index() {
               <Share2 className="w-8 h-8 text-yellow-500 mb-4" />
               <h3 className="text-xl font-semibold text-white mb-2">Transparent</h3>
               <p className="text-white/70">
-                Track every proposal, vote, and soft commitment on-chain via your proposal NFT.
+                Track every proposal, vote, and commitment on-chain through your proposal NFT.
               </p>
             </motion.div>
           </div>
