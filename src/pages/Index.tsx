@@ -58,10 +58,10 @@ export default function Index() {
         <div className="container px-4">
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { icon: DollarSign, label: "Mint a Proposal", value: "$25" },
+              { icon: DollarSign, label: "Proposal Mint Cost", value: "$25" },
               { icon: Users, label: "Community Members", value: "2,558+" },
               { icon: Share2, label: "Newsletter Subscribers", value: "1,545+" },
-              { icon: Zap, label: "Vote on Projects", value: "$1" }
+              { icon: Zap, label: "Voting Fee", value: "$1" }
             ].map((stat, index) => (
               <motion.div
                 key={index}
@@ -103,7 +103,7 @@ export default function Index() {
                 <h3 className="text-xl font-semibold">Collect Commitments</h3>
               </div>
               <p className="text-white/70">
-                Supporters vote with $1 each to show genuine interest in your project. These micro-commitments validate market demand without requiring major investment.
+                Supporters indicate their potential investment amount through soft commitments, with just a $1 voting fee to show genuine interest. Gauge real market demand without requiring immediate investment.
               </p>
             </Card>
 
@@ -115,7 +115,7 @@ export default function Index() {
                 <h3 className="text-xl font-semibold">Build Community</h3>
               </div>
               <p className="text-white/70">
-                Every vote creates a direct connection with interested wallets. Build relationships with potential users and investors before launch.
+                Connect directly with interested supporters and track their soft commitment amounts. Build relationships with potential investors before launch.
               </p>
             </Card>
 
@@ -127,7 +127,7 @@ export default function Index() {
                 <h3 className="text-xl font-semibold">Launch With Backing</h3>
               </div>
               <p className="text-white/70">
-                Once you hit your soft commitment target, re-engage your supporter network for presale participation and early adoption of your project.
+                Once you hit your soft commitment target, re-engage supporters for their pledged investments. Launch with confidence knowing you have verified interest and committed capital.
               </p>
             </Card>
           </div>
