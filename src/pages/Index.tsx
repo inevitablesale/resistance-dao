@@ -282,22 +282,6 @@ const IndexContent = () => {
         ref={heroRef} 
         className="text-center mb-8 max-w-6xl mx-auto pt-32 relative z-10 min-h-[120vh] flex flex-col items-center justify-start"
       >
-        <div className="fixed inset-0 z-0">
-          <div className="circuit-board" />
-          <div 
-            className="absolute inset-0 animate-parallax-slow"
-            style={{
-              background: `
-                radial-gradient(2px 2px at 20% 20%, rgba(234, 179, 8, 0.95) 100%, transparent),
-                radial-gradient(2px 2px at 40% 40%, rgba(234, 179, 8, 0.92) 100%, transparent),
-                radial-gradient(3px 3px at 60% 60%, rgba(234, 179, 8, 0.90) 100%, transparent)
-              `,
-              backgroundSize: "240px 240px",
-              opacity: Math.max(0.1, 0.85 - scrollProgress)
-            }}
-          />
-        </div>
-
         <div 
           ref={presaleRef}
           className="relative z-3 mt-[20vh]" 
@@ -307,27 +291,54 @@ const IndexContent = () => {
           }}
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Launch Your Web3 Idea—Test, Grow, and Succeed Risk-Free
+            Mint an NFT to Launch Your Web3 Idea—Simple and Accessible
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
-            Launch a proposal for $25, gather soft commitments with $1 votes—tap our network, no big connections needed
+            Use our LedgerFren Proposal Factory to mint a LedgerFren Proposal (LFP) for just $25—an NFT that lets you test any Web3 idea (token, NFT, DeFi, AI, or more) and collect soft commitments. No smart contracts or tech skills required upfront.
           </p>
 
-          <div className="space-y-6">
-            <div className="flex justify-center gap-4">
-              <button 
-                onClick={() => navigate('/thesis')}
-                className="px-12 py-6 bg-yellow-500 text-black rounded-lg font-bold text-2xl hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
-              >
-                Create Proposal
-              </button>
-              <button 
-                onClick={() => navigate('/proposals')}
-                className="px-12 py-6 bg-teal-500 text-black rounded-lg font-bold text-2xl hover:bg-teal-400 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
-              >
-                Explore Projects
-              </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-yellow-500/10 rounded-full">
+                <Wallet className="w-8 h-8 text-yellow-500" />
+              </div>
+              <span className="text-white/80 text-lg">Mint your proposal NFT for just $25</span>
             </div>
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-teal-500/10 rounded-full">
+                <Users className="w-8 h-8 text-teal-500" />
+              </div>
+              <span className="text-white/80 text-lg">Collect $1 votes as soft commitments</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-yellow-500/10 rounded-full">
+                <UsersRound className="w-8 h-8 text-yellow-500" />
+              </div>
+              <span className="text-white/80 text-lg">Join 1,500+ newsletter subscribers</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-teal-500/10 rounded-full">
+                <Shield className="w-8 h-8 text-teal-500" />
+              </div>
+              <span className="text-white/80 text-lg">2,500+ LinkedIn network members</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <button 
+              onClick={() => navigate('/thesis')}
+              className="px-8 py-4 bg-yellow-500 text-black rounded-lg font-bold text-xl hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm flex items-center justify-center gap-2"
+            >
+              <Wallet className="w-5 h-5" />
+              Mint Your Proposal NFT
+            </button>
+            <button 
+              onClick={() => navigate('/proposals')}
+              className="px-8 py-4 bg-teal-500 text-black rounded-lg font-bold text-xl hover:bg-teal-400 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm flex items-center justify-center gap-2"
+            >
+              <Users className="w-5 h-5" />
+              View Active Proposals
+            </button>
           </div>
         </div>
       </div>
