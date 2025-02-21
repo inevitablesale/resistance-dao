@@ -82,7 +82,133 @@ export default function Index() {
         </div>
       </section>
 
-      {/* NEW: Soft Commitments Process Section */}
+      {/* NEW: Detailed Soft Commitments & Voting Section */}
+      <section className="py-16 relative">
+        <div className="container px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
+              How Soft Commitments & Voting Work
+            </h2>
+            <p className="text-xl text-white/80 max-w-3xl mx-auto mb-8">
+              Our unique two-step process helps you validate market interest and build a community of committed supporters before launch.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+            <Card className="bg-black/30 border-white/10 p-8 hover:border-yellow-500/50 transition-all duration-300">
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                  <DollarSign className="w-7 h-7 text-yellow-500" />
+                </div>
+                Initial Voting
+              </h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <Check className="w-5 h-5 text-yellow-500 mt-1" />
+                  <div>
+                    <span className="font-semibold">$1 Voting Fee:</span> Small fee to ensure genuine interest and prevent spam
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Check className="w-5 h-5 text-yellow-500 mt-1" />
+                  <div>
+                    <span className="font-semibold">Soft Commitment Amount:</span> Supporters indicate how much they'd potentially invest
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Check className="w-5 h-5 text-yellow-500 mt-1" />
+                  <div>
+                    <span className="font-semibold">No Lock-in:</span> Soft commitments are non-binding to encourage honest feedback
+                  </div>
+                </li>
+              </ul>
+            </Card>
+
+            <Card className="bg-black/30 border-white/10 p-8 hover:border-teal-500/50 transition-all duration-300">
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center">
+                  <Rocket className="w-7 h-7 text-teal-500" />
+                </div>
+                Launch Process
+              </h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <Check className="w-5 h-5 text-teal-500 mt-1" />
+                  <div>
+                    <span className="font-semibold">Target Reached:</span> Once your soft commitment goal is met, begin the launch phase
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Check className="w-5 h-5 text-teal-500 mt-1" />
+                  <div>
+                    <span className="font-semibold">Direct Communication:</span> Re-engage supporters who showed interest through voting
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Check className="w-5 h-5 text-teal-500 mt-1" />
+                  <div>
+                    <span className="font-semibold">Convert Interest:</span> Turn soft commitments into actual investments
+                  </div>
+                </li>
+              </ul>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* NEW: Community Promotion Section */}
+      <section className="py-16 relative">
+        <div className="container px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
+              Amplify Your Reach
+            </h2>
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+              Get your project in front of thousands of potential supporters through our established channels.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <Card className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-yellow-500" />
+                </div>
+                <h3 className="text-xl font-semibold">Newsletter Feature</h3>
+              </div>
+              <p className="text-white/70">
+                Reach 1,500+ engaged subscribers through our curated newsletter. Each proposal gets dedicated coverage to maximize visibility.
+              </p>
+            </Card>
+
+            <Card className="bg-black/30 border-white/10 p-6 hover:border-teal-500/50 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center">
+                  <Building2 className="w-6 h-6 text-teal-500" />
+                </div>
+                <h3 className="text-xl font-semibold">LinkedIn Network</h3>
+              </div>
+              <p className="text-white/70">
+                Get exposure to our network of 2,500+ LinkedIn professionals. Your proposal will be shared with detailed insights.
+              </p>
+            </Card>
+
+            <Card className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-yellow-500" />
+                </div>
+                <h3 className="text-xl font-semibold">Community Events</h3>
+              </div>
+              <p className="text-white/70">
+                Present your project in our community calls and AMAs. Connect directly with potential supporters and get valuable feedback.
+              </p>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Soft Commitments Process Section */}
       <section className="py-16 relative">
         <div className="container px-4">
           <div className="text-center mb-12">
