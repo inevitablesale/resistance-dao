@@ -1,15 +1,9 @@
 
 import React from 'react';
-import { WhatWeBuilding } from "@/components/WhatWeBuilding";
-import { ReclaimControl } from "@/components/ReclaimControl";
-import { HowItWorks } from "@/components/HowItWorks";
-import { CallToAction } from "@/components/CallToAction";
 import { Roadmap } from "@/components/Roadmap";
-import { LedgerFrens } from "@/components/LedgerFrens";
 import { Partners } from "@/components/Partners";
 import { FAQ } from "@/components/FAQ";
 import { useNavigate } from "react-router-dom";
-import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
@@ -145,7 +139,6 @@ const IndexContent = () => {
       </div>
 
       <LGRFloatingWidget />
-      <CallToAction />
       <Roadmap />
       <FAQ />
       <Partners />
