@@ -11,7 +11,11 @@ import {
   Wallet,
   Users,
   Shield,
-  UsersRound
+  UsersRound,
+  DollarSign,
+  Clock,
+  Crown,
+  Rocket
 } from "lucide-react";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
@@ -139,6 +143,108 @@ const IndexContent = () => {
       </div>
 
       <LGRFloatingWidget />
+
+      <section className="py-16 relative z-10">
+        <div className="container px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
+                  Unleash Your Web3 Vision
+                </span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-teal-200">
+                  —Tap Our Network to Launch Without Risk
+                </span>
+              </h2>
+              <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto">
+                Whether you're a CEO, product manager, developer, marketer, or analyst—your Web3 vision deserves a shot. No network? No problem.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              {/* Feeling Sidelined Card */}
+              <div className="p-8 rounded-lg border border-red-900/30 bg-red-950/20 backdrop-blur-sm">
+                <div className="text-red-400 mb-6">
+                  <DollarSign className="w-12 h-12" />
+                </div>
+                <h3 className="text-2xl font-bold text-red-400 mb-6">Feeling Sidelined?</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3 text-white/70">
+                    <Users className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
+                    <span>Watching others launch tokens, NFTs, and DeFi platforms while your idea stays locked in your head</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-white/70">
+                    <Clock className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
+                    <span>Launchpads demand steep fees and force commitments before proving interest</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-white/70">
+                    <Crown className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
+                    <span>Social platforms drown out fresh voices, and traditional routes demand insider networks</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Our Pre-Launch Solution Card */}
+              <div className="p-8 rounded-lg border border-teal-900/30 bg-teal-950/20 backdrop-blur-sm">
+                <div className="text-teal-400 mb-6">
+                  <Rocket className="w-12 h-12" />
+                </div>
+                <h3 className="text-2xl font-bold text-teal-400 mb-6">Our Pre-Launch Solution</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3 text-white/70">
+                    <Rocket className="w-5 h-5 text-teal-400 mt-1 flex-shrink-0" />
+                    <span>Start with just $25—create a proposal NFT that tests your token, NFT, DeFi, or AI project</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-white/70">
+                    <Users className="w-5 h-5 text-teal-400 mt-1 flex-shrink-0" />
+                    <span>Tap our network of 1,500 newsletter subscribers and 2,500 LinkedIn members</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-white/70">
+                    <Shield className="w-5 h-5 text-teal-400 mt-1 flex-shrink-0" />
+                    <span>Gather soft commitments with $1 votes before investing in smart contracts</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Non-Custodial Card */}
+              <div className="p-8 rounded-lg border border-yellow-900/30 bg-yellow-950/20 backdrop-blur-sm">
+                <div className="text-yellow-400 mb-6">
+                  <Shield className="w-12 h-12" />
+                </div>
+                <h3 className="text-2xl font-bold text-yellow-400 mb-6">Non-Custodial</h3>
+                <p className="text-white/70">
+                  Your wallet, your control. Create and manage your proposal NFT directly—no intermediaries or gatekeepers involved.
+                </p>
+              </div>
+
+              {/* Decentralized Card */}
+              <div className="p-8 rounded-lg border border-teal-900/30 bg-teal-950/20 backdrop-blur-sm">
+                <div className="text-teal-400 mb-6">
+                  <Users className="w-12 h-12" />
+                </div>
+                <h3 className="text-2xl font-bold text-teal-400 mb-6">Decentralized</h3>
+                <p className="text-white/70">
+                  No centralized authorities—your potential supporters vote with $1 each to show interest and guide your project's direction.
+                </p>
+              </div>
+
+              {/* Transparent Card */}
+              <div className="p-8 rounded-lg border border-yellow-900/30 bg-yellow-950/20 backdrop-blur-sm">
+                <div className="text-yellow-400 mb-6">
+                  <Rocket className="w-12 h-12" />
+                </div>
+                <h3 className="text-2xl font-bold text-yellow-400 mb-6">Transparent</h3>
+                <p className="text-white/70">
+                  Track every $25 proposal, $1 vote, and soft commitment on-chain via your proposal NFT. Monitor interest in real-time.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <Roadmap />
       <FAQ />
       <Partners />
