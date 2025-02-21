@@ -76,7 +76,7 @@ const dynamicSettings = {
     evmNetworks,
     network: evmNetworks[0],
     environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
-    appName: "LedgerFund",
+    appName: "Resistance",
     appLogoUrl: "/favicon.ico",
     onramp: {
       providers: ['banxa']
@@ -113,7 +113,7 @@ const dynamicSettings = {
         address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
         symbol: "LGR",
         decimals: 18,
-        name: "LedgerFund Token",
+        name: "Resistance Token",
         icon: "/favicon.ico",
         chainId: 137
       },

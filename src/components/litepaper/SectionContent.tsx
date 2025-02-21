@@ -7,17 +7,17 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">1.0 Introduction</h2>
         <p className="text-gray-300 leading-relaxed">
-          LedgerFund DAO is a decentralized acquisition platform designed to buy, govern, 
+          Resistance DAO is a decentralized acquisition platform designed to buy, govern, 
           and scale accounting firms through blockchain-powered investment strategies. 
           Unlike traditional private equity roll-ups that focus on short-term profits 
-          and aggressive cost-cutting, LedgerFund DAO is investor-led, ensuring sustainable 
+          and aggressive cost-cutting, Resistance DAO is investor-led, ensuring sustainable 
           growth, operational efficiency, and long-term value creation in firm ownership.
         </p>
       </div>
     ),
     "how-it-works": (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-yellow-500">2.0 How LedgerFund DAO Works</h2>
+        <h2 className="text-2xl font-bold text-yellow-500">2.0 How Resistance DAO Works</h2>
         <div className="grid gap-4">
           <div className="bg-white/5 p-6 rounded-lg border border-white/10">
             <h3 className="text-xl font-semibold mb-4 text-teal-400">Key Strategies</h3>
@@ -54,7 +54,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
           </div>
         </div>
         <p className="text-gray-300 leading-relaxed">
-          By focusing on long-term scalability and operational efficiency, LedgerFund DAO 
+          By focusing on long-term scalability and operational efficiency, Resistance DAO 
           creates value for investors while transforming acquired firms into modern, 
           technology-driven operations.
         </p>
@@ -71,7 +71,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
             </li>
             <li className="flex items-start">
               <span className="mr-2">🔹</span>
-              <span>The LedgerFund DAO Model – How blockchain and decentralized governance create a superior investment framework.</span>
+              <span>The Resistance DAO Model – How blockchain and decentralized governance create a superior investment framework.</span>
             </li>
             <li className="flex items-start">
               <span className="mr-2">🔹</span>
@@ -79,7 +79,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
             </li>
             <li className="flex items-start">
               <span className="mr-2">🔹</span>
-              <span>Roadmap & Future Expansion – How LedgerFund DAO plans to scale firm acquisitions.</span>
+              <span>Roadmap & Future Expansion – How Resistance DAO plans to scale firm acquisitions.</span>
             </li>
             <li className="flex items-start">
               <span className="mr-2">🔹</span>
@@ -93,7 +93,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">4.0 Target Audience</h2>
         <p className="text-gray-300 leading-relaxed mb-4">
-          LedgerFund DAO is designed for those looking to redefine firm acquisitions through blockchain-enabled investment strategies.
+          Resistance DAO is designed for those looking to redefine firm acquisitions through blockchain-enabled investment strategies.
         </p>
         <div className="bg-white/5 p-6 rounded-lg border border-white/10">
           <ul className="space-y-3 text-gray-300">
@@ -124,7 +124,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
           <div>
             <h3 className="text-xl font-semibold text-teal-400 mb-4">Key Objectives & Vision</h3>
             <p className="text-gray-300 leading-relaxed">
-              LedgerFund DAO is a strategic acquisition engine focused on buying, governing, and optimizing 
+              Resistance DAO is a strategic acquisition engine focused on buying, governing, and optimizing 
               accounting firms at scale. Our mission is to modernize firm ownership through blockchain-driven 
               investment models that prioritize long-term value creation over short-term profit extraction.
             </p>
@@ -232,7 +232,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            LedgerFund DAO provides a modern, decentralized alternative—eliminating inefficiencies, 
+            Resistance DAO provides a modern, decentralized alternative—eliminating inefficiencies, 
             increasing transparency, and giving investors direct control over firm ownership.
           </p>
         </div>
@@ -327,7 +327,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>LedgerFund DAO enables tokenized ownership, making firm M&A accessible to a broader investor base.</span>
+                <span>Resistance DAO enables tokenized ownership, making firm M&A accessible to a broader investor base.</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
@@ -383,7 +383,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
-                <span>No forced cost-cutting for short-term exits—LedgerFund DAO prioritizes long-term firm growth.</span>
+                <span>No forced cost-cutting for short-term exits—Resistance DAO prioritizes long-term firm growth.</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">🔹</span>
@@ -423,7 +423,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
         <h2 className="text-2xl font-bold text-yellow-500">8.0 DAO Framework</h2>
         <div className="space-y-8">
           <p className="text-gray-300 leading-relaxed">
-            LedgerFund DAO is a decentralized, permissionless network, where governance and investment 
+            Resistance DAO is a decentralized, permissionless network, where governance and investment 
             decisions are executed via smart contracts and community voting.
           </p>
 
@@ -438,10 +438,6 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
                 <li className="flex items-start">
                   <span className="mr-2">🔹</span>
                   <span>Governance Board – Elected to oversee deal sourcing, acquisitions, and operational strategy.</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">🔹</span>
-                  <span>Special Purpose Vehicles (SPVs) – Each acquired firm is structured under an SPV for legal compliance and financial separation.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">🔹</span>
@@ -491,7 +487,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-yellow-500">9.0 Tokenomics</h2>
         <p className="text-gray-300 leading-relaxed mb-6">
-          LedgerFund DAO operates with two token models, offering governance rights, revenue-sharing, and liquidity incentives.
+          Resistance DAO operates with two token models, offering governance rights, revenue-sharing, and liquidity incentives.
         </p>
 
         <div className="space-y-8">
@@ -736,243 +732,4 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
     ),
     "acquisition-process": (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-yellow-500">13.0 Acquisition Process</h2>
-        
-        <div className="space-y-8">
-          <div>
-            <h3 className="text-xl font-semibold text-teal-400 mb-4">Sourcing & Due Diligence</h3>
-            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-              <ul className="space-y-6 text-gray-300">
-                <li>
-                  <h4 className="font-semibold text-yellow-400 mb-2">1️⃣ Sourcing Strategy</h4>
-                  <ul className="space-y-2 ml-6">
-                    <li className="flex items-start">
-                      <span className="mr-2">✔</span>
-                      <span>Direct outreach & broker networks.</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✔</span>
-                      <span>AI-driven firm analysis and targeting.</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✔</span>
-                      <span>Industry partnerships and referrals.</span>
-                    </li>
-                  </ul>
-                </li>
-                <li>
-                  <h4 className="font-semibold text-yellow-400 mb-2">2️⃣ Due Diligence</h4>
-                  <ul className="space-y-2 ml-6">
-                    <li className="flex items-start">
-                      <span className="mr-2">✔</span>
-                      <span>Financial analysis and verification.</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✔</span>
-                      <span>Operational assessment.</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✔</span>
-                      <span>Legal and compliance review.</span>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
-    "post-acquisition": (
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-yellow-500">14.0 Post-Acquisition</h2>
-        
-        <div className="space-y-8">
-          <div>
-            <h3 className="text-xl font-semibold text-teal-400 mb-4">Integration & Value Creation</h3>
-            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-              <ul className="space-y-6 text-gray-300">
-                <li>
-                  <h4 className="font-semibold text-yellow-400 mb-2">1️⃣ Leadership & Operations</h4>
-                  <ul className="space-y-2 ml-6">
-                    <li className="flex items-start">
-                      <span className="mr-2">✔</span>
-                      <span>DAO-approved operators and management teams.</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✔</span>
-                      <span>Key personnel retention strategies.</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✔</span>
-                      <span>Performance-based incentives.</span>
-                    </li>
-                  </ul>
-                </li>
-                <li>
-                  <h4 className="font-semibold text-yellow-400 mb-2">2️⃣ Technology Enhancement</h4>
-                  <ul className="space-y-2 ml-6">
-                    <li className="flex items-start">
-                      <span className="mr-2">✔</span>
-                      <span>AI & automation implementation.</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✔</span>
-                      <span>Cloud-based system migration.</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">✔</span>
-                      <span>Digital workflow optimization.</span>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
-    "token-benefits": (
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-yellow-500">15.0 Token Benefits</h2>
-        
-        <div className="space-y-8">
-          <div>
-            <h3 className="text-xl font-semibold text-teal-400 mb-4">$LGR Token Utilities</h3>
-            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start">
-                  <span className="mr-2">🗳️</span>
-                  <span>Governance rights and voting power</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">💰</span>
-                  <span>Revenue sharing from firm operations</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">🔄</span>
-                  <span>Staking rewards and liquidity mining</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
-    "revenue-sharing": (
-      <div className="space-y-4">
-        <h3 className="text-xl font-semibold text-teal-400">Revenue Sharing</h3>
-        <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-          <ul className="space-y-3 text-gray-300">
-            <li className="flex items-start">
-              <span className="mr-2">🔹</span>
-              <span>The DAO distributes a portion of firm revenues to active $LGR token holders.</span>
-            </li>
-            <li className="flex items-start">
-              <span className="mr-2">🔹</span>
-              <span>On-chain, automated distributions ensure full transparency and fairness.</span>
-            </li>
-            <li className="flex items-start">
-              <span className="mr-2">🔹</span>
-              <span>Revenue Breakdown:</span>
-            </li>
-            <li className="flex items-start ml-6">
-              <span className="mr-2">✔</span>
-              <span>50% reinvested into future acquisitions & DAO expansion.</span>
-            </li>
-            <li className="flex items-start ml-6">
-              <span className="mr-2">✔</span>
-              <span>40% distributed to token holders via staking rewards.</span>
-            </li>
-            <li className="flex items-start ml-6">
-              <span className="mr-2">✔</span>
-              <span>10% allocated to DAO operations & legal compliance.</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    ),
-    "regulatory": (
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-yellow-500">16.0 Regulatory Compliance</h2>
-        
-        <div className="space-y-8">
-          <div>
-            <h3 className="text-xl font-semibold text-teal-400 mb-4">Legal Framework</h3>
-            <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-              <ul className="space-y-3 text-gray-300">
-                <li className="flex items-start">
-                  <span className="mr-2">⚖️</span>
-                  <span>SEC Reg D 506(b) compliance</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">🔒</span>
-                  <span>KYC/AML requirements</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2">📜</span>
-                  <span>SPV legal structuring</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
-    "roadmap": (
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-yellow-500">17.0 Roadmap & Milestones</h2>
-        
-        <div className="space-y-8">
-          <div>
-            <h3 className="text-xl font-semibold text-teal-400 mb-4">Phased Development Plan</h3>
-            <div className="space-y-6">
-              <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-                <h4 className="text-lg font-semibold text-yellow-400 mb-4">🚀 Phase 1: Foundation & Infrastructure (Q1 2025)</h4>
-                <ul className="space-y-3 text-gray-300">
-                  <li className="flex items-start">
-                    <span className="mr-2">✔</span>
-                    <span>Presale launch & governance onboarding.</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mr-2">✔</span>
-                    <span>Legal structuring (SPVs, compliance frameworks).</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mr-2">✔</span>
-                    <span>Smart contract audits & DAO voting system deployment.</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mr-2">✔</span>
-                    <span>LP-funded pool structuring & early investor participation.</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="bg-white/5 p-6 rounded-lg border border-white/10">
-                <h4 className="text-lg font-semibold text-yellow-400 mb-4">🏗 Phase 2: Private Token Sale & Community Growth (Q2 2025)</h4>
-                <ul className="space-y-3 text-gray-300">
-                  <li className="flex items-start">
-                    <span className="mr-2">✔</span>
-                    <span>Private sale for accredited investors.</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mr-2">✔</span>
-                    <span>LP-funded acquisition pools go live.</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mr-2">✔</span>
-                    <span>First batch of target firm sourcing & due diligence.</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  };
-
-  return sectionContent[sectionId] || null;
-};
-
-export default SectionContent;
+        <h2 className="text-2xl font-bold text-yellow
