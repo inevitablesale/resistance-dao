@@ -24,17 +24,18 @@ const App = () => {
             paymasterRpc: "https://polygon.drpc.org"
           }
         },
-        network: {
-          chainId: 137
-        },
-        settings: {
-          network: {
-            chainId: 137
+        evmNetworks: [{
+          chainId: 137,
+          name: 'Polygon',
+          chainName: 'Polygon Mainnet',
+          rpcUrls: ['https://polygon-rpc.com'],
+          nativeCurrency: {
+            name: 'MATIC',
+            symbol: 'MATIC',
+            decimals: 18,
           },
-          environmentId: "2ace0996-5136-4c6c-a384-6f205ad7661c",
-          appName: "LedgerFren",
-          appLogoUrl: "/lgr-logo.png"
-        }
+          blockExplorerUrls: ['https://polygonscan.com/'],
+        }],
       }}
     >
       <Router>
