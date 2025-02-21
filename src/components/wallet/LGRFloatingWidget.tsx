@@ -12,6 +12,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useOnramp } from "@dynamic-labs/sdk-react-core";
 import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNavigate } from "react-router-dom";
 
 export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
@@ -25,6 +26,7 @@ export const LGRFloatingWidget = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -191,8 +193,8 @@ export const LGRFloatingWidget = () => {
               <div className="flex flex-col gap-2">
                 <Button 
                   className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold"
-                  onClick={() => setIsConfirmOpen(true)}
-                  disabled={!address || Number(maticBalance) <= 0}
+                  onClick={() => navigate('/buy-tokens')}
+                  disabled={!address}
                 >
                   <Coins className="w-4 h-4 mr-2" />
                   Buy LGR
