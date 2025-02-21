@@ -338,7 +338,7 @@ const IndexContent = () => {
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-bold mb-12 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400 text-center">
-              Launch Your Web3 Vision with LedgerFren
+              Introducing LedgerFrens
             </h2>
             
             <div className="grid md:grid-cols-3 gap-8">
