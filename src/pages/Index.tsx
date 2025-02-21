@@ -284,19 +284,6 @@ const IndexContent = () => {
             transform: `scale(${1 - scrollProgress * 0.3}) translateY(${scrollProgress * -50}px)`
           }}
         >
-          <div className="mb-8 relative">
-            <div className="relative flex items-center justify-center w-32 h-32">
-              <div className="absolute inset-0 bg-black/90 rounded-full" />
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-teal-500/20 rounded-full animate-cosmic-pulse" />
-              <span className="relative text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-yellow-500 via-yellow-400 to-teal-400">
-                $25
-              </span>
-              <div className="absolute inset-0 rounded-full border border-yellow-500/20" />
-              <span className="token-symbol absolute -top-4 -left-2 text-yellow-500/60 text-xl">$</span>
-              <span className="token-symbol absolute -bottom-4 -right-2 text-teal-500/60 text-xl delay-1000">$</span>
-            </div>
-          </div>
-
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
             Got a Crypto Idea?<br />Crowdsource Your Pre-ICO Crew
           </h1>
