@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { DynamicContextProvider } from '@dynamic-labs/sdk-react-core';
 import { EthereumWalletConnectors } from '@dynamic-labs/ethereum';
+import { ZeroDevSmartWalletConnectors } from '@dynamic-labs/ethereum-aa';
 import Nav from './components/Nav';
 import Index from './pages/Index';
 import Proposals from './pages/Proposals';
@@ -15,19 +16,25 @@ const App = () => {
     <DynamicContextProvider
       settings={{
         environmentId: "2ace0996-5136-4c6c-a384-6f205ad7661c",
-        walletConnectors: [EthereumWalletConnectors],
-        evmNetworks: [{
-          chainId: 137,
-          name: 'Polygon',
-          chainName: 'Polygon Mainnet',
-          rpcUrls: ['https://polygon-rpc.com'],
-          nativeCurrency: {
-            name: 'MATIC',
-            symbol: 'MATIC',
-            decimals: 18,
+        walletConnectors: [EthereumWalletConnectors, ZeroDevSmartWalletConnectors],
+        walletConnectorOptions: {
+          zeroDevOptions: {
+            projectId: "2ace0996-5136-4c6c-a384-6f205ad7661c", // Using the same ID for consistency
+            bundlerRpc: "https://polygon.drpc.org",
+            paymasterRpc: "https://polygon.drpc.org"
+          }
+        },
+        network: {
+          chainId: 137
+        },
+        settings: {
+          network: {
+            chainId: 137
           },
-          blockExplorerUrls: ['https://polygonscan.com/'],
-        }],
+          environmentId: "2ace0996-5136-4c6c-a384-6f205ad7661c",
+          appName: "LedgerFren",
+          appLogoUrl: "/lgr-logo.png"
+        }
       }}
     >
       <Router>
