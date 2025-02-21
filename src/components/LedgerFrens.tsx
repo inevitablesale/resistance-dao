@@ -19,7 +19,7 @@ export const LedgerFrens = () => {
       <div className="container px-4 relative">
         <div className="max-w-4xl mx-auto text-center mb-12">
           <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
-            Invest in the Future—Grow with LedgerFund DAO
+            Support Web3 Innovation—Join the LedgerFund DAO Presale
           </h2>
 
           {/* Community Stats */}
@@ -35,23 +35,42 @@ export const LedgerFrens = () => {
           </div>
 
           {/* Presale CTA */}
-          <div className="bg-gradient-to-r from-yellow-500/10 to-teal-500/10 rounded-xl p-6 mb-8 backdrop-blur-sm border border-white/10">
-            <h3 className="text-2xl font-bold text-white mb-2">LGR Token Presale Now Live</h3>
-            <p className="text-lg text-white/80 mb-4">Join early and secure your tokens at $0.10 USD per LGR</p>
+          <div className="bg-gradient-to-r from-yellow-500/10 to-teal-500/10 rounded-xl p-8 mb-8 backdrop-blur-sm border border-white/10">
+            <h3 className="text-3xl font-bold text-white mb-4">LGR Token Presale: Your Gateway to Web3 Innovation</h3>
+            <div className="space-y-4 mb-6">
+              <p className="text-xl text-white/90">Early Access Price: $0.10 USD per LGR</p>
+              <p className="text-lg text-white/80">
+                Every LGR token holder gains exclusive benefits:
+              </p>
+              <ul className="text-white/80 space-y-2">
+                <li className="flex items-center justify-center gap-2">
+                  <DollarSign className="w-5 h-5 text-yellow-500" />
+                  <span>Priority access to mint proposal NFTs at discounted rates</span>
+                </li>
+                <li className="flex items-center justify-center gap-2">
+                  <Users className="w-5 h-5 text-teal-500" />
+                  <span>Voting power on community-driven Web3 proposals</span>
+                </li>
+                <li className="flex items-center justify-center gap-2">
+                  <Rocket className="w-5 h-5 text-yellow-500" />
+                  <span>Share in the success of funded Web3 projects</span>
+                </li>
+              </ul>
+            </div>
             <Button 
               onClick={() => setShowOnRamp?.(true)}
-              className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-6 text-lg"
+              className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-6 text-xl"
             >
-              <DollarSign className="w-5 h-5 mr-2" />
-              Participate in Presale
+              <DollarSign className="w-6 h-6 mr-2" />
+              Join LGR Presale Now
             </Button>
           </div>
 
           <p className="text-xl text-white/80">
-            Tap our community to fund tokens, NFTs, DeFi, and AI
+            Your LGR tokens fuel the next generation of Web3 innovation
           </p>
-          <p className="mt-6 text-lg text-white/70">
-            LedgerFund DAO is transforming into a decentralized fund that invests in cutting-edge Web3 projects.
+          <p className="mt-4 text-lg text-white/70">
+            Every presale contribution strengthens our ability to fund and launch groundbreaking Web3 projects through the LedgerFund DAO
           </p>
         </div>
 
