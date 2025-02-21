@@ -312,41 +312,41 @@ const IndexContent = () => {
 
       <LGRFloatingWidget />
 
-      {/* Market Dynamics Section */}
+      {/* Pre-ICO Opportunity Section */}
       <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
-              <BarChart2 className="w-16 h-16 mx-auto text-teal-500 mb-6" />
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-teal-200">
-                Market Opportunity
+              <Rocket className="w-16 h-16 mx-auto text-yellow-500 mb-6 animate-cosmic-pulse" />
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400">
+                Why Your Crypto Idea Deserves a Launch
               </h2>
               <p className="text-xl text-white/80 mb-12 max-w-4xl mx-auto">
-                In today's accounting practice market, quality firms are scarce while buyers are abundant. We're solving this through collaborative investing and blockchain technology.
+                Skip the VC bullshit. Launch your token with a crew that believes in your vision.
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 mb-16">
-              {/* Market Challenge */}
+              {/* Pain Points */}
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-orange-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
                   <div className="p-2 bg-red-500/10 rounded-lg inline-block mb-6">
-                    <Calculator className="w-12 h-12 text-red-500" />
+                    <DollarSign className="w-12 h-12 text-red-500" />
                   </div>
-                  <h3 className="text-2xl font-bold text-red-500 mb-4">Supply-Demand Imbalance</h3>
+                  <h3 className="text-2xl font-bold text-red-500 mb-4">Crypto Creator Struggles</h3>
                   <ul className="space-y-4 text-white/70">
                     <li className="flex items-start gap-3">
+                      <Users className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                      <span>Quality token projects are tough to kick off without connections—competition drowns out fresh ideas</span>
+                    </li>
+                    <li className="flex items-start gap-3">
                       <Clock className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                      <span>Quality accounting practices rarely come to market, with long wait times for interested buyers</span>
+                      <span>Traditional pre-ICO routes demand insider networks and take forever</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <DollarSign className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                      <span>High competition drives up prices, making individual acquisitions increasingly challenging</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Calendar className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                      <span>Traditional deal sourcing can take years, limiting growth opportunities</span>
+                      <Crown className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                      <span>Gatekeepers and VCs hold your vision hostage</span>
                     </li>
                   </ul>
                 </div>
@@ -357,28 +357,28 @@ const IndexContent = () => {
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
                   <div className="p-2 bg-teal-500/10 rounded-lg inline-block mb-6">
-                    <Users className="w-12 h-12 text-teal-500" />
+                    <Rocket className="w-12 h-12 text-teal-500" />
                   </div>
-                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Collaborative Solution</h3>
+                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Crowdsourced Launch Power</h3>
                   <ul className="space-y-4 text-white/70">
                     <li className="flex items-start gap-3">
-                      <BookOpen className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                      <span>Pool expertise from experienced practitioners to better evaluate and manage practices</span>
+                      <Wallet className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
+                      <span>Drop your vision for $25, rally backers with $1 votes—build your crew from scratch</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <Building className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                      <span>Combine resources to access larger, higher-quality practices typically out of reach</span>
+                      <Users className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
+                      <span>Pool support to launch projects that'd never see light through traditional routes</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Shield className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                      <span>Reduce individual risk through diversified ownership and shared due diligence</span>
+                      <span>Your token, your rules—all secured by smart contracts</span>
                     </li>
                   </ul>
                 </div>
               </div>
             </div>
 
-            {/* Blockchain Benefits */}
+            {/* Web3 Pillars */}
             <div className="grid md:grid-cols-3 gap-8">
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
@@ -388,7 +388,7 @@ const IndexContent = () => {
                   </div>
                   <h3 className="text-xl font-bold text-yellow-500 mb-4">Non-Custodial</h3>
                   <p className="text-white/70">
-                    Maintain direct control of your assets through smart contracts. No intermediaries hold your tokens or investment rights.
+                    Launch and manage directly through your wallet. No middlemen, no bullshit—just you and the chain.
                   </p>
                 </div>
               </div>
@@ -401,7 +401,7 @@ const IndexContent = () => {
                   </div>
                   <h3 className="text-xl font-bold text-teal-500 mb-4">Decentralized</h3>
                   <p className="text-white/70">
-                    Community-driven governance ensures decisions align with token holder interests, not centralized authorities.
+                    No gatekeepers—your crew votes with $1 each to drive decisions and shape the outcome.
                   </p>
                 </div>
               </div>
@@ -410,189 +410,12 @@ const IndexContent = () => {
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10 h-full">
                   <div className="p-2 bg-yellow-500/10 rounded-lg inline-block mb-6">
-                    <Briefcase className="w-12 h-12 text-yellow-500" />
+                    <Rocket className="w-12 h-12 text-yellow-500" />
                   </div>
                   <h3 className="text-xl font-bold text-yellow-500 mb-4">Transparent</h3>
                   <p className="text-white/70">
-                    All investments, voting, and distributions are recorded on-chain, providing unprecedented visibility into operations.
+                    Watch your proposal grow in real-time. Every $1 vote and milestone tracked on-chain.
                   </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof Section */}
-      <section className="py-12 relative z-10 bg-black/30 backdrop-blur-sm">
-        <div className="container px-4">
-          <div className="max-w-6xl mx-auto">
-            <NewsletterSubscription />
-          </div>
-        </div>
-      </section>
-
-      {/* Step 1: Submit Your Investment Thesis */}
-      <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
-        <div className="container px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <Trophy className="w-16 h-16 mx-auto text-yellow-500 mb-6" />
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
-                Submit Your Investment Thesis
-              </h2>
-              <p className="text-xl text-white/80 mb-12 max-w-4xl mx-auto">
-                Join a community of like-minded investors to propose and develop investment strategies for accounting practices you want to acquire.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* Create Thesis */}
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
-                  <div className="p-2 bg-yellow-500/10 rounded-lg inline-block mb-6">
-                    <Trophy className="w-12 h-12 text-yellow-500" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Create Thesis</h3>
-                  <p className="text-white/70">
-                    Propose your vision for acquiring and growing accounting practices. Define your strategy, target metrics, and growth plans.
-                  </p>
-                </div>
-              </div>
-
-              {/* Token-Based Voting */}
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
-                  <div className="p-2 bg-teal-500/10 rounded-lg inline-block mb-6">
-                    <Vote className="w-12 h-12 text-teal-500" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Token-Based Voting</h3>
-                  <p className="text-white/70">
-                    Community members vote on theses by dedicating their LGR tokens, aligning incentives and building consensus.
-                  </p>
-                </div>
-              </div>
-
-              {/* Pool Resources */}
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
-                  <div className="p-2 bg-yellow-500/10 rounded-lg inline-block mb-6">
-                    <Crown className="w-12 h-12 text-yellow-500" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Pool Resources</h3>
-                  <p className="text-white/70">
-                    Once approved, create or join liquidity pools with your LGR tokens to participate in practice acquisitions.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Step 2: Tokenize Firm Assets */}
-      <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
-        <div className="container px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <Crown className="w-16 h-16 mx-auto text-yellow-500 mb-6" />
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
-                Tokenize Acquired Practices
-              </h2>
-              <p className="text-xl text-white/80 mb-12 max-w-4xl mx-auto">
-                Convert illiquid practice assets into tradeable tokens on our decentralized exchange, unlocking new value from human capital, client relationships, and intellectual property.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Firm Valuation */}
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="p-2 bg-teal-500/10 rounded-lg">
-                      <Building className="w-8 h-8 text-teal-500" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-white mb-2">Firm Valuation</h3>
-                      <p className="text-white/70">Tokenize partner expertise, specialized skills, and professional certifications into tradeable assets</p>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center mt-6">
-                    <span className="text-sm text-white/60">Asset Class: Professional Expertise</span>
-                    <span className="text-yellow-500 px-3 py-1 rounded-full text-sm border border-yellow-500/20 bg-yellow-500/10">
-                      Available after presale
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Client Portfolio */}
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="p-2 bg-purple-500/10 rounded-lg">
-                      <Users className="w-8 h-8 text-purple-500" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-white mb-2">Client Portfolio</h3>
-                      <p className="text-white/70">Transform long-term client relationships and recurring revenue streams into liquid digital assets</p>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center mt-6">
-                    <span className="text-sm text-white/60">Asset Class: Customer Relations</span>
-                    <span className="text-yellow-500 px-3 py-1 rounded-full text-sm border border-yellow-500/20 bg-yellow-500/10">
-                      Available after presale
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Advisory Services */}
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="p-2 bg-yellow-500/10 rounded-lg">
-                      <Briefcase className="w-8 h-12 text-yellow-500" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-white mb-2">Advisory Services</h3>
-                      <p className="text-white/70">Monetize industry networks, referral partnerships, and community relationships through tokenization</p>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center mt-6">
-                    <span className="text-sm text-white/60">Asset Class: Professional Network</span>
-                    <span className="text-yellow-500 px-3 py-1 rounded-full text-sm border border-yellow-500/20 bg-yellow-500/10">
-                      Available after presale
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Resources & IP */}
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="p-2 bg-pink-500/10 rounded-lg">
-                      <BarChart2 className="w-8 h-8 text-pink-500" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-white mb-2">Resources & IP</h3>
-                      <p className="text-white/70">Convert proprietary processes, workflows, and systems into tradeable digital assets</p>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center mt-6">
-                    <span className="text-sm text-white/60">Asset Class: Intellectual Property</span>
-                    <span className="text-yellow-500 px-3 py-1 rounded-full text-sm border border-yellow-500/20 bg-yellow-500/10">
-                      Available after presale
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
