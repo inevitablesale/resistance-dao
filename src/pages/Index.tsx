@@ -348,111 +348,61 @@ const IndexContent = () => {
       <section className="py-16 relative z-10">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
-                  Unleash Your Web3 Vision
-                </span>
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-teal-200">
-                  —Tap Our Network to Launch Without Risk
-                </span>
-              </h2>
-              <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto">
-                Whether you're a CEO, product manager, developer, marketer, or analyst—your Web3 vision deserves a shot. No network? No problem.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <div className="p-8 rounded-lg border border-red-900/30 bg-red-950/20 backdrop-blur-sm">
-                <div className="text-red-400 mb-6">
-                  <DollarSign className="w-12 h-12" />
-                </div>
-                <h3 className="text-2xl font-bold text-red-400 mb-6">Feeling Sidelined?</h3>
-                <ul className="space-y-4">
-                  <li className="flex items-start gap-3 text-white/70">
-                    <Users className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
-                    <span>Watching others launch tokens, NFTs, and DeFi platforms while your idea stays locked in your head</span>
-                  </li>
-                  <li className="flex items-start gap-3 text-white/70">
-                    <Clock className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
-                    <span>Launchpads demand steep fees and force commitments before proving interest</span>
-                  </li>
-                  <li className="flex items-start gap-3 text-white/70">
-                    <Crown className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
-                    <span>Social platforms drown out fresh voices, and traditional routes demand insider networks</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="p-8 rounded-lg border border-teal-900/30 bg-teal-950/20 backdrop-blur-sm">
-                <div className="text-teal-400 mb-6">
-                  <Rocket className="w-12 h-12" />
-                </div>
-                <h3 className="text-2xl font-bold text-teal-400 mb-6">Our Pre-Launch Solution</h3>
-                <ul className="space-y-4">
-                  <li className="flex items-start gap-3 text-white/70">
-                    <Rocket className="w-5 h-5 text-teal-400 mt-1 flex-shrink-0" />
-                    <span>Start with just $25—create a proposal NFT that tests your token, NFT, DeFi, or AI project</span>
-                  </li>
-                  <li className="flex items-start gap-3 text-white/70">
-                    <Users className="w-5 h-5 text-teal-400 mt-1 flex-shrink-0" />
-                    <span>Tap our network of 1,500 newsletter subscribers and 2,500 LinkedIn members</span>
-                  </li>
-                  <li className="flex items-start gap-3 text-white/70">
-                    <Shield className="w-5 h-5 text-teal-400 mt-1 flex-shrink-0" />
-                    <span>Gather soft commitments with $1 votes before investing in smart contracts</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
+            <h2 className="text-4xl md:text-5xl font-bold mb-12 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400 text-center">
+              Introducing LedgerFrens
+            </h2>
+            
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="p-8 rounded-lg border border-yellow-900/30 bg-yellow-950/20 backdrop-blur-sm">
-                <div className="text-yellow-400 mb-6">
-                  <Shield className="w-12 h-12" />
+              {/* $25 LFP Mint */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div className="p-2 bg-yellow-500/10 rounded-lg inline-block mb-6">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-yellow-500/30 rounded-full animate-pulse"></div>
+                      <Wallet className="w-12 h-12 text-yellow-500 relative z-10 animate-cosmic-pulse" />
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Start Your Web3 Journey for $25</h3>
+                  <p className="text-white/70">
+                    Mint a LedgerFren Proposal (LFP) with our LedgerFren Proposal Factory for just $25—no fancy pitch decks, VC connections, or smart contracts needed. Test your idea (token, NFT, DeFi, AI, or more) and build momentum with our community.
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold text-yellow-400 mb-6">Non-Custodial</h3>
-                <p className="text-white/70">
-                  Your wallet, your control. Create and manage your proposal NFT directly—no intermediaries or gatekeepers involved.
-                </p>
               </div>
 
-              <div className="p-8 rounded-lg border border-teal-900/30 bg-teal-950/20 backdrop-blur-sm">
-                <div className="text-teal-400 mb-6">
-                  <Users className="w-12 h-12" />
+              {/* Community Voting */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div className="p-2 bg-teal-500/10 rounded-lg inline-block mb-6">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-teal-500/30 rounded-full animate-pulse"></div>
+                      <UsersRound className="w-12 h-12 text-teal-500 relative z-10 animate-vote-stack" />
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Tap Our Community's Votes</h3>
+                  <p className="text-white/70">
+                    Our 1,500 newsletter subscribers and 2,500 LinkedIn members vote with $1 each on your LFP to show soft commitments, shaping your project's direction—no centralized gatekeepers, just raw support.
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold text-teal-400 mb-6">Decentralized</h3>
-                <p className="text-white/70">
-                  No centralized authorities—your potential supporters vote with $1 each to show interest and guide your project's direction.
-                </p>
               </div>
 
-              <div className="p-8 rounded-lg border border-yellow-900/30 bg-yellow-950/20 backdrop-blur-sm">
-                <div className="text-yellow-400 mb-6">
-                  <Rocket className="w-12 h-12" />
+              {/* Launch Momentum */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
+                  <div className="p-2 bg-yellow-500/10 rounded-lg inline-block mb-6">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-yellow-500/30 rounded-full animate-pulse"></div>
+                      <Rocket className="w-12 h-12 text-yellow-500 relative z-10 animate-cosmic-pulse" />
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-bold text-yellow-500 mb-4">Gain Traction Before You Launch</h3>
+                  <p className="text-white/70">
+                    Use your LFP to prove your project's potential on-chain, gathering votes and commitments before investing in smart contracts. No upfront risks, no steep fees—just clear momentum to launch when you're ready.
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold text-yellow-400 mb-6">Transparent</h3>
-                <p className="text-white/70">
-                  Track every $25 proposal, $1 vote, and soft commitment on-chain via your proposal NFT. Monitor interest in real-time.
-                </p>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 relative z-10">
-        <div className="container px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300">
-                  Ecosystem & Partnerships
-                </span>
-              </h2>
-              <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto">
-                Join a thriving ecosystem of accounting firms, banks, technology providers, and staffing agencies supporting practice acquisitions.
-              </p>
             </div>
           </div>
         </div>
