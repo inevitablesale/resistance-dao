@@ -82,6 +82,43 @@ export default function Index() {
         </div>
       </section>
 
+      {/* History Section */}
+      <section className="py-16 relative">
+        <div className="container px-4">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
+                  The Resistance is Back
+                </h2>
+                <p className="text-xl text-white/80">
+                  We started as a web3 group connecting early stage entrepreneurs with early stage capital. With the crypto winter, we went on to work in the alternative investments space. However, Resistance DAO is back.
+                </p>
+              </motion.div>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-teal-500/10 rounded-2xl blur-xl" />
+              <img 
+                src="https://media.licdn.com/dms/image/v2/C5622AQF4qrRtwMVNIQ/feedshare-shrink_800/feedshare-shrink_800/0/1658061466739?e=1743033600&v=beta&t=cxc5SGWFNT1lRXR1TKuBaFJrNlN05NaUmIGQvPrmrqA"
+                alt="Resistance DAO at Metaverse Summit Paris 2022"
+                className="relative rounded-2xl w-full h-[400px] object-cover"
+              />
+              <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm rounded-lg p-3">
+                <p className="text-white/90 text-sm">Metaverse Summit Paris 2022</p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Project Proposal Section - Redesigned */}
       <section className="py-16 relative">
         <div className="container px-4">
@@ -545,77 +582,4 @@ export default function Index() {
             ].map((milestone, index) => (
               <Card key={index} className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
                 <div className="text-yellow-500 font-bold text-2xl mb-2">{milestone.amount}</div>
-                <h3 className="text-xl font-semibold text-white mb-3">{milestone.title}</h3>
-                <p className="text-white/70">{milestone.description}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Roadmap Section */}
-      <section className="py-16 relative">
-        <div className="container px-4">
-          <h2 className="text-4xl font-bold text-center mb-12">Resistance DAO Roadmap</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                phase: "Phase 1: Foundation",
-                timing: "Q1 2025",
-                items: [
-                  "Website Development",
-                  "Token Contract Development",
-                  "Presale Contract Development",
-                  "Listed on top100token.com and coinmooner.com",
-                  "Applied for Polygon Community Grant",
-                  "Developed Litepaper",
-                  "Launched Presale",
-                  "Onboard Partners into Ecosystem",
-                  "Soft Cap: $250K"
-                ]
-              },
-              {
-                phase: "Phase 2: Growth & Integration",
-                timing: "Q2 2025",
-                items: [
-                  "Apply for Direct Listing with Banxa",
-                  "Launch Resistance NFT Platform",
-                  "Form DAO in Wyoming",
-                  "Apply to CoinGeko and CoinMarketCap for listings",
-                  "Release Deal Thesis and Firm Bounties",
-                  "Hard Cap: $500K"
-                ]
-              },
-              {
-                phase: "Phase 3: Infrastructure & Deal Flow",
-                timing: "Q3 2025",
-                items: [
-                  "Integrate flowinc.com for Management",
-                  "Deploy Deal Thesis Framework",
-                  "Deploy Liquidity Pool UI",
-                  "Launch Community Governance",
-                  "First Liquidity Pool Acquisitions Begin",
-                  "Launch Decentralized Marketplace",
-                  "Targeted Raise: $5M"
-                ]
-              }
-            ].map((phase, index) => (
-              <Card key={index} className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
-                <h3 className="text-xl font-bold text-white mb-2">{phase.phase}</h3>
-                <p className="text-yellow-500 mb-4">{phase.timing}</p>
-                <ul className="space-y-2">
-                  {phase.items.map((item, itemIndex) => (
-                    <li key={itemIndex} className="text-white/70 flex items-start gap-2">
-                      <ChevronRight className="w-4 h-4 text-yellow-500 mt-1 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
+                <h3 className="text-xl font-semibold text
