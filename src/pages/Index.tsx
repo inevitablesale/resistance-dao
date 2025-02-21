@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Rocket, DollarSign, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,11 +24,11 @@ export default function Index() {
             transition={{ duration: 0.5 }}
             className="max-w-4xl mx-auto text-center"
           >
-            <h1 className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500 mb-6">
               Launch Your Web3 Idea for $25
             </h1>
             <p className="text-xl text-white/80 mb-8 max-w-3xl mx-auto">
-              Got a Web3 vision—token, NFT, DeFi, AI, or beyond? Don't let it die in your head. With our LedgerFren Proposal Factory, you mint a proposal NFT, pitch your idea to 1,500+ subscribers and 2,500+ LinkedIn members, and collect soft commitments to gauge real interest. No coding, no gatekeepers, no upfront fortune required.
+              Got a Web3 vision—token, NFT, DeFi, AI, or beyond? Don't let it die in your head. With our Resistance Proposal Factory, you mint a proposal NFT, pitch your idea to 1,500+ subscribers and 2,500+ LinkedIn members, and collect soft commitments to gauge real interest. No coding, no gatekeepers, no upfront fortune required.
             </p>
             
             <div className="flex flex-wrap gap-4 justify-center">
@@ -397,22 +398,22 @@ export default function Index() {
             {[
               {
                 title: "Early Access to Proposals",
-                description: "At $50K raised in LGR tokens, early supporters gain exclusive access to mint LedgerFren Proposals (LFP), testing and pitching Web3 projects to our community for $25.",
+                description: "At $50K raised in LGR tokens, early supporters gain exclusive access to mint Resistance Proposals, testing and pitching Web3 projects to our community for $25.",
                 amount: "$50K"
               },
               {
                 title: "Community Voting Power",
-                description: "At $100K raised, our community elects a governance board to steer investment decisions, with LFP holders voting with $1 each.",
+                description: "At $100K raised, our community elects a governance board to steer investment decisions, with NFT holders voting with $1 each.",
                 amount: "$100K"
               },
               {
                 title: "Exclusive Web3 Swag",
-                description: "At $150K raised, 150 random LFP minters or LGR token stakers receive exclusive Web3 merchandise—limited-edition digital art and apparel.",
+                description: "At $150K raised, 150 random NFT minters or LGR token stakers receive exclusive Web3 merchandise—limited-edition digital art and apparel.",
                 amount: "$150K"
               },
               {
                 title: "Investment Proposals Open",
-                description: "At $250K raised, LFP holders can submit investment thesis proposals for Web3 projects, pledging LGR tokens to indicate interest.",
+                description: "At $250K raised, NFT holders can submit investment thesis proposals for Web3 projects, pledging LGR tokens to indicate interest.",
                 amount: "$250K"
               },
               {
@@ -422,7 +423,7 @@ export default function Index() {
               },
               {
                 title: "First Web3 Investment",
-                description: "At $500K raised, complete our first Web3 project investment, inviting 5 random LFP holders to a virtual launch event with $1,000 in crypto rewards.",
+                description: "At $500K raised, complete our first Web3 project investment, inviting 5 random NFT holders to a virtual launch event with $1,000 in crypto rewards.",
                 amount: "$500K"
               }
             ].map((milestone, index) => (
@@ -439,7 +440,7 @@ export default function Index() {
       {/* Roadmap Section */}
       <section className="py-16 relative">
         <div className="container px-4">
-          <h2 className="text-4xl font-bold text-center mb-12">LedgerFund Roadmap</h2>
+          <h2 className="text-4xl font-bold text-center mb-12">Resistance DAO Roadmap</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
@@ -462,9 +463,8 @@ export default function Index() {
                 timing: "Q2 2025",
                 items: [
                   "Apply for Direct Listing with Banxa",
-                  "Launch LedgerFren NFT Platform",
+                  "Launch Resistance NFT Platform",
                   "Form DAO in Wyoming",
-                  "Launch Community",
                   "Apply to CoinGeko and CoinMarketCap for listings",
                   "Release Deal Thesis and Firm Bounties",
                   "Hard Cap: $500K"
@@ -474,7 +474,7 @@ export default function Index() {
                 phase: "Phase 3: Infrastructure & Deal Flow",
                 timing: "Q3 2025",
                 items: [
-                  "Integrate flowinc.com for SPV Management",
+                  "Integrate flowinc.com for Management",
                   "Deploy Deal Thesis Framework",
                   "Deploy Liquidity Pool UI",
                   "Launch Community Governance",
