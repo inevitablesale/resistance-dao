@@ -326,16 +326,6 @@ const IndexContent = () => {
               </button>
             </div>
           </div>
-
-          <div className="fixed bottom-6 right-6 z-50">
-            <button
-              onClick={handleBuyToken}
-              className="flex items-center gap-2 px-4 py-2 bg-black/20 backdrop-blur-sm border border-yellow-500/30 rounded-full text-yellow-500 hover:bg-black/40 transition-all duration-300 animate-pulse hover:animate-none"
-            >
-              <Coins className="w-5 h-5" />
-              <span className="font-semibold">Buy LGR</span>
-            </button>
-          </div>
         </div>
       </div>
 
