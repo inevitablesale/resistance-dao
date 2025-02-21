@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -263,7 +264,7 @@ async function approveTokensIfNeeded(
     LGR_TOKEN_ADDRESS,
     signerAddress,
     spender,
-    amount
+    amount.toString() // Convert BigNumber to string here
   );
 
   if (!hasAllowance) {
