@@ -313,13 +313,13 @@ const IndexContent = () => {
           <div className="space-y-6">
             <div className="flex justify-center gap-4">
               <button 
-                onClick={() => navigate('/proposals')}
+                onClick={() => navigate('/thesis')}
                 className="px-12 py-6 bg-yellow-500 text-black rounded-lg font-bold text-2xl hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
               >
                 Create Pool
               </button>
               <button 
-                onClick={() => window.open('https://calendly.com/inevitable-sale/lgr-presale', '_blank')}
+                onClick={() => navigate('/proposals')}
                 className="px-12 py-6 bg-teal-500 text-black rounded-lg font-bold text-2xl hover:bg-teal-400 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
               >
                 Explore Projects
