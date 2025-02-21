@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
 import { ReclaimControl } from "@/components/ReclaimControl";
@@ -14,7 +15,25 @@ import { WalletInfo } from "@/components/WalletInfo";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, Award, Vote, Star, Rocket, Users, Shield, Crown, Calculator, Clock, Calendar, DollarSign, BookOpen, BarChart2, Briefcase, Building } from "lucide-react";
+import { 
+  Trophy, 
+  Award, 
+  Vote, 
+  Star, 
+  Rocket, 
+  Users, 
+  Shield, 
+  Crown, 
+  Calculator, 
+  Clock, 
+  Calendar, 
+  DollarSign, 
+  BookOpen, 
+  BarChart2, 
+  Briefcase, 
+  Building,
+  Wallet
+} from "lucide-react";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { NewsletterSubscription } from "@/components/NewsletterSubscription";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
