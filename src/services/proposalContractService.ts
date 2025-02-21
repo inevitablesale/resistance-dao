@@ -5,7 +5,8 @@ import { transactionQueue } from "./transactionQueueService";
 import { checkTokenAllowance } from "./tokenService";
 import { WalletType } from "@/hooks/useWalletProvider";
 import { executeTransaction } from "./transactionManager";
-import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
+import { uploadToIPFS } from "./ipfsService";
 import { 
   ProposalMetadata, 
   ProposalConfig, 
@@ -110,10 +111,8 @@ function sanitizeString(str: string): string {
 }
 
 function processText(text: string): string {
-  if (!text || typeof text !== 'string') {
-    return '';
-  }
-  return sanitizeString(text);
+  if (!text || typeof text !== 'string') return '';
+  return text.trim().replace(/[^\w\s.,'-]/g, '').replace(/\s+/g, ' ');
 }
 
 function validateTextLength(text: string, field: string, min?: number, max?: number): void {
@@ -251,47 +250,116 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
   }
 }
 
+async function approveTokensIfNeeded(
+  provider: ethers.providers.Web3Provider,
+  spender: string,
+  amount: ethers.BigNumber
+): Promise<void> {
+  const signer = provider.getSigner();
+  const signerAddress = await signer.getAddress();
+  
+  const hasAllowance = await checkTokenAllowance(
+    provider,
+    LGR_TOKEN_ADDRESS,
+    signerAddress,
+    spender,
+    amount
+  );
+
+  if (!hasAllowance) {
+    console.log("Approving LGR tokens...");
+    const lgrToken = new ethers.Contract(
+      LGR_TOKEN_ADDRESS,
+      ["function approve(address spender, uint256 amount) returns (bool)"],
+      signer
+    );
+
+    await executeTransaction(
+      () => lgrToken.approve(spender, amount),
+      {
+        type: 'token',
+        description: `Approve ${ethers.utils.formatEther(amount)} LGR tokens`,
+        tokenConfig: {
+          tokenAddress: LGR_TOKEN_ADDRESS,
+          spenderAddress: spender,
+          amount: amount.toString(),
+          isApproval: true
+        }
+      }
+    );
+  }
+}
+
 export const createProposal = async (
-  config: ProposalConfig,
+  metadata: ProposalMetadata,
   wallet: NonNullable<DynamicContextType['primaryWallet']>
 ): Promise<ethers.ContractTransaction> => {
+  console.log("Starting proposal creation with metadata:", metadata);
+  
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
+  const status = await getContractStatus(wallet);
   
   try {
-    const contractInput = transformConfigToContractInput(config);
-    validateProposalInput(contractInput);
+    // Upload metadata to IPFS first
+    console.log("Uploading metadata to IPFS...");
+    const ipfsHash = await uploadToIPFS(metadata);
+    console.log("IPFS upload successful:", ipfsHash);
+
+    // Convert metadata to contract input format
+    const contractInput: ProposalContractInput = {
+      title: processText(metadata.title),
+      ipfsMetadata: ipfsHash,
+      targetCapital: ethers.utils.parseUnits(metadata.investment.targetCapital, 18),
+      votingDuration: metadata.votingDuration,
+      investmentDrivers: processText(metadata.investment.drivers),
+      additionalCriteria: metadata.investment.additionalCriteria 
+        ? processText(metadata.investment.additionalCriteria)
+        : "",
+      firmSize: metadata.firmCriteria.size,
+      location: processText(metadata.firmCriteria.location),
+      dealType: metadata.firmCriteria.dealType,
+      geographicFocus: metadata.firmCriteria.geographicFocus,
+      paymentTerms: metadata.paymentTerms,
+      operationalStrategies: metadata.strategies.operational,
+      growthStrategies: metadata.strategies.growth,
+      integrationStrategies: metadata.strategies.integration
+    };
+
+    // Check and approve tokens if needed
+    await approveTokensIfNeeded(provider, status.treasury, contractInput.targetCapital);
     
-    const contractTuple = transformToContractTuple(contractInput);
-    
+    // Transform to contract tuple format
+    const tuple = transformToContractTuple(contractInput);
     const tupleArray = [
-      contractTuple.title,
-      contractTuple.ipfsMetadata,
-      contractTuple.targetCapital,
-      contractTuple.votingDuration,
-      contractTuple.investmentDrivers,
-      contractTuple.additionalCriteria,
-      contractTuple.firmSize,
-      contractTuple.location,
-      contractTuple.dealType,
-      contractTuple.geographicFocus,
-      contractTuple.paymentTerms,
-      contractTuple.operationalStrategies,
-      contractTuple.growthStrategies,
-      contractTuple.integrationStrategies
+      tuple.title,
+      tuple.ipfsMetadata,
+      tuple.targetCapital,
+      tuple.votingDuration,
+      tuple.investmentDrivers,
+      tuple.additionalCriteria,
+      tuple.firmSize,
+      tuple.location,
+      tuple.dealType,
+      tuple.geographicFocus,
+      tuple.paymentTerms,
+      tuple.operationalStrategies,
+      tuple.growthStrategies,
+      tuple.integrationStrategies
     ];
 
     console.log("Creating proposal with parameters:", {
       tupleArray,
-      linkedInURL: config.linkedInURL,
-      targetCapitalLGR: ethers.utils.formatUnits(contractTuple.targetCapital, 18)
+      linkedInURL: metadata.linkedInURL,
+      targetCapitalLGR: ethers.utils.formatUnits(tuple.targetCapital, 18)
     });
 
+    // Submit proposal
     return await executeTransaction(
-      () => factory.createProposal(tupleArray, config.linkedInURL),
+      () => factory.createProposal(tupleArray, metadata.linkedInURL),
       {
         type: 'nft',
-        description: `Creating proposal with target capital ${ethers.utils.formatUnits(contractTuple.targetCapital, 18)} LGR`,
+        description: `Creating proposal with target capital ${ethers.utils.formatUnits(tuple.targetCapital, 18)} LGR`,
         timeout: 180000,
         maxRetries: 3,
         backoffMs: 5000,

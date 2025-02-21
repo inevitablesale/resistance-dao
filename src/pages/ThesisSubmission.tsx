@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
-import { TargetCapitalInput, convertUSDToLGRWei } from "@/components/thesis/TargetCapitalInput";
-import { ContractApprovalStatus } from "@/components/thesis/ContractApprovalStatus";
-import { ArrowRight } from "lucide-react";
+import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -16,11 +15,8 @@ import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTe
 import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
-import { ProposalMetadata, ProposalConfig, FirmSize, DealType, GeographicFocus, PaymentTerm, OperationalStrategy, GrowthStrategy, IntegrationStrategy } from "@/types/proposals";
-import { SUBMISSION_FEE } from "@/lib/constants";
-import { uploadToIPFS } from "@/services/ipfsService";
 import { createProposal } from "@/services/proposalContractService";
-import { ethers } from "ethers";
+import { ProposalMetadata, FirmSize, DealType, GeographicFocus } from "@/types/proposals";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -105,39 +101,9 @@ const thesisFormSchema = z.object({
 const ThesisSubmission = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isConnected, address, wallet } = useWalletConnection();
+  const { isConnected, wallet } = useWalletConnection();
   const { user } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isApproved, setIsApproved] = useState(false);
-
-  const handleApprovalComplete = () => {
-    setIsApproved(true);
-    toast({
-      title: "Approval Complete",
-      description: "You can now submit your investment thesis"
-    });
-  };
-
-  const getLinkedInUrl = () => {
-    if (!user) {
-      console.log("[LinkedIn] No user data available");
-      return "";
-    }
-
-    const urlFromMetadata = user.metadata?.["LinkedIn Profile URL"];
-    const urlFromVerifications = user.verifications?.customFields?.["LinkedIn Profile URL"];
-    
-    const url = urlFromMetadata || urlFromVerifications;
-    
-    console.log("[LinkedIn] URL Resolution:", {
-      fromMetadata: urlFromMetadata,
-      fromVerifications: urlFromVerifications,
-      finalUrl: url,
-      user: user
-    });
-    
-    return url || "";
-  };
 
   const form = useForm<ProposalMetadata>({
     resolver: zodResolver(thesisFormSchema),
@@ -161,74 +127,12 @@ const ThesisSubmission = () => {
         integration: []
       },
       votingDuration: 7 * 24 * 60 * 60,
-      linkedInURL: ""
-    },
-    mode: "onChange"
+      linkedInURL: user?.verifications?.customFields?.["LinkedIn Profile URL"] || 
+                  user?.metadata?.["LinkedIn Profile URL"] || ""
+    }
   });
 
-  const isFormValid = form.formState.isValid;
-  const errors = form.formState.errors;
-
-  const handleInvalidSubmit = () => {
-    const errorMessages = [];
-    if (errors.title) errorMessages.push(errors.title.message);
-    if (errors.investment?.drivers) errorMessages.push(errors.investment.drivers.message);
-    if (errors.investment?.targetCapital) errorMessages.push(errors.investment.targetCapital.message);
-    if (errors.firmCriteria?.location) errorMessages.push(errors.firmCriteria.location.message);
-    if (errors.paymentTerms) errorMessages.push("Please select at least one payment term");
-    if (errors.strategies?.operational) errorMessages.push("Please select at least one operational strategy");
-    if (errors.strategies?.growth) errorMessages.push("Please select at least one growth strategy");
-    if (errors.strategies?.integration) errorMessages.push("Please select at least one integration strategy");
-
-    toast({
-      title: "Invalid Form",
-      description: errorMessages.join("\n"),
-      variant: "destructive"
-    });
-  };
-
-  useEffect(() => {
-    const linkedInUrl = getLinkedInUrl();
-    console.log("[LinkedIn] Setting form LinkedIn URL:", linkedInUrl);
-    if (linkedInUrl) {
-      form.setValue("linkedInURL", linkedInUrl, { shouldValidate: true });
-    }
-  }, [user]);
-
-  const validateStrategies = (data: ProposalMetadata): boolean => {
-    const { operational, growth, integration } = data.strategies;
-    
-    if (!operational.length || !growth.length || !integration.length) {
-      const missing = [];
-      if (!operational.length) missing.push("operational");
-      if (!growth.length) missing.push("growth");
-      if (!integration.length) missing.push("integration");
-      
-      toast({
-        title: "Missing Strategies",
-        description: `Please select at least one ${missing.join(", ")} strategy`,
-        variant: "destructive"
-      });
-      return false;
-    }
-    return true;
-  };
-
-  const validateLinkedInUrl = (url: string): boolean => {
-    if (!url) {
-      toast({
-        title: "LinkedIn URL Required",
-        description: "Please ensure your LinkedIn profile is connected",
-        variant: "destructive"
-      });
-      return false;
-    }
-    return true;
-  };
-
   const onSubmit = async (data: ProposalMetadata) => {
-    console.log("[Form] Starting submission with data:", data);
-
     if (!isConnected || !wallet) {
       toast({
         title: "Connect Wallet",
@@ -238,85 +142,20 @@ const ThesisSubmission = () => {
       return;
     }
 
-    if (!isApproved) {
-      toast({
-        title: "Approval Required",
-        description: "Please approve the contract to submit your thesis",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!validateStrategies(data)) {
-      return;
-    }
-
-    const linkedInUrl = getLinkedInUrl();
-    console.log("[LinkedIn] URL for submission:", linkedInUrl);
-    
-    if (!validateLinkedInUrl(linkedInUrl)) {
-      return;
-    }
-
     setIsSubmitting(true);
     try {
-      let targetCapitalWei;
-      try {
-        targetCapitalWei = convertUSDToLGRWei(data.investment.targetCapital);
-        console.log("[Contract] Target capital in wei:", targetCapitalWei.toString());
-      } catch (error) {
-        console.error("[Contract] Target capital conversion error:", error);
-        toast({
-          title: "Invalid Target Capital",
-          description: error instanceof Error ? error.message : "Please enter a valid target capital amount",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      const cleanedData: ProposalMetadata = {
-        ...data,
-        title: data.title.trim(),
-        investment: {
-          ...data.investment,
-          drivers: data.investment.drivers.trim(),
-          additionalCriteria: data.investment.additionalCriteria?.trim() || ""
-        },
-        firmCriteria: {
-          ...data.firmCriteria,
-          location: data.firmCriteria.location.trim()
-        }
-      };
-
-      console.log("[IPFS] Uploading form data:", cleanedData);
-      const ipfsHash = await uploadToIPFS<ProposalMetadata>(cleanedData);
-      console.log("[IPFS] Upload successful, hash:", ipfsHash);
-
-      const config: ProposalConfig = {
-        targetCapital: targetCapitalWei,
-        votingDuration: data.votingDuration,
-        ipfsHash,
-        metadata: {
-          ...cleanedData,
-          linkedInURL: linkedInUrl
-        },
-        linkedInURL: linkedInUrl
-      };
-
-      console.log("[Contract] Creating proposal with config:", config);
-      const tx = await createProposal(config, wallet);
-      console.log("[Contract] Proposal created successfully:", tx);
-
+      await createProposal(data, wallet);
+      
       toast({
         title: "Success",
         description: "Your thesis has been submitted successfully",
       });
       navigate("/proposals");
     } catch (error) {
-      console.error("[Contract] Submission error:", error);
+      console.error("Submission error:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to submit thesis. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to submit thesis",
         variant: "destructive"
       });
     } finally {
@@ -362,19 +201,9 @@ const ThesisSubmission = () => {
             </p>
           </div>
 
-          <Card className="bg-black/40 border-white/10 p-6 mb-8">
-            <h2 className="text-lg font-medium text-white mb-4">Step 1: Approve Contract</h2>
-            <ContractApprovalStatus
-              onApprovalComplete={handleApprovalComplete}
-              requiredAmount={SUBMISSION_FEE}
-              isTestMode={false}
-              currentFormData={form.getValues()}
-            />
-          </Card>
-
-          <form onSubmit={form.handleSubmit(onSubmit, handleInvalidSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <Card className="bg-black/40 border-white/10 p-6">
-              <h2 className="text-lg font-medium text-white mb-4">Step 2: Investment Details</h2>
+              <h2 className="text-lg font-medium text-white mb-4">Investment Details</h2>
               <div className="space-y-4">
                 <div>
                   <label className="text-lg font-medium text-white">Title</label>
@@ -383,11 +212,11 @@ const ThesisSubmission = () => {
                     placeholder="Enter a descriptive title for your investment thesis"
                     className={cn(
                       "mt-2",
-                      errors.title && "border-red-500"
+                      form.formState.errors.title && "border-red-500"
                     )}
                   />
-                  {errors.title && (
-                    <p className="text-sm text-red-400 mt-1">{errors.title.message}</p>
+                  {form.formState.errors.title && (
+                    <p className="text-sm text-red-400 mt-1">{form.formState.errors.title.message}</p>
                   )}
                 </div>
 
@@ -398,11 +227,11 @@ const ThesisSubmission = () => {
                     placeholder="Describe the key drivers behind this investment opportunity..."
                     className={cn(
                       "mt-2 min-h-[100px]",
-                      errors.investment?.drivers && "border-red-500"
+                      form.formState.errors.investment?.drivers && "border-red-500"
                     )}
                   />
-                  {errors.investment?.drivers && (
-                    <p className="text-sm text-red-400 mt-1">{errors.investment.drivers.message}</p>
+                  {form.formState.errors.investment?.drivers && (
+                    <p className="text-sm text-red-400 mt-1">{form.formState.errors.investment.drivers.message}</p>
                   )}
                 </div>
 
@@ -413,18 +242,18 @@ const ThesisSubmission = () => {
                     placeholder="Any additional investment criteria or preferences..."
                     className={cn(
                       "mt-2",
-                      errors.investment?.additionalCriteria && "border-red-500"
+                      form.formState.errors.investment?.additionalCriteria && "border-red-500"
                     )}
                   />
-                  {errors.investment?.additionalCriteria && (
-                    <p className="text-sm text-red-400 mt-1">{errors.investment.additionalCriteria.message}</p>
+                  {form.formState.errors.investment?.additionalCriteria && (
+                    <p className="text-sm text-red-400 mt-1">{form.formState.errors.investment.additionalCriteria.message}</p>
                   )}
                 </div>
               </div>
             </Card>
 
             <Card className="bg-black/40 border-white/10 p-6">
-              <h2 className="text-lg font-medium text-white mb-4">Step 3: Investment Parameters</h2>
+              <h2 className="text-lg font-medium text-white mb-4">Investment Parameters</h2>
               <div className="space-y-6">
                 <TargetCapitalInput
                   value={form.watch("investment.targetCapital")}
@@ -466,7 +295,7 @@ const ThesisSubmission = () => {
 
             <Button 
               type="submit"
-              disabled={isSubmitting || !isFormValid || !isApproved}
+              disabled={isSubmitting || !form.formState.isValid || !isConnected}
               className={cn(
                 "w-full h-12",
                 "bg-gradient-to-r from-yellow-500 to-teal-500 hover:from-yellow-600 hover:to-teal-600",
@@ -478,7 +307,7 @@ const ThesisSubmission = () => {
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Processing...</span>
                 </div>
               ) : (
