@@ -44,7 +44,7 @@ export default function Index() {
                 size="lg"
                 variant="outline"
                 onClick={() => navigate('/proposals')}
-                className="border-white/20 hover:bg-white/10"
+                className="border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10 hover:border-yellow-500"
               >
                 <Share2 className="w-5 h-5 mr-2" />
                 View Active Proposals
