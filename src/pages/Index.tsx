@@ -3,6 +3,7 @@ import React from 'react';
 import { Roadmap } from "@/components/Roadmap";
 import { Partners } from "@/components/Partners";
 import { FAQ } from "@/components/FAQ";
+import { LedgerFrens } from "@/components/LedgerFrens";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -245,6 +246,7 @@ const IndexContent = () => {
         </div>
       </section>
 
+      <LedgerFrens />
       <Roadmap />
       <FAQ />
       <Partners />
