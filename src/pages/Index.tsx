@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { WhatWeBuilding } from "@/components/WhatWeBuilding";
 import { ReclaimControl } from "@/components/ReclaimControl";
@@ -37,6 +36,7 @@ import {
   Settings,
   Brain,
   UsersRound,
+  Orbit
 } from "lucide-react";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { NewsletterSubscription } from "@/components/NewsletterSubscription";
@@ -335,210 +335,46 @@ const IndexContent = () => {
 
       <LGRFloatingWidget />
 
-      {/* Pre-ICO Opportunity Section */}
-      <section className="py-24 relative z-10 bg-black/30 backdrop-blur-sm">
-        <div className="container px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <Rocket className="w-16 h-16 mx-auto text-yellow-500 mb-6 animate-cosmic-pulse" />
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400">
-                Unleash Your Web3 Vision—Tap Our Network to Launch Without Risk
-              </h2>
-              <p className="text-xl text-white/80 mb-12 max-w-4xl mx-auto">
-                Whether you're a CEO, product manager, developer, marketer, or analyst—your Web3 vision deserves a shot. No network? No problem.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8 mb-16">
-              {/* Pain Points */}
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-orange-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
-                  <div className="p-2 bg-red-500/10 rounded-lg inline-block mb-6">
-                    <DollarSign className="w-12 h-12 text-red-500" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-red-500 mb-4">Feeling Sidelined?</h3>
-                  <ul className="space-y-4 text-white/70">
-                    <li className="flex items-start gap-3">
-                      <Users className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                      <span>Watching others launch tokens, NFTs, and DeFi platforms while your idea stays locked in your head</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Clock className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                      <span>Launchpads demand steep fees and force commitments before proving interest</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Crown className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                      <span>Social platforms drown out fresh voices, and traditional routes demand insider networks</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Solution */}
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
-                  <div className="p-2 bg-teal-500/10 rounded-lg inline-block mb-6">
-                    <Rocket className="w-12 h-12 text-teal-500" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Our Pre-Launch Solution</h3>
-                  <ul className="space-y-4 text-white/70">
-                    <li className="flex items-start gap-3">
-                      <Wallet className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                      <span>Start with just $25—create a proposal NFT that tests your token, NFT, DeFi, or AI project</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Users className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                      <span>Tap our network of 1,500 newsletter subscribers and 2,500 LinkedIn members</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Shield className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                      <span>Gather soft commitments with $1 votes before investing in smart contracts</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Web3 Pillars */}
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10 h-full">
-                  <div className="p-2 bg-yellow-500/10 rounded-lg inline-block mb-6">
-                    <Shield className="w-12 h-12 text-yellow-500" />
-                  </div>
-                  <h3 className="text-xl font-bold text-yellow-500 mb-4">Non-Custodial</h3>
-                  <p className="text-white/70">
-                    Your wallet, your control. Create and manage your proposal NFT directly—no intermediaries or gatekeepers involved.
-                  </p>
-                </div>
-              </div>
-
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10 h-full">
-                  <div className="p-2 bg-teal-500/10 rounded-lg inline-block mb-6">
-                    <Users className="w-12 h-12 text-teal-500" />
-                  </div>
-                  <h3 className="text-xl font-bold text-teal-500 mb-4">Decentralized</h3>
-                  <p className="text-white/70">
-                    No centralized authorities—your potential supporters vote with $1 each to show interest and guide your project's direction.
-                  </p>
-                </div>
-              </div>
-
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10 h-full">
-                  <div className="p-2 bg-yellow-500/10 rounded-lg inline-block mb-6">
-                    <Rocket className="w-12 h-12 text-yellow-500" />
-                  </div>
-                  <h3 className="text-xl font-bold text-yellow-500 mb-4">Transparent</h3>
-                  <p className="text-white/70">
-                    Track every $25 proposal, $1 vote, and soft commitment on-chain via your proposal NFT. Monitor interest in real-time.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center mt-12">
-              <button 
-                onClick={() => navigate('/thesis')}
-                className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-teal-500 text-black font-bold text-xl rounded-lg hover:from-yellow-400 hover:to-teal-400 transition-all duration-300 transform hover:scale-105"
-              >
-                Start for $25—test your idea, tap our network, and launch without risk
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mint NFT Section - Right after Hero */}
       <section className="py-16 relative z-10">
         <div className="container px-4">
           <div className="max-w-6xl mx-auto">
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500 to-teal-500 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
               <div className="relative p-8 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10">
-                <div className="flex flex-col md:flex-row items-center gap-8">
-                  {/* Left side - Animated Icons */}
-                  <div className="w-full md:w-1/3 flex justify-center relative">
-                    {/* Main NFT Visual */}
-                    <div className="relative w-64 h-64">
-                      {/* Floating Project Symbols */}
-                      <div className="absolute inset-0">
-                        <DollarSign className="absolute top-0 left-0 w-8 h-8 text-yellow-500 animate-float" />
-                        <Image className="absolute top-1/4 right-0 w-8 h-8 text-purple-500 animate-float-delayed" />
-                        <Settings className="absolute bottom-1/4 left-0 w-8 h-8 text-teal-500 animate-float-more-delayed" />
-                        <Brain className="absolute bottom-0 right-0 w-8 h-8 text-blue-500 animate-float-most-delayed" />
-                      </div>
-                      
-                      {/* Wallet Icon */}
-                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-yellow-500/30 rounded-full animate-pulse"></div>
-                          <Wallet className="w-16 h-16 text-yellow-500 relative z-10 animate-cosmic-pulse" />
-                        </div>
-                      </div>
-
-                      {/* Users Vote Stack */}
-                      <div className="absolute left-1/2 bottom-0 -translate-x-1/2">
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-teal-500/30 rounded-full animate-pulse"></div>
-                          <UsersRound className="w-16 h-16 text-teal-500 relative z-10 animate-vote-stack" />
-                        </div>
-                      </div>
+                <div className="grid md:grid-cols-3 gap-8">
+                  <div className="p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-all duration-300 group">
+                    <div className="relative w-12 h-12 mb-6">
+                      <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-teal-500/20 rounded-full animate-cosmic-pulse" />
+                      <div className="absolute inset-0 bg-black/40 rounded-full backdrop-blur-sm" />
+                      <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400 animate-cosmic-pulse">
+                        $25
+                      </span>
+                      <div className="absolute inset-0 rounded-full glow-border" />
                     </div>
+                    <h3 className="text-xl font-bold text-white mb-4">Launch Your Token</h3>
+                    <p className="text-gray-300">
+                      Start your crypto journey with just $25. No fancy pitch decks or VC connections needed - just your vision and our platform.
+                    </p>
                   </div>
 
-                  {/* Right side - Content */}
-                  <div className="w-full md:w-2/3">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400">
-                      Mint an NFT to Launch Your Web3 Idea—Simple and Accessible
-                    </h2>
-                    <p className="text-lg text-white/80 mb-8">
-                      Use our LedgerFren Proposal Factory to mint a LedgerFren Proposal (LFP) for just $25—an NFT that lets you test any Web3 idea (token, NFT, DeFi, AI, or more) and collect soft commitments. No smart contracts or tech skills required upfront.
+                  <div className="p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-all duration-300 group">
+                    <div className="w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center mb-6">
+                      <Orbit className="w-6 h-6 text-teal-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-4">Community Network</h3>
+                    <p className="text-gray-300">
+                      Join our thriving community of innovators and supporters. Connect, collaborate, and grow together.
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                      <div className="flex items-start gap-3">
-                        <Wallet className="w-6 h-6 text-yellow-500 mt-1 flex-shrink-0 animate-pulse" />
-                        <span className="text-white/70">Mint your proposal NFT for just $25</span>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <UsersRound className="w-6 h-6 text-teal-500 mt-1 flex-shrink-0 animate-pulse" />
-                        <span className="text-white/70">Collect $1 votes as soft commitments</span>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <Users className="w-6 h-6 text-yellow-500 mt-1 flex-shrink-0" />
-                        <span className="text-white/70">Join 1,500+ newsletter subscribers</span>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <Shield className="w-6 h-6 text-teal-500 mt-1 flex-shrink-0" />
-                        <span className="text-white/70">2,500+ LinkedIn network members</span>
-                      </div>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-black/30 border border-white/10 hover:bg-black/40 transition-all duration-300 group">
+                    <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center mb-6">
+                      <Shield className="w-6 h-6 text-yellow-500" />
                     </div>
-                    <div className="flex flex-wrap gap-4">
-                      <button 
-                        onClick={() => navigate('/thesis')}
-                        className="px-6 py-3 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Wallet className="w-5 h-5" />
-                          <span>Mint Your Proposal NFT</span>
-                        </div>
-                      </button>
-                      <button 
-                        onClick={() => navigate('/proposals')}
-                        className="px-6 py-3 bg-teal-500 text-black rounded-lg font-semibold hover:bg-teal-400 transition-all duration-300 transform hover:scale-105"
-                      >
-                        <div className="flex items-center gap-2">
-                          <UsersRound className="w-5 h-5" />
-                          <span>View Active Proposals</span>
-                        </div>
-                      </button>
-                    </div>
+                    <h3 className="text-xl font-bold text-white mb-4">Safe & Transparent</h3>
+                    <p className="text-gray-300">
+                      Every vote and commitment is tracked on-chain. Build trust through transparency.
+                    </p>
                   </div>
                 </div>
               </div>
