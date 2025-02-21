@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +17,16 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { createProposal } from "@/services/proposalContractService";
-import { ProposalMetadata, FirmSize, DealType, GeographicFocus } from "@/types/proposals";
+import { 
+  ProposalMetadata, 
+  FirmSize, 
+  DealType, 
+  GeographicFocus,
+  PaymentTerm,
+  OperationalStrategy,
+  GrowthStrategy,
+  IntegrationStrategy 
+} from "@/types/proposals";
 import {
   Breadcrumb,
   BreadcrumbItem,

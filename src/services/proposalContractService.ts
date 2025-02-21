@@ -279,6 +279,9 @@ async function approveTokensIfNeeded(
       {
         type: 'token',
         description: `Approve ${ethers.utils.formatEther(amount)} LGR tokens`,
+        timeout: 120000, // 2 minutes
+        maxRetries: 3,
+        backoffMs: 5000,
         tokenConfig: {
           tokenAddress: LGR_TOKEN_ADDRESS,
           spenderAddress: spender,
