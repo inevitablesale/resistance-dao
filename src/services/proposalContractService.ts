@@ -264,7 +264,7 @@ export const createProposal = async (
     
     const contractTuple = transformToContractTuple(contractInput);
     
-    const contractParams = [
+    const tupleArray = [
       contractTuple.title,
       contractTuple.ipfsMetadata,
       contractTuple.targetCapital,
@@ -282,13 +282,13 @@ export const createProposal = async (
     ];
 
     console.log("Creating proposal with parameters:", {
-      contractParams,
+      tupleArray,
       linkedInURL: config.linkedInURL,
       targetCapitalLGR: ethers.utils.formatUnits(contractTuple.targetCapital, 18)
     });
 
     return await executeTransaction(
-      () => factory.createProposal([contractParams, config.linkedInURL]),
+      () => factory.createProposal(tupleArray, config.linkedInURL),
       {
         type: 'nft',
         description: `Creating proposal with target capital ${ethers.utils.formatUnits(contractTuple.targetCapital, 18)} LGR`,
