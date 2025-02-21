@@ -338,10 +338,10 @@ const IndexContent = () => {
             <div className="text-center mb-16">
               <Rocket className="w-16 h-16 mx-auto text-yellow-500 mb-6 animate-cosmic-pulse" />
               <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-400">
-                Why Your Crypto Idea Deserves a Launch
+                Think You Can't Launch Your Crypto Project? You're Wrong
               </h2>
               <p className="text-xl text-white/80 mb-12 max-w-4xl mx-auto">
-                Skip the VC bullshit. Launch your token with a crew that believes in your vision.
+                Whether you're a developer, marketer, or analyst—your Web3 vision deserves a shot. No network? No problem.
               </p>
             </div>
 
@@ -353,19 +353,19 @@ const IndexContent = () => {
                   <div className="p-2 bg-red-500/10 rounded-lg inline-block mb-6">
                     <DollarSign className="w-12 h-12 text-red-500" />
                   </div>
-                  <h3 className="text-2xl font-bold text-red-500 mb-4">Crypto Creator Struggles</h3>
+                  <h3 className="text-2xl font-bold text-red-500 mb-4">Stuck on the Sidelines?</h3>
                   <ul className="space-y-4 text-white/70">
                     <li className="flex items-start gap-3">
                       <Users className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                      <span>Quality token projects are tough to kick off without connections—competition drowns out fresh ideas</span>
+                      <span>Watching others launch tokens, NFTs, and DeFi platforms while your idea stays locked in your head</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Clock className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                      <span>Traditional pre-ICO routes demand insider networks and take forever</span>
+                      <span>No insider connections? Traditional routes keep you waiting forever</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Crown className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                      <span>Gatekeepers and VCs hold your vision hostage</span>
+                      <span>Competition on launchpads, X, and Discord drowns out fresh voices like yours</span>
                     </li>
                   </ul>
                 </div>
@@ -378,19 +378,19 @@ const IndexContent = () => {
                   <div className="p-2 bg-teal-500/10 rounded-lg inline-block mb-6">
                     <Rocket className="w-12 h-12 text-teal-500" />
                   </div>
-                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Crowdsourced Launch Power</h3>
+                  <h3 className="text-2xl font-bold text-teal-500 mb-4">Your Time to Launch</h3>
                   <ul className="space-y-4 text-white/70">
                     <li className="flex items-start gap-3">
                       <Wallet className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                      <span>Drop your vision for $25, rally backers with $1 votes—build your crew from scratch</span>
+                      <span>Start with just $25—launch tokens, NFTs, DeFi platforms, or AI agents</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Users className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                      <span>Pool support to launch projects that'd never see light through traditional routes</span>
+                      <span>Build your crew from scratch with $1 votes—no pre-existing network needed</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Shield className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
-                      <span>Your token, your rules—all secured by smart contracts</span>
+                      <span>Your project, your rules—secured by smart contracts, not gatekeepers</span>
                     </li>
                   </ul>
                 </div>
@@ -407,7 +407,7 @@ const IndexContent = () => {
                   </div>
                   <h3 className="text-xl font-bold text-yellow-500 mb-4">Non-Custodial</h3>
                   <p className="text-white/70">
-                    Launch and manage directly through your wallet. No middlemen, no bullshit—just you and the chain.
+                    Your wallet, your control. Launch and manage any project type directly—no middlemen or gatekeepers in your way.
                   </p>
                 </div>
               </div>
@@ -420,7 +420,7 @@ const IndexContent = () => {
                   </div>
                   <h3 className="text-xl font-bold text-teal-500 mb-4">Decentralized</h3>
                   <p className="text-white/70">
-                    No gatekeepers—your crew votes with $1 each to drive decisions and shape the outcome.
+                    No suits calling shots—your crew votes with $1 each to shape your project's future. Pure democracy in action.
                   </p>
                 </div>
               </div>
@@ -433,10 +433,19 @@ const IndexContent = () => {
                   </div>
                   <h3 className="text-xl font-bold text-yellow-500 mb-4">Transparent</h3>
                   <p className="text-white/70">
-                    Watch your proposal grow in real-time. Every $1 vote and milestone tracked on-chain.
+                    Track every vote and milestone on-chain. From $25 proposal to launch, watch your project grow in real-time.
                   </p>
                 </div>
               </div>
+            </div>
+
+            <div className="text-center mt-12">
+              <button 
+                onClick={() => navigate('/proposals')}
+                className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-teal-500 text-black font-bold text-xl rounded-lg hover:from-yellow-400 hover:to-teal-400 transition-all duration-300 transform hover:scale-105"
+              >
+                Start for $25—prove you can do this
+              </button>
             </div>
           </div>
         </div>
