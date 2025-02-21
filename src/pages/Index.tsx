@@ -32,7 +32,6 @@ import {
   Briefcase, 
   Building,
   Wallet,
-  Coins
 } from "lucide-react";
 import { getPresaleContract, PRESALE_CONTRACT_ADDRESS, fetchPresaleMaticPrice } from "@/services/presaleContractService";
 import { NewsletterSubscription } from "@/components/NewsletterSubscription";
@@ -304,7 +303,7 @@ const IndexContent = () => {
           }}
         >
           <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">
-            Got a Crypto Idea?<br />Test the Waters Before You Launch
+            Launch Your Web3 Idea—Test, Grow, and Succeed Risk-Free
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto mb-12">
             Launch a proposal for $25, gather soft commitments with $1 votes—tap our network, no big connections needed
