@@ -89,14 +89,14 @@ export default function Index() {
             <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 mb-6">
               How Soft Commitments & Voting Work
             </h2>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-white mb-8">
               Our unique two-step process helps you validate market interest and build a community of committed supporters before launch.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
             <Card className="bg-black/30 border-white/10 p-8 hover:border-yellow-500/50 transition-all duration-300">
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
                   <DollarSign className="w-7 h-7 text-yellow-500" />
                 </div>
@@ -104,20 +104,20 @@ export default function Index() {
               </h3>
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-yellow-500 mt-1" />
-                  <div>
+                  <Check className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
+                  <div className="text-white">
                     <span className="font-semibold">$1 Voting Fee:</span> Small fee to ensure genuine interest and prevent spam
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-yellow-500 mt-1" />
-                  <div>
+                  <Check className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
+                  <div className="text-white">
                     <span className="font-semibold">Soft Commitment Amount:</span> Supporters indicate how much they'd potentially invest
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-yellow-500 mt-1" />
-                  <div>
+                  <Check className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
+                  <div className="text-white">
                     <span className="font-semibold">No Lock-in:</span> Soft commitments are non-binding to encourage honest feedback
                   </div>
                 </li>
@@ -125,7 +125,7 @@ export default function Index() {
             </Card>
 
             <Card className="bg-black/30 border-white/10 p-8 hover:border-teal-500/50 transition-all duration-300">
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center">
                   <Rocket className="w-7 h-7 text-teal-500" />
                 </div>
@@ -133,20 +133,20 @@ export default function Index() {
               </h3>
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-teal-500 mt-1" />
-                  <div>
+                  <Check className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
+                  <div className="text-white">
                     <span className="font-semibold">Target Reached:</span> Once your soft commitment goal is met, begin the launch phase
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-teal-500 mt-1" />
-                  <div>
+                  <Check className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
+                  <div className="text-white">
                     <span className="font-semibold">Direct Communication:</span> Re-engage supporters who showed interest through voting
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-teal-500 mt-1" />
-                  <div>
+                  <Check className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
+                  <div className="text-white">
                     <span className="font-semibold">Convert Interest:</span> Turn soft commitments into actual investments
                   </div>
                 </li>
