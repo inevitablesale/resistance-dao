@@ -1,15 +1,17 @@
-
 import { motion } from "framer-motion";
 import { Rocket, DollarSign, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import { AccessCoverOverlay } from "@/components/AccessCoverOverlay";
 
 const Index = () => {
   const navigate = useNavigate();
   
   return (
-    <div className="min-h-screen bg-black text-white">
+    <>
+      <AccessCoverOverlay />
+      <div className="min-h-screen bg-black text-white">
       {/* Hero Section */}
       <section className="relative pt-32 pb-16 overflow-hidden">
         <div className="absolute inset-0">
@@ -582,16 +584,4 @@ const Index = () => {
               }
             ].map((milestone, index) => (
               <Card key={index} className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
-                <div className="text-yellow-500 font-bold text-2xl mb-2">{milestone.amount}</div>
-                <h3 className="text-xl font-semibold text-white mb-2">{milestone.title}</h3>
-                <p className="text-white/80">{milestone.description}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-};
-
-export default Index;
+                <div className="text-yellow-500 font-bold text-2xl
