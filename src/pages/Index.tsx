@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { Rocket, Coins, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText, Percent, BadgeDollarSign } from "lucide-react";
+import { Rocket, Coins, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText, Percent, BadgeDollarSign, CircleDollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -461,7 +461,7 @@ const Index = () => {
               <Card className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-yellow-500" />
+                    <CircleDollarSign className="w-6 h-6 text-yellow-500" />
                   </div>
                   <h3 className="text-xl font-semibold">Collect Commitments</h3>
                 </div>
