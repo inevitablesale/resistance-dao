@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Rocket, DollarSign, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText, Percent, Coins, BadgeDollarSign } from "lucide-react";
+import { Rocket, Coins, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText, Percent, BadgeDollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -74,7 +74,7 @@ const Index = () => {
 
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { icon: DollarSign, label: "Proposal Mint Cost", value: "25 RD", description: "One-time fee to submit your Web3 proposal" },
+                { icon: Coins, label: "Proposal Mint Cost", value: "25 RD", description: "One-time fee to submit your Web3 proposal" },
                 { icon: Percent, label: "DAO Agreement", value: "2.5%", description: "Token allocation for DAO members" },
                 { icon: Zap, label: "Voting Fee", value: "1 RD", description: "Per-vote fee to ensure genuine interest" }
               ].map((stat, index) => (
@@ -334,7 +334,7 @@ const Index = () => {
               <Card className="bg-black/30 border-white/10 p-8 hover:border-yellow-500/50 transition-all duration-300">
                 <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                    <DollarSign className="w-7 h-7 text-yellow-500" />
+                    <Coins className="w-7 h-7 text-yellow-500" />
                   </div>
                   Initial Voting
                 </h3>
@@ -575,18 +575,4 @@ const Index = () => {
                   amount: "$500K"
                 }
               ].map((milestone, index) => (
-                <Card key={index} className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
-                  <div className="text-yellow-500 font-bold text-2xl mb-4">{milestone.amount}</div>
-                  <h3 className="text-xl font-bold text-white mb-3">{milestone.title}</h3>
-                  <p className="text-white/70">{milestone.description}</p>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-      </div>
-    </>
-  );
-};
-
-export default Index;
+                <Card key={index} className="bg-black/30 border-white/10
