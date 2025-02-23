@@ -74,9 +74,9 @@ const Index = () => {
 
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { icon: DollarSign, label: "Proposal Mint Cost", value: "$25", description: "One-time fee to submit your Web3 proposal" },
+                { icon: DollarSign, label: "Proposal Mint Cost", value: "25 RD", description: "One-time fee to submit your Web3 proposal" },
                 { icon: Percent, label: "DAO Agreement", value: "2.5%", description: "Token allocation for DAO members" },
-                { icon: Zap, label: "Voting Fee", value: "$1", description: "Per-vote fee to ensure genuine interest" }
+                { icon: Zap, label: "Voting Fee", value: "1 RD", description: "Per-vote fee to ensure genuine interest" }
               ].map((stat, index) => (
                 <motion.div
                   key={index}
@@ -465,7 +465,7 @@ const Index = () => {
                   <h3 className="text-xl font-semibold">Collect Commitments</h3>
                 </div>
                 <p className="text-white/70">
-                  Supporters indicate their potential investment amount through soft commitments, with just a $1 voting fee to show genuine interest. Gauge real market demand without requiring immediate investment.
+                  Supporters indicate their potential investment amount through soft pledges, with a voting fee in RD to show genuine interest. Gauge real market demand without requiring immediate investment.
                 </p>
               </Card>
 
@@ -522,7 +522,7 @@ const Index = () => {
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3 text-white/80">
                     <div className="mt-1"><Check className="w-5 h-5 text-teal-500" /></div>
-                    Start with just $25—create a proposal NFT that tests your token, NFT, DeFi, or AI project
+                    Create a proposal NFT that tests your token, NFT, DeFi, or AI project
                   </li>
                   <li className="flex items-start gap-3 text-white/80">
                     <div className="mt-1"><Check className="w-5 h-5 text-teal-500" /></div>
