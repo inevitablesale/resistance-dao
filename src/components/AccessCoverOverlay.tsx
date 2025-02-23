@@ -1,7 +1,7 @@
 
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Shield, Rocket, Zap } from "lucide-react";
+import { X, Shield, Rocket } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
@@ -43,14 +43,14 @@ export const AccessCoverOverlay = () => {
                   <Shield className="w-10 h-10 text-yellow-500" />
                 </motion.div>
                 <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
-                  The Resistance is Back - Original Holders Welcome Home
+                  The Resistance is Back<br />Original Holders Welcome Home
                 </h1>
                 <p className="text-xl text-white/80 max-w-2xl mx-auto">
                   As one of our original NFT holders, you have exclusive early access to the next evolution of Resistance DAO.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6 mb-12">
+              <div className="grid md:grid-cols-2 gap-6 mb-12 max-w-2xl mx-auto">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -70,19 +70,6 @@ export const AccessCoverOverlay = () => {
                   transition={{ delay: 0.4 }}
                   className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center mx-auto mb-4">
-                    <Zap className="w-6 h-6 text-teal-500" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">LGR Airdrop</h3>
-                  <p className="text-white/60">10 LGR tokens airdropped for immediate voting power</p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6"
-                >
                   <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center mx-auto mb-4">
                     <Shield className="w-6 h-6 text-yellow-500" />
                   </div>
@@ -94,7 +81,7 @@ export const AccessCoverOverlay = () => {
               <div className="space-y-6">
                 <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6 max-w-2xl mx-auto">
                   <p className="text-white/80 text-lg">
-                    New members can join the revolution by minting an access pass for $50 (includes $50 in LGR voting credits).
+                    New members can join the revolution by minting an access pass for $50.
                   </p>
                 </div>
 
@@ -116,4 +103,3 @@ export const AccessCoverOverlay = () => {
     </Dialog>
   );
 };
-
