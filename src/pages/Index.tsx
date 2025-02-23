@@ -136,6 +136,189 @@ const Index = () => {
           </div>
         </section>
 
+        {/* How Soft Commitments & Voting Work */}
+        <section className="py-24 relative overflow-hidden">
+          <div className="container px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
+                How Soft Commitments & Voting Work
+              </h2>
+              <p className="text-xl text-white/70 mb-12">
+                Our unique two-step process helps you validate market interest and build a community of committed supporters before launch.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-black/30 border border-white/10 p-8 rounded-xl">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
+                    <Coins className="w-6 h-6 text-yellow-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Initial Voting</h3>
+                </div>
+                <ul className="space-y-4">
+                  {[
+                    "$1 Voting Fee: Small fee to ensure genuine interest and prevent spam",
+                    "Soft Commitment Amount: Supporters indicate how much they'd potentially invest",
+                    "No Lock-in: Soft commitments are non-binding to encourage honest feedback"
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-start gap-3 text-white/70">
+                      <Check className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-black/30 border border-white/10 p-8 rounded-xl">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                    <Rocket className="w-6 h-6 text-blue-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Launch Process</h3>
+                </div>
+                <ul className="space-y-4">
+                  {[
+                    "Target Reached: Once your soft commitment goal is met, begin the launch phase",
+                    "Direct Communication: Re-engage supporters who showed interest through voting",
+                    "Convert Interest: Turn soft commitments into actual investments"
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-start gap-3 text-white/70">
+                      <Check className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Amplify Your Reach */}
+        <section className="py-24 relative bg-black/50">
+          <div className="container px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
+                Amplify Your Reach
+              </h2>
+              <p className="text-xl text-white/70 mb-12">
+                Get your project in front of thousands of potential supporters through our established channels.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <Card className="bg-black/30 border border-white/10 p-6">
+                <div className="mb-4">
+                  <FileText className="w-8 h-8 text-yellow-400" />
+                </div>
+                <p className="text-white/70">
+                  Reach 1,500+ engaged subscribers through our curated newsletter. Each proposal gets dedicated coverage to maximize visibility.
+                </p>
+              </Card>
+
+              <Card className="bg-black/30 border border-white/10 p-6">
+                <div className="mb-4">
+                  <Building2 className="w-8 h-8 text-blue-400" />
+                </div>
+                <p className="text-white/70">
+                  Get exposure to our network of 2,500+ LinkedIn professionals. Your proposal will be shared with detailed insights.
+                </p>
+              </Card>
+
+              <Card className="bg-black/30 border border-white/10 p-6">
+                <div className="mb-4">
+                  <Users className="w-8 h-8 text-green-400" />
+                </div>
+                <p className="text-white/70">
+                  Present your project in our community calls and AMAs. Connect directly with potential supporters and get valuable feedback.
+                </p>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Test Market Interest */}
+        <section className="py-24 relative">
+          <div className="container px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
+                Test Market Interest, Then Launch With Confidence
+              </h2>
+              <p className="text-xl text-white/70 mb-12">
+                Collect soft commitments from interested supporters and build your launch community before investing in development.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <Card className="bg-black/30 border border-white/10 p-6">
+                <div className="mb-4">
+                  <CircleDollarSign className="w-8 h-8 text-yellow-400" />
+                </div>
+                <p className="text-white/70">
+                  Supporters indicate their potential investment amount through soft pledges with a voting fee to RD. Test your project's market interest verified without requiring immediate investment.
+                </p>
+              </Card>
+
+              <Card className="bg-black/30 border border-white/10 p-6">
+                <div className="mb-4">
+                  <Share2 className="w-8 h-8 text-blue-400" />
+                </div>
+                <p className="text-white/70">
+                  Connect directly with interested supporters and track their soft commitment amounts. Build reports that provide concrete proof of market interest.
+                </p>
+              </Card>
+
+              <Card className="bg-black/30 border border-white/10 p-6">
+                <div className="mb-4">
+                  <BadgeDollarSign className="w-8 h-8 text-green-400" />
+                </div>
+                <p className="text-white/70">
+                  Once you hit your soft commitment target, re-engage supporters for their pledged investments. Launch with confidence knowing you have verified interest and committed capital.
+                </p>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Pre-Launch Solution */}
+        <section className="py-24 relative bg-black/50">
+          <div className="container px-4">
+            <div className="grid md:grid-cols-2 gap-12">
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-6">Feeling Sidelined?</h3>
+                <ul className="space-y-4">
+                  {[
+                    "Watching others launch tokens, NFTs, and DeFi platforms while your idea stays locked in your head",
+                    "Launchpads demand steep fees and force commitments before proving interest",
+                    "Social platforms drown out fresh voices, and traditional routes demand insider networks"
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-start gap-3 text-white/70">
+                      <ChevronRight className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-6">Our Pre-Launch Solution</h3>
+                <ul className="space-y-4">
+                  {[
+                    "Create a proposal NFT that tests your token, NFT, DeFi, or AI project",
+                    "Tap our network of 1,500+ newsletter subscribers and 2,500+ LinkedIn members",
+                    "Gather soft commitments with $1 votes before investing in smart contracts"
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-start gap-3 text-white/70">
+                      <Check className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Ecosystem Economy Section */}
         <section className="py-24 relative overflow-hidden">
           <div className="absolute inset-0">
@@ -437,156 +620,4 @@ const Index = () => {
               <div className="bg-green-400/5 rounded-xl p-8 border border-green-400/20">
                 <h3 className="text-2xl font-bold text-white mb-4">Ready to Share Your Vision?</h3>
                 <p className="text-white/70 mb-6">
-                  Start your Web3 journey today by creating a proposal and connecting with our community of builders and investors.
-                </p>
-                <Button 
-                  onClick={() => navigate('/thesis')}
-                  className="w-full bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700"
-                >
-                  Start Your Proposal
-                  <ChevronRight className="w-5 h-5" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Investment Milestones Section */}
-        <section className="py-16 relative">
-          <div className="container px-4">
-            <h2 className="text-4xl font-bold text-center mb-12">Investment Milestones</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  title: "Early Access to Proposals",
-                  description: "At $50K raised in LGR tokens, early supporters gain exclusive access to mint Resistance Proposals, testing and pitching Web3 projects to our community.",
-                  amount: "$50K"
-                },
-                {
-                  title: "Community Voting Power",
-                  description: "At $100K raised, our community elects a governance board to steer investment decisions, with NFT holders voting with RD tokens.",
-                  amount: "$100K"
-                },
-                {
-                  title: "Exclusive Web3 Swag",
-                  description: "At $150K raised, 150 random NFT minters or LGR token stakers receive exclusive Web3 merchandise—limited-edition digital art and apparel.",
-                  amount: "$150K"
-                },
-                {
-                  title: "Investment Proposals Open",
-                  description: "At $250K raised, NFT holders can submit investment thesis proposals for Web3 projects, pledging LGR tokens to indicate interest.",
-                  amount: "$250K"
-                },
-                {
-                  title: "Deal Scout Program",
-                  description: "At $400K raised, launch our Deal Scout Program, rewarding community members who identify high-potential Web3 projects with LGR token bounties.",
-                  amount: "$400K"
-                },
-                {
-                  title: "First Web3 Investment",
-                  description: "At $500K raised, complete our first Web3 project investment, inviting 5 random NFT holders to a virtual launch event with crypto rewards.",
-                  amount: "$500K"
-                }
-              ].map((milestone, index) => (
-                <Card key={index} className="bg-black/30 border-white/10 p-6 hover:border-blue-400/50 transition-all duration-300">
-                  <div className="text-blue-400 font-bold text-2xl mb-4">{milestone.amount}</div>
-                  <h3 className="text-xl font-bold text-white mb-3">{milestone.title}</h3>
-                  <p className="text-white/70">{milestone.description}</p>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works */}
-        <section className="py-24 relative">
-          <div className="container px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
-                How It Works
-              </h2>
-              <p className="text-xl text-white/70">
-                A simple, transparent process for Web3 innovation
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-4 gap-8">
-              {[
-                {
-                  step: "1",
-                  title: "Submit Proposal",
-                  description: "Create your Web3 proposal and mint it as an NFT"
-                },
-                {
-                  step: "2",
-                  title: "Community Review",
-                  description: "Get feedback from our diverse community of experts"
-                },
-                {
-                  step: "3",
-                  title: "Gather Support",
-                  description: "Collect soft commitments from interested parties"
-                },
-                {
-                  step: "4",
-                  title: "Launch",
-                  description: "Execute your vision with community backing"
-                }
-              ].map((item, index) => (
-                <div key={index} className="relative">
-                  <div className="w-12 h-12 rounded-full bg-green-400/10 flex items-center justify-center mb-4">
-                    <span className="text-green-400 font-bold">{item.step}</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
-                  <p className="text-white/70">{item.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section className="py-24 relative bg-black/50">
-          <div className="container px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
-                Frequently Asked Questions
-              </h2>
-              <p className="text-xl text-white/70">
-                Everything you need to know about the Resistance DAO
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {[
-                {
-                  question: "What is Resistance DAO?",
-                  answer: "Resistance DAO is a community-driven platform connecting Web3 innovators with early-stage capital and support."
-                },
-                {
-                  question: "How do I submit a proposal?",
-                  answer: "Simply mint a Resistance Proposal NFT for $25 and share your Web3 vision with our community."
-                },
-                {
-                  question: "What types of projects are accepted?",
-                  answer: "We welcome all Web3 projects including tokens, NFTs, DeFi platforms, and innovative blockchain applications."
-                },
-                {
-                  question: "How does voting work?",
-                  answer: "Community members can vote on proposals with a small fee to ensure genuine interest and prevent spam."
-                }
-              ].map((item, index) => (
-                <Card key={index} className="bg-black/30 border border-white/10 p-6">
-                  <h3 className="text-xl font-bold text-white mb-3">{item.question}</h3>
-                  <p className="text-white/70">{item.answer}</p>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-      </div>
-    </>
-  );
-};
-
-export default Index;
+                  Start your Web3 journey today by creating a proposal and connecting with our community
