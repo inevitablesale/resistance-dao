@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,14 +6,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { Input } from "@/components/ui/input";
 
-// Mock data for demonstration
 const MOCK_LISTINGS = [
   {
     id: '1',
     title: 'Tax Return Review Needed',
     description: 'Need experienced CPA to review 25 individual tax returns before filing deadline.',
     category: 'tax_prep',
-    lgrAmount: 500,
+    rdAmount: 500,
     durationType: 'short-term',
     timeframe: '2 weeks',
     skills: ['Tax Review', '1040 Forms', 'Individual Returns'],
@@ -25,7 +23,7 @@ const MOCK_LISTINGS = [
     title: 'Monthly Bank Reconciliation',
     description: 'Looking for help with QuickBooks bank reconciliation for small retail business.',
     category: 'bookkeeping',
-    lgrAmount: 200,
+    rdAmount: 200,
     durationType: 'short-term',
     timeframe: '3 days',
     skills: ['QuickBooks', 'Bank Reconciliation'],
@@ -36,7 +34,7 @@ const MOCK_LISTINGS = [
     title: 'Audit Support - Manufacturing',
     description: 'Need assistance with preparing audit documentation for manufacturing client.',
     category: 'audit',
-    lgrAmount: 1000,
+    rdAmount: 1000,
     durationType: 'short-term',
     timeframe: '1 week',
     skills: ['Audit Prep', 'Manufacturing', 'Documentation'],
@@ -89,7 +87,6 @@ export function MarketplaceListings() {
 
   return (
     <div className="space-y-8">
-      {/* Filters */}
       <div className="flex flex-wrap gap-4 items-center bg-white/5 p-4 rounded-xl border border-white/10">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
@@ -119,7 +116,6 @@ export function MarketplaceListings() {
         </div>
       </div>
 
-      {/* Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredListings.map(listing => (
           <div 
@@ -127,7 +123,6 @@ export function MarketplaceListings() {
             className="group relative bg-white/5 rounded-xl border border-white/10 hover:border-teal-500/50 
               transition-all duration-200 overflow-hidden animate-fade-in"
           >
-            {/* Status Indicators */}
             <div className="absolute top-4 left-4 flex gap-2">
               {listing.urgent && (
                 <Badge variant="secondary" className="bg-red-500/20 text-red-400 border-none">
@@ -142,7 +137,6 @@ export function MarketplaceListings() {
               )}
             </div>
 
-            {/* Content */}
             <div className="p-6">
               <div className="flex items-center gap-2 text-white/60 mb-4">
                 <CategoryIcon category={listing.category} />
@@ -179,7 +173,7 @@ export function MarketplaceListings() {
                   </div>
                   <div className="flex items-center gap-2 text-2xl font-bold text-teal-400">
                     <DollarSign className="w-5 h-5" />
-                    <span>{listing.lgrAmount} LGR</span>
+                    <span>{listing.rdAmount} RD</span>
                   </div>
                 </div>
                 <Button 

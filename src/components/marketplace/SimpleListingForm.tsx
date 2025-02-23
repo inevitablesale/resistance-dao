@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +18,7 @@ export function SimpleListingForm({ onClose }: { onClose: () => void }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [lgrAmount, setLgrAmount] = useState("");
+  const [rdAmount, setRdAmount] = useState("");
   const [deadline, setDeadline] = useState("");
   
   const { toast } = useToast();
@@ -101,14 +100,14 @@ export function SimpleListingForm({ onClose }: { onClose: () => void }) {
           <Label className="text-lg text-white">Payment Details</Label>
           <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-4">
             <div className="space-y-2">
-              <Label className="text-white/60">LGR Token Amount</Label>
+              <Label className="text-white/60">RD Token Amount</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
                 <Input
                   type="number"
-                  value={lgrAmount}
-                  onChange={(e) => setLgrAmount(e.target.value)}
-                  placeholder="Amount"
+                  value={rdAmount}
+                  onChange={(e) => setRdAmount(e.target.value)}
+                  placeholder="Amount in RD"
                   className="pl-10 bg-white/5 border-white/10 text-white"
                   required
                   min="1"
