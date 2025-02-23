@@ -37,11 +37,6 @@ export const AccessCoverOverlay = () => {
           className="text-center space-y-8 relative"
         >
           <div className="mb-12 relative">
-            <img 
-              src="/lovable-uploads/ca457542-e761-44f2-acbf-1bf9b4255b78.png" 
-              alt="Phoenix Logo" 
-              className="w-40 h-40 mx-auto mb-8 animate-cosmic-pulse"
-            />
             <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
               The Resistance is Back<br />Original Holders Welcome Home
             </h1>
