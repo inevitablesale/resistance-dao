@@ -1,12 +1,14 @@
 
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Wallet } from "lucide-react";
+import { X, Wallet, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const { connectWallet, isInitializing } = useDynamicUtils();
 
   if (!isOpen) return null;
 
@@ -40,10 +42,16 @@ export const AccessCoverOverlay = () => {
           <div className="flex justify-center">
             <Button 
               size="lg"
+              onClick={connectWallet}
+              disabled={isInitializing}
               className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold px-8 py-6 text-lg"
             >
-              <Wallet className="w-6 h-6 mr-3" />
-              Check My Wallet
+              {isInitializing ? (
+                <Loader2 className="w-6 h-6 mr-3 animate-spin" />
+              ) : (
+                <Wallet className="w-6 h-6 mr-3" />
+              )}
+              Connect Wallet
             </Button>
           </div>
 
