@@ -159,62 +159,62 @@ const Index = () => {
 
               {/* Market Stats */}
               <div className="grid md:grid-cols-3 gap-6 mt-8">
-                <Card className="bg-gradient-to-br from-blue-900/40 to-blue-800/30 border-blue-500/20 p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-blue-500/10 rounded-lg">
-                      <CircleDollarSign className="w-6 h-6 text-blue-400" />
+                <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="p-3 rounded-full bg-blue-500/10">
+                      <CircleDollarSign className="w-6 h-6 text-blue-300" />
                     </div>
-                    <div className="flex-1">
-                      <div className="text-sm text-white/60 mb-1">Total Locked Value</div>
-                      <div className="font-mono text-xl text-white">$2.5M</div>
+                    <div>
+                      <div className="text-white/60 text-sm">Total Locked Value</div>
+                      <div className="text-2xl font-semibold text-white">$2.5M</div>
                     </div>
                   </div>
-                  <Progress value={65} className="bg-blue-950 h-1">
-                    <div className="bg-gradient-to-r from-blue-500 to-blue-400 h-1" />
-                  </Progress>
-                  <div className="flex justify-between mt-2 text-xs">
+                  <div className="h-1 bg-blue-900/30 rounded-full mb-2">
+                    <div className="h-full w-[65%] bg-blue-400 rounded-full" />
+                  </div>
+                  <div className="flex justify-between text-sm">
                     <span className="text-white/60">24h Change</span>
                     <span className="text-green-400">+12.5%</span>
                   </div>
-                </Card>
+                </div>
 
-                <Card className="bg-gradient-to-br from-green-900/40 to-green-800/30 border-green-500/20 p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-green-500/10 rounded-lg">
-                      <Users className="w-6 h-6 text-green-400" />
+                <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="p-3 rounded-full bg-green-500/10">
+                      <Users className="w-6 h-6 text-green-300" />
                     </div>
-                    <div className="flex-1">
-                      <div className="text-sm text-white/60 mb-1">Active Members</div>
-                      <div className="font-mono text-xl text-white">1.5K</div>
+                    <div>
+                      <div className="text-white/60 text-sm">Active Members</div>
+                      <div className="text-2xl font-semibold text-white">1.5K</div>
                     </div>
                   </div>
-                  <Progress value={80} className="bg-green-950 h-1">
-                    <div className="bg-gradient-to-r from-green-500 to-green-400 h-1" />
-                  </Progress>
-                  <div className="flex justify-between mt-2 text-xs">
+                  <div className="h-1 bg-green-900/30 rounded-full mb-2">
+                    <div className="h-full w-[82%] bg-green-400 rounded-full" />
+                  </div>
+                  <div className="flex justify-between text-sm">
                     <span className="text-white/60">24h Users</span>
                     <span className="text-green-400">+82</span>
                   </div>
-                </Card>
+                </div>
 
-                <Card className="bg-gradient-to-br from-yellow-900/40 to-yellow-800/30 border-yellow-500/20 p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-yellow-500/10 rounded-lg">
-                      <Scale className="w-6 h-6 text-yellow-400" />
+                <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="p-3 rounded-full bg-yellow-500/10">
+                      <Scale className="w-6 h-6 text-yellow-300" />
                     </div>
-                    <div className="flex-1">
-                      <div className="text-sm text-white/60 mb-1">Active Markets</div>
-                      <div className="font-mono text-xl text-white">24</div>
+                    <div>
+                      <div className="text-white/60 text-sm">Active Markets</div>
+                      <div className="text-2xl font-semibold text-white">24</div>
                     </div>
                   </div>
-                  <Progress value={45} className="bg-yellow-950 h-1">
-                    <div className="bg-gradient-to-r from-yellow-500 to-yellow-400 h-1" />
-                  </Progress>
-                  <div className="flex justify-between mt-2 text-xs">
+                  <div className="h-1 bg-yellow-900/30 rounded-full mb-2">
+                    <div className="h-full w-[89%] bg-yellow-400 rounded-full" />
+                  </div>
+                  <div className="flex justify-between text-sm">
                     <span className="text-white/60">Avg. Success</span>
                     <span className="text-green-400">89%</span>
                   </div>
-                </Card>
+                </div>
               </div>
             </motion.div>
           </div>
