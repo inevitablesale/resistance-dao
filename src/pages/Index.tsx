@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Rocket, DollarSign, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText } from "lucide-react";
+import { Rocket, DollarSign, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText, Percent, Coins, BadgeDollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -56,14 +56,13 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Stats Section */}
+        {/* Stats Section - Updated with 3 key metrics */}
         <section className="py-16 relative">
           <div className="container px-4">
-            <div className="grid md:grid-cols-4 gap-8">
+            <div className="grid md:grid-cols-3 gap-8">
               {[
                 { icon: DollarSign, label: "Proposal Mint Cost", value: "$25" },
-                { icon: Users, label: "Community Members", value: "2,558+" },
-                { icon: Share2, label: "Newsletter Subscribers", value: "1,545+" },
+                { icon: Percent, label: "DAO Agreement", value: "2.5%" },
                 { icon: Zap, label: "Voting Fee", value: "$1" }
               ].map((stat, index) => (
                 <motion.div
@@ -81,6 +80,95 @@ const Index = () => {
                   </div>
                 </motion.div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* NEW: Value to DAO Members Section */}
+        <section className="py-16 relative">
+          <div className="container px-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
+                Value to DAO Members
+              </h2>
+              <p className="text-xl text-white/80 max-w-3xl mx-auto">
+                Join our community and receive automatic benefits from every successful project launch
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              <Card className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+                    <Coins className="w-6 h-6 text-yellow-500" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white">Automatic Airdrops</h3>
+                </div>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
+                    <p className="text-white/70">2.5% token/NFT/equity allocations airdropped directly to your wallet</p>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
+                    <p className="text-white/70">Zero claim process - tokens appear automatically</p>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
+                    <p className="text-white/70">Share in every successful project launch</p>
+                  </li>
+                </ul>
+              </Card>
+
+              <Card className="bg-black/30 border-white/10 p-6 hover:border-teal-500/50 transition-all duration-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-teal-500/20 flex items-center justify-center">
+                    <BadgeDollarSign className="w-6 h-6 text-teal-500" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white">Early Access</h3>
+                </div>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
+                    <p className="text-white/70">First look at new Web3 projects</p>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
+                    <p className="text-white/70">Vote on proposals ($1 fee)</p>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-teal-500 mt-1 flex-shrink-0" />
+                    <p className="text-white/70">Direct influence on which projects get funded</p>
+                  </li>
+                </ul>
+              </Card>
+
+              <Card className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+                    <Users className="w-6 h-6 text-yellow-500" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white">Community</h3>
+                </div>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
+                    <p className="text-white/70">Direct access to founders</p>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
+                    <p className="text-white/70">Network with other Web3 investors</p>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
+                    <p className="text-white/70">Be part of the next wave of Web3 innovation</p>
+                  </li>
+                </ul>
+              </Card>
             </div>
           </div>
         </section>
