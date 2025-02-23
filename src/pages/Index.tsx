@@ -58,13 +58,22 @@ const Index = () => {
                 </div>
               </div>
             </div>
-            <Button 
-              onClick={() => navigate('/mint')}
-              className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-mono"
-            >
-              <Shield className="w-4 h-4 mr-2" />
-              Mint Access Pass
-            </Button>
+            <div className="flex items-center gap-4">
+              <Button 
+                onClick={() => navigate('/mint')}
+                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-mono"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Mint Access Pass
+              </Button>
+              <Button 
+                onClick={() => navigate('/thesis')}
+                className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-mono"
+              >
+                <Rocket className="w-4 h-4 mr-2" />
+                Start Proposal
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -402,7 +411,7 @@ const Index = () => {
 
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
-                <div className="bg-blue-950/40 border border-blue-400/10 rounded-xl p-6">
+                <div className="bg-blue-950/40 border border-blue-400/10 rounded-lg p-6">
                   <h3 className="text-2xl font-bold text-white mb-4">Community Agreement NFT</h3>
                   <p className="text-white/70 mb-4">
                     When you submit your proposal, a unique NFT is minted representing your commitment to allocate 2.5% of your project's tokens to the DAO community.
