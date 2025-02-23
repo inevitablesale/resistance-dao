@@ -14,7 +14,13 @@ export const AccessCoverOverlay = () => {
 
   return (
     <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-blue-950 to-black">
-      <div className="absolute inset-0 bg-[url('/lovable-uploads/ca457542-e761-44f2-acbf-1bf9b4255b78.png')] bg-center bg-no-repeat opacity-10 animate-pulse" />
+      <div 
+        className="absolute inset-0 bg-[url('/lovable-uploads/ca457542-e761-44f2-acbf-1bf9b4255b78.png')] bg-center bg-no-repeat opacity-10 group-hover:opacity-20 transition-opacity duration-500"
+        style={{
+          animation: 'phoenixLook 8s ease-in-out infinite',
+          transformOrigin: 'center center'
+        }}
+      />
       
       <Button 
         variant="ghost" 
@@ -25,7 +31,7 @@ export const AccessCoverOverlay = () => {
         <X className="h-10 w-10" />
       </Button>
 
-      <div className="container max-w-4xl mx-auto px-4 h-full flex items-center justify-center relative">
+      <div className="container max-w-4xl mx-auto px-4 h-full flex items-center justify-center relative group">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
         </div>
@@ -75,6 +81,20 @@ export const AccessCoverOverlay = () => {
           </div>
         </motion.div>
       </div>
+
+      <style jsx global>{`
+        @keyframes phoenixLook {
+          0%, 100% {
+            transform: rotate(0deg);
+          }
+          25% {
+            transform: rotate(-3deg);
+          }
+          75% {
+            transform: rotate(3deg);
+          }
+        }
+      `}</style>
     </div>
   );
 };
