@@ -11,7 +11,8 @@ import {
   TrendingUp,
   ArrowUpRight,
   Scale,
-  ShieldCheck
+  ShieldCheck,
+  FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -198,7 +199,7 @@ const Index = () => {
 
               <Card className="bg-black/30 border border-white/10 p-6">
                 <div className="mb-4">
-                  <BadgeDollarSign className="w-8 h-8 text-green-400" />
+                  <CircleDollarSign className="w-8 h-8 text-green-400" />
                 </div>
                 <p className="text-white/70">
                   Once you hit your soft commitment target, re-engage supporters for their pledged investments. Launch with confidence knowing you have verified interest and committed capital.
