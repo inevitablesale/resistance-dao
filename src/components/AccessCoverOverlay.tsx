@@ -1,6 +1,7 @@
+
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Shield, Rocket } from "lucide-react";
+import { X, Rocket } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
@@ -28,14 +29,6 @@ export const AccessCoverOverlay = () => {
           className="text-center space-y-8"
         >
           <div className="mb-12">
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="w-20 h-20 rounded-full bg-yellow-500/20 flex items-center justify-center mx-auto mb-6"
-            >
-              <Shield className="w-10 h-10 text-yellow-500" />
-            </motion.div>
             <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
               The Resistance is Back<br />Original Holders Welcome Home
             </h1>
@@ -65,7 +58,7 @@ export const AccessCoverOverlay = () => {
               className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6"
             >
               <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-6 h-6 text-yellow-500" />
+                <Rocket className="w-6 h-6 text-yellow-500" />
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Priority Access</h3>
               <p className="text-white/60">Early access to all proposal pre-sales</p>
