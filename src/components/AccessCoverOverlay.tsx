@@ -1,7 +1,7 @@
 
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Rocket, Coins } from "lucide-react";
+import { X, Rocket } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
@@ -32,13 +32,9 @@ export const AccessCoverOverlay = () => {
             <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
               The Resistance is Back<br />Original Holders Welcome Home
             </h1>
-            <p className="text-xl text-white/80 max-w-2xl mx-auto mb-6">
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">
               As one of our original NFT holders, you have exclusive early access to the next evolution of Resistance DAO
             </p>
-            <div className="inline-flex items-center gap-2 bg-yellow-500/10 px-4 py-2 rounded-full border border-yellow-500/20">
-              <Coins className="w-5 h-5 text-yellow-500" />
-              <span className="text-yellow-500 font-semibold">10 RD tokens airdropped to OG holders</span>
-            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 mb-12 max-w-2xl mx-auto">
@@ -71,13 +67,9 @@ export const AccessCoverOverlay = () => {
 
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6 max-w-2xl mx-auto">
-              <p className="text-white/80 text-lg mb-4">
+              <p className="text-white/80 text-lg">
                 New members can join the revolution by minting an access pass.
               </p>
-              <div className="inline-flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10">
-                <Coins className="w-5 h-5 text-yellow-500" />
-                <span className="text-white/60">Receive 10 RD tokens with your Member NFT</span>
-              </div>
             </div>
 
             <p className="text-white/40 text-sm">
