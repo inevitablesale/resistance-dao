@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Rocket, Coins, Users, Share2, Shield, Zap, Check, ChevronRight, Building2, FileText, Percent, BadgeDollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -546,12 +547,12 @@ const Index = () => {
               {[
                 {
                   title: "Early Access to Proposals",
-                  description: "At $50K raised in LGR tokens, early supporters gain exclusive access to mint Resistance Proposals, testing and pitching Web3 projects to our community for $25.",
+                  description: "At $50K raised in LGR tokens, early supporters gain exclusive access to mint Resistance Proposals, testing and pitching Web3 projects to our community.",
                   amount: "$50K"
                 },
                 {
                   title: "Community Voting Power",
-                  description: "At $100K raised, our community elects a governance board to steer investment decisions, with NFT holders voting with $1 each.",
+                  description: "At $100K raised, our community elects a governance board to steer investment decisions, with NFT holders voting with RD tokens.",
                   amount: "$100K"
                 },
                 {
@@ -571,8 +572,22 @@ const Index = () => {
                 },
                 {
                   title: "First Web3 Investment",
-                  description: "At $500K raised, complete our first Web3 project investment, inviting 5 random NFT holders to a virtual launch event with $1,000 in crypto rewards.",
+                  description: "At $500K raised, complete our first Web3 project investment, inviting 5 random NFT holders to a virtual launch event with crypto rewards.",
                   amount: "$500K"
                 }
               ].map((milestone, index) => (
-                <Card key={index} className="bg-black/30 border-white/10
+                <Card key={index} className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
+                  <div className="text-yellow-500 font-bold text-2xl mb-4">{milestone.amount}</div>
+                  <h3 className="text-xl font-bold text-white mb-3">{milestone.title}</h3>
+                  <p className="text-white/70">{milestone.description}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
+  );
+};
+
+export default Index;
