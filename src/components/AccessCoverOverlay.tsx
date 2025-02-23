@@ -11,7 +11,7 @@ export const AccessCoverOverlay = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <div className="fixed inset-0 z-50">
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black">
           <Button 
             variant="ghost" 
             size="icon" 
@@ -91,4 +91,3 @@ export const AccessCoverOverlay = () => {
     </Dialog>
   );
 };
-
