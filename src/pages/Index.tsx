@@ -71,7 +71,7 @@ const Index = () => {
                 className="bg-[#4263EB] hover:bg-[#3B5BD9] text-white font-mono rounded-xl px-6"
               >
                 <Rocket className="w-4 h-4 mr-2" />
-                Start Proposal
+                Mint NFT
               </Button>
             </div>
           </div>
