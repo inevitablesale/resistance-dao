@@ -56,6 +56,107 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Test Market Interest */}
+        <section className="py-24 relative">
+          <div className="container px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
+                Test Market Interest, Then Launch With Confidence
+              </h2>
+              <p className="text-xl text-white/70 mb-12">
+                Collect soft commitments from interested supporters and build your launch community before investing in development.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <Card className="bg-black/30 border border-white/10 p-6">
+                <div className="mb-4">
+                  <CircleDollarSign className="w-8 h-8 text-yellow-400" />
+                </div>
+                <p className="text-white/70">
+                  Supporters indicate their potential investment amount through soft pledges with a voting fee to RD. Test your project's market interest verified without requiring immediate investment.
+                </p>
+              </Card>
+
+              <Card className="bg-black/30 border border-white/10 p-6">
+                <div className="mb-4">
+                  <Share2 className="w-8 h-8 text-blue-400" />
+                </div>
+                <p className="text-white/70">
+                  Connect directly with interested supporters and track their soft commitment amounts. Build reports that provide concrete proof of market interest.
+                </p>
+              </Card>
+
+              <Card className="bg-black/30 border border-white/10 p-6">
+                <div className="mb-4">
+                  <BadgeDollarSign className="w-8 h-8 text-green-400" />
+                </div>
+                <p className="text-white/70">
+                  Once you hit your soft commitment target, re-engage supporters for their pledged investments. Launch with confidence knowing you have verified interest and committed capital.
+                </p>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* How Soft Commitments & Voting Work */}
+        <section className="py-24 relative overflow-hidden">
+          <div className="container px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
+                How Soft Commitments & Voting Work
+              </h2>
+              <p className="text-xl text-white/70 mb-12">
+                Our unique two-step process helps you validate market interest and build a community of committed supporters before launch.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-black/30 border border-white/10 p-8 rounded-xl">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
+                    <Coins className="w-6 h-6 text-yellow-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Initial Voting</h3>
+                </div>
+                <ul className="space-y-4">
+                  {[
+                    "$1 Voting Fee: Small fee to ensure genuine interest and prevent spam",
+                    "Soft Commitment Amount: Supporters indicate how much they'd potentially invest",
+                    "No Lock-in: Soft commitments are non-binding to encourage honest feedback"
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-start gap-3 text-white/70">
+                      <Check className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-black/30 border border-white/10 p-8 rounded-xl">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                    <Rocket className="w-6 h-6 text-blue-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Launch Process</h3>
+                </div>
+                <ul className="space-y-4">
+                  {[
+                    "Target Reached: Once your soft commitment goal is met, begin the launch phase",
+                    "Direct Communication: Re-engage supporters who showed interest through voting",
+                    "Convert Interest: Turn soft commitments into actual investments"
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-start gap-3 text-white/70">
+                      <Check className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* NFT Contract Section */}
         <section className="py-24 relative overflow-hidden">
           <div className="absolute inset-0">
@@ -136,64 +237,6 @@ const Index = () => {
           </div>
         </section>
 
-        {/* How Soft Commitments & Voting Work */}
-        <section className="py-24 relative overflow-hidden">
-          <div className="container px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
-                How Soft Commitments & Voting Work
-              </h2>
-              <p className="text-xl text-white/70 mb-12">
-                Our unique two-step process helps you validate market interest and build a community of committed supporters before launch.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-black/30 border border-white/10 p-8 rounded-xl">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                    <Coins className="w-6 h-6 text-yellow-400" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white">Initial Voting</h3>
-                </div>
-                <ul className="space-y-4">
-                  {[
-                    "$1 Voting Fee: Small fee to ensure genuine interest and prevent spam",
-                    "Soft Commitment Amount: Supporters indicate how much they'd potentially invest",
-                    "No Lock-in: Soft commitments are non-binding to encourage honest feedback"
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start gap-3 text-white/70">
-                      <Check className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-black/30 border border-white/10 p-8 rounded-xl">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                    <Rocket className="w-6 h-6 text-blue-400" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white">Launch Process</h3>
-                </div>
-                <ul className="space-y-4">
-                  {[
-                    "Target Reached: Once your soft commitment goal is met, begin the launch phase",
-                    "Direct Communication: Re-engage supporters who showed interest through voting",
-                    "Convert Interest: Turn soft commitments into actual investments"
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start gap-3 text-white/70">
-                      <Check className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Amplify Your Reach */}
         <section className="py-24 relative bg-black/50">
           <div className="container px-4">
@@ -231,49 +274,6 @@ const Index = () => {
                 </div>
                 <p className="text-white/70">
                   Present your project in our community calls and AMAs. Connect directly with potential supporters and get valuable feedback.
-                </p>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* Test Market Interest */}
-        <section className="py-24 relative">
-          <div className="container px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
-                Test Market Interest, Then Launch With Confidence
-              </h2>
-              <p className="text-xl text-white/70 mb-12">
-                Collect soft commitments from interested supporters and build your launch community before investing in development.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              <Card className="bg-black/30 border border-white/10 p-6">
-                <div className="mb-4">
-                  <CircleDollarSign className="w-8 h-8 text-yellow-400" />
-                </div>
-                <p className="text-white/70">
-                  Supporters indicate their potential investment amount through soft pledges with a voting fee to RD. Test your project's market interest verified without requiring immediate investment.
-                </p>
-              </Card>
-
-              <Card className="bg-black/30 border border-white/10 p-6">
-                <div className="mb-4">
-                  <Share2 className="w-8 h-8 text-blue-400" />
-                </div>
-                <p className="text-white/70">
-                  Connect directly with interested supporters and track their soft commitment amounts. Build reports that provide concrete proof of market interest.
-                </p>
-              </Card>
-
-              <Card className="bg-black/30 border border-white/10 p-6">
-                <div className="mb-4">
-                  <BadgeDollarSign className="w-8 h-8 text-green-400" />
-                </div>
-                <p className="text-white/70">
-                  Once you hit your soft commitment target, re-engage supporters for their pledged investments. Launch with confidence knowing you have verified interest and committed capital.
                 </p>
               </Card>
             </div>
