@@ -31,21 +31,21 @@ const Index = () => {
     <>
       <AccessCoverOverlay />
       <div className="min-h-screen bg-black text-white">
-        {/* Stats Bar - Fixed at top with DeFi-style metrics */}
+        {/* Stats Bar */}
         <div className="fixed top-0 left-0 right-0 z-10 bg-black/90 backdrop-blur-xl border-b border-white/10">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between text-sm">
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 <div>
-                  <div className="text-white/50">TVL (Soft Commitments)</div>
+                  <div className="text-white/50">Total Commitments</div>
                   <div className="font-mono text-white">$2.5M USD</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
                 <div>
-                  <div className="text-white/50">24h Volume</div>
+                  <div className="text-white/50">24h Activity</div>
                   <div className="font-mono text-white">$125.4K</div>
                 </div>
               </div>
@@ -67,7 +67,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Hero Section with Terminal + DeFi Style */}
+        {/* Hero Section */}
         <section className="pt-32 pb-16 relative overflow-hidden">
           <div className="absolute inset-0">
             <div className="absolute w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl -top-48 -left-24" />
@@ -120,7 +120,7 @@ const Index = () => {
                     className="border-blue-500/50 text-blue-300 hover:bg-blue-500/10 font-mono"
                   >
                     <Share2 className="w-5 h-5 mr-2" />
-                    View Markets
+                    View Proposals
                   </Button>
                 </div>
               </div>
@@ -203,7 +203,7 @@ const Index = () => {
                       <Scale className="w-6 h-6 text-yellow-300" />
                     </div>
                     <div>
-                      <div className="text-white/60 text-sm">Active Markets</div>
+                      <div className="text-white/60 text-sm">Active Proposals</div>
                       <div className="text-2xl font-semibold text-white">24</div>
                     </div>
                   </div>
@@ -211,7 +211,7 @@ const Index = () => {
                     <div className="h-full w-[89%] bg-yellow-400 rounded-full" />
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-white/60">Avg. Success</span>
+                    <span className="text-white/60">Success Rate</span>
                     <span className="text-green-400">89%</span>
                   </div>
                 </div>
