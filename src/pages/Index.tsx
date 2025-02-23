@@ -1,4 +1,4 @@
-
+<lov-code>
 import { motion } from "framer-motion";
 import { Rocket, Coins, Users, Share2, Zap, Check, ChevronRight, Building2, FileText, Percent, BadgeDollarSign, CircleDollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -576,18 +576,4 @@ const Index = () => {
                   amount: "$500K"
                 }
               ].map((milestone, index) => (
-                <Card key={index} className="bg-black/30 border-white/10 p-6 hover:border-yellow-500/50 transition-all duration-300">
-                  <div className="text-yellow-500 font-bold text-2xl mb-4">{milestone.amount}</div>
-                  <h3 className="text-xl font-bold text-white mb-3">{milestone.title}</h3>
-                  <p className="text-white/70">{milestone.description}</p>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-      </div>
-    </>
-  );
-};
-
-export default Index;
+                <Card key={index} className="bg-black/30 border-white/10 p-6 hover:border
