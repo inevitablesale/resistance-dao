@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Rocket, Coins, Users, Share2, Zap, Check, ChevronRight, Building2, FileText, Percent, BadgeDollarSign, CircleDollarSign, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -136,7 +137,7 @@ const Index = () => {
                   </div>
                   <div className="space-y-6">
                     {[
-                      { icon: CreditCard, label: "Access Card NFT", value: "$50", description: "One-time access pass to join the community" },
+                      { icon: CreditCard, label: "Access Card NFT", value: "50 USDC", description: "One-time access pass to join the community" },
                       { icon: Zap, label: "Voting Fee", value: "1 RD", description: "Per-vote fee to ensure genuine interest" },
                     ].map((item, index) => (
                       <div key={index} className="flex items-start gap-4 p-4 rounded-xl bg-blue-950/40 border border-blue-400/10 hover:border-blue-400/30 transition-colors">
