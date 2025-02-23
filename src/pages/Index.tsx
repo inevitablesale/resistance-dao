@@ -57,107 +57,102 @@ const Index = () => {
         </section>
 
         {/* Ecosystem Economy Section */}
-        <section className="py-16 relative">
-          <div className="container px-4">
+        <section className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0">
+            <div className="absolute w-[800px] h-[800px] bg-blue-500/10 rounded-full blur-[120px] -top-1/2 -left-1/4" />
+            <div className="absolute w-[600px] h-[600px] bg-cyan-400/10 rounded-full blur-[100px] -bottom-1/4 -right-1/4" />
+          </div>
+
+          <div className="container px-4 relative">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-16"
+              className="text-center mb-20"
             >
-              <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-cyan-300 to-blue-300">
+              <div className="inline-block mb-4">
+                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-400/20 bg-blue-500/5 backdrop-blur">
+                  <CircleDollarSign className="w-5 h-5 text-blue-400" />
+                  <span className="text-sm font-medium text-blue-300">Transparent Economics</span>
+                </div>
+              </div>
+              <h2 className="text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-300">
                 Ecosystem Economy
               </h2>
-              <p className="text-xl text-white/80 max-w-3xl mx-auto">
+              <p className="text-xl text-white/70 max-w-2xl mx-auto">
                 Simple, transparent economics for a thriving Web3 ecosystem
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-12">
+            <div className="grid md:grid-cols-2 gap-8">
               {/* Creators Section */}
-              <div className="space-y-8 relative">
-                <div className="absolute inset-0 bg-blue-500/5 rounded-3xl blur-3xl" />
-                <div className="relative">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                      <Users className="w-5 h-5 text-blue-400" />
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="relative group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-blue-400/5 to-transparent rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                <div className="relative h-full p-8 rounded-2xl border border-blue-300/10 bg-gradient-to-br from-blue-900/40 via-blue-900/20 to-blue-900/30 backdrop-blur">
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-400/20">
+                      <Users className="w-6 h-6 text-blue-400" />
                     </div>
-                    <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-blue-400">
-                      For Creators
-                    </h3>
+                    <h3 className="text-2xl font-bold text-white">For Creators</h3>
                   </div>
-                  <div className="grid gap-6">
+                  <div className="space-y-6">
                     {[
                       { icon: Coins, label: "Proposal Mint Cost", value: "25 RD", description: "One-time fee to submit your Web3 proposal" },
                       { icon: Percent, label: "DAO Agreement", value: "2.5%", description: "Token allocation for DAO members" },
-                    ].map((stat, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                        className="relative group"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-cyan-400/5 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                        <div className="relative p-6 rounded-xl bg-blue-950/20 backdrop-blur border border-blue-400/10 hover:border-blue-400/30 transition-all duration-300">
-                          <div className="flex items-start gap-4">
-                            <div className="h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                              <stat.icon className="w-6 h-6 text-blue-400" />
-                            </div>
-                            <div>
-                              <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                              <div className="text-blue-200 font-medium mb-1">{stat.label}</div>
-                              <div className="text-sm text-blue-200/60">{stat.description}</div>
-                            </div>
-                          </div>
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-start gap-4 p-4 rounded-xl bg-blue-950/40 border border-blue-400/10 hover:border-blue-400/30 transition-colors">
+                        <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20">
+                          <item.icon className="w-6 h-6 text-blue-400" />
                         </div>
-                      </motion.div>
+                        <div>
+                          <div className="text-2xl font-bold text-white mb-1">{item.value}</div>
+                          <div className="text-blue-200 font-medium mb-1">{item.label}</div>
+                          <div className="text-sm text-blue-300/60">{item.description}</div>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Members Section */}
-              <div className="space-y-8 relative">
-                <div className="absolute inset-0 bg-blue-500/5 rounded-3xl blur-3xl" />
-                <div className="relative">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                      <Building2 className="w-5 h-5 text-blue-400" />
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="relative group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-blue-400/5 to-transparent rounded-2xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700" />
+                <div className="relative h-full p-8 rounded-2xl border border-blue-300/10 bg-gradient-to-br from-blue-900/40 via-blue-900/20 to-blue-900/30 backdrop-blur">
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-400/20">
+                      <Building2 className="w-6 h-6 text-blue-400" />
                     </div>
-                    <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-blue-400">
-                      For Members
-                    </h3>
+                    <h3 className="text-2xl font-bold text-white">For Members</h3>
                   </div>
-                  <div className="grid gap-6">
+                  <div className="space-y-6">
                     {[
                       { icon: CreditCard, label: "Access Card NFT", value: "$50", description: "One-time access pass to join the community" },
                       { icon: Zap, label: "Voting Fee", value: "1 RD", description: "Per-vote fee to ensure genuine interest" },
-                    ].map((stat, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                        className="relative group"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-cyan-400/5 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                        <div className="relative p-6 rounded-xl bg-blue-950/20 backdrop-blur border border-blue-400/10 hover:border-blue-400/30 transition-all duration-300">
-                          <div className="flex items-start gap-4">
-                            <div className="h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                              <stat.icon className="w-6 h-6 text-blue-400" />
-                            </div>
-                            <div>
-                              <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                              <div className="text-blue-200 font-medium mb-1">{stat.label}</div>
-                              <div className="text-sm text-blue-200/60">{stat.description}</div>
-                            </div>
-                          </div>
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-start gap-4 p-4 rounded-xl bg-blue-950/40 border border-blue-400/10 hover:border-blue-400/30 transition-colors">
+                        <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20">
+                          <item.icon className="w-6 h-6 text-blue-400" />
                         </div>
-                      </motion.div>
+                        <div>
+                          <div className="text-2xl font-bold text-white mb-1">{item.value}</div>
+                          <div className="text-blue-200 font-medium mb-1">{item.label}</div>
+                          <div className="text-sm text-blue-300/60">{item.description}</div>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
