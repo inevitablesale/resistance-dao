@@ -1,9 +1,23 @@
 import { motion } from "framer-motion";
-import { Rocket, Coins, Users, Share2, Zap, Check, ChevronRight, Building2, FileText, Percent, BadgeDollarSign, CircleDollarSign, CreditCard } from "lucide-react";
+import { 
+  Rocket, 
+  Coins, 
+  Users, 
+  Share2, 
+  Check, 
+  ChevronRight, 
+  Building2, 
+  CircleDollarSign,
+  TrendingUp,
+  ArrowUpRight,
+  Scale,
+  ShieldCheck
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { AccessCoverOverlay } from "@/components/AccessCoverOverlay";
+import { Progress } from "@/components/ui/progress";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -12,11 +26,38 @@ const Index = () => {
     <>
       <AccessCoverOverlay />
       <div className="min-h-screen bg-black text-white">
-        {/* Hero Section */}
-        <section className="relative pt-32 pb-16 overflow-hidden">
+        {/* Stats Bar - Fixed at top */}
+        <div className="fixed top-0 left-0 right-0 z-10 bg-black/80 backdrop-blur-xl border-b border-white/10">
+          <div className="container mx-auto px-4 h-16 flex items-center justify-between text-sm">
+            <div className="flex items-center gap-8">
+              <div>
+                <div className="text-white/50">Total Soft Commitments</div>
+                <div className="font-mono text-white">$2.5M USD</div>
+              </div>
+              <div>
+                <div className="text-white/50">Active Proposals</div>
+                <div className="font-mono text-white">24</div>
+              </div>
+              <div>
+                <div className="text-white/50">NFT Floor</div>
+                <div className="font-mono text-white">25 LGR</div>
+              </div>
+            </div>
+            <Button 
+              onClick={() => navigate('/thesis')}
+              className="bg-blue-500 hover:bg-blue-600 text-white"
+            >
+              <Rocket className="w-4 h-4 mr-2" />
+              Launch Proposal
+            </Button>
+          </div>
+        </div>
+
+        {/* Hero Section with Terminal Style */}
+        <section className="pt-32 pb-16 relative overflow-hidden">
           <div className="absolute inset-0">
-            <div className="absolute w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-3xl -top-48 -left-24 animate-pulse" />
-            <div className="absolute w-[500px] h-[500px] bg-cyan-400/20 rounded-full blur-3xl -bottom-48 -right-24 animate-pulse" />
+            <div className="absolute w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl -top-48 -left-24" />
+            <div className="absolute w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl -bottom-48 -right-24" />
           </div>
           
           <div className="container px-4 relative">
@@ -24,35 +65,103 @@ const Index = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="max-w-4xl mx-auto text-center"
+              className="max-w-4xl mx-auto"
             >
-              <h1 className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 mb-6">
-                Launch Your Web3 Idea
-              </h1>
-              <p className="text-xl text-white/80 mb-8 max-w-3xl mx-auto">
-                Got a Web3 vision—token, NFT, DeFi, AI, or beyond? Don't let it die in your head. With our Resistance Proposal Factory, you mint a proposal NFT, pitch your idea to 1,500+ subscribers and 2,500+ LinkedIn members, and collect soft commitments to gauge real interest. No coding, no gatekeepers, no upfront fortune required.
-              </p>
-              
-              <div className="flex flex-wrap gap-4 justify-center">
-                <Button 
-                  size="lg"
-                  onClick={() => navigate('/thesis')}
-                  className="bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold"
-                >
-                  <Rocket className="w-5 h-5 mr-2" />
-                  Start Your Proposal
-                </Button>
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  onClick={() => navigate('/proposals')}
-                  className="border-blue-400/50 text-blue-300 hover:bg-blue-500/10 hover:border-blue-400"
-                >
-                  <Share2 className="w-5 h-5 mr-2" />
-                  View Active Proposals
-                </Button>
+              <div className="text-left mb-8">
+                <h1 className="text-5xl md:text-6xl font-bold font-mono mb-6 bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">
+                  Launch Your Web3 Idea
+                </h1>
+                <p className="text-xl text-white/70 mb-8">
+                  Test market interest before investing in development. Collect soft commitments and build your launch community.
+                </p>
+                
+                <div className="flex flex-wrap gap-4">
+                  <Button 
+                    size="lg"
+                    onClick={() => navigate('/thesis')}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-mono"
+                  >
+                    <Rocket className="w-5 h-5 mr-2" />
+                    Start Proposal
+                  </Button>
+                  <Button 
+                    size="lg"
+                    variant="outline"
+                    onClick={() => navigate('/proposals')}
+                    className="border-blue-500/50 text-blue-300 hover:bg-blue-500/10"
+                  >
+                    <Share2 className="w-5 h-5 mr-2" />
+                    View Proposals
+                  </Button>
+                </div>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="grid md:grid-cols-3 gap-6 mt-12">
+                <Card className="bg-blue-900/20 border-blue-500/20 p-6">
+                  <CircleDollarSign className="w-8 h-8 text-blue-400 mb-4" />
+                  <div className="font-mono text-2xl mb-2">$2.5M</div>
+                  <div className="text-white/60">Total Soft Commitments</div>
+                  <Progress value={65} className="mt-4 bg-blue-950 h-1">
+                    <div className="bg-blue-500 h-1" style={{ width: '65%' }} />
+                  </Progress>
+                </Card>
+                <Card className="bg-blue-900/20 border-blue-500/20 p-6">
+                  <Users className="w-8 h-8 text-blue-400 mb-4" />
+                  <div className="font-mono text-2xl mb-2">1.5K+</div>
+                  <div className="text-white/60">Active Members</div>
+                  <Progress value={80} className="mt-4 bg-blue-950 h-1">
+                    <div className="bg-blue-500 h-1" style={{ width: '80%' }} />
+                  </Progress>
+                </Card>
+                <Card className="bg-blue-900/20 border-blue-500/20 p-6">
+                  <Scale className="w-8 h-8 text-blue-400 mb-4" />
+                  <div className="font-mono text-2xl mb-2">24</div>
+                  <div className="text-white/60">Active Proposals</div>
+                  <Progress value={45} className="mt-4 bg-blue-950 h-1">
+                    <div className="bg-blue-500 h-1" style={{ width: '45%' }} />
+                  </Progress>
+                </Card>
               </div>
             </motion.div>
+          </div>
+        </section>
+
+        {/* Process Section */}
+        <section className="py-24 relative">
+          <div className="container px-4">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-500/20 bg-blue-500/5 text-blue-300 mb-4">
+                <ShieldCheck className="w-4 h-4" />
+                <span className="text-sm font-mono">Secure Process</span>
+              </div>
+              <h2 className="text-3xl font-bold font-mono mb-4">
+                Test Market Interest, Then Launch
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <Card className="bg-black/30 border border-blue-500/20 p-6 hover:border-blue-500/40 transition-colors">
+                <CircleDollarSign className="w-8 h-8 text-blue-400 mb-4" />
+                <p className="text-white/70 font-mono">
+                  Supporters indicate potential investment through soft pledges with a voting fee. Test market interest without immediate capital commitment.
+                </p>
+              </Card>
+
+              <Card className="bg-black/30 border border-blue-500/20 p-6 hover:border-blue-500/40 transition-colors">
+                <Share2 className="w-8 h-8 text-blue-400 mb-4" />
+                <p className="text-white/70 font-mono">
+                  Connect directly with interested supporters and track soft commitment amounts. Build reports showing concrete proof of market interest.
+                </p>
+              </Card>
+
+              <Card className="bg-black/30 border border-blue-500/20 p-6 hover:border-blue-500/40 transition-colors">
+                <TrendingUp className="w-8 h-8 text-blue-400 mb-4" />
+                <p className="text-white/70 font-mono">
+                  Once you hit your soft commitment target, re-engage supporters for their pledged investments. Launch with verified interest.
+                </p>
+              </Card>
+            </div>
           </div>
         </section>
 
