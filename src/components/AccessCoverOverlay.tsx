@@ -31,7 +31,7 @@ export const AccessCoverOverlay = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="text-center space-y-8"
+              className="text-center space-y-8 mt-20"
             >
               <div className="mb-12">
                 <motion.div
@@ -46,7 +46,7 @@ export const AccessCoverOverlay = () => {
                   The Resistance is Back<br />Original Holders Welcome Home
                 </h1>
                 <p className="text-xl text-white/80 max-w-2xl mx-auto">
-                  As one of our original NFT holders, you have exclusive early access to the next evolution of Resistance DAO.
+                  As one of our original NFT holders, you have exclusive early access to the next evolution of Resistance DAO
                 </p>
               </div>
 
@@ -61,7 +61,7 @@ export const AccessCoverOverlay = () => {
                     <Rocket className="w-6 h-6 text-yellow-500" />
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-2">Lifetime Access</h3>
-                  <p className="text-white/60">Free lifetime access to Resistance DAO 2.0</p>
+                  <p className="text-white/60">Free lifetime access to Resistance DAO</p>
                 </motion.div>
 
                 <motion.div
@@ -81,16 +81,9 @@ export const AccessCoverOverlay = () => {
               <div className="space-y-6">
                 <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6 max-w-2xl mx-auto">
                   <p className="text-white/80 text-lg">
-                    New members can join the revolution by minting an access pass for $50.
+                    New members can join the revolution by minting an access pass.
                   </p>
                 </div>
-
-                <Button 
-                  size="lg"
-                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold px-8"
-                >
-                  Connect Wallet to Access Platform
-                </Button>
 
                 <p className="text-white/40 text-sm">
                   Development mode: Click X to temporarily dismiss this overlay
