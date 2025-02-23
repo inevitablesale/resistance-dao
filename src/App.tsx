@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -50,7 +51,7 @@ const evmNetworks = [
 ];
 
 const dynamicSettings = {
-  environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
+  environmentId: "ad4b2b5c-ffbd-47e7-b6e0-88c7f66580e5",
   walletConnectors: [
     EthereumWalletConnectors,
     ZeroDevSmartWalletConnectorsWithConfig(zeroDevConfig)
@@ -75,7 +76,7 @@ const dynamicSettings = {
   settings: {
     evmNetworks,
     network: evmNetworks[0],
-    environmentId: "00a01fb3-76e6-438d-a77d-342bbf2084e2",
+    environmentId: "ad4b2b5c-ffbd-47e7-b6e0-88c7f66580e5",
     appName: "Resistance",
     appLogoUrl: "/favicon.ico",
     onramp: {
