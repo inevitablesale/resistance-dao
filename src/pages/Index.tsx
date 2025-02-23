@@ -27,7 +27,7 @@ const Index = () => {
               className="max-w-4xl mx-auto text-center"
             >
               <h1 className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500 mb-6">
-                Launch Your Web3 Idea for $25
+                Launch Your Web3 Idea
               </h1>
               <p className="text-xl text-white/80 mb-8 max-w-3xl mx-auto">
                 Got a Web3 vision—token, NFT, DeFi, AI, or beyond? Don't let it die in your head. With our Resistance Proposal Factory, you mint a proposal NFT, pitch your idea to 1,500+ subscribers and 2,500+ LinkedIn members, and collect soft commitments to gauge real interest. No coding, no gatekeepers, no upfront fortune required.
