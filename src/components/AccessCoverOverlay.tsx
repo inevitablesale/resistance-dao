@@ -50,7 +50,7 @@ export const AccessCoverOverlay = () => {
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6 max-w-2xl mx-auto">
               <p className="text-white/80 text-lg">
-                New members can join the revolution by minting an access pass.
+                Missed our 2022 mint?
               </p>
             </div>
 
