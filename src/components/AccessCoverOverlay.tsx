@@ -15,7 +15,7 @@ export const AccessCoverOverlay = () => {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="absolute right-4 top-4 text-white/60 hover:text-white hover:bg-white/10"
+            className="absolute right-4 top-4 text-white hover:text-white bg-white/10 hover:bg-white/20"
             onClick={() => setIsOpen(false)}
           >
             <X className="h-6 w-6" />
