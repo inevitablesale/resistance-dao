@@ -15,10 +15,10 @@ export const AccessCoverOverlay = () => {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="absolute right-4 top-4 text-white hover:text-white bg-white/10 hover:bg-white/20"
+            className="absolute right-8 top-8 text-white hover:text-white bg-white/20 hover:bg-white/30 p-6"
             onClick={() => setIsOpen(false)}
           >
-            <X className="h-6 w-6" />
+            <X className="h-8 w-8" />
           </Button>
 
           <div className="container max-w-4xl mx-auto px-4 h-full flex items-center justify-center">
