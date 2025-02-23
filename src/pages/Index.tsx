@@ -116,15 +116,6 @@ const Index = () => {
                 
                 <div className="flex flex-wrap gap-4">
                   <Button 
-                    size="lg"
-                    onClick={() => navigate('/thesis')}
-                    className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-mono"
-                  >
-                    <Rocket className="w-5 h-5 mr-2" />
-                    Start Proposal
-                  </Button>
-                  <Button 
-                    size="lg"
                     variant="outline"
                     onClick={() => navigate('/proposals')}
                     className="border-blue-500/50 text-blue-300 hover:bg-blue-500/10 font-mono"
