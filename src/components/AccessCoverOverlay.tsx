@@ -15,7 +15,7 @@ export const AccessCoverOverlay = () => {
   return (
     <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-blue-950 to-black">
       <div 
-        className="absolute inset-0 bg-[url('/lovable-uploads/ca457542-e761-44f2-acbf-1bf9b4255b78.png')] bg-center bg-no-repeat opacity-10 group-hover:opacity-20 transition-opacity duration-500"
+        className="absolute inset-0 bg-[url('/lovable-uploads/ca457542-e761-44f2-acbf-1bf9b4255b78.png')] bg-cover bg-center opacity-10 group-hover:opacity-20 transition-opacity duration-500"
         style={{
           animation: 'phoenixLook 8s ease-in-out infinite',
           transformOrigin: 'center center'
@@ -82,19 +82,21 @@ export const AccessCoverOverlay = () => {
         </motion.div>
       </div>
 
-      <style jsx global>{`
-        @keyframes phoenixLook {
-          0%, 100% {
-            transform: rotate(0deg);
+      <style>
+        {`
+          @keyframes phoenixLook {
+            0%, 100% {
+              transform: rotate(0deg);
+            }
+            25% {
+              transform: rotate(-3deg);
+            }
+            75% {
+              transform: rotate(3deg);
+            }
           }
-          25% {
-            transform: rotate(-3deg);
-          }
-          75% {
-            transform: rotate(3deg);
-          }
-        }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
