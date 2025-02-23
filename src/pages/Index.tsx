@@ -56,6 +56,86 @@ const Index = () => {
           </div>
         </section>
 
+        {/* NFT Contract Section */}
+        <section className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0">
+            <div className="absolute w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[100px] -top-1/4 -right-1/4" />
+          </div>
+          <div className="container px-4 relative">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-16"
+            >
+              <div className="inline-block mb-4">
+                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-400/20 bg-blue-500/5 backdrop-blur">
+                  <FileText className="w-5 h-5 text-blue-400" />
+                  <span className="text-sm font-medium text-blue-300">Smart Contract NFT</span>
+                </div>
+              </div>
+              <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-300">
+                NFT-Backed Agreement
+              </h2>
+              <p className="text-xl text-white/70 max-w-2xl mx-auto">
+                Your proposal is minted as an NFT, representing a binding smart contract with the community
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <div className="bg-blue-950/40 border border-blue-400/10 rounded-xl p-6">
+                  <h3 className="text-2xl font-bold text-white mb-4">Community Agreement NFT</h3>
+                  <p className="text-white/70 mb-4">
+                    When you submit your proposal, a unique NFT is minted representing your commitment to allocate 2.5% of your project's tokens to the DAO community.
+                  </p>
+                  <ul className="space-y-3">
+                    {[
+                      "Immutable smart contract agreement",
+                      "Automated token distribution mechanism",
+                      "Transparent on-chain verification",
+                      "Permanent proof of commitment"
+                    ].map((feature, index) => (
+                      <li key={index} className="flex items-center gap-2 text-white/70">
+                        <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl p-6 border border-blue-400/20">
+                  <h4 className="text-xl font-bold text-white mb-2">Token Distribution</h4>
+                  <p className="text-white/70">
+                    The 2.5% token allocation is automatically distributed to DAO members through the smart contract when your project launches, ensuring fairness and transparency.
+                  </p>
+                </div>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-2xl blur-2xl opacity-50" />
+                <div className="relative bg-blue-950/40 border border-blue-400/20 rounded-xl p-8">
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between border-b border-blue-400/20 pb-4">
+                      <span className="text-white/70">Token Allocation</span>
+                      <span className="text-white font-bold">2.5%</span>
+                    </div>
+                    <div className="flex items-center justify-between border-b border-blue-400/20 pb-4">
+                      <span className="text-white/70">Distribution Method</span>
+                      <span className="text-white font-bold">Automatic</span>
+                    </div>
+                    <div className="flex items-center justify-between border-b border-blue-400/20 pb-4">
+                      <span className="text-white/70">Contract Type</span>
+                      <span className="text-white font-bold">ERC-721</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/70">Verification</span>
+                      <span className="text-white font-bold">On-chain</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Ecosystem Economy Section */}
         <section className="py-24 relative overflow-hidden">
           <div className="absolute inset-0">
