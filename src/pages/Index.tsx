@@ -578,46 +578,48 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Create Your Project Proposal */}
-        <section className="py-24 relative">
+        {/* FAQ Section */}
+        <section className="py-24 relative bg-black/50">
           <div className="container px-4">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
-                Create Your Project Proposal
+                Frequently Asked Questions
               </h2>
               <p className="text-xl text-white/70">
-                Share your Web3 vision with our community and gather support through a streamlined proposal process.
+                Everything you need to know about the Resistance DAO
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="space-y-8">
-                {[
-                  {
-                    title: "Mint Your Proposal",
-                    description: "Create a Resistance Proposal NFT for just $25 and share your vision"
-                  },
-                  {
-                    title: "Connect & Grow",
-                    description: "Reach 1,500+ subscribers and 2,500+ LinkedIn members"
-                  },
-                  {
-                    title: "Launch With Confidence",
-                    description: "Validate interest through soft commitments before full launch"
-                  }
-                ].map((step, index) => (
-                  <div key={index} className="flex gap-4">
-                    <div className="w-12 h-12 rounded-full bg-green-400/10 flex items-center justify-center">
-                      <span className="text-green-400 font-bold">{index + 1}</span>
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
-                      <p className="text-white/70">{step.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="bg-green-400/5 rounded-xl p-8 border border-green-400/20">
-                <h3 className="text-2xl font-bold text-white mb-4">Ready to Share Your Vision?</h3>
-                <p className="text-white/70 mb-6">
-                  Start your Web3 journey today by creating a proposal and connecting with our community
+            <div className="grid md:grid-cols-2 gap-8">
+              {[
+                {
+                  question: "What is Resistance DAO?",
+                  answer: "Resistance DAO is a community-driven platform connecting Web3 innovators with early-stage capital and support."
+                },
+                {
+                  question: "How do I submit a proposal?",
+                  answer: "Simply mint a Resistance Proposal NFT for $25 and share your Web3 vision with our community."
+                },
+                {
+                  question: "What types of projects are accepted?",
+                  answer: "We welcome all Web3 projects including tokens, NFTs, DeFi platforms, and innovative blockchain applications."
+                },
+                {
+                  question: "How does voting work?",
+                  answer: "Community members can vote on proposals with a small fee to ensure genuine interest and prevent spam."
+                }
+              ].map((item, index) => (
+                <Card key={index} className="bg-black/30 border border-white/10 p-6">
+                  <h3 className="text-xl font-bold text-white mb-3">{item.question}</h3>
+                  <p className="text-white/70">{item.answer}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
+  );
+};
+
+export default Index;
