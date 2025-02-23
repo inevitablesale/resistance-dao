@@ -56,14 +56,27 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Stats Section - Updated with 3 key metrics */}
+        {/* Ecosystem Economy Section */}
         <section className="py-16 relative">
           <div className="container px-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-teal-500">
+                Ecosystem Economy
+              </h2>
+              <p className="text-xl text-white/80 max-w-3xl mx-auto">
+                Simple, transparent economics for a thriving Web3 ecosystem
+              </p>
+            </motion.div>
+
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { icon: DollarSign, label: "Proposal Mint Cost", value: "$25" },
-                { icon: Percent, label: "DAO Agreement", value: "2.5%" },
-                { icon: Zap, label: "Voting Fee", value: "$1" }
+                { icon: DollarSign, label: "Proposal Mint Cost", value: "$25", description: "One-time fee to submit your Web3 proposal" },
+                { icon: Percent, label: "DAO Agreement", value: "2.5%", description: "Token allocation for DAO members" },
+                { icon: Zap, label: "Voting Fee", value: "$1", description: "Per-vote fee to ensure genuine interest" }
               ].map((stat, index) => (
                 <motion.div
                   key={index}
@@ -76,7 +89,8 @@ const Index = () => {
                   <div className="relative p-6 rounded-xl bg-black/30 backdrop-blur border border-white/10 group-hover:border-yellow-500/50 transition-all duration-300">
                     <stat.icon className="w-8 h-8 text-yellow-500 mb-4" />
                     <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
-                    <div className="text-white/60">{stat.label}</div>
+                    <div className="text-white/60 mb-2">{stat.label}</div>
+                    <div className="text-sm text-white/40">{stat.description}</div>
                   </div>
                 </motion.div>
               ))}
@@ -84,7 +98,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* NEW: Value to DAO Members Section */}
+        {/* Value to DAO Members Section */}
         <section className="py-16 relative">
           <div className="container px-4">
             <motion.div 
