@@ -68,7 +68,7 @@ const Index = () => {
               </Button>
               <Button 
                 onClick={() => navigate('/thesis')}
-                className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-mono"
+                className="bg-[#4263EB] hover:bg-[#3B5BD9] text-white font-mono rounded-xl px-6"
               >
                 <Rocket className="w-4 h-4 mr-2" />
                 Start Proposal
