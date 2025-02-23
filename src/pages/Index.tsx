@@ -16,7 +16,8 @@ import {
   ChevronRight as ArrowIcon,
   Clock,
   Target,
-  Wallet
+  Wallet,
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -58,11 +59,11 @@ const Index = () => {
               </div>
             </div>
             <Button 
-              onClick={() => navigate('/thesis')}
+              onClick={() => navigate('/mint')}
               className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-mono"
             >
-              <Rocket className="w-4 h-4 mr-2" />
-              Launch Proposal
+              <Shield className="w-4 h-4 mr-2" />
+              Mint Access Pass
             </Button>
           </div>
         </div>
