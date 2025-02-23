@@ -1,7 +1,7 @@
 
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Rocket } from "lucide-react";
+import { X, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
@@ -37,32 +37,14 @@ export const AccessCoverOverlay = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-12 max-w-2xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6"
+          <div className="flex justify-center">
+            <Button 
+              size="lg"
+              className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold px-8 py-6 text-lg"
             >
-              <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center mx-auto mb-4">
-                <Rocket className="w-6 h-6 text-yellow-500" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Lifetime Access</h3>
-              <p className="text-white/60">Free lifetime access to Resistance DAO</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6"
-            >
-              <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center mx-auto mb-4">
-                <Rocket className="w-6 h-6 text-yellow-500" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Priority Access</h3>
-              <p className="text-white/60">Early access to all proposal pre-sales</p>
-            </motion.div>
+              <Wallet className="w-6 h-6 mr-3" />
+              Check My Wallet
+            </Button>
           </div>
 
           <div className="space-y-6">
