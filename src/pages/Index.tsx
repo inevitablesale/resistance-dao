@@ -32,7 +32,7 @@ const Index = () => {
       <AccessCoverOverlay />
       <div className="min-h-screen bg-black text-white">
         {/* Stats Bar - Fixed at top with DeFi-style metrics */}
-        <div className="fixed top-0 left-0 right-0 z-10 bg-black/80 backdrop-blur-xl border-b border-white/10">
+        <div className="fixed top-0 left-0 right-0 z-10 bg-black/90 backdrop-blur-xl border-b border-white/10">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between text-sm">
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-2">
@@ -126,7 +126,7 @@ const Index = () => {
               </div>
 
               {/* Live Activity Feed */}
-              <div className="mt-12 bg-blue-950/20 border border-blue-500/20 rounded-xl p-6">
+              <div className="mt-12 bg-blue-950/40 border border-blue-500/20 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-mono text-blue-300">Live Activity</h3>
                   <div className="flex items-center gap-2 text-sm text-blue-400">
@@ -159,7 +159,7 @@ const Index = () => {
 
               {/* Market Stats */}
               <div className="grid md:grid-cols-3 gap-6 mt-8">
-                <Card className="bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-500/20 p-6">
+                <Card className="bg-gradient-to-br from-blue-900/40 to-blue-800/30 border-blue-500/20 p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 bg-blue-500/10 rounded-lg">
                       <CircleDollarSign className="w-6 h-6 text-blue-400" />
@@ -178,7 +178,7 @@ const Index = () => {
                   </div>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-500/20 p-6">
+                <Card className="bg-gradient-to-br from-green-900/40 to-green-800/30 border-green-500/20 p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 bg-green-500/10 rounded-lg">
                       <Users className="w-6 h-6 text-green-400" />
@@ -197,7 +197,7 @@ const Index = () => {
                   </div>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-yellow-900/20 to-yellow-800/10 border-yellow-500/20 p-6">
+                <Card className="bg-gradient-to-br from-yellow-900/40 to-yellow-800/30 border-yellow-500/20 p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 bg-yellow-500/10 rounded-lg">
                       <Scale className="w-6 h-6 text-yellow-400" />
@@ -234,7 +234,7 @@ const Index = () => {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
-              <Card className="relative bg-gradient-to-br from-blue-900/20 to-transparent border border-blue-500/20 p-6 hover:border-blue-500/40 transition-colors overflow-hidden group">
+              <Card className="relative bg-gradient-to-br from-blue-900/40 to-blue-950/95 border border-blue-500/20 p-6 hover:border-blue-500/40 transition-colors overflow-hidden group">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-colors" />
                 <Target className="w-8 h-8 text-blue-400 mb-4" />
                 <h3 className="text-lg font-mono text-blue-300 mb-2">1. Market Testing</h3>
@@ -246,7 +246,7 @@ const Index = () => {
                 </div>
               </Card>
 
-              <Card className="relative bg-gradient-to-br from-green-900/20 to-transparent border border-green-500/20 p-6 hover:border-green-500/40 transition-colors overflow-hidden group">
+              <Card className="relative bg-gradient-to-br from-green-900/40 to-green-950/95 border border-green-500/20 p-6 hover:border-green-500/40 transition-colors overflow-hidden group">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-green-500/5 rounded-full blur-3xl group-hover:bg-green-500/10 transition-colors" />
                 <Share2 className="w-8 h-8 text-green-400 mb-4" />
                 <h3 className="text-lg font-mono text-green-300 mb-2">2. Community Building</h3>
@@ -258,7 +258,7 @@ const Index = () => {
                 </div>
               </Card>
 
-              <Card className="relative bg-gradient-to-br from-yellow-900/20 to-transparent border border-yellow-500/20 p-6 hover:border-yellow-500/40 transition-colors overflow-hidden group">
+              <Card className="relative bg-gradient-to-br from-yellow-900/40 to-yellow-950/95 border border-yellow-500/20 p-6 hover:border-yellow-500/40 transition-colors overflow-hidden group">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-yellow-500/5 rounded-full blur-3xl group-hover:bg-yellow-500/10 transition-colors" />
                 <Wallet className="w-8 h-8 text-yellow-400 mb-4" />
                 <h3 className="text-lg font-mono text-yellow-300 mb-2">3. Token Launch</h3>
@@ -286,7 +286,7 @@ const Index = () => {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
-              <Card className="bg-black/30 border border-white/10 p-6">
+              <Card className="bg-gradient-to-br from-black/60 to-black/80 border border-white/10 p-6">
                 <div className="mb-4">
                   <CircleDollarSign className="w-8 h-8 text-yellow-400" />
                 </div>
@@ -295,7 +295,7 @@ const Index = () => {
                 </p>
               </Card>
 
-              <Card className="bg-black/30 border border-white/10 p-6">
+              <Card className="bg-gradient-to-br from-black/60 to-black/80 border border-white/10 p-6">
                 <div className="mb-4">
                   <Share2 className="w-8 h-8 text-blue-400" />
                 </div>
@@ -304,7 +304,7 @@ const Index = () => {
                 </p>
               </Card>
 
-              <Card className="bg-black/30 border border-white/10 p-6">
+              <Card className="bg-gradient-to-br from-black/60 to-black/80 border border-white/10 p-6">
                 <div className="mb-4">
                   <CircleDollarSign className="w-8 h-8 text-green-400" />
                 </div>
