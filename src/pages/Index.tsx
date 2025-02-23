@@ -12,7 +12,11 @@ import {
   ArrowUpRight,
   Scale,
   ShieldCheck,
-  FileText
+  FileText,
+  ChevronRight as ArrowIcon,
+  Clock,
+  Target,
+  Wallet
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -27,26 +31,35 @@ const Index = () => {
     <>
       <AccessCoverOverlay />
       <div className="min-h-screen bg-black text-white">
-        {/* Stats Bar - Fixed at top */}
+        {/* Stats Bar - Fixed at top with DeFi-style metrics */}
         <div className="fixed top-0 left-0 right-0 z-10 bg-black/80 backdrop-blur-xl border-b border-white/10">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between text-sm">
             <div className="flex items-center gap-8">
-              <div>
-                <div className="text-white/50">Total Soft Commitments</div>
-                <div className="font-mono text-white">$2.5M USD</div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <div>
+                  <div className="text-white/50">TVL (Soft Commitments)</div>
+                  <div className="font-mono text-white">$2.5M USD</div>
+                </div>
               </div>
-              <div>
-                <div className="text-white/50">Active Proposals</div>
-                <div className="font-mono text-white">24</div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                <div>
+                  <div className="text-white/50">24h Volume</div>
+                  <div className="font-mono text-white">$125.4K</div>
+                </div>
               </div>
-              <div>
-                <div className="text-white/50">NFT Floor</div>
-                <div className="font-mono text-white">25 LGR</div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
+                <div>
+                  <div className="text-white/50">NFT Floor</div>
+                  <div className="font-mono text-white">25 LGR</div>
+                </div>
               </div>
             </div>
             <Button 
               onClick={() => navigate('/thesis')}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
+              className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-mono"
             >
               <Rocket className="w-4 h-4 mr-2" />
               Launch Proposal
@@ -54,7 +67,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Hero Section with Terminal Style */}
+        {/* Hero Section with Terminal + DeFi Style */}
         <section className="pt-32 pb-16 relative overflow-hidden">
           <div className="absolute inset-0">
             <div className="absolute w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl -top-48 -left-24" />
@@ -69,18 +82,33 @@ const Index = () => {
               className="max-w-4xl mx-auto"
             >
               <div className="text-left mb-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-sm mb-4 font-mono">
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  Network Status: Active
+                </div>
                 <h1 className="text-5xl md:text-6xl font-bold font-mono mb-6 bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">
-                  Launch Your Web3 Idea
+                  DeFi-Powered Launch Platform
                 </h1>
-                <p className="text-xl text-white/70 mb-8">
-                  Test market interest before investing in development. Collect soft commitments and build your launch community.
-                </p>
+                <div className="flex gap-4 mb-8">
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 flex-1">
+                    <div className="text-blue-400 text-sm mb-1">Total Projects</div>
+                    <div className="font-mono text-2xl">2.4K</div>
+                  </div>
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 flex-1">
+                    <div className="text-green-400 text-sm mb-1">Success Rate</div>
+                    <div className="font-mono text-2xl">89%</div>
+                  </div>
+                  <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 flex-1">
+                    <div className="text-yellow-400 text-sm mb-1">Avg. Raise</div>
+                    <div className="font-mono text-2xl">$180K</div>
+                  </div>
+                </div>
                 
                 <div className="flex flex-wrap gap-4">
                   <Button 
                     size="lg"
                     onClick={() => navigate('/thesis')}
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-mono"
+                    className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-mono"
                   >
                     <Rocket className="w-5 h-5 mr-2" />
                     Start Proposal
@@ -89,39 +117,103 @@ const Index = () => {
                     size="lg"
                     variant="outline"
                     onClick={() => navigate('/proposals')}
-                    className="border-blue-500/50 text-blue-300 hover:bg-blue-500/10"
+                    className="border-blue-500/50 text-blue-300 hover:bg-blue-500/10 font-mono"
                   >
                     <Share2 className="w-5 h-5 mr-2" />
-                    View Proposals
+                    View Markets
                   </Button>
                 </div>
               </div>
 
-              {/* Stats Cards */}
-              <div className="grid md:grid-cols-3 gap-6 mt-12">
-                <Card className="bg-blue-900/20 border-blue-500/20 p-6">
-                  <CircleDollarSign className="w-8 h-8 text-blue-400 mb-4" />
-                  <div className="font-mono text-2xl mb-2">$2.5M</div>
-                  <div className="text-white/60">Total Soft Commitments</div>
-                  <Progress value={65} className="mt-4 bg-blue-950 h-1">
-                    <div className="bg-blue-500 h-1" style={{ width: '65%' }} />
+              {/* Live Activity Feed */}
+              <div className="mt-12 bg-blue-950/20 border border-blue-500/20 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-mono text-blue-300">Live Activity</h3>
+                  <div className="flex items-center gap-2 text-sm text-blue-400">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                    Real-time Updates
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {[
+                    { action: "New Commitment", amount: "$5.2K", time: "2m ago", type: "buy" },
+                    { action: "Proposal Launched", amount: "$150K target", time: "5m ago", type: "new" },
+                    { action: "Target Reached", amount: "$75K", time: "12m ago", type: "success" }
+                  ].map((activity, i) => (
+                    <div key={i} className="flex items-center justify-between py-2 border-b border-blue-500/10 last:border-0">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${
+                          activity.type === 'buy' ? 'bg-green-500' :
+                          activity.type === 'new' ? 'bg-blue-500' : 'bg-yellow-500'
+                        }`} />
+                        <span className="text-white/70">{activity.action}</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="font-mono text-white">{activity.amount}</span>
+                        <span className="text-sm text-white/50">{activity.time}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Market Stats */}
+              <div className="grid md:grid-cols-3 gap-6 mt-8">
+                <Card className="bg-gradient-to-br from-blue-900/20 to-blue-800/10 border-blue-500/20 p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-blue-500/10 rounded-lg">
+                      <CircleDollarSign className="w-6 h-6 text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm text-white/60 mb-1">Total Locked Value</div>
+                      <div className="font-mono text-xl text-white">$2.5M</div>
+                    </div>
+                  </div>
+                  <Progress value={65} className="bg-blue-950 h-1">
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-400 h-1" />
                   </Progress>
+                  <div className="flex justify-between mt-2 text-xs">
+                    <span className="text-white/60">24h Change</span>
+                    <span className="text-green-400">+12.5%</span>
+                  </div>
                 </Card>
-                <Card className="bg-blue-900/20 border-blue-500/20 p-6">
-                  <Users className="w-8 h-8 text-blue-400 mb-4" />
-                  <div className="font-mono text-2xl mb-2">1.5K+</div>
-                  <div className="text-white/60">Active Members</div>
-                  <Progress value={80} className="mt-4 bg-blue-950 h-1">
-                    <div className="bg-blue-500 h-1" style={{ width: '80%' }} />
+
+                <Card className="bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-500/20 p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-green-500/10 rounded-lg">
+                      <Users className="w-6 h-6 text-green-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm text-white/60 mb-1">Active Members</div>
+                      <div className="font-mono text-xl text-white">1.5K</div>
+                    </div>
+                  </div>
+                  <Progress value={80} className="bg-green-950 h-1">
+                    <div className="bg-gradient-to-r from-green-500 to-green-400 h-1" />
                   </Progress>
+                  <div className="flex justify-between mt-2 text-xs">
+                    <span className="text-white/60">24h Users</span>
+                    <span className="text-green-400">+82</span>
+                  </div>
                 </Card>
-                <Card className="bg-blue-900/20 border-blue-500/20 p-6">
-                  <Scale className="w-8 h-8 text-blue-400 mb-4" />
-                  <div className="font-mono text-2xl mb-2">24</div>
-                  <div className="text-white/60">Active Proposals</div>
-                  <Progress value={45} className="mt-4 bg-blue-950 h-1">
-                    <div className="bg-blue-500 h-1" style={{ width: '45%' }} />
+
+                <Card className="bg-gradient-to-br from-yellow-900/20 to-yellow-800/10 border-yellow-500/20 p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-yellow-500/10 rounded-lg">
+                      <Scale className="w-6 h-6 text-yellow-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm text-white/60 mb-1">Active Markets</div>
+                      <div className="font-mono text-xl text-white">24</div>
+                    </div>
+                  </div>
+                  <Progress value={45} className="bg-yellow-950 h-1">
+                    <div className="bg-gradient-to-r from-yellow-500 to-yellow-400 h-1" />
                   </Progress>
+                  <div className="flex justify-between mt-2 text-xs">
+                    <span className="text-white/60">Avg. Success</span>
+                    <span className="text-green-400">89%</span>
+                  </div>
                 </Card>
               </div>
             </motion.div>
@@ -133,34 +225,49 @@ const Index = () => {
           <div className="container px-4">
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-500/20 bg-blue-500/5 text-blue-300 mb-4">
-                <ShieldCheck className="w-4 h-4" />
-                <span className="text-sm font-mono">Secure Process</span>
+                <Clock className="w-4 h-4" />
+                <span className="text-sm font-mono">3-Step Process</span>
               </div>
               <h2 className="text-3xl font-bold font-mono mb-4">
-                Test Market Interest, Then Launch
+                Launch Protocol
               </h2>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
-              <Card className="bg-black/30 border border-blue-500/20 p-6 hover:border-blue-500/40 transition-colors">
-                <CircleDollarSign className="w-8 h-8 text-blue-400 mb-4" />
-                <p className="text-white/70 font-mono">
-                  Supporters indicate potential investment through soft pledges with a voting fee. Test market interest without immediate capital commitment.
+              <Card className="relative bg-gradient-to-br from-blue-900/20 to-transparent border border-blue-500/20 p-6 hover:border-blue-500/40 transition-colors overflow-hidden group">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-colors" />
+                <Target className="w-8 h-8 text-blue-400 mb-4" />
+                <h3 className="text-lg font-mono text-blue-300 mb-2">1. Market Testing</h3>
+                <p className="text-white/70 relative z-10">
+                  Submit proposal and collect soft commitments with minimal risk. Smart contracts ensure transparent voting and commitment tracking.
                 </p>
+                <div className="absolute bottom-6 right-6 text-blue-400/20 group-hover:text-blue-400/40 transition-colors">
+                  <ArrowIcon className="w-6 h-6" />
+                </div>
               </Card>
 
-              <Card className="bg-black/30 border border-blue-500/20 p-6 hover:border-blue-500/40 transition-colors">
-                <Share2 className="w-8 h-8 text-blue-400 mb-4" />
-                <p className="text-white/70 font-mono">
-                  Connect directly with interested supporters and track soft commitment amounts. Build reports showing concrete proof of market interest.
+              <Card className="relative bg-gradient-to-br from-green-900/20 to-transparent border border-green-500/20 p-6 hover:border-green-500/40 transition-colors overflow-hidden group">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-green-500/5 rounded-full blur-3xl group-hover:bg-green-500/10 transition-colors" />
+                <Share2 className="w-8 h-8 text-green-400 mb-4" />
+                <h3 className="text-lg font-mono text-green-300 mb-2">2. Community Building</h3>
+                <p className="text-white/70 relative z-10">
+                  Connect with supporters and track engagement metrics. Build proof of market interest through on-chain analytics.
                 </p>
+                <div className="absolute bottom-6 right-6 text-green-400/20 group-hover:text-green-400/40 transition-colors">
+                  <ArrowIcon className="w-6 h-6" />
+                </div>
               </Card>
 
-              <Card className="bg-black/30 border border-blue-500/20 p-6 hover:border-blue-500/40 transition-colors">
-                <TrendingUp className="w-8 h-8 text-blue-400 mb-4" />
-                <p className="text-white/70 font-mono">
-                  Once you hit your soft commitment target, re-engage supporters for their pledged investments. Launch with verified interest.
+              <Card className="relative bg-gradient-to-br from-yellow-900/20 to-transparent border border-yellow-500/20 p-6 hover:border-yellow-500/40 transition-colors overflow-hidden group">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-yellow-500/5 rounded-full blur-3xl group-hover:bg-yellow-500/10 transition-colors" />
+                <Wallet className="w-8 h-8 text-yellow-400 mb-4" />
+                <h3 className="text-lg font-mono text-yellow-300 mb-2">3. Token Launch</h3>
+                <p className="text-white/70 relative z-10">
+                  Convert soft commitments to investment when targets are met. Automated distribution through smart contract execution.
                 </p>
+                <div className="absolute bottom-6 right-6 text-yellow-400/20 group-hover:text-yellow-400/40 transition-colors">
+                  <ArrowIcon className="w-6 h-6" />
+                </div>
               </Card>
             </div>
           </div>
