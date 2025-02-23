@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Rocket, Coins, Users, Share2, Zap, Check, ChevronRight, Building2, FileText, Percent, BadgeDollarSign, CircleDollarSign, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -154,6 +153,143 @@ const Index = () => {
                   </div>
                 </div>
               </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Value to DAO Members */}
+        <section className="py-24 relative">
+          <div className="container px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
+                Value to DAO Members
+              </h2>
+              <p className="text-xl text-white/70">
+                Join our community and receive automatic benefits from every successful project launch
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  title: "Automatic Airdrops",
+                  items: [
+                    "2.5% token/NFT royalty allocations distributed directly to your wallet",
+                    "Zero claim process - tokens appear automatically",
+                    "Share in every successful project launch"
+                  ]
+                },
+                {
+                  title: "Early Access",
+                  items: [
+                    "First look at new Web3 projects",
+                    "Vote on proposals ($1 fee)",
+                    "Direct influence on which projects get funded"
+                  ]
+                },
+                {
+                  title: "Community",
+                  items: [
+                    "Direct access to founders",
+                    "Network with other Web3 investors",
+                    "Be part of the next wave of Web3 innovation"
+                  ]
+                }
+              ].map((benefit, index) => (
+                <Card key={index} className="bg-black/30 border border-white/10 p-6">
+                  <h3 className="text-xl font-bold text-white mb-4">{benefit.title}</h3>
+                  <ul className="space-y-3">
+                    {benefit.items.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-white/70">
+                        <Check className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* The Resistance is Back */}
+        <section className="py-24 relative overflow-hidden bg-black/50">
+          <div className="container px-4">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
+                  The Resistance is Back
+                </h2>
+                <p className="text-lg text-white/70">
+                  We started as a web3 group connecting early stage entrepreneurs with early stage capital. With the crypto winter, we went on to work in the alternative investments space. However, Resistance DAO is back.
+                </p>
+              </div>
+              <div className="relative rounded-xl overflow-hidden">
+                <img 
+                  src="/lovable-uploads/ca457542-e761-44f2-acbf-1bf9b4255b78.png" 
+                  alt="Metaverse Summit Paris 2022" 
+                  className="w-full rounded-xl"
+                />
+                <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/60 backdrop-blur-sm">
+                  <p className="text-sm text-white/80">Metaverse Summit Paris 2022</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Create Your Project Proposal */}
+        <section className="py-24 relative">
+          <div className="container px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#98FF98] to-[#98FF98]">
+                Create Your Project Proposal
+              </h2>
+              <p className="text-xl text-white/70">
+                Share your Web3 vision with our community and gather support through a streamlined proposal process.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-8">
+                {[
+                  {
+                    title: "Mint Your Proposal",
+                    description: "Create a Resistance Proposal NFT for just $25 and share your vision"
+                  },
+                  {
+                    title: "Connect & Grow",
+                    description: "Reach 1,500+ subscribers and 2,500+ LinkedIn members"
+                  },
+                  {
+                    title: "Launch With Confidence",
+                    description: "Validate interest through soft commitments before full launch"
+                  }
+                ].map((step, index) => (
+                  <div key={index} className="flex gap-4">
+                    <div className="w-12 h-12 rounded-full bg-green-400/10 flex items-center justify-center">
+                      <span className="text-green-400 font-bold">{index + 1}</span>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
+                      <p className="text-white/70">{step.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-green-400/5 rounded-xl p-8 border border-green-400/20">
+                <h3 className="text-2xl font-bold text-white mb-4">Ready to Share Your Vision?</h3>
+                <p className="text-white/70 mb-6">
+                  Start your Web3 journey today by creating a proposal and connecting with our community of builders and investors.
+                </p>
+                <Button 
+                  onClick={() => navigate('/thesis')}
+                  className="w-full bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700"
+                >
+                  Start Your Proposal
+                  <ChevronRight className="w-5 h-5" />
+                </Button>
+              </div>
             </div>
           </div>
         </section>
