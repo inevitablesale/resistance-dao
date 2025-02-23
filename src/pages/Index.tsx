@@ -62,7 +62,7 @@ const Index = () => {
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-12"
+              className="text-center mb-16"
             >
               <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-cyan-300 to-blue-300">
                 Ecosystem Economy
@@ -72,65 +72,97 @@ const Index = () => {
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-2 gap-12">
               {/* Creators Section */}
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold text-blue-300 mb-4">For Creators</h3>
-                <div className="grid gap-6">
-                  {[
-                    { icon: Coins, label: "Proposal Mint Cost", value: "25 RD", description: "One-time fee to submit your Web3 proposal" },
-                    { icon: Percent, label: "DAO Agreement", value: "2.5%", description: "Token allocation for DAO members" },
-                  ].map((stat, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      className="relative group"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300" />
-                      <div className="relative p-6 rounded-xl bg-black/30 backdrop-blur border border-white/10 group-hover:border-blue-400/50 transition-all duration-300">
-                        <stat.icon className="w-8 h-8 text-blue-400 mb-4" />
-                        <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
-                        <div className="text-white/60 mb-2">{stat.label}</div>
-                        <div className="text-sm text-white/40">{stat.description}</div>
-                      </div>
-                    </motion.div>
-                  ))}
+              <div className="space-y-8 relative">
+                <div className="absolute inset-0 bg-blue-500/5 rounded-3xl blur-3xl" />
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                      <Users className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-blue-400">
+                      For Creators
+                    </h3>
+                  </div>
+                  <div className="grid gap-6">
+                    {[
+                      { icon: Coins, label: "Proposal Mint Cost", value: "25 RD", description: "One-time fee to submit your Web3 proposal" },
+                      { icon: Percent, label: "DAO Agreement", value: "2.5%", description: "Token allocation for DAO members" },
+                    ].map((stat, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        className="relative group"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-cyan-400/5 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                        <div className="relative p-6 rounded-xl bg-blue-950/20 backdrop-blur border border-blue-400/10 hover:border-blue-400/30 transition-all duration-300">
+                          <div className="flex items-start gap-4">
+                            <div className="h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                              <stat.icon className="w-6 h-6 text-blue-400" />
+                            </div>
+                            <div>
+                              <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
+                              <div className="text-blue-200 font-medium mb-1">{stat.label}</div>
+                              <div className="text-sm text-blue-200/60">{stat.description}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               {/* Members Section */}
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold text-blue-300 mb-4">For Members</h3>
-                <div className="grid gap-6">
-                  {[
-                    { icon: CreditCard, label: "Access Card NFT", value: "$50", description: "One-time access pass to join the community" },
-                    { icon: Zap, label: "Voting Fee", value: "1 RD", description: "Per-vote fee to ensure genuine interest" },
-                  ].map((stat, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      className="relative group"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300" />
-                      <div className="relative p-6 rounded-xl bg-black/30 backdrop-blur border border-white/10 group-hover:border-blue-400/50 transition-all duration-300">
-                        <stat.icon className="w-8 h-8 text-blue-400 mb-4" />
-                        <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
-                        <div className="text-white/60 mb-2">{stat.label}</div>
-                        <div className="text-sm text-white/40">{stat.description}</div>
-                      </div>
-                    </motion.div>
-                  ))}
+              <div className="space-y-8 relative">
+                <div className="absolute inset-0 bg-blue-500/5 rounded-3xl blur-3xl" />
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                      <Building2 className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-blue-400">
+                      For Members
+                    </h3>
+                  </div>
+                  <div className="grid gap-6">
+                    {[
+                      { icon: CreditCard, label: "Access Card NFT", value: "$50", description: "One-time access pass to join the community" },
+                      { icon: Zap, label: "Voting Fee", value: "1 RD", description: "Per-vote fee to ensure genuine interest" },
+                    ].map((stat, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        className="relative group"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-cyan-400/5 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                        <div className="relative p-6 rounded-xl bg-blue-950/20 backdrop-blur border border-blue-400/10 hover:border-blue-400/30 transition-all duration-300">
+                          <div className="flex items-start gap-4">
+                            <div className="h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                              <stat.icon className="w-6 h-6 text-blue-400" />
+                            </div>
+                            <div>
+                              <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
+                              <div className="text-blue-200 font-medium mb-1">{stat.label}</div>
+                              <div className="text-sm text-blue-200/60">{stat.description}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Investment Milestones */}
+        {/* Investment Milestones Section */}
         <section className="py-16 relative">
           <div className="container px-4">
             <h2 className="text-4xl font-bold text-center mb-12">Investment Milestones</h2>
