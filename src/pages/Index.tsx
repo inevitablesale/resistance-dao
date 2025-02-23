@@ -1,6 +1,5 @@
-
 import { motion } from "framer-motion";
-import { Rocket, Coins, Users, Share2, Zap, Check, ChevronRight, Building2, FileText, Percent, BadgeDollarSign, CircleDollarSign } from "lucide-react";
+import { Rocket, Coins, Users, Share2, Zap, Check, ChevronRight, Building2, FileText, Percent, BadgeDollarSign, CircleDollarSign, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -73,28 +72,60 @@ const Index = () => {
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                { icon: Coins, label: "Proposal Mint Cost", value: "25 RD", description: "One-time fee to submit your Web3 proposal" },
-                { icon: Percent, label: "DAO Agreement", value: "2.5%", description: "Token allocation for DAO members" },
-                { icon: Zap, label: "Voting Fee", value: "1 RD", description: "Per-vote fee to ensure genuine interest" }
-              ].map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="relative group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300" />
-                  <div className="relative p-6 rounded-xl bg-black/30 backdrop-blur border border-white/10 group-hover:border-blue-400/50 transition-all duration-300">
-                    <stat.icon className="w-8 h-8 text-blue-400 mb-4" />
-                    <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
-                    <div className="text-white/60 mb-2">{stat.label}</div>
-                    <div className="text-sm text-white/40">{stat.description}</div>
-                  </div>
-                </motion.div>
-              ))}
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Creators Section */}
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold text-blue-300 mb-4">For Creators</h3>
+                <div className="grid gap-6">
+                  {[
+                    { icon: Coins, label: "Proposal Mint Cost", value: "25 RD", description: "One-time fee to submit your Web3 proposal" },
+                    { icon: Percent, label: "DAO Agreement", value: "2.5%", description: "Token allocation for DAO members" },
+                  ].map((stat, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      className="relative group"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300" />
+                      <div className="relative p-6 rounded-xl bg-black/30 backdrop-blur border border-white/10 group-hover:border-blue-400/50 transition-all duration-300">
+                        <stat.icon className="w-8 h-8 text-blue-400 mb-4" />
+                        <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
+                        <div className="text-white/60 mb-2">{stat.label}</div>
+                        <div className="text-sm text-white/40">{stat.description}</div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Members Section */}
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold text-blue-300 mb-4">For Members</h3>
+                <div className="grid gap-6">
+                  {[
+                    { icon: CreditCard, label: "Access Card NFT", value: "$50", description: "One-time access pass to join the community" },
+                    { icon: Zap, label: "Voting Fee", value: "1 RD", description: "Per-vote fee to ensure genuine interest" },
+                  ].map((stat, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      className="relative group"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300" />
+                      <div className="relative p-6 rounded-xl bg-black/30 backdrop-blur border border-white/10 group-hover:border-blue-400/50 transition-all duration-300">
+                        <stat.icon className="w-8 h-8 text-blue-400 mb-4" />
+                        <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
+                        <div className="text-white/60 mb-2">{stat.label}</div>
+                        <div className="text-sm text-white/40">{stat.description}</div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
