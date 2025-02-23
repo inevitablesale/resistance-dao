@@ -43,7 +43,7 @@ export const AccessCoverOverlay = () => {
                   <Shield className="w-10 h-10 text-yellow-500" />
                 </motion.div>
                 <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300">
-                  Welcome Back, Original Resistance Member
+                  The Resistance is Back - Original Holders Welcome Home
                 </h1>
                 <p className="text-xl text-white/80 max-w-2xl mx-auto">
                   As one of our original NFT holders, you have exclusive early access to the next evolution of Resistance DAO.
@@ -61,7 +61,7 @@ export const AccessCoverOverlay = () => {
                     <Rocket className="w-6 h-6 text-yellow-500" />
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-2">Lifetime Access</h3>
-                  <p className="text-white/60">Free lifetime access to Resistance DAO 2.0 ($50 value)</p>
+                  <p className="text-white/60">Free lifetime access to Resistance DAO 2.0</p>
                 </motion.div>
 
                 <motion.div
@@ -116,3 +116,4 @@ export const AccessCoverOverlay = () => {
     </Dialog>
   );
 };
+
