@@ -43,7 +43,7 @@ const Proposals = () => {
       {/* Hero Section with Asymmetrical Design */}
       <div className="relative">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute w-full h-full bg-gradient-to-b from-purple-900/20 to-transparent" />
+          <div className="absolute w-full h-full bg-gradient-to-b from-blue-900/20 to-transparent" />
           <div className="absolute w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJub25lIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9zdmc+')] opacity-10" />
         </div>
 
@@ -56,13 +56,13 @@ const Proposals = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <div className="inline-flex items-center space-x-2 bg-purple-900/20 rounded-full px-4 py-2 mb-6">
-                  <BrainCircuit className="w-4 h-4 text-purple-400" />
-                  <span className="text-sm text-purple-400">Resistance DAO Proposals</span>
+                <div className="inline-flex items-center space-x-2 bg-blue-900/20 rounded-full px-4 py-2 mb-6">
+                  <BrainCircuit className="w-4 h-4 text-blue-400" />
+                  <span className="text-sm text-blue-400">Resistance DAO Proposals</span>
                 </div>
                 <h1 className="text-5xl font-bold mb-6 text-white">
                   Shape the Future of 
-                  <span className="block mt-2 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                  <span className="block mt-2 bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">
                     Decentralized Innovation
                   </span>
                 </h1>
@@ -72,7 +72,7 @@ const Proposals = () => {
                 </p>
                 <Button 
                   onClick={() => navigate('/thesis')} 
-                  className="relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg font-semibold text-lg"
+                  className="relative bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg"
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   Submit Proposal
@@ -94,8 +94,8 @@ const Proposals = () => {
                     <Card className="bg-zinc-900/50 border-zinc-800/50 backdrop-blur-sm p-6 hover:bg-zinc-900/70 transition-all duration-300">
                       <div className="flex gap-4">
                         <div className="flex-shrink-0">
-                          <div className="w-10 h-10 rounded-lg bg-purple-900/20 flex items-center justify-center">
-                            <Icon className="w-5 h-5 text-purple-400" />
+                          <div className="w-10 h-10 rounded-lg bg-blue-900/20 flex items-center justify-center">
+                            <Icon className="w-5 h-5 text-blue-400" />
                           </div>
                         </div>
                         <div>
@@ -104,7 +104,7 @@ const Proposals = () => {
                           <ul className="space-y-1">
                             {step.points.map((point, i) => (
                               <li key={i} className="text-sm text-zinc-500 flex items-center gap-2">
-                                <div className="w-1 h-1 rounded-full bg-purple-400" />
+                                <div className="w-1 h-1 rounded-full bg-blue-400" />
                                 {point}
                               </li>
                             ))}
@@ -129,8 +129,8 @@ const Proposals = () => {
             transition={{ delay: 0.4 }}
           >
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-lg bg-purple-900/20 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-purple-400" />
+              <div className="w-10 h-10 rounded-lg bg-blue-900/20 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-blue-400" />
               </div>
               <h2 className="text-2xl font-bold text-white">Active Proposals</h2>
             </div>
