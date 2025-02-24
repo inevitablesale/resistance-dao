@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -42,6 +41,7 @@ import { ProposalMetadata } from "@/types/proposals";
 import { useToast } from "@/hooks/use-toast";
 import { waitForProposalCreation } from "@/services/eventListenerService";
 import { sepolia, mainnet, polygonMumbai, polygon } from 'viem/chains';
+import { ethers } from 'ethers';
 
 const thesisFormSchema = z.object({
   title: z.string().min(2, {
@@ -267,7 +267,6 @@ export default function ThesisSubmission() {
   return (
     <div className="min-h-screen bg-black text-white pb-20">
       <div className="container mx-auto px-4 pt-24">
-        {/* Breadcrumb section */}
         <Breadcrumb className="mb-8">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -283,7 +282,6 @@ export default function ThesisSubmission() {
         </Breadcrumb>
 
         <div className="max-w-4xl mx-auto">
-          {/* Header section */}
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-4xl font-bold text-white mb-2">Submit Your Thesis</h1>
@@ -298,7 +296,6 @@ export default function ThesisSubmission() {
             </Button>
           </div>
 
-          {/* Form section */}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <Card className="bg-gray-900/50 border-white/10">
