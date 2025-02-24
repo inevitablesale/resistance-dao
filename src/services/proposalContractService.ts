@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -199,7 +200,7 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
   try {
     const contractInput: ProposalContractInput = {
       title: processText(config.metadata.title),
-      metadataURI: config.metadataURI || "",
+      metadataURI: config.metadataURI,
       ipfsMetadata: config.ipfsHash || '',
       targetCapital: config.targetCapital,
       votingDuration: config.votingDuration,
@@ -213,10 +214,10 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
       location: processText(config.metadata.firmCriteria.location),
       dealType: config.metadata.firmCriteria.dealType,
       geographicFocus: config.metadata.firmCriteria.geographicFocus,
-      paymentTerms: Array.isArray(config.metadata.paymentTerms) ? config.metadata.paymentTerms : [],
-      operationalStrategies: Array.isArray(config.metadata.strategies.operational) ? config.metadata.strategies.operational : [],
-      growthStrategies: Array.isArray(config.metadata.strategies.growth) ? config.metadata.strategies.growth : [],
-      integrationStrategies: Array.isArray(config.metadata.strategies.integration) ? config.metadata.strategies.integration : []
+      paymentTerms: config.metadata.paymentTerms || [],
+      operationalStrategies: config.metadata.strategies.operational || [],
+      growthStrategies: config.metadata.strategies.growth || [],
+      integrationStrategies: config.metadata.strategies.integration || []
     };
 
     return contractInput;
