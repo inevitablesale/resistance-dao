@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
@@ -15,31 +14,24 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
 import { HelpCircle } from "lucide-react";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput, convertToWei } from "@/components/thesis/TargetCapitalInput";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { 
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator 
+} from "@/components/ui/breadcrumb";
 import { Link, useNavigate } from "react-router-dom";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -47,10 +39,7 @@ import { uploadToIPFS } from "@/services/ipfsService";
 import { ProposalMetadata } from "@/types/proposals";
 import { useToast } from "@/hooks/use-toast";
 import { waitForProposalCreation } from "@/services/eventListenerService";
-import { sepolia } from 'viem/chains';
-import { mainnet } from 'viem/chains';
-import { polygonMumbai } from 'viem/chains';
-import { polygon } from 'viem/chains';
+import { sepolia, mainnet, polygonMumbai, polygon } from 'viem/chains';
 
 const thesisFormSchema = z.object({
   title: z.string().min(2, {
@@ -139,7 +128,7 @@ const sampleFormData = {
 export default function ThesisSubmission() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { walletClient } = useWalletConnection();
+  const { wallet, user, isConnected } = useWalletConnection();
   const { primaryWallet } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -170,8 +159,8 @@ export default function ThesisSubmission() {
   async function onSubmit(values: z.infer<typeof thesisFormSchema>) {
     setIsSubmitting(true);
     try {
-      if (!walletClient) {
-        throw new Error("Wallet client is not available");
+      if (!wallet) {
+        throw new Error("Wallet is not available");
       }
 
       // Convert targetCapital to Wei
@@ -203,7 +192,7 @@ export default function ThesisSubmission() {
       });
 
       // Contract interaction parameters
-      const chainId = await walletClient.getChainId();
+      const chainId = await wallet.getChainId();
       const isTestMode = chainId !== mainnet.id && chainId !== polygon.id;
       const chain = isTestMode ? polygonMumbai : polygon;
       const contractAddress = isTestMode ? process.env.NEXT_PUBLIC_POLYGON_MUMBAI_CONTRACT_ADDRESS : process.env.NEXT_PUBLIC_POLYGON_MAINNET_CONTRACT_ADDRESS;
@@ -218,7 +207,7 @@ export default function ThesisSubmission() {
         title: "Creating Proposal...",
         description: "Please approve the transaction in your wallet.",
       });
-      const { request } = await walletClient.simulateContract({
+      const { request } = await wallet.simulateContract({
         address: contractAddress as `0x${string}`,
         abi: abi,
         functionName: 'createProposal',
@@ -230,14 +219,14 @@ export default function ThesisSubmission() {
         ],
         chainId: chain.id,
       });
-      const txHash = await walletClient.writeContract(request);
+      const txHash = await wallet.writeContract(request);
       toast({
         title: "Transaction Sent",
         description: `Transaction hash: ${txHash}`,
       });
 
       // Setup event listener configuration
-      const provider = walletClient.getProvider();
+      const provider = wallet.getProvider();
       const eventConfig = {
         provider: provider,
         contractAddress: contractAddress,
