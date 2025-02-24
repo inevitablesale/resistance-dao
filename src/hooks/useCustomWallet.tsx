@@ -7,6 +7,8 @@ export const useCustomWallet = () => {
   return {
     isConnected: !!primaryWallet?.address,
     address: primaryWallet?.address,
-    user
+    user,
+    // Add wallet type detection
+    isSmartWallet: primaryWallet?.connector?.name?.toLowerCase().includes('zerodev')
   };
 };
