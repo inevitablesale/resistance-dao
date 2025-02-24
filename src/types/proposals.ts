@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { IPFSContent } from "./content";
 
 export enum FirmSize {
   BELOW_1M = 0,
@@ -166,6 +167,13 @@ export interface ProposalContractTuple {
   metadataURI: string;
   targetCapital: string;
   votingDuration: number;
+}
+
+export interface NFTMetadata extends IPFSContent {
+  name: string;
+  description: string;
+  image?: string;
+  attributes?: Array<{ trait_type: string; value: string }>;
 }
 
 export interface ProposalEvent {

@@ -8,21 +8,13 @@ import { ethers } from "ethers";
 import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS, LGR_PRICE_USD } from "@/lib/constants";
 import { getTokenBalance } from "@/services/tokenService";
 import { getFromIPFS } from "@/services/ipfsService";
-import { ProposalMetadata, ProposalEvent } from "@/types/proposals";
+import { ProposalMetadata, ProposalEvent, NFTMetadata } from "@/types/proposals";
 import { useToast } from "@/hooks/use-toast";
-import { IPFSContent } from "@/types/content";
 import { loadingStates } from "./LoadingStates";
 import { ProposalLoadingCard } from "./ProposalLoadingCard";
 import { ProposalListItem } from "./ProposalListItem";
 
 const MIN_LGR_REQUIRED = "1";
-
-interface NFTMetadata extends IPFSContent {
-  name: string;
-  description: string;
-  image?: string;
-  attributes?: Array<{ trait_type: string; value: string }>;
-}
 
 export const ProposalsHistory = () => {
   const [proposalEvents, setProposalEvents] = useState<ProposalEvent[]>([]);
