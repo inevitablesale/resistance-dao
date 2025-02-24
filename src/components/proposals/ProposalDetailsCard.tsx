@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -367,138 +366,147 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.2 }}
         className="space-y-6"
       >
-        <div className="relative bg-gradient-to-br from-yellow-500/10 via-transparent to-teal-500/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
-          <div className="absolute inset-0 bg-black/20 rounded-2xl backdrop-blur-sm" />
+        <Card className="bg-gradient-to-br from-yellow-500/10 via-transparent to-teal-500/10 backdrop-blur-lg border border-white/20">
+          <CardHeader>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 text-xs font-medium bg-yellow-500/10 text-yellow-500 rounded-full">
+                  {proposalDetails.category}
+                </span>
+                {proposalDetails.blockchain?.map((chain) => (
+                  <span key={chain} className="px-3 py-1 text-xs font-medium bg-teal-500/10 text-teal-500 rounded-full">
+                    {chain}
+                  </span>
+                ))}
+              </div>
+              <h1 className="text-2xl font-bold text-white">{proposalDetails.title}</h1>
+              <p className="text-white/60">{proposalDetails.description}</p>
+            </div>
+          </CardHeader>
           
-          <div className="relative">
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <h3 className="text-2xl font-semibold text-white flex items-center gap-2">
-                    <Coins className="w-6 h-6 text-yellow-500" />
-                    Support This Proposal
-                  </h3>
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 backdrop-blur-sm border border-yellow-500/20">
-                    <Clock className="w-5 h-5 text-yellow-500" />
-                    <span className={`text-lg font-medium ${isVotingEnded ? 'text-red-400' : 'text-yellow-500'}`}>
-                      {timeRemaining}
+          <CardContent className="p-8 space-y-8">
+            <div className="relative">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <h3 className="text-2xl font-semibold text-white flex items-center gap-2">
+                      <Coins className="w-6 h-6 text-yellow-500" />
+                      Support This Proposal
+                    </h3>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 backdrop-blur-sm border border-yellow-500/20">
+                      <Clock className="w-5 h-5 text-yellow-500" />
+                      <span className={`text-lg font-medium ${isVotingEnded ? 'text-red-400' : 'text-yellow-500'}`}>
+                        {timeRemaining}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-center md:text-right">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm">
+                    <p className="text-2xl font-bold text-white">
+                      {formatLGRAmount(pledgedAmount)}
+                    </p>
+                    <span className="text-sm text-white/60 border-l border-white/10 pl-2">
+                      {backerCount} supporter{backerCount !== 1 ? 's' : ''}
                     </span>
                   </div>
                 </div>
               </div>
-              <div className="text-center md:text-right">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm">
-                  <p className="text-2xl font-bold text-white">
-                    {formatLGRAmount(pledgedAmount)}
-                  </p>
-                  <span className="text-sm text-white/60 border-l border-white/10 pl-2">
-                    {backerCount} supporter{backerCount !== 1 ? 's' : ''}
+
+              <div className="mb-8">
+                <div className="flex justify-between text-sm text-white/60 mb-2">
+                  <span>Progress Towards Target Capital</span>
+                  <span>
+                    {proposalDetails?.investment?.targetCapital 
+                      ? ((Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100).toFixed(1) 
+                      : 0}%
                   </span>
                 </div>
+                <Progress 
+                  value={proposalDetails?.investment?.targetCapital 
+                    ? (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100 
+                    : 0}
+                  className="h-3 bg-white/5"
+                />
+                <p className="text-sm text-white/60 mt-2">
+                  Target: {formatLGRAmount(proposalDetails.investment.targetCapital)}
+                </p>
               </div>
-            </div>
 
-            <div className="mb-8">
-              <div className="flex justify-between text-sm text-white/60 mb-2">
-                <span>Total Commitments Progress</span>
-                <span>
-                  {proposalDetails?.investment?.targetCapital 
-                    ? ((Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100).toFixed(1) 
-                    : 0}%
-                </span>
-              </div>
-              <Progress 
-                value={proposalDetails?.investment?.targetCapital 
-                  ? (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100 
-                  : 0}
-                className="h-3 bg-white/5"
-              />
-            </div>
+              <div className="space-y-4">
+                <div className="bg-black/20 rounded-lg p-6 space-y-4">
+                  <h4 className="text-lg font-medium text-white flex items-center gap-2">
+                    <Info className="w-5 h-5 text-yellow-500" />
+                    Investment Purpose
+                  </h4>
+                  <p className="text-white/80 leading-relaxed">
+                    {proposalDetails.investment.description}
+                  </p>
+                </div>
 
-            <div className="space-y-4">
-              <Collapsible>
-                <div className="bg-white/5 p-4 rounded-lg border border-white/10 mb-4">
-                  <CollapsibleTrigger 
-                    className="flex items-center justify-between w-full text-white"
-                  >
-                    <h4 className="font-medium flex items-center gap-2">
-                      <Info className="w-5 h-5 text-yellow-500" />
-                      About Supporting Proposals
-                    </h4>
-                    {isInfoExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-white/60" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-white/60" />
-                    )}
+                <Collapsible>
+                  <CollapsibleTrigger className="w-full">
+                    <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                      <div className="flex items-center justify-between text-white">
+                        <h4 className="font-medium flex items-center gap-2">
+                          <Info className="w-5 h-5 text-yellow-500" />
+                          About Supporting Proposals
+                        </h4>
+                        <ChevronDown className="w-5 h-5 text-white/60" />
+                      </div>
+                    </div>
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-2">
+                  <CollapsibleContent className="p-4 bg-black/20 rounded-lg mt-2">
                     <p className="text-sm text-white/80 leading-relaxed">
                       Express your interest by making a soft commitment. This is not an actual investment - 
                       only a 10 LGR voting fee will be charged to record your support. Your pledged amount shows how much 
                       you're potentially interested in investing later.
                     </p>
                   </CollapsibleContent>
-                </div>
-              </Collapsible>
-              
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <Label htmlFor="pledgeAmount" className="text-white/60 mb-2 block">
-                    Commitment Amount
-                  </Label>
-                  <Input
-                    id="pledgeAmount"
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    value={pledgeInput}
-                    onChange={(e) => setPledgeInput(e.target.value)}
-                    placeholder="Enter amount you're interested in"
-                    className="bg-black/40 border-white/10 text-white h-12"
-                  />
-                  <p className="text-sm text-white/60 mt-2 flex items-center gap-2">
-                    <Info className="w-4 h-4" />
-                    Only a 10 LGR voting fee is required in your wallet
-                  </p>
-                </div>
-                <Button
-                  onClick={handlePledge}
-                  disabled={isPledging || !pledgeInput}
-                  size="lg"
-                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold transition-all duration-300 transform hover:scale-105 h-12 mt-8 md:mt-0"
-                >
-                  {isPledging ? (
-                    "Recording..."
-                  ) : (
-                    <>
-                      <Coins className="w-5 h-5 mr-2" />
-                      Record Support
-                    </>
-                  )}
-                </Button>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-white/40">
-                  Total commitments so far: {formatLGRAmount(pledgedAmount)} ({formatUSDAmount(pledgedAmount)})
-                </p>
-                {pledgeInput && (
-                  <div className="space-y-1">
-                    <p className="text-sm text-yellow-500/80">
-                      Required in wallet: {formatLGRAmount("10")} ({formatUSDAmount("10")}) voting fee
-                    </p>
-                    <p className="text-xs text-white/40">
-                      Your commitment of {formatLGRAmount(pledgeInput)} ({formatUSDAmount(pledgeInput)}) will be recorded without transfer
+                </Collapsible>
+                
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-1">
+                    <Label htmlFor="pledgeAmount" className="text-white/60 mb-2 block">
+                      Commitment Amount
+                    </Label>
+                    <Input
+                      id="pledgeAmount"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      value={pledgeInput}
+                      onChange={(e) => setPledgeInput(e.target.value)}
+                      placeholder="Enter amount you're interested in"
+                      className="bg-black/40 border-white/10 text-white h-12"
+                    />
+                    <p className="text-sm text-white/60 mt-2 flex items-center gap-2">
+                      <Info className="w-4 h-4" />
+                      Only a 10 LGR voting fee is required
                     </p>
                   </div>
-                )}
+                  <Button
+                    onClick={handlePledge}
+                    disabled={isPledging || !pledgeInput}
+                    size="lg"
+                    className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold h-12 mt-8 md:mt-0"
+                  >
+                    {isPledging ? (
+                      "Recording..."
+                    ) : (
+                      <>
+                        <Coins className="w-5 h-5 mr-2" />
+                        Record Support
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </motion.div>
     );
   }
