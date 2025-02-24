@@ -29,6 +29,12 @@ const thesisFormSchema = z.object({
   category: z.string().min(2, {
     message: "Category must be at least 2 characters.",
   }),
+  external_url: z.string().url({
+    message: "Please enter a valid project URL.",
+  }),
+  image: z.string().min(1, {
+    message: "Project image is required.",
+  }),
   investment: z.object({
     targetCapital: z.string().min(1, {
       message: "Target capital is required."
@@ -37,6 +43,10 @@ const thesisFormSchema = z.object({
       message: "Investment description must be at least 10 characters.",
     }),
   }),
+  fundingBreakdown: z.array(z.object({
+    category: z.string(),
+    amount: z.string()
+  })),
   votingDuration: z.number().min(7 * 24 * 60 * 60, {
     message: "Voting duration must be at least 7 days.",
   }),
@@ -52,10 +62,13 @@ const requiredFormData = {
   title: "Decentralized Identity Protocol",
   description: "A protocol for self-sovereign identity management using zero-knowledge proofs",
   category: "Identity & Privacy",
+  external_url: "https://zkid.example.com",
+  image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
   investment: {
     targetCapital: "500000",
     description: "Funding for protocol development and security audits",
   },
+  fundingBreakdown: [],
   votingDuration: 14 * 24 * 60 * 60, // 14 days
   linkedInURL: "https://linkedin.com/in/example",
   blockchain: ["Ethereum", "Polygon"],
@@ -63,16 +76,24 @@ const requiredFormData = {
 
 const completeFormData = {
   ...requiredFormData,
+  fundingBreakdown: [
+    { category: "Smart Contract Development", amount: "200000" },
+    { category: "Security Audit", amount: "100000" },
+    { category: "Marketing & Community", amount: "100000" },
+    { category: "Operations & Legal", amount: "100000" }
+  ],
   team: [
     {
       name: "Alice Johnson",
       role: "Lead Developer",
       linkedin: "https://linkedin.com/in/alice",
+      github: "https://github.com/alicejohnson"
     },
     {
       name: "Bob Smith",
       role: "Security Architect",
       linkedin: "https://linkedin.com/in/bob",
+      github: "https://github.com/bobsmith"
     }
   ],
   investmentDrivers: [
@@ -118,10 +139,13 @@ export default function ThesisSubmission() {
       title: "",
       description: "",
       category: "",
+      external_url: "",
+      image: "",
       investment: {
         targetCapital: "",
         description: "",
       },
+      fundingBreakdown: [],
       votingDuration: 7 * 24 * 60 * 60, // 7 days default
       linkedInURL: "",
       blockchain: [],
@@ -311,6 +335,24 @@ export default function ThesisSubmission() {
                       className="mt-2 bg-black/50 border-white/10 min-h-[120px]"
                     />
                   </div>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <Label>Project URL</Label>
+                      <Input
+                        {...form.register("external_url")}
+                        placeholder="https://your-project.com"
+                        className="mt-2 bg-black/50 border-white/10"
+                      />
+                    </div>
+                    <div>
+                      <Label>Project Image URL</Label>
+                      <Input
+                        {...form.register("image")}
+                        placeholder="https://image-url.com"
+                        className="mt-2 bg-black/50 border-white/10"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -352,29 +394,6 @@ export default function ThesisSubmission() {
               <div className="bg-[#111] rounded-xl border border-white/5 p-6">
                 <div className="flex items-center gap-2 mb-6">
                   <Users className="w-5 h-5 text-blue-400" />
-                  <h2 className="text-lg font-medium">Investment Drivers & Incentives</h2>
-                </div>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <Label>Investment Drivers</Label>
-                    <Input placeholder="Key driver #1" className="bg-black/50 border-white/10" />
-                    <Input placeholder="Key driver #2" className="bg-black/50 border-white/10" />
-                    <Input placeholder="Key driver #3" className="bg-black/50 border-white/10" />
-                    <Input placeholder="Key driver #4" className="bg-black/50 border-white/10" />
-                  </div>
-                  <div className="space-y-4">
-                    <Label>Backer Incentives</Label>
-                    <Input placeholder="Utility (e.g., Early access)" className="bg-black/50 border-white/10" />
-                    <Input placeholder="Governance rights" className="bg-black/50 border-white/10" />
-                    <Input placeholder="NFT rewards" className="bg-black/50 border-white/10" />
-                    <Input placeholder="Token allocation" className="bg-black/50 border-white/10" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-[#111] rounded-xl border border-white/5 p-6">
-                <div className="flex items-center gap-2 mb-6">
-                  <Users className="w-5 h-5 text-blue-400" />
                   <h2 className="text-lg font-medium">Team & Roadmap</h2>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6">
@@ -383,16 +402,18 @@ export default function ThesisSubmission() {
                     <div className="space-y-4">
                       <div>
                         <Input placeholder="Team member 1 name" className="bg-black/50 border-white/10 mb-2" />
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-3 gap-2">
                           <Input placeholder="Role" className="bg-black/50 border-white/10" />
                           <Input placeholder="LinkedIn URL" className="bg-black/50 border-white/10" />
+                          <Input placeholder="GitHub URL" className="bg-black/50 border-white/10" />
                         </div>
                       </div>
                       <div>
                         <Input placeholder="Team member 2 name" className="bg-black/50 border-white/10 mb-2" />
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-3 gap-2">
                           <Input placeholder="Role" className="bg-black/50 border-white/10" />
                           <Input placeholder="LinkedIn URL" className="bg-black/50 border-white/10" />
+                          <Input placeholder="GitHub URL" className="bg-black/50 border-white/10" />
                         </div>
                       </div>
                     </div>
