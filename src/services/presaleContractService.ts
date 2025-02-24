@@ -1,6 +1,7 @@
+
 import { ethers } from "ethers";
 
-export const RD_TOKEN_CONTRACT_ADDRESS = "0xEa1c340f9DDFAd13f984c9d6A25e592496388351";
+export const RD_TOKEN_CONTRACT_ADDRESS = "0x81137573408bCD23f801A56D68268cc0CE5206B5";
 export const USDC_CONTRACT_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"; // Polygon USDC
 
 // Simplified ABI for the new contract
