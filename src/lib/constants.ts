@@ -1,8 +1,9 @@
 
 import { ethers } from "ethers";
 
-export const FACTORY_ADDRESS = "0x624dFf6455FBE2f569571fba31c7D020b905b745";
-export const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
+export const FACTORY_ADDRESS = "0x3522fCA64A8F79b004fDbd9a383B56113B81130B";
+export const LGR_TOKEN_ADDRESS = "0x81137573408bCD23f801A56D68268cc0CE5206B5";
+export const TREASURY_ADDRESS = "0x386f47AE974255c9486A2D4B91a3694E95A1EE81";
 export const LGR_PRICE_USD = 0.10; // $0.10 per LGR token
 
 // Contract-specific constants
