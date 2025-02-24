@@ -119,10 +119,10 @@ export const ProposalsHistory = () => {
         const tokenUri = await contract.tokenURI(proposal.tokenId);
         console.log('Token URI:', tokenUri);
 
-        // Get pledged amount
+        // Get pledged amount from proposals mapping
         console.log('Getting pledged amount...');
-        const pledgedAmount = await contract.pledgedAmount(proposal.tokenId)
-          .catch(() => ethers.BigNumber.from(0));
+        const proposalData = await contract.proposals(proposal.tokenId);
+        const pledgedAmount = proposalData.totalPledged;
         console.log('Pledged amount:', ethers.utils.formatEther(pledgedAmount), 'RD');
 
         if (tokenUri) {
