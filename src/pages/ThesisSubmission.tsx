@@ -47,6 +47,12 @@ const thesisFormSchema = z.object({
     category: z.string(),
     amount: z.string()
   })),
+  team: z.array(z.object({
+    name: z.string(),
+    role: z.string(),
+    linkedin: z.string().url().optional(),
+    github: z.string().url().optional(),
+  })),
   votingDuration: z.number().min(7 * 24 * 60 * 60, {
     message: "Voting duration must be at least 7 days.",
   }),
@@ -150,6 +156,10 @@ export default function ThesisSubmission() {
         { category: "", amount: "" },
         { category: "", amount: "" },
         { category: "", amount: "" }
+      ],
+      team: [
+        { name: "", role: "", linkedin: "", github: "" },
+        { name: "", role: "", linkedin: "", github: "" }
       ],
       votingDuration: 7 * 24 * 60 * 60,
       linkedInURL: "",
