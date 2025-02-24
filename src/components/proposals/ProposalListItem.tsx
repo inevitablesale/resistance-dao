@@ -100,8 +100,8 @@ export const ProposalListItem = ({
               <ChevronRight className="w-5 h-5 text-purple-400 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all duration-200" />
             </div>
           </div>
-          {metadata?.investment?.drivers && (
-            <p className="text-sm text-white/60 mt-2">{metadata.investment.drivers}</p>
+          {metadata?.investment?.description && (
+            <p className="text-sm text-white/60 mt-2">{metadata.investment.description}</p>
           )}
         </div>
       )}

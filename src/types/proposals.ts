@@ -53,7 +53,6 @@ export interface ProposalContractInput {
   votingDuration: number;
 }
 
-// New type that exactly matches contract tuple structure
 export interface ProposalContractTuple {
   title: string;
   metadataURI: string;

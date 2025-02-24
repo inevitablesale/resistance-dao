@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
-import { ProposalMetadata, FirmSize, DealType, GeographicFocus, PaymentTerm } from "@/types/proposals";
+import { ProposalMetadata } from "@/types/proposals";
 import { ExternalLink, Users, Target, Coins, Info, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
@@ -20,70 +20,6 @@ import { ProposalLoadingCard } from "./ProposalLoadingCard";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const MIN_LGR_REQUIRED = "1";
-
-const getFirmSizeLabel = (size: FirmSize): string => {
-  switch (size) {
-    case FirmSize.BELOW_1M:
-      return "Below $1M";
-    case FirmSize.ONE_TO_FIVE_M:
-      return "$1M-$5M";
-    case FirmSize.FIVE_TO_TEN_M:
-      return "$5M-$10M";
-    case FirmSize.TEN_PLUS:
-      return "$10M+";
-    default:
-      return "Unknown";
-  }
-};
-
-const getDealTypeLabel = (type: DealType): string => {
-  switch (type) {
-    case DealType.ACQUISITION:
-      return "Acquisition";
-    case DealType.MERGER:
-      return "Merger";
-    case DealType.EQUITY_BUYOUT:
-      return "Equity Buyout";
-    case DealType.FRANCHISE:
-      return "Franchise";
-    case DealType.SUCCESSION:
-      return "Succession";
-    default:
-      return "Unknown";
-  }
-};
-
-const getGeographicFocusLabel = (focus: GeographicFocus): string => {
-  switch (focus) {
-    case GeographicFocus.LOCAL:
-      return "Local";
-    case GeographicFocus.REGIONAL:
-      return "Regional";
-    case GeographicFocus.NATIONAL:
-      return "National";
-    case GeographicFocus.REMOTE:
-      return "Remote";
-    default:
-      return "Unknown";
-  }
-};
-
-const getPaymentTermLabel = (term: PaymentTerm): string => {
-  switch (term) {
-    case PaymentTerm.CASH:
-      return "Cash";
-    case PaymentTerm.SELLER_FINANCING:
-      return "Seller Financing";
-    case PaymentTerm.EARNOUT:
-      return "Earnout";
-    case PaymentTerm.EQUITY_ROLLOVER:
-      return "Equity Rollover";
-    case PaymentTerm.BANK_FINANCING:
-      return "Bank Financing";
-    default:
-      return "Unknown";
-  }
-};
 
 const formatLGRAmount = (amount: string): string => {
   const number = parseFloat(amount);
@@ -426,10 +362,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
     );
   }
 
-  const progressPercentage = proposalDetails?.investment?.targetCapital
-    ? (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100
-    : 0;
-
   if (view === 'overview') {
     return (
       <motion.div
@@ -473,10 +405,16 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
             <div className="mb-8">
               <div className="flex justify-between text-sm text-white/60 mb-2">
                 <span>Total Commitments Progress</span>
-                <span>{proposalDetails?.investment?.targetCapital ? ((Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100).toFixed(1) : 0}%</span>
+                <span>
+                  {proposalDetails?.investment?.targetCapital 
+                    ? ((Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100).toFixed(1) 
+                    : 0}%
+                </span>
               </div>
               <Progress 
-                value={proposalDetails?.investment?.targetCapital ? (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100 : 0}
+                value={proposalDetails?.investment?.targetCapital 
+                  ? (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100 
+                  : 0}
                 className="h-3 bg-white/5"
               />
             </div>
@@ -579,54 +517,11 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
             </CardTitle>
           </CardHeader>
           <CardContent className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <motion.div 
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
-                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group border border-teal-500/10"
-              >
-                <strong className="text-teal-400 block mb-2">Firm Size</strong>
-                <span className="text-white/80 text-lg">
-                  {getFirmSizeLabel(proposalDetails.firmCriteria.size)}
-                </span>
-              </motion.div>
-              
-              <motion.div 
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group border border-yellow-500/10"
-              >
-                <strong className="text-yellow-400 block mb-2">Deal Type</strong>
-                <span className="text-white/80 text-lg">
-                  {getDealTypeLabel(proposalDetails.firmCriteria.dealType)}
-                </span>
-              </motion.div>
-              
-              <motion.div 
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group border border-teal-500/10"
-              >
-                <strong className="text-teal-400 block mb-2">Geographic Focus</strong>
-                <span className="text-white/80 text-lg">
-                  {getGeographicFocusLabel(proposalDetails.firmCriteria.geographicFocus)}
-                </span>
-              </motion.div>
-              
-              <motion.div 
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-                className="bg-white/5 p-6 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors group border border-yellow-500/10"
-              >
-                <strong className="text-yellow-400 block mb-2">Payment Terms</strong>
-                <span className="text-white/80 text-lg">
-                  {proposalDetails.paymentTerms?.map(term => getPaymentTermLabel(term)).join(", ")}
-                </span>
-              </motion.div>
+            <div className="bg-white/5 p-6 rounded-xl backdrop-blur-sm space-y-4">
+              <h3 className="text-xl font-semibold text-white">Investment Strategy</h3>
+              <p className="text-white/80 leading-relaxed">
+                {proposalDetails.investment.description}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -643,23 +538,23 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       >
         <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
           <CardContent className="p-8 space-y-8">
-            {proposalDetails?.investment && (
-              <>
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-white">Investment Drivers</h3>
-                  <p className="text-white/80 bg-white/5 p-6 rounded-xl backdrop-blur-sm leading-relaxed border border-yellow-500/10">
-                    {proposalDetails.investment.drivers}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-white">Investment Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white/5 p-4 rounded-lg">
+                  <p className="text-white/60 text-sm">Target Capital</p>
+                  <p className="text-white text-lg font-medium">
+                    {formatLGRAmount(proposalDetails.investment.targetCapital)}
                   </p>
                 </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-white">Additional Criteria</h3>
-                  <p className="text-white/80 bg-white/5 p-6 rounded-xl backdrop-blur-sm leading-relaxed border border-teal-500/10">
-                    {proposalDetails.investment.additionalCriteria}
+                <div className="bg-white/5 p-4 rounded-lg">
+                  <p className="text-white/60 text-sm">Total Pledged</p>
+                  <p className="text-white text-lg font-medium">
+                    {formatLGRAmount(pledgedAmount)}
                   </p>
                 </div>
-              </>
-            )}
+              </div>
+            </div>
 
             {proposalDetails?.linkedInURL && (
               <motion.div
