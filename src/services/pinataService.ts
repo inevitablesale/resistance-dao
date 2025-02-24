@@ -1,21 +1,15 @@
 
-import { supabase } from "@/integrations/supabase/client";
-
 interface PinataResponse {
   IpfsHash: string;
   PinSize: number;
   Timestamp: string;
 }
 
+const PINATA_API_KEY = "e8141c7ad25bbe26737a";
+const PINATA_API_SECRET = "e0e8973e186c9eb3c70332357ddbf20da260b9374d390b76f1d9bd4b3e66eafc";
+
 export const uploadMetadataToPinata = async (metadata: any): Promise<string> => {
   try {
-    const { data: { PINATA_API_KEY, PINATA_API_SECRET } } = await supabase
-      .functions.invoke('get-pinata-credentials');
-
-    if (!PINATA_API_KEY || !PINATA_API_SECRET) {
-      throw new Error('Pinata credentials not found');
-    }
-
     const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
       method: 'POST',
       headers: {
@@ -51,13 +45,6 @@ export const uploadMetadataToPinata = async (metadata: any): Promise<string> => 
 
 export const uploadImageToPinata = async (imageUrl: string): Promise<string> => {
   try {
-    const { data: { PINATA_API_KEY, PINATA_API_SECRET } } = await supabase
-      .functions.invoke('get-pinata-credentials');
-
-    if (!PINATA_API_KEY || !PINATA_API_SECRET) {
-      throw new Error('Pinata credentials not found');
-    }
-
     // Fetch the image from LinkedIn
     const imageResponse = await fetch(imageUrl);
     const imageBlob = await imageResponse.blob();
