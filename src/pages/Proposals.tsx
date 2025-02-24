@@ -1,10 +1,9 @@
-
 import { ProposalsHistory } from "@/components/proposals/ProposalsHistory";
 import { Button } from "@/components/ui/button";
 import { FileText, Plus, Building2, HandCoins, TrendingUp, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
+import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 import { motion } from "framer-motion";
 
 const Proposals = () => {
@@ -15,7 +14,7 @@ const Proposals = () => {
     description: "Back promising proposals with soft pledges. No immediate investment required - just a 10 LGR voting fee to show genuine interest.",
     points: [
       "Discover potential investments",
-      "Support with soft pledges",
+      "Support with soft pledges", 
       "Track proposal progress"
     ]
   }, {
@@ -140,7 +139,7 @@ const Proposals = () => {
         </div>
       </div>
 
-      <LGRFloatingWidget />
+      <ResistanceWalletWidget />
     </div>
   );
 };

@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
+import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 import { createProposal } from "@/services/proposalContractService";
 import { ProposalMetadata, TeamMember, RoadmapMilestone, FundingBreakdown } from "@/types/proposals";
 import {
@@ -553,7 +553,7 @@ const ThesisSubmission = () => {
         </motion.div>
       </div>
 
-      <LGRFloatingWidget />
+      <ResistanceWalletWidget />
     </div>
   );
 };

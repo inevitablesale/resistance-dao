@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Building2, ChevronLeft, FileText, Target, Users, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
+import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 import { ProposalDetailsCard } from "@/components/proposals/ProposalDetailsCard";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -117,7 +117,7 @@ const ProposalDetails = () => {
         </div>
       </div>
       
-      <LGRFloatingWidget />
+      <ResistanceWalletWidget />
     </div>
   );
 };

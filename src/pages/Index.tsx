@@ -23,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { AccessCoverOverlay } from "@/components/AccessCoverOverlay";
 import { Progress } from "@/components/ui/progress";
-import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
+import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -613,7 +613,7 @@ const Index = () => {
         </section>
 
         {/* Add the LGRFloatingWidget */}
-        <LGRFloatingWidget />
+        <ResistanceWalletWidget />
       </div>
     </>
   );

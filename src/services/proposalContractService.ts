@@ -174,27 +174,13 @@ function transformToContractTuple(input: ProposalContractInput): ProposalContrac
     ? input.targetCapital
     : ethers.BigNumber.from(input.targetCapital);
 
-  console.log("Creating contract tuple:", {
-    title: input.title,
-    ipfsHash: input.ipfsMetadata,
-    targetCapital: {
-      wei: targetCapitalWei.toString(),
-      lgr: ethers.utils.formatUnits(targetCapitalWei, 18)
-    },
-    arrays: {
-      paymentTerms: toUint8Array(input.paymentTerms),
-      operationalStrategies: toUint8Array(input.operationalStrategies),
-      growthStrategies: toUint8Array(input.growthStrategies),
-      integrationStrategies: toUint8Array(input.integrationStrategies)
-    }
-  });
-
   return {
     title: input.title || "",
+    metadataURI: input.metadataURI || "",
     ipfsMetadata: input.ipfsMetadata || "",
     targetCapital: targetCapitalWei.toString(),
     votingDuration: input.votingDuration || 604800,
-    investmentDrivers: input.investmentDrivers || "",
+    investmentDrivers: Array.isArray(input.investmentDrivers) ? input.investmentDrivers.join(',') : input.investmentDrivers || "",
     additionalCriteria: input.additionalCriteria || "",
     firmSize: Number(input.firmSize),
     location: input.location || "",
@@ -213,10 +199,13 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
   try {
     const contractInput: ProposalContractInput = {
       title: processText(config.metadata.title),
+      metadataURI: config.metadataURI || "",
       ipfsMetadata: config.ipfsHash || '',
       targetCapital: config.targetCapital,
       votingDuration: config.votingDuration,
-      investmentDrivers: processText(config.metadata.investment.drivers),
+      investmentDrivers: Array.isArray(config.metadata.investment.drivers) 
+        ? config.metadata.investment.drivers.join(',')
+        : config.metadata.investment.drivers || "",
       additionalCriteria: config.metadata.investment.additionalCriteria 
         ? processText(config.metadata.investment.additionalCriteria)
         : "",
@@ -230,23 +219,10 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
       integrationStrategies: Array.isArray(config.metadata.strategies.integration) ? config.metadata.strategies.integration : []
     };
 
-    console.log("Contract input prepared:", {
-      ...contractInput,
-      targetCapital: contractInput.targetCapital.toString()
-    });
-    
     return contractInput;
   } catch (error) {
     console.error("Error transforming config:", error);
-    throw new ProposalError({
-      category: 'validation',
-      message: `Failed to transform proposal config: ${error.message}`,
-      recoverySteps: [
-        'Check that all text fields contain valid string data',
-        'Ensure all required fields are provided',
-        'Try submitting the form again'
-      ]
-    });
+    throw error;
   }
 }
 

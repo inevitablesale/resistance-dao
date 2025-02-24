@@ -1,23 +1,27 @@
-
 import { ethers } from "ethers";
 
 export enum FirmSize {
-  SMALL = 0,
-  MEDIUM = 1,
-  LARGE = 2
+  BELOW_1M = 0,
+  ONE_TO_FIVE_M = 1,
+  FIVE_TO_TEN_M = 2,
+  TEN_PLUS = 3
 }
 
 export enum DealType {
-  ACQUISITION = 0,
-  MERGER = 1,
-  PARTNERSHIP = 2
+  EQUITY_BUYOUT = 0,
+  FRANCHISE = 1,
+  SUCCESSION = 2,
+  ACQUISITION = 3,
+  MERGER = 4,
+  PARTNERSHIP = 5
 }
 
 export enum GeographicFocus {
   LOCAL = 0,
   REGIONAL = 1,
   NATIONAL = 2,
-  INTERNATIONAL = 3
+  INTERNATIONAL = 3,
+  REMOTE = 4
 }
 
 export enum PaymentTerm {
