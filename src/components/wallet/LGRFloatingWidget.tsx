@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { getWorkingProvider, getRdTokenContract, getUsdcContract, getPresaleContract, fetchPresaleMaticPrice, purchaseTokens } from "@/services/presaleContractService";
+import { getWorkingProvider, getRdTokenContract, getUsdcContract, purchaseTokens } from "@/services/presaleContractService";
 import { ethers } from "ethers";
 import { Coins, Info } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -210,6 +211,61 @@ export const LGRFloatingWidget = () => {
         </PopoverContent>
       </Popover>
 
+      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <DialogContent className="bg-black/95 border border-blue-500/20">
+          <DialogHeader>
+            <DialogTitle className="text-blue-400">Buy RD Tokens</DialogTitle>
+            <DialogDescription>
+              Enter the amount of USDC you want to spend
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm text-gray-400">Amount in USDC</label>
+              <Input
+                type="number"
+                placeholder="Enter USDC amount"
+                value={purchaseAmount}
+                onChange={(e) => setPurchaseAmount(e.target.value)}
+                className="bg-black/50 border border-blue-500/20 text-white placeholder:text-gray-500"
+              />
+            </div>
+            
+            <div className="space-y-1">
+              <p className="text-sm text-gray-400">You will receive approximately:</p>
+              <p className="text-lg font-bold text-blue-400">
+                {(Number(purchaseAmount) * 10).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })} RD
+              </p>
+            </div>
+
+            <div className="text-sm text-gray-400">
+              Your USDC Balance: {Number(usdcBalance).toLocaleString()} USDC
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsConfirmOpen(false)}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmPurchase}
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+              disabled={!purchaseAmount || Number(purchaseAmount) <= 0 || Number(purchaseAmount) > Number(usdcBalance)}
+            >
+              Confirm Purchase
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
         <DialogContent className="bg-black/95 border border-blue-500/20 max-w-2xl">
           <DialogHeader>
@@ -236,7 +292,7 @@ export const LGRFloatingWidget = () => {
                   <li>Pay a small gas fee in MATIC to complete the transaction</li>
                 </ol>
                 <p className="text-sm text-gray-400 mt-4">
-                  Note: Make sure to purchase enough MATIC to cover both your RD purchase and the gas fees (approximately 0.001 MATIC)
+                  Note: Make sure to purchase enough MATIC to cover gas fees (approximately 0.001 MATIC)
                 </p>
               </div>
             </TabsContent>
@@ -248,7 +304,7 @@ export const LGRFloatingWidget = () => {
                   <p>USDC is a stablecoin pegged to the US dollar. You need it to:</p>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>Purchase RD tokens</li>
-                    <li>Pay for transaction fees (gas)</li>
+                    <li>Each RD token costs $0.10 USDC</li>
                   </ul>
                   <p className="mt-4">To get USDC:</p>
                   <ol className="list-decimal pl-5 space-y-2">
@@ -290,61 +346,6 @@ export const LGRFloatingWidget = () => {
               className="w-full sm:w-auto"
             >
               Got it
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <DialogContent className="bg-black/95 border border-blue-500/20">
-          <DialogHeader>
-            <DialogTitle className="text-blue-400">Confirm RD Purchase</DialogTitle>
-            <DialogDescription>
-              Enter the amount of USDC you want to spend
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm text-gray-400">Amount in USDC</label>
-              <Input
-                type="number"
-                placeholder="Enter USDC amount"
-                value={purchaseAmount}
-                onChange={(e) => setPurchaseAmount(e.target.value)}
-                className="bg-black/50 border border-blue-500/20 text-white placeholder:text-gray-500"
-              />
-            </div>
-            
-            <div className="space-y-1">
-              <p className="text-sm text-gray-400">You will receive approximately:</p>
-              <p className="text-lg font-bold text-blue-400">
-                {(Number(purchaseAmount) / Number(maticPrice)).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                })} RD
-              </p>
-            </div>
-
-            <div className="text-sm text-gray-400">
-              Your USDC Balance: {Number(usdcBalance).toLocaleString()} USDC
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsConfirmOpen(false)}
-              className="w-full sm:w-auto"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleConfirmPurchase}
-              className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-black"
-              disabled={!purchaseAmount || Number(purchaseAmount) <= 0 || Number(purchaseAmount) > Number(usdcBalance)}
-            >
-              Confirm Purchase
             </Button>
           </DialogFooter>
         </DialogContent>

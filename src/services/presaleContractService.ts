@@ -51,32 +51,6 @@ export const getUsdcContract = async (provider: ethers.providers.Provider) => {
   return new ethers.Contract(USDC_CONTRACT_ADDRESS, ERC20_ABI, provider);
 };
 
-// Function to fetch total RD sold
-export const fetchTotalRDSold = async () => {
-  try {
-    const provider = await getWorkingProvider();
-    const rdContract = await getRdTokenContract(provider);
-    const totalSold = await rdContract.totalSupply();
-    return ethers.utils.formatUnits(totalSold, 6); // USDC has 6 decimals
-  } catch (error) {
-    console.error("Error fetching total RD sold:", error);
-    return "0";
-  }
-};
-
-// Function to fetch USDC balance
-export const fetchUsdcBalance = async (address: string) => {
-  try {
-    const provider = await getWorkingProvider();
-    const usdcContract = await getUsdcContract(provider);
-    const balance = await usdcContract.balanceOf(address);
-    return ethers.utils.formatUnits(balance, 6); // USDC has 6 decimals
-  } catch (error) {
-    console.error("Error fetching USDC balance:", error);
-    return "0";
-  }
-};
-
 // Function to purchase tokens with USDC
 export const purchaseTokens = async (signer: ethers.Signer, usdcAmount: string) => {
   try {
