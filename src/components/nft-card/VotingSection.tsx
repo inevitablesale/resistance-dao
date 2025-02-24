@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ThumbsUp, ChevronRight, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { ethers } from "ethers";
-import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS } from "@/lib/constants";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 
 interface VotingSectionProps {
@@ -49,7 +48,7 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
 
       // Initialize contracts
       const lgrToken = new ethers.Contract(
-        LGR_TOKEN_ADDRESS,
+        RD_TOKEN_ADDRESS,
         ["function balanceOf(address) view returns (uint256)", "function approve(address spender, uint256 amount) returns (bool)"],
         signer
       );
@@ -174,4 +173,3 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
     </>
   );
 };
-

@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -5,7 +6,7 @@ import { transactionQueue } from "./transactionQueueService";
 import { checkTokenAllowance } from "./tokenService";
 import { WalletType } from "@/hooks/useWalletProvider";
 import { executeTransaction } from "./transactionManager";
-import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS } from "@/lib/constants";
 import { uploadToIPFS } from "./ipfsService";
 import { 
   ProposalMetadata, 

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata } from "@/types/proposals";
@@ -82,7 +82,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         
         const balance = await getTokenBalance(
           walletProvider.provider,
-          LGR_TOKEN_ADDRESS,
+          RD_TOKEN_ADDRESS,
           address
         );
 
@@ -240,7 +240,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       console.log('Checking balance for voting fee');
       const balance = await getTokenBalance(
         walletProvider.provider,
-        LGR_TOKEN_ADDRESS,
+        RD_TOKEN_ADDRESS,
         address!
       );
       const userBalance = ethers.utils.parseEther(balance);
@@ -256,7 +256,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       );
 
       const lgrToken = new ethers.Contract(
-        LGR_TOKEN_ADDRESS,
+        RD_TOKEN_ADDRESS,
         ["function approve(address spender, uint256 amount) returns (bool)"],
         signer
       );

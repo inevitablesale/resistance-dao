@@ -19,8 +19,7 @@ import { mainnet, polygon, polygonMumbai } from 'viem/chains';
 import { ethers } from 'ethers';
 import { useNavigate } from "react-router-dom";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
-import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
-import { LGR_TOKEN_ADDRESS, SUBMISSION_FEE } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS, SUBMISSION_FEE } from "@/lib/constants";
 
 const thesisFormSchema = z.object({
   title: z.string().min(2, {
@@ -195,7 +194,7 @@ export default function ThesisSubmission() {
       const signer = provider.getSigner();
       
       const rdToken = new ethers.Contract(
-        LGR_TOKEN_ADDRESS,
+        RD_TOKEN_ADDRESS,
         ["function approve(address spender, uint256 amount) external returns (bool)"],
         signer
       );
