@@ -9,7 +9,7 @@ import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS } from "@/lib/constants"
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata } from "@/types/proposals";
-import { ExternalLink, Users, Target, Coins, Info, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { ExternalLink, Users, Target, Coins, Info, Clock, ChevronDown, Github, Twitter, Discord, Telegram, Briefcase, PieChart, User } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
@@ -370,8 +370,8 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       >
         <Card className="bg-gradient-to-br from-yellow-500/10 via-transparent to-teal-500/10 backdrop-blur-lg border border-white/20">
           <CardHeader>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="px-3 py-1 text-xs font-medium bg-yellow-500/10 text-yellow-500 rounded-full">
                   {proposalDetails.category}
                 </span>
@@ -380,9 +380,78 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                     {chain}
                   </span>
                 ))}
+                {proposalDetails.isTestMode && (
+                  <span className="px-3 py-1 text-xs font-medium bg-blue-500/10 text-blue-500 rounded-full">
+                    Test Mode
+                  </span>
+                )}
               </div>
-              <h1 className="text-2xl font-bold text-white">{proposalDetails.title}</h1>
-              <p className="text-white/60">{proposalDetails.description}</p>
+              
+              <div>
+                <h1 className="text-2xl font-bold text-white mb-2">{proposalDetails.title}</h1>
+                <p className="text-white/60">{proposalDetails.description}</p>
+              </div>
+
+              {proposalDetails.team && proposalDetails.team.length > 0 && (
+                <div className="pt-4">
+                  <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-yellow-500" />
+                    Team
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {proposalDetails.team.map((member, index) => (
+                      <div key={index} className="bg-black/20 rounded-lg p-4 border border-white/10">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-white font-medium">{member.name}</p>
+                            <p className="text-white/60 text-sm">{member.role}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            {member.linkedin && (
+                              <a href={member.linkedin} target="_blank" rel="noopener noreferrer"
+                                className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
+                                <ExternalLink className="w-4 h-4 text-blue-400" />
+                              </a>
+                            )}
+                            {member.github && (
+                              <a href={member.github} target="_blank" rel="noopener noreferrer"
+                                className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
+                                <Github className="w-4 h-4 text-white/70" />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {proposalDetails.socials && (
+                <div className="flex flex-wrap gap-3">
+                  {proposalDetails.socials.twitter && (
+                    <a href={proposalDetails.socials.twitter} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white/70">
+                      <Twitter className="w-4 h-4 text-blue-400" />
+                      <span className="text-sm">Twitter</span>
+                    </a>
+                  )}
+                  {proposalDetails.socials.discord && (
+                    <a href={proposalDetails.socials.discord} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white/70">
+                      <Discord className="w-4 h-4 text-indigo-400" />
+                      <span className="text-sm">Discord</span>
+                    </a>
+                  )}
+                  {proposalDetails.socials.telegram && (
+                    <a href={proposalDetails.socials.telegram} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white/70">
+                      <Telegram className="w-4 h-4 text-blue-400" />
+                      <span className="text-sm">Telegram</span>
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           </CardHeader>
           
@@ -401,6 +470,9 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                         {timeRemaining}
                       </span>
                     </div>
+                  </div>
+                  <div className="text-sm text-white/60">
+                    Submitted {new Date(proposalDetails.submissionTimestamp * 1000).toLocaleDateString()}
                   </div>
                 </div>
                 <div className="text-center md:text-right">
@@ -435,74 +507,89 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 </p>
               </div>
 
-              <div className="space-y-4">
-                <div className="bg-black/20 rounded-lg p-6 space-y-4">
-                  <h4 className="text-lg font-medium text-white flex items-center gap-2">
-                    <Info className="w-5 h-5 text-yellow-500" />
-                    Investment Purpose
+              {proposalDetails.fundingBreakdown && (
+                <div className="bg-black/20 rounded-lg p-6 mb-6">
+                  <h4 className="text-lg font-medium text-white flex items-center gap-2 mb-4">
+                    <PieChart className="w-5 h-5 text-yellow-500" />
+                    Funding Breakdown
                   </h4>
-                  <p className="text-white/80 leading-relaxed">
-                    {proposalDetails.investment.description}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {proposalDetails.fundingBreakdown.map((item, index) => (
+                      <div key={index} className="bg-white/5 rounded-lg p-4">
+                        <p className="text-white/60 text-sm">{item.category}</p>
+                        <p className="text-white font-medium">{formatLGRAmount(item.amount)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="bg-black/20 rounded-lg p-6 space-y-4 mb-6">
+                <h4 className="text-lg font-medium text-white flex items-center gap-2">
+                  <Info className="w-5 h-5 text-yellow-500" />
+                  Investment Purpose
+                </h4>
+                <p className="text-white/80 leading-relaxed">
+                  {proposalDetails.investment.description}
+                </p>
+              </div>
+
+              <Collapsible>
+                <CollapsibleTrigger className="w-full">
+                  <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                    <div className="flex items-center justify-between text-white">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <Info className="w-5 h-5 text-yellow-500" />
+                        About Supporting Proposals
+                      </h4>
+                      <ChevronDown className="w-5 h-5 text-white/60" />
+                    </div>
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="p-4 bg-black/20 rounded-lg mt-2">
+                  <p className="text-sm text-white/80 leading-relaxed">
+                    Express your interest by making a soft commitment. This is not an actual investment - 
+                    only a 10 LGR voting fee will be charged to record your support. Your pledged amount shows how much 
+                    you're potentially interested in investing later.
+                  </p>
+                </CollapsibleContent>
+              </Collapsible>
+              
+              <div className="flex flex-col md:flex-row gap-4 mt-6">
+                <div className="flex-1">
+                  <Label htmlFor="pledgeAmount" className="text-white/60 mb-2 block">
+                    Commitment Amount
+                  </Label>
+                  <Input
+                    id="pledgeAmount"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    value={pledgeInput}
+                    onChange={(e) => setPledgeInput(e.target.value)}
+                    placeholder="Enter amount you're interested in"
+                    className="bg-black/40 border-white/10 text-white h-12"
+                  />
+                  <p className="text-sm text-white/60 mt-2 flex items-center gap-2">
+                    <Info className="w-4 h-4" />
+                    Only a 10 LGR voting fee is required
                   </p>
                 </div>
-
-                <Collapsible>
-                  <CollapsibleTrigger className="w-full">
-                    <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                      <div className="flex items-center justify-between text-white">
-                        <h4 className="font-medium flex items-center gap-2">
-                          <Info className="w-5 h-5 text-yellow-500" />
-                          About Supporting Proposals
-                        </h4>
-                        <ChevronDown className="w-5 h-5 text-white/60" />
-                      </div>
-                    </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="p-4 bg-black/20 rounded-lg mt-2">
-                    <p className="text-sm text-white/80 leading-relaxed">
-                      Express your interest by making a soft commitment. This is not an actual investment - 
-                      only a 10 LGR voting fee will be charged to record your support. Your pledged amount shows how much 
-                      you're potentially interested in investing later.
-                    </p>
-                  </CollapsibleContent>
-                </Collapsible>
-                
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1">
-                    <Label htmlFor="pledgeAmount" className="text-white/60 mb-2 block">
-                      Commitment Amount
-                    </Label>
-                    <Input
-                      id="pledgeAmount"
-                      type="number"
-                      min="0"
-                      step="0.1"
-                      value={pledgeInput}
-                      onChange={(e) => setPledgeInput(e.target.value)}
-                      placeholder="Enter amount you're interested in"
-                      className="bg-black/40 border-white/10 text-white h-12"
-                    />
-                    <p className="text-sm text-white/60 mt-2 flex items-center gap-2">
-                      <Info className="w-4 h-4" />
-                      Only a 10 LGR voting fee is required
-                    </p>
-                  </div>
-                  <Button
-                    onClick={handlePledge}
-                    disabled={isPledging || !pledgeInput}
-                    size="lg"
-                    className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold h-12 mt-8 md:mt-0"
-                  >
-                    {isPledging ? (
-                      "Recording..."
-                    ) : (
-                      <>
-                        <Coins className="w-5 h-5 mr-2" />
-                        Record Support
-                      </>
-                    )}
-                  </Button>
-                </div>
+                <Button
+                  onClick={handlePledge}
+                  disabled={isPledging || !pledgeInput}
+                  size="lg"
+                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold h-12 mt-8 md:mt-0"
+                >
+                  {isPledging ? (
+                    "Recording..."
+                  ) : (
+                    <>
+                      <Coins className="w-5 h-5 mr-2" />
+                      Record Support
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </CardContent>
