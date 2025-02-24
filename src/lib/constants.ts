@@ -11,93 +11,31 @@ export const MIN_VOTING_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
 export const MAX_VOTING_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
 export const MIN_TARGET_CAPITAL = ethers.utils.parseEther("1000"); // 1,000 LGR
 export const MAX_TARGET_CAPITAL = ethers.utils.parseEther("25000000"); // 25,000,000 LGR
-export const SUBMISSION_FEE = ethers.utils.parseEther("250"); // 250 LGR
-export const VOTING_FEE = ethers.utils.parseEther("10"); // 10 LGR
+export const SUBMISSION_FEE = ethers.utils.parseEther("25"); // 25 LGR to submit
+export const VOTING_FEE = ethers.utils.parseEther("1"); // 1 LGR to vote
 
 // Contract addresses
 export const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2";
 
 // Factory Contract ABI for LedgerFren Proposal Factory
 export const FACTORY_ABI = [
-  // Proposal creation
-  `function createProposal(
-    tuple(
-      string title,
-      string ipfsMetadata,
-      uint128 targetCapital,
-      uint256 votingDuration,
-      string investmentDrivers,
-      string additionalCriteria,
-      uint8 firmSize,
-      string location,
-      uint8 dealType,
-      uint8 geographicFocus,
-      uint8[] paymentTerms,
-      uint8[] operationalStrategies,
-      uint8[] growthStrategies,
-      uint8[] integrationStrategies
-    ) input,
-    string linkedInURL
-  ) external returns (uint256)`,
-
-  // Proposal data getters
-  `function proposals(uint256) public view returns (
-    address creator,
-    string creatorLinkedIn,
-    string title,
-    string ipfsMetadata,
-    uint128 targetCapital,
-    uint256 votingEnds,
-    string investmentDrivers,
-    string additionalCriteria,
-    uint8 firmSize,
-    string location,
-    uint8 dealType,
-    uint8 geographicFocus,
-    uint8[] paymentTerms,
-    uint8[] operationalStrategies,
-    uint8[] growthStrategies,
-    uint8[] integrationStrategies,
-    uint256 totalVotes
-  )`,
-
-  // Core contract getters
-  "function LGR_TOKEN() public view returns (address)",
-  "function tester() public view returns (address)",
-  "function treasury() public view returns (address)",
-  "function submissionFee() public view returns (uint256)",
-  "function testModeEnabled() public view returns (bool)",
-
-  // Constants getters
-  "function MIN_VOTING_DURATION() public view returns (uint256)",
-  "function MAX_VOTING_DURATION() public view returns (uint256)",
-  "function MIN_TARGET_CAPITAL() public view returns (uint128)",
-  "function MAX_TARGET_CAPITAL() public view returns (uint128)",
-  "function VOTING_FEE() public view returns (uint256)",
-
-  // Proposal tracking
-  "function userProposals(address) public view returns (uint256[])",
-  "function hasVoted(uint256,address) public view returns (bool)",
-  "function pledgedAmount(uint256) public view returns (uint128)",
-  "function voterPledges(uint256,address) public view returns (uint128)",
-  "function proposalVoters(uint256) public view returns (address[])",
-
-  // Voting functionality
-  "function vote(uint256 tokenId, uint128 pledgeAmount) external",
+  // Core functions
+  "function createProposal(string calldata title, string calldata metadataURI, uint128 targetCapital, uint256 votingDuration) external returns (uint256)",
+  "function vote(uint256 proposalId, uint128 pledgeAmount) external",
+  "function updateMetadata(uint256 proposalId, string calldata newMetadataURI) external",
   
-  // Admin functions
-  "function setTestMode(bool _enabled) external",
-  "function owner() public view returns (address)",
-  "function paused() public view returns (bool)",
-  
-  // NFT functionality
-  "function tokenURI(uint256) public view returns (string)",
+  // View functions
+  "function RD_TOKEN() external view returns (address)",
+  "function treasury() external view returns (address)",
+  "function submissionFee() external view returns (uint256)",
+  "function VOTING_FEE() external view returns (uint256)",
+  "function MIN_TARGET_CAPITAL() external view returns (uint128)",
+  "function MAX_TARGET_CAPITAL() external view returns (uint128)",
   
   // Events
-  "event ProposalCreated(uint256 indexed tokenId, address indexed creator)",
-  "event ProposalNFTMinted(uint256 indexed tokenId, address indexed creator)",
-  "event ProposalVoted(uint256 indexed tokenId, address indexed voter, uint128 pledgeAmount)",
-  "event ProposalFullyPledged(uint256 indexed tokenId, uint128 totalPledged, address[] backers)",
-  "event TestModeChanged(bool newStatus)"
+  "event ProposalCreated(uint256 indexed proposalId, address indexed creator)",
+  "event ProposalMetadataUpdated(uint256 indexed proposalId, string newMetadataURI)",
+  "event ProposalVoted(uint256 indexed proposalId, address indexed voter, uint128 pledgeAmount, uint256 timestamp)",
+  "event ProposalFullyPledged(uint256 indexed proposalId, uint128 totalPledged, uint256 backerCount, uint256 timestamp)",
+  "event MilestoneReached(uint256 indexed proposalId, uint256 milestone, uint256 currentAmount, uint256 timestamp)"
 ];
-
