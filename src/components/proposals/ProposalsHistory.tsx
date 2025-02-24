@@ -78,23 +78,35 @@ export const ProposalsHistory = () => {
 
   const fetchProposalMetadata = async (proposal: ProposalEvent, contract: ethers.Contract) => {
     try {
-      console.log(`\n--- Processing token #${proposal.tokenId} ---`);
+      console.log(`\n=== Processing Proposal #${proposal.tokenId} ===`);
+      console.log('Proposal initial data:', proposal);
       
       updateProposalData(proposal.tokenId, { isLoading: true });
 
+      console.log(`Fetching token URI for #${proposal.tokenId}...`);
       const [tokenUri, pledgedAmount] = await Promise.all([
         contract.tokenURI(proposal.tokenId),
         contract.pledgedAmount(proposal.tokenId)
       ]);
 
-      console.log(`NFT metadata URI for token #${proposal.tokenId}:`, tokenUri);
-      console.log(`Pledged amount for token #${proposal.tokenId}:`, ethers.utils.formatEther(pledgedAmount));
+      console.log(`Token URI for #${proposal.tokenId}:`, tokenUri);
+      console.log(`Pledged amount for #${proposal.tokenId}:`, ethers.utils.formatEther(pledgedAmount));
 
       let metadata: ProposalMetadata | undefined;
       if (tokenUri) {
+        console.log(`\nFetching IPFS data for token #${proposal.tokenId}`);
+        console.log('Token URI:', tokenUri);
+        
         const ipfsHash = tokenUri.replace('ipfs://', '');
-        metadata = await getFromIPFS<ProposalMetadata>(ipfsHash, 'proposal');
-        console.log(`Successfully fetched IPFS data for token #${proposal.tokenId}:`, metadata);
+        console.log('IPFS Hash:', ipfsHash);
+        
+        try {
+          metadata = await getFromIPFS<ProposalMetadata>(ipfsHash, 'proposal');
+          console.log(`\nSuccessfully fetched IPFS data for token #${proposal.tokenId}:`, metadata);
+        } catch (ipfsError) {
+          console.error(`IPFS fetch error for token #${proposal.tokenId}:`, ipfsError);
+          throw new Error(`IPFS fetch failed: ${ipfsError.message}`);
+        }
       }
 
       updateProposalData(proposal.tokenId, {
@@ -104,7 +116,7 @@ export const ProposalsHistory = () => {
       });
 
     } catch (error: any) {
-      console.error(`Error processing token #${proposal.tokenId}:`, error);
+      console.error(`\nError processing token #${proposal.tokenId}:`, error);
       updateProposalData(proposal.tokenId, {
         isLoading: false,
         error: error.message
