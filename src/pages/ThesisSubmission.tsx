@@ -145,8 +145,13 @@ export default function ThesisSubmission() {
         targetCapital: "",
         description: "",
       },
-      fundingBreakdown: [],
-      votingDuration: 7 * 24 * 60 * 60, // 7 days default
+      fundingBreakdown: [
+        { category: "", amount: "" },
+        { category: "", amount: "" },
+        { category: "", amount: "" },
+        { category: "", amount: "" }
+      ],
+      votingDuration: 7 * 24 * 60 * 60,
       linkedInURL: "",
       blockchain: [],
     }
@@ -367,22 +372,22 @@ export default function ThesisSubmission() {
                     onChange={(value) => form.setValue("investment.targetCapital", value)}
                     error={form.formState.errors.investment?.targetCapital ? [form.formState.errors.investment.targetCapital.message || ""] : undefined}
                   />
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input placeholder="Smart Contract Development" className="bg-black/50 border-white/10" />
-                    <Input placeholder="Amount in RD" className="bg-black/50 border-white/10" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input placeholder="Security Audit" className="bg-black/50 border-white/10" />
-                    <Input placeholder="Amount in RD" className="bg-black/50 border-white/10" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input placeholder="Marketing & Community" className="bg-black/50 border-white/10" />
-                    <Input placeholder="Amount in RD" className="bg-black/50 border-white/10" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input placeholder="Operations & Legal" className="bg-black/50 border-white/10" />
-                    <Input placeholder="Amount in RD" className="bg-black/50 border-white/10" />
-                  </div>
+                  
+                  {form.watch("fundingBreakdown")?.map((_, index) => (
+                    <div key={index} className="grid grid-cols-2 gap-4">
+                      <Input
+                        {...form.register(`fundingBreakdown.${index}.category`)}
+                        placeholder="Category (e.g., Smart Contract Development)"
+                        className="bg-black/50 border-white/10"
+                      />
+                      <Input
+                        {...form.register(`fundingBreakdown.${index}.amount`)}
+                        placeholder="Amount in RD"
+                        className="bg-black/50 border-white/10"
+                      />
+                    </div>
+                  ))}
+
                   <VotingDurationInput
                     value={form.watch("votingDuration")}
                     onChange={(value) => form.setValue("votingDuration", value[0])}
@@ -400,45 +405,32 @@ export default function ThesisSubmission() {
                   <div className="space-y-4">
                     <Label>Team Members</Label>
                     <div className="space-y-4">
-                      <div>
-                        <Input placeholder="Team member 1 name" className="bg-black/50 border-white/10 mb-2" />
-                        <div className="grid grid-cols-3 gap-2">
-                          <Input placeholder="Role" className="bg-black/50 border-white/10" />
-                          <Input placeholder="LinkedIn URL" className="bg-black/50 border-white/10" />
-                          <Input placeholder="GitHub URL" className="bg-black/50 border-white/10" />
+                      {[0, 1].map((index) => (
+                        <div key={index}>
+                          <Input
+                            {...form.register(`team.${index}.name`)}
+                            placeholder={`Team member ${index + 1} name`}
+                            className="bg-black/50 border-white/10 mb-2"
+                          />
+                          <div className="grid grid-cols-3 gap-2">
+                            <Input
+                              {...form.register(`team.${index}.role`)}
+                              placeholder="Role"
+                              className="bg-black/50 border-white/10"
+                            />
+                            <Input
+                              {...form.register(`team.${index}.linkedin`)}
+                              placeholder="LinkedIn URL"
+                              className="bg-black/50 border-white/10"
+                            />
+                            <Input
+                              {...form.register(`team.${index}.github`)}
+                              placeholder="GitHub URL"
+                              className="bg-black/50 border-white/10"
+                            />
+                          </div>
                         </div>
-                      </div>
-                      <div>
-                        <Input placeholder="Team member 2 name" className="bg-black/50 border-white/10 mb-2" />
-                        <div className="grid grid-cols-3 gap-2">
-                          <Input placeholder="Role" className="bg-black/50 border-white/10" />
-                          <Input placeholder="LinkedIn URL" className="bg-black/50 border-white/10" />
-                          <Input placeholder="GitHub URL" className="bg-black/50 border-white/10" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <Label>Roadmap Milestones</Label>
-                    <div className="space-y-4">
-                      <div>
-                        <Input placeholder="Milestone 1" className="bg-black/50 border-white/10 mb-2" />
-                        <div className="flex gap-2">
-                          <Input placeholder="Expected Date (Q2 2025)" className="bg-black/50 border-white/10" />
-                          <Button variant="outline" size="sm" className="shrink-0">
-                            Pending
-                          </Button>
-                        </div>
-                      </div>
-                      <div>
-                        <Input placeholder="Milestone 2" className="bg-black/50 border-white/10 mb-2" />
-                        <div className="flex gap-2">
-                          <Input placeholder="Expected Date (Q2 2025)" className="bg-black/50 border-white/10" />
-                          <Button variant="outline" size="sm" className="shrink-0">
-                            Pending
-                          </Button>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 </div>
