@@ -82,6 +82,9 @@ export const uploadToIPFS = async <T extends ProposalMetadata | IPFSContent>(
   content: T
 ): Promise<string> => {
   try {
+    console.log('\n=== Starting IPFS Upload ===');
+    console.log('Content to upload:', JSON.stringify(content, null, 2));
+    
     console.log('Getting Pinata credentials from Supabase...');
     const { data: credentials, error: credentialsError } = await supabase
       .functions.invoke('get-pinata-credentials');
@@ -91,7 +94,7 @@ export const uploadToIPFS = async <T extends ProposalMetadata | IPFSContent>(
       throw new Error('Failed to get Pinata credentials');
     }
 
-    console.log('Uploading content to Pinata:', JSON.stringify(content, null, 2));
+    console.log('Uploading content to Pinata...');
     
     const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
       method: 'POST',
@@ -111,7 +114,8 @@ export const uploadToIPFS = async <T extends ProposalMetadata | IPFSContent>(
 
     const result = await response.json();
     const ipfsHash = result.IpfsHash;
-    console.log('Upload successful. IPFS hash:', ipfsHash);
+    console.log('Upload successful! IPFS hash:', ipfsHash);
+    console.log('=== IPFS Upload Complete ===\n');
     
     return ipfsHash;
   } catch (error) {
