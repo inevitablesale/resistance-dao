@@ -18,6 +18,15 @@ import { ProposalListItem } from "./ProposalListItem";
 
 const MIN_LGR_REQUIRED = "1";
 
+// First, let's define a type for the initial proposal data
+interface InitialProposalData {
+  tokenId: string;
+  creator: string;
+  blockNumber: number;
+  transactionHash: string;
+  isLoading: boolean;
+}
+
 interface NFTMetadata extends IPFSContent {
   name: string;
   description: string;
@@ -183,20 +192,25 @@ export const ProposalsHistory = () => {
         const events = await contract.queryFilter(filter);
         console.log('Found proposal events:', events.length);
 
-        // Safely extract data from events
-        const initialProposals = events.map(event => {
-          if (!event.args) {
-            console.warn('Event missing args:', event);
-            return null;
-          }
-          return {
-            tokenId: event.args.tokenId?.toString() || '',
-            creator: event.args.creator || '',
-            blockNumber: event.blockNumber || 0,
-            transactionHash: event.transactionHash || '',
-            isLoading: true
-          };
-        }).filter((proposal): proposal is ProposalEvent => proposal !== null);
+        // Safely extract data from events with proper typing
+        const initialProposals = events
+          .map(event => {
+            if (!event.args) {
+              console.warn('Event missing args:', event);
+              return null;
+            }
+            
+            const proposal: InitialProposalData = {
+              tokenId: event.args.tokenId?.toString() || '',
+              creator: event.args.creator || '',
+              blockNumber: event.blockNumber || 0,
+              transactionHash: event.transactionHash || '',
+              isLoading: true
+            };
+            
+            return proposal;
+          })
+          .filter((proposal): proposal is InitialProposalData => proposal !== null);
 
         // Sort by block number (newest first) and set initial state
         initialProposals.sort((a, b) => b.blockNumber - a.blockNumber);
