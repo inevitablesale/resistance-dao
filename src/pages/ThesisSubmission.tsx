@@ -2,45 +2,20 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { HelpCircle } from "lucide-react";
+import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { File, DollarSign, Users, MessageSquare, Timer, HelpCircle } from "lucide-react";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput, convertToWei } from "@/components/thesis/TargetCapitalInput";
-import { 
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator 
-} from "@/components/ui/breadcrumb";
-import { Link, useNavigate } from "react-router-dom";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { uploadToIPFS } from "@/services/ipfsService";
 import { ProposalMetadata } from "@/types/proposals";
 import { useToast } from "@/hooks/use-toast";
 import { waitForProposalCreation } from "@/services/eventListenerService";
-import { sepolia, mainnet, polygonMumbai, polygon } from 'viem/chains';
+import { mainnet, polygon, polygonMumbai } from 'viem/chains';
 import { ethers } from 'ethers';
 
 const thesisFormSchema = z.object({
@@ -72,64 +47,8 @@ const thesisFormSchema = z.object({
   }),
 });
 
-const sampleFormData = {
-  title: "Revolutionizing Small Business Accounting with Blockchain",
-  description: "Implementing a decentralized accounting system that leverages blockchain technology to provide transparent, immutable, and efficient financial tracking for small businesses.",
-  category: "DeFi Infrastructure",
-  investment: {
-    targetCapital: "1000000",
-    description: "The funds will be used to develop the core infrastructure, build user interfaces, conduct security audits, and launch marketing campaigns to drive adoption.",
-  },
-  votingDuration: 30 * 24 * 60 * 60, // 30 days in seconds
-  linkedInURL: "https://linkedin.com/in/sample-profile",
-  blockchain: ["Ethereum", "Polygon"],
-  fundingBreakdown: [
-    { category: "Development", amount: "400000" },
-    { category: "Security Audits", amount: "200000" },
-    { category: "Marketing", amount: "200000" },
-    { category: "Operations", amount: "200000" }
-  ],
-  investmentDrivers: [
-    "Market Demand",
-    "Technological Innovation",
-    "Scalability"
-  ],
-  backerIncentives: {
-    utility: "Access to premium features",
-    governance: "Voting rights on protocol upgrades",
-    NFTRewards: "Exclusive NFT collection for early backers",
-    tokenAllocation: "5% of total token supply"
-  },
-  team: [
-    {
-      name: "Jane Smith",
-      role: "Lead Developer",
-      linkedin: "https://linkedin.com/in/jane-smith",
-      github: "https://github.com/janesmith"
-    }
-  ],
-  roadmap: [
-    {
-      milestone: "MVP Launch",
-      expectedDate: "2024-06-30",
-      status: "Pending"
-    },
-    {
-      milestone: "Security Audit",
-      expectedDate: "2024-08-30",
-      status: "Pending"
-    }
-  ],
-  socials: {
-    twitter: "https://twitter.com/sample",
-    discord: "https://discord.gg/sample",
-    telegram: "https://t.me/sample"
-  }
-};
-
 export default function ThesisSubmission() {
   const { toast } = useToast();
-  const navigate = useNavigate();
   const { primaryWallet } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -143,19 +62,11 @@ export default function ThesisSubmission() {
         targetCapital: "",
         description: "",
       },
-      votingDuration: 30 * 24 * 60 * 60, // 30 days default
+      votingDuration: 7 * 24 * 60 * 60, // 7 days default
       linkedInURL: "",
       blockchain: [],
     }
   });
-
-  const fillFormWithSampleData = () => {
-    form.reset(sampleFormData);
-    toast({
-      title: "Form Filled",
-      description: "Sample data has been loaded into the form.",
-    });
-  };
 
   async function onSubmit(values: z.infer<typeof thesisFormSchema>) {
     setIsSubmitting(true);
@@ -265,281 +176,302 @@ export default function ThesisSubmission() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pb-20">
-      <div className="container mx-auto px-4 pt-24">
-        <Breadcrumb className="mb-8">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Submit Thesis</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
-        <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-4xl font-bold text-white mb-2">Submit Your Thesis</h1>
-              <p className="text-gray-400">Create a proposal for the community to review and back.</p>
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-3xl mx-auto px-4 py-12">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Project Overview Section */}
+            <div className="bg-[#111111] rounded-lg p-6 space-y-6">
+              <div className="flex items-center gap-2 text-lg font-medium">
+                <File className="w-5 h-5" />
+                <span>Project Overview</span>
+              </div>
+              <div className="grid gap-6">
+                <div>
+                  <Label className="text-sm text-gray-400">Title</Label>
+                  <Input
+                    {...form.register("title")}
+                    placeholder="Enter your project title"
+                    className="mt-1 bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-400">Category</Label>
+                  <Input
+                    {...form.register("category")}
+                    placeholder="e.g., DeFi, NFT, Gaming"
+                    className="mt-1 bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-400">Description</Label>
+                  <Textarea
+                    {...form.register("description")}
+                    placeholder="Describe your project's vision and goals..."
+                    className="mt-1 bg-black/50 border-white/10 text-white placeholder:text-gray-600 min-h-[100px]"
+                  />
+                </div>
+              </div>
             </div>
-            <Button
-              onClick={fillFormWithSampleData}
-              variant="outline"
-              className="border-yellow-500/50 hover:bg-yellow-500/10 text-yellow-500"
+
+            {/* Investment Details Section */}
+            <div className="bg-[#111111] rounded-lg p-6 space-y-6">
+              <div className="flex items-center gap-2 text-lg font-medium">
+                <DollarSign className="w-5 h-5" />
+                <span>Investment Details</span>
+              </div>
+              <div className="space-y-6">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Label className="text-sm text-gray-400">Target Capital</Label>
+                    <HelpCircle className="w-4 h-4 text-gray-500" />
+                  </div>
+                  <TargetCapitalInput
+                    value={form.watch("investment.targetCapital")}
+                    onChange={(value) => form.setValue("investment.targetCapital", value)}
+                    error={form.formState.errors.investment?.targetCapital ? [form.formState.errors.investment.targetCapital.message || ""] : undefined}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Input
+                      placeholder="Smart Contract Development"
+                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Amount in RD"
+                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Input
+                      placeholder="Security Audit"
+                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Amount in RD"
+                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Input
+                      placeholder="Marketing & Community"
+                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Amount in RD"
+                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Input
+                      placeholder="Operations & Legal"
+                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Amount in RD"
+                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Timer className="w-5 h-5" />
+                    <Label className="text-sm text-gray-400">Voting Duration</Label>
+                    <HelpCircle className="w-4 h-4 text-gray-500" />
+                  </div>
+                  <VotingDurationInput
+                    value={form.watch("votingDuration")}
+                    onChange={(value) => form.setValue("votingDuration", value[0])}
+                    error={form.formState.errors.votingDuration ? [form.formState.errors.votingDuration.message || ""] : undefined}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Investment Drivers & Incentives */}
+            <div className="bg-[#111111] rounded-lg p-6 space-y-6">
+              <div className="flex items-center gap-2 text-lg font-medium">
+                <Users className="w-5 h-5" />
+                <span>Investment Drivers & Incentives</span>
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <Label className="text-sm text-gray-400">Investment Drivers</Label>
+                  <Input
+                    placeholder="Key driver #1"
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                  />
+                  <Input
+                    placeholder="Key driver #2"
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                  />
+                  <Input
+                    placeholder="Key driver #3"
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                  />
+                  <Input
+                    placeholder="Key driver #4"
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <Label className="text-sm text-gray-400">Backer Incentives</Label>
+                  <Input
+                    placeholder="Utility (e.g., Early access)"
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                  />
+                  <Input
+                    placeholder="Governance rights"
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                  />
+                  <Input
+                    placeholder="NFT rewards"
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                  />
+                  <Input
+                    placeholder="Token allocation"
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Team & Roadmap */}
+            <div className="bg-[#111111] rounded-lg p-6 space-y-6">
+              <div className="flex items-center gap-2 text-lg font-medium">
+                <Users className="w-5 h-5" />
+                <span>Team & Roadmap</span>
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <Label className="text-sm text-gray-400">Team Members</Label>
+                  <div className="space-y-2">
+                    <Input
+                      placeholder="Team member 1 name"
+                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input
+                        placeholder="Role"
+                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                      />
+                      <Input
+                        placeholder="LinkedIn URL"
+                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Input
+                      placeholder="Team member 2 name"
+                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input
+                        placeholder="Role"
+                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                      />
+                      <Input
+                        placeholder="LinkedIn URL"
+                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <Label className="text-sm text-gray-400">Roadmap Milestones</Label>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Input
+                        placeholder="Milestone 1"
+                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                      />
+                      <div className="flex items-center justify-between gap-2">
+                        <Input
+                          placeholder="Expected Date (Q2 2025)"
+                          className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                        />
+                        <Button variant="outline" className="border-white/10 text-white">
+                          Pending
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Input
+                        placeholder="Milestone 2"
+                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                      />
+                      <div className="flex items-center justify-between gap-2">
+                        <Input
+                          placeholder="Expected Date (Q2 2025)"
+                          className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                        />
+                        <Button variant="outline" className="border-white/10 text-white">
+                          Pending
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Links */}
+            <div className="bg-[#111111] rounded-lg p-6 space-y-6">
+              <div className="flex items-center gap-2 text-lg font-medium">
+                <MessageSquare className="w-5 h-5" />
+                <span>Social Links</span>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <Input
+                  placeholder="Twitter URL"
+                  className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                />
+                <Input
+                  placeholder="Discord URL"
+                  className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                />
+                <Input
+                  placeholder="Telegram URL"
+                  className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                />
+              </div>
+            </div>
+
+            {/* Submit Section */}
+            <div className="bg-[#0a1020] rounded-lg p-6">
+              <div className="flex items-start gap-3">
+                <div className="shrink-0 mt-1">ℹ️</div>
+                <p className="text-sm text-gray-400">
+                  Your proposal will be minted as an NFT, representing a binding smart contract. A fee of 25 RD tokens is required to submit.
+                </p>
+              </div>
+            </div>
+
+            <Button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="w-full bg-[#9b87f5] hover:bg-[#8b77e5] text-white py-6 text-lg font-medium"
             >
-              Fill Sample Data
+              {isSubmitting ? "Submitting..." : "Launch Proposal →"}
             </Button>
-          </div>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <Card className="bg-gray-900/50 border-white/10">
-                <CardHeader>
-                  <CardTitle className="text-2xl">Thesis Information</CardTitle>
-                  <CardDescription>Enter the basic details of your thesis.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center justify-between">
-                          <FormLabel className="text-lg font-medium text-white flex items-center gap-2">
-                            Thesis Title
-                            <HelpCircle className="h-4 w-4 text-gray-400" />
-                          </FormLabel>
-                        </div>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., Decentralized Accounting for Small Businesses"
-                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center justify-between">
-                          <FormLabel className="text-lg font-medium text-white flex items-center gap-2">
-                            Thesis Description
-                            <HelpCircle className="h-4 w-4 text-gray-400" />
-                          </FormLabel>
-                        </div>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Explain your thesis in detail"
-                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 resize-none"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center justify-between">
-                          <FormLabel className="text-lg font-medium text-white flex items-center gap-2">
-                            Category
-                            <HelpCircle className="h-4 w-4 text-gray-400" />
-                          </FormLabel>
-                        </div>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., DeFi, Infrastructure, Tooling"
-                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gray-900/50 border-white/10">
-                <CardHeader>
-                  <CardTitle className="text-2xl">Investment Details</CardTitle>
-                  <CardDescription>Provide details about the investment opportunity.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="investment.targetCapital"
-                    render={({ field }) => (
-                      <FormItem>
-                        <TargetCapitalInput
-                          value={field.value}
-                          onChange={field.onChange}
-                          error={form.formState.errors.investment?.targetCapital ? [form.formState.errors.investment.targetCapital.message || ""] : undefined}
-                        />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="investment.description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center justify-between">
-                          <FormLabel className="text-lg font-medium text-white flex items-center gap-2">
-                            Investment Description
-                            <HelpCircle className="h-4 w-4 text-gray-400" />
-                          </FormLabel>
-                        </div>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Explain how the funds will be used"
-                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 resize-none"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gray-900/50 border-white/10">
-                <CardHeader>
-                  <CardTitle className="text-2xl">Voting Duration</CardTitle>
-                  <CardDescription>Set the duration for community voting.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="votingDuration"
-                    render={({ field }) => (
-                      <FormItem>
-                        <VotingDurationInput
-                          value={field.value}
-                          onChange={(value) => field.onChange(value[0])}
-                          error={form.formState.errors.votingDuration ? [form.formState.errors.votingDuration.message || ""] : undefined}
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gray-900/50 border-white/10">
-                <CardHeader>
-                  <CardTitle className="text-2xl">Additional Information</CardTitle>
-                  <CardDescription>Provide additional details for the proposal.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="linkedInURL"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center justify-between">
-                          <FormLabel className="text-lg font-medium text-white flex items-center gap-2">
-                            LinkedIn URL
-                            <HelpCircle className="h-4 w-4 text-gray-400" />
-                          </FormLabel>
-                        </div>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., linkedin.com/in/yourprofile"
-                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="blockchain"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="mb-4 flex items-center justify-between">
-                          <FormLabel className="text-lg font-medium text-white flex items-center gap-2">
-                            Supported Blockchains
-                            <HelpCircle className="h-4 w-4 text-gray-400" />
-                          </FormLabel>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id="ethereum"
-                              checked={field.value.includes("Ethereum")}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  field.onChange([...field.value, "Ethereum"]);
-                                } else {
-                                  field.onChange(field.value.filter((v) => v !== "Ethereum"));
-                                }
-                              }}
-                            />
-                            <Label htmlFor="ethereum" className="text-white">Ethereum</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id="polygon"
-                              checked={field.value.includes("Polygon")}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  field.onChange([...field.value, "Polygon"]);
-                                } else {
-                                  field.onChange(field.value.filter((v) => v !== "Polygon"));
-                                }
-                              }}
-                            />
-                            <Label htmlFor="polygon" className="text-white">Polygon</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id="solana"
-                              checked={field.value.includes("Solana")}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  field.onChange([...field.value, "Solana"]);
-                                } else {
-                                  field.onChange(field.value.filter((v) => v !== "Solana"));
-                                }
-                              }}
-                            />
-                            <Label htmlFor="solana" className="text-white">Solana</Label>
-                          </div>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
-
-              <Button disabled={isSubmitting} type="submit" className="w-full bg-yellow-500 hover:bg-yellow-600 text-white">
-                {isSubmitting ? "Submitting..." : "Submit Thesis"}
-              </Button>
-            </form>
-          </Form>
-        </div>
+          </form>
+        </Form>
       </div>
     </div>
   );
