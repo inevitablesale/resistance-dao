@@ -1,7 +1,7 @@
 
 import { ProposalsHistory } from "@/components/proposals/ProposalsHistory";
 import { Button } from "@/components/ui/button";
-import { FileText, Plus, Building2, HandCoins, TrendingUp, MessageSquare, Sparkles } from "lucide-react";
+import { FileText, Plus, BrainCircuit, Layers, Network, Blocks } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 const Proposals = () => {
   const navigate = useNavigate();
   const processSteps = [{
-    icon: HandCoins,
+    icon: Layers,
     title: "Initial Voting",
     description: "Support early-stage proposals with a minimal voting fee. Just 1 LGR to participate and show genuine interest.",
     points: [
@@ -19,7 +19,7 @@ const Proposals = () => {
       "Monitor proposal traction"
     ]
   }, {
-    icon: TrendingUp,
+    icon: Network,
     title: "Community Building",
     description: "Track how proposals gain DAO support. Each vote brings the project closer to its funding goal.",
     points: [
@@ -28,7 +28,7 @@ const Proposals = () => {
       "Get milestone alerts"
     ]
   }, {
-    icon: MessageSquare,
+    icon: Blocks,
     title: "Token Launch",
     description: "When voting goals are met, creators work with the DAO community to launch their Web3 project.",
     points: [
@@ -39,172 +39,49 @@ const Proposals = () => {
   }];
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="relative overflow-hidden">
-        {/* Enhanced background with multiple layers */}
-        <div className="absolute inset-0">
-          <div className="circuit-board opacity-20" />
-          <div className="absolute inset-0">
-            {/* Animated grid lines */}
-            <motion.div 
-              className="absolute inset-0"
-              style={{
-                backgroundImage: 'linear-gradient(to right, rgba(59, 130, 246, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(59, 130, 246, 0.1) 1px, transparent 1px)',
-                backgroundSize: '40px 40px'
-              }}
-              animate={{
-                backgroundPosition: ['0px 0px', '40px 40px']
-              }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-            />
-            
-            {/* Floating orbs */}
-            <motion.div
-              className="absolute w-[500px] h-[500px] rounded-full bg-blue-500/5 blur-3xl"
-              animate={{
-                x: ['-25%', '25%'],
-                y: ['-15%', '15%']
-              }}
-              transition={{
-                duration: 15,
-                repeat: Infinity,
-                yoyo: true,
-                ease: "easeInOut"
-              }}
-              style={{
-                top: '20%',
-                left: '60%'
-              }}
-            />
-            
-            <motion.div
-              className="absolute w-[300px] h-[300px] rounded-full bg-blue-400/5 blur-2xl"
-              animate={{
-                x: ['25%', '-25%'],
-                y: ['15%', '-15%']
-              }}
-              transition={{
-                duration: 12,
-                repeat: Infinity,
-                yoyo: true,
-                ease: "easeInOut"
-              }}
-              style={{
-                top: '50%',
-                left: '30%'
-              }}
-            />
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/95 to-black/90" />
+    <div className="min-h-screen bg-[#0A0A0A]">
+      {/* Hero Section with Asymmetrical Design */}
+      <div className="relative">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute w-full h-full bg-gradient-to-b from-purple-900/20 to-transparent" />
+          <div className="absolute w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJub25lIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9zdmc+')] opacity-10" />
         </div>
 
-        {/* Main content */}
-        <div className="container mx-auto px-4 pt-32 pb-20 relative z-10">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-16"
-          >
-            <motion.div 
-              className="mb-8 relative cyber-box p-8 inline-block"
-              whileHover={{ scale: 1.02 }}
-            >
+        <div className="container mx-auto">
+          <div className="flex flex-col lg:flex-row items-start gap-12 pt-32 pb-20 px-4">
+            {/* Left Column - Main Content */}
+            <div className="flex-1 relative z-10">
               <motion.div
-                animate={{
-                  rotateY: [0, 360]
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
               >
-                <Building2 className="w-16 h-16 mx-auto text-blue-400" />
-              </motion.div>
-              {[...Array(4)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute -top-2 -right-2"
-                  animate={{
-                    rotate: [0, 360],
-                    opacity: [0, 1, 0],
-                    scale: [0.8, 1.2, 0.8]
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    delay: i * 1,
-                    ease: "easeInOut"
-                  }}
+                <div className="inline-flex items-center space-x-2 bg-purple-900/20 rounded-full px-4 py-2 mb-6">
+                  <BrainCircuit className="w-4 h-4 text-purple-400" />
+                  <span className="text-sm text-purple-400">Resistance DAO Proposals</span>
+                </div>
+                <h1 className="text-5xl font-bold mb-6 text-white">
+                  Shape the Future of 
+                  <span className="block mt-2 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                    Decentralized Innovation
+                  </span>
+                </h1>
+                <p className="text-lg text-zinc-400 mb-8 max-w-xl">
+                  Join the Resistance DAO community in discovering and supporting innovative Web3 projects. 
+                  Vote on proposals, track progress, and participate in token launches.
+                </p>
+                <Button 
+                  onClick={() => navigate('/thesis')} 
+                  className="relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg font-semibold text-lg"
                 >
-                  <Sparkles className="w-6 h-6 text-blue-400" />
-                </motion.div>
-              ))}
-            </motion.div>
-            
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              <motion.span 
-                className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300"
-                animate={{
-                  backgroundPosition: ['0% center', '200% center']
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-                style={{
-                  backgroundSize: '200% auto'
-                }}
-              >
-                DeFi-Powered Launch Platform
-              </motion.span>
-            </h1>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto mb-8">
-              Join the Resistance DAO community in discovering and supporting innovative Web3 projects. 
-              Vote on proposals, track progress, and participate in token launches.
-            </p>
-            
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Button 
-                onClick={() => navigate('/thesis')} 
-                className="relative px-8 py-6 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-lg font-bold text-xl transition-all duration-300 shadow-lg shadow-blue-500/20 overflow-hidden group"
-              >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                  animate={{
-                    x: ['-100%', '100%']
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    repeatDelay: 3
-                  }}
-                />
-                <Plus className="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
-                Submit Proposal
-              </Button>
-            </motion.div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mb-20"
-          >
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-blue-300 mb-4">How Proposal Voting Works</h2>
+                  <Plus className="w-5 h-5 mr-2" />
+                  Submit Proposal
+                </Button>
+              </motion.div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            {/* Right Column - Process Steps */}
+            <div className="lg:w-[450px] space-y-4">
               {processSteps.map((step, index) => {
                 const Icon = step.icon;
                 return (
@@ -212,76 +89,50 @@ const Proposals = () => {
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 + index * 0.1 }}
-                    whileHover={{ y: -5 }}
-                    className="group"
+                    transition={{ delay: 0.2 + index * 0.1 }}
                   >
-                    <Card className="cyber-box p-6 bg-black/40 border border-blue-500/20 hover:border-blue-500/40 h-full relative overflow-hidden">
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0"
-                        animate={{
-                          x: ['-200%', '200%']
-                        }}
-                        transition={{
-                          duration: 3,
-                          repeat: Infinity,
-                          repeatDelay: 1
-                        }}
-                      />
-                      <div className="flex flex-col h-full relative">
-                        <motion.div 
-                          className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/10 mb-6 mx-auto"
-                          whileHover={{ scale: 1.1, rotate: 5 }}
-                        >
-                          <Icon className="w-6 h-6 text-blue-400 group-hover:scale-110 transition-transform duration-300" />
-                        </motion.div>
-                        <h3 className="text-xl font-bold text-blue-300 mb-3 text-center group-hover:text-blue-200 transition-colors">{step.title}</h3>
-                        <p className="text-white/60 mb-6 text-center">{step.description}</p>
-                        <ul className="space-y-2 mt-auto">
-                          {step.points.map((point, pointIndex) => (
-                            <motion.li 
-                              key={pointIndex}
-                              className="flex items-center text-white/80 group-hover:text-white/90 transition-colors"
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.6 + index * 0.1 + pointIndex * 0.1 }}
-                            >
-                              <motion.div 
-                                className="w-1.5 h-1.5 rounded-full bg-blue-400 mr-2"
-                                animate={{
-                                  scale: [1, 1.2, 1],
-                                }}
-                                transition={{
-                                  duration: 2,
-                                  repeat: Infinity,
-                                  delay: pointIndex * 0.3
-                                }}
-                              />
-                              {point}
-                            </motion.li>
-                          ))}
-                        </ul>
+                    <Card className="bg-zinc-900/50 border-zinc-800/50 backdrop-blur-sm p-6 hover:bg-zinc-900/70 transition-all duration-300">
+                      <div className="flex gap-4">
+                        <div className="flex-shrink-0">
+                          <div className="w-10 h-10 rounded-lg bg-purple-900/20 flex items-center justify-center">
+                            <Icon className="w-5 h-5 text-purple-400" />
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>
+                          <p className="text-sm text-zinc-400 mb-3">{step.description}</p>
+                          <ul className="space-y-1">
+                            {step.points.map((point, i) => (
+                              <li key={i} className="text-sm text-zinc-500 flex items-center gap-2">
+                                <div className="w-1 h-1 rounded-full bg-purple-400" />
+                                {point}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
                     </Card>
                   </motion.div>
                 );
               })}
             </div>
-          </motion.div>
+          </div>
+        </div>
+      </div>
 
+      {/* Proposals Section */}
+      <div className="bg-gradient-to-b from-zinc-900/50 to-transparent">
+        <div className="container mx-auto px-4 py-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="relative z-10"
+            transition={{ delay: 0.4 }}
           >
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-blue-400" />
-                </div>
-                <h2 className="text-2xl font-bold text-blue-300">Active Proposals</h2>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 rounded-lg bg-purple-900/20 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-purple-400" />
               </div>
+              <h2 className="text-2xl font-bold text-white">Active Proposals</h2>
             </div>
             <ProposalsHistory />
           </motion.div>
