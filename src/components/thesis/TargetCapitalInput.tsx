@@ -4,7 +4,6 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { HelpCircle } from "lucide-react";
 import { ethers } from "ethers";
-import { LGR_PRICE_USD } from "@/lib/constants";
 
 interface TargetCapitalInputProps {
   value: string;
@@ -12,34 +11,31 @@ interface TargetCapitalInputProps {
   error?: string[];
 }
 
-// Constants in LGR terms
-const MIN_TARGET_CAPITAL_LGR = 1000;
-const MAX_TARGET_CAPITAL_LGR = 25000000;
+// Constants for validation
+const MIN_TARGET_CAPITAL = 1000;
+const MAX_TARGET_CAPITAL = 25000000;
 
 // Helper to ensure the value fits in uint128
 const MAX_UINT128 = ethers.BigNumber.from(2).pow(128).sub(1);
 
-export const convertUSDToLGRWei = (lgrAmount: string): ethers.BigNumber => {
-  if (!lgrAmount || isNaN(parseFloat(lgrAmount))) {
+export const convertToWei = (amount: string): ethers.BigNumber => {
+  if (!amount || isNaN(parseFloat(amount))) {
     throw new Error("Invalid amount");
   }
   
-  // Convert string to number and validate
-  const lgrValue = parseFloat(lgrAmount);
-  const wholeLGRAmount = Math.floor(lgrValue);
+  const value = parseFloat(amount);
+  const wholeAmount = Math.floor(value);
   
-  if (wholeLGRAmount < MIN_TARGET_CAPITAL_LGR) {
-    throw new Error(`Minimum target capital is ${MIN_TARGET_CAPITAL_LGR.toLocaleString()} LGR ($${(MIN_TARGET_CAPITAL_LGR * LGR_PRICE_USD).toLocaleString()} USD)`);
+  if (wholeAmount < MIN_TARGET_CAPITAL) {
+    throw new Error(`Minimum target capital is ${MIN_TARGET_CAPITAL.toLocaleString()}`);
   }
-  if (wholeLGRAmount > MAX_TARGET_CAPITAL_LGR) {
-    throw new Error(`Maximum target capital is ${MAX_TARGET_CAPITAL_LGR.toLocaleString()} LGR ($${(MAX_TARGET_CAPITAL_LGR * LGR_PRICE_USD).toLocaleString()} USD)`);
+  if (wholeAmount > MAX_TARGET_CAPITAL) {
+    throw new Error(`Maximum target capital is ${MAX_TARGET_CAPITAL.toLocaleString()}`);
   }
   
   try {
-    // Convert the whole LGR amount to wei (18 decimals)
-    const weiValue = ethers.utils.parseUnits(wholeLGRAmount.toString(), 18);
+    const weiValue = ethers.utils.parseUnits(wholeAmount.toString(), 18);
     
-    // Validate that the value fits in uint128
     if (weiValue.gt(MAX_UINT128)) {
       console.error("Value exceeds uint128 max:", {
         weiValue: weiValue.toString(),
@@ -48,11 +44,10 @@ export const convertUSDToLGRWei = (lgrAmount: string): ethers.BigNumber => {
       throw new Error("Amount too large for contract (exceeds uint128)");
     }
 
-    // Log the conversion details
     console.log("Target capital conversion:", {
-      inputAmount: lgrAmount,
-      wholeLGRAmount,
-      weiValueDecimal: weiValue.toString(),
+      inputAmount: amount,
+      wholeAmount,
+      weiValue: weiValue.toString(),
       weiValueHex: weiValue.toHexString(),
       fits_uint128: weiValue.lte(MAX_UINT128)
     });
@@ -75,7 +70,7 @@ export const TargetCapitalInput = ({
     // Ensure only one decimal point
     const parts = numericValue.split('.');
     if (parts.length > 2) return value;
-    // No decimals allowed for LGR tokens
+    // No decimals allowed
     if (parts.length > 1) {
       return parts[0];
     }
@@ -87,26 +82,15 @@ export const TargetCapitalInput = ({
     onChange(formattedValue);
   };
 
-  const calculateUSDAmount = (lgrAmount: string): string => {
-    if (!lgrAmount) return "0";
-    const lgrValue = parseFloat(lgrAmount);
-    if (isNaN(lgrValue)) return "0";
-    const usdAmount = lgrValue * LGR_PRICE_USD;
-    return usdAmount.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  };
-
   const getHelperText = () => {
     if (!value) return "";
-    const lgrValue = parseFloat(value);
-    if (isNaN(lgrValue)) return "Please enter a valid number";
-    if (lgrValue < MIN_TARGET_CAPITAL_LGR) {
-      return `Minimum target capital is ${MIN_TARGET_CAPITAL_LGR.toLocaleString()} LGR`;
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) return "Please enter a valid number";
+    if (numValue < MIN_TARGET_CAPITAL) {
+      return `Minimum target capital is ${MIN_TARGET_CAPITAL.toLocaleString()}`;
     }
-    if (lgrValue > MAX_TARGET_CAPITAL_LGR) {
-      return `Maximum target capital is ${MAX_TARGET_CAPITAL_LGR.toLocaleString()} LGR`;
+    if (numValue > MAX_TARGET_CAPITAL) {
+      return `Maximum target capital is ${MAX_TARGET_CAPITAL.toLocaleString()}`;
     }
     return "";
   };
@@ -115,17 +99,17 @@ export const TargetCapitalInput = ({
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <Label className="text-lg font-medium text-white mb-2 flex items-center gap-2">
-          Target Capital (LGR)
+          Target Capital
           <HelpCircle className="h-4 w-4 text-gray-400" />
         </Label>
         <div className="text-sm text-gray-400">
-          {value && `≈ $${calculateUSDAmount(value)} USD`}
+          {value && `Target: ${parseInt(value).toLocaleString()}`}
         </div>
       </div>
       <div className="relative">
         <Input
           type="text"
-          placeholder="Enter amount in LGR"
+          placeholder="Enter target amount"
           className={cn(
             "bg-black/50 border-white/10 text-white placeholder:text-gray-500 pl-12",
             error ? "border-red-500" : ""
@@ -133,7 +117,7 @@ export const TargetCapitalInput = ({
           value={value}
           onChange={handleChange}
         />
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">LGR</span>
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
       </div>
       {(error || getHelperText()) && (
         <p className="text-sm text-red-500">

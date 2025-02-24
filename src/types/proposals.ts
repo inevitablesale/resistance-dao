@@ -2,8 +2,8 @@
 import { ethers } from "ethers";
 
 export interface TeamMember {
-  name: string;
-  role: string;
+  name?: string;
+  role?: string;
   linkedin?: string;
   github?: string;
 }
@@ -20,10 +20,10 @@ export interface FundingBreakdown {
 }
 
 export interface BackerIncentives {
-  utility: string;
-  governance: string;
-  NFTRewards: string;
-  tokenAllocation: string;
+  utility?: string;
+  governance?: string;
+  NFTRewards?: string;
+  tokenAllocation?: string;
 }
 
 export interface ProposalSocials {
@@ -41,21 +41,21 @@ export interface ContractProposal {
 
 export interface ProposalMetadata {
   title: string;
-  description: string;
-  category: string;
+  description?: string;
+  category?: string;
   investment: {
     targetCapital: string;
     description: string;
   };
   votingDuration: number;
   linkedInURL: string;
-  blockchain: string[];
-  fundingBreakdown: FundingBreakdown[];
-  investmentDrivers: string[];
-  backerIncentives: BackerIncentives;
-  team: TeamMember[];
-  roadmap: RoadmapMilestone[];
-  socials: ProposalSocials;
+  blockchain?: string[];
+  fundingBreakdown?: FundingBreakdown[];
+  investmentDrivers?: string[];
+  backerIncentives?: BackerIncentives;
+  team?: TeamMember[];
+  roadmap?: RoadmapMilestone[];
+  socials?: ProposalSocials;
   isTestMode?: boolean;
   submissionTimestamp?: number;
   submitter?: string;
