@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -70,24 +71,24 @@ const thesisFormSchema = z.object({
   ).optional(),
   investmentDrivers: z.array(z.string()).optional(),
   backerIncentives: z.object({
-    utility: z.string(),
-    governance: z.string(),
-    NFTRewards: z.string(),
-    tokenAllocation: z.string(),
+    utility: z.string().optional(),
+    governance: z.string().optional(),
+    NFTRewards: z.string().optional(),
+    tokenAllocation: z.string().optional(),
   }).optional(),
   team: z.array(
     z.object({
-      name: z.string(),
-      role: z.string(),
+      name: z.string().optional(),
+      role: z.string().optional(),
       linkedin: z.string().optional(),
       github: z.string().optional(),
     })
   ).optional(),
   roadmap: z.array(
     z.object({
-      milestone: z.string(),
-      expectedDate: z.string(),
-      status: z.enum(["Pending", "In Progress", "Completed"]),
+      milestone: z.string().optional(),
+      expectedDate: z.string().optional(),
+      status: z.enum(["Pending", "In Progress", "Completed"]).optional(),
     })
   ).optional(),
   socials: z.object({
