@@ -167,3 +167,15 @@ export interface ProposalContractTuple {
   targetCapital: string;
   votingDuration: number;
 }
+
+export interface ProposalEvent {
+  tokenId: string;
+  creator: string;
+  blockNumber: number;
+  transactionHash: string;
+  isLoading: boolean;
+  metadata?: ProposalMetadata;
+  nftMetadata?: NFTMetadata;
+  pledgedAmount?: string;
+  error?: string;
+}

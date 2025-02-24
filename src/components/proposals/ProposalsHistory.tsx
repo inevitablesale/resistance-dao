@@ -8,7 +8,7 @@ import { ethers } from "ethers";
 import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS, LGR_PRICE_USD } from "@/lib/constants";
 import { getTokenBalance } from "@/services/tokenService";
 import { getFromIPFS } from "@/services/ipfsService";
-import { ProposalMetadata } from "@/types/proposals";
+import { ProposalMetadata, ProposalEvent } from "@/types/proposals";
 import { useToast } from "@/hooks/use-toast";
 import { IPFSContent } from "@/types/content";
 import { loadingStates } from "./LoadingStates";
@@ -17,31 +17,11 @@ import { ProposalListItem } from "./ProposalListItem";
 
 const MIN_LGR_REQUIRED = "1";
 
-interface InitialProposalData {
-  tokenId: string;
-  creator: string;
-  blockNumber: number;
-  transactionHash: string;
-  isLoading: boolean;
-}
-
 interface NFTMetadata extends IPFSContent {
   name: string;
   description: string;
   image?: string;
   attributes?: Array<{ trait_type: string; value: string }>;
-}
-
-interface ProposalEvent {
-  tokenId: string;
-  creator: string;
-  blockNumber: number;
-  transactionHash: string;
-  metadata?: ProposalMetadata;
-  nftMetadata?: NFTMetadata;
-  pledgedAmount?: string;
-  isLoading?: boolean;
-  error?: string;
 }
 
 export const ProposalsHistory = () => {
@@ -213,13 +193,15 @@ export const ProposalsHistory = () => {
               return null;
             }
             
-            return {
+            const proposal: ProposalEvent = {
               tokenId: event.args.tokenId.toString(),
               creator: event.args.creator,
               blockNumber: event.blockNumber,
               transactionHash: event.transactionHash,
               isLoading: true
             };
+            
+            return proposal;
           })
           .filter((proposal): proposal is ProposalEvent => proposal !== null);
 
