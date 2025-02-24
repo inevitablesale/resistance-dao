@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -158,10 +159,9 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
         console.log(`Getting tokenURI, pledged amount, and vote events for token #${tokenId}`);
         
-        const [tokenUri, pledged] = await Promise.all([
-          factoryContract.tokenURI(tokenId),
-          factoryContract.pledgedAmount(tokenId)
-        ]);
+        // Get proposal details from the proposals mapping
+        const proposalData = await factoryContract.proposals(tokenId);
+        const tokenUri = await factoryContract.tokenURI(tokenId);
         setLoadingProgress(50);
 
         console.log('Querying ProposalVoted events...');
@@ -169,10 +169,10 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         const events = await factoryContract.queryFilter(filter);
         
         console.log('Token URI:', tokenUri);
-        console.log('Pledged amount:', ethers.utils.formatEther(pledged));
+        console.log('Pledged amount:', ethers.utils.formatEther(proposalData.totalPledged));
         console.log('Vote events count:', events.length);
         
-        setPledgedAmount(ethers.utils.formatEther(pledged));
+        setPledgedAmount(ethers.utils.formatEther(proposalData.totalPledged));
         setBackerCount(events.length);
         setLoadingProgress(60);
 
