@@ -119,159 +119,159 @@ const completeFormData = {
   }
 };
 
-const form = useForm<z.infer<typeof thesisFormSchema>>({
-  resolver: zodResolver(thesisFormSchema),
-  defaultValues: {
-    title: "",
-    description: "",
-    category: "",
-    external_url: "",
-    image: "",
-    investment: {
-      targetCapital: "",
-      description: "",
-    },
-    fundingBreakdown: [
-      { category: "", amount: "" },
-      { category: "", amount: "" },
-      { category: "", amount: "" },
-      { category: "", amount: "" }
-    ],
-    team: [
-      { name: "", role: "", linkedin: "", github: "" },
-      { name: "", role: "", linkedin: "", github: "" }
-    ],
-    votingDuration: 7 * 24 * 60 * 60,
-    linkedInURL: "",
-    blockchain: [],
-    socials: {
-      twitter: "",
-      discord: "",
-      telegram: "",
-    },
-  }
-});
-
-const fillRequiredData = () => {
-  form.reset(requiredFormData);
-  toast({
-    title: "Required Data Loaded",
-    description: "Form has been filled with required fields only.",
-  });
-};
-
-const fillCompleteData = () => {
-  form.reset(completeFormData);
-  toast({
-    title: "Complete Data Loaded",
-    description: "Form has been filled with all available fields.",
-  });
-};
-
-async function onSubmit(values: z.infer<typeof thesisFormSchema>) {
-  setIsSubmitting(true);
-  try {
-    if (!primaryWallet) {
-      throw new Error("Wallet is not available");
-    }
-
-    const walletClient = await primaryWallet.getWalletClient();
-    if (!walletClient) {
-      throw new Error("Wallet client not available");
-    }
-
-    const targetCapitalInWei = convertToWei(values.investment.targetCapital);
-
-    const metadata: ProposalMetadata = {
-      title: values.title,
-      description: values.description,
-      category: values.category,
-      investment: {
-        targetCapital: values.investment.targetCapital,
-        description: values.investment.description,
-      },
-      votingDuration: values.votingDuration,
-      linkedInURL: values.linkedInURL,
-      blockchain: values.blockchain,
-    };
-
-    toast({
-      title: "Uploading to IPFS...",
-      description: "Please wait while we upload your proposal metadata to IPFS.",
-    });
-    const ipfsHash = await uploadToIPFS<ProposalMetadata>(metadata);
-    toast({
-      title: "IPFS Upload Successful",
-      description: `Metadata uploaded to IPFS with hash: ${ipfsHash}`,
-    });
-
-    const chainId = await walletClient.chainId;
-    const isTestMode = chainId !== mainnet.id && chainId !== polygon.id;
-    const chain = isTestMode ? polygonMumbai : polygon;
-    const contractAddress = isTestMode ? process.env.NEXT_PUBLIC_POLYGON_MUMBAI_CONTRACT_ADDRESS : process.env.NEXT_PUBLIC_POLYGON_MAINNET_CONTRACT_ADDRESS;
-    const abi = JSON.parse(process.env.NEXT_PUBLIC_CONTRACT_ABI || '[]');
-
-    if (!contractAddress) {
-      throw new Error("Contract address is not available");
-    }
-
-    toast({
-      title: "Creating Proposal...",
-      description: "Please approve the transaction in your wallet.",
-    });
-    
-    const provider = new ethers.providers.Web3Provider(walletClient as any);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, abi, signer);
-
-    const tx = await contract.createProposal(
-      values.title,
-      ipfsHash,
-      targetCapitalInWei,
-      BigInt(values.votingDuration)
-    );
-
-    toast({
-      title: "Transaction Sent",
-      description: `Transaction hash: ${tx.hash}`,
-    });
-
-    const eventConfig = {
-      provider,
-      contractAddress,
-      abi,
-      eventName: 'ProposalCreated'
-    };
-
-    toast({
-      title: "Waiting for Confirmation...",
-      description: "Waiting for the proposal to be created on the blockchain.",
-    });
-    const proposalEvent = await waitForProposalCreation(eventConfig, tx.hash);
-    toast({
-      title: "Proposal Created!",
-      description: `Proposal created with token ID: ${proposalEvent.tokenId}`,
-    });
-
-    navigate(`/thesis/${proposalEvent.tokenId}`);
-
-  } catch (error: any) {
-    console.error("Error submitting thesis:", error);
-    toast({
-      title: "Error Submitting Thesis",
-      description: error.message || "An error occurred while submitting the thesis.",
-      variant: "destructive",
-    });
-  } finally {
-    setIsSubmitting(false);
-  }
-}
-
 export default function ThesisSubmission() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { primaryWallet } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const form = useForm<z.infer<typeof thesisFormSchema>>({
+    resolver: zodResolver(thesisFormSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      category: "",
+      external_url: "",
+      image: "",
+      investment: {
+        targetCapital: "",
+        description: "",
+      },
+      fundingBreakdown: [
+        { category: "", amount: "" },
+        { category: "", amount: "" },
+        { category: "", amount: "" },
+        { category: "", amount: "" }
+      ],
+      team: [
+        { name: "", role: "", linkedin: "", github: "" },
+        { name: "", role: "", linkedin: "", github: "" }
+      ],
+      votingDuration: 7 * 24 * 60 * 60,
+      linkedInURL: "",
+      blockchain: [],
+      socials: {
+        twitter: "",
+        discord: "",
+        telegram: "",
+      },
+    }
+  });
+
+  const fillRequiredData = () => {
+    form.reset(requiredFormData);
+    toast({
+      title: "Required Data Loaded",
+      description: "Form has been filled with required fields only.",
+    });
+  };
+
+  const fillCompleteData = () => {
+    form.reset(completeFormData);
+    toast({
+      title: "Complete Data Loaded",
+      description: "Form has been filled with all available fields.",
+    });
+  };
+
+  async function onSubmit(values: z.infer<typeof thesisFormSchema>) {
+    setIsSubmitting(true);
+    try {
+      if (!primaryWallet) {
+        throw new Error("Wallet is not available");
+      }
+
+      const walletClient = await primaryWallet.getWalletClient();
+      if (!walletClient) {
+        throw new Error("Wallet client not available");
+      }
+
+      const targetCapitalInWei = convertToWei(values.investment.targetCapital);
+
+      const metadata: ProposalMetadata = {
+        title: values.title,
+        description: values.description,
+        category: values.category,
+        investment: {
+          targetCapital: values.investment.targetCapital,
+          description: values.investment.description,
+        },
+        votingDuration: values.votingDuration,
+        linkedInURL: values.linkedInURL,
+        blockchain: values.blockchain,
+      };
+
+      toast({
+        title: "Uploading to IPFS...",
+        description: "Please wait while we upload your proposal metadata to IPFS.",
+      });
+      const ipfsHash = await uploadToIPFS<ProposalMetadata>(metadata);
+      toast({
+        title: "IPFS Upload Successful",
+        description: `Metadata uploaded to IPFS with hash: ${ipfsHash}`,
+      });
+
+      const chainId = await walletClient.chainId;
+      const isTestMode = chainId !== mainnet.id && chainId !== polygon.id;
+      const chain = isTestMode ? polygonMumbai : polygon;
+      const contractAddress = isTestMode ? process.env.NEXT_PUBLIC_POLYGON_MUMBAI_CONTRACT_ADDRESS : process.env.NEXT_PUBLIC_POLYGON_MAINNET_CONTRACT_ADDRESS;
+      const abi = JSON.parse(process.env.NEXT_PUBLIC_CONTRACT_ABI || '[]');
+
+      if (!contractAddress) {
+        throw new Error("Contract address is not available");
+      }
+
+      toast({
+        title: "Creating Proposal...",
+        description: "Please approve the transaction in your wallet.",
+      });
+      
+      const provider = new ethers.providers.Web3Provider(walletClient as any);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+
+      const tx = await contract.createProposal(
+        values.title,
+        ipfsHash,
+        targetCapitalInWei,
+        BigInt(values.votingDuration)
+      );
+
+      toast({
+        title: "Transaction Sent",
+        description: `Transaction hash: ${tx.hash}`,
+      });
+
+      const eventConfig = {
+        provider,
+        contractAddress,
+        abi,
+        eventName: 'ProposalCreated'
+      };
+
+      toast({
+        title: "Waiting for Confirmation...",
+        description: "Waiting for the proposal to be created on the blockchain.",
+      });
+      const proposalEvent = await waitForProposalCreation(eventConfig, tx.hash);
+      toast({
+        title: "Proposal Created!",
+        description: `Proposal created with token ID: ${proposalEvent.tokenId}`,
+      });
+
+      navigate(`/thesis/${proposalEvent.tokenId}`);
+
+    } catch (error: any) {
+      console.error("Error submitting thesis:", error);
+      toast({
+        title: "Error Submitting Thesis",
+        description: error.message || "An error occurred while submitting the thesis.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-black text-white pt-20">
