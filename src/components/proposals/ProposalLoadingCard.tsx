@@ -1,10 +1,45 @@
+
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { LoadingState } from "@/types/loading";
+import { Loader2 } from "lucide-react";
 
 interface ProposalLoadingCardProps {
   loadingState: LoadingState;
 }
+
+export const loadingStates: LoadingState[] = [
+  {
+    message: "Connecting to wallet...",
+    subtitle: "Please wait while we connect to your wallet",
+    icon: Loader2,
+    progress: 20
+  },
+  {
+    message: "Checking permissions...",
+    subtitle: "Verifying your access rights",
+    icon: Loader2,
+    progress: 40
+  },
+  {
+    message: "Loading proposal data...",
+    subtitle: "Fetching proposal information",
+    icon: Loader2,
+    progress: 60
+  },
+  {
+    message: "Fetching metadata...",
+    subtitle: "Retrieving additional details",
+    icon: Loader2,
+    progress: 80
+  },
+  {
+    message: "Almost done...",
+    subtitle: "Finalizing proposal details",
+    icon: Loader2,
+    progress: 95
+  }
+];
 
 export const ProposalLoadingCard = ({ loadingState }: ProposalLoadingCardProps) => {
   const LoadingIcon = loadingState.icon;
@@ -55,11 +90,3 @@ export const ProposalLoadingCard = ({ loadingState }: ProposalLoadingCardProps) 
     </Card>
   );
 };
-
-export const loadingStates = [
-  "Connecting to wallet...",
-  "Checking permissions...",
-  "Loading proposal data...",
-  "Fetching metadata...",
-  "Almost done..."
-];

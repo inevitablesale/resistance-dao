@@ -19,7 +19,7 @@ export const useProposal = (tokenId?: string) => {
       
       if (!uri) throw new Error('No metadata URI found');
       
-      const metadata = await getFromIPFS<ProposalMetadata>(uri.replace('ipfs://', ''));
+      const metadata = await getFromIPFS<ProposalMetadata>(uri.replace('ipfs://', ''), 'proposal');
       return { ...data, metadata };
     },
     enabled: !!tokenId
