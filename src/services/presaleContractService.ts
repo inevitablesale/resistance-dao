@@ -28,7 +28,6 @@ export const RPC_ENDPOINTS = [
   "https://rpc-mainnet.matic.quiknode.pro"
 ];
 
-// Function to get a working RPC provider
 export const getWorkingProvider = async () => {
   for (const rpc of RPC_ENDPOINTS) {
     try {
@@ -51,13 +50,11 @@ export const getUsdcContract = async (provider: ethers.providers.Provider) => {
   return new ethers.Contract(USDC_CONTRACT_ADDRESS, ERC20_ABI, provider);
 };
 
-// Function to purchase tokens with USDC
 export const purchaseTokens = async (signer: ethers.Signer, usdcAmount: string) => {
   try {
     console.log('Starting token purchase with USDC amount:', usdcAmount);
     
     const usdcContract = await getUsdcContract(signer.provider!);
-    const rdContract = await getRdTokenContract(signer.provider!);
     
     // Convert USDC amount to wei (USDC has 6 decimals)
     const usdcAmountWei = ethers.utils.parseUnits(usdcAmount, 6);
@@ -71,7 +68,7 @@ export const purchaseTokens = async (signer: ethers.Signer, usdcAmount: string) 
     // Execute purchase transaction
     const contract = new ethers.Contract(RD_TOKEN_CONTRACT_ADDRESS, RD_SALE_ABI, signer);
     const tx = await contract.buyTokens(usdcAmountWei, {
-      gasLimit: 500000 // Added explicit gas limit for better transaction handling
+      gasLimit: 500000
     });
     
     console.log('Purchase transaction submitted:', tx.hash);

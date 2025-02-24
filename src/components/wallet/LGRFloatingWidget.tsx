@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -235,15 +234,12 @@ export const LGRFloatingWidget = () => {
             <div className="space-y-1">
               <p className="text-sm text-gray-400">You will receive approximately:</p>
               <p className="text-lg font-bold text-blue-400">
-                {(Number(purchaseAmount) * 10).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                })} RD
+                {(Number(purchaseAmount)).toFixed(2)} RD
               </p>
             </div>
 
             <div className="text-sm text-gray-400">
-              Your USDC Balance: {Number(usdcBalance).toLocaleString()} USDC
+              Your USDC Balance: {Number(usdcBalance)} USDC
             </div>
           </div>
 
