@@ -159,33 +159,11 @@ export interface ProposalContractInput {
   metadataURI: string;
   targetCapital: ethers.BigNumber;
   votingDuration: number;
-  ipfsMetadata?: string;
-  investmentDrivers?: string;
-  additionalCriteria?: string;
-  location?: string;
-  firmSize?: number;
-  dealType?: number;
-  geographicFocus?: number;
-  paymentTerms?: number[];
-  operationalStrategies?: number[];
-  growthStrategies?: number[];
-  integrationStrategies?: number[];
 }
 
 export interface ProposalContractTuple {
   title: string;
   metadataURI: string;
-  targetCapital: string;  // uint128 as string
+  targetCapital: string;
   votingDuration: number;
-  ipfsMetadata?: string;
-  investmentDrivers?: string;
-  additionalCriteria?: string;
-  firmSize?: number;
-  location?: string;
-  dealType?: number;
-  geographicFocus?: number;
-  paymentTerms?: number[];
-  operationalStrategies?: number[];
-  growthStrategies?: number[];
-  integrationStrategies?: number[];
 }

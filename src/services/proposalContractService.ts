@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -12,14 +11,7 @@ import {
   ProposalMetadata, 
   ProposalConfig, 
   ProposalContractInput,
-  ProposalContractTuple,
-  FirmSize,
-  DealType,
-  GeographicFocus,
-  PaymentTerm,
-  OperationalStrategy,
-  GrowthStrategy,
-  IntegrationStrategy
+  ProposalContractTuple
 } from "@/types/proposals";
 import type { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 
@@ -151,16 +143,14 @@ function validateProposalInput(input: ProposalContractInput) {
 }
 
 function transformToContractTuple(input: ProposalContractInput): ProposalContractTuple {
-  const targetCapitalString = ethers.BigNumber.isBigNumber(input.targetCapital) 
-    ? input.targetCapital.toString() 
-    : typeof input.targetCapital === 'string' 
-      ? input.targetCapital 
-      : input.targetCapital.toString();
+  if (!ethers.BigNumber.isBigNumber(input.targetCapital)) {
+    throw new Error("targetCapital must be a BigNumber");
+  }
 
   return {
     title: input.title,
     metadataURI: input.metadataURI,
-    targetCapital: targetCapitalString,
+    targetCapital: input.targetCapital.toString(),
     votingDuration: input.votingDuration
   };
 }
@@ -194,7 +184,6 @@ export const createProposal = async (
   
   const provider = await getProvider(wallet);
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
-  const status = await getContractStatus(wallet);
   
   try {
     // Upload metadata to IPFS first
@@ -219,7 +208,7 @@ export const createProposal = async (
     console.log("Creating proposal with parameters:", {
       title: tuple.title,
       metadataURI: tuple.metadataURI,
-      targetCapital: ethers.utils.formatUnits(tuple.targetCapital, 18),
+      targetCapital: tuple.targetCapital,
       votingDuration: tuple.votingDuration
     });
 
