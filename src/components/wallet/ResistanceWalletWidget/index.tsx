@@ -12,6 +12,8 @@ import { getWorkingProvider, getRdTokenContract, getUsdcContract, purchaseTokens
 import { ethers } from "ethers";
 import { TokenBalanceDisplay } from "./TokenBalanceDisplay";
 import { BuyTokenSection } from "./BuyTokenSection";
+import { NFTDisplay } from "./NFTDisplay";
+import { useNFTBalance } from "@/hooks/useNFTBalance";
 
 export const ResistanceWalletWidget = () => {
   const { address } = useCustomWallet();
@@ -20,6 +22,7 @@ export const ResistanceWalletWidget = () => {
   const [rdBalance, setRdBalance] = useState<string>("0");
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
   const { toast } = useToast();
+  const { data: nftBalance = 0 } = useNFTBalance(address);
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -37,7 +40,6 @@ export const ResistanceWalletWidget = () => {
           usdcContract.balanceOf(address)
         ]);
         
-        // Use 18 decimals for RD token, 6 for USDC
         setRdBalance(ethers.utils.formatUnits(rdBal, 18));
         setUsdcBalance(ethers.utils.formatUnits(usdcBal, 6));
       } catch (error) {
@@ -127,6 +129,11 @@ export const ResistanceWalletWidget = () => {
         </PopoverTrigger>
         <PopoverContent className="w-80 p-4 bg-black/90 backdrop-blur-lg border border-blue-500/10">
           <div className="space-y-4">
+            <NFTDisplay 
+              balance={nftBalance} 
+              className="mb-2"
+            />
+
             <TokenBalanceDisplay
               symbol="RD"
               balance={rdBalance}
