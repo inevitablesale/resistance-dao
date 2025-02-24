@@ -171,20 +171,23 @@ export const ProposalsHistory = () => {
           walletProvider.provider
         );
 
-        // Get total supply first
-        console.log('Getting total supply...');
-        const totalSupply = await contract.totalSupply().catch(() => 0);
-        console.log('Total proposals:', totalSupply.toString());
+        // Get latest block for reference
+        const latestBlock = await walletProvider.provider.getBlockNumber();
+        console.log('Current block:', latestBlock);
+
+        // Get event logs from the last 10000 blocks or from block 0 if chain is shorter
+        const fromBlock = Math.max(0, latestBlock - 10000);
+        console.log('Fetching events from block:', fromBlock);
 
         const filter = contract.filters.ProposalCreated();
         console.log('Querying ProposalCreated events...');
-        const events = await contract.queryFilter(filter);
+        const events = await contract.queryFilter(filter, fromBlock, latestBlock);
         console.log('Found events:', events.length);
         
         console.log('Event details:', events.map(e => ({
           blockNumber: e.blockNumber,
           args: e.args ? {
-            tokenId: e.args.tokenId?.toString(),
+            proposalId: e.args.proposalId?.toString(),
             creator: e.args.creator
           } : 'No args'
         })));
@@ -197,7 +200,7 @@ export const ProposalsHistory = () => {
             }
             
             const proposal: ProposalEvent = {
-              tokenId: event.args.tokenId.toString(),
+              tokenId: event.args.proposalId.toString(),
               creator: event.args.creator,
               blockNumber: event.blockNumber,
               transactionHash: event.transactionHash,
@@ -212,14 +215,24 @@ export const ProposalsHistory = () => {
 
         if (initialProposals.length === 0) {
           console.log('No proposals found in events');
+          setIsInitialLoading(false);
+          return;
         }
 
+        // Sort by block number (newest first)
         initialProposals.sort((a, b) => b.blockNumber - a.blockNumber);
         setProposalEvents(initialProposals);
         setIsInitialLoading(false);
 
+        // Fetch metadata for each proposal with delay to avoid rate limiting
         for (const proposal of initialProposals) {
-          await fetchProposalMetadata(proposal, contract);
+          try {
+            await fetchProposalMetadata(proposal, contract);
+            // Add small delay between requests to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 500));
+          } catch (error) {
+            console.error(`Error fetching metadata for proposal ${proposal.tokenId}:`, error);
+          }
         }
 
       } catch (error: any) {
