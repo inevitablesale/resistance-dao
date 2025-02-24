@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +17,6 @@ import { ProposalListItem } from "./ProposalListItem";
 
 const MIN_LGR_REQUIRED = "1";
 
-// First, let's define a type for the initial proposal data
 interface InitialProposalData {
   tokenId: string;
   creator: string;
@@ -74,54 +72,6 @@ export const ProposalsHistory = () => {
           : event
       )
     );
-  };
-
-  const fetchProposalMetadata = async (proposal: ProposalEvent, contract: ethers.Contract) => {
-    try {
-      console.log(`\n=== Processing Proposal #${proposal.tokenId} ===`);
-      console.log('Proposal initial data:', proposal);
-      
-      updateProposalData(proposal.tokenId, { isLoading: true });
-
-      console.log(`Fetching token URI for #${proposal.tokenId}...`);
-      const [tokenUri, pledgedAmount] = await Promise.all([
-        contract.tokenURI(proposal.tokenId),
-        contract.pledgedAmount(proposal.tokenId)
-      ]);
-
-      console.log(`Token URI for #${proposal.tokenId}:`, tokenUri);
-      console.log(`Pledged amount for #${proposal.tokenId}:`, ethers.utils.formatEther(pledgedAmount));
-
-      let metadata: ProposalMetadata | undefined;
-      if (tokenUri) {
-        console.log(`\nFetching IPFS data for token #${proposal.tokenId}`);
-        console.log('Token URI:', tokenUri);
-        
-        const ipfsHash = tokenUri.replace('ipfs://', '');
-        console.log('IPFS Hash:', ipfsHash);
-        
-        try {
-          metadata = await getFromIPFS<ProposalMetadata>(ipfsHash, 'proposal');
-          console.log(`\nSuccessfully fetched IPFS data for token #${proposal.tokenId}:`, metadata);
-        } catch (ipfsError) {
-          console.error(`IPFS fetch error for token #${proposal.tokenId}:`, ipfsError);
-          throw new Error(`IPFS fetch failed: ${ipfsError.message}`);
-        }
-      }
-
-      updateProposalData(proposal.tokenId, {
-        metadata,
-        pledgedAmount: ethers.utils.formatEther(pledgedAmount),
-        isLoading: false
-      });
-
-    } catch (error: any) {
-      console.error(`\nError processing token #${proposal.tokenId}:`, error);
-      updateProposalData(proposal.tokenId, {
-        isLoading: false,
-        error: error.message
-      });
-    }
   };
 
   useEffect(() => {
@@ -186,6 +136,58 @@ export const ProposalsHistory = () => {
   }, [isConnected, address, getProvider]);
 
   useEffect(() => {
+    const fetchProposalMetadata = async (proposal: ProposalEvent, contract: ethers.Contract) => {
+      try {
+        console.log(`\n=== Processing Proposal #${proposal.tokenId} ===`);
+        console.log('Proposal initial data:', proposal);
+        
+        updateProposalData(proposal.tokenId, { isLoading: true });
+
+        if (!proposal.tokenId) {
+          throw new Error("Invalid token ID");
+        }
+
+        console.log(`Fetching token URI for #${proposal.tokenId}...`);
+        const [tokenUri, pledgedAmount] = await Promise.all([
+          contract.tokenURI(proposal.tokenId),
+          contract.pledgedAmount(proposal.tokenId).catch(() => ethers.BigNumber.from(0))
+        ]);
+
+        console.log(`Token URI for #${proposal.tokenId}:`, tokenUri);
+        console.log(`Pledged amount for #${proposal.tokenId}:`, ethers.utils.formatEther(pledgedAmount));
+
+        let metadata: ProposalMetadata | undefined;
+        if (tokenUri) {
+          console.log(`\nFetching IPFS data for token #${proposal.tokenId}`);
+          console.log('Token URI:', tokenUri);
+          
+          const ipfsHash = tokenUri.replace('ipfs://', '');
+          console.log('IPFS Hash:', ipfsHash);
+          
+          try {
+            metadata = await getFromIPFS<ProposalMetadata>(ipfsHash, 'proposal');
+            console.log(`\nSuccessfully fetched IPFS data for token #${proposal.tokenId}:`, metadata);
+          } catch (ipfsError) {
+            console.error(`IPFS fetch error for token #${proposal.tokenId}:`, ipfsError);
+            throw new Error(`IPFS fetch failed: ${ipfsError.message}`);
+          }
+        }
+
+        updateProposalData(proposal.tokenId, {
+          metadata,
+          pledgedAmount: ethers.utils.formatEther(pledgedAmount),
+          isLoading: false
+        });
+
+      } catch (error: any) {
+        console.error(`\nError processing token #${proposal.tokenId}:`, error);
+        updateProposalData(proposal.tokenId, {
+          isLoading: false,
+          error: error.message
+        });
+      }
+    };
+
     const fetchProposalData = async () => {
       if (!isConnected || !hasMinimumLGR) return;
 
@@ -204,7 +206,6 @@ export const ProposalsHistory = () => {
         const events = await contract.queryFilter(filter);
         console.log('Found proposal events:', events.length);
 
-        // Safely extract data from events with proper typing
         const initialProposals = events
           .map(event => {
             if (!event.args) {
@@ -212,24 +213,20 @@ export const ProposalsHistory = () => {
               return null;
             }
             
-            const proposal: InitialProposalData = {
-              tokenId: event.args.tokenId?.toString() || '',
-              creator: event.args.creator || '',
-              blockNumber: event.blockNumber || 0,
-              transactionHash: event.transactionHash || '',
+            return {
+              tokenId: event.args.tokenId.toString(),
+              creator: event.args.creator,
+              blockNumber: event.blockNumber,
+              transactionHash: event.transactionHash,
               isLoading: true
             };
-            
-            return proposal;
           })
-          .filter((proposal): proposal is InitialProposalData => proposal !== null);
+          .filter((proposal): proposal is ProposalEvent => proposal !== null);
 
-        // Sort by block number (newest first) and set initial state
         initialProposals.sort((a, b) => b.blockNumber - a.blockNumber);
         setProposalEvents(initialProposals);
         setIsInitialLoading(false);
 
-        // Fetch metadata for each proposal individually
         for (const proposal of initialProposals) {
           await fetchProposalMetadata(proposal, contract);
         }
