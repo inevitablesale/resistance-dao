@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -150,12 +151,16 @@ function validateProposalInput(input: ProposalContractInput) {
 }
 
 function transformToContractTuple(input: ProposalContractInput): ProposalContractTuple {
+  const targetCapitalString = ethers.BigNumber.isBigNumber(input.targetCapital) 
+    ? input.targetCapital.toString() 
+    : typeof input.targetCapital === 'string' 
+      ? input.targetCapital 
+      : input.targetCapital.toString();
+
   return {
     title: input.title,
     metadataURI: input.metadataURI,
-    targetCapital: ethers.BigNumber.isBigNumber(input.targetCapital) 
-      ? input.targetCapital.toString() 
-      : input.targetCapital.toString(),
+    targetCapital: targetCapitalString,
     votingDuration: input.votingDuration
   };
 }
