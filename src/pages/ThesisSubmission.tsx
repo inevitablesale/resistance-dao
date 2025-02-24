@@ -299,7 +299,7 @@ export default function ThesisSubmission() {
         description: `Proposal created with token ID: ${proposalEvent.tokenId}`,
       });
 
-      navigate(`/proposal/${proposalEvent.tokenId}`);
+      navigate(`/proposals/${proposalEvent.tokenId}`);
 
     } catch (error: any) {
       console.error("Error submitting thesis:", error);
