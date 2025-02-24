@@ -1,111 +1,149 @@
-
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
-import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
-import { 
-  ArrowRight, Loader2, Rocket, Target, Clock, FileText, Users, Info, ChevronRight,
-  Workflow, Coins, Gift, Trophy, Github, Linkedin, Twitter, MessageCircle 
-} from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { HelpCircle } from "lucide-react";
+import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
+import { TargetCapitalInput, convertToWei } from "@/components/thesis/TargetCapitalInput";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Link, useNavigate } from "react-router-dom";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
-import { createProposal } from "@/services/proposalContractService";
-import { ProposalMetadata, TeamMember, RoadmapMilestone, FundingBreakdown } from "@/types/proposals";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Link } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { motion } from "framer-motion";
+import { uploadToIPFS } from "@/services/ipfsService";
+import { ProposalMetadata } from "@/types/proposals";
+import { useToast } from "@/hooks/use-toast";
+import { waitForProposalCreation } from "@/services/eventListenerService";
+import { sepolia } from 'viem/chains';
+import { mainnet } from 'viem/chains';
+import { polygonMumbai } from 'viem/chains';
+import { polygon } from 'viem/chains';
 
 const thesisFormSchema = z.object({
-  title: z.string()
-    .min(10, "Title must be at least 10 characters")
-    .max(100, "Title must be less than 100 characters"),
-  description: z.string()
-    .min(50, "Description must be at least 50 characters")
-    .max(500, "Description must be less than 500 characters"),
-  category: z.string()
-    .min(3, "Category must be at least 3 characters")
-    .max(50, "Category must be less than 50 characters"),
-  investment: z.object({
-    targetCapital: z.string()
-      .min(1, "Target capital is required")
-      .refine(
-        (val) => {
-          const num = parseFloat(val);
-          return num >= 1000 && num <= 25000000;
-        },
-        "Target capital must be between 1,000 and 25,000,000 RD"
-      ),
-    description: z.string()
-      .min(50, "Description must be at least 50 characters")
-      .max(500, "Description must be less than 500 characters"),
+  title: z.string().min(2, {
+    message: "Thesis title must be at least 2 characters.",
   }),
-  votingDuration: z.number()
-    .min(7 * 24 * 60 * 60, "Minimum voting duration is 7 days")
-    .max(90 * 24 * 60 * 60, "Maximum voting duration is 90 days"),
-  linkedInURL: z.string()
-    .min(1, "LinkedIn URL is required")
-    .max(200, "LinkedIn URL must be less than 200 characters"),
-  blockchain: z.array(z.string()).optional(),
-  fundingBreakdown: z.array(
-    z.object({
-      category: z.string(),
-      amount: z.string(),
-    })
-  ).optional(),
-  investmentDrivers: z.array(z.string()).optional(),
-  backerIncentives: z.object({
-    utility: z.string().optional(),
-    governance: z.string().optional(),
-    NFTRewards: z.string().optional(),
-    tokenAllocation: z.string().optional(),
-  }).optional(),
-  team: z.array(
-    z.object({
-      name: z.string().optional(),
-      role: z.string().optional(),
-      linkedin: z.string().optional(),
-      github: z.string().optional(),
-    })
-  ).optional(),
-  roadmap: z.array(
-    z.object({
-      milestone: z.string().optional(),
-      expectedDate: z.string().optional(),
-      status: z.enum(["Pending", "In Progress", "Completed"]).optional(),
-    })
-  ).optional(),
-  socials: z.object({
-    twitter: z.string().optional(),
-    discord: z.string().optional(),
-    telegram: z.string().optional(),
-  }).optional(),
+  description: z.string().min(10, {
+    message: "Description must be at least 10 characters.",
+  }),
+  category: z.string().min(2, {
+    message: "Category must be at least 2 characters.",
+  }),
+  investment: z.object({
+    targetCapital: z.string().min(1, {
+      message: "Target capital is required."
+    }),
+    description: z.string().min(10, {
+      message: "Investment description must be at least 10 characters.",
+    }),
+  }),
+  votingDuration: z.number().min(7 * 24 * 60 * 60, {
+    message: "Voting duration must be at least 7 days.",
+  }),
+  linkedInURL: z.string().url({
+    message: "Please enter a valid LinkedIn URL.",
+  }),
+  blockchain: z.string().array().nonempty({
+    message: "Please select at least one blockchain.",
+  }),
 });
 
-const ThesisSubmission = () => {
-  const navigate = useNavigate();
+const sampleFormData = {
+  title: "Revolutionizing Small Business Accounting with Blockchain",
+  description: "Implementing a decentralized accounting system that leverages blockchain technology to provide transparent, immutable, and efficient financial tracking for small businesses.",
+  category: "DeFi Infrastructure",
+  investment: {
+    targetCapital: "1000000",
+    description: "The funds will be used to develop the core infrastructure, build user interfaces, conduct security audits, and launch marketing campaigns to drive adoption.",
+  },
+  votingDuration: 30 * 24 * 60 * 60, // 30 days in seconds
+  linkedInURL: "https://linkedin.com/in/sample-profile",
+  blockchain: ["Ethereum", "Polygon"],
+  fundingBreakdown: [
+    { category: "Development", amount: "400000" },
+    { category: "Security Audits", amount: "200000" },
+    { category: "Marketing", amount: "200000" },
+    { category: "Operations", amount: "200000" }
+  ],
+  investmentDrivers: [
+    "Market Demand",
+    "Technological Innovation",
+    "Scalability"
+  ],
+  backerIncentives: {
+    utility: "Access to premium features",
+    governance: "Voting rights on protocol upgrades",
+    NFTRewards: "Exclusive NFT collection for early backers",
+    tokenAllocation: "5% of total token supply"
+  },
+  team: [
+    {
+      name: "Jane Smith",
+      role: "Lead Developer",
+      linkedin: "https://linkedin.com/in/jane-smith",
+      github: "https://github.com/janesmith"
+    }
+  ],
+  roadmap: [
+    {
+      milestone: "MVP Launch",
+      expectedDate: "2024-06-30",
+      status: "Pending"
+    },
+    {
+      milestone: "Security Audit",
+      expectedDate: "2024-08-30",
+      status: "Pending"
+    }
+  ],
+  socials: {
+    twitter: "https://twitter.com/sample",
+    discord: "https://discord.gg/sample",
+    telegram: "https://t.me/sample"
+  }
+};
+
+export default function ThesisSubmission() {
   const { toast } = useToast();
-  const { isConnected, wallet } = useWalletConnection();
-  const { user } = useDynamicContext();
+  const navigate = useNavigate();
+  const { walletClient } = useWalletConnection();
+  const { primaryWallet } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<ProposalMetadata>({
+  const form = useForm<z.infer<typeof thesisFormSchema>>({
     resolver: zodResolver(thesisFormSchema),
     defaultValues: {
       title: "",
@@ -113,450 +151,406 @@ const ThesisSubmission = () => {
       category: "",
       investment: {
         targetCapital: "",
-        description: ""
+        description: "",
       },
-      votingDuration: 7 * 24 * 60 * 60,
-      linkedInURL: user?.verifications?.customFields?.["LinkedIn Profile URL"] || 
-                  user?.metadata?.["LinkedIn Profile URL"] || "",
+      votingDuration: 30 * 24 * 60 * 60, // 30 days default
+      linkedInURL: "",
       blockchain: [],
-      fundingBreakdown: [],
-      investmentDrivers: [],
-      backerIncentives: {
-        utility: "",
-        governance: "",
-        NFTRewards: "",
-        tokenAllocation: "",
-      },
-      team: [],
-      roadmap: [],
-      socials: {
-        twitter: "",
-        discord: "",
-        telegram: "",
-      },
     }
   });
 
-  const onSubmit = async (data: ProposalMetadata) => {
-    if (!isConnected || !wallet) {
-      toast({
-        title: "Connect Wallet",
-        description: "Please connect your wallet to submit a thesis",
-        variant: "destructive"
-      });
-      return;
-    }
+  const fillFormWithSampleData = () => {
+    form.reset(sampleFormData);
+    toast({
+      title: "Form Filled",
+      description: "Sample data has been loaded into the form.",
+    });
+  };
 
+  async function onSubmit(values: z.infer<typeof thesisFormSchema>) {
     setIsSubmitting(true);
     try {
-      await createProposal(data, wallet);
-      
+      if (!walletClient) {
+        throw new Error("Wallet client is not available");
+      }
+
+      // Convert targetCapital to Wei
+      const targetCapitalInWei = convertToWei(values.investment.targetCapital);
+
+      // Prepare metadata for IPFS upload
+      const metadata: ProposalMetadata = {
+        title: values.title,
+        description: values.description,
+        category: values.category,
+        investment: {
+          targetCapital: values.investment.targetCapital,
+          description: values.investment.description,
+        },
+        votingDuration: values.votingDuration,
+        linkedInURL: values.linkedInURL,
+        blockchain: values.blockchain,
+      };
+
+      // Upload metadata to IPFS
       toast({
-        title: "Success",
-        description: "Your thesis has been submitted successfully",
+        title: "Uploading to IPFS...",
+        description: "Please wait while we upload your proposal metadata to IPFS.",
       });
-      navigate("/proposals");
-    } catch (error) {
-      console.error("Submission error:", error);
+      const ipfsHash = await uploadToIPFS<ProposalMetadata>(metadata);
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to submit thesis",
-        variant: "destructive"
+        title: "IPFS Upload Successful",
+        description: `Metadata uploaded to IPFS with hash: ${ipfsHash}`,
+      });
+
+      // Contract interaction parameters
+      const chainId = await walletClient.getChainId();
+      const isTestMode = chainId !== mainnet.id && chainId !== polygon.id;
+      const chain = isTestMode ? polygonMumbai : polygon;
+      const contractAddress = isTestMode ? process.env.NEXT_PUBLIC_POLYGON_MUMBAI_CONTRACT_ADDRESS : process.env.NEXT_PUBLIC_POLYGON_MAINNET_CONTRACT_ADDRESS;
+      const abi = JSON.parse(process.env.NEXT_PUBLIC_CONTRACT_ABI || '[]');
+
+      if (!contractAddress) {
+        throw new Error("Contract address is not available");
+      }
+
+      // Call the createProposal function
+      toast({
+        title: "Creating Proposal...",
+        description: "Please approve the transaction in your wallet.",
+      });
+      const { request } = await walletClient.simulateContract({
+        address: contractAddress as `0x${string}`,
+        abi: abi,
+        functionName: 'createProposal',
+        args: [
+          values.title,
+          ipfsHash,
+          targetCapitalInWei,
+          BigInt(values.votingDuration)
+        ],
+        chainId: chain.id,
+      });
+      const txHash = await walletClient.writeContract(request);
+      toast({
+        title: "Transaction Sent",
+        description: `Transaction hash: ${txHash}`,
+      });
+
+      // Setup event listener configuration
+      const provider = walletClient.getProvider();
+      const eventConfig = {
+        provider: provider,
+        contractAddress: contractAddress,
+        abi: abi,
+        eventName: 'ProposalCreated'
+      };
+
+      // Wait for the proposal creation event
+      toast({
+        title: "Waiting for Confirmation...",
+        description: "Waiting for the proposal to be created on the blockchain.",
+      });
+      const proposalEvent = await waitForProposalCreation(eventConfig, txHash);
+      toast({
+        title: "Proposal Created!",
+        description: `Proposal created with token ID: ${proposalEvent.tokenId}`,
+      });
+
+      // Redirect to the proposal details page
+      navigate(`/thesis/${proposalEvent.tokenId}`);
+
+    } catch (error: any) {
+      console.error("Error submitting thesis:", error);
+      toast({
+        title: "Error Submitting Thesis",
+        description: error.message || "An error occurred while submitting the thesis.",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Background Effects */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-yellow-500/5 animate-gradient" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black" />
-        <div className="absolute w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl -top-48 -left-24" />
-        <div className="absolute w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl -bottom-48 -right-24" />
-      </div>
-
-      {/* Stats Bar */}
-      <div className="fixed top-0 left-0 right-0 z-10 bg-black/90 backdrop-blur-xl border-b border-white/10">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between text-sm">
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <div>
-                <div className="text-white/50">Active Proposals</div>
-                <div className="font-mono text-white">24</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-              <div>
-                <div className="text-white/50">Total Commitments</div>
-                <div className="font-mono text-white">$2.5M</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
-              <div>
-                <div className="text-white/50">Success Rate</div>
-                <div className="font-mono text-white">89%</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 pt-32 pb-16">
-        {/* Breadcrumb */}
+    <div className="min-h-screen bg-black text-white pb-20">
+      <div className="container mx-auto px-4 pt-24">
+        {/* Breadcrumb section */}
         <Breadcrumb className="mb-8">
-          <BreadcrumbList className="text-white/60">
+          <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/" className="hover:text-white">Home</Link>
+                <Link to="/">Home</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator className="text-white/40" />
+            <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/proposals" className="hover:text-white">Proposals</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="text-white/40" />
-            <BreadcrumbItem>
-              <BreadcrumbPage className="text-white">Submit Proposal</BreadcrumbPage>
+              <BreadcrumbPage>Submit Thesis</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-4xl mx-auto"
-        >
-          {/* Header Section */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm mb-4 font-mono">
-              <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-              Launch Your Investment Strategy
+        <div className="max-w-4xl mx-auto">
+          {/* Header section */}
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">Submit Your Thesis</h1>
+              <p className="text-gray-400">Create a proposal for the community to review and back.</p>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold font-mono mb-6 bg-gradient-to-r from-blue-300 via-purple-200 to-yellow-300 bg-clip-text text-transparent">
-              Submit Your Proposal
-            </h1>
-            <p className="text-lg text-white/60 max-w-2xl mx-auto">
-              Present your investment strategy to find co-investors who share your vision. Test market interest before committing resources.
-            </p>
+            <Button
+              onClick={fillFormWithSampleData}
+              variant="outline"
+              className="border-yellow-500/50 hover:bg-yellow-500/10 text-yellow-500"
+            >
+              Fill Sample Data
+            </Button>
           </div>
 
-          {/* Form */}
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* Project Overview */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <Card className="bg-white/5 border-white/10 p-6 backdrop-blur-lg">
-                <h2 className="text-xl font-medium text-white mb-6 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-blue-400" />
-                  Project Overview
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-white/80 mb-2 block">Title</label>
-                      <Input
-                        {...form.register("title")}
-                        placeholder="Enter your project title"
-                        className="bg-black/20 border-white/10 text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-white/80 mb-2 block">Category</label>
-                      <Input
-                        {...form.register("category")}
-                        placeholder="e.g., DeFi, NFT, Gaming"
-                        className="bg-black/20 border-white/10 text-white"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-white/80 mb-2 block">Description</label>
-                    <Textarea
-                      {...form.register("investment.description")}
-                      placeholder="Describe your project's vision and goals..."
-                      className="bg-black/20 border-white/10 text-white min-h-[132px]"
-                    />
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-
-            {/* Investment Details */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <Card className="bg-white/5 border-white/10 p-6 backdrop-blur-lg">
-                <h2 className="text-xl font-medium text-white mb-6 flex items-center gap-2">
-                  <Coins className="w-5 h-5 text-purple-400" />
-                  Investment Details
-                </h2>
-                <div className="space-y-6">
-                  <TargetCapitalInput
-                    value={form.watch("investment.targetCapital")}
-                    onChange={(value) => form.setValue("investment.targetCapital", value, { shouldValidate: true })}
-                    error={form.formState.errors.investment?.targetCapital?.message?.split(",")}
-                  />
-
-                  <div className="space-y-4">
-                    <label className="text-white/80 block">Funding Breakdown</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {[
-                        "Smart Contract Development",
-                        "Security Audit",
-                        "Marketing & Community",
-                        "Operations & Legal"
-                      ].map((category, index) => (
-                        <div key={index} className="flex gap-3">
-                          <Input
-                            placeholder={category}
-                            className="bg-black/20 border-white/10 text-white"
-                          />
-                          <Input
-                            placeholder="Amount in RD"
-                            type="number"
-                            className="bg-black/20 border-white/10 text-white w-32"
-                          />
+          {/* Form section */}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <Card className="bg-gray-900/50 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Thesis Information</CardTitle>
+                  <CardDescription>Enter the basic details of your thesis.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="text-lg font-medium text-white flex items-center gap-2">
+                            Thesis Title
+                            <HelpCircle className="h-4 w-4 text-gray-400" />
+                          </FormLabel>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <VotingDurationInput
-                    value={form.watch("votingDuration")}
-                    onChange={(value) => form.setValue("votingDuration", value[0], { shouldValidate: true })}
-                    error={form.formState.errors.votingDuration?.message?.split(",")}
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., Decentralized Accounting for Small Businesses"
+                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-              </Card>
-            </motion.div>
 
-            {/* Investment Drivers & Incentives */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              <Card className="bg-white/5 border-white/10 p-6 backdrop-blur-lg">
-                <h2 className="text-xl font-medium text-white mb-6 flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-yellow-400" />
-                  Investment Drivers & Incentives
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <label className="text-white/80 block">Investment Drivers</label>
-                    <div className="space-y-3">
-                      {[1, 2, 3, 4].map((index) => (
-                        <Input
-                          key={index}
-                          placeholder={`Key driver #${index}`}
-                          className="bg-black/20 border-white/10 text-white"
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="text-lg font-medium text-white flex items-center gap-2">
+                            Thesis Description
+                            <HelpCircle className="h-4 w-4 text-gray-400" />
+                          </FormLabel>
+                        </div>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Explain your thesis in detail"
+                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="text-lg font-medium text-white flex items-center gap-2">
+                            Category
+                            <HelpCircle className="h-4 w-4 text-gray-400" />
+                          </FormLabel>
+                        </div>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., DeFi, Infrastructure, Tooling"
+                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-900/50 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Investment Details</CardTitle>
+                  <CardDescription>Provide details about the investment opportunity.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="investment.targetCapital"
+                    render={({ field }) => (
+                      <FormItem>
+                        <TargetCapitalInput
+                          value={field.value}
+                          onChange={field.onChange}
+                          error={form.formState.errors.investment?.targetCapital ? [form.formState.errors.investment.targetCapital.message || ""] : undefined}
                         />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <label className="text-white/80 block">Backer Incentives</label>
-                    <div className="space-y-3">
-                      <Input
-                        placeholder="Utility (e.g., Early access)"
-                        className="bg-black/20 border-white/10 text-white"
-                      />
-                      <Input
-                        placeholder="Governance rights"
-                        className="bg-black/20 border-white/10 text-white"
-                      />
-                      <Input
-                        placeholder="NFT rewards"
-                        className="bg-black/20 border-white/10 text-white"
-                      />
-                      <Input
-                        placeholder="Token allocation"
-                        className="bg-black/20 border-white/10 text-white"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
+                      </FormItem>
+                    )}
+                  />
 
-            {/* Team & Roadmap */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-            >
-              <Card className="bg-white/5 border-white/10 p-6 backdrop-blur-lg">
-                <h2 className="text-xl font-medium text-white mb-6 flex items-center gap-2">
-                  <Users className="w-5 h-5 text-green-400" />
-                  Team & Roadmap
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <label className="text-white/80 block">Team Members</label>
-                    <div className="space-y-4">
-                      {[1, 2].map((index) => (
-                        <div key={index} className="space-y-3">
-                          <Input
-                            placeholder={`Team member ${index} name`}
-                            className="bg-black/20 border-white/10 text-white"
+                  <FormField
+                    control={form.control}
+                    name="investment.description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="text-lg font-medium text-white flex items-center gap-2">
+                            Investment Description
+                            <HelpCircle className="h-4 w-4 text-gray-400" />
+                          </FormLabel>
+                        </div>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Explain how the funds will be used"
+                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 resize-none"
+                            {...field}
                           />
-                          <div className="flex gap-3">
-                            <div className="flex-1">
-                              <Input
-                                placeholder="Role"
-                                className="bg-black/20 border-white/10 text-white"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <Input
-                                placeholder="LinkedIn URL"
-                                className="bg-black/20 border-white/10 text-white"
-                              />
-                            </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-900/50 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Voting Duration</CardTitle>
+                  <CardDescription>Set the duration for community voting.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="votingDuration"
+                    render={({ field }) => (
+                      <FormItem>
+                        <VotingDurationInput
+                          value={field.value}
+                          onChange={(value) => field.onChange(value[0])}
+                          error={form.formState.errors.votingDuration ? [form.formState.errors.votingDuration.message || ""] : undefined}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-900/50 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Additional Information</CardTitle>
+                  <CardDescription>Provide additional details for the proposal.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="linkedInURL"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="text-lg font-medium text-white flex items-center gap-2">
+                            LinkedIn URL
+                            <HelpCircle className="h-4 w-4 text-gray-400" />
+                          </FormLabel>
+                        </div>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., linkedin.com/in/yourprofile"
+                            className="bg-black/50 border-white/10 text-white placeholder:text-gray-500"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="blockchain"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="mb-4 flex items-center justify-between">
+                          <FormLabel className="text-lg font-medium text-white flex items-center gap-2">
+                            Supported Blockchains
+                            <HelpCircle className="h-4 w-4 text-gray-400" />
+                          </FormLabel>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="ethereum"
+                              checked={field.value.includes("Ethereum")}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  field.onChange([...field.value, "Ethereum"]);
+                                } else {
+                                  field.onChange(field.value.filter((v) => v !== "Ethereum"));
+                                }
+                              }}
+                            />
+                            <Label htmlFor="ethereum" className="text-white">Ethereum</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="polygon"
+                              checked={field.value.includes("Polygon")}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  field.onChange([...field.value, "Polygon"]);
+                                } else {
+                                  field.onChange(field.value.filter((v) => v !== "Polygon"));
+                                }
+                              }}
+                            />
+                            <Label htmlFor="polygon" className="text-white">Polygon</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="solana"
+                              checked={field.value.includes("Solana")}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  field.onChange([...field.value, "Solana"]);
+                                } else {
+                                  field.onChange(field.value.filter((v) => v !== "Solana"));
+                                }
+                              }}
+                            />
+                            <Label htmlFor="solana" className="text-white">Solana</Label>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <label className="text-white/80 block">Roadmap Milestones</label>
-                    <div className="space-y-4">
-                      {[1, 2].map((index) => (
-                        <div key={index} className="space-y-3">
-                          <Input
-                            placeholder={`Milestone ${index}`}
-                            className="bg-black/20 border-white/10 text-white"
-                          />
-                          <div className="flex gap-3">
-                            <div className="flex-1">
-                              <Input
-                                type="text"
-                                placeholder="Expected Date (Q2 2025)"
-                                className="bg-black/20 border-white/10 text-white"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <select 
-                                className="w-full bg-black/20 border-white/10 text-white rounded-md h-10 px-3"
-                              >
-                                <option value="Pending">Pending</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="Completed">Completed</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
               </Card>
-            </motion.div>
 
-            {/* Social Links */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-            >
-              <Card className="bg-white/5 border-white/10 p-6 backdrop-blur-lg">
-                <h2 className="text-xl font-medium text-white mb-6 flex items-center gap-2">
-                  <MessageCircle className="w-5 h-5 text-blue-400" />
-                  Social Links
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="flex items-center gap-3">
-                    <Twitter className="w-5 h-5 text-blue-400" />
-                    <Input
-                      placeholder="Twitter URL"
-                      className="bg-black/20 border-white/10 text-white"
-                    />
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <MessageCircle className="w-5 h-5 text-purple-400" />
-                    <Input
-                      placeholder="Discord URL"
-                      className="bg-black/20 border-white/10 text-white"
-                    />
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <MessageCircle className="w-5 h-5 text-blue-400" />
-                    <Input
-                      placeholder="Telegram URL"
-                      className="bg-black/20 border-white/10 text-white"
-                    />
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-
-            {/* Submit Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9 }}
-              className="flex flex-col gap-4"
-            >
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-blue-400 mt-1" />
-                  <div>
-                    <h3 className="text-white font-medium mb-1">Before You Submit</h3>
-                    <p className="text-sm text-white/60">
-                      Your proposal will be minted as an NFT, representing a binding smart contract. 
-                      A fee of 25 RD tokens is required to submit.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <Button 
-                type="submit"
-                disabled={isSubmitting || !form.formState.isValid || !isConnected}
-                className={cn(
-                  "w-full h-14",
-                  "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600",
-                  "text-white font-medium text-lg",
-                  "transition-all duration-300 transform hover:scale-[1.02]",
-                  "disabled:opacity-50 disabled:hover:scale-100",
-                  "flex items-center justify-center gap-2"
-                )}
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Processing...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center gap-2">
-                    <Rocket className="w-5 h-5" />
-                    <span>Launch Proposal</span>
-                    <ChevronRight className="w-5 h-5" />
-                  </div>
-                )}
+              <Button disabled={isSubmitting} type="submit" className="w-full bg-yellow-500 hover:bg-yellow-600 text-white">
+                {isSubmitting ? "Submitting..." : "Submit Thesis"}
               </Button>
-            </motion.div>
-          </form>
-        </motion.div>
+            </form>
+          </Form>
+        </div>
       </div>
-
-      <ResistanceWalletWidget />
     </div>
   );
-};
-
-export default ThesisSubmission;
+}
