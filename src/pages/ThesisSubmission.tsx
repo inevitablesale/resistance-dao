@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { File, DollarSign, Users, MessageSquare, Timer, HelpCircle } from "lucide-react";
+import { File, DollarSign, Users, MessageSquare, Timer, HelpCircle, Beaker } from "lucide-react";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput, convertToWei } from "@/components/thesis/TargetCapitalInput";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { waitForProposalCreation } from "@/services/eventListenerService";
 import { mainnet, polygon, polygonMumbai } from 'viem/chains';
 import { ethers } from 'ethers';
+import { useNavigate } from "react-router-dom";
 
 const thesisFormSchema = z.object({
   title: z.string().min(2, {
@@ -47,8 +48,22 @@ const thesisFormSchema = z.object({
   }),
 });
 
+const sampleFormData = {
+  title: "Decentralized Identity Protocol",
+  description: "A protocol for self-sovereign identity management using zero-knowledge proofs",
+  category: "Identity & Privacy",
+  investment: {
+    targetCapital: "500000",
+    description: "Funding for protocol development and security audits",
+  },
+  votingDuration: 14 * 24 * 60 * 60, // 14 days
+  linkedInURL: "https://linkedin.com/in/example",
+  blockchain: ["Ethereum", "Polygon"],
+};
+
 export default function ThesisSubmission() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { primaryWallet } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -68,6 +83,14 @@ export default function ThesisSubmission() {
     }
   });
 
+  const fillTestData = () => {
+    form.reset(sampleFormData);
+    toast({
+      title: "Test Data Loaded",
+      description: "Form has been filled with sample data.",
+    });
+  };
+
   async function onSubmit(values: z.infer<typeof thesisFormSchema>) {
     setIsSubmitting(true);
     try {
@@ -80,10 +103,8 @@ export default function ThesisSubmission() {
         throw new Error("Wallet client not available");
       }
 
-      // Convert targetCapital to Wei
       const targetCapitalInWei = convertToWei(values.investment.targetCapital);
 
-      // Prepare metadata for IPFS upload
       const metadata: ProposalMetadata = {
         title: values.title,
         description: values.description,
@@ -97,7 +118,6 @@ export default function ThesisSubmission() {
         blockchain: values.blockchain,
       };
 
-      // Upload metadata to IPFS
       toast({
         title: "Uploading to IPFS...",
         description: "Please wait while we upload your proposal metadata to IPFS.",
@@ -108,7 +128,6 @@ export default function ThesisSubmission() {
         description: `Metadata uploaded to IPFS with hash: ${ipfsHash}`,
       });
 
-      // Contract interaction parameters
       const chainId = await walletClient.chainId;
       const isTestMode = chainId !== mainnet.id && chainId !== polygon.id;
       const chain = isTestMode ? polygonMumbai : polygon;
@@ -119,7 +138,6 @@ export default function ThesisSubmission() {
         throw new Error("Contract address is not available");
       }
 
-      // Call the createProposal function
       toast({
         title: "Creating Proposal...",
         description: "Please approve the transaction in your wallet.",
@@ -141,7 +159,6 @@ export default function ThesisSubmission() {
         description: `Transaction hash: ${tx.hash}`,
       });
 
-      // Setup event listener configuration
       const eventConfig = {
         provider,
         contractAddress,
@@ -149,7 +166,6 @@ export default function ThesisSubmission() {
         eventName: 'ProposalCreated'
       };
 
-      // Wait for the proposal creation event
       toast({
         title: "Waiting for Confirmation...",
         description: "Waiting for the proposal to be created on the blockchain.",
@@ -160,7 +176,6 @@ export default function ThesisSubmission() {
         description: `Proposal created with token ID: ${proposalEvent.tokenId}`,
       });
 
-      // Redirect to the proposal details page
       navigate(`/thesis/${proposalEvent.tokenId}`);
 
     } catch (error: any) {
@@ -178,10 +193,24 @@ export default function ThesisSubmission() {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-3xl mx-auto px-4 py-12">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-300">
+            Submit Your Thesis
+          </h1>
+          <Button
+            onClick={fillTestData}
+            variant="outline"
+            className="bg-black/30 border-purple-500/30 hover:border-purple-500/50 text-purple-400 gap-2"
+          >
+            <Beaker className="w-4 h-4" />
+            Load Test Data
+          </Button>
+        </div>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             {/* Project Overview Section */}
-            <div className="bg-[#111111] rounded-lg p-6 space-y-6">
+            <div className="bg-[#111111] rounded-lg p-6 space-y-6 shadow-xl border border-white/5 hover:border-purple-500/20 transition-colors">
               <div className="flex items-center gap-2 text-lg font-medium">
                 <File className="w-5 h-5" />
                 <span>Project Overview</span>
@@ -215,7 +244,7 @@ export default function ThesisSubmission() {
             </div>
 
             {/* Investment Details Section */}
-            <div className="bg-[#111111] rounded-lg p-6 space-y-6">
+            <div className="bg-[#111111] rounded-lg p-6 space-y-6 shadow-xl border border-white/5 hover:border-purple-500/20 transition-colors">
               <div className="flex items-center gap-2 text-lg font-medium">
                 <DollarSign className="w-5 h-5" />
                 <span>Investment Details</span>
@@ -304,7 +333,7 @@ export default function ThesisSubmission() {
             </div>
 
             {/* Investment Drivers & Incentives */}
-            <div className="bg-[#111111] rounded-lg p-6 space-y-6">
+            <div className="bg-[#111111] rounded-lg p-6 space-y-6 shadow-xl border border-white/5 hover:border-purple-500/20 transition-colors">
               <div className="flex items-center gap-2 text-lg font-medium">
                 <Users className="w-5 h-5" />
                 <span>Investment Drivers & Incentives</span>
@@ -352,7 +381,7 @@ export default function ThesisSubmission() {
             </div>
 
             {/* Team & Roadmap */}
-            <div className="bg-[#111111] rounded-lg p-6 space-y-6">
+            <div className="bg-[#111111] rounded-lg p-6 space-y-6 shadow-xl border border-white/5 hover:border-purple-500/20 transition-colors">
               <div className="flex items-center gap-2 text-lg font-medium">
                 <Users className="w-5 h-5" />
                 <span>Team & Roadmap</span>
@@ -432,7 +461,7 @@ export default function ThesisSubmission() {
             </div>
 
             {/* Social Links */}
-            <div className="bg-[#111111] rounded-lg p-6 space-y-6">
+            <div className="bg-[#111111] rounded-lg p-6 space-y-6 shadow-xl border border-white/5 hover:border-purple-500/20 transition-colors">
               <div className="flex items-center gap-2 text-lg font-medium">
                 <MessageSquare className="w-5 h-5" />
                 <span>Social Links</span>
@@ -454,9 +483,13 @@ export default function ThesisSubmission() {
             </div>
 
             {/* Submit Section */}
-            <div className="bg-[#0a1020] rounded-lg p-6">
+            <div className="bg-[#0a1020] rounded-lg p-6 shadow-xl border border-white/5">
               <div className="flex items-start gap-3">
-                <div className="shrink-0 mt-1">ℹ️</div>
+                <div className="shrink-0 mt-1">
+                  <div className="w-6 h-6 flex items-center justify-center rounded-full bg-purple-500/10 text-purple-400">
+                    ℹ️
+                  </div>
+                </div>
                 <p className="text-sm text-gray-400">
                   Your proposal will be minted as an NFT, representing a binding smart contract. A fee of 25 RD tokens is required to submit.
                 </p>
@@ -466,9 +499,19 @@ export default function ThesisSubmission() {
             <Button 
               type="submit" 
               disabled={isSubmitting}
-              className="w-full bg-[#9b87f5] hover:bg-[#8b77e5] text-white py-6 text-lg font-medium"
+              className="w-full bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white py-6 text-lg font-medium shadow-xl transition-all duration-200 ease-out hover:shadow-purple-500/20 disabled:opacity-50"
             >
-              {isSubmitting ? "Submitting..." : "Launch Proposal →"}
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                  Submitting...
+                </div>
+              ) : (
+                <span className="flex items-center gap-2">
+                  Launch Proposal
+                  <span className="text-xl">→</span>
+                </span>
+              )}
             </Button>
           </form>
         </Form>
