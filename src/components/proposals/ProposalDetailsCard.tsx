@@ -1,36 +1,18 @@
-import { useState, useEffect } from "react";
-import { ethers } from "ethers";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useState } from 'react';
+import { useProposal } from '@/hooks/useProposal';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS } from "@/lib/constants";
-import { useToast } from "@/hooks/use-toast";
-import { getFromIPFS } from "@/services/ipfsService";
-import { ProposalMetadata } from "@/types/proposals";
-import { ExternalLink, Users, Target, Coins, Info, Clock, ChevronDown, Github, Twitter, BrainCircuit, User, Building2, PieChart } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { motion } from "framer-motion";
-import { useWalletProvider } from "@/hooks/useWalletProvider";
-import { getTokenBalance } from "@/services/tokenService";
-import { format, formatDistanceToNow, isPast } from "date-fns";
-import { loadingStates } from "./LoadingStates";
-import { ProposalLoadingCard } from "./ProposalLoadingCard";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-
-const MIN_LGR_REQUIRED = "1";
-const MIN_RD_REQUIRED = "1";
-
-const formatLGRAmount = (amount: string): string => {
-  const number = parseFloat(amount);
-  return `${number.toLocaleString(undefined, { maximumFractionDigits: 2 })} LGR`;
-};
-
-const formatRDAmount = (amount: string): string => {
-  const number = parseFloat(amount);
-  return `${number.toLocaleString(undefined, { maximumFractionDigits: 2 })} RD`;
-};
+import { motion } from "framer-motion";
+import { 
+  Coins, Clock, ChevronDown, Info, PieChart, Users, ExternalLink, 
+  BrainCircuit, Twitter, Github, Calendar, Gift, Target, ArrowUpRight
+} from "lucide-react";
+import { ProposalLoadingCard } from './ProposalLoadingCard';
+import { formatRDAmount } from '@/lib/utils';
 
 interface ProposalDetailsCardProps {
   tokenId?: string;
@@ -380,7 +362,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       >
         <Card className="bg-zinc-900/50 border-zinc-800/50 backdrop-blur-sm">
           <CardHeader>
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="flex flex-wrap items-center gap-2">
                 <div className="inline-flex items-center space-x-2 bg-blue-900/20 rounded-full px-4 py-2">
                   <BrainCircuit className="w-4 h-4 text-blue-400" />
@@ -391,11 +373,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                     {chain}
                   </span>
                 ))}
-                {proposalDetails.isTestMode && (
-                  <span className="px-3 py-1 text-xs font-medium bg-zinc-800 text-zinc-400 rounded-full">
-                    Test Mode
-                  </span>
-                )}
               </div>
               
               <div>
@@ -405,7 +382,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 <p className="text-lg text-zinc-400">{proposalDetails.description}</p>
               </div>
 
-              {proposalDetails.team && proposalDetails.team.length > 0 && (
+              {(proposalDetails.team && proposalDetails.team.length > 0) && (
                 <div className="pt-4">
                   <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                     <Users className="w-6 h-6 text-blue-400" />
@@ -413,7 +390,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {proposalDetails.team.map((member, index) => (
-                      <div key={index} className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4 hover:bg-zinc-900/70 transition-all duration-300">
+                      <div key={index} className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
                         <div className="flex items-start justify-between">
                           <div>
                             <p className="text-white font-medium">{member.name}</p>
@@ -440,6 +417,69 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 </div>
               )}
 
+              {(proposalDetails.roadmap && proposalDetails.roadmap.length > 0) && (
+                <div className="pt-4">
+                  <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <Calendar className="w-6 h-6 text-blue-400" />
+                    Roadmap
+                  </h3>
+                  <div className="space-y-4">
+                    {proposalDetails.roadmap.map((milestone, index) => (
+                      <div key={index} className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-white font-medium">{milestone.milestone}</p>
+                            <p className="text-zinc-400 text-sm">Expected: {milestone.expectedDate}</p>
+                          </div>
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                            milestone.status === 'Completed' ? 'bg-green-900/20 text-green-400' :
+                            milestone.status === 'In Progress' ? 'bg-blue-900/20 text-blue-400' :
+                            'bg-zinc-800 text-zinc-400'
+                          }`}>
+                            {milestone.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {proposalDetails.backerIncentives && (
+                <div className="pt-4">
+                  <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <Gift className="w-6 h-6 text-blue-400" />
+                    Backer Incentives
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {proposalDetails.backerIncentives.utility && (
+                      <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
+                        <p className="text-zinc-400 text-sm">Utility</p>
+                        <p className="text-white">{proposalDetails.backerIncentives.utility}</p>
+                      </div>
+                    )}
+                    {proposalDetails.backerIncentives.governance && (
+                      <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
+                        <p className="text-zinc-400 text-sm">Governance</p>
+                        <p className="text-white">{proposalDetails.backerIncentives.governance}</p>
+                      </div>
+                    )}
+                    {proposalDetails.backerIncentives.NFTRewards && (
+                      <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
+                        <p className="text-zinc-400 text-sm">NFT Rewards</p>
+                        <p className="text-white">{proposalDetails.backerIncentives.NFTRewards}</p>
+                      </div>
+                    )}
+                    {proposalDetails.backerIncentives.tokenAllocation && (
+                      <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
+                        <p className="text-zinc-400 text-sm">Token Allocation</p>
+                        <p className="text-white">{proposalDetails.backerIncentives.tokenAllocation}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {proposalDetails.socials && (
                 <div className="flex flex-wrap gap-3">
                   {proposalDetails.socials.twitter && (
@@ -452,14 +492,14 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   {proposalDetails.socials.discord && (
                     <a href={proposalDetails.socials.discord} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-900/20 hover:bg-blue-900/40 transition-colors text-blue-400">
-                      <User className="w-4 h-4" />
+                      <ArrowUpRight className="w-4 h-4" />
                       <span className="text-sm">Discord</span>
                     </a>
                   )}
                   {proposalDetails.socials.telegram && (
                     <a href={proposalDetails.socials.telegram} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-900/20 hover:bg-blue-900/40 transition-colors text-blue-400">
-                      <User className="w-4 h-4" />
+                      <ArrowUpRight className="w-4 h-4" />
                       <span className="text-sm">Telegram</span>
                     </a>
                   )}
