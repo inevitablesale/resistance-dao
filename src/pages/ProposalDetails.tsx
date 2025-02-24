@@ -45,10 +45,10 @@ const ProposalDetails = () => {
               <Building2 className="w-16 h-16 mx-auto text-blue-400 relative" />
             </div>
             <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
-              Proposal Details
+              Support This Project
             </h1>
             <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto">
-              Review complete investment strategy and firm criteria
+              Make a soft commitment to help Web3 innovators bring their vision to life
             </p>
           </motion.div>
 
