@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -129,34 +128,21 @@ function validateProposalInput(input: ProposalContractInput) {
   try {
     validateTextLength(input.title, "Title", 10, 100);
     
-    if (!input.ipfsMetadata || input.ipfsMetadata.length === 0) {
-      throw new Error("IPFS metadata hash is required");
+    if (!input.metadataURI || input.metadataURI.length === 0) {
+      throw new Error("Metadata URI is required");
     }
 
-    validateTextLength(input.investmentDrivers, "Investment drivers", 50, 500);
-    
-    if (input.additionalCriteria) {
-      validateTextLength(input.additionalCriteria, "Additional criteria", undefined, 500);
+    const targetCapitalBN = ethers.BigNumber.from(input.targetCapital);
+    const minTarget = ethers.utils.parseUnits("1000", 18); // 1,000 RD
+    const maxTarget = ethers.utils.parseUnits("25000000", 18); // 25M RD
+
+    if (targetCapitalBN.lt(minTarget) || targetCapitalBN.gt(maxTarget)) {
+      throw new Error("Target capital must be between 1,000 and 25,000,000 RD");
     }
 
-    validateTextLength(input.location, "Location", 1, 100);
-
-    const validateArray = (arr: any[], name: string) => {
-      if (!Array.isArray(arr) || arr.length === 0) {
-        throw new Error(`${name} array is required and must not be empty`);
-      }
-      if (arr.some(item => {
-        const num = Number(item);
-        return isNaN(num) || num < 0 || num > 255;
-      })) {
-        throw new Error(`${name} array contains invalid values (must be uint8: 0-255)`);
-      }
-    };
-
-    validateArray(input.paymentTerms, "Payment terms");
-    validateArray(input.operationalStrategies, "Operational strategies");
-    validateArray(input.growthStrategies, "Growth strategies");
-    validateArray(input.integrationStrategies, "Integration strategies");
+    if (input.votingDuration < 7 * 24 * 60 * 60 || input.votingDuration > 90 * 24 * 60 * 60) {
+      throw new Error("Voting duration must be between 7 and 90 days");
+    }
   } catch (error) {
     console.error("Validation error:", error);
     throw error;
@@ -164,33 +150,13 @@ function validateProposalInput(input: ProposalContractInput) {
 }
 
 function transformToContractTuple(input: ProposalContractInput): ProposalContractTuple {
-  const toUint8Array = (arr: (number | string)[] | undefined): number[] => {
-    if (!Array.isArray(arr) || arr.length === 0) {
-      return [0];
-    }
-    return arr.map(num => Math.max(0, Math.min(255, Number(num))));
-  };
-
-  const targetCapitalWei = ethers.BigNumber.isBigNumber(input.targetCapital)
-    ? input.targetCapital
-    : ethers.BigNumber.from(input.targetCapital);
-
   return {
-    title: input.title || "",
-    metadataURI: input.metadataURI || "",
-    ipfsMetadata: input.ipfsMetadata || "",
-    targetCapital: targetCapitalWei.toString(),
-    votingDuration: input.votingDuration || 604800,
-    investmentDrivers: Array.isArray(input.investmentDrivers) ? input.investmentDrivers.join(',') : input.investmentDrivers || "",
-    additionalCriteria: input.additionalCriteria || "",
-    firmSize: Number(input.firmSize),
-    location: input.location || "",
-    dealType: Number(input.dealType),
-    geographicFocus: Number(input.geographicFocus),
-    paymentTerms: toUint8Array(input.paymentTerms),
-    operationalStrategies: toUint8Array(input.operationalStrategies),
-    growthStrategies: toUint8Array(input.growthStrategies),
-    integrationStrategies: toUint8Array(input.integrationStrategies)
+    title: input.title,
+    metadataURI: input.metadataURI,
+    targetCapital: ethers.BigNumber.isBigNumber(input.targetCapital) 
+      ? input.targetCapital.toString() 
+      : input.targetCapital.toString(),
+    votingDuration: input.votingDuration
   };
 }
 
@@ -201,72 +167,17 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
     const contractInput: ProposalContractInput = {
       title: processText(config.metadata.title),
       metadataURI: config.metadataURI,
-      ipfsMetadata: config.ipfsHash || '',
       targetCapital: config.targetCapital,
-      votingDuration: config.votingDuration,
-      investmentDrivers: Array.isArray(config.metadata.investment.drivers) 
-        ? config.metadata.investment.drivers.join(',')
-        : config.metadata.investment.drivers || "",
-      additionalCriteria: config.metadata.investment.additionalCriteria 
-        ? processText(config.metadata.investment.additionalCriteria)
-        : "",
-      firmSize: config.metadata.firmCriteria.size,
-      location: processText(config.metadata.firmCriteria.location),
-      dealType: config.metadata.firmCriteria.dealType,
-      geographicFocus: config.metadata.firmCriteria.geographicFocus,
-      paymentTerms: config.metadata.paymentTerms || [],
-      operationalStrategies: config.metadata.strategies.operational || [],
-      growthStrategies: config.metadata.strategies.growth || [],
-      integrationStrategies: config.metadata.strategies.integration || []
+      votingDuration: config.votingDuration
     };
+
+    // Validate the input before returning
+    validateProposalInput(contractInput);
 
     return contractInput;
   } catch (error) {
     console.error("Error transforming config:", error);
     throw error;
-  }
-}
-
-async function approveTokensIfNeeded(
-  provider: ethers.providers.Web3Provider,
-  spender: string,
-  amount: ethers.BigNumber
-): Promise<void> {
-  const signer = provider.getSigner();
-  const signerAddress = await signer.getAddress();
-  
-  const hasAllowance = await checkTokenAllowance(
-    provider,
-    LGR_TOKEN_ADDRESS,
-    signerAddress,
-    FACTORY_ADDRESS,
-    amount.toString()
-  );
-
-  if (!hasAllowance) {
-    console.log("Approving LGR tokens...");
-    const lgrToken = new ethers.Contract(
-      LGR_TOKEN_ADDRESS,
-      ["function approve(address spender, uint256 amount) returns (bool)"],
-      signer
-    );
-
-    await executeTransaction(
-      () => lgrToken.approve(FACTORY_ADDRESS, amount),
-      {
-        type: 'token',
-        description: `Approve ${ethers.utils.formatEther(amount)} LGR tokens`,
-        timeout: 120000,
-        maxRetries: 3,
-        backoffMs: 5000,
-        tokenConfig: {
-          tokenAddress: LGR_TOKEN_ADDRESS,
-          spenderAddress: FACTORY_ADDRESS,
-          amount: amount.toString(),
-          isApproval: true
-        }
-      }
-    );
   }
 }
 
@@ -286,62 +197,41 @@ export const createProposal = async (
     const ipfsHash = await uploadToIPFS(metadata);
     console.log("IPFS upload successful:", ipfsHash);
 
-    // Convert metadata to contract input format
+    // Create the contract input with the required fields only
     const contractInput: ProposalContractInput = {
       title: processText(metadata.title),
-      ipfsMetadata: ipfsHash,
+      metadataURI: `https://gateway.pinata.cloud/ipfs/${ipfsHash}`,
       targetCapital: ethers.utils.parseUnits(metadata.investment.targetCapital, 18),
-      votingDuration: metadata.votingDuration,
-      investmentDrivers: processText(metadata.investment.drivers),
-      additionalCriteria: metadata.investment.additionalCriteria 
-        ? processText(metadata.investment.additionalCriteria)
-        : "",
-      firmSize: metadata.firmCriteria.size,
-      location: processText(metadata.firmCriteria.location),
-      dealType: metadata.firmCriteria.dealType,
-      geographicFocus: metadata.firmCriteria.geographicFocus,
-      paymentTerms: metadata.paymentTerms,
-      operationalStrategies: metadata.strategies.operational,
-      growthStrategies: metadata.strategies.growth,
-      integrationStrategies: metadata.strategies.integration
+      votingDuration: metadata.votingDuration
     };
 
-    // Check and approve tokens if needed
-    await approveTokensIfNeeded(provider, status.treasury, contractInput.targetCapital);
-    
-    // Transform to contract tuple format
+    // Validate the input
+    validateProposalInput(contractInput);
+
+    // Transform to tuple for contract call
     const tuple = transformToContractTuple(contractInput);
-    const tupleArray = [
-      tuple.title,
-      tuple.ipfsMetadata,
-      tuple.targetCapital,
-      tuple.votingDuration,
-      tuple.investmentDrivers,
-      tuple.additionalCriteria,
-      tuple.firmSize,
-      tuple.location,
-      tuple.dealType,
-      tuple.geographicFocus,
-      tuple.paymentTerms,
-      tuple.operationalStrategies,
-      tuple.growthStrategies,
-      tuple.integrationStrategies
-    ];
 
     console.log("Creating proposal with parameters:", {
-      tupleArray,
-      linkedInURL: metadata.linkedInURL,
-      targetCapitalLGR: ethers.utils.formatUnits(tuple.targetCapital, 18)
+      title: tuple.title,
+      metadataURI: tuple.metadataURI,
+      targetCapital: ethers.utils.formatUnits(tuple.targetCapital, 18),
+      votingDuration: tuple.votingDuration
     });
 
     // Submit proposal with explicit gas settings
     return await executeTransaction(
-      () => factory.createProposal(tupleArray, metadata.linkedInURL, {
-        gasLimit: 1000000,
-      }),
+      () => factory.createProposal(
+        tuple.title,
+        tuple.metadataURI,
+        tuple.targetCapital,
+        tuple.votingDuration,
+        {
+          gasLimit: 1000000,
+        }
+      ),
       {
         type: 'nft',
-        description: `Creating proposal with target capital ${ethers.utils.formatUnits(tuple.targetCapital, 18)} LGR`,
+        description: `Creating proposal with target capital ${ethers.utils.formatUnits(tuple.targetCapital, 18)} RD`,
         timeout: 180000,
         maxRetries: 3,
         backoffMs: 5000,
@@ -349,27 +239,13 @@ export const createProposal = async (
           tokenAddress: FACTORY_ADDRESS,
           amount: 1,
           standard: "ERC721",
-          symbol: "LFP",
-          name: "LedgerFren Proposal"
+          symbol: "RDP",
+          name: "Resistance DAO Proposal"
         }
       }
     );
   } catch (error) {
     console.error("Error creating proposal:", error);
-    
-    // Enhanced error handling
-    if (error.message?.includes('execution reverted')) {
-      throw new ProposalError({
-        category: 'contract',
-        message: 'The proposal creation was rejected by the contract. Please check your input values.',
-        recoverySteps: [
-          'Verify all input fields are correct',
-          'Check if you have sufficient LGR tokens',
-          'Ensure your target capital is within allowed limits'
-        ]
-      });
-    }
-    
     throw error;
   }
 };
