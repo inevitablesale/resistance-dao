@@ -1,7 +1,7 @@
 
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Wallet, Loader2, Shield, ArrowRight } from "lucide-react";
+import { X, Wallet, Loader2, Shield, Crown } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
@@ -94,11 +94,17 @@ export const AccessCoverOverlay = () => {
           <div className="mb-12">
             {!address ? (
               <>
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-500/20 flex items-center justify-center">
+                  <Crown className="w-10 h-10 text-amber-400" />
+                </div>
                 <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
-                  Join Resistance DAO<br />Become a Member
+                  Welcome to Resistance DAO
                 </h1>
+                <p className="text-xl text-blue-200/80 max-w-2xl mx-auto mb-4">
+                  Original holders: You're part of our founding community. Thank you for being here since the beginning.
+                </p>
                 <p className="text-xl text-blue-200/80 max-w-2xl mx-auto">
-                  Connect your wallet to mint a Member NFT and join our community
+                  New members: Join our community by minting a Member NFT
                 </p>
               </>
             ) : nftBalance > 0 ? (
@@ -117,7 +123,7 @@ export const AccessCoverOverlay = () => {
                   onClick={() => setIsOpen(false)}
                   className="bg-gradient-to-r from-green-600 to-green-500"
                 >
-                  Enter DAO <ArrowRight className="ml-2" />
+                  Enter DAO
                 </Button>
               </>
             ) : (
@@ -125,6 +131,9 @@ export const AccessCoverOverlay = () => {
                 <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
                   Mint Your Member NFT
                 </h1>
+                <p className="text-xl text-blue-200/80 max-w-2xl mx-auto mb-4">
+                  Original holders: You've been with us since the beginning. Thank you for your support.
+                </p>
                 <p className="text-xl text-blue-200/80 max-w-2xl mx-auto mb-8">
                   Join Resistance DAO by minting your Member NFT for {MINT_PRICE} USDC
                 </p>
@@ -203,4 +212,3 @@ export const AccessCoverOverlay = () => {
     </div>
   );
 };
-
