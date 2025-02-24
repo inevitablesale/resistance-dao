@@ -255,7 +255,7 @@ export default function ThesisSubmission() {
               Submit Your Proposal
             </h1>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Present your investment strategy to find co-investors who share your vision. Test market interest before committing resources.
+              Join the Resistance DAO and shape the future of web3 accounting. Present your proposal to our community of seasoned professionals and find co-builders who share your vision.
             </p>
             <div className="flex items-center justify-center gap-4">
               <Button
