@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -9,7 +10,7 @@ import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS } from "@/lib/constants"
 import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata } from "@/types/proposals";
-import { ExternalLink, Users, Target, Coins, Info, Clock, ChevronDown, Github, Twitter, Discord, Telegram, Briefcase, PieChart, User } from "lucide-react";
+import { ExternalLink, Users, Target, Coins, Info, Clock, ChevronDown, Github, Twitter, BrainCircuit, User, Building2, PieChart } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
@@ -295,18 +296,18 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
   if (!isConnected) {
     return (
-      <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
+      <Card className="bg-zinc-900/50 border-zinc-800/50 backdrop-blur-sm">
         <CardContent className="p-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
-            <p className="text-white/60 text-lg">Connect your wallet to view proposal details</p>
+            <p className="text-zinc-400 text-lg">Connect your wallet to view proposal details</p>
             <Button 
               onClick={connect} 
               size="lg"
-              className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold"
+              className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg"
             >
               Connect Wallet
             </Button>
@@ -318,17 +319,17 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
   if (hasMinimumLGR === false) {
     return (
-      <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
+      <Card className="bg-zinc-900/50 border-zinc-800/50 backdrop-blur-sm">
         <CardContent className="p-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
-            <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Coins className="w-8 h-8 text-yellow-500" />
+            <div className="w-16 h-16 bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Coins className="w-8 h-8 text-blue-400" />
             </div>
-            <p className="text-white/60 text-lg">
+            <p className="text-zinc-400 text-lg">
               You need at least {MIN_LGR_REQUIRED} LGR to view proposal details
             </p>
           </motion.div>
@@ -353,9 +354,9 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
   if (!proposalDetails) {
     return (
-      <Card className="w-full bg-black/40 border-white/10 backdrop-blur-sm">
+      <Card className="bg-zinc-900/50 border-zinc-800/50 backdrop-blur-sm">
         <CardContent className="p-8 text-center">
-          <p className="text-white/60 text-lg">The requested proposal could not be found.</p>
+          <p className="text-zinc-400 text-lg">The requested proposal could not be found.</p>
         </CardContent>
       </Card>
     );
@@ -368,55 +369,58 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         animate={{ opacity: 1, y: 0 }}
         className="space-y-6"
       >
-        <Card className="bg-gradient-to-br from-yellow-500/10 via-transparent to-teal-500/10 backdrop-blur-lg border border-white/20">
+        <Card className="bg-zinc-900/50 border-zinc-800/50 backdrop-blur-sm">
           <CardHeader>
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="px-3 py-1 text-xs font-medium bg-yellow-500/10 text-yellow-500 rounded-full">
-                  {proposalDetails.category}
-                </span>
+                <div className="inline-flex items-center space-x-2 bg-blue-900/20 rounded-full px-4 py-2">
+                  <BrainCircuit className="w-4 h-4 text-blue-400" />
+                  <span className="text-sm text-blue-400">{proposalDetails.category}</span>
+                </div>
                 {proposalDetails.blockchain?.map((chain) => (
-                  <span key={chain} className="px-3 py-1 text-xs font-medium bg-teal-500/10 text-teal-500 rounded-full">
+                  <span key={chain} className="px-3 py-1 text-xs font-medium bg-blue-900/20 text-blue-400 rounded-full">
                     {chain}
                   </span>
                 ))}
                 {proposalDetails.isTestMode && (
-                  <span className="px-3 py-1 text-xs font-medium bg-blue-500/10 text-blue-500 rounded-full">
+                  <span className="px-3 py-1 text-xs font-medium bg-zinc-800 text-zinc-400 rounded-full">
                     Test Mode
                   </span>
                 )}
               </div>
               
               <div>
-                <h1 className="text-2xl font-bold text-white mb-2">{proposalDetails.title}</h1>
-                <p className="text-white/60">{proposalDetails.description}</p>
+                <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
+                  {proposalDetails.title}
+                </h1>
+                <p className="text-lg text-zinc-400">{proposalDetails.description}</p>
               </div>
 
               {proposalDetails.team && proposalDetails.team.length > 0 && (
                 <div className="pt-4">
-                  <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                    <Users className="w-5 h-5 text-yellow-500" />
+                  <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <Users className="w-6 h-6 text-blue-400" />
                     Team
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {proposalDetails.team.map((member, index) => (
-                      <div key={index} className="bg-black/20 rounded-lg p-4 border border-white/10">
+                      <div key={index} className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4 hover:bg-zinc-900/70 transition-all duration-300">
                         <div className="flex items-start justify-between">
                           <div>
                             <p className="text-white font-medium">{member.name}</p>
-                            <p className="text-white/60 text-sm">{member.role}</p>
+                            <p className="text-zinc-400 text-sm">{member.role}</p>
                           </div>
                           <div className="flex gap-2">
                             {member.linkedin && (
                               <a href={member.linkedin} target="_blank" rel="noopener noreferrer"
-                                className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
+                                className="p-2 rounded-full bg-blue-900/20 hover:bg-blue-900/40 transition-colors">
                                 <ExternalLink className="w-4 h-4 text-blue-400" />
                               </a>
                             )}
                             {member.github && (
                               <a href={member.github} target="_blank" rel="noopener noreferrer"
-                                className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
-                                <Github className="w-4 h-4 text-white/70" />
+                                className="p-2 rounded-full bg-blue-900/20 hover:bg-blue-900/40 transition-colors">
+                                <Github className="w-4 h-4 text-blue-400" />
                               </a>
                             )}
                           </div>
@@ -431,22 +435,22 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 <div className="flex flex-wrap gap-3">
                   {proposalDetails.socials.twitter && (
                     <a href={proposalDetails.socials.twitter} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white/70">
-                      <Twitter className="w-4 h-4 text-blue-400" />
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-900/20 hover:bg-blue-900/40 transition-colors text-blue-400">
+                      <Twitter className="w-4 h-4" />
                       <span className="text-sm">Twitter</span>
                     </a>
                   )}
                   {proposalDetails.socials.discord && (
                     <a href={proposalDetails.socials.discord} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white/70">
-                      <Discord className="w-4 h-4 text-indigo-400" />
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-900/20 hover:bg-blue-900/40 transition-colors text-blue-400">
+                      <User className="w-4 h-4" />
                       <span className="text-sm">Discord</span>
                     </a>
                   )}
                   {proposalDetails.socials.telegram && (
                     <a href={proposalDetails.socials.telegram} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white/70">
-                      <Telegram className="w-4 h-4 text-blue-400" />
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-900/20 hover:bg-blue-900/40 transition-colors text-blue-400">
+                      <User className="w-4 h-4" />
                       <span className="text-sm">Telegram</span>
                     </a>
                   )}
@@ -460,27 +464,27 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
-                    <h3 className="text-2xl font-semibold text-white flex items-center gap-2">
-                      <Coins className="w-6 h-6 text-yellow-500" />
+                    <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                      <Coins className="w-6 h-6 text-blue-400" />
                       Support This Proposal
                     </h3>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 backdrop-blur-sm border border-yellow-500/20">
-                      <Clock className="w-5 h-5 text-yellow-500" />
-                      <span className={`text-lg font-medium ${isVotingEnded ? 'text-red-400' : 'text-yellow-500'}`}>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-900/20 border border-blue-900/40">
+                      <Clock className="w-5 h-5 text-blue-400" />
+                      <span className={`text-lg font-medium ${isVotingEnded ? 'text-red-400' : 'text-blue-400'}`}>
                         {timeRemaining}
                       </span>
                     </div>
                   </div>
-                  <div className="text-sm text-white/60">
+                  <div className="text-sm text-zinc-400">
                     Submitted {new Date(proposalDetails.submissionTimestamp * 1000).toLocaleDateString()}
                   </div>
                 </div>
                 <div className="text-center md:text-right">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-900/20 backdrop-blur-sm">
                     <p className="text-2xl font-bold text-white">
                       {formatLGRAmount(pledgedAmount)}
                     </p>
-                    <span className="text-sm text-white/60 border-l border-white/10 pl-2">
+                    <span className="text-sm text-zinc-400 border-l border-zinc-700 pl-2">
                       {backerCount} supporter{backerCount !== 1 ? 's' : ''}
                     </span>
                   </div>
@@ -488,7 +492,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               </div>
 
               <div className="mb-8">
-                <div className="flex justify-between text-sm text-white/60 mb-2">
+                <div className="flex justify-between text-sm text-zinc-400 mb-2">
                   <span>Progress Towards Target Capital</span>
                   <span>
                     {proposalDetails?.investment?.targetCapital 
@@ -500,23 +504,23 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   value={proposalDetails?.investment?.targetCapital 
                     ? (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100 
                     : 0}
-                  className="h-3 bg-white/5"
+                  className="h-3 bg-zinc-800"
                 />
-                <p className="text-sm text-white/60 mt-2">
+                <p className="text-sm text-zinc-400 mt-2">
                   Target: {formatLGRAmount(proposalDetails.investment.targetCapital)}
                 </p>
               </div>
 
               {proposalDetails.fundingBreakdown && (
-                <div className="bg-black/20 rounded-lg p-6 mb-6">
-                  <h4 className="text-lg font-medium text-white flex items-center gap-2 mb-4">
-                    <PieChart className="w-5 h-5 text-yellow-500" />
+                <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-6 mb-6">
+                  <h4 className="text-xl font-bold text-white flex items-center gap-2 mb-4">
+                    <PieChart className="w-5 h-5 text-blue-400" />
                     Funding Breakdown
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {proposalDetails.fundingBreakdown.map((item, index) => (
-                      <div key={index} className="bg-white/5 rounded-lg p-4">
-                        <p className="text-white/60 text-sm">{item.category}</p>
+                      <div key={index} className="bg-zinc-800/50 rounded-lg p-4">
+                        <p className="text-zinc-400 text-sm">{item.category}</p>
                         <p className="text-white font-medium">{formatLGRAmount(item.amount)}</p>
                       </div>
                     ))}
@@ -524,30 +528,30 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 </div>
               )}
 
-              <div className="bg-black/20 rounded-lg p-6 space-y-4 mb-6">
-                <h4 className="text-lg font-medium text-white flex items-center gap-2">
-                  <Info className="w-5 h-5 text-yellow-500" />
+              <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-6 space-y-4 mb-6">
+                <h4 className="text-xl font-bold text-white flex items-center gap-2">
+                  <Info className="w-5 h-5 text-blue-400" />
                   Investment Purpose
                 </h4>
-                <p className="text-white/80 leading-relaxed">
+                <p className="text-zinc-300 leading-relaxed">
                   {proposalDetails.investment.description}
                 </p>
               </div>
 
               <Collapsible>
                 <CollapsibleTrigger className="w-full">
-                  <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                  <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
                     <div className="flex items-center justify-between text-white">
                       <h4 className="font-medium flex items-center gap-2">
-                        <Info className="w-5 h-5 text-yellow-500" />
+                        <Info className="w-5 h-5 text-blue-400" />
                         About Supporting Proposals
                       </h4>
-                      <ChevronDown className="w-5 h-5 text-white/60" />
+                      <ChevronDown className="w-5 h-5 text-zinc-400" />
                     </div>
                   </div>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="p-4 bg-black/20 rounded-lg mt-2">
-                  <p className="text-sm text-white/80 leading-relaxed">
+                <CollapsibleContent className="p-4 bg-zinc-900/50 border border-zinc-800/50 rounded-lg mt-2">
+                  <p className="text-sm text-zinc-300 leading-relaxed">
                     Express your interest by making a soft commitment. This is not an actual investment - 
                     only a 10 LGR voting fee will be charged to record your support. Your pledged amount shows how much 
                     you're potentially interested in investing later.
@@ -557,7 +561,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               
               <div className="flex flex-col md:flex-row gap-4 mt-6">
                 <div className="flex-1">
-                  <Label htmlFor="pledgeAmount" className="text-white/60 mb-2 block">
+                  <Label htmlFor="pledgeAmount" className="text-zinc-400 mb-2 block">
                     Commitment Amount
                   </Label>
                   <Input
@@ -568,9 +572,9 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                     value={pledgeInput}
                     onChange={(e) => setPledgeInput(e.target.value)}
                     placeholder="Enter amount you're interested in"
-                    className="bg-black/40 border-white/10 text-white h-12"
+                    className="bg-zinc-900/50 border-zinc-800/50 text-white h-12"
                   />
-                  <p className="text-sm text-white/60 mt-2 flex items-center gap-2">
+                  <p className="text-sm text-zinc-400 mt-2 flex items-center gap-2">
                     <Info className="w-4 h-4" />
                     Only a 10 LGR voting fee is required
                   </p>
@@ -579,7 +583,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   onClick={handlePledge}
                   disabled={isPledging || !pledgeInput}
                   size="lg"
-                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold h-12 mt-8 md:mt-0"
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold h-12 mt-8 md:mt-0"
                 >
                   {isPledging ? (
                     "Recording..."
