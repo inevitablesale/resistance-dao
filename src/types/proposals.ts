@@ -1,6 +1,51 @@
 
 import { ethers } from "ethers";
 
+export enum FirmSize {
+  SMALL = 0,
+  MEDIUM = 1,
+  LARGE = 2
+}
+
+export enum DealType {
+  ACQUISITION = 0,
+  MERGER = 1,
+  PARTNERSHIP = 2
+}
+
+export enum GeographicFocus {
+  LOCAL = 0,
+  REGIONAL = 1,
+  NATIONAL = 2,
+  INTERNATIONAL = 3
+}
+
+export enum PaymentTerm {
+  CASH = 0,
+  SELLER_FINANCING = 1,
+  EARNOUT = 2,
+  EQUITY_ROLLOVER = 3,
+  BANK_FINANCING = 4
+}
+
+export enum OperationalStrategy {
+  TECH_MODERNIZATION = 0,
+  PROCESS_STANDARDIZATION = 1,
+  STAFF_RETENTION = 2
+}
+
+export enum GrowthStrategy {
+  GEOGRAPHIC_EXPANSION = 0,
+  SERVICE_EXPANSION = 1,
+  CLIENT_GROWTH = 2
+}
+
+export enum IntegrationStrategy {
+  MERGING_OPERATIONS = 0,
+  CULTURE_INTEGRATION = 1,
+  SYSTEMS_CONSOLIDATION = 2
+}
+
 export interface TeamMember {
   name?: string;
   role?: string;
@@ -32,6 +77,19 @@ export interface ProposalSocials {
   telegram?: string;
 }
 
+export interface FirmCriteria {
+  size: FirmSize;
+  location: string;
+  dealType: DealType;
+  geographicFocus: GeographicFocus;
+}
+
+export interface Strategies {
+  operational: OperationalStrategy[];
+  growth: GrowthStrategy[];
+  integration: IntegrationStrategy[];
+}
+
 export interface ContractProposal {
   title: string;
   metadataURI: string;
@@ -46,6 +104,8 @@ export interface ProposalMetadata {
   investment: {
     targetCapital: string;
     description: string;
+    drivers?: string[];
+    additionalCriteria?: string;
   };
   votingDuration: number;
   linkedInURL: string;
@@ -56,6 +116,9 @@ export interface ProposalMetadata {
   team?: TeamMember[];
   roadmap?: RoadmapMilestone[];
   socials?: ProposalSocials;
+  firmCriteria?: FirmCriteria;
+  paymentTerms?: PaymentTerm[];
+  strategies?: Strategies;
   isTestMode?: boolean;
   submissionTimestamp?: number;
   submitter?: string;
@@ -77,6 +140,7 @@ export interface ProposalConfig {
   metadataURI: string;
   metadata: ProposalMetadata;
   linkedInURL: string;
+  ipfsHash?: string;
 }
 
 export interface ProposalInput {
@@ -91,6 +155,17 @@ export interface ProposalContractInput {
   metadataURI: string;
   targetCapital: ethers.BigNumber;
   votingDuration: number;
+  ipfsMetadata?: string;
+  investmentDrivers?: string;
+  additionalCriteria?: string;
+  location?: string;
+  firmSize?: number;
+  dealType?: number;
+  geographicFocus?: number;
+  paymentTerms?: number[];
+  operationalStrategies?: number[];
+  growthStrategies?: number[];
+  integrationStrategies?: number[];
 }
 
 export interface ProposalContractTuple {
@@ -98,4 +173,15 @@ export interface ProposalContractTuple {
   metadataURI: string;
   targetCapital: string;  // uint128 as string
   votingDuration: number;
+  ipfsMetadata?: string;
+  investmentDrivers?: string;
+  additionalCriteria?: string;
+  firmSize?: number;
+  location?: string;
+  dealType?: number;
+  geographicFocus?: number;
+  paymentTerms?: number[];
+  operationalStrategies?: number[];
+  growthStrategies?: number[];
+  integrationStrategies?: number[];
 }
