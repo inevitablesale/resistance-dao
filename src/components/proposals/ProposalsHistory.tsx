@@ -8,7 +8,7 @@ import { ethers } from "ethers";
 import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS, RD_PRICE_USD } from "@/lib/constants";
 import { getTokenBalance } from "@/services/tokenService";
 import { getFromIPFS } from "@/services/ipfsService";
-import { ProposalMetadata, ProposalEvent, NFTMetadata } from "@/types/proposals";
+import { ProposalMetadata, ProposalEvent } from "@/types/proposals";
 import { useToast } from "@/hooks/use-toast";
 import { loadingStates } from "./LoadingStates";
 import { ProposalLoadingCard } from "./ProposalLoadingCard";
@@ -110,49 +110,45 @@ export const ProposalsHistory = () => {
   useEffect(() => {
     const fetchProposalMetadata = async (proposal: ProposalEvent, contract: ethers.Contract) => {
       try {
-        console.log(`\n=== Processing Proposal #${proposal.tokenId} ===`);
-        console.log('Proposal initial data:', proposal);
+        console.log(`\n=== Fetching metadata for proposal #${proposal.tokenId} ===`);
         
         updateProposalData(proposal.tokenId, { isLoading: true });
 
-        if (!proposal.tokenId) {
-          throw new Error("Invalid token ID");
-        }
+        // Get token URI
+        console.log('Getting token URI from contract...');
+        const tokenUri = await contract.tokenURI(proposal.tokenId);
+        console.log('Token URI:', tokenUri);
 
-        console.log(`Fetching token URI for #${proposal.tokenId}...`);
-        const [tokenUri, pledgedAmount] = await Promise.all([
-          contract.tokenURI(proposal.tokenId),
-          contract.pledgedAmount(proposal.tokenId).catch(() => ethers.BigNumber.from(0))
-        ]);
+        // Get pledged amount
+        console.log('Getting pledged amount...');
+        const pledgedAmount = await contract.pledgedAmount(proposal.tokenId)
+          .catch(() => ethers.BigNumber.from(0));
+        console.log('Pledged amount:', ethers.utils.formatEther(pledgedAmount), 'RD');
 
-        console.log(`Token URI for #${proposal.tokenId}:`, tokenUri);
-        console.log(`Pledged amount for #${proposal.tokenId}:`, ethers.utils.formatEther(pledgedAmount));
-
-        let metadata: ProposalMetadata | undefined;
         if (tokenUri) {
-          console.log(`\nFetching IPFS data for token #${proposal.tokenId}`);
-          console.log('Token URI:', tokenUri);
-          
-          const ipfsHash = tokenUri.replace('ipfs://', '');
-          console.log('IPFS Hash:', ipfsHash);
-          
+          console.log('Fetching IPFS data...');
           try {
-            metadata = await getFromIPFS<ProposalMetadata>(ipfsHash, 'proposal');
-            console.log(`\nSuccessfully fetched IPFS data for token #${proposal.tokenId}:`, metadata);
+            const metadata = await getFromIPFS<ProposalMetadata>(
+              tokenUri.replace('ipfs://', ''),
+              'proposal'
+            );
+            console.log('IPFS metadata retrieved:', metadata);
+
+            updateProposalData(proposal.tokenId, {
+              metadata,
+              pledgedAmount: ethers.utils.formatEther(pledgedAmount),
+              isLoading: false
+            });
           } catch (ipfsError) {
-            console.error(`IPFS fetch error for token #${proposal.tokenId}:`, ipfsError);
-            throw new Error(`IPFS fetch failed: ${ipfsError.message}`);
+            console.error('IPFS fetch error:', ipfsError);
+            updateProposalData(proposal.tokenId, {
+              isLoading: false,
+              error: `IPFS fetch failed: ${ipfsError.message}`
+            });
           }
         }
-
-        updateProposalData(proposal.tokenId, {
-          metadata,
-          pledgedAmount: ethers.utils.formatEther(pledgedAmount),
-          isLoading: false
-        });
-
       } catch (error: any) {
-        console.error(`\nError processing token #${proposal.tokenId}:`, error);
+        console.error(`Error processing proposal #${proposal.tokenId}:`, error);
         updateProposalData(proposal.tokenId, {
           isLoading: false,
           error: error.message
@@ -166,7 +162,8 @@ export const ProposalsHistory = () => {
       try {
         setIsInitialLoading(true);
         const walletProvider = await getProvider();
-        console.log('Initializing contract to fetch proposals...');
+        console.log('\n=== Fetching Proposals ===');
+        console.log('Using Factory Address:', FACTORY_ADDRESS);
         
         const contract = new ethers.Contract(
           FACTORY_ADDRESS,
@@ -174,9 +171,23 @@ export const ProposalsHistory = () => {
           walletProvider.provider
         );
 
+        // Get total supply first
+        console.log('Getting total supply...');
+        const totalSupply = await contract.totalSupply().catch(() => 0);
+        console.log('Total proposals:', totalSupply.toString());
+
         const filter = contract.filters.ProposalCreated();
+        console.log('Querying ProposalCreated events...');
         const events = await contract.queryFilter(filter);
-        console.log('Found proposal events:', events.length);
+        console.log('Found events:', events.length);
+        
+        console.log('Event details:', events.map(e => ({
+          blockNumber: e.blockNumber,
+          args: e.args ? {
+            tokenId: e.args.tokenId?.toString(),
+            creator: e.args.creator
+          } : 'No args'
+        })));
 
         const initialProposals = events
           .map(event => {
@@ -196,6 +207,12 @@ export const ProposalsHistory = () => {
             return proposal;
           })
           .filter((proposal): proposal is ProposalEvent => proposal !== null);
+
+        console.log('Processed proposals:', initialProposals);
+
+        if (initialProposals.length === 0) {
+          console.log('No proposals found in events');
+        }
 
         initialProposals.sort((a, b) => b.blockNumber - a.blockNumber);
         setProposalEvents(initialProposals);
