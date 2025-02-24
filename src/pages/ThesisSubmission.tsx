@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
@@ -128,7 +130,6 @@ const sampleFormData = {
 export default function ThesisSubmission() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { wallet, user, isConnected } = useWalletConnection();
   const { primaryWallet } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -159,8 +160,13 @@ export default function ThesisSubmission() {
   async function onSubmit(values: z.infer<typeof thesisFormSchema>) {
     setIsSubmitting(true);
     try {
-      if (!wallet) {
+      if (!primaryWallet) {
         throw new Error("Wallet is not available");
+      }
+
+      const walletClient = await primaryWallet.getWalletClient();
+      if (!walletClient) {
+        throw new Error("Wallet client not available");
       }
 
       // Convert targetCapital to Wei
@@ -192,7 +198,7 @@ export default function ThesisSubmission() {
       });
 
       // Contract interaction parameters
-      const chainId = await wallet.getChainId();
+      const chainId = await walletClient.chainId;
       const isTestMode = chainId !== mainnet.id && chainId !== polygon.id;
       const chain = isTestMode ? polygonMumbai : polygon;
       const contractAddress = isTestMode ? process.env.NEXT_PUBLIC_POLYGON_MUMBAI_CONTRACT_ADDRESS : process.env.NEXT_PUBLIC_POLYGON_MAINNET_CONTRACT_ADDRESS;
@@ -207,30 +213,28 @@ export default function ThesisSubmission() {
         title: "Creating Proposal...",
         description: "Please approve the transaction in your wallet.",
       });
-      const { request } = await wallet.simulateContract({
-        address: contractAddress as `0x${string}`,
-        abi: abi,
-        functionName: 'createProposal',
-        args: [
-          values.title,
-          ipfsHash,
-          targetCapitalInWei,
-          BigInt(values.votingDuration)
-        ],
-        chainId: chain.id,
-      });
-      const txHash = await wallet.writeContract(request);
+      
+      const provider = new ethers.providers.Web3Provider(walletClient as any);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+
+      const tx = await contract.createProposal(
+        values.title,
+        ipfsHash,
+        targetCapitalInWei,
+        BigInt(values.votingDuration)
+      );
+
       toast({
         title: "Transaction Sent",
-        description: `Transaction hash: ${txHash}`,
+        description: `Transaction hash: ${tx.hash}`,
       });
 
       // Setup event listener configuration
-      const provider = wallet.getProvider();
       const eventConfig = {
-        provider: provider,
-        contractAddress: contractAddress,
-        abi: abi,
+        provider,
+        contractAddress,
+        abi,
         eventName: 'ProposalCreated'
       };
 
@@ -239,7 +243,7 @@ export default function ThesisSubmission() {
         title: "Waiting for Confirmation...",
         description: "Waiting for the proposal to be created on the blockchain.",
       });
-      const proposalEvent = await waitForProposalCreation(eventConfig, txHash);
+      const proposalEvent = await waitForProposalCreation(eventConfig, tx.hash);
       toast({
         title: "Proposal Created!",
         description: `Proposal created with token ID: ${proposalEvent.tokenId}`,
