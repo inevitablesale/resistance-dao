@@ -220,14 +220,24 @@ export default function ThesisSubmission() {
         investment: {
           targetCapital: values.investment.targetCapital,
           description: values.investment.description,
-          drivers: [],
-          additionalCriteria: ""
         },
         votingDuration: values.votingDuration,
         linkedInURL: values.linkedInURL,
         blockchain: values.blockchain,
-        fundingBreakdown: values.fundingBreakdown.filter(item => item.category && item.amount),
-        team: values.team.filter(member => member.name && member.role),
+        fundingBreakdown: values.fundingBreakdown
+          .filter(item => item.category && item.amount)
+          .map(item => ({
+            category: item.category as string,
+            amount: item.amount as string
+          })),
+        team: values.team
+          .filter(member => member.name && member.role)
+          .map(member => ({
+            name: member.name as string,
+            role: member.role as string,
+            linkedin: member.linkedin,
+            github: member.github
+          })),
         socials: {
           twitter: values.socials.twitter || undefined,
           discord: values.socials.discord || undefined,
@@ -242,7 +252,9 @@ export default function ThesisSubmission() {
         title: "Uploading to IPFS...",
         description: "Please wait while we upload your proposal metadata to IPFS.",
       });
+      
       const ipfsHash = await uploadToIPFS<ProposalMetadata>(metadata);
+      
       toast({
         title: "IPFS Upload Successful",
         description: `Metadata uploaded to IPFS with hash: ${ipfsHash}`,
@@ -279,7 +291,9 @@ export default function ThesisSubmission() {
         title: "Waiting for Confirmation...",
         description: "Waiting for the proposal to be created on the blockchain.",
       });
+      
       const proposalEvent = await waitForProposalCreation(eventConfig, tx.hash);
+      
       toast({
         title: "Proposal Created!",
         description: `Proposal created with token ID: ${proposalEvent.tokenId}`,
