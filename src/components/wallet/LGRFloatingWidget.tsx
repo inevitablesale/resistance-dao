@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { getWorkingProvider, getLgrTokenContract, getPresaleContract, fetchPresaleMaticPrice, purchaseTokens } from "@/services/presaleContractService";
+import { getWorkingProvider, getRdTokenContract, getUsdcContract, getPresaleContract, fetchPresaleMaticPrice, purchaseTokens } from "@/services/presaleContractService";
 import { ethers } from "ethers";
 import { Coins, Info } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -17,10 +17,8 @@ export const LGRFloatingWidget = () => {
   const { address } = useCustomWallet();
   const { setShowAuthFlow, primaryWallet } = useDynamicContext();
   const { enabled, open } = useOnramp();
-  const [lgrBalance, setLgrBalance] = useState<string>("0");
-  const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
+  const [rdBalance, setRdBalance] = useState<string>("0");
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
-  const [maticPrice, setMaticPrice] = useState<string>("0");
   const [purchaseAmount, setPurchaseAmount] = useState<string>("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
@@ -32,23 +30,18 @@ export const LGRFloatingWidget = () => {
 
       try {
         const provider = await getWorkingProvider();
-        const [lgrContract, presaleContract, usdcBal] = await Promise.all([
-          getLgrTokenContract(provider),
-          getPresaleContract(provider),
-          provider.getBalance(address)
+        const [rdContract, usdcContract] = await Promise.all([
+          getRdTokenContract(provider),
+          getUsdcContract(provider)
         ]);
         
-        const [lgrBal, purchased] = await Promise.all([
-          lgrContract.balanceOf(address),
-          presaleContract.purchasedTokens(address)
+        const [rdBal, usdcBal] = await Promise.all([
+          rdContract.balanceOf(address),
+          usdcContract.balanceOf(address)
         ]);
         
-        setLgrBalance(ethers.utils.formatUnits(lgrBal, 18));
-        setPurchasedTokens(ethers.utils.formatUnits(purchased, 18));
-        setUsdcBalance(ethers.utils.formatEther(usdcBal));
-
-        const currentMaticPrice = await fetchPresaleMaticPrice();
-        setMaticPrice(currentMaticPrice);
+        setRdBalance(ethers.utils.formatUnits(rdBal, 6));
+        setUsdcBalance(ethers.utils.formatUnits(usdcBal, 6));
       } catch (error) {
         console.error("Error fetching balances:", error);
       }
@@ -148,15 +141,9 @@ export const LGRFloatingWidget = () => {
               </div>
               <div className="text-right">
                 <div className="text-white font-medium">
-                  {Number(lgrBalance).toLocaleString(undefined, { 
+                  {Number(rdBalance).toLocaleString(undefined, { 
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2 
-                  })} RD
-                </div>
-                <div className="text-sm text-gray-400">
-                  Purchased: {Number(purchasedTokens).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
                   })} RD
                 </div>
               </div>
@@ -176,8 +163,8 @@ export const LGRFloatingWidget = () => {
               <div className="text-right">
                 <div className="text-white font-medium">
                   {Number(usdcBalance).toLocaleString(undefined, {
-                    minimumFractionDigits: 4,
-                    maximumFractionDigits: 4
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
                   })} USDC
                 </div>
               </div>
@@ -192,7 +179,6 @@ export const LGRFloatingWidget = () => {
                 <Button 
                   className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold"
                   onClick={() => setIsConfirmOpen(true)}
-                  disabled={!address || Number(usdcBalance) <= 0}
                 >
                   <Coins className="w-4 h-4 mr-2" />
                   Buy RD
