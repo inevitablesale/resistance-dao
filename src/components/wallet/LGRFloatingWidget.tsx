@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -20,7 +19,7 @@ export const LGRFloatingWidget = () => {
   const { enabled, open } = useOnramp();
   const [lgrBalance, setLgrBalance] = useState<string>("0");
   const [purchasedTokens, setPurchasedTokens] = useState<string>("0");
-  const [maticBalance, setMaticBalance] = useState<string>("0");
+  const [usdcBalance, setUsdcBalance] = useState<string>("0");
   const [maticPrice, setMaticPrice] = useState<string>("0");
   const [purchaseAmount, setPurchaseAmount] = useState<string>("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -33,7 +32,7 @@ export const LGRFloatingWidget = () => {
 
       try {
         const provider = await getWorkingProvider();
-        const [lgrContract, presaleContract, maticBal] = await Promise.all([
+        const [lgrContract, presaleContract, usdcBal] = await Promise.all([
           getLgrTokenContract(provider),
           getPresaleContract(provider),
           provider.getBalance(address)
@@ -46,7 +45,7 @@ export const LGRFloatingWidget = () => {
         
         setLgrBalance(ethers.utils.formatUnits(lgrBal, 18));
         setPurchasedTokens(ethers.utils.formatUnits(purchased, 18));
-        setMaticBalance(ethers.utils.formatEther(maticBal));
+        setUsdcBalance(ethers.utils.formatEther(usdcBal));
 
         const currentMaticPrice = await fetchPresaleMaticPrice();
         setMaticPrice(currentMaticPrice);
@@ -60,7 +59,7 @@ export const LGRFloatingWidget = () => {
     return () => clearInterval(interval);
   }, [address]);
 
-  const handleBuyPolygon = async () => {
+  const handleBuyUsdc = async () => {
     if (!primaryWallet?.address) {
       setShowAuthFlow?.(true);
       return;
@@ -78,13 +77,13 @@ export const LGRFloatingWidget = () => {
     try {
       await open({
         onrampProvider: OnrampProviders.Banxa,
-        token: 'MATIC',
+        token: 'USDC',
         address: primaryWallet.address,
       });
       
       toast({
         title: "Purchase Initiated",
-        description: "Your MATIC purchase has been initiated successfully",
+        description: "Your USDC purchase has been initiated successfully",
       });
     } catch (error) {
       console.error("Onramp error:", error);
@@ -112,7 +111,7 @@ export const LGRFloatingWidget = () => {
       
       toast({
         title: "Purchase Successful",
-        description: `Successfully purchased ${result.amount} LGR tokens`,
+        description: `Successfully purchased ${result.amount} RD tokens`,
       });
       
       setIsConfirmOpen(false);
@@ -129,86 +128,86 @@ export const LGRFloatingWidget = () => {
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
-      <div className="mb-2 px-3 py-1 bg-black/90 rounded-lg backdrop-blur-sm border border-white/10">
-        <span className="text-yellow-500 text-sm font-medium">Resistance Wallet</span>
+      <div className="mb-2 px-3 py-1 bg-black/90 rounded-lg backdrop-blur-sm border border-blue-500/10">
+        <span className="text-blue-400 text-sm font-medium">Resistance Wallet</span>
       </div>
       <Popover>
         <PopoverTrigger asChild>
-          <button className="w-12 h-12 rounded-full bg-yellow-500/20 hover:bg-yellow-500/30 transition-colors flex items-center justify-center">
-            <Coins className="w-6 h-6 text-yellow-500" />
+          <button className="w-12 h-12 rounded-full bg-blue-500/20 hover:bg-blue-500/30 transition-colors flex items-center justify-center">
+            <Coins className="w-6 h-6 text-blue-400" />
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-4 bg-black/90 backdrop-blur-lg border border-white/10">
+        <PopoverContent className="w-80 p-4 bg-black/90 backdrop-blur-lg border border-blue-500/10">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                  <Coins className="w-5 h-5 text-yellow-500" />
+                <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+                  <Coins className="w-5 h-5 text-blue-400" />
                 </div>
-                <span className="text-white">LGR Token</span>
+                <span className="text-white">RD Token</span>
               </div>
               <div className="text-right">
                 <div className="text-white font-medium">
                   {Number(lgrBalance).toLocaleString(undefined, { 
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2 
-                  })} LGR
+                  })} RD
                 </div>
                 <div className="text-sm text-gray-400">
                   Purchased: {Number(purchasedTokens).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
-                  })} LGR
+                  })} RD
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between py-2 border-t border-white/10">
+            <div className="flex items-center justify-between py-2 border-t border-blue-500/10">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
                   <img 
-                    src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-                    alt="Polygon"
+                    src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
+                    alt="USDC"
                     className="w-5 h-5"
                   />
                 </div>
-                <span className="text-white">POLYGON Balance</span>
+                <span className="text-white">USDC Balance</span>
               </div>
               <div className="text-right">
                 <div className="text-white font-medium">
-                  {Number(maticBalance).toLocaleString(undefined, {
+                  {Number(usdcBalance).toLocaleString(undefined, {
                     minimumFractionDigits: 4,
                     maximumFractionDigits: 4
-                  })} POLYGON
+                  })} USDC
                 </div>
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="text-sm text-gray-400">
-                Price: $0.10 USD per LGR
+                Price: $0.10 USD per RD
               </div>
 
               <div className="flex flex-col gap-2">
                 <Button 
-                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold"
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold"
                   onClick={() => setIsConfirmOpen(true)}
-                  disabled={!address || Number(maticBalance) <= 0}
+                  disabled={!address || Number(usdcBalance) <= 0}
                 >
                   <Coins className="w-4 h-4 mr-2" />
-                  Buy LGR
+                  Buy RD
                 </Button>
 
                 <Button
-                  onClick={handleBuyPolygon}
-                  className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold flex items-center justify-center gap-2"
+                  onClick={handleBuyUsdc}
+                  className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold flex items-center justify-center gap-2"
                 >
                   <img 
-                    src="https://cryptologos.cc/logos/polygon-matic-logo.png"
-                    alt="Polygon"
+                    src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
+                    alt="USDC"
                     className="w-5 h-5"
                   />
-                  Buy Polygon
+                  Buy USDC
                 </Button>
 
                 <Button
@@ -226,19 +225,19 @@ export const LGRFloatingWidget = () => {
       </Popover>
 
       <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
-        <DialogContent className="bg-black/95 border border-yellow-500/20 max-w-2xl">
+        <DialogContent className="bg-black/95 border border-blue-500/20 max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-yellow-500">How to Buy LGR Tokens</DialogTitle>
+            <DialogTitle className="text-blue-400">How to Buy RD Tokens</DialogTitle>
             <DialogDescription>
-              Follow these steps to purchase LGR tokens
+              Follow these steps to purchase RD tokens
             </DialogDescription>
           </DialogHeader>
           
           <Tabs defaultValue="overview" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="polygon">Get MATIC</TabsTrigger>
-              <TabsTrigger value="lgr">Buy LGR</TabsTrigger>
+              <TabsTrigger value="usdc">Get USDC</TabsTrigger>
+              <TabsTrigger value="rd">Buy RD</TabsTrigger>
             </TabsList>
             
             <TabsContent value="overview">
@@ -246,28 +245,28 @@ export const LGRFloatingWidget = () => {
                 <h3 className="font-semibold text-lg">Quick Start Guide</h3>
                 <ol className="list-decimal pl-5 space-y-2">
                   <li>Connect your wallet using the button in the top right</li>
-                  <li>Purchase MATIC (Polygon) tokens using our onramp service</li>
-                  <li>Use your MATIC to buy LGR tokens</li>
+                  <li>Purchase USDC tokens using our onramp service</li>
+                  <li>Use your USDC to buy RD tokens</li>
                   <li>Pay a small gas fee in MATIC to complete the transaction</li>
                 </ol>
                 <p className="text-sm text-gray-400 mt-4">
-                  Note: Make sure to purchase enough MATIC to cover both your LGR purchase and the gas fees (approximately 0.001 MATIC)
+                  Note: Make sure to purchase enough MATIC to cover both your RD purchase and the gas fees (approximately 0.001 MATIC)
                 </p>
               </div>
             </TabsContent>
             
-            <TabsContent value="polygon">
+            <TabsContent value="usdc">
               <div className="space-y-4 text-white">
-                <h3 className="font-semibold text-lg">Getting MATIC (Polygon)</h3>
+                <h3 className="font-semibold text-lg">Getting USDC</h3>
                 <div className="space-y-2">
-                  <p>MATIC is the native token of the Polygon network. You need it to:</p>
+                  <p>USDC is a stablecoin pegged to the US dollar. You need it to:</p>
                   <ul className="list-disc pl-5 space-y-1">
-                    <li>Purchase LGR tokens</li>
+                    <li>Purchase RD tokens</li>
                     <li>Pay for transaction fees (gas)</li>
                   </ul>
-                  <p className="mt-4">To get MATIC:</p>
+                  <p className="mt-4">To get USDC:</p>
                   <ol className="list-decimal pl-5 space-y-2">
-                    <li>Click the "Buy Polygon" button</li>
+                    <li>Click the "Buy USDC" button</li>
                     <li>Enter the amount you wish to purchase</li>
                     <li>Complete the payment through our secure partner</li>
                   </ol>
@@ -275,21 +274,21 @@ export const LGRFloatingWidget = () => {
               </div>
             </TabsContent>
             
-            <TabsContent value="lgr">
+            <TabsContent value="rd">
               <div className="space-y-4 text-white">
-                <h3 className="font-semibold text-lg">Buying LGR Tokens</h3>
+                <h3 className="font-semibold text-lg">Buying RD Tokens</h3>
                 <div className="space-y-2">
-                  <p>Once you have MATIC in your wallet:</p>
+                  <p>Once you have USDC in your wallet:</p>
                   <ol className="list-decimal pl-5 space-y-2">
-                    <li>Click the "Buy LGR" button</li>
-                    <li>Enter the amount of MATIC you want to spend</li>
-                    <li>Review the number of LGR tokens you'll receive</li>
+                    <li>Click the "Buy RD" button</li>
+                    <li>Enter the amount of USDC you want to spend</li>
+                    <li>Review the number of RD tokens you'll receive</li>
                     <li>Confirm the transaction in your wallet</li>
                   </ol>
-                  <div className="mt-4 p-4 bg-yellow-500/10 rounded-lg">
-                    <p className="text-yellow-500 font-semibold">Important:</p>
+                  <div className="mt-4 p-4 bg-blue-500/10 rounded-lg">
+                    <p className="text-blue-400 font-semibold">Important:</p>
                     <ul className="list-disc pl-5 mt-2 space-y-1 text-sm">
-                      <li>Current price: $0.10 USD per LGR</li>
+                      <li>Current price: $0.10 USD per RD</li>
                       <li>Minimum purchase: None</li>
                       <li>Transaction fee: ~0.001 MATIC</li>
                     </ul>
@@ -311,38 +310,38 @@ export const LGRFloatingWidget = () => {
       </Dialog>
 
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <DialogContent className="bg-black/95 border border-yellow-500/20">
+        <DialogContent className="bg-black/95 border border-blue-500/20">
           <DialogHeader>
-            <DialogTitle className="text-yellow-500">Confirm LGR Purchase</DialogTitle>
+            <DialogTitle className="text-blue-400">Confirm RD Purchase</DialogTitle>
             <DialogDescription>
-              Enter the amount of POLYGON you want to spend
+              Enter the amount of USDC you want to spend
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm text-gray-400">Amount in POLYGON</label>
+              <label className="text-sm text-gray-400">Amount in USDC</label>
               <Input
                 type="number"
-                placeholder="Enter POLYGON amount"
+                placeholder="Enter USDC amount"
                 value={purchaseAmount}
                 onChange={(e) => setPurchaseAmount(e.target.value)}
-                className="bg-black/50 border border-yellow-500/20 text-white placeholder:text-gray-500"
+                className="bg-black/50 border border-blue-500/20 text-white placeholder:text-gray-500"
               />
             </div>
             
             <div className="space-y-1">
               <p className="text-sm text-gray-400">You will receive approximately:</p>
-              <p className="text-lg font-bold text-yellow-500">
+              <p className="text-lg font-bold text-blue-400">
                 {(Number(purchaseAmount) / Number(maticPrice)).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
-                })} LGR
+                })} RD
               </p>
             </div>
 
             <div className="text-sm text-gray-400">
-              Your POLYGON Balance: {Number(maticBalance).toLocaleString()} POLYGON
+              Your USDC Balance: {Number(usdcBalance).toLocaleString()} USDC
             </div>
           </div>
 
@@ -356,8 +355,8 @@ export const LGRFloatingWidget = () => {
             </Button>
             <Button
               onClick={handleConfirmPurchase}
-              className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black"
-              disabled={!purchaseAmount || Number(purchaseAmount) <= 0 || Number(purchaseAmount) > Number(maticBalance)}
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-black"
+              disabled={!purchaseAmount || Number(purchaseAmount) <= 0 || Number(purchaseAmount) > Number(usdcBalance)}
             >
               Confirm Purchase
             </Button>
