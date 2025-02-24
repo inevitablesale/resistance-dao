@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -11,21 +12,9 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { PaymentTermsSection } from "@/components/thesis/form-sections/PaymentTermsSection";
-import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesSection";
-import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { createProposal } from "@/services/proposalContractService";
-import { 
-  ProposalMetadata, 
-  FirmSize, 
-  DealType, 
-  GeographicFocus,
-  PaymentTerm,
-  OperationalStrategy,
-  GrowthStrategy,
-  IntegrationStrategy 
-} from "@/types/proposals";
+import { ProposalMetadata } from "@/types/proposals";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -51,53 +40,11 @@ const thesisFormSchema = z.object({
           const num = parseFloat(val);
           return num >= 1000 && num <= 25000000;
         },
-        "Target capital must be between 1,000 and 25,000,000 LGR"
+        "Target capital must be between 1,000 and 25,000,000 RD"
       ),
-    drivers: z.string()
-      .min(50, "Investment drivers must be at least 50 characters")
-      .max(500, "Investment drivers must be less than 500 characters"),
-    additionalCriteria: z.string()
-      .max(500, "Additional criteria must be less than 500 characters")
-  }),
-  firmCriteria: z.object({
-    size: z.number()
-      .min(0)
-      .max(Object.keys(FirmSize).length / 2 - 1, "Invalid firm size"),
-    location: z.string()
-      .min(1, "Location is required")
-      .max(100, "Location must be less than 100 characters"),
-    dealType: z.number()
-      .min(0)
-      .max(Object.keys(DealType).length / 2 - 1, "Invalid deal type"),
-    geographicFocus: z.number()
-      .min(0)
-      .max(Object.keys(GeographicFocus).length / 2 - 1, "Invalid geographic focus")
-  }),
-  paymentTerms: z.array(z.number())
-    .min(1, "At least one payment term is required")
-    .refine(
-      (terms) => terms.every(t => t >= 0 && t < Object.keys(PaymentTerm).length / 2),
-      "Invalid payment term selected"
-    ),
-  strategies: z.object({
-    operational: z.array(z.number())
-      .min(1, "At least one operational strategy is required")
-      .refine(
-        (ops) => ops.every(o => o >= 0 && o < Object.keys(OperationalStrategy).length / 2),
-        "Invalid operational strategy selected"
-      ),
-    growth: z.array(z.number())
-      .min(1, "At least one growth strategy is required")
-      .refine(
-        (growth) => growth.every(g => g >= 0 && g < Object.keys(GrowthStrategy).length / 2),
-        "Invalid growth strategy selected"
-      ),
-    integration: z.array(z.number())
-      .min(1, "At least one integration strategy is required")
-      .refine(
-        (ints) => ints.every(i => i >= 0 && i < Object.keys(IntegrationStrategy).length / 2),
-        "Invalid integration strategy selected"
-      )
+    description: z.string()
+      .min(50, "Description must be at least 50 characters")
+      .max(500, "Description must be less than 500 characters"),
   }),
   votingDuration: z.number()
     .min(7 * 24 * 60 * 60, "Minimum voting duration is 7 days")
@@ -120,20 +67,7 @@ const ThesisSubmission = () => {
       title: "",
       investment: {
         targetCapital: "",
-        drivers: "",
-        additionalCriteria: ""
-      },
-      firmCriteria: {
-        size: FirmSize.BELOW_1M,
-        location: "",
-        dealType: DealType.ACQUISITION,
-        geographicFocus: GeographicFocus.LOCAL
-      },
-      paymentTerms: [],
-      strategies: {
-        operational: [],
-        growth: [],
-        integration: []
+        description: ""
       },
       votingDuration: 7 * 24 * 60 * 60,
       linkedInURL: user?.verifications?.customFields?.["LinkedIn Profile URL"] || 
@@ -206,19 +140,19 @@ const ThesisSubmission = () => {
               Share Your Investment Strategy
             </h1>
             <p className="text-lg text-white/60">
-              Present your acquisition strategy to find co-investors who share your vision.
+              Present your strategy to find co-investors who share your vision.
             </p>
           </div>
 
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <Card className="bg-black/40 border-white/10 p-6">
-              <h2 className="text-lg font-medium text-white mb-4">Investment Details</h2>
+              <h2 className="text-lg font-medium text-white mb-4">Proposal Details</h2>
               <div className="space-y-4">
                 <div>
                   <label className="text-lg font-medium text-white">Title</label>
                   <Input
                     {...form.register("title")}
-                    placeholder="Enter a descriptive title for your investment thesis"
+                    placeholder="Enter a descriptive title for your proposal"
                     className={cn(
                       "mt-2",
                       form.formState.errors.title && "border-red-500"
@@ -230,32 +164,17 @@ const ThesisSubmission = () => {
                 </div>
 
                 <div>
-                  <label className="text-lg font-medium text-white">Investment Drivers</label>
+                  <label className="text-lg font-medium text-white">Description</label>
                   <Textarea
-                    {...form.register("investment.drivers")}
-                    placeholder="Describe the key drivers behind this investment opportunity..."
+                    {...form.register("investment.description")}
+                    placeholder="Describe your investment strategy and vision..."
                     className={cn(
                       "mt-2 min-h-[100px]",
-                      form.formState.errors.investment?.drivers && "border-red-500"
+                      form.formState.errors.investment?.description && "border-red-500"
                     )}
                   />
-                  {form.formState.errors.investment?.drivers && (
-                    <p className="text-sm text-red-400 mt-1">{form.formState.errors.investment.drivers.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="text-lg font-medium text-white">Additional Criteria</label>
-                  <Textarea
-                    {...form.register("investment.additionalCriteria")}
-                    placeholder="Any additional investment criteria or preferences..."
-                    className={cn(
-                      "mt-2",
-                      form.formState.errors.investment?.additionalCriteria && "border-red-500"
-                    )}
-                  />
-                  {form.formState.errors.investment?.additionalCriteria && (
-                    <p className="text-sm text-red-400 mt-1">{form.formState.errors.investment.additionalCriteria.message}</p>
+                  {form.formState.errors.investment?.description && (
+                    <p className="text-sm text-red-400 mt-1">{form.formState.errors.investment.description.message}</p>
                   )}
                 </div>
               </div>
@@ -277,30 +196,6 @@ const ThesisSubmission = () => {
                 />
               </div>
             </Card>
-
-            <FirmCriteriaSection
-              formData={form.getValues()}
-              formErrors={form.formState.errors}
-              onChange={(field, value) => {
-                form.setValue(`firmCriteria.${field}` as const, value, { shouldValidate: true });
-              }}
-            />
-
-            <PaymentTermsSection
-              formData={form.getValues()}
-              formErrors={form.formState.errors}
-              register={form.register}
-              onChange={(_, value) => form.setValue('paymentTerms', value, { shouldValidate: true })}
-            />
-
-            <StrategiesSection
-              formData={form.getValues()}
-              formErrors={form.formState.errors}
-              register={form.register}
-              onChange={(category, value) => {
-                form.setValue(`strategies.${category}` as const, value, { shouldValidate: true });
-              }}
-            />
 
             <Button 
               type="submit"
