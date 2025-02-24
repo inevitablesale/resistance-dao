@@ -6,9 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 import { motion } from "framer-motion";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 const Proposals = () => {
   const navigate = useNavigate();
+  const { isConnected, connect } = useWalletConnection();
+  
   const processSteps = [{
     icon: Layers,
     title: "Review Projects",
@@ -37,6 +40,14 @@ const Proposals = () => {
       "Launch preparation"
     ]
   }];
+
+  const handleAction = () => {
+    if (!isConnected) {
+      connect();
+    } else {
+      navigate('/thesis');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
@@ -67,15 +78,16 @@ const Proposals = () => {
                   </span>
                 </h1>
                 <p className="text-lg text-zinc-400 mb-8 max-w-xl">
-                  Discover promising protocols and show your support through soft commitments. 
-                  Help projects demonstrate real community interest with zero upfront capital.
+                  {isConnected 
+                    ? "Discover promising protocols and show your support through soft commitments. Help projects demonstrate real community interest with zero upfront capital."
+                    : "Connect your wallet to explore and support innovative protocols. Join our community in shaping the future of decentralized finance."}
                 </p>
                 <Button 
-                  onClick={() => navigate('/thesis')} 
+                  onClick={handleAction}
                   className="relative bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg"
                 >
                   <Plus className="w-5 h-5 mr-2" />
-                  Submit Protocol
+                  {isConnected ? "Submit Protocol" : "Connect Wallet"}
                 </Button>
               </motion.div>
             </div>
@@ -120,24 +132,26 @@ const Proposals = () => {
         </div>
       </div>
 
-      {/* Proposals Section */}
-      <div className="bg-gradient-to-b from-zinc-900/50 to-transparent">
-        <div className="container mx-auto px-4 py-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-lg bg-blue-900/20 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-blue-400" />
+      {/* Proposals Section - Only shown when connected */}
+      {isConnected && (
+        <div className="bg-gradient-to-b from-zinc-900/50 to-transparent">
+          <div className="container mx-auto px-4 py-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-lg bg-blue-900/20 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-blue-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-white">Active Projects</h2>
               </div>
-              <h2 className="text-2xl font-bold text-white">Active Projects</h2>
-            </div>
-            <ProposalsHistory />
-          </motion.div>
+              <ProposalsHistory />
+            </motion.div>
+          </div>
         </div>
-      </div>
+      )}
 
       <ResistanceWalletWidget />
     </div>
