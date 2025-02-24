@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -8,13 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput } from "@/components/thesis/TargetCapitalInput";
-import { ArrowRight, Loader2, Rocket, Target, Clock, FileText, Users, Info, ChevronRight } from "lucide-react";
+import { 
+  ArrowRight, Loader2, Rocket, Target, Clock, FileText, Users, Info, ChevronRight,
+  Workflow, Coins, Gift, Trophy, Github, Linkedin, Twitter, MessageCircle 
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { createProposal } from "@/services/proposalContractService";
-import { ProposalMetadata } from "@/types/proposals";
+import { ProposalMetadata, TeamMember, RoadmapMilestone, FundingBreakdown } from "@/types/proposals";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -33,6 +35,12 @@ const thesisFormSchema = z.object({
   title: z.string()
     .min(10, "Title must be at least 10 characters")
     .max(100, "Title must be less than 100 characters"),
+  description: z.string()
+    .min(50, "Description must be at least 50 characters")
+    .max(500, "Description must be less than 500 characters"),
+  category: z.string()
+    .min(3, "Category must be at least 3 characters")
+    .max(50, "Category must be less than 50 characters"),
   investment: z.object({
     targetCapital: z.string()
       .min(1, "Target capital is required")
@@ -52,7 +60,41 @@ const thesisFormSchema = z.object({
     .max(90 * 24 * 60 * 60, "Maximum voting duration is 90 days"),
   linkedInURL: z.string()
     .min(1, "LinkedIn URL is required")
-    .max(200, "LinkedIn URL must be less than 200 characters")
+    .max(200, "LinkedIn URL must be less than 200 characters"),
+  blockchain: z.array(z.string()).optional(),
+  fundingBreakdown: z.array(
+    z.object({
+      category: z.string(),
+      amount: z.string(),
+    })
+  ).optional(),
+  investmentDrivers: z.array(z.string()).optional(),
+  backerIncentives: z.object({
+    utility: z.string(),
+    governance: z.string(),
+    NFTRewards: z.string(),
+    tokenAllocation: z.string(),
+  }).optional(),
+  team: z.array(
+    z.object({
+      name: z.string(),
+      role: z.string(),
+      linkedin: z.string().optional(),
+      github: z.string().optional(),
+    })
+  ).optional(),
+  roadmap: z.array(
+    z.object({
+      milestone: z.string(),
+      expectedDate: z.string(),
+      status: z.enum(["Pending", "In Progress", "Completed"]),
+    })
+  ).optional(),
+  socials: z.object({
+    twitter: z.string().optional(),
+    discord: z.string().optional(),
+    telegram: z.string().optional(),
+  }).optional(),
 });
 
 const ThesisSubmission = () => {
@@ -66,13 +108,31 @@ const ThesisSubmission = () => {
     resolver: zodResolver(thesisFormSchema),
     defaultValues: {
       title: "",
+      description: "",
+      category: "",
       investment: {
         targetCapital: "",
         description: ""
       },
       votingDuration: 7 * 24 * 60 * 60,
       linkedInURL: user?.verifications?.customFields?.["LinkedIn Profile URL"] || 
-                  user?.metadata?.["LinkedIn Profile URL"] || ""
+                  user?.metadata?.["LinkedIn Profile URL"] || "",
+      blockchain: [],
+      fundingBreakdown: [],
+      investmentDrivers: [],
+      backerIncentives: {
+        utility: "",
+        governance: "",
+        NFTRewards: "",
+        tokenAllocation: "",
+      },
+      team: [],
+      roadmap: [],
+      socials: {
+        twitter: "",
+        discord: "",
+        telegram: "",
+      },
     }
   });
 
@@ -147,6 +207,7 @@ const ThesisSubmission = () => {
       </div>
 
       <div className="container mx-auto px-4 pt-32 pb-16">
+        {/* Breadcrumb */}
         <Breadcrumb className="mb-8">
           <BreadcrumbList className="text-white/60">
             <BreadcrumbItem>
@@ -171,7 +232,7 @@ const ThesisSubmission = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-3xl mx-auto"
+          className="max-w-4xl mx-auto"
         >
           {/* Header Section */}
           <div className="text-center mb-12">
@@ -187,115 +248,60 @@ const ThesisSubmission = () => {
             </p>
           </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/10 rounded-lg">
-                  <Target className="w-5 h-5 text-blue-400" />
-                </div>
-                <div>
-                  <div className="text-white/60 text-sm">Min Target</div>
-                  <div className="text-white font-mono">1,000 RD</div>
-                </div>
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-500/10 rounded-lg">
-                  <Clock className="w-5 h-5 text-purple-400" />
-                </div>
-                <div>
-                  <div className="text-white/60 text-sm">Vote Duration</div>
-                  <div className="text-white font-mono">7-90 Days</div>
-                </div>
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-yellow-500/10 rounded-lg">
-                  <Users className="w-5 h-5 text-yellow-400" />
-                </div>
-                <div>
-                  <div className="text-white/60 text-sm">Success Rate</div>
-                  <div className="text-white font-mono">89%</div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-
           {/* Form */}
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Project Overview */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
               <Card className="bg-white/5 border-white/10 p-6 backdrop-blur-lg">
-                <h2 className="text-xl font-medium text-white mb-4 flex items-center gap-2">
+                <h2 className="text-xl font-medium text-white mb-6 flex items-center gap-2">
                   <FileText className="w-5 h-5 text-blue-400" />
-                  Proposal Details
+                  Project Overview
                 </h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-white/80 mb-2 block">Title</label>
-                    <Input
-                      {...form.register("title")}
-                      placeholder="Enter a descriptive title for your proposal"
-                      className={cn(
-                        "bg-black/20 border-white/10 text-white",
-                        form.formState.errors.title && "border-red-500"
-                      )}
-                    />
-                    {form.formState.errors.title && (
-                      <p className="text-sm text-red-400 mt-1">{form.formState.errors.title.message}</p>
-                    )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-white/80 mb-2 block">Title</label>
+                      <Input
+                        {...form.register("title")}
+                        placeholder="Enter your project title"
+                        className="bg-black/20 border-white/10 text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-white/80 mb-2 block">Category</label>
+                      <Input
+                        {...form.register("category")}
+                        placeholder="e.g., DeFi, NFT, Gaming"
+                        className="bg-black/20 border-white/10 text-white"
+                      />
+                    </div>
                   </div>
-
                   <div>
                     <label className="text-white/80 mb-2 block">Description</label>
                     <Textarea
                       {...form.register("investment.description")}
-                      placeholder="Describe your investment strategy and vision..."
-                      className={cn(
-                        "bg-black/20 border-white/10 text-white min-h-[120px]",
-                        form.formState.errors.investment?.description && "border-red-500"
-                      )}
+                      placeholder="Describe your project's vision and goals..."
+                      className="bg-black/20 border-white/10 text-white min-h-[132px]"
                     />
-                    {form.formState.errors.investment?.description && (
-                      <p className="text-sm text-red-400 mt-1">{form.formState.errors.investment.description.message}</p>
-                    )}
                   </div>
                 </div>
               </Card>
             </motion.div>
 
+            {/* Investment Details */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
             >
               <Card className="bg-white/5 border-white/10 p-6 backdrop-blur-lg">
-                <h2 className="text-xl font-medium text-white mb-4 flex items-center gap-2">
-                  <Target className="w-5 h-5 text-purple-400" />
-                  Investment Parameters
+                <h2 className="text-xl font-medium text-white mb-6 flex items-center gap-2">
+                  <Coins className="w-5 h-5 text-purple-400" />
+                  Investment Details
                 </h2>
                 <div className="space-y-6">
                   <TargetCapitalInput
@@ -303,6 +309,30 @@ const ThesisSubmission = () => {
                     onChange={(value) => form.setValue("investment.targetCapital", value, { shouldValidate: true })}
                     error={form.formState.errors.investment?.targetCapital?.message?.split(",")}
                   />
+
+                  <div className="space-y-4">
+                    <label className="text-white/80 block">Funding Breakdown</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {[
+                        "Smart Contract Development",
+                        "Security Audit",
+                        "Marketing & Community",
+                        "Operations & Legal"
+                      ].map((category, index) => (
+                        <div key={index} className="flex gap-3">
+                          <Input
+                            placeholder={category}
+                            className="bg-black/20 border-white/10 text-white"
+                          />
+                          <Input
+                            placeholder="Amount in RD"
+                            type="number"
+                            className="bg-black/20 border-white/10 text-white w-32"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
                   <VotingDurationInput
                     value={form.watch("votingDuration")}
@@ -313,10 +343,171 @@ const ThesisSubmission = () => {
               </Card>
             </motion.div>
 
+            {/* Investment Drivers & Incentives */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
+            >
+              <Card className="bg-white/5 border-white/10 p-6 backdrop-blur-lg">
+                <h2 className="text-xl font-medium text-white mb-6 flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-yellow-400" />
+                  Investment Drivers & Incentives
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <label className="text-white/80 block">Investment Drivers</label>
+                    <div className="space-y-3">
+                      {[1, 2, 3, 4].map((index) => (
+                        <Input
+                          key={index}
+                          placeholder={`Key driver #${index}`}
+                          className="bg-black/20 border-white/10 text-white"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <label className="text-white/80 block">Backer Incentives</label>
+                    <div className="space-y-3">
+                      <Input
+                        placeholder="Utility (e.g., Early access)"
+                        className="bg-black/20 border-white/10 text-white"
+                      />
+                      <Input
+                        placeholder="Governance rights"
+                        className="bg-black/20 border-white/10 text-white"
+                      />
+                      <Input
+                        placeholder="NFT rewards"
+                        className="bg-black/20 border-white/10 text-white"
+                      />
+                      <Input
+                        placeholder="Token allocation"
+                        className="bg-black/20 border-white/10 text-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            {/* Team & Roadmap */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <Card className="bg-white/5 border-white/10 p-6 backdrop-blur-lg">
+                <h2 className="text-xl font-medium text-white mb-6 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-green-400" />
+                  Team & Roadmap
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <label className="text-white/80 block">Team Members</label>
+                    <div className="space-y-4">
+                      {[1, 2].map((index) => (
+                        <div key={index} className="space-y-3">
+                          <Input
+                            placeholder={`Team member ${index} name`}
+                            className="bg-black/20 border-white/10 text-white"
+                          />
+                          <div className="flex gap-3">
+                            <div className="flex-1">
+                              <Input
+                                placeholder="Role"
+                                className="bg-black/20 border-white/10 text-white"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <Input
+                                placeholder="LinkedIn URL"
+                                className="bg-black/20 border-white/10 text-white"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <label className="text-white/80 block">Roadmap Milestones</label>
+                    <div className="space-y-4">
+                      {[1, 2].map((index) => (
+                        <div key={index} className="space-y-3">
+                          <Input
+                            placeholder={`Milestone ${index}`}
+                            className="bg-black/20 border-white/10 text-white"
+                          />
+                          <div className="flex gap-3">
+                            <div className="flex-1">
+                              <Input
+                                type="text"
+                                placeholder="Expected Date (Q2 2025)"
+                                className="bg-black/20 border-white/10 text-white"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <select 
+                                className="w-full bg-black/20 border-white/10 text-white rounded-md h-10 px-3"
+                              >
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            {/* Social Links */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <Card className="bg-white/5 border-white/10 p-6 backdrop-blur-lg">
+                <h2 className="text-xl font-medium text-white mb-6 flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5 text-blue-400" />
+                  Social Links
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex items-center gap-3">
+                    <Twitter className="w-5 h-5 text-blue-400" />
+                    <Input
+                      placeholder="Twitter URL"
+                      className="bg-black/20 border-white/10 text-white"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="w-5 h-5 text-purple-400" />
+                    <Input
+                      placeholder="Discord URL"
+                      className="bg-black/20 border-white/10 text-white"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="w-5 h-5 text-blue-400" />
+                    <Input
+                      placeholder="Telegram URL"
+                      className="bg-black/20 border-white/10 text-white"
+                    />
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            {/* Submit Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
               className="flex flex-col gap-4"
             >
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
