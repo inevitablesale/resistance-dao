@@ -191,12 +191,12 @@ export default function ThesisSubmission() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white pt-20">
       <div className="flex flex-col items-center justify-center px-4 py-12">
         <div className="w-full max-w-3xl space-y-8">
           <div className="text-center space-y-4">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-500/10 text-blue-400 text-sm mb-4">
-              🚀 Launch Your Investment Strategy
+              🚀 Launch Your Web3 Project
             </div>
             <h1 className="text-5xl font-bold text-white font-mono">
               Submit Your Proposal
