@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
+import { isPast, formatDistanceToNow } from 'date-fns';
 import { useProposal } from '@/hooks/useProposal';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,10 +11,23 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { motion } from "framer-motion";
 import { 
   Coins, Clock, ChevronDown, Info, PieChart, Users, ExternalLink, 
-  BrainCircuit, Twitter, Github, Calendar, Gift, Target, ArrowUpRight
+  BrainCircuit, Twitter, Github, Calendar, Gift, Target, ArrowUpRight, User
 } from "lucide-react";
 import { ProposalLoadingCard } from './ProposalLoadingCard';
 import { formatRDAmount } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
+import { useWalletProvider } from '@/hooks/useWalletProvider';
+import { ProposalMetadata } from '@/types/proposals';
+import { getTokenBalance } from '@/services/tokenService';
+import { 
+  FACTORY_ADDRESS, 
+  FACTORY_ABI, 
+  RD_TOKEN_ADDRESS,
+  MIN_LGR_REQUIRED 
+} from '@/lib/constants';
+import { getFromIPFS } from '@/services/ipfsService';
+import { loadingStates } from './ProposalLoadingCard';
 
 interface ProposalDetailsCardProps {
   tokenId?: string;

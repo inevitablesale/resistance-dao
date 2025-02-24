@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { LoadingState } from "@/types/loading";
@@ -56,3 +55,11 @@ export const ProposalLoadingCard = ({ loadingState }: ProposalLoadingCardProps) 
     </Card>
   );
 };
+
+export const loadingStates = [
+  "Connecting to wallet...",
+  "Checking permissions...",
+  "Loading proposal data...",
+  "Fetching metadata...",
+  "Almost done..."
+];
