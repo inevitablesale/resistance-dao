@@ -37,7 +37,8 @@ export const ResistanceWalletWidget = () => {
           usdcContract.balanceOf(address)
         ]);
         
-        setRdBalance(ethers.utils.formatUnits(rdBal, 6));
+        // Use 18 decimals for RD token, 6 for USDC
+        setRdBalance(ethers.utils.formatUnits(rdBal, 18));
         setUsdcBalance(ethers.utils.formatUnits(usdcBal, 6));
       } catch (error) {
         console.error("Error fetching balances:", error);

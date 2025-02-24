@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 
 export const RD_TOKEN_CONTRACT_ADDRESS = "0xEa1c340f9DDFAd13f984c9d6A25e592496388351";
@@ -16,7 +15,8 @@ export const RD_SALE_ABI = [
 const ERC20_ABI = [
   "function balanceOf(address account) public view returns (uint256)",
   "function approve(address spender, uint256 amount) public returns (bool)",
-  "function allowance(address owner, address spender) public view returns (uint256)"
+  "function allowance(address owner, address spender) public view returns (uint256)",
+  "function decimals() public view returns (uint8)"
 ];
 
 // Array of RPC endpoints for redundancy
