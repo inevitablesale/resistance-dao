@@ -11,30 +11,30 @@ const Proposals = () => {
   const navigate = useNavigate();
   const processSteps = [{
     icon: Layers,
-    title: "Initial Voting",
-    description: "Support early-stage proposals with a minimal voting fee. Just 1 RD token to participate and show genuine interest.",
+    title: "Initial Support",
+    description: "Support innovative proposals with a minimal voting fee. Just 1 RD token to participate and show genuine interest.",
     points: [
-      "Discover Web3 innovations",
+      "Discover groundbreaking protocols",
       "Vote with RD tokens",
-      "Monitor proposal traction"
+      "Track proposal momentum"
     ]
   }, {
     icon: Network,
-    title: "Community Building",
-    description: "Track how proposals gain DAO support. Each vote brings the project closer to its funding goal.",
+    title: "DAO Consensus",
+    description: "Watch proposals gain community backing. Each vote strengthens decentralized governance.",
     points: [
-      "View community engagement",
-      "Track voting progress",
-      "Get milestone alerts"
+      "Monitor community support",
+      "Track voting thresholds",
+      "Follow key milestones"
     ]
   }, {
     icon: Blocks,
-    title: "Token Launch",
-    description: "When voting goals are met, creators work with the DAO community to launch their Web3 project.",
+    title: "Protocol Launch",
+    description: "When voting thresholds are met, creators collaborate with the DAO to launch their protocol.",
     points: [
-      "Direct creator communication",
-      "Token distribution planning",
-      "Community-driven launch"
+      "Direct community feedback",
+      "Protocol deployment planning",
+      "Decentralized governance"
     ]
   }];
 
@@ -58,24 +58,24 @@ const Proposals = () => {
               >
                 <div className="inline-flex items-center space-x-2 bg-blue-900/20 rounded-full px-4 py-2 mb-6">
                   <BrainCircuit className="w-4 h-4 text-blue-400" />
-                  <span className="text-sm text-blue-400">Protocol Evolution</span>
+                  <span className="text-sm text-blue-400">Resistance Protocol</span>
                 </div>
                 <h1 className="text-5xl font-bold mb-6 text-white">
-                  Shape the Future of 
+                  Build the Future of 
                   <span className="block mt-2 bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">
-                    Decentralized Innovation
+                    Decentralized Protocols
                   </span>
                 </h1>
                 <p className="text-lg text-zinc-400 mb-8 max-w-xl">
-                  Join the Resistance DAO community in discovering and supporting revolutionary Web3 projects. 
-                  Each vote strengthens our collective mission to transform decentralized finance.
+                  Join the Resistance DAO in shaping the next generation of decentralized protocols. 
+                  Every proposal advances our mission of true decentralization and community governance.
                 </p>
                 <Button 
                   onClick={() => navigate('/thesis')} 
                   className="relative bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg"
                 >
                   <Plus className="w-5 h-5 mr-2" />
-                  Submit Proposal
+                  Submit Protocol
                 </Button>
               </motion.div>
             </div>
@@ -132,7 +132,7 @@ const Proposals = () => {
               <div className="w-10 h-10 rounded-lg bg-blue-900/20 flex items-center justify-center">
                 <FileText className="w-5 h-5 text-blue-400" />
               </div>
-              <h2 className="text-2xl font-bold text-white">Active Proposals</h2>
+              <h2 className="text-2xl font-bold text-white">Active Protocols</h2>
             </div>
             <ProposalsHistory />
           </motion.div>
