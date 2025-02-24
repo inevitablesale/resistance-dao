@@ -273,19 +273,20 @@ export default function ThesisSubmission() {
         description: `Proposal created with token ID: ${proposalEvent.tokenId}`,
       });
 
-      navigate(`/thesis/${proposalEvent.tokenId}`);
+    // Update the navigation path to match the correct route
+    navigate(`/proposal/${proposalEvent.tokenId}`);
 
-    } catch (error: any) {
-      console.error("Error submitting thesis:", error);
-      toast({
-        title: "Error Submitting Thesis",
-        description: error.message || "An error occurred while submitting the thesis.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  } catch (error: any) {
+    console.error("Error submitting thesis:", error);
+    toast({
+      title: "Error Submitting Thesis",
+      description: error.message || "An error occurred while submitting the thesis.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsSubmitting(false);
   }
+}
 
   return (
     <div className="min-h-screen bg-black text-white pt-20">
