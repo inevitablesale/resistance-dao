@@ -48,7 +48,7 @@ const thesisFormSchema = z.object({
   }),
 });
 
-const sampleFormData = {
+const requiredFormData = {
   title: "Decentralized Identity Protocol",
   description: "A protocol for self-sovereign identity management using zero-knowledge proofs",
   category: "Identity & Privacy",
@@ -59,6 +59,51 @@ const sampleFormData = {
   votingDuration: 14 * 24 * 60 * 60, // 14 days
   linkedInURL: "https://linkedin.com/in/example",
   blockchain: ["Ethereum", "Polygon"],
+};
+
+const completeFormData = {
+  ...requiredFormData,
+  team: [
+    {
+      name: "Alice Johnson",
+      role: "Lead Developer",
+      linkedin: "https://linkedin.com/in/alice",
+    },
+    {
+      name: "Bob Smith",
+      role: "Security Architect",
+      linkedin: "https://linkedin.com/in/bob",
+    }
+  ],
+  investmentDrivers: [
+    "First-mover advantage in zkID space",
+    "Strong network effects",
+    "Enterprise partnerships",
+    "Patent-pending technology"
+  ],
+  backerIncentives: {
+    utility: "Early access to enterprise features",
+    governance: "Protocol governance rights",
+    NFTRewards: "Founding member NFT badge",
+    tokenAllocation: "2% of token supply"
+  },
+  socials: {
+    twitter: "https://twitter.com/zkidproject",
+    discord: "https://discord.gg/zkid",
+    telegram: "https://t.me/zkidproject"
+  },
+  roadmap: [
+    {
+      milestone: "MVP Launch",
+      expectedDate: "Q2 2024",
+      status: "Pending"
+    },
+    {
+      milestone: "Mainnet Launch",
+      expectedDate: "Q4 2024",
+      status: "Pending"
+    }
+  ]
 };
 
 export default function ThesisSubmission() {
@@ -83,11 +128,19 @@ export default function ThesisSubmission() {
     }
   });
 
-  const fillTestData = () => {
-    form.reset(sampleFormData);
+  const fillRequiredData = () => {
+    form.reset(requiredFormData);
     toast({
-      title: "Test Data Loaded",
-      description: "Form has been filled with sample data.",
+      title: "Required Data Loaded",
+      description: "Form has been filled with required fields only.",
+    });
+  };
+
+  const fillCompleteData = () => {
+    form.reset(completeFormData);
+    toast({
+      title: "Complete Data Loaded",
+      description: "Form has been filled with all available fields.",
     });
   };
 
@@ -204,14 +257,24 @@ export default function ThesisSubmission() {
             <p className="text-gray-400 max-w-2xl mx-auto">
               Present your investment strategy to find co-investors who share your vision. Test market interest before committing resources.
             </p>
-            <Button
-              onClick={fillTestData}
-              variant="outline"
-              className="bg-black/30 border-blue-500/30 hover:border-blue-500/50 text-blue-400 gap-2"
-            >
-              <Beaker className="w-4 h-4" />
-              Load Test Data
-            </Button>
+            <div className="flex items-center justify-center gap-4">
+              <Button
+                onClick={fillRequiredData}
+                variant="outline"
+                className="bg-black/30 border-blue-500/30 hover:border-blue-500/50 text-blue-400 gap-2"
+              >
+                <Beaker className="w-4 h-4" />
+                Load Required Data
+              </Button>
+              <Button
+                onClick={fillCompleteData}
+                variant="outline"
+                className="bg-black/30 border-green-500/30 hover:border-green-500/50 text-green-400 gap-2"
+              >
+                <Beaker className="w-4 h-4" />
+                Load Complete Data
+              </Button>
+            </div>
           </div>
 
           <Form {...form}>
