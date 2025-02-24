@@ -30,7 +30,7 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
     if (!pledgeAmount) {
       toast({
         title: "Enter Commitment Amount",
-        description: "Please enter how much LGR you want to commit to this proposal",
+        description: "Please enter how much RD you want to commit to this proposal",
         variant: "destructive",
       });
       return;
@@ -47,7 +47,7 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
       const userAddress = await signer.getAddress();
 
       // Initialize contracts
-      const lgrToken = new ethers.Contract(
+      const rdToken = new ethers.Contract(
         RD_TOKEN_ADDRESS,
         ["function balanceOf(address) view returns (uint256)", "function approve(address spender, uint256 amount) returns (bool)"],
         signer
@@ -58,25 +58,25 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
       const votingFee = await factory.VOTING_FEE();
       console.log('Voting fee:', ethers.utils.formatEther(votingFee));
 
-      // Check user's LGR balance
-      const balance = await lgrToken.balanceOf(userAddress);
+      // Check user's RD balance
+      const balance = await rdToken.balanceOf(userAddress);
       if (balance.lt(votingFee)) {
         toast({
-          title: "Insufficient LGR Balance",
-          description: "You need 10 LGR to cover the voting fee to record your soft commitment",
+          title: "Insufficient RD Balance",
+          description: "You need 10 RD to cover the voting fee to record your soft commitment",
           variant: "destructive",
         });
         return;
       }
 
       // Only approve the voting fee amount
-      console.log('Approving voting fee:', ethers.utils.formatEther(votingFee), 'LGR');
-      const approveTx = await lgrToken.approve(FACTORY_ADDRESS, votingFee);
+      console.log('Approving voting fee:', ethers.utils.formatEther(votingFee), 'RD');
+      const approveTx = await rdToken.approve(FACTORY_ADDRESS, votingFee);
       await approveTx.wait();
       console.log('Voting fee approved');
 
       // Submit vote with pledge amount (not transferred, just recorded)
-      console.log('Recording soft commitment amount:', pledgeAmount, 'LGR');
+      console.log('Recording soft commitment amount:', pledgeAmount, 'RD');
       const voteTx = await factory.vote(tokenId, ethers.utils.parseEther(pledgeAmount), {
         gasLimit: 500000
       });
@@ -86,21 +86,16 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
 
       toast({
         title: "Soft Commitment Recorded",
-        description: `Recorded ${pledgeAmount} LGR commitment. Paid 10 LGR voting fee.`,
+        description: `Recorded ${pledgeAmount} RD commitment. Paid 10 RD voting fee.`,
       });
 
       setPledgeAmount("");
     } catch (error: any) {
       console.error('Error recording commitment:', error);
       
-      // Provide more specific error messages
       let errorMessage = "Failed to record your soft commitment. Please try again.";
       if (error.message.includes("Voting fee transfer failed")) {
-        errorMessage = "Failed to transfer voting fee. Please ensure you have 10 LGR available.";
-      } else if (error.message.includes("Already voted")) {
-        errorMessage = "You have already recorded a commitment for this proposal.";
-      } else if (error.message.includes("Voting period ended")) {
-        errorMessage = "The commitment period for this proposal has ended.";
+        errorMessage = "Failed to transfer voting fee. Please ensure you have 10 RD available.";
       }
 
       toast({
@@ -125,7 +120,7 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
       <div className="mt-4 space-y-4">
         <div className="space-y-2">
           <Label htmlFor="pledgeAmount" className="text-white/60">
-            Commitment Amount (LGR)
+            Commitment Amount (RD)
           </Label>
           <Input
             id="pledgeAmount"
@@ -134,13 +129,13 @@ export const VotingSection = ({ tokenId, owner }: VotingSectionProps) => {
             step="0.1"
             value={pledgeAmount}
             onChange={(e) => setPledgeAmount(e.target.value)}
-            placeholder="Enter LGR amount you want to commit"
+            placeholder="Enter RD amount you want to commit"
             className="bg-black/40 border-white/10 text-white"
           />
           <div className="space-y-1">
             <p className="text-sm text-white/60 flex items-center gap-2">
               <Info className="w-4 h-4" />
-              10 LGR voting fee will be charged to record your soft commitment
+              10 RD voting fee will be charged to record your soft commitment
             </p>
             <p className="text-sm text-white/60 flex items-center gap-2 pl-6">
               Your committed amount is a soft commitment and will not be transferred

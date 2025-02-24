@@ -16,6 +16,17 @@ import { ProposalListItem } from "./ProposalListItem";
 
 const MIN_RD_REQUIRED = "1";
 
+const formatRDAmount = (rdAmount: string): string => {
+  const amount = parseFloat(rdAmount);
+  if (isNaN(amount)) return "$0.00";
+  const RD_PRICE_USD = 0.10;
+  const usdAmount = amount * RD_PRICE_USD;
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(usdAmount);
+};
+
 export const ProposalsHistory = () => {
   const [proposalEvents, setProposalEvents] = useState<ProposalEvent[]>([]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);

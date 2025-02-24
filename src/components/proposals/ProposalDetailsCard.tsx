@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -21,10 +20,16 @@ import { ProposalLoadingCard } from "./ProposalLoadingCard";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const MIN_LGR_REQUIRED = "1";
+const MIN_RD_REQUIRED = "1";
 
 const formatLGRAmount = (amount: string): string => {
   const number = parseFloat(amount);
   return `${number.toLocaleString(undefined, { maximumFractionDigits: 2 })} LGR`;
+};
+
+const formatRDAmount = (amount: string): string => {
+  const number = parseFloat(amount);
+  return `${number.toLocaleString(undefined, { maximumFractionDigits: 2 })} RD`;
 };
 
 interface ProposalDetailsCardProps {
@@ -246,7 +251,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       const userBalance = ethers.utils.parseEther(balance);
       
       if (userBalance.lt(VOTING_FEE)) {
-        throw new Error("Insufficient LGR balance. You need 10 LGR to cover the voting fee.");
+        throw new Error("Insufficient RD balance. You need 10 RD to cover the voting fee.");
       }
 
       const factoryContract = new ethers.Contract(
@@ -255,14 +260,14 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         walletProvider.provider.getSigner()
       );
 
-      const lgrToken = new ethers.Contract(
+      const rdToken = new ethers.Contract(
         RD_TOKEN_ADDRESS,
         ["function approve(address spender, uint256 amount) returns (bool)"],
         signer
       );
       
       console.log('Approving voting fee:', ethers.utils.formatEther(VOTING_FEE));
-      const approveTx = await lgrToken.approve(FACTORY_ADDRESS, VOTING_FEE);
+      const approveTx = await rdToken.approve(FACTORY_ADDRESS, VOTING_FEE);
       await approveTx.wait();
 
       const pledgeAmountBN = ethers.utils.parseEther(pledgeInput);
@@ -271,7 +276,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
       toast({
         title: "Support Pledged Successfully",
-        description: `Your commitment of ${pledgeInput} LGR has been recorded. The 10 LGR voting fee has been processed.`,
+        description: `Your commitment of ${pledgeInput} RD has been recorded. The 10 RD voting fee has been processed.`,
       });
 
       setPledgedAmount(prev => {
@@ -284,9 +289,13 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       setPledgeInput("");
     } catch (error: any) {
       console.error("Pledging error:", error);
+      let errorMessage = error.message || "Failed to submit pledge. Please try again.";
+      if (error.message.includes("Voting fee transfer failed")) {
+        errorMessage = "Failed to transfer voting fee. Please ensure you have 10 RD available.";
+      }
       toast({
         title: "Pledging Failed",
-        description: error.message || "Failed to submit pledge. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -482,7 +491,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 <div className="text-center md:text-right">
                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-900/20 backdrop-blur-sm">
                     <p className="text-2xl font-bold text-white">
-                      {formatLGRAmount(pledgedAmount)}
+                      {formatRDAmount(pledgedAmount)}
                     </p>
                     <span className="text-sm text-zinc-400 border-l border-zinc-700 pl-2">
                       {backerCount} supporter{backerCount !== 1 ? 's' : ''}
@@ -507,7 +516,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   className="h-3 bg-zinc-800"
                 />
                 <p className="text-sm text-zinc-400 mt-2">
-                  Target: {formatLGRAmount(proposalDetails.investment.targetCapital)}
+                  Target: {formatRDAmount(proposalDetails.investment.targetCapital)}
                 </p>
               </div>
 
@@ -521,7 +530,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                     {proposalDetails.fundingBreakdown.map((item, index) => (
                       <div key={index} className="bg-zinc-800/50 rounded-lg p-4">
                         <p className="text-zinc-400 text-sm">{item.category}</p>
-                        <p className="text-white font-medium">{formatLGRAmount(item.amount)}</p>
+                        <p className="text-white font-medium">{formatRDAmount(item.amount)}</p>
                       </div>
                     ))}
                   </div>
@@ -553,7 +562,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 <CollapsibleContent className="p-4 bg-zinc-900/50 border border-zinc-800/50 rounded-lg mt-2">
                   <p className="text-sm text-zinc-300 leading-relaxed">
                     Express your interest by making a soft commitment. This is not an actual investment - 
-                    only a 10 LGR voting fee will be charged to record your support. Your pledged amount shows how much 
+                    only a 10 RD voting fee will be charged to record your support. Your pledged amount shows how much 
                     you're potentially interested in investing later.
                   </p>
                 </CollapsibleContent>
@@ -562,7 +571,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               <div className="flex flex-col md:flex-row gap-4 mt-6">
                 <div className="flex-1">
                   <Label htmlFor="pledgeAmount" className="text-zinc-400 mb-2 block">
-                    Commitment Amount
+                    Commitment Amount (RD)
                   </Label>
                   <Input
                     id="pledgeAmount"
@@ -571,12 +580,12 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                     step="0.1"
                     value={pledgeInput}
                     onChange={(e) => setPledgeInput(e.target.value)}
-                    placeholder="Enter amount you're interested in"
+                    placeholder="Enter RD amount you want to commit"
                     className="bg-zinc-900/50 border-zinc-800/50 text-white h-12"
                   />
                   <p className="text-sm text-zinc-400 mt-2 flex items-center gap-2">
                     <Info className="w-4 h-4" />
-                    Only a 10 LGR voting fee is required
+                    Only a 10 RD voting fee is required
                   </p>
                 </div>
                 <Button
@@ -643,13 +652,13 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 <div className="bg-white/5 p-4 rounded-lg">
                   <p className="text-white/60 text-sm">Target Capital</p>
                   <p className="text-white text-lg font-medium">
-                    {formatLGRAmount(proposalDetails.investment.targetCapital)}
+                    {formatRDAmount(proposalDetails.investment.targetCapital)}
                   </p>
                 </div>
                 <div className="bg-white/5 p-4 rounded-lg">
                   <p className="text-white/60 text-sm">Total Pledged</p>
                   <p className="text-white text-lg font-medium">
-                    {formatLGRAmount(pledgedAmount)}
+                    {formatRDAmount(pledgedAmount)}
                   </p>
                 </div>
               </div>
