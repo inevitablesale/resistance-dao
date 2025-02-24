@@ -12,10 +12,10 @@ const Proposals = () => {
   const processSteps = [{
     icon: Layers,
     title: "Initial Voting",
-    description: "Support early-stage proposals with a minimal voting fee. Just 1 LGR to participate and show genuine interest.",
+    description: "Support early-stage proposals with a minimal voting fee. Just 1 RD token to participate and show genuine interest.",
     points: [
       "Discover Web3 innovations",
-      "Vote with LGR tokens",
+      "Vote with RD tokens",
       "Monitor proposal traction"
     ]
   }, {
@@ -58,7 +58,7 @@ const Proposals = () => {
               >
                 <div className="inline-flex items-center space-x-2 bg-blue-900/20 rounded-full px-4 py-2 mb-6">
                   <BrainCircuit className="w-4 h-4 text-blue-400" />
-                  <span className="text-sm text-blue-400">Resistance DAO Proposals</span>
+                  <span className="text-sm text-blue-400">Protocol Evolution</span>
                 </div>
                 <h1 className="text-5xl font-bold mb-6 text-white">
                   Shape the Future of 
@@ -67,8 +67,8 @@ const Proposals = () => {
                   </span>
                 </h1>
                 <p className="text-lg text-zinc-400 mb-8 max-w-xl">
-                  Join the Resistance DAO community in discovering and supporting innovative Web3 projects. 
-                  Vote on proposals, track progress, and participate in token launches.
+                  Join the Resistance DAO community in discovering and supporting revolutionary Web3 projects. 
+                  Each vote strengthens our collective mission to transform decentralized finance.
                 </p>
                 <Button 
                   onClick={() => navigate('/thesis')} 
