@@ -11,30 +11,30 @@ const Proposals = () => {
   const navigate = useNavigate();
   const processSteps = [{
     icon: Layers,
-    title: "Initial Support",
-    description: "Support innovative proposals with a minimal voting fee. Just 1 RD token to participate and show genuine interest.",
+    title: "Review Projects",
+    description: "Explore submitted projects and evaluate their potential impact. Your vote starts with just 1 RD token.",
     points: [
-      "Discover groundbreaking protocols",
-      "Vote with RD tokens",
-      "Track proposal momentum"
+      "Review protocol details",
+      "Assess market opportunity",
+      "Evaluate team background"
     ]
   }, {
     icon: Network,
-    title: "DAO Consensus",
-    description: "Watch proposals gain community backing. Each vote strengthens decentralized governance.",
+    title: "Soft Commitments",
+    description: "Show your support by making soft capital commitments. Help projects demonstrate community interest.",
     points: [
-      "Monitor community support",
-      "Track voting thresholds",
-      "Follow key milestones"
+      "Indicate capital interest",
+      "No upfront capital needed",
+      "Track total commitments"
     ]
   }, {
     icon: Blocks,
-    title: "Protocol Launch",
-    description: "When voting thresholds are met, creators collaborate with the DAO to launch their protocol.",
+    title: "Launch Support",
+    description: "Once voting thresholds are met, successful projects move forward with DAO backing and guidance.",
     points: [
-      "Direct community feedback",
-      "Protocol deployment planning",
-      "Decentralized governance"
+      "Protocol refinement",
+      "Community input",
+      "Launch preparation"
     ]
   }];
 
@@ -61,14 +61,14 @@ const Proposals = () => {
                   <span className="text-sm text-blue-400">Resistance Protocol</span>
                 </div>
                 <h1 className="text-5xl font-bold mb-6 text-white">
-                  Build the Future of 
+                  Support Projects with
                   <span className="block mt-2 bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">
-                    Decentralized Protocols
+                    Soft Capital Commitments
                   </span>
                 </h1>
                 <p className="text-lg text-zinc-400 mb-8 max-w-xl">
-                  Join the Resistance DAO in shaping the next generation of decentralized protocols. 
-                  Every proposal advances our mission of true decentralization and community governance.
+                  Discover promising protocols and show your support through soft commitments. 
+                  Help projects demonstrate real community interest with zero upfront capital.
                 </p>
                 <Button 
                   onClick={() => navigate('/thesis')} 
@@ -132,7 +132,7 @@ const Proposals = () => {
               <div className="w-10 h-10 rounded-lg bg-blue-900/20 flex items-center justify-center">
                 <FileText className="w-5 h-5 text-blue-400" />
               </div>
-              <h2 className="text-2xl font-bold text-white">Active Protocols</h2>
+              <h2 className="text-2xl font-bold text-white">Active Projects</h2>
             </div>
             <ProposalsHistory />
           </motion.div>
