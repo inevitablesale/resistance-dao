@@ -222,11 +222,26 @@ export default function ThesisSubmission() {
       const signer = provider.getSigner();
       const contract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
 
+      const proposalInput = {
+        title: values.title,
+        ipfsMetadata: ipfsHash,
+        targetCapital: targetCapitalInWei,
+        votingDuration: BigInt(values.votingDuration),
+        investmentDrivers: "",
+        additionalCriteria: "",
+        firmSize: 0,
+        location: "",
+        dealType: 0,
+        geographicFocus: 0,
+        paymentTerms: [],
+        operationalStrategies: [],
+        growthStrategies: [],
+        integrationStrategies: []
+      };
+
       const tx = await contract.createProposal(
-        values.title,
-        ipfsHash,
-        targetCapitalInWei,
-        BigInt(values.votingDuration)
+        proposalInput,
+        values.linkedInURL
       );
 
       toast({
