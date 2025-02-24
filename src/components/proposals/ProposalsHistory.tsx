@@ -57,7 +57,6 @@ export const ProposalsHistory = () => {
     }).format(usdAmount);
   };
 
-  // Update a single proposal's data
   const updateProposalData = (tokenId: string, updates: Partial<ProposalEvent>) => {
     setProposalEvents(current =>
       current.map(event =>
@@ -68,12 +67,10 @@ export const ProposalsHistory = () => {
     );
   };
 
-  // Fetch metadata for a single proposal
   const fetchProposalMetadata = async (proposal: ProposalEvent, contract: ethers.Contract) => {
     try {
       console.log(`\n--- Processing token #${proposal.tokenId} ---`);
       
-      // Update loading state
       updateProposalData(proposal.tokenId, { isLoading: true });
 
       const [tokenUri, pledgedAmount] = await Promise.all([
@@ -91,7 +88,6 @@ export const ProposalsHistory = () => {
         console.log(`Successfully fetched IPFS data for token #${proposal.tokenId}:`, metadata);
       }
 
-      // Update proposal with fetched data
       updateProposalData(proposal.tokenId, {
         metadata,
         pledgedAmount: ethers.utils.formatEther(pledgedAmount),
@@ -187,14 +183,20 @@ export const ProposalsHistory = () => {
         const events = await contract.queryFilter(filter);
         console.log('Found proposal events:', events.length);
 
-        // Initialize proposals with basic data
-        const initialProposals = events.map(event => ({
-          tokenId: event.args?.tokenId.toString(),
-          creator: event.args?.creator,
-          blockNumber: event.blockNumber,
-          transactionHash: event.transactionHash,
-          isLoading: true
-        }));
+        // Safely extract data from events
+        const initialProposals = events.map(event => {
+          if (!event.args) {
+            console.warn('Event missing args:', event);
+            return null;
+          }
+          return {
+            tokenId: event.args.tokenId?.toString() || '',
+            creator: event.args.creator || '',
+            blockNumber: event.blockNumber || 0,
+            transactionHash: event.transactionHash || '',
+            isLoading: true
+          };
+        }).filter((proposal): proposal is ProposalEvent => proposal !== null);
 
         // Sort by block number (newest first) and set initial state
         initialProposals.sort((a, b) => b.blockNumber - a.blockNumber);
@@ -225,7 +227,7 @@ export const ProposalsHistory = () => {
       <Card className="bg-black/40 border-white/10">
         <CardContent className="p-6 text-center">
           <p className="text-white/60 mb-4">Connect your wallet to view proposals</p>
-          <Button onClick={connect} className="bg-purple-500 hover:bg-purple-600">
+          <Button onClick={connect} className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600">
             Connect Wallet
           </Button>
         </CardContent>
@@ -255,7 +257,7 @@ export const ProposalsHistory = () => {
           <Button 
             variant="link" 
             onClick={() => navigate('/thesis')}
-            className="mt-2 text-purple-400"
+            className="mt-2 text-blue-400"
           >
             Create your first proposal
           </Button>
@@ -284,4 +286,3 @@ export const ProposalsHistory = () => {
     </div>
   );
 };
-
