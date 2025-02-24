@@ -192,136 +192,91 @@ export default function ThesisSubmission() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="max-w-3xl mx-auto px-4 py-12">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-300">
-            Submit Your Thesis
-          </h1>
-          <Button
-            onClick={fillTestData}
-            variant="outline"
-            className="bg-black/30 border-purple-500/30 hover:border-purple-500/50 text-purple-400 gap-2"
-          >
-            <Beaker className="w-4 h-4" />
-            Load Test Data
-          </Button>
-        </div>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* Project Overview Section */}
-            <div className="bg-[#111111] rounded-lg p-6 space-y-6 shadow-xl border border-white/5 hover:border-purple-500/20 transition-colors">
-              <div className="flex items-center gap-2 text-lg font-medium">
-                <File className="w-5 h-5" />
-                <span>Project Overview</span>
-              </div>
-              <div className="grid gap-6">
-                <div>
-                  <Label className="text-sm text-gray-400">Title</Label>
-                  <Input
-                    {...form.register("title")}
-                    placeholder="Enter your project title"
-                    className="mt-1 bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm text-gray-400">Category</Label>
-                  <Input
-                    {...form.register("category")}
-                    placeholder="e.g., DeFi, NFT, Gaming"
-                    className="mt-1 bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm text-gray-400">Description</Label>
-                  <Textarea
-                    {...form.register("description")}
-                    placeholder="Describe your project's vision and goals..."
-                    className="mt-1 bg-black/50 border-white/10 text-white placeholder:text-gray-600 min-h-[100px]"
-                  />
-                </div>
-              </div>
+      <div className="flex flex-col items-center justify-center px-4 py-12">
+        <div className="w-full max-w-3xl space-y-8">
+          <div className="text-center space-y-4">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-500/10 text-blue-400 text-sm mb-4">
+              🚀 Launch Your Investment Strategy
             </div>
+            <h1 className="text-5xl font-bold text-white font-mono">
+              Submit Your Proposal
+            </h1>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Present your investment strategy to find co-investors who share your vision. Test market interest before committing resources.
+            </p>
+            <Button
+              onClick={fillTestData}
+              variant="outline"
+              className="bg-black/30 border-blue-500/30 hover:border-blue-500/50 text-blue-400 gap-2"
+            >
+              <Beaker className="w-4 h-4" />
+              Load Test Data
+            </Button>
+          </div>
 
-            {/* Investment Details Section */}
-            <div className="bg-[#111111] rounded-lg p-6 space-y-6 shadow-xl border border-white/5 hover:border-purple-500/20 transition-colors">
-              <div className="flex items-center gap-2 text-lg font-medium">
-                <DollarSign className="w-5 h-5" />
-                <span>Investment Details</span>
-              </div>
-              <div className="space-y-6">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Label className="text-sm text-gray-400">Target Capital</Label>
-                    <HelpCircle className="w-4 h-4 text-gray-500" />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="bg-[#111] rounded-xl border border-white/5 p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <File className="w-5 h-5 text-blue-400" />
+                  <h2 className="text-lg font-medium">Project Overview</h2>
+                </div>
+                <div className="grid gap-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <Label>Title</Label>
+                      <Input
+                        {...form.register("title")}
+                        placeholder="Enter your project title"
+                        className="mt-2 bg-black/50 border-white/10"
+                      />
+                    </div>
+                    <div>
+                      <Label>Category</Label>
+                      <Input
+                        {...form.register("category")}
+                        placeholder="e.g., DeFi, NFT, Gaming"
+                        className="mt-2 bg-black/50 border-white/10"
+                      />
+                    </div>
                   </div>
+                  <div>
+                    <Label>Description</Label>
+                    <Textarea
+                      {...form.register("description")}
+                      placeholder="Describe your project's vision and goals..."
+                      className="mt-2 bg-black/50 border-white/10 min-h-[120px]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#111] rounded-xl border border-white/5 p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <DollarSign className="w-5 h-5 text-blue-400" />
+                  <h2 className="text-lg font-medium">Investment Details</h2>
+                </div>
+                <div className="space-y-6">
                   <TargetCapitalInput
                     value={form.watch("investment.targetCapital")}
                     onChange={(value) => form.setValue("investment.targetCapital", value)}
                     error={form.formState.errors.investment?.targetCapital ? [form.formState.errors.investment.targetCapital.message || ""] : undefined}
                   />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Input
-                      placeholder="Smart Contract Development"
-                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input placeholder="Smart Contract Development" className="bg-black/50 border-white/10" />
+                    <Input placeholder="Amount in RD" className="bg-black/50 border-white/10" />
                   </div>
-                  <div>
-                    <Input
-                      placeholder="Amount in RD"
-                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input placeholder="Security Audit" className="bg-black/50 border-white/10" />
+                    <Input placeholder="Amount in RD" className="bg-black/50 border-white/10" />
                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Input
-                      placeholder="Security Audit"
-                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input placeholder="Marketing & Community" className="bg-black/50 border-white/10" />
+                    <Input placeholder="Amount in RD" className="bg-black/50 border-white/10" />
                   </div>
-                  <div>
-                    <Input
-                      placeholder="Amount in RD"
-                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Input
-                      placeholder="Marketing & Community"
-                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      placeholder="Amount in RD"
-                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Input
-                      placeholder="Operations & Legal"
-                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      placeholder="Amount in RD"
-                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Timer className="w-5 h-5" />
-                    <Label className="text-sm text-gray-400">Voting Duration</Label>
-                    <HelpCircle className="w-4 h-4 text-gray-500" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input placeholder="Operations & Legal" className="bg-black/50 border-white/10" />
+                    <Input placeholder="Amount in RD" className="bg-black/50 border-white/10" />
                   </div>
                   <VotingDurationInput
                     value={form.watch("votingDuration")}
@@ -330,191 +285,126 @@ export default function ThesisSubmission() {
                   />
                 </div>
               </div>
-            </div>
 
-            {/* Investment Drivers & Incentives */}
-            <div className="bg-[#111111] rounded-lg p-6 space-y-6 shadow-xl border border-white/5 hover:border-purple-500/20 transition-colors">
-              <div className="flex items-center gap-2 text-lg font-medium">
-                <Users className="w-5 h-5" />
-                <span>Investment Drivers & Incentives</span>
-              </div>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <Label className="text-sm text-gray-400">Investment Drivers</Label>
-                  <Input
-                    placeholder="Key driver #1"
-                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                  />
-                  <Input
-                    placeholder="Key driver #2"
-                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                  />
-                  <Input
-                    placeholder="Key driver #3"
-                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                  />
-                  <Input
-                    placeholder="Key driver #4"
-                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                  />
+              <div className="bg-[#111] rounded-xl border border-white/5 p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Users className="w-5 h-5 text-blue-400" />
+                  <h2 className="text-lg font-medium">Investment Drivers & Incentives</h2>
                 </div>
-                <div className="space-y-4">
-                  <Label className="text-sm text-gray-400">Backer Incentives</Label>
-                  <Input
-                    placeholder="Utility (e.g., Early access)"
-                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                  />
-                  <Input
-                    placeholder="Governance rights"
-                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                  />
-                  <Input
-                    placeholder="NFT rewards"
-                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                  />
-                  <Input
-                    placeholder="Token allocation"
-                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Team & Roadmap */}
-            <div className="bg-[#111111] rounded-lg p-6 space-y-6 shadow-xl border border-white/5 hover:border-purple-500/20 transition-colors">
-              <div className="flex items-center gap-2 text-lg font-medium">
-                <Users className="w-5 h-5" />
-                <span>Team & Roadmap</span>
-              </div>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <Label className="text-sm text-gray-400">Team Members</Label>
-                  <div className="space-y-2">
-                    <Input
-                      placeholder="Team member 1 name"
-                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                    />
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input
-                        placeholder="Role"
-                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                      />
-                      <Input
-                        placeholder="LinkedIn URL"
-                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Input
-                      placeholder="Team member 2 name"
-                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                    />
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input
-                        placeholder="Role"
-                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                      />
-                      <Input
-                        placeholder="LinkedIn URL"
-                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <Label className="text-sm text-gray-400">Roadmap Milestones</Label>
+                <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Input
-                        placeholder="Milestone 1"
-                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                      />
-                      <div className="flex items-center justify-between gap-2">
-                        <Input
-                          placeholder="Expected Date (Q2 2025)"
-                          className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                        />
-                        <Button variant="outline" className="border-white/10 text-white">
-                          Pending
-                        </Button>
+                    <Label>Investment Drivers</Label>
+                    <Input placeholder="Key driver #1" className="bg-black/50 border-white/10" />
+                    <Input placeholder="Key driver #2" className="bg-black/50 border-white/10" />
+                    <Input placeholder="Key driver #3" className="bg-black/50 border-white/10" />
+                    <Input placeholder="Key driver #4" className="bg-black/50 border-white/10" />
+                  </div>
+                  <div className="space-y-4">
+                    <Label>Backer Incentives</Label>
+                    <Input placeholder="Utility (e.g., Early access)" className="bg-black/50 border-white/10" />
+                    <Input placeholder="Governance rights" className="bg-black/50 border-white/10" />
+                    <Input placeholder="NFT rewards" className="bg-black/50 border-white/10" />
+                    <Input placeholder="Token allocation" className="bg-black/50 border-white/10" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#111] rounded-xl border border-white/5 p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Users className="w-5 h-5 text-blue-400" />
+                  <h2 className="text-lg font-medium">Team & Roadmap</h2>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <Label>Team Members</Label>
+                    <div className="space-y-4">
+                      <div>
+                        <Input placeholder="Team member 1 name" className="bg-black/50 border-white/10 mb-2" />
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input placeholder="Role" className="bg-black/50 border-white/10" />
+                          <Input placeholder="LinkedIn URL" className="bg-black/50 border-white/10" />
+                        </div>
+                      </div>
+                      <div>
+                        <Input placeholder="Team member 2 name" className="bg-black/50 border-white/10 mb-2" />
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input placeholder="Role" className="bg-black/50 border-white/10" />
+                          <Input placeholder="LinkedIn URL" className="bg-black/50 border-white/10" />
+                        </div>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Input
-                        placeholder="Milestone 2"
-                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                      />
-                      <div className="flex items-center justify-between gap-2">
-                        <Input
-                          placeholder="Expected Date (Q2 2025)"
-                          className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                        />
-                        <Button variant="outline" className="border-white/10 text-white">
-                          Pending
-                        </Button>
+                  </div>
+                  <div className="space-y-4">
+                    <Label>Roadmap Milestones</Label>
+                    <div className="space-y-4">
+                      <div>
+                        <Input placeholder="Milestone 1" className="bg-black/50 border-white/10 mb-2" />
+                        <div className="flex gap-2">
+                          <Input placeholder="Expected Date (Q2 2025)" className="bg-black/50 border-white/10" />
+                          <Button variant="outline" size="sm" className="shrink-0">
+                            Pending
+                          </Button>
+                        </div>
+                      </div>
+                      <div>
+                        <Input placeholder="Milestone 2" className="bg-black/50 border-white/10 mb-2" />
+                        <div className="flex gap-2">
+                          <Input placeholder="Expected Date (Q2 2025)" className="bg-black/50 border-white/10" />
+                          <Button variant="outline" size="sm" className="shrink-0">
+                            Pending
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Social Links */}
-            <div className="bg-[#111111] rounded-lg p-6 space-y-6 shadow-xl border border-white/5 hover:border-purple-500/20 transition-colors">
-              <div className="flex items-center gap-2 text-lg font-medium">
-                <MessageSquare className="w-5 h-5" />
-                <span>Social Links</span>
+              <div className="bg-[#111] rounded-xl border border-white/5 p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <MessageSquare className="w-5 h-5 text-blue-400" />
+                  <h2 className="text-lg font-medium">Social Links</h2>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <Input placeholder="Twitter URL" className="bg-black/50 border-white/10" />
+                  <Input placeholder="Discord URL" className="bg-black/50 border-white/10" />
+                  <Input placeholder="Telegram URL" className="bg-black/50 border-white/10" />
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
-                <Input
-                  placeholder="Twitter URL"
-                  className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                />
-                <Input
-                  placeholder="Discord URL"
-                  className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                />
-                <Input
-                  placeholder="Telegram URL"
-                  className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                />
-              </div>
-            </div>
 
-            {/* Submit Section */}
-            <div className="bg-[#0a1020] rounded-lg p-6 shadow-xl border border-white/5">
-              <div className="flex items-start gap-3">
-                <div className="shrink-0 mt-1">
-                  <div className="w-6 h-6 flex items-center justify-center rounded-full bg-purple-500/10 text-purple-400">
-                    ℹ️
+              <div className="bg-[#0a1020] rounded-xl border border-white/5 p-6">
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 mt-1">
+                    <div className="w-6 h-6 flex items-center justify-center rounded-full bg-blue-500/10 text-blue-400">
+                      ℹ️
+                    </div>
                   </div>
+                  <p className="text-sm text-gray-400">
+                    Your proposal will be minted as an NFT, representing a binding smart contract. A fee of 25 RD tokens is required to submit.
+                  </p>
                 </div>
-                <p className="text-sm text-gray-400">
-                  Your proposal will be minted as an NFT, representing a binding smart contract. A fee of 25 RD tokens is required to submit.
-                </p>
               </div>
-            </div>
 
-            <Button 
-              type="submit" 
-              disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white py-6 text-lg font-medium shadow-xl transition-all duration-200 ease-out hover:shadow-purple-500/20 disabled:opacity-50"
-            >
-              {isSubmitting ? (
-                <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-                  Submitting...
-                </div>
-              ) : (
-                <span className="flex items-center gap-2">
-                  Launch Proposal
-                  <span className="text-xl">→</span>
-                </span>
-              )}
-            </Button>
-          </form>
-        </Form>
+              <Button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white py-6 text-lg font-medium"
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                    Submitting...
+                  </div>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    Launch Proposal
+                    <span className="text-xl">→</span>
+                  </span>
+                )}
+              </Button>
+            </form>
+          </Form>
+        </div>
       </div>
     </div>
   );
