@@ -16,7 +16,6 @@ import { StrategiesSection } from "@/components/thesis/form-sections/StrategiesS
 import { FirmCriteriaSection } from "@/components/thesis/form-sections/FirmCriteriaSection";
 import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 import { createProposal } from "@/services/proposalContractService";
-import { WalletConnectionOverlay } from "@/components/thesis/WalletConnectionOverlay";
 import { 
   ProposalMetadata, 
   FirmSize, 
@@ -175,8 +174,6 @@ const ThesisSubmission = () => {
 
   return (
     <div className="min-h-screen bg-black">
-      <WalletConnectionOverlay />
-      
       <div className="fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-teal-500/5 to-yellow-500/5 animate-gradient" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-black to-black" />
