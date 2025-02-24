@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { ethers } from "ethers";
-import { FACTORY_ADDRESS, FACTORY_ABI, LGR_TOKEN_ADDRESS, LGR_PRICE_USD } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS, RD_PRICE_USD } from "@/lib/constants";
 import { getTokenBalance } from "@/services/tokenService";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata, ProposalEvent, NFTMetadata } from "@/types/proposals";
@@ -14,22 +14,22 @@ import { loadingStates } from "./LoadingStates";
 import { ProposalLoadingCard } from "./ProposalLoadingCard";
 import { ProposalListItem } from "./ProposalListItem";
 
-const MIN_LGR_REQUIRED = "1";
+const MIN_RD_REQUIRED = "1";
 
 export const ProposalsHistory = () => {
   const [proposalEvents, setProposalEvents] = useState<ProposalEvent[]>([]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [loadingStateIndex, setLoadingStateIndex] = useState(0);
-  const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
+  const [hasMinimumRD, setHasMinimumRD] = useState<boolean | null>(null);
   const { isConnected, connect, address } = useWalletConnection();
   const { getProvider } = useWalletProvider();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const formatUSDAmount = (lgrAmount: string): string => {
-    const amount = parseFloat(lgrAmount);
+  const formatUSDAmount = (rdAmount: string): string => {
+    const amount = parseFloat(rdAmount);
     if (isNaN(amount)) return "$0.00";
-    const usdAmount = amount * LGR_PRICE_USD;
+    const usdAmount = amount * RD_PRICE_USD;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
@@ -69,9 +69,9 @@ export const ProposalsHistory = () => {
   }, [isInitialLoading]);
 
   useEffect(() => {
-    const checkLGRBalance = async () => {
+    const checkRDBalance = async () => {
       if (!isConnected || !address) {
-        setHasMinimumLGR(null);
+        setHasMinimumRD(null);
         return;
       }
 
@@ -79,32 +79,32 @@ export const ProposalsHistory = () => {
         const walletProvider = await getProvider();
         const balance = await getTokenBalance(
           walletProvider.provider,
-          LGR_TOKEN_ADDRESS,
+          RD_TOKEN_ADDRESS,
           address
         );
 
         const hasEnough = ethers.utils.parseEther(balance).gte(
-          ethers.utils.parseEther(MIN_LGR_REQUIRED)
+          ethers.utils.parseEther(MIN_RD_REQUIRED)
         );
         
-        console.log('LGR Balance check:', {
+        console.log('RD Balance check:', {
           balance,
-          required: MIN_LGR_REQUIRED,
+          required: MIN_RD_REQUIRED,
           hasEnough
         });
         
-        setHasMinimumLGR(hasEnough);
+        setHasMinimumRD(hasEnough);
       } catch (error) {
-        console.error("Error checking LGR balance:", error);
+        console.error("Error checking RD balance:", error);
         toast({
           title: "Balance Check Failed",
-          description: "Failed to verify LGR balance. Please try again.",
+          description: "Failed to verify RD balance. Please try again.",
           variant: "destructive",
         });
       }
     };
 
-    checkLGRBalance();
+    checkRDBalance();
   }, [isConnected, address, getProvider]);
 
   useEffect(() => {
@@ -161,7 +161,7 @@ export const ProposalsHistory = () => {
     };
 
     const fetchProposalData = async () => {
-      if (!isConnected || !hasMinimumLGR) return;
+      if (!isConnected || !hasMinimumRD) return;
 
       try {
         setIsInitialLoading(true);
@@ -217,7 +217,7 @@ export const ProposalsHistory = () => {
     };
 
     fetchProposalData();
-  }, [isConnected, hasMinimumLGR, getProvider]);
+  }, [isConnected, hasMinimumRD, getProvider]);
 
   if (!isConnected) {
     return (
@@ -232,11 +232,11 @@ export const ProposalsHistory = () => {
     );
   }
 
-  if (hasMinimumLGR === false) {
+  if (hasMinimumRD === false) {
     return (
       <Card className="bg-black/40 border-white/10">
         <CardContent className="p-6 text-center text-white/60">
-          <p>You need at least {MIN_LGR_REQUIRED} LGR to view proposals</p>
+          <p>You need at least {MIN_RD_REQUIRED} RD to view proposals</p>
         </CardContent>
       </Card>
     );
