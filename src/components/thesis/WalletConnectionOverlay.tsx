@@ -6,9 +6,11 @@ import { useWalletConnection } from "@/hooks/useWalletConnection";
 export const WalletConnectionOverlay = () => {
   const { isConnected } = useWalletConnection();
   const location = useLocation();
+  const pathArray = location.pathname.split('/');
+  const isThesisRelatedPage = pathArray.includes('thesis');
 
-  // Don't show overlay on thesis page
-  if (location.pathname === '/thesis' || isConnected) {
+  // Don't show overlay on any thesis-related pages or when connected
+  if (isThesisRelatedPage || isConnected) {
     return null;
   }
 
