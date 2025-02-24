@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Coins, Vote, Shield, Award } from "lucide-react";
@@ -11,22 +12,22 @@ interface LoadingSlide {
 
 const slides: LoadingSlide[] = [
   {
-    icon: <Shield className="w-12 h-12 text-polygon-primary" />,
+    icon: <Shield className="w-12 h-12 text-blue-400" />,
     title: "Analyzing Professional Experience",
     description: "Evaluating your LinkedIn profile to determine governance power."
   },
   {
-    icon: <Award className="w-12 h-12 text-polygon-primary" />,
+    icon: <Award className="w-12 h-12 text-blue-400" />,
     title: "Calculating Governance Power",
     description: "Your experience translates to voting weight in the DAO."
   },
   {
-    icon: <Coins className="w-12 h-12 text-polygon-primary" />,
+    icon: <Coins className="w-12 h-12 text-blue-400" />,
     title: "LGR Token Utility",
     description: "Access professional network features and participate in firm operations."
   },
   {
-    icon: <Vote className="w-12 h-12 text-polygon-primary" />,
+    icon: <Vote className="w-12 h-12 text-blue-400" />,
     title: "Governance Participation",
     description: "Vote on operational decisions and shape the future of accounting."
   }
@@ -81,7 +82,7 @@ export const LoadingSlides = ({ isAnalyzing }: { isAnalyzing: boolean }) => {
                 key={index}
                 className={cn(
                   "w-2 h-2 rounded-full transition-colors duration-300",
-                  currentSlide === index ? "bg-polygon-primary" : "bg-gray-600"
+                  currentSlide === index ? "bg-blue-400" : "bg-gray-600"
                 )}
               />
             ))}
