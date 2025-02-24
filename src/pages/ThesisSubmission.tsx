@@ -18,6 +18,7 @@ import { waitForProposalCreation } from "@/services/eventListenerService";
 import { mainnet, polygon, polygonMumbai } from 'viem/chains';
 import { ethers } from 'ethers';
 import { useNavigate } from "react-router-dom";
+import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 
 const thesisFormSchema = z.object({
   title: z.string().min(2, {
@@ -495,6 +496,7 @@ export default function ThesisSubmission() {
           </Form>
         </div>
       </div>
+      <ResistanceWalletWidget />
     </div>
   );
 }
