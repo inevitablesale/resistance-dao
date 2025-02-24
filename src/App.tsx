@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
 import { Analytics } from '@vercel/analytics/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Nav from "./components/Nav";
 import { ScrollToTop } from "./components/ScrollToTop";
 import Index from "./pages/Index";
@@ -132,6 +132,8 @@ const dynamicSettings = {
   }
 };
 
+const queryClient = new QueryClient();
+
 function Layout() {
   return (
     <>
@@ -157,14 +159,16 @@ function Layout() {
 
 function App() {
   return (
-    <DynamicContextProvider settings={dynamicSettings}>
-      <Router>
-        <ScrollToTop />
-        <Layout />
-      </Router>
-      <Toaster />
-      <Analytics />
-    </DynamicContextProvider>
+    <QueryClientProvider client={queryClient}>
+      <DynamicContextProvider settings={dynamicSettings}>
+        <Router>
+          <ScrollToTop />
+          <Layout />
+        </Router>
+        <Toaster />
+        <Analytics />
+      </DynamicContextProvider>
+    </QueryClientProvider>
   );
 }
 
