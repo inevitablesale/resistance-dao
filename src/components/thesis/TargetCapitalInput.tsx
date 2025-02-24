@@ -27,10 +27,10 @@ export const convertToWei = (amount: string): ethers.BigNumber => {
   const wholeAmount = Math.floor(value);
   
   if (wholeAmount < MIN_TARGET_CAPITAL) {
-    throw new Error(`Minimum target capital is ${MIN_TARGET_CAPITAL.toLocaleString()}`);
+    throw new Error(`Minimum target capital is $${MIN_TARGET_CAPITAL.toLocaleString()}`);
   }
   if (wholeAmount > MAX_TARGET_CAPITAL) {
-    throw new Error(`Maximum target capital is ${MAX_TARGET_CAPITAL.toLocaleString()}`);
+    throw new Error(`Maximum target capital is $${MAX_TARGET_CAPITAL.toLocaleString()}`);
   }
   
   try {
@@ -87,12 +87,18 @@ export const TargetCapitalInput = ({
     const numValue = parseFloat(value);
     if (isNaN(numValue)) return "Please enter a valid number";
     if (numValue < MIN_TARGET_CAPITAL) {
-      return `Minimum target capital is ${MIN_TARGET_CAPITAL.toLocaleString()}`;
+      return `Minimum target capital is $${MIN_TARGET_CAPITAL.toLocaleString()}`;
     }
     if (numValue > MAX_TARGET_CAPITAL) {
-      return `Maximum target capital is ${MAX_TARGET_CAPITAL.toLocaleString()}`;
+      return `Maximum target capital is $${MAX_TARGET_CAPITAL.toLocaleString()}`;
     }
     return "";
+  };
+
+  const formatUSD = (val: string) => {
+    const num = parseInt(val);
+    if (isNaN(num)) return "";
+    return `$${num.toLocaleString()}`;
   };
 
   return (
@@ -103,7 +109,7 @@ export const TargetCapitalInput = ({
           <HelpCircle className="h-4 w-4 text-gray-400" />
         </Label>
         <div className="text-sm text-gray-400">
-          {value && `Target: ${parseInt(value).toLocaleString()}`}
+          {value && `Target: ${formatUSD(value)}`}
         </div>
       </div>
       <div className="relative">
