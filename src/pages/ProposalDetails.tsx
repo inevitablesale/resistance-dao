@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { Building2, ChevronLeft, FileText, Target, Users, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,8 +14,10 @@ const ProposalDetails = () => {
   return (
     <div className="min-h-screen bg-black">
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-teal-500/5 to-yellow-500/5 animate-gradient" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-black to-black" />
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-900/20 to-black" />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJub25lIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9zdmc+')] opacity-10" />
+        </div>
         
         <div className="container mx-auto px-4 pt-24 pb-20 relative z-10 max-w-6xl">
           <motion.div 
@@ -38,10 +41,10 @@ const ProposalDetails = () => {
             className="text-center mb-12"
           >
             <div className="mb-6 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-teal-500/20 blur-xl" />
-              <Building2 className="w-16 h-16 mx-auto text-yellow-500 relative animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-blue-400/20 blur-xl" />
+              <Building2 className="w-16 h-16 mx-auto text-blue-400 relative" />
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-teal-200 to-yellow-300 animate-gradient">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
               Proposal Details
             </h1>
             <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto">
@@ -51,13 +54,13 @@ const ProposalDetails = () => {
 
           <Tabs defaultValue="overview" className="space-y-8">
             <TabsList className="bg-black/40 border border-white/10 backdrop-blur-sm mx-auto">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-yellow-500/10 data-[state=active]:text-yellow-500">
+              <TabsTrigger value="overview" className="data-[state=active]:bg-blue-500/10 data-[state=active]:text-blue-400">
                 Overview
               </TabsTrigger>
-              <TabsTrigger value="details" className="data-[state=active]:bg-teal-500/10 data-[state=active]:text-teal-500">
+              <TabsTrigger value="details" className="data-[state=active]:bg-blue-500/10 data-[state=active]:text-blue-400">
                 Details
               </TabsTrigger>
-              <TabsTrigger value="investment" className="data-[state=active]:bg-yellow-500/10 data-[state=active]:text-yellow-500">
+              <TabsTrigger value="investment" className="data-[state=active]:bg-blue-500/10 data-[state=active]:text-blue-400">
                 Investment
               </TabsTrigger>
             </TabsList>
@@ -70,8 +73,8 @@ const ProposalDetails = () => {
                 className="relative z-10"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center backdrop-blur-sm">
-                    <FileText className="w-5 h-5 text-yellow-400" />
+                  <div className="w-10 h-10 rounded-lg bg-blue-900/20 flex items-center justify-center backdrop-blur-sm">
+                    <FileText className="w-5 h-5 text-blue-400" />
                   </div>
                   <h2 className="text-2xl font-bold text-white">Overview</h2>
                 </div>
@@ -87,8 +90,8 @@ const ProposalDetails = () => {
                 className="relative z-10"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center backdrop-blur-sm">
-                    <Target className="w-5 h-5 text-teal-400" />
+                  <div className="w-10 h-10 rounded-lg bg-blue-900/20 flex items-center justify-center backdrop-blur-sm">
+                    <Target className="w-5 h-5 text-blue-400" />
                   </div>
                   <h2 className="text-2xl font-bold text-white">Firm Details</h2>
                 </div>
@@ -104,8 +107,8 @@ const ProposalDetails = () => {
                 className="relative z-10"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center backdrop-blur-sm">
-                    <Users className="w-5 h-5 text-yellow-400" />
+                  <div className="w-10 h-10 rounded-lg bg-blue-900/20 flex items-center justify-center backdrop-blur-sm">
+                    <Users className="w-5 h-5 text-blue-400" />
                   </div>
                   <h2 className="text-2xl font-bold text-white">Investment Information</h2>
                 </div>
