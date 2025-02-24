@@ -19,6 +19,7 @@ import { mainnet, polygon, polygonMumbai } from 'viem/chains';
 import { ethers } from 'ethers';
 import { useNavigate } from "react-router-dom";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
+import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
 
 const thesisFormSchema = z.object({
   title: z.string().min(2, {
@@ -212,16 +213,6 @@ export default function ThesisSubmission() {
         description: `Metadata uploaded to IPFS with hash: ${ipfsHash}`,
       });
 
-      const chainId = await walletClient.chainId;
-      const isTestMode = chainId !== mainnet.id && chainId !== polygon.id;
-      const chain = isTestMode ? polygonMumbai : polygon;
-      const contractAddress = isTestMode ? process.env.NEXT_PUBLIC_POLYGON_MUMBAI_CONTRACT_ADDRESS : process.env.NEXT_PUBLIC_POLYGON_MAINNET_CONTRACT_ADDRESS;
-      const abi = JSON.parse(process.env.NEXT_PUBLIC_CONTRACT_ABI || '[]');
-
-      if (!contractAddress) {
-        throw new Error("Contract address is not available");
-      }
-
       toast({
         title: "Creating Proposal...",
         description: "Please approve the transaction in your wallet.",
@@ -229,7 +220,7 @@ export default function ThesisSubmission() {
       
       const provider = new ethers.providers.Web3Provider(walletClient as any);
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, abi, signer);
+      const contract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
 
       const tx = await contract.createProposal(
         values.title,
@@ -245,8 +236,8 @@ export default function ThesisSubmission() {
 
       const eventConfig = {
         provider,
-        contractAddress,
-        abi,
+        contractAddress: FACTORY_ADDRESS,
+        abi: FACTORY_ABI,
         eventName: 'ProposalCreated'
       };
 
