@@ -20,6 +20,7 @@ import { ethers } from 'ethers';
 import { useNavigate } from "react-router-dom";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 import { FACTORY_ADDRESS, FACTORY_ABI } from "@/lib/constants";
+import { LGR_TOKEN_ADDRESS, SUBMISSION_FEE } from "@/lib/constants";
 
 const thesisFormSchema = z.object({
   title: z.string().min(2, {
@@ -188,7 +189,29 @@ export default function ThesisSubmission() {
         throw new Error("Wallet client not available");
       }
 
-      const targetCapitalInWei = convertToWei(values.investment.targetCapital);
+      const targetCapitalInWei = ethers.utils.parseEther(values.investment.targetCapital);
+
+      const provider = new ethers.providers.Web3Provider(walletClient as any);
+      const signer = provider.getSigner();
+      
+      const rdToken = new ethers.Contract(
+        LGR_TOKEN_ADDRESS,
+        ["function approve(address spender, uint256 amount) external returns (bool)"],
+        signer
+      );
+
+      toast({
+        title: "Approving Token Usage...",
+        description: "Please approve the transaction to allow token usage",
+      });
+
+      const approveTx = await rdToken.approve(FACTORY_ADDRESS, SUBMISSION_FEE);
+      await approveTx.wait();
+
+      toast({
+        title: "Token Approved",
+        description: "Now creating your proposal...",
+      });
 
       const metadata: ProposalMetadata = {
         title: values.title,
@@ -218,15 +241,14 @@ export default function ThesisSubmission() {
         description: "Please approve the transaction in your wallet.",
       });
       
-      const provider = new ethers.providers.Web3Provider(walletClient as any);
-      const signer = provider.getSigner();
       const contract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
 
       const tx = await contract.createProposal(
         values.title,
         `ipfs://${ipfsHash}`,
         targetCapitalInWei,
-        values.votingDuration
+        values.votingDuration,
+        { gasLimit: 500000 }
       );
 
       toast({
