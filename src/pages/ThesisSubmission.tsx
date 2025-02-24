@@ -220,10 +220,22 @@ export default function ThesisSubmission() {
         investment: {
           targetCapital: values.investment.targetCapital,
           description: values.investment.description,
+          drivers: [],
+          additionalCriteria: ""
         },
         votingDuration: values.votingDuration,
         linkedInURL: values.linkedInURL,
         blockchain: values.blockchain,
+        fundingBreakdown: values.fundingBreakdown.filter(item => item.category && item.amount),
+        team: values.team.filter(member => member.name && member.role),
+        socials: {
+          twitter: values.socials.twitter || undefined,
+          discord: values.socials.discord || undefined,
+          telegram: values.socials.telegram || undefined
+        },
+        submissionTimestamp: Math.floor(Date.now() / 1000),
+        submitter: await signer.getAddress(),
+        isTestMode: false
       };
 
       toast({
@@ -273,20 +285,19 @@ export default function ThesisSubmission() {
         description: `Proposal created with token ID: ${proposalEvent.tokenId}`,
       });
 
-    // Update the navigation path to match the correct route
-    navigate(`/proposal/${proposalEvent.tokenId}`);
+      navigate(`/proposal/${proposalEvent.tokenId}`);
 
-  } catch (error: any) {
-    console.error("Error submitting thesis:", error);
-    toast({
-      title: "Error Submitting Thesis",
-      description: error.message || "An error occurred while submitting the thesis.",
-      variant: "destructive",
-    });
-  } finally {
-    setIsSubmitting(false);
+    } catch (error: any) {
+      console.error("Error submitting thesis:", error);
+      toast({
+        title: "Error Submitting Thesis",
+        description: error.message || "An error occurred while submitting the thesis.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
-}
 
   return (
     <div className="min-h-screen bg-black text-white pt-20">
