@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { AccessCoverOverlay } from "@/components/AccessCoverOverlay";
 import { Progress } from "@/components/ui/progress";
+import { LGRFloatingWidget } from "@/components/wallet/LGRFloatingWidget";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -610,6 +611,9 @@ const Index = () => {
             </div>
           </div>
         </section>
+
+        {/* Add the LGRFloatingWidget */}
+        <LGRFloatingWidget />
       </div>
     </>
   );
