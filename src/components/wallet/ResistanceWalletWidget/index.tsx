@@ -59,6 +59,7 @@ export const ResistanceWalletWidget = () => {
     }
 
     if (!enabled) {
+      console.log("Onramp not enabled, current state:", { enabled, primaryWallet });
       toast({
         title: "Onramp Not Available",
         description: "The onramp service is currently not available",
@@ -68,6 +69,12 @@ export const ResistanceWalletWidget = () => {
     }
 
     try {
+      console.log("Opening Banxa onramp with config:", {
+        provider: OnrampProviders.Banxa,
+        token: 'USDC',
+        address: primaryWallet.address,
+      });
+
       await open({
         onrampProvider: OnrampProviders.Banxa,
         token: 'USDC',
