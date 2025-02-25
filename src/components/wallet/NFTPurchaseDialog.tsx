@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -31,7 +32,7 @@ interface NFTPurchaseDialogProps {
 export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps) => {
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
-  const { primaryWallet, logout } = useDynamicContext();
+  const { primaryWallet, user } = useDynamicContext();
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
   const [usdcAllowance, setUsdcAllowance] = useState<string>("0");
   const [isApproving, setIsApproving] = useState(false);
@@ -41,7 +42,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await user?.logout();
       onOpenChange(false);
       toast({
         title: "Success",
