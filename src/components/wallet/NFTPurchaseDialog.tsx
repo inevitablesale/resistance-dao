@@ -166,6 +166,15 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   };
 
   const handleMintNFT = async () => {
+    if (Number(usdcBalance) < 50) {
+      toast({
+        title: "Error",
+        description: "Insufficient USDC balance",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsMinting(true);
       const walletProvider = await getProvider();
@@ -285,16 +294,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
                     <Check className="w-5 h-5 text-green-500" />
                   </div>
                   <p className="text-green-400 text-base font-semibold">Welcome to Resistance DAO!</p>
-                </motion.div>
-              ) : !hasEnoughUSDC ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="flex flex-col items-center gap-2"
-                >
-                  <AlertCircle className="w-6 h-6 text-yellow-500" />
-                  <p className="text-yellow-500 text-sm">Insufficient USDC balance</p>
                 </motion.div>
               ) : needsApproval ? (
                 <Button
