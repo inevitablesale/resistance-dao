@@ -8,16 +8,12 @@ import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNFTMinting } from "@/hooks/useNFTMinting";
-import { BuyTokenSection } from "@/components/wallet/ResistanceWalletWidget/BuyTokenSection";
-import { purchaseTokens } from "@/services/presaleContractService";
-import { useWalletProvider } from "@/hooks/useWalletProvider";
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
-  const { getProvider } = useWalletProvider();
   const { 
     isApproving,
     isMinting,
@@ -30,7 +26,6 @@ export const AccessCoverOverlay = () => {
   
   const [usdcBalance, setUsdcBalance] = useState("0");
   const [hasApproval, setHasApproval] = useState(false);
-  const [showTokenPurchase, setShowTokenPurchase] = useState(false);
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -46,6 +41,13 @@ export const AccessCoverOverlay = () => {
 
     checkBalances();
   }, [address, getUSDCBalance, checkUSDCApproval]);
+
+  // If user has NFT, close the overlay
+  useEffect(() => {
+    if (nftBalance > 0) {
+      setIsOpen(false);
+    }
+  }, [nftBalance]);
 
   if (!isOpen) return null;
 
@@ -66,20 +68,6 @@ export const AccessCoverOverlay = () => {
     }
   };
 
-  const handleBuyRd = async (amount: string) => {
-    try {
-      const provider = await getProvider();
-      const signer = provider.provider.getSigner();
-      await purchaseTokens(signer, amount);
-    } catch (error) {
-      console.error('Error purchasing tokens:', error);
-    }
-  };
-
-  const handleBuyUsdc = async () => {
-    // Implement your USDC purchase flow here
-  };
-
   return (
     <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-blue-950 to-black">
       <div 
@@ -90,15 +78,6 @@ export const AccessCoverOverlay = () => {
         }}
       />
       
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="fixed right-4 top-4 z-[101] text-white hover:text-white bg-blue-500/20 hover:bg-blue-600/20 p-8 rounded-full shadow-lg backdrop-blur-sm border border-blue-400/20"
-        onClick={() => setIsOpen(false)}
-      >
-        <X className="h-10 w-10" />
-      </Button>
-
       <div className="container max-w-4xl mx-auto px-4 h-full flex items-center justify-center relative">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
@@ -118,11 +97,8 @@ export const AccessCoverOverlay = () => {
               <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
                 Welcome to Resistance DAO
               </h1>
-              <p className="text-xl text-blue-200/80 max-w-2xl mx-auto mb-4">
-                Original holders: You're part of our founding community. Thank you for being here since the beginning.
-              </p>
               <p className="text-xl text-blue-200/80 max-w-2xl mx-auto mb-8">
-                New members: Join our community by minting a Member NFT or purchasing RD tokens
+                Connect your wallet to verify your membership NFT
               </p>
               <Button 
                 size="lg"
@@ -142,65 +118,33 @@ export const AccessCoverOverlay = () => {
           ) : (
             <div className="space-y-8">
               <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
-                {showTokenPurchase ? "Purchase RD Tokens" : "Choose Your Path"}
+                Membership Required
               </h1>
               
-              {showTokenPurchase ? (
-                <div className="space-y-6">
-                  <BuyTokenSection 
-                    usdcBalance={usdcBalance}
-                    onBuyUsdc={handleBuyUsdc}
-                    onBuyRd={handleBuyRd}
-                  />
+              <div className="bg-blue-900/30 rounded-xl p-6 backdrop-blur border border-blue-500/20 max-w-xl mx-auto">
+                <h3 className="text-2xl font-bold text-blue-300 mb-4">Member NFT</h3>
+                <p className="text-blue-200/80 mb-6">
+                  Mint a Member NFT to join our community and get exclusive access
+                </p>
+                <div className="space-y-4">
+                  <div className="text-left text-sm text-blue-300/60">
+                    <div>Price: {MINT_PRICE} USDC</div>
+                    <div>Your balance: {usdcBalance} USDC</div>
+                  </div>
                   <Button
-                    variant="ghost"
-                    onClick={() => setShowTokenPurchase(false)}
-                    className="text-blue-400 hover:text-blue-300"
+                    onClick={handleMintClick}
+                    disabled={isMinting || isApproving || Number(usdcBalance) < Number(MINT_PRICE)}
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600"
                   >
-                    Back to options
+                    {isApproving || isMinting ? (
+                      <Loader2 className="w-6 h-6 mr-2 animate-spin" />
+                    ) : null}
+                    {isApproving ? "Approving USDC..." :
+                     isMinting ? "Minting NFT..." :
+                     !hasApproval ? "Approve USDC" : "Mint Member NFT"}
                   </Button>
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                  <div className="bg-blue-900/30 rounded-xl p-6 backdrop-blur border border-blue-500/20">
-                    <h3 className="text-2xl font-bold text-blue-300 mb-4">Member NFT</h3>
-                    <p className="text-blue-200/80 mb-6">
-                      Mint a Member NFT to join our community and get exclusive access
-                    </p>
-                    <div className="space-y-4">
-                      <div className="text-left text-sm text-blue-300/60">
-                        <div>Price: {MINT_PRICE} USDC</div>
-                        <div>Your balance: {usdcBalance} USDC</div>
-                      </div>
-                      <Button
-                        onClick={handleMintClick}
-                        disabled={isMinting || isApproving || Number(usdcBalance) < Number(MINT_PRICE)}
-                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600"
-                      >
-                        {isApproving || isMinting ? (
-                          <Loader2 className="w-6 h-6 mr-2 animate-spin" />
-                        ) : null}
-                        {isApproving ? "Approving USDC..." :
-                         isMinting ? "Minting NFT..." :
-                         !hasApproval ? "Approve USDC" : "Mint Member NFT"}
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="bg-blue-900/30 rounded-xl p-6 backdrop-blur border border-blue-500/20">
-                    <h3 className="text-2xl font-bold text-blue-300 mb-4">RD Tokens</h3>
-                    <p className="text-blue-200/80 mb-6">
-                      Purchase RD tokens to participate in governance and earn rewards
-                    </p>
-                    <Button
-                      onClick={() => setShowTokenPurchase(true)}
-                      className="w-full bg-gradient-to-r from-teal-600 to-blue-600"
-                    >
-                      Buy RD Tokens
-                    </Button>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           )}
         </motion.div>
