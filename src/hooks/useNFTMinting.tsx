@@ -1,19 +1,25 @@
+
 import { useState } from "react";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletProvider } from "./useWalletProvider";
 
+// Contract addresses on Polygon
 const NFT_CONTRACT_ADDRESS = "0x6527b171AF1c61AE43bf405ABe53861b0487A369";
 const USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
-const MINT_PRICE = ethers.utils.parseUnits("50", 6);
+const MINT_PRICE = ethers.utils.parseUnits("50", 6); // 50 USDC with 6 decimals
 
 const NFT_ABI = [
   "function mintNFT(string calldata tokenURI) external",
   "function safeMint(address recipient, string memory tokenURI) public",
   "function bulkMint(address[] calldata recipients, string[] calldata tokenURIs) external",
   "function owner() view returns (address)",
+  "function tokenCounter() view returns (uint256)",
   "function MINT_PRICE() view returns (uint256)",
-  "function balanceOf(address owner) view returns (uint256)"
+  "function treasury() view returns (address)",
+  "function USDC_TOKEN() view returns (address)",
+  "function balanceOf(address owner) view returns (uint256)",
+  "event NFTMinted(address indexed recipient, uint256 indexed tokenId, string tokenURI)"
 ];
 
 const USDC_ABI = [
@@ -51,7 +57,7 @@ export const useNFTMinting = () => {
 
       const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
       const balance = await usdcContract.balanceOf(address);
-      return ethers.utils.formatUnits(balance, 6);
+      return ethers.utils.formatUnits(balance, 6); // USDC has 6 decimals
     } catch (error) {
       console.error("Error getting USDC balance:", error);
       return "0";
@@ -102,7 +108,9 @@ export const useNFTMinting = () => {
       );
       
       const ownerAddress = await nftContract.owner();
-      return address.toLowerCase() === ownerAddress.toLowerCase();
+      const isContractOwner = address.toLowerCase() === ownerAddress.toLowerCase();
+      setIsOwner(isContractOwner);
+      return isContractOwner;
     } catch (error) {
       console.error("Error checking owner:", error);
       return false;
@@ -110,7 +118,6 @@ export const useNFTMinting = () => {
   };
 
   const ownerMint = async (recipient: string) => {
-    console.log("Attempting owner mint for:", recipient);
     setIsMinting(true);
     try {
       const provider = await getProvider();
@@ -130,7 +137,7 @@ export const useNFTMinting = () => {
         attributes: [
           {
             trait_type: "Membership Type",
-            value: "Standard"
+            value: "Core Member"
           },
           {
             trait_type: "Joined",
@@ -140,10 +147,14 @@ export const useNFTMinting = () => {
       };
 
       const metadataUri = `ipfs://QmYourIPFSHash`;
-      console.log("Calling safeMint with URI:", metadataUri);
       const tx = await nftContract.safeMint(recipient, metadataUri);
-      await tx.wait();
+      const receipt = await tx.wait();
       
+      const mintEvent = receipt.events?.find((e: any) => e.event === 'NFTMinted');
+      if (!mintEvent) {
+        throw new Error('Mint event not found in transaction receipt');
+      }
+
       return true;
     } catch (error) {
       console.error("Error in owner mint:", error);
@@ -166,23 +177,14 @@ export const useNFTMinting = () => {
       const ownerStatus = await checkIfOwner();
       console.log("Is owner?", ownerStatus);
 
+      // If owner, use direct minting
       if (ownerStatus) {
-        console.log("Owner detected, using ownerMint");
+        console.log("Owner detected, using safeMint");
         return await ownerMint(address);
       }
 
-      console.log("Not owner, proceeding with regular mint");
-      const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
-      const balance = await usdcContract.balanceOf(address);
-      if (balance.lt(MINT_PRICE)) {
-        throw new Error(`Insufficient USDC balance. You need 50 USDC to mint.`);
-      }
-
-      const allowance = await usdcContract.allowance(address, NFT_CONTRACT_ADDRESS);
-      if (allowance.lt(MINT_PRICE)) {
-        throw new Error("USDC allowance too low. Please approve USDC first.");
-      }
-
+      // Regular user minting with USDC payment
+      console.log("Regular user, proceeding with USDC payment mint");
       const nftContract = new ethers.Contract(
         NFT_CONTRACT_ADDRESS,
         NFT_ABI,
@@ -196,7 +198,7 @@ export const useNFTMinting = () => {
         attributes: [
           {
             trait_type: "Membership Type",
-            value: "Standard"
+            value: "Member"
           },
           {
             trait_type: "Joined",
@@ -207,8 +209,13 @@ export const useNFTMinting = () => {
 
       const metadataUri = `ipfs://QmYourIPFSHash`;
       const tx = await nftContract.mintNFT(metadataUri);
-      await tx.wait();
+      const receipt = await tx.wait();
       
+      const mintEvent = receipt.events?.find((e: any) => e.event === 'NFTMinted');
+      if (!mintEvent) {
+        throw new Error('Mint event not found in transaction receipt');
+      }
+
       return true;
     } catch (error) {
       console.error("Error minting NFT:", error);
@@ -221,40 +228,12 @@ export const useNFTMinting = () => {
   return {
     isApproving,
     isMinting,
+    isOwner,
     checkUSDCApproval,
     getUSDCBalance,
     approveUSDC,
     mintNFT,
     ownerMint,
-    bulkMint: async (recipients: string[], metadataUris: string[]) => {
-      setIsMinting(true);
-      try {
-        const provider = await getProvider();
-        if (!provider?.provider) throw new Error("No provider available");
-
-        const signer = provider.provider.getSigner();
-        const nftContract = new ethers.Contract(
-          NFT_CONTRACT_ADDRESS,
-          NFT_ABI,
-          signer
-        );
-
-        const isContractOwner = await checkIfOwner();
-        if (!isContractOwner) {
-          throw new Error("Only the contract owner can bulk mint");
-        }
-
-        const tx = await nftContract.bulkMint(recipients, metadataUris);
-        await tx.wait();
-        
-        return true;
-      } catch (error) {
-        console.error("Error in bulk mint:", error);
-        throw error;
-      } finally {
-        setIsMinting(false);
-      }
-    },
     checkIfOwner,
     MINT_PRICE: "50",
   };
