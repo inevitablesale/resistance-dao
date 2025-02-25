@@ -12,7 +12,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 const USDC_CONTRACT = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const NFT_CONTRACT = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
 const NFT_PRICE = ethers.utils.parseUnits("50", 6); // 50 USDC (6 decimals)
-const DEFAULT_TOKEN_URI = "ipfs://bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi";
+const DEFAULT_TOKEN_URI = "ipfs://bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py"; // Metadata JSON CID
 
 const USDCInterface = new ethers.utils.Interface([
   "function balanceOf(address owner) view returns (uint256)",
@@ -22,7 +22,8 @@ const USDCInterface = new ethers.utils.Interface([
 
 const NFTInterface = new ethers.utils.Interface([
   "function owner() view returns (address)",
-  "function mintNFT(string calldata tokenURI) external"
+  "function mintNFT(string calldata tokenURI) external",
+  "function safeMint(address recipient, string memory tokenURI) external"
 ]);
 
 interface NFTPurchaseDialogProps {
@@ -176,14 +177,19 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       setIsMinting(true);
       const walletProvider = await getProvider();
       
+      console.log("Minting with tokenURI:", DEFAULT_TOKEN_URI);
+      
       await executeTransaction(
         async () => {
           const signer = walletProvider.provider.getSigner();
           const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, signer);
+          const address = await signer.getAddress();
           
           if (isContractOwner) {
-            return nftContract.safeMint(await signer.getAddress(), DEFAULT_TOKEN_URI);
+            console.log("Minting as owner with safeMint");
+            return nftContract.safeMint(address, DEFAULT_TOKEN_URI);
           } else {
+            console.log("Minting as user with mintNFT");
             return nftContract.mintNFT(DEFAULT_TOKEN_URI);
           }
         },
