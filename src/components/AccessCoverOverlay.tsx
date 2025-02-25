@@ -1,4 +1,3 @@
-
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Wallet, Loader2, Shield, CreditCard, Copy, LogOut } from "lucide-react";
@@ -17,7 +16,7 @@ export const AccessCoverOverlay = () => {
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
-  const { logout } = useDynamicContext();
+  const { primaryWallet } = useDynamicContext();
   const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
   const { toast } = useToast();
   const { 
@@ -49,15 +48,16 @@ export const AccessCoverOverlay = () => {
     checkBalances();
   }, [address, getUSDCBalance, checkUSDCApproval]);
 
-  useEffect(() => {
-    if (nftBalance > 0) {
-      setIsOpen(false);
-    }
-  }, [nftBalance]);
-
-  if (!isOpen) return null;
-
   const handleMintClick = async () => {
+    if (Number(usdcBalance) < Number(MINT_PRICE)) {
+      toast({
+        title: "Insufficient USDC Balance",
+        description: `You need ${MINT_PRICE} USDC to mint. Current balance: ${usdcBalance} USDC`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!hasApproval) {
       const approved = await approveUSDC();
       if (approved) {
@@ -131,7 +131,7 @@ export const AccessCoverOverlay = () => {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await primaryWallet?.disconnect();
     } catch (error) {
       console.error('Logout error:', error);
       toast({
@@ -149,7 +149,7 @@ export const AccessCoverOverlay = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleLogout}
+            onClick={() => primaryWallet?.disconnect()}
             className="text-blue-300 hover:text-blue-200 hover:bg-blue-900/50"
           >
             <LogOut className="w-4 h-4 mr-2" />
@@ -157,14 +157,6 @@ export const AccessCoverOverlay = () => {
           </Button>
         </div>
       )}
-      
-      <div 
-        className="absolute inset-0 bg-[url('/lovable-uploads/ca457542-e761-44f2-acbf-1bf9b4255b78.png')] bg-cover bg-center opacity-10"
-        style={{
-          animation: 'phoenixLook 8s ease-in-out infinite',
-          transformOrigin: 'center center'
-        }}
-      />
       
       <div className="container max-w-4xl mx-auto px-4 h-full flex items-center justify-center relative">
         <div className="absolute inset-0 flex items-center justify-center">
@@ -253,7 +245,15 @@ export const AccessCoverOverlay = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={handleCopyAddress}
+                        onClick={() => {
+                          if (address) {
+                            navigator.clipboard.writeText(address);
+                            toast({
+                              title: "Address Copied",
+                              description: "Wallet address copied to clipboard",
+                            });
+                          }
+                        }}
                         className="ml-2 hover:bg-blue-800/50"
                       >
                         <Copy className="w-4 h-4 text-blue-300" />
@@ -264,7 +264,7 @@ export const AccessCoverOverlay = () => {
                   {Number(usdcBalance) < Number(MINT_PRICE) && (
                     <Button
                       onClick={handleBuyUSDC}
-                      disabled={!onrampEnabled}
+                      disabled={!onrampEnabled || isOpeningOnramp}
                       className="w-full bg-gradient-to-r from-green-600 to-blue-600 py-6 text-lg mb-2"
                     >
                       <CreditCard className="w-5 h-5 mr-2" />
