@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletProvider } from "./useWalletProvider";
 import { uploadToIPFS } from "@/services/ipfsService";
+import { IPFSContent } from "@/types/content";
 
 const NFT_CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
 const USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
@@ -97,20 +98,32 @@ export const useNFTMinting = () => {
       const address = await signer.getAddress();
 
       console.log("Preparing NFT metadata...");
-      const metadata = {
-        name: "Resistance DAO Member NFT",
-        description: "Official member of the Resistance DAO community",
-        image: "ipfs://QmYctf3BzCzqY1K6LiQPzZyWnM6rBwM9qvtonnEZZfb5DQ",
-        attributes: [
-          {
-            trait_type: "Membership Type",
-            value: "Member"
-          },
-          {
-            trait_type: "Join Date",
-            value: new Date().toISOString().split('T')[0]
-          }
-        ]
+      const metadata: IPFSContent = {
+        contentSchema: "nft-metadata-v1",
+        contentType: "application/json",
+        title: "Resistance DAO Member NFT",
+        content: JSON.stringify({
+          name: "Resistance DAO Member NFT",
+          description: "Official member of the Resistance DAO community",
+          image: "ipfs://QmYctf3BzCzqY1K6LiQPzZyWnM6rBwM9qvtonnEZZfb5DQ",
+          attributes: [
+            {
+              trait_type: "Membership Type",
+              value: "Member"
+            },
+            {
+              trait_type: "Join Date",
+              value: new Date().toISOString().split('T')[0]
+            }
+          ]
+        }),
+        metadata: {
+          author: address,
+          publishedAt: Date.now(),
+          version: 1,
+          language: "en",
+          tags: ["nft", "membership", "resistance-dao"]
+        }
       };
 
       console.log("Uploading metadata to IPFS...");
