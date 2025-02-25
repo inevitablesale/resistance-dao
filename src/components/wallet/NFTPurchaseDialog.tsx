@@ -264,18 +264,15 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       const walletProvider = await getProvider();
       const signer = walletProvider.provider.getSigner();
       
-      // Pre-check: estimate gas
-      const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, signer);
-      
       console.log("Attempting to mint NFT with params:", {
         tokenURI: "bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py",
         isOwner: isContractOwner,
         userAddress: await signer.getAddress()
       });
 
-      // Now handle the NFT minting with explicit gas settings
       await executeTransaction(
         async () => {
+          const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, signer);
           return nftContract.mintNFT(
             "bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py",
             {
@@ -312,7 +309,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       console.error("Minting error:", error);
       const errorMessage = error.message || "Failed to mint NFT";
       
-      // Check for specific error conditions
       if (errorMessage.includes("gas")) {
         toast({
           title: "Error",
