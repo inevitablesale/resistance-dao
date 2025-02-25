@@ -6,10 +6,27 @@ import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidg
 import { ProposalDetailsCard } from "@/components/proposals/ProposalDetailsCard";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useProposal } from "@/hooks/useProposal";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 const ProposalDetails = () => {
   const { tokenId } = useParams();
   const navigate = useNavigate();
+  const { isConnected, connect } = useWalletConnection();
+  const { data: proposal, isLoading, error } = useProposal(tokenId);
+
+  if (!isConnected) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl text-white mb-4">Connect your wallet to view proposal details</h1>
+          <Button onClick={connect} className="bg-blue-600 hover:bg-blue-700">
+            Connect Wallet
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black">
@@ -65,56 +82,16 @@ const ProposalDetails = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className="space-y-6">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="relative z-10"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-blue-900/20 flex items-center justify-center backdrop-blur-sm">
-                    <FileText className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-white">Overview</h2>
-                </div>
-                
-                <ProposalDetailsCard tokenId={tokenId} />
-              </motion.div>
+            <TabsContent value="overview">
+              <ProposalDetailsCard tokenId={tokenId} />
             </TabsContent>
 
             <TabsContent value="details">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="relative z-10"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-blue-900/20 flex items-center justify-center backdrop-blur-sm">
-                    <Target className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-white">Firm Details</h2>
-                </div>
-                
-                <ProposalDetailsCard tokenId={tokenId} view="details" />
-              </motion.div>
+              <ProposalDetailsCard tokenId={tokenId} view="details" />
             </TabsContent>
 
             <TabsContent value="investment">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="relative z-10"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-blue-900/20 flex items-center justify-center backdrop-blur-sm">
-                    <Users className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-white">Investment Information</h2>
-                </div>
-                
-                <ProposalDetailsCard tokenId={tokenId} view="investment" />
-              </motion.div>
+              <ProposalDetailsCard tokenId={tokenId} view="investment" />
             </TabsContent>
           </Tabs>
         </div>

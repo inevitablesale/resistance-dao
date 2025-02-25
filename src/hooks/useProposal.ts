@@ -14,14 +14,18 @@ export const useProposal = (tokenId?: string) => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const contract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
       
+      console.log('Fetching proposal data for token ID:', tokenId);
+      
       const data = await contract.proposals(tokenId);
       const uri = await contract.tokenURI(tokenId);
       
       if (!uri) throw new Error('No metadata URI found');
+      console.log('Fetching metadata from URI:', uri);
       
       const metadata = await getFromIPFS<ProposalMetadata>(uri.replace('ipfs://', ''), 'proposal');
       return { ...data, metadata };
     },
-    enabled: !!tokenId
+    enabled: !!tokenId,
+    retry: 2
   });
 };
