@@ -249,14 +249,14 @@ export default function ThesisSubmission() {
         fundingBreakdown: values.fundingBreakdown
           .filter(item => item.category && item.amount)
           .map(item => ({
-            category: item.category as string,
-            amount: item.amount as string
+            category: item.category,
+            amount: item.amount
           })),
         team: values.team
           .filter(member => member.name && member.role)
           .map(member => ({
-            name: member.name as string,
-            role: member.role as string,
+            name: member.name,
+            role: member.role,
             linkedin: member.linkedin,
             github: member.github
           })),
@@ -289,10 +289,12 @@ export default function ThesisSubmission() {
         description: "Please approve the transaction in your wallet.",
       });
 
+      const metadataURI = `ipfs://${ipfsHash}`;
+
       const tx = await executeTransaction(
         () => contract.createProposal(
           values.title,
-          `ipfs://${ipfsHash}`,
+          metadataURI,
           targetCapitalInWei,
           values.votingDuration,
           { gasLimit: 1000000 }
