@@ -20,6 +20,8 @@ import { ethers } from 'ethers';
 import { useNavigate } from "react-router-dom";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS, SUBMISSION_FEE } from "@/lib/constants";
+import { checkTokenAllowance, approveExactAmount } from "@/services/tokenService";
+import { executeTransaction } from "@/services/transactionManager";
 
 const thesisFormSchema = z.object({
   title: z.string().min(2, {
