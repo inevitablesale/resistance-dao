@@ -121,6 +121,16 @@ const dynamicSettings = {
         type: "ERC721",
         standard: "ERC721",
         decimals: 0
+      },
+      {
+        address: "0x3522fCA64A8F79b004fDbd9a383B56113B81130B",
+        symbol: "RDP",
+        name: "Resistance DAO Proposal",
+        icon: "/favicon.ico",
+        chainId: 137,
+        type: "ERC721",
+        standard: "ERC721",
+        decimals: 0
       }
     ]
   }
