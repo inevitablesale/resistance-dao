@@ -50,15 +50,32 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   const checkContractStatus = async () => {
     try {
       const walletProvider = await getProvider();
+      
+      // First verify the network
+      const network = await walletProvider.provider.getNetwork();
+      console.log("Current network:", network);
+      
+      if (network.chainId !== 137) { // Polygon Mainnet
+        throw new Error("Please switch to Polygon Mainnet");
+      }
+
       const signer = walletProvider.provider.getSigner();
       const address = await signer.getAddress();
       setUserAddress(address);
       
       console.log("Checking contract status for address:", address);
       
+      // First verify contract exists
+      const code = await walletProvider.provider.getCode(NFT_CONTRACT);
+      if (code === "0x") {
+        throw new Error("NFT contract not found at specified address");
+      }
+      
       const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, walletProvider.provider);
       
+      // Try call with static first to validate
       try {
+        await nftContract.callStatic.owner();
         const ownerAddress = await nftContract.owner();
         console.log("Contract owner address:", ownerAddress);
         setIsContractOwner(ownerAddress.toLowerCase() === address.toLowerCase());
@@ -68,6 +85,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       }
 
       try {
+        await nftContract.callStatic.paused();
         const contractPaused = await nftContract.paused();
         console.log("Contract paused status:", contractPaused);
         setIsPaused(contractPaused);
@@ -79,13 +97,27 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       console.log("Contract status check complete:", {
         owner: address,
         isOwner: isContractOwner,
-        isPaused: isPaused
+        isPaused: isPaused,
+        contractCode: code !== "0x" ? "Found" : "Not Found"
       });
-    } catch (error) {
-      console.error("Error checking contract status:", error);
+    } catch (error: any) {
+      console.error("Error checking contract status:", {
+        error,
+        message: error.message,
+        code: error.code,
+        data: error.data
+      });
+      
+      let errorMessage = "Failed to check contract status";
+      if (error.message.includes("network")) {
+        errorMessage = "Please switch to Polygon network";
+      } else if (error.message.includes("not found")) {
+        errorMessage = "NFT contract not found";
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to check contract status",
+        description: errorMessage,
         variant: "destructive",
       });
     }
