@@ -23,7 +23,7 @@ export interface TransactionConfig {
   tokenConfig?: {
     tokenAddress: string;
     spenderAddress: string;
-    amount: string | ethers.BigNumber; // Allow both string and BigNumber
+    amount: string;
     isTestMode?: boolean;
     isApproval?: boolean;
   };
@@ -51,26 +51,12 @@ export const executeTransaction = async (
 ): Promise<ethers.ContractTransaction> => {
   console.log(`Executing ${config.type} transaction:`, {
     description: config.description,
-    tokenConfig: config.tokenConfig && {
-      ...config.tokenConfig,
-      amount: config.tokenConfig.amount.toString()
-    },
+    tokenConfig: config.tokenConfig,
     nftConfig: config.nftConfig
   });
 
   if (config.type === 'erc20_approval' && config.tokenConfig) {
-    const amountBN = ethers.BigNumber.isBigNumber(config.tokenConfig.amount)
-      ? config.tokenConfig.amount
-      : ethers.utils.parseUnits(config.tokenConfig.amount, 18);
-
-    console.log('Token approval config:', {
-      ...config.tokenConfig,
-      amount: ethers.utils.formatUnits(amountBN, 18)
-    });
-  }
-
-  if (config.type === 'erc721_mint' && config.nftConfig) {
-    console.log('NFT mint config:', config.nftConfig);
+    console.log('Token approval config:', config.tokenConfig);
   }
 
   if (provider) {
@@ -85,16 +71,12 @@ export const executeTransaction = async (
     console.log('Checking token allowance...');
     const signerAddress = await provider.getSigner().getAddress();
     
-    const amountBN = ethers.BigNumber.isBigNumber(config.tokenConfig.amount)
-      ? config.tokenConfig.amount
-      : ethers.utils.parseUnits(config.tokenConfig.amount, 18);
-
     const hasAllowance = await checkTokenAllowance(
       provider,
       config.tokenConfig.tokenAddress,
       signerAddress,
       config.tokenConfig.spenderAddress,
-      amountBN
+      config.tokenConfig.amount
     );
 
     if (!hasAllowance) {
@@ -115,7 +97,7 @@ export const executeTransaction = async (
     description: config.description
   });
   
-  return await transactionQueue.processTransaction(txId, async () => {
+  const result = await transactionQueue.processTransaction(txId, async () => {
     try {
       console.log('Executing transaction...');
       const tx = await transaction();
@@ -133,15 +115,6 @@ export const executeTransaction = async (
       const receipt = await Promise.race([receiptPromise, timeoutPromise]);
       console.log('Transaction receipt received:', receipt);
 
-      if (config.type === 'erc721_mint') {
-        console.log('NFT transaction completed:', {
-          type: config.type,
-          tokenAddress: config.nftConfig?.tokenAddress,
-          amount: config.nftConfig?.amount,
-          standard: config.nftConfig?.standard
-        });
-      }
-      
       if (config.eventConfig) {
         try {
           const event = await waitForProposalCreation(config.eventConfig, tx.hash);
@@ -151,19 +124,12 @@ export const executeTransaction = async (
         }
       }
       
-      return {
-        success: true,
-        transaction: tx,
-        receipt
-      };
+      return tx;
     } catch (error: any) {
       console.error('Transaction execution failed:', error);
-      const errorDetails = handleError(error);
-      
-      return {
-        success: false,
-        error: new ProposalError(errorDetails)
-      };
+      throw error;
     }
   });
+
+  return result;
 };

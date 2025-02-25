@@ -12,7 +12,7 @@ export const checkTokenAllowance = async (
   tokenAddress: string,
   ownerAddress: string,
   spenderAddress: string,
-  requiredAmount: ethers.BigNumber
+  requiredAmount: string
 ): Promise<boolean> => {
   try {
     const tokenContract = new ethers.Contract(
@@ -21,22 +21,25 @@ export const checkTokenAllowance = async (
       provider
     );
 
+    const requiredAmountWei = ethers.utils.parseUnits(requiredAmount, 18);
+    
     console.log("Checking allowance for:", {
       tokenAddress,
       owner: ownerAddress,
       spender: spenderAddress,
-      requiredAmount: ethers.utils.formatUnits(requiredAmount, 18)
+      requiredAmount,
+      requiredAmountWei: requiredAmountWei.toString()
     });
 
     const allowance = await tokenContract.allowance(ownerAddress, spenderAddress);
     
     console.log("Allowance check:", {
-      current: ethers.utils.formatUnits(allowance, 18),
-      required: ethers.utils.formatUnits(requiredAmount, 18),
-      hasEnough: allowance.gte(requiredAmount)
+      currentAllowance: ethers.utils.formatUnits(allowance, 18),
+      requiredAmount,
+      hasEnough: allowance.gte(requiredAmountWei)
     });
 
-    return allowance.gte(requiredAmount);
+    return allowance.gte(requiredAmountWei);
   } catch (error) {
     console.error('Error checking token allowance:', error);
     return false;
@@ -68,7 +71,7 @@ export const approveExactAmount = async (
   provider: ethers.providers.Web3Provider,
   tokenAddress: string,
   spenderAddress: string,
-  amount: string | ethers.BigNumber // Allow both string and BigNumber input
+  amount: string
 ): Promise<ethers.ContractTransaction> => {
   try {
     const signer = provider.getSigner();
@@ -78,32 +81,26 @@ export const approveExactAmount = async (
       signer
     );
 
-    // Convert string amount to BigNumber if needed
-    const amountBN = ethers.BigNumber.isBigNumber(amount) 
-      ? amount 
-      : ethers.utils.parseUnits(amount, 18);
+    const amountWei = ethers.utils.parseUnits(amount, 18);
 
     console.log("Approving exact amount:", {
       token: tokenAddress,
       spender: spenderAddress,
-      amountFormatted: ethers.utils.formatUnits(amountBN, 18),
-      amountWei: amountBN.toString()
+      amount,
+      amountWei: amountWei.toString()
     });
 
     // First check if we already have sufficient allowance
     const ownerAddress = await signer.getAddress();
     const currentAllowance = await tokenContract.allowance(ownerAddress, spenderAddress);
 
-    if (currentAllowance.gte(amountBN)) {
+    if (currentAllowance.gte(amountWei)) {
       console.log("Sufficient allowance already exists");
-      return {} as ethers.ContractTransaction; // Return empty transaction as no approval needed
+      return {} as ethers.ContractTransaction;
     }
 
     // If we need to approve, proceed with exact amount
-    return await tokenContract.approve(
-      spenderAddress, 
-      amountBN
-    );
+    return await tokenContract.approve(spenderAddress, amountWei);
   } catch (error) {
     console.error('Error approving tokens:', error);
     throw error;
