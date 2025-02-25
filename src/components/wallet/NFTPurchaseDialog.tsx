@@ -1,15 +1,14 @@
+
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ethers } from "ethers";
-import { Loader2, Check, AlertCircle, ExternalLink, Wallet } from "lucide-react";
+import { Loader2, Check, AlertCircle, Wallet } from "lucide-react";
 import { executeTransaction } from "@/services/transactionManager";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useOnramp } from "@dynamic-labs/sdk-react-core";
-import { OnrampProviders } from "@dynamic-labs/sdk-api-core";
 
 const USDC_CONTRACT = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const NFT_CONTRACT = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
@@ -34,13 +33,11 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
   const { primaryWallet } = useDynamicContext();
-  const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
   const [usdcAllowance, setUsdcAllowance] = useState<string>("0");
   const [isApproving, setIsApproving] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isBuyingUsdc, setIsBuyingUsdc] = useState(false);
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -70,52 +67,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       checkBalances();
     }
   }, [open, getProvider, toast]);
-
-  const handleBuyUsdc = () => {
-    console.log("[Onramp] Starting USDC purchase flow");
-    console.log("[Onramp] Enabled status:", onrampEnabled);
-    console.log("[Onramp] Wallet address:", primaryWallet?.address);
-
-    if (!onrampEnabled || !primaryWallet?.address) {
-      console.error("[Onramp] Invalid state:", { onrampEnabled, address: primaryWallet?.address });
-      toast({
-        title: "Error",
-        description: !onrampEnabled 
-          ? "USDC purchase is not available at the moment"
-          : "Please connect your wallet first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsBuyingUsdc(true);
-    console.log("[Onramp] Attempting to open Banxa onramp window");
-    
-    openOnramp({
-      onrampProvider: OnrampProviders.Banxa,
-      token: 'USDC',
-      address: primaryWallet.address,
-    })
-    .then(() => {
-      console.log("[Onramp] Window opened successfully");
-      toast({
-        title: "Success",
-        description: "USDC purchase initiated. Follow the instructions to complete your purchase.",
-      });
-    })
-    .catch((error) => {
-      console.error("[Onramp] Failed to open window:", error);
-      toast({
-        title: "Error",
-        description: "Failed to open USDC purchase window. Please try again.",
-        variant: "destructive",
-      });
-    })
-    .finally(() => {
-      console.log("[Onramp] Cleaning up state");
-      setIsBuyingUsdc(false);
-    });
-  };
 
   const handleApproveUSDC = async () => {
     try {
@@ -261,26 +212,15 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
           </div>
 
           <div className="space-y-2">
-            <Button
-              onClick={handleBuyUsdc}
-              disabled={isBuyingUsdc || !onrampEnabled}
-              className="w-full bg-[#9B87F5] hover:bg-[#7E69AB] text-white py-4 text-base font-medium rounded-lg flex items-center justify-center gap-2"
-            >
-              {isBuyingUsdc ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <ExternalLink className="w-4 h-4" />
-              )}
-              {isBuyingUsdc ? "Initiating Purchase..." : "Buy USDC"}
-            </Button>
-
-            <Button
-              onClick={handleOpenWallet}
-              className="w-full bg-[#33C3F0] hover:bg-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg flex items-center justify-center gap-2"
-            >
-              <Wallet className="w-4 h-4" />
-              Transfer
-            </Button>
+            {!hasEnoughUSDC && (
+              <Button
+                onClick={handleOpenWallet}
+                className="w-full bg-[#33C3F0] hover:bg-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg flex items-center justify-center gap-2"
+              >
+                <Wallet className="w-4 h-4" />
+                Transfer USDC From Wallet
+              </Button>
+            )}
 
             <AnimatePresence mode="wait">
               {isSuccess ? (
@@ -298,7 +238,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
               ) : needsApproval ? (
                 <Button
                   onClick={handleApproveUSDC}
-                  disabled={isApproving}
+                  disabled={isApproving || !hasEnoughUSDC}
                   className="w-full bg-[#1EAEDB] hover:bg-[#0FA0CE] text-white py-4 text-base font-medium rounded-lg"
                 >
                   {isApproving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
@@ -307,7 +247,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
               ) : (
                 <Button
                   onClick={handleMintNFT}
-                  disabled={isMinting}
+                  disabled={isMinting || !hasEnoughUSDC}
                   className="w-full bg-gradient-to-r from-[#9B87F5] to-[#33C3F0] hover:from-[#7E69AB] hover:to-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg"
                 >
                   {isMinting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

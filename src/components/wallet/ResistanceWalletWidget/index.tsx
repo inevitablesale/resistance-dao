@@ -88,7 +88,7 @@ export const ResistanceWalletWidget = () => {
                 onClick={handleTransfer}
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold"
               >
-                Transfer
+                Transfer From Wallet
               </Button>
               <Button
                 onClick={() => setIsNftDialogOpen(true)}
