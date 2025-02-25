@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -12,21 +13,12 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 const USDC_CONTRACT = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const NFT_CONTRACT = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
 const NFT_PRICE = ethers.utils.parseUnits("50", 6); // 50 USDC (6 decimals)
-const DEFAULT_GAS_LIMIT = 500000; // Increased gas limit for safety
+const DEFAULT_GAS_LIMIT = 500000;
 
 const USDCInterface = new ethers.utils.Interface([
   "function balanceOf(address owner) view returns (uint256)",
   "function allowance(address owner, address spender) view returns (uint256)",
   "function approve(address spender, uint256 amount) returns (bool)"
-]);
-
-const NFTInterface = new ethers.utils.Interface([
-  "function mintNFT(string memory tokenURI) external",
-  "function owner() view returns (address)",
-  "function paused() view returns (bool)",
-  "function getPendingRefund(address user) view returns (uint256)",
-  "function claimRefund() external",
-  "function treasury() view returns (address)"
 ]);
 
 interface NFTPurchaseDialogProps {
@@ -44,142 +36,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   const [isMinting, setIsMinting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [userAddress, setUserAddress] = useState<string>("");
-  const [isContractOwner, setIsContractOwner] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-
-  const checkContractStatus = async () => {
-    try {
-      const walletProvider = await getProvider();
-      
-      // First verify the network
-      const network = await walletProvider.provider.getNetwork();
-      console.log("Current network:", network);
-      
-      if (network.chainId !== 137) { // Polygon Mainnet
-        throw new Error("Please switch to Polygon Mainnet");
-      }
-
-      const signer = walletProvider.provider.getSigner();
-      const address = await signer.getAddress();
-      setUserAddress(address);
-      
-      console.log("Checking contract status for address:", address);
-      
-      // First verify contract exists
-      const code = await walletProvider.provider.getCode(NFT_CONTRACT);
-      if (code === "0x") {
-        throw new Error("NFT contract not found at specified address");
-      }
-      
-      const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, walletProvider.provider);
-      
-      // Try call with static first to validate
-      try {
-        await nftContract.callStatic.owner();
-        const ownerAddress = await nftContract.owner();
-        console.log("Contract owner address:", ownerAddress);
-        setIsContractOwner(ownerAddress.toLowerCase() === address.toLowerCase());
-      } catch (error) {
-        console.warn("Failed to check owner:", error);
-        setIsContractOwner(false);
-      }
-
-      try {
-        await nftContract.callStatic.paused();
-        const contractPaused = await nftContract.paused();
-        console.log("Contract paused status:", contractPaused);
-        setIsPaused(contractPaused);
-      } catch (error) {
-        console.warn("Failed to check pause status:", error);
-        setIsPaused(false);
-      }
-
-      console.log("Contract status check complete:", {
-        owner: address,
-        isOwner: isContractOwner,
-        isPaused: isPaused,
-        contractCode: code !== "0x" ? "Found" : "Not Found"
-      });
-    } catch (error: any) {
-      console.error("Error checking contract status:", {
-        error,
-        message: error.message,
-        code: error.code,
-        data: error.data
-      });
-      
-      let errorMessage = "Failed to check contract status";
-      if (error.message.includes("network")) {
-        errorMessage = "Please switch to Polygon network";
-      } else if (error.message.includes("not found")) {
-        errorMessage = "NFT contract not found";
-      }
-      
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const checkPendingRefund = async () => {
-    try {
-      const walletProvider = await getProvider();
-      const signer = walletProvider.provider.getSigner();
-      const address = await signer.getAddress();
-      
-      const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, walletProvider.provider);
-      const pendingRefund = await nftContract.getPendingRefund(address);
-      
-      if (pendingRefund.gt(0)) {
-        toast({
-          title: "Pending Refund Available",
-          description: `You have ${ethers.utils.formatUnits(pendingRefund, 6)} USDC available for refund`,
-          action: (
-            <Button onClick={() => handleClaimRefund()} variant="outline">
-              Claim Refund
-            </Button>
-          ),
-        });
-      }
-    } catch (error) {
-      console.error("Error checking refund:", error);
-    }
-  };
-
-  const handleClaimRefund = async () => {
-    try {
-      const walletProvider = await getProvider();
-      const signer = walletProvider.provider.getSigner();
-      const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, signer);
-      
-      await executeTransaction(
-        async () => {
-          return nftContract.claimRefund();
-        },
-        {
-          type: 'contract',
-          description: "Claim USDC Refund",
-          timeout: 60000,
-          maxRetries: 2,
-          backoffMs: 5000
-        }
-      );
-
-      toast({
-        title: "Success",
-        description: "Refund claimed successfully",
-      });
-    } catch (error) {
-      console.error("Refund claim error:", error);
-      toast({
-        title: "Error",
-        description: "Failed to claim refund",
-        variant: "destructive",
-      });
-    }
-  };
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -214,9 +70,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     };
 
     if (open) {
-      checkContractStatus();
       checkBalances();
-      checkPendingRefund();
     }
   }, [open, getProvider, toast]);
 
@@ -265,9 +119,8 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       );
 
       const signer = walletProvider.provider.getSigner();
-      const address = await signer.getAddress();
       const usdcContract = new ethers.Contract(USDC_CONTRACT, USDCInterface, walletProvider.provider);
-      const newAllowance = await usdcContract.allowance(address, NFT_CONTRACT);
+      const newAllowance = await usdcContract.allowance(await signer.getAddress(), NFT_CONTRACT);
       setUsdcAllowance(ethers.utils.formatUnits(newAllowance, 6));
 
       toast({
@@ -287,7 +140,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   };
 
   const handleMintNFT = async () => {
-    if (!isContractOwner && Number(usdcBalance) < 50) {
+    if (Number(usdcBalance) < 50) {
       toast({
         title: "Error",
         description: "Insufficient USDC balance",
@@ -296,35 +149,18 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       return;
     }
 
-    if (isPaused) {
-      toast({
-        title: "Error",
-        description: "Minting is currently paused",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       setIsMinting(true);
       const walletProvider = await getProvider();
-      const signer = walletProvider.provider.getSigner();
       
-      console.log("Attempting to mint NFT with params:", {
-        tokenURI: "bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py",
-        isOwner: isContractOwner,
-        userAddress: await signer.getAddress()
-      });
-
       await executeTransaction(
         async () => {
-          const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, signer);
-          return nftContract.mintNFT(
-            "bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py",
-            {
-              gasLimit: DEFAULT_GAS_LIMIT,
-            }
-          );
+          const signer = walletProvider.provider.getSigner();
+          return signer.sendTransaction({
+            to: NFT_CONTRACT,
+            data: "0x1249c58b", // mintNFT()
+            gasLimit: DEFAULT_GAS_LIMIT,
+          });
         },
         {
           type: 'erc721_mint',
@@ -351,36 +187,20 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       setTimeout(() => {
         onOpenChange(false);
       }, 2000);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Minting error:", error);
-      const errorMessage = error.message || "Failed to mint NFT";
-      
-      if (errorMessage.includes("gas")) {
-        toast({
-          title: "Error",
-          description: "Transaction failed due to gas estimation. Please try again with higher gas limit.",
-          variant: "destructive",
-        });
-      } else if (errorMessage.includes("paused")) {
-        toast({
-          title: "Error",
-          description: "Minting is currently paused",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to mint NFT. Please try again.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Error",
+        description: "Failed to mint NFT",
+        variant: "destructive",
+      });
     } finally {
       setIsMinting(false);
     }
   };
 
   const needsApproval = Number(usdcAllowance) < 50;
-  const hasEnoughUSDC = isContractOwner || Number(usdcBalance) >= 50;
+  const hasEnoughUSDC = Number(usdcBalance) >= 50;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -415,7 +235,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
           </div>
 
           <div className="space-y-2">
-            {!hasEnoughUSDC && !isContractOwner && (
+            {!hasEnoughUSDC && (
               <Button
                 onClick={handleOpenWallet}
                 className="w-full bg-[#33C3F0] hover:bg-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg flex items-center justify-center gap-2"
@@ -438,7 +258,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
                   </div>
                   <p className="text-green-400 text-base font-semibold">Welcome to Resistance DAO!</p>
                 </motion.div>
-              ) : needsApproval && !isContractOwner ? (
+              ) : needsApproval ? (
                 <Button
                   onClick={handleApproveUSDC}
                   disabled={isApproving}
@@ -450,11 +270,11 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
               ) : (
                 <Button
                   onClick={handleMintNFT}
-                  disabled={isMinting || (!isContractOwner && !hasEnoughUSDC) || isPaused}
+                  disabled={isMinting || !hasEnoughUSDC}
                   className="w-full bg-gradient-to-r from-[#9B87F5] to-[#33C3F0] hover:from-[#7E69AB] hover:to-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg"
                 >
                   {isMinting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  {isMinting ? "Minting..." : isPaused ? "Minting Paused" : isContractOwner ? "Mint Member NFT" : "Buy Member NFT"}
+                  {isMinting ? "Minting..." : "Buy Member NFT"}
                 </Button>
               )}
             </AnimatePresence>
