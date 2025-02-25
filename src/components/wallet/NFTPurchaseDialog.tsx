@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -34,12 +35,13 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
   const { primaryWallet } = useDynamicContext();
-  const { enabled, open: openOnramp } = useOnramp();
+  const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
   const [usdcAllowance, setUsdcAllowance] = useState<string>("0");
   const [isApproving, setIsApproving] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isBuyingUsdc, setIsBuyingUsdc] = useState(false);
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -69,6 +71,58 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       checkBalances();
     }
   }, [open, getProvider, toast]);
+
+  const handleBuyUsdc = async () => {
+    try {
+      console.log("[Onramp] Starting USDC purchase flow");
+      console.log("[Onramp] Enabled status:", onrampEnabled);
+      console.log("[Onramp] Wallet address:", primaryWallet?.address);
+
+      if (!onrampEnabled) {
+        console.error("[Onramp] Onramp is not enabled");
+        toast({
+          title: "Error",
+          description: "USDC purchase is not available at the moment",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!primaryWallet?.address) {
+        console.error("[Onramp] No wallet address available");
+        toast({
+          title: "Error",
+          description: "Please connect your wallet first",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsBuyingUsdc(true);
+      console.log("[Onramp] Opening Banxa onramp");
+      
+      await openOnramp({
+        onrampProvider: OnrampProviders.Banxa,
+        token: 'USDC',
+        address: primaryWallet.address,
+      });
+
+      console.log("[Onramp] Banxa onramp opened successfully");
+      toast({
+        title: "Success",
+        description: "USDC purchase initiated. Follow the instructions to complete your purchase.",
+      });
+    } catch (error) {
+      console.error("[Onramp] Error during USDC purchase:", error);
+      toast({
+        title: "Error",
+        description: "Failed to initiate USDC purchase. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBuyingUsdc(false);
+    }
+  };
 
   const handleApproveUSDC = async () => {
     try {
@@ -166,19 +220,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     }
   };
 
-  const handleBuyUsdc = () => {
-    openOnramp({
-      onrampProvider: OnrampProviders.Banxa,
-      token: 'USDC',
-      address: primaryWallet?.address,
-    }).then(() => {
-      toast({
-        title: "Success",
-        description: "USDC purchase initiated successfully",
-      });
-    });
-  };
-
   const handleOpenWallet = () => {
     primaryWallet?.connector?.showWallet?.({ view: 'send' });
   };
@@ -220,11 +261,15 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
           <div className="space-y-2">
             <Button
               onClick={handleBuyUsdc}
-              disabled={!enabled}
+              disabled={isBuyingUsdc || !onrampEnabled}
               className="w-full bg-[#9B87F5] hover:bg-[#7E69AB] text-white py-4 text-base font-medium rounded-lg flex items-center justify-center gap-2"
             >
-              <ExternalLink className="w-4 h-4" />
-              Buy USDC
+              {isBuyingUsdc ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <ExternalLink className="w-4 h-4" />
+              )}
+              {isBuyingUsdc ? "Initiating Purchase..." : "Buy USDC"}
             </Button>
 
             <Button
@@ -284,3 +329,4 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     </Dialog>
   );
 };
+
