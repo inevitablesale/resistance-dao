@@ -1,10 +1,9 @@
-
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ethers } from "ethers";
-import { Loader2, Check, AlertCircle, Copy, ExternalLink, Wallet } from "lucide-react";
+import { Loader2, Check, AlertCircle, ExternalLink, Wallet } from "lucide-react";
 import { executeTransaction } from "@/services/transactionManager";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { motion, AnimatePresence } from "framer-motion";
@@ -35,14 +34,12 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
   const { primaryWallet } = useDynamicContext();
-  const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
+  const { enabled, open: openOnramp } = useOnramp();
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
   const [usdcAllowance, setUsdcAllowance] = useState<string>("0");
   const [isApproving, setIsApproving] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
-  const [isOnrampLoading, setIsOnrampLoading] = useState(false);
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -169,67 +166,17 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     }
   };
 
-  const handleCopyAddress = async () => {
-    if (!primaryWallet?.address) return;
-    
-    try {
-      await navigator.clipboard.writeText(primaryWallet.address);
-      setIsCopied(true);
-      toast({
-        title: "Success",
-        description: "Address copied to clipboard",
-      });
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to copy address",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleBuyUsdc = async () => {
-    if (!primaryWallet?.address) {
-      toast({
-        title: "Error",
-        description: "Please connect your wallet first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!onrampEnabled) {
-      toast({
-        title: "Service Unavailable",
-        description: "The onramp service is currently not available",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      setIsOnrampLoading(true);
-      await openOnramp({
-        onrampProvider: OnrampProviders.Banxa,
-        token: 'USDC',
-        address: primaryWallet.address,
-      });
-      
+  const handleBuyUsdc = () => {
+    openOnramp({
+      onrampProvider: OnrampProviders.Banxa,
+      token: 'USDC',
+      address: primaryWallet?.address,
+    }).then(() => {
       toast({
         title: "Success",
         description: "USDC purchase initiated successfully",
       });
-    } catch (error) {
-      console.error("Onramp error:", error);
-      toast({
-        title: "Purchase Failed",
-        description: error instanceof Error ? error.message : "Failed to initiate USDC purchase",
-        variant: "destructive",
-      });
-    } finally {
-      setIsOnrampLoading(false);
-    }
+    });
   };
 
   const handleOpenWallet = () => {
@@ -243,7 +190,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-[#0A0B2E] border border-blue-500/20 p-0 max-w-md w-[90%] overflow-hidden">
         <div className="p-4 space-y-4">
-          {/* NFT Image Display */}
           <div className="relative rounded-lg overflow-hidden bg-[#111444] border border-blue-400/20" style={{ maxHeight: '240px' }}>
             <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent" />
             <img
@@ -253,7 +199,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
             />
           </div>
 
-          {/* NFT Details */}
           <div className="space-y-2 text-center">
             <h2 className="text-xl font-bold text-blue-100">Resistance DAO Member</h2>
             <p className="text-blue-200/80 text-sm">
@@ -261,7 +206,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
             </p>
           </div>
 
-          {/* Price and Balance Display */}
           <div className="space-y-1 bg-blue-950/30 rounded-lg p-3">
             <div className="flex justify-between items-center text-blue-100 text-sm">
               <span>Price:</span>
@@ -273,18 +217,13 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="space-y-2">
             <Button
               onClick={handleBuyUsdc}
-              disabled={isOnrampLoading || !onrampEnabled}
+              disabled={!enabled}
               className="w-full bg-[#9B87F5] hover:bg-[#7E69AB] text-white py-4 text-base font-medium rounded-lg flex items-center justify-center gap-2"
             >
-              {isOnrampLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <ExternalLink className="w-4 h-4" />
-              )}
+              <ExternalLink className="w-4 h-4" />
               Buy USDC
             </Button>
 
