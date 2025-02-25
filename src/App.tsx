@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -14,8 +13,6 @@ import ThesisSubmission from "./pages/ThesisSubmission";
 import ProposalDetails from "./pages/ProposalDetails";
 import Proposals from "./pages/Proposals";
 import { Toaster } from "./components/ui/toaster";
-
-const FACTORY_ADDRESS = "0x4b729792-4b38-4d73-8a69-4f7559f2c2cd";
 
 const zeroDevConfig = {
   projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -116,9 +113,9 @@ const dynamicSettings = {
         chainId: 137
       },
       {
-        address: FACTORY_ADDRESS,
-        symbol: "LFP",
-        name: "LedgerFren Proposal",
+        address: "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C",
+        symbol: "RDM",
+        name: "Resistance DAO Member",
         icon: "/favicon.ico",
         chainId: 137,
         type: "ERC721",
