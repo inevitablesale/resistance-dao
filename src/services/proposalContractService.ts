@@ -22,12 +22,6 @@ export const createProposal = async (
     const signer = provider.getSigner();
     const signerAddress = await signer.getAddress();
 
-    // Detect if using ZeroDev
-    const isZeroDev = wallet.connector?.name?.toLowerCase().includes('zerodev');
-    const walletType = isZeroDev ? 'zerodev' : 'regular';
-
-    console.log("Creating proposal with wallet type:", walletType);
-
     // Upload metadata to IPFS
     const ipfsHash = await uploadToIPFS(metadata);
     const metadataURI = `ipfs://${ipfsHash}`;
@@ -49,11 +43,10 @@ export const createProposal = async (
       RD_TOKEN_ADDRESS,
       signerAddress,
       FACTORY_ADDRESS,
-      submissionFee,
-      walletType
+      submissionFee
     );
 
-    if (!hasAllowance && walletType !== 'zerodev') {
+    if (!hasAllowance) {
       throw new Error("Insufficient token allowance");
     }
 

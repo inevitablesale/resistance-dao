@@ -1,6 +1,5 @@
 
 import { ethers } from "ethers";
-import { WalletType } from "@/hooks/useWalletProvider";
 
 const ERC20_ABI = [
   "function allowance(address owner, address spender) view returns (uint256)",
@@ -13,8 +12,7 @@ export const checkTokenAllowance = async (
   tokenAddress: string,
   ownerAddress: string,
   spenderAddress: string,
-  requiredAmount: ethers.BigNumber,
-  walletType?: WalletType
+  requiredAmount: ethers.BigNumber
 ): Promise<boolean> => {
   try {
     const tokenContract = new ethers.Contract(
@@ -23,18 +21,9 @@ export const checkTokenAllowance = async (
       provider
     );
 
-    console.log("Checking allowance for wallet type:", walletType);
-
-    // For ZeroDev wallets, we assume allowance is always sufficient
-    if (walletType === 'zerodev') {
-      console.log("ZeroDev wallet detected, skipping allowance check");
-      return true;
-    }
-
     const allowance = await tokenContract.allowance(ownerAddress, spenderAddress);
     
     console.log("Allowance check:", {
-      walletType,
       tokenAddress,
       owner: ownerAddress,
       spender: spenderAddress,
@@ -75,16 +64,9 @@ export const approveExactAmount = async (
   provider: ethers.providers.Web3Provider,
   tokenAddress: string,
   spenderAddress: string,
-  amount: ethers.BigNumber,
-  walletType?: WalletType
+  amount: ethers.BigNumber
 ): Promise<ethers.ContractTransaction> => {
   try {
-    // For ZeroDev wallets, we skip the approval
-    if (walletType === 'zerodev') {
-      console.log("ZeroDev wallet detected, skipping token approval");
-      return {} as ethers.ContractTransaction;
-    }
-
     const signer = provider.getSigner();
     const tokenContract = new ethers.Contract(
       tokenAddress,
@@ -93,7 +75,6 @@ export const approveExactAmount = async (
     );
 
     console.log("Approving exact amount:", {
-      walletType,
       token: tokenAddress,
       spender: spenderAddress,
       amount: ethers.utils.formatUnits(amount, 18),
