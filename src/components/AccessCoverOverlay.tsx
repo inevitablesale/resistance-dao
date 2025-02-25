@@ -31,8 +31,18 @@ export const AccessCoverOverlay = () => {
   return (
     <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-blue-950 to-black">
       <div className="container max-w-4xl mx-auto px-4 h-full flex items-center justify-center relative">
+        {/* Background effects */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+        </div>
+        
+        {/* Phoenix Logo */}
+        <div className="absolute top-10 left-1/2 transform -translate-x-1/2">
+          <img 
+            src="https://i.postimg.cc/BbGmN3qd/image-6.jpg" 
+            alt="Resistance DAO Phoenix" 
+            className="w-24 h-24 object-cover rounded-full border-2 border-blue-500/50 shadow-lg shadow-blue-500/20"
+          />
         </div>
         
         <motion.div 
