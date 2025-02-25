@@ -1,4 +1,3 @@
-
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Wallet, Loader2, Shield, CreditCard } from "lucide-react";
@@ -10,6 +9,7 @@ import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNFTMinting } from "@/hooks/useNFTMinting";
 import { useDynamicContext, useOnramp } from "@dynamic-labs/sdk-react-core";
 import { OnrampProviders } from "@dynamic-labs/sdk-api-core";
+import { useToast } from "@/hooks/use-toast";
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -18,6 +18,7 @@ export const AccessCoverOverlay = () => {
   const { data: nftBalance = 0 } = useNFTBalance(address);
   const { primaryWallet } = useDynamicContext();
   const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
+  const { toast } = useToast();
   const { 
     isApproving,
     isMinting,
@@ -30,6 +31,7 @@ export const AccessCoverOverlay = () => {
   
   const [usdcBalance, setUsdcBalance] = useState("0");
   const [hasApproval, setHasApproval] = useState(false);
+  const [isOpeningOnramp, setIsOpeningOnramp] = useState(false);
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -73,30 +75,66 @@ export const AccessCoverOverlay = () => {
 
   const handleBuyUSDC = async () => {
     console.log('Buy USDC button clicked');
-    console.log('Onramp enabled:', onrampEnabled);
-    console.log('User address:', address);
+    console.log({
+      onrampEnabled,
+      address,
+      walletConnected: !!primaryWallet?.isConnected?.(),
+      primaryWallet
+    });
     
-    if (!onrampEnabled || !address) {
-      console.log('Cannot proceed: onramp disabled or no address');
+    if (!onrampEnabled) {
+      console.error('Onramp is not enabled');
+      toast({
+        title: "Onramp Not Available",
+        description: "The onramp service is currently not available.",
+        variant: "destructive"
+      });
       return;
     }
+
+    if (!address) {
+      console.error('No wallet address available');
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsOpeningOnramp(true);
     
     try {
       console.log('Attempting to open onramp with params:', {
         onrampProvider: OnrampProviders.Banxa,
         token: 'USDC',
-        address: address
+        address: address,
+        defaultFiatAmount: '50',
+        defaultCrypto: 'USDC'
       });
       
       await openOnramp({
         onrampProvider: OnrampProviders.Banxa,
         token: 'USDC',
-        address: address
+        address: address,
+        defaultFiatAmount: '50',
+        defaultCrypto: 'USDC'
       });
       
       console.log('Onramp opened successfully');
+      toast({
+        title: "Purchase USDC",
+        description: "The Banxa window should open shortly.",
+      });
     } catch (error) {
       console.error('Failed to open onramp:', error);
+      toast({
+        title: "Error Opening Onramp",
+        description: "Failed to open the purchase window. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsOpeningOnramp(false);
     }
   };
 
