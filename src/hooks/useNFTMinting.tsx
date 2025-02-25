@@ -1,15 +1,17 @@
-
 import { useState } from "react";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletProvider } from "./useWalletProvider";
 
 const NFT_CONTRACT_ADDRESS = "0x6527b171AF1c61AE43bf405ABe53861b0487A369";
-const USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"; // Polygon USDC
-const MINT_PRICE = ethers.utils.parseUnits("50", 6); // 50 USDC with 6 decimals
+const USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+const MINT_PRICE = ethers.utils.parseUnits("50", 6);
 
 const NFT_ABI = [
   "function mintNFT(string calldata tokenURI) external",
+  "function safeMint(address recipient, string memory tokenURI) public",
+  "function bulkMint(address[] calldata recipients, string[] calldata tokenURIs) external",
+  "function owner() view returns (address)",
   "function MINT_PRICE() view returns (uint256)",
   "function balanceOf(address owner) view returns (uint256)"
 ];
@@ -24,6 +26,7 @@ const USDC_ABI = [
 export const useNFTMinting = () => {
   const [isApproving, setIsApproving] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
 
@@ -48,7 +51,7 @@ export const useNFTMinting = () => {
 
       const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
       const balance = await usdcContract.balanceOf(address);
-      return ethers.utils.formatUnits(balance, 6); // USDC has 6 decimals
+      return ethers.utils.formatUnits(balance, 6);
     } catch (error) {
       console.error("Error getting USDC balance:", error);
       return "0";
@@ -84,6 +87,105 @@ export const useNFTMinting = () => {
     }
   };
 
+  const checkIfOwner = async () => {
+    try {
+      const provider = await getProvider();
+      if (!provider?.provider) return false;
+
+      const signer = provider.provider.getSigner();
+      const address = await signer.getAddress();
+      
+      const nftContract = new ethers.Contract(
+        NFT_CONTRACT_ADDRESS,
+        NFT_ABI,
+        provider.provider
+      );
+      
+      const ownerAddress = await nftContract.owner();
+      return address.toLowerCase() === ownerAddress.toLowerCase();
+    } catch (error) {
+      console.error("Error checking owner:", error);
+      return false;
+    }
+  };
+
+  const ownerMint = async (recipient: string) => {
+    setIsMinting(true);
+    try {
+      const provider = await getProvider();
+      if (!provider?.provider) throw new Error("No provider available");
+
+      const signer = provider.provider.getSigner();
+      const nftContract = new ethers.Contract(
+        NFT_CONTRACT_ADDRESS,
+        NFT_ABI,
+        signer
+      );
+
+      const isContractOwner = await checkIfOwner();
+      if (!isContractOwner) {
+        throw new Error("Only the contract owner can mint without USDC");
+      }
+
+      const metadata = {
+        name: "Resistance DAO Member NFT",
+        description: "A member of the Resistance DAO community",
+        image: "ipfs://QmYourDefaultImageHash",
+        attributes: [
+          {
+            trait_type: "Membership Type",
+            value: "Standard"
+          },
+          {
+            trait_type: "Joined",
+            value: new Date().toISOString()
+          }
+        ]
+      };
+
+      const metadataUri = `ipfs://QmYourIPFSHash`;
+      const tx = await nftContract.safeMint(recipient, metadataUri);
+      await tx.wait();
+      
+      return true;
+    } catch (error) {
+      console.error("Error in owner mint:", error);
+      throw error;
+    } finally {
+      setIsMinting(false);
+    }
+  };
+
+  const bulkMint = async (recipients: string[], metadataUris: string[]) => {
+    setIsMinting(true);
+    try {
+      const provider = await getProvider();
+      if (!provider?.provider) throw new Error("No provider available");
+
+      const signer = provider.provider.getSigner();
+      const nftContract = new ethers.Contract(
+        NFT_CONTRACT_ADDRESS,
+        NFT_ABI,
+        signer
+      );
+
+      const isContractOwner = await checkIfOwner();
+      if (!isContractOwner) {
+        throw new Error("Only the contract owner can bulk mint");
+      }
+
+      const tx = await nftContract.bulkMint(recipients, metadataUris);
+      await tx.wait();
+      
+      return true;
+    } catch (error) {
+      console.error("Error in bulk mint:", error);
+      throw error;
+    } finally {
+      setIsMinting(false);
+    }
+  };
+
   const mintNFT = async () => {
     setIsMinting(true);
     try {
@@ -93,7 +195,11 @@ export const useNFTMinting = () => {
       const signer = provider.provider.getSigner();
       const address = await signer.getAddress();
       
-      // Double-check USDC balance and allowance before minting
+      const ownerStatus = await checkIfOwner();
+      if (ownerStatus) {
+        return ownerMint(address);
+      }
+
       const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
       const balance = await usdcContract.balanceOf(address);
       if (balance.lt(MINT_PRICE)) {
@@ -111,11 +217,10 @@ export const useNFTMinting = () => {
         signer
       );
 
-      // Generate metadata with timestamp to ensure uniqueness
       const metadata = {
         name: "Resistance DAO Member NFT",
         description: "A member of the Resistance DAO community",
-        image: "ipfs://QmYourDefaultImageHash", // Replace with your default image
+        image: "ipfs://QmYourDefaultImageHash",
         attributes: [
           {
             trait_type: "Membership Type",
@@ -128,14 +233,14 @@ export const useNFTMinting = () => {
         ]
       };
 
-      const metadataUri = `ipfs://QmYourIPFSHash`; // Replace with actual metadata URI generation
+      const metadataUri = `ipfs://QmYourIPFSHash`;
       const tx = await nftContract.mintNFT(metadataUri);
       await tx.wait();
       
       return true;
     } catch (error) {
       console.error("Error minting NFT:", error);
-      throw error; // Let the component handle the error display
+      throw error;
     } finally {
       setIsMinting(false);
     }
@@ -148,6 +253,9 @@ export const useNFTMinting = () => {
     getUSDCBalance,
     approveUSDC,
     mintNFT,
-    MINT_PRICE: "50", // Human-readable price
+    ownerMint,
+    bulkMint,
+    checkIfOwner,
+    MINT_PRICE: "50",
   };
 };
