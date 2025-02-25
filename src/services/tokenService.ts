@@ -3,7 +3,8 @@ import { ethers } from "ethers";
 
 const ERC20_ABI = [
   "function allowance(address owner, address spender) view returns (uint256)",
-  "function balanceOf(address owner) view returns (uint256)"
+  "function balanceOf(address owner) view returns (uint256)",
+  "function approve(address spender, uint256 amount) returns (bool)"
 ];
 
 export const checkTokenAllowance = async (
@@ -20,9 +21,17 @@ export const checkTokenAllowance = async (
       provider
     );
 
+    console.log("Checking allowance for:", {
+      tokenAddress,
+      owner: ownerAddress,
+      spender: spenderAddress,
+      requiredAmount
+    });
+
     const allowance = await tokenContract.allowance(ownerAddress, spenderAddress);
     const requiredAmountBN = ethers.utils.parseUnits(requiredAmount, 18);
     
+    console.log("Current allowance:", ethers.utils.formatUnits(allowance, 18));
     return allowance.gte(requiredAmountBN);
   } catch (error) {
     console.error('Error checking token allowance:', error);
@@ -51,6 +60,37 @@ export const getTokenAllowance = async (
   }
 };
 
+export const approveExactAmount = async (
+  provider: ethers.providers.Provider,
+  tokenAddress: string,
+  spenderAddress: string,
+  amount: string
+): Promise<ethers.ContractTransaction> => {
+  try {
+    const signer = provider.getSigner();
+    const tokenContract = new ethers.Contract(
+      tokenAddress,
+      ERC20_ABI,
+      signer
+    );
+
+    console.log("Approving exact amount:", {
+      token: tokenAddress,
+      spender: spenderAddress,
+      amount: amount,
+      amountWei: ethers.utils.parseUnits(amount, 18).toString()
+    });
+
+    return await tokenContract.approve(
+      spenderAddress, 
+      ethers.utils.parseUnits(amount, 18)
+    );
+  } catch (error) {
+    console.error('Error approving tokens:', error);
+    throw error;
+  }
+};
+
 export const getTokenBalance = async (
   provider: ethers.providers.Provider,
   tokenAddress: string,
@@ -70,4 +110,3 @@ export const getTokenBalance = async (
     return '0';
   }
 };
-
