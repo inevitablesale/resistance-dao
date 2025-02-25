@@ -1,6 +1,7 @@
+
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Wallet, Loader2, Shield, CreditCard, Copy, LogOut, Check, ExternalLink } from "lucide-react";
+import { X, Wallet, Loader2, Shield, CreditCard, Copy, LogOut, Check, ExternalLink, Coins } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
@@ -196,11 +197,12 @@ export const AccessCoverOverlay = () => {
 
             <div className="flex flex-col gap-3">
               <Button 
-                onClick={() => window.location.href = '/governance-voting'}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 py-6 text-lg"
+                onClick={handleBuyUSDC}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 py-6 text-lg relative overflow-hidden group"
               >
-                Go to Governance
-                <ExternalLink className="w-5 h-5 ml-2" />
+                <div className="absolute inset-0 bg-blue-400/20 group-hover:animate-pulse" />
+                <Coins className="w-5 h-5 mr-2" />
+                Load Wallet with RD Tokens
               </Button>
               <Button
                 variant="ghost"
