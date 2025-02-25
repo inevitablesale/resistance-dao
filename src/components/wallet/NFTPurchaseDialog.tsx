@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -123,10 +124,11 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
         async () => {
           const signer = walletProvider.provider.getSigner();
           const usdcContract = new ethers.Contract(USDC_CONTRACT, USDCInterface, signer);
+          // First, only approve USDC
           return usdcContract.approve(NFT_CONTRACT, NFT_PRICE);
         },
         {
-          type: "approval",
+          type: 'erc20_approval',
           description: "Approve USDC spending",
           timeout: 60000,
           maxRetries: 2,
@@ -140,6 +142,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
         }
       );
 
+      // Update allowance after approval
       const signer = walletProvider.provider.getSigner();
       const address = await signer.getAddress();
       const usdcContract = new ethers.Contract(USDC_CONTRACT, USDCInterface, walletProvider.provider);
@@ -176,6 +179,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       setIsMinting(true);
       const walletProvider = await getProvider();
       
+      // Now handle the NFT minting as a separate transaction
       await executeTransaction(
         async () => {
           const signer = walletProvider.provider.getSigner();
@@ -183,7 +187,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
           return nftContract.mintNFT("bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py");
         },
         {
-          type: "nft",
+          type: 'erc721_mint',
           description: "Mint Member NFT",
           timeout: 120000,
           maxRetries: 2,

@@ -6,13 +6,20 @@ import { transactionQueue } from "./transactionQueueService";
 import { checkTokenAllowance } from "./tokenService";
 import { WalletType } from "@/hooks/useWalletProvider";
 
+export type TransactionType = 
+  | 'erc20_approval'
+  | 'erc20_transfer'
+  | 'erc721_mint'
+  | 'proposal'
+  | 'contract';
+
 export interface TransactionConfig {
   timeout: number;
   maxRetries: number;
   backoffMs: number;
   eventConfig?: EventConfig;
   description: string;
-  type: 'proposal' | 'token' | 'contract' | 'nft' | 'approval';
+  type: TransactionType;
   tokenConfig?: {
     tokenAddress: string;
     spenderAddress: string;
@@ -32,7 +39,7 @@ export interface TransactionConfig {
 }
 
 const DEFAULT_CONFIG: Omit<TransactionConfig, 'description' | 'type'> = {
-  timeout: 120000, // 2 minutes
+  timeout: 120000,
   maxRetries: 3,
   backoffMs: 5000
 };
@@ -42,21 +49,26 @@ export const executeTransaction = async (
   config: TransactionConfig,
   provider?: ethers.providers.Web3Provider
 ): Promise<ethers.ContractTransaction> => {
-  if (config.type === 'token' && config.tokenConfig) {
-    console.log('Token transaction config:', {
+  // Log transaction type and configuration
+  console.log(`Executing ${config.type} transaction:`, {
+    description: config.description,
+    tokenConfig: config.tokenConfig,
+    nftConfig: config.nftConfig
+  });
+
+  if (config.type === 'erc20_approval' && config.tokenConfig) {
+    console.log('Token approval config:', {
       ...config.tokenConfig,
       amount: ethers.utils.formatEther(config.tokenConfig.amount),
     });
   }
 
-  if (config.type === 'nft' && config.nftConfig) {
-    console.log('NFT transaction config:', {
+  if (config.type === 'erc721_mint' && config.nftConfig) {
+    console.log('NFT mint config:', {
       ...config.nftConfig,
       tokenAddress: config.nftConfig.tokenAddress,
       standard: config.nftConfig.standard,
-      amount: config.nftConfig.amount,
-      symbol: config.nftConfig.symbol || 'Unknown',
-      name: config.nftConfig.name || 'Unknown NFT'
+      amount: config.nftConfig.amount
     });
   }
 
@@ -70,7 +82,7 @@ export const executeTransaction = async (
   }
 
   // Skip allowance check for approval transactions
-  if (config.type === 'token' && config.tokenConfig && provider && !config.tokenConfig.isTestMode && !config.tokenConfig.isApproval) {
+  if (config.type === 'erc20_transfer' && config.tokenConfig && provider && !config.tokenConfig.isTestMode) {
     console.log('Checking token allowance...');
     const signerAddress = await provider.getSigner().getAddress();
     
@@ -116,18 +128,15 @@ export const executeTransaction = async (
       });
       
       const receiptPromise = tx.wait();
-      
       const receipt = await Promise.race([receiptPromise, timeoutPromise]);
       console.log('Transaction receipt received:', receipt);
 
-      if (config.type === 'nft') {
+      if (config.type === 'erc721_mint') {
         console.log('NFT transaction completed:', {
           type: config.type,
           tokenAddress: config.nftConfig?.tokenAddress,
           amount: config.nftConfig?.amount,
-          standard: config.nftConfig?.standard,
-          symbol: config.nftConfig?.symbol,
-          name: config.nftConfig?.name
+          standard: config.nftConfig?.standard
         });
       }
       
@@ -167,4 +176,3 @@ export const executeTransaction = async (
 
   return result.transaction;
 };
-

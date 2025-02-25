@@ -2,10 +2,11 @@
 import { ethers } from "ethers";
 import { nanoid } from 'nanoid';
 import { ProposalError } from "./errorHandlingService";
+import { TransactionType } from "./transactionManager";
 
 export interface QueuedTransaction {
   id: string;
-  type: 'contract' | 'proposal' | 'approval' | 'token' | 'nft';  // Added 'nft' type
+  type: TransactionType;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   description: string;
   hash?: string;
@@ -28,7 +29,6 @@ class TransactionQueue {
   private readonly DEFAULT_TIMEOUT = 30000;
 
   constructor() {
-    // Initialize with empty queue
     this.transactions = new Map();
   }
 
@@ -46,6 +46,7 @@ class TransactionQueue {
     };
     
     this.transactions.set(id, newTransaction);
+    console.log(`Added transaction to queue: ${transaction.type} - ${transaction.description}`);
     return id;
   }
 
@@ -100,6 +101,7 @@ class TransactionQueue {
         transaction.status = 'processing';
         transaction.retryCount = attempt;
         this.transactions.set(id, transaction);
+        console.log(`Processing ${transaction.type} transaction (attempt ${attempt + 1}/${maxRetries + 1})`);
 
         const result = await this.executeWithTimeout(operation(), timeout);
 
@@ -108,6 +110,7 @@ class TransactionQueue {
           transaction.hash = (result as any).hash;
         }
         this.transactions.set(id, transaction);
+        console.log(`Transaction completed successfully: ${transaction.type}`);
 
         return result;
       } catch (error: any) {
@@ -115,7 +118,8 @@ class TransactionQueue {
         lastError = error;
 
         if (this.shouldRetry(error) && attempt < maxRetries) {
-          await this.wait(retryDelay * Math.pow(2, attempt)); // Exponential backoff
+          console.log(`Retrying ${transaction.type} transaction in ${retryDelay}ms...`);
+          await this.wait(retryDelay * Math.pow(2, attempt));
           continue;
         }
 
