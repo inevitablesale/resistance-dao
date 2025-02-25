@@ -43,8 +43,9 @@ export const AccessCoverOverlay = () => {
     const fetchNFTMetadata = async () => {
       if (showNFTSuccess) {
         try {
+          console.log("Fetching NFT metadata from IPFS...");
           const metadata = await getFromIPFS<NFTMetadata>("bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py", "content");
-          console.log("Fetched NFT metadata:", metadata);
+          console.log("NFT metadata retrieved:", metadata);
           setNftMetadata(metadata);
         } catch (error) {
           console.error("Error fetching NFT metadata:", error);
