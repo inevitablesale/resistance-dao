@@ -1,6 +1,7 @@
-import React from 'react';
+
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
+import { DynamicContextProvider, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
 import { Analytics } from '@vercel/analytics/react';
@@ -21,6 +22,7 @@ import ThesisSubmission from "./pages/ThesisSubmission";
 import ProposalDetails from "./pages/ProposalDetails";
 import Proposals from "./pages/Proposals";
 import { Toaster } from "./components/ui/toaster";
+import { useToast } from "./hooks/use-toast";
 
 const FACTORY_ADDRESS = "0x4b729792-4b38-4d73-8a69-4f7559f2c2cd";
 
@@ -71,6 +73,16 @@ const dynamicSettings = {
     },
     onSessionRestore: () => {
       console.log("[Dynamic SDK] Session restored");
+    },
+    onError: (error: any) => {
+      // Handle verification errors here
+      if (error?.status === 403 && error?.error?.message?.includes('verifyWallet')) {
+        console.log("[Dynamic SDK] Wallet verification failed, triggering custom flow");
+        // You can access the global event bus using window.dispatchEvent
+        window.dispatchEvent(new CustomEvent('walletVerificationFailed', {
+          detail: { error }
+        }));
+      }
     }
   },
   settings: {
@@ -135,6 +147,27 @@ const dynamicSettings = {
 const queryClient = new QueryClient();
 
 function Layout() {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const handleVerificationError = (event: CustomEvent) => {
+      console.log("Handling wallet verification error:", event.detail);
+      // Show a toast notification
+      toast({
+        title: "Wallet Verification Required",
+        description: "Please complete the verification process to continue",
+        variant: "default"
+      });
+      // You can also trigger any custom UI flows here
+    };
+
+    window.addEventListener('walletVerificationFailed', handleVerificationError as EventListener);
+    
+    return () => {
+      window.removeEventListener('walletVerificationFailed', handleVerificationError as EventListener);
+    };
+  }, [toast]);
+
   return (
     <>
       <Nav />
