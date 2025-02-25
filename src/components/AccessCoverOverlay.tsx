@@ -21,7 +21,7 @@ export const AccessCoverOverlay = () => {
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
-  const { primaryWallet, logout } = useDynamicContext();
+  const { primaryWallet } = useDynamicContext();
   const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
   const { toast } = useToast();
   const { 
@@ -168,11 +168,13 @@ export const AccessCoverOverlay = () => {
 
   const handleLogoutClick = async () => {
     try {
-      await logout();
-      toast({
-        title: "Logged Out",
-        description: "Successfully disconnected wallet",
-      });
+      if (primaryWallet?.disconnect) {
+        await primaryWallet.disconnect();
+        toast({
+          title: "Logged Out",
+          description: "Successfully disconnected wallet",
+        });
+      }
     } catch (error) {
       console.error('Logout error:', error);
       toast({
