@@ -61,7 +61,7 @@ export const getTokenAllowance = async (
 };
 
 export const approveExactAmount = async (
-  provider: ethers.providers.Web3Provider, // Changed from Provider to Web3Provider
+  provider: ethers.providers.Provider,
   tokenAddress: string,
   spenderAddress: string,
   amount: string
