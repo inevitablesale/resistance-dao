@@ -1,4 +1,3 @@
-<lov-code>
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -630,3 +629,4 @@ const Index = () => {
                 {
                   question: "What is Resistance DAO?",
                   answer: "Resistance DAO is a community-driven platform connecting Web3 innovators with early-stage capital and support."
+                },
