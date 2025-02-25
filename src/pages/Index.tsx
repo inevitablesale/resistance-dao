@@ -160,22 +160,18 @@ const Index = () => {
                 <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
                   <div className="flex items-center gap-4">
                     <div className="p-3 rounded-full bg-green-500/10">
-                      <FileText className="w-6 h-6 text-green-300" />
+                      <Users className="w-6 h-6 text-green-300" />
                     </div>
                     <div>
-                      <div className="text-white/60 text-sm">Total Proposals</div>
+                      <div className="text-white/60 text-sm">Total Participants</div>
                       <div className="text-2xl font-semibold text-white">
                         {isLoadingStats ? (
                           <span className="animate-pulse">Loading...</span>
                         ) : (
-                          formatNumber(stats?.recentActivities.filter(a => a.type === 'create').length || 0)
+                          formatNumber(stats?.totalHolders || 0)
                         )}
                       </div>
                     </div>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-white/60">24h Users</span>
-                    <span className="text-green-400">+82</span>
                   </div>
                 </div>
 
