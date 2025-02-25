@@ -10,11 +10,11 @@ const USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const MINT_PRICE = ethers.utils.parseUnits("50", 6); // 50 USDC with 6 decimals
 
 const NFT_ABI = [
-  "function mint(address to) external",
-  "function safeMint(address to, string memory uri) external",
-  "function setTokenURI(uint256 tokenId, string memory uri) external",
+  "function mintNFT(string calldata tokenURI) external",
   "function tokenURI(uint256 tokenId) view returns (string)",
-  "function balanceOf(address owner) view returns (uint256)"
+  "function balanceOf(address owner) view returns (uint256)",
+  "function claimRefund() external",
+  "function getPendingRefund(address user) external view returns (uint256)"
 ];
 
 const USDC_ABI = [
@@ -116,13 +116,24 @@ export const useNFTMinting = () => {
         signer
       );
 
-      // First mint the token to the user
-      console.log("Minting NFT...");
-      const tx = await nftContract.mint(await signer.getAddress());
+      // Default tokenURI for now - this should be replaced with actual metadata URI
+      const tokenURI = "ipfs://bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py";
+      
+      console.log("Minting NFT with URI:", tokenURI);
+      const tx = await nftContract.mintNFT(tokenURI);
       console.log("Mint transaction submitted:", tx.hash);
 
       const receipt = await tx.wait();
       console.log("NFT minted successfully:", receipt);
+
+      // Check if we need to claim a refund
+      const pendingRefund = await nftContract.getPendingRefund(await signer.getAddress());
+      if (pendingRefund.gt(0)) {
+        console.log("Claiming refund...");
+        const refundTx = await nftContract.claimRefund();
+        await refundTx.wait();
+        console.log("Refund claimed successfully");
+      }
 
       return true;
     } catch (error) {

@@ -1,4 +1,3 @@
-
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Wallet, Loader2, Shield, CreditCard, Copy, Check, ExternalLink, LogOut } from "lucide-react";
@@ -21,7 +20,7 @@ export const AccessCoverOverlay = () => {
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
-  const { logout } = useDynamicContext();
+  const { handleLogout } = useDynamicContext();
   const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
   const { toast } = useToast();
   const { 
@@ -170,7 +169,7 @@ export const AccessCoverOverlay = () => {
 
   const handleLogoutClick = () => {
     try {
-      logout();
+      handleLogout();
       toast({
         title: "Logged Out",
         description: "Successfully disconnected wallet",
