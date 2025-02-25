@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -72,56 +71,50 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     }
   }, [open, getProvider, toast]);
 
-  const handleBuyUsdc = async () => {
-    try {
-      console.log("[Onramp] Starting USDC purchase flow");
-      console.log("[Onramp] Enabled status:", onrampEnabled);
-      console.log("[Onramp] Wallet address:", primaryWallet?.address);
+  const handleBuyUsdc = () => {
+    console.log("[Onramp] Starting USDC purchase flow");
+    console.log("[Onramp] Enabled status:", onrampEnabled);
+    console.log("[Onramp] Wallet address:", primaryWallet?.address);
 
-      if (!onrampEnabled) {
-        console.error("[Onramp] Onramp is not enabled");
-        toast({
-          title: "Error",
-          description: "USDC purchase is not available at the moment",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!primaryWallet?.address) {
-        console.error("[Onramp] No wallet address available");
-        toast({
-          title: "Error",
-          description: "Please connect your wallet first",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setIsBuyingUsdc(true);
-      console.log("[Onramp] Opening Banxa onramp");
-      
-      await openOnramp({
-        onrampProvider: OnrampProviders.Banxa,
-        token: 'USDC',
-        address: primaryWallet.address,
+    if (!onrampEnabled || !primaryWallet?.address) {
+      console.error("[Onramp] Invalid state:", { onrampEnabled, address: primaryWallet?.address });
+      toast({
+        title: "Error",
+        description: !onrampEnabled 
+          ? "USDC purchase is not available at the moment"
+          : "Please connect your wallet first",
+        variant: "destructive",
       });
+      return;
+    }
 
-      console.log("[Onramp] Banxa onramp opened successfully");
+    setIsBuyingUsdc(true);
+    console.log("[Onramp] Attempting to open Banxa onramp window");
+    
+    openOnramp({
+      onrampProvider: OnrampProviders.Banxa,
+      token: 'USDC',
+      address: primaryWallet.address,
+    })
+    .then(() => {
+      console.log("[Onramp] Window opened successfully");
       toast({
         title: "Success",
         description: "USDC purchase initiated. Follow the instructions to complete your purchase.",
       });
-    } catch (error) {
-      console.error("[Onramp] Error during USDC purchase:", error);
+    })
+    .catch((error) => {
+      console.error("[Onramp] Failed to open window:", error);
       toast({
         title: "Error",
-        description: "Failed to initiate USDC purchase. Please try again.",
+        description: "Failed to open USDC purchase window. Please try again.",
         variant: "destructive",
       });
-    } finally {
+    })
+    .finally(() => {
+      console.log("[Onramp] Cleaning up state");
       setIsBuyingUsdc(false);
-    }
+    });
   };
 
   const handleApproveUSDC = async () => {
@@ -329,4 +322,3 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     </Dialog>
   );
 };
-
