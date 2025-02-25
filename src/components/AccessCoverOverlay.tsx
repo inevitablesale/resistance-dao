@@ -16,7 +16,6 @@ export const AccessCoverOverlay = () => {
   const { data: nftBalance = 0, isLoading: isCheckingNFT } = useNFTBalance(address);
   const { toast } = useToast();
 
-  // Effect to check NFT membership and close overlay
   useEffect(() => {
     if (isCheckingNFT) return;
     
@@ -29,22 +28,18 @@ export const AccessCoverOverlay = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-blue-950 to-black">
-      <div className="container max-w-4xl mx-auto px-4 h-full flex items-center justify-center relative">
-        {/* Background effects */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-        </div>
-        
-        {/* Phoenix Logo */}
-        <div className="absolute top-10 left-1/2 transform -translate-x-1/2">
-          <img 
-            src="https://i.postimg.cc/BbGmN3qd/image-6.jpg" 
-            alt="Resistance DAO Phoenix" 
-            className="w-24 h-24 object-cover rounded-full border-2 border-blue-500/50 shadow-lg shadow-blue-500/20"
-          />
-        </div>
-        
+    <div 
+      className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center"
+      style={{
+        backgroundImage: `url(https://i.postimg.cc/BbGmN3qd/image-6.jpg)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/80" />
+      
+      <div className="container max-w-4xl mx-auto px-4 relative">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -52,46 +47,30 @@ export const AccessCoverOverlay = () => {
           className="text-center space-y-8 relative"
         >
           {!address ? (
-            <>
-              <div className="flex flex-col items-center gap-6">
-                <div className="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center mb-2">
-                  <Shield className="w-8 h-8 text-blue-400" />
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-center gap-2 mb-4">
-                    <Star className="w-5 h-5 text-yellow-400" />
-                    <span className="text-yellow-400 font-semibold">OG Holders get exclusive benefits</span>
-                  </div>
-                  <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
-                    Welcome to Resistance DAO
-                  </h1>
-                  <div className="flex flex-col gap-6 items-center">
-                    <div className="space-y-4">
-                      <p className="text-xl text-blue-200/80">
-                        Connect your wallet to access the platform and become an OG member
-                      </p>
-                      <div className="flex flex-col items-center gap-2">
-                        <Button 
-                          size="lg"
-                          onClick={connectWallet}
-                          disabled={isInitializing}
-                          className="bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold px-8 py-6 text-lg relative overflow-hidden group"
-                        >
-                          <div className="absolute inset-0 bg-blue-400/20 group-hover:animate-pulse" />
-                          {isInitializing ? (
-                            <Loader2 className="w-6 h-6 mr-3 animate-spin" />
-                          ) : (
-                            <Wallet className="w-6 h-6 mr-3" />
-                          )}
-                          Connect Wallet
-                        </Button>
-                        <p className="text-sm text-blue-200/60">Early supporters get exclusive rewards and benefits</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <div className="flex flex-col items-center gap-6">
+              <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
+                Welcome to Resistance DAO
+              </h1>
+              <p className="text-xl text-blue-200/80 max-w-2xl">
+                Connect your wallet to access the platform and become an OG member
+              </p>
+              <div className="flex flex-col items-center gap-2">
+                <Button 
+                  size="lg"
+                  onClick={connectWallet}
+                  disabled={isInitializing}
+                  className="bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold px-8 py-6 text-lg relative overflow-hidden group"
+                >
+                  {isInitializing ? (
+                    <Loader2 className="w-6 h-6 mr-3 animate-spin" />
+                  ) : (
+                    <Wallet className="w-6 h-6 mr-3" />
+                  )}
+                  Connect Wallet
+                </Button>
+                <p className="text-sm text-blue-200/60">Early supporters get exclusive rewards and benefits</p>
               </div>
-            </>
+            </div>
           ) : (
             <div className="space-y-8">
               {isCheckingNFT ? (
@@ -100,16 +79,13 @@ export const AccessCoverOverlay = () => {
                   <p className="text-blue-200">Checking membership status...</p>
                 </div>
               ) : (
-                <>
+                <div className="space-y-6">
                   <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
                     Membership Required
                   </h1>
                   
-                  <div className="bg-blue-900/30 rounded-xl p-8 backdrop-blur border border-blue-500/20 max-w-xl mx-auto">
-                    <div className="flex items-center justify-center mb-6">
-                      <Shield className="w-12 h-12 text-blue-400" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-blue-300 mb-2">Member NFT Required</h3>
+                  <div className="bg-black/50 backdrop-blur rounded-xl p-8 border border-blue-500/20 max-w-xl mx-auto">
+                    <h3 className="text-2xl font-bold text-blue-300 mb-4">Member NFT Required</h3>
                     <p className="text-blue-200/80 mb-6">
                       You need to own a Resistance DAO Member NFT to access the platform
                     </p>
@@ -121,7 +97,7 @@ export const AccessCoverOverlay = () => {
                     </Button>
                     <p className="text-sm text-blue-200/60 mt-4">Join now to become an OG holder with exclusive benefits</p>
                   </div>
-                </>
+                </div>
               )}
             </div>
           )}
