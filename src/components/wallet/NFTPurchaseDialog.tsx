@@ -9,6 +9,8 @@ import { executeTransaction } from "@/services/transactionManager";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useOnramp } from "@dynamic-labs/sdk-react-core";
+import { OnrampProviders } from "@dynamic-labs/sdk-api-core";
 
 const USDC_CONTRACT = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const NFT_CONTRACT = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
@@ -32,13 +34,15 @@ interface NFTPurchaseDialogProps {
 export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps) => {
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
-  const { primaryWallet, setShowOnRamp } = useDynamicContext();
+  const { primaryWallet } = useDynamicContext();
+  const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
   const [usdcAllowance, setUsdcAllowance] = useState<string>("0");
   const [isApproving, setIsApproving] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [isOnrampLoading, setIsOnrampLoading] = useState(false);
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -185,8 +189,47 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     }
   };
 
-  const handleBuyUsdc = () => {
-    setShowOnRamp?.(true);
+  const handleBuyUsdc = async () => {
+    if (!primaryWallet?.address) {
+      toast({
+        title: "Error",
+        description: "Please connect your wallet first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!onrampEnabled) {
+      toast({
+        title: "Service Unavailable",
+        description: "The onramp service is currently not available",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsOnrampLoading(true);
+      await openOnramp({
+        onrampProvider: OnrampProviders.Banxa,
+        token: 'USDC',
+        address: primaryWallet.address,
+      });
+      
+      toast({
+        title: "Success",
+        description: "USDC purchase initiated successfully",
+      });
+    } catch (error) {
+      console.error("Onramp error:", error);
+      toast({
+        title: "Purchase Failed",
+        description: error instanceof Error ? error.message : "Failed to initiate USDC purchase",
+        variant: "destructive",
+      });
+    } finally {
+      setIsOnrampLoading(false);
+    }
   };
 
   const handleOpenWallet = () => {
@@ -234,9 +277,14 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
           <div className="space-y-2">
             <Button
               onClick={handleBuyUsdc}
+              disabled={isOnrampLoading || !onrampEnabled}
               className="w-full bg-[#9B87F5] hover:bg-[#7E69AB] text-white py-4 text-base font-medium rounded-lg flex items-center justify-center gap-2"
             >
-              <ExternalLink className="w-4 h-4" />
+              {isOnrampLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <ExternalLink className="w-4 h-4" />
+              )}
               Buy USDC
             </Button>
 
