@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 export const FACTORY_ADDRESS = "0x3522fCA64A8F79b004fDbd9a383B56113B81130B";
 export const RD_TOKEN_ADDRESS = "0x81137573408bCD23f801A56D68268cc0CE5206B5";
 export const TREASURY_ADDRESS = "0x386f47AE974255c9486A2D4B91a3694E95A1EE81";
-export const RD_PRICE_USD = 0.10; // $0.10 per RD token
+export const RD_PRICE_USD = 1.00; // $1.00 per RD token
 export const MIN_LGR_REQUIRED = "100"; // 100 RD tokens minimum required
 
 // Contract-specific constants
