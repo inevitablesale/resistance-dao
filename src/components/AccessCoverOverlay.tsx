@@ -1,6 +1,6 @@
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Wallet, Loader2, Shield, CreditCard, Copy, Check, ExternalLink } from "lucide-react";
+import { X, Wallet, Loader2, Shield, CreditCard, Copy, Check, ExternalLink, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
@@ -20,7 +20,7 @@ export const AccessCoverOverlay = () => {
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
-  const { logout } = useDynamicContext();
+  const { handleLogOut } = useDynamicContext();
   const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
   const { toast } = useToast();
   const { 
@@ -167,15 +167,13 @@ export const AccessCoverOverlay = () => {
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogoutClick = () => {
     try {
-      if (primaryWallet?.disconnect) {
-        await primaryWallet.disconnect();
-        toast({
-          title: "Logged Out",
-          description: "Successfully disconnected wallet",
-        });
-      }
+      handleLogOut();
+      toast({
+        title: "Logged Out",
+        description: "Successfully disconnected wallet",
+      });
     } catch (error) {
       console.error('Logout error:', error);
       toast({
@@ -256,7 +254,7 @@ export const AccessCoverOverlay = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleLogout}
+            onClick={handleLogoutClick}
             className="text-blue-300 hover:text-blue-200 hover:bg-blue-900/50"
           >
             <LogOut className="w-4 h-4 mr-2" />
