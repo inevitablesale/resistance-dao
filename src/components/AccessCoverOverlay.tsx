@@ -1,8 +1,7 @@
-
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Wallet, Loader2, Shield, CreditCard, Copy, LogOut } from "lucide-react";
-import { motion } from "framer-motion";
+import { X, Wallet, Loader2, Shield, CreditCard, Copy, LogOut, Check, ExternalLink } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -14,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const [showNFTSuccess, setShowNFTSuccess] = useState(false);
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
@@ -78,7 +78,7 @@ export const AccessCoverOverlay = () => {
           title: "Success!",
           description: "Your NFT has been minted successfully.",
         });
-        setTimeout(() => setIsOpen(false), 2000);
+        setShowNFTSuccess(true);
       }
     } catch (error) {
       console.error("Minting error:", error);
@@ -160,6 +160,61 @@ export const AccessCoverOverlay = () => {
       });
     }
   };
+
+  if (showNFTSuccess) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-blue-950 to-black">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="container max-w-2xl mx-auto px-4 h-full flex items-center justify-center"
+        >
+          <div className="bg-blue-900/20 p-8 rounded-2xl border border-blue-500/20 backdrop-blur-xl space-y-6 w-full">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center">
+                <Check className="w-10 h-10 text-green-400" />
+              </div>
+              <h2 className="text-3xl font-bold text-white">Welcome to Resistance DAO!</h2>
+              <p className="text-blue-200/80 text-center">
+                Your Member NFT has been successfully minted. You now have access to all DAO features and benefits.
+              </p>
+            </div>
+
+            <div className="p-6 bg-blue-950/40 rounded-xl border border-blue-500/10">
+              <img 
+                src="/lgr-logo.png"
+                alt="Member NFT"
+                className="w-full h-48 object-contain rounded-lg mb-4"
+              />
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold text-blue-200">Resistance DAO Member NFT</h3>
+                <p className="text-blue-300/60 text-sm">
+                  This NFT represents your membership and voting power in the DAO
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <Button 
+                onClick={() => window.location.href = '/governance-voting'}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 py-6 text-lg"
+              >
+                Go to Governance
+                <ExternalLink className="w-5 h-5 ml-2" />
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setShowNFTSuccess(false)}
+                className="text-blue-300 hover:text-blue-200 hover:bg-blue-900/50"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-blue-950 to-black">
