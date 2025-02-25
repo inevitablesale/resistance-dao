@@ -205,6 +205,12 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
             standard: "ERC721",
             symbol: "MEMBER",
             name: "Resistance DAO Member"
+          },
+          tokenConfig: {
+            tokenAddress: USDC_CONTRACT,
+            spenderAddress: NFT_CONTRACT,
+            amount: NFT_PRICE,
+            isApproval: true
           }
         }
       );

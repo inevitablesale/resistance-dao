@@ -1,15 +1,43 @@
 
 import { ethers } from "ethers";
-import { DynamicContext } from "@dynamic-labs/sdk-react-core";
+import { DynamicContext as DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { ProposalInput } from "@/types/proposals";
 import { uploadToIPFS } from "./ipfsService";
 import { executeTransaction, TransactionConfig } from "./transactionManager";
 import { RD_TOKEN_ADDRESS, FACTORY_ADDRESS } from "@/lib/constants";
 import { approveExactAmount, checkTokenAllowance } from "./tokenService";
 
+export interface ContractStatus {
+  treasury: string;
+  isTestMode: boolean;
+}
+
+export const getContractStatus = async (
+  wallet: DynamicContextType["primaryWallet"]
+): Promise<ContractStatus> => {
+  const walletClient = await wallet?.getWalletClient();
+  if (!walletClient) throw new Error("No wallet client available");
+  
+  const provider = new ethers.providers.Web3Provider(walletClient as any);
+  const signer = provider.getSigner();
+  
+  const factoryContract = new ethers.Contract(
+    FACTORY_ADDRESS,
+    ["function treasury() view returns (address)"],
+    signer
+  );
+  
+  const treasury = await factoryContract.treasury();
+  
+  return {
+    treasury,
+    isTestMode: false // You can modify this based on your needs
+  };
+};
+
 export const createProposal = async (
   metadata: any,
-  wallet: DynamicContext["primaryWallet"]
+  wallet: DynamicContextType["primaryWallet"]
 ): Promise<ethers.ContractTransaction> => {
   try {
     if (!wallet) throw new Error("No wallet connected");

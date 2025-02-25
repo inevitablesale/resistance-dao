@@ -31,6 +31,8 @@ export const ContractApprovalStatus = ({
       setIsApproving(true);
       const walletProvider = await getProvider();
       
+      const amountBigNumber = ethers.utils.parseUnits(amount, 18);
+      
       const tokenContract = new ethers.Contract(
         tokenAddress,
         ["function approve(address spender, uint256 amount) external returns (bool)"],
@@ -38,7 +40,7 @@ export const ContractApprovalStatus = ({
       );
 
       await executeTransaction(
-        () => tokenContract.approve(spenderAddress, amount),
+        () => tokenContract.approve(spenderAddress, amountBigNumber),
         {
           type: 'erc20_approval',
           description: "Token approval for contract interaction",
@@ -48,7 +50,7 @@ export const ContractApprovalStatus = ({
           tokenConfig: {
             tokenAddress: tokenAddress,
             spenderAddress: spenderAddress,
-            amount: amount,
+            amount: amountBigNumber,
             isApproval: true
           }
         }
