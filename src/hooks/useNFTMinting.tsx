@@ -110,6 +110,7 @@ export const useNFTMinting = () => {
   };
 
   const ownerMint = async (recipient: string) => {
+    console.log("Attempting owner mint for:", recipient);
     setIsMinting(true);
     try {
       const provider = await getProvider();
@@ -121,11 +122,6 @@ export const useNFTMinting = () => {
         NFT_ABI,
         signer
       );
-
-      const isContractOwner = await checkIfOwner();
-      if (!isContractOwner) {
-        throw new Error("Only the contract owner can mint without USDC");
-      }
 
       const metadata = {
         name: "Resistance DAO Member NFT",
@@ -144,42 +140,13 @@ export const useNFTMinting = () => {
       };
 
       const metadataUri = `ipfs://QmYourIPFSHash`;
+      console.log("Calling safeMint with URI:", metadataUri);
       const tx = await nftContract.safeMint(recipient, metadataUri);
       await tx.wait();
       
       return true;
     } catch (error) {
       console.error("Error in owner mint:", error);
-      throw error;
-    } finally {
-      setIsMinting(false);
-    }
-  };
-
-  const bulkMint = async (recipients: string[], metadataUris: string[]) => {
-    setIsMinting(true);
-    try {
-      const provider = await getProvider();
-      if (!provider?.provider) throw new Error("No provider available");
-
-      const signer = provider.provider.getSigner();
-      const nftContract = new ethers.Contract(
-        NFT_CONTRACT_ADDRESS,
-        NFT_ABI,
-        signer
-      );
-
-      const isContractOwner = await checkIfOwner();
-      if (!isContractOwner) {
-        throw new Error("Only the contract owner can bulk mint");
-      }
-
-      const tx = await nftContract.bulkMint(recipients, metadataUris);
-      await tx.wait();
-      
-      return true;
-    } catch (error) {
-      console.error("Error in bulk mint:", error);
       throw error;
     } finally {
       setIsMinting(false);
@@ -195,11 +162,16 @@ export const useNFTMinting = () => {
       const signer = provider.provider.getSigner();
       const address = await signer.getAddress();
       
+      console.log("Checking if address is owner:", address);
       const ownerStatus = await checkIfOwner();
+      console.log("Is owner?", ownerStatus);
+
       if (ownerStatus) {
-        return ownerMint(address);
+        console.log("Owner detected, using ownerMint");
+        return await ownerMint(address);
       }
 
+      console.log("Not owner, proceeding with regular mint");
       const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
       const balance = await usdcContract.balanceOf(address);
       if (balance.lt(MINT_PRICE)) {
@@ -254,7 +226,35 @@ export const useNFTMinting = () => {
     approveUSDC,
     mintNFT,
     ownerMint,
-    bulkMint,
+    bulkMint: async (recipients: string[], metadataUris: string[]) => {
+      setIsMinting(true);
+      try {
+        const provider = await getProvider();
+        if (!provider?.provider) throw new Error("No provider available");
+
+        const signer = provider.provider.getSigner();
+        const nftContract = new ethers.Contract(
+          NFT_CONTRACT_ADDRESS,
+          NFT_ABI,
+          signer
+        );
+
+        const isContractOwner = await checkIfOwner();
+        if (!isContractOwner) {
+          throw new Error("Only the contract owner can bulk mint");
+        }
+
+        const tx = await nftContract.bulkMint(recipients, metadataUris);
+        await tx.wait();
+        
+        return true;
+      } catch (error) {
+        console.error("Error in bulk mint:", error);
+        throw error;
+      } finally {
+        setIsMinting(false);
+      }
+    },
     checkIfOwner,
     MINT_PRICE: "50",
   };
