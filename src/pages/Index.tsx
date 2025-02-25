@@ -8,10 +8,7 @@ import {
   ChevronRight, 
   Building2, 
   CircleDollarSign,
-  TrendingUp,
-  ArrowUpRight,
   Scale,
-  ShieldCheck,
   FileText,
   ChevronRight as ArrowIcon,
   Clock,
@@ -630,3 +627,34 @@ const Index = () => {
                   question: "What is Resistance DAO?",
                   answer: "Resistance DAO is a community-driven platform connecting Web3 innovators with early-stage capital and support."
                 },
+                {
+                  question: "How does it work?",
+                  answer: "Our platform allows you to submit a proposal, collect soft commitments, and launch your project with confidence."
+                },
+                {
+                  question: "What are the benefits?",
+                  answer: "Join our community and access capital, support, and visibility to grow your project."
+                },
+                {
+                  question: "Is it secure?",
+                  answer: "Yes, our platform uses smart contracts and secure protocols to ensure the safety of your project."
+                },
+                {
+                  question: "What are the fees?",
+                  answer: "Our platform is free to use, but we may charge fees for certain services or features."
+                }
+              ].map((item, index) => (
+                <div key={index} className="bg-black/30 border border-white/10 p-6 hover:border-green-400/20 transition-all duration-300">
+                  <h3 className="text-xl font-bold text-white mb-3">{item.question}</h3>
+                  <p className="text-white/70">{item.answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
+  );
+};
+
+export default Index;
