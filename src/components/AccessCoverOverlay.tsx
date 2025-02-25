@@ -49,28 +49,43 @@ export const AccessCoverOverlay = () => {
   }, [address, getUSDCBalance, checkUSDCApproval]);
 
   const handleMintClick = async () => {
-    if (Number(usdcBalance) < Number(MINT_PRICE)) {
+    if (!address) {
       toast({
-        title: "Insufficient USDC Balance",
-        description: `You need ${MINT_PRICE} USDC to mint. Current balance: ${usdcBalance} USDC`,
+        title: "Connect Wallet",
+        description: "Please connect your wallet to mint.",
         variant: "destructive"
       });
       return;
     }
 
-    if (!hasApproval) {
-      const approved = await approveUSDC();
-      if (approved) {
-        setHasApproval(true);
+    try {
+      if (!hasApproval) {
+        const approved = await approveUSDC();
+        if (approved) {
+          setHasApproval(true);
+          toast({
+            title: "USDC Approved",
+            description: "You can now mint your NFT",
+          });
+        }
         return;
       }
-    }
-    
-    if (hasApproval) {
+      
       const minted = await mintNFT();
       if (minted) {
+        toast({
+          title: "Success!",
+          description: "Your NFT has been minted successfully.",
+        });
         setTimeout(() => setIsOpen(false), 2000);
       }
+    } catch (error) {
+      console.error("Minting error:", error);
+      toast({
+        title: "Minting Failed",
+        description: error instanceof Error ? error.message : "Failed to mint NFT",
+        variant: "destructive"
+      });
     }
   };
 
@@ -282,7 +297,7 @@ export const AccessCoverOverlay = () => {
                     ) : null}
                     {isApproving ? "Approving USDC..." :
                      isMinting ? "Minting NFT..." :
-                     !hasApproval ? "Buy NFT" : "Mint Member NFT"}
+                     !hasApproval ? "Approve USDC" : "Mint Member NFT"}
                   </Button>
                 </div>
               </div>
