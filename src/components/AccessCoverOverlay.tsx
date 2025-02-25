@@ -11,10 +11,13 @@ import { useNFTMinting } from "@/hooks/useNFTMinting";
 import { useDynamicContext, useOnramp } from "@dynamic-labs/sdk-react-core";
 import { OnrampProviders } from "@dynamic-labs/sdk-api-core";
 import { useToast } from "@/hooks/use-toast";
+import { getFromIPFS } from '@/services/ipfsService';
+import { NFTMetadata } from '@/types/proposals';
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [showNFTSuccess, setShowNFTSuccess] = useState(false);
+  const [nftMetadata, setNftMetadata] = useState<NFTMetadata | null>(null);
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
@@ -34,6 +37,22 @@ export const AccessCoverOverlay = () => {
   const [usdcBalance, setUsdcBalance] = useState("0");
   const [hasApproval, setHasApproval] = useState(false);
   const [isOpeningOnramp, setIsOpeningOnramp] = useState(false);
+
+  useEffect(() => {
+    const fetchNFTMetadata = async () => {
+      if (showNFTSuccess) {
+        try {
+          // This is the IPFS hash we used in mintNFT function
+          const metadata = await getFromIPFS<NFTMetadata>("QmResistanceDAOMetadata", "content");
+          setNftMetadata(metadata);
+        } catch (error) {
+          console.error("Error fetching NFT metadata:", error);
+        }
+      }
+    };
+
+    fetchNFTMetadata();
+  }, [showNFTSuccess]);
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -187,25 +206,30 @@ export const AccessCoverOverlay = () => {
               <div className="relative p-6 space-y-4">
                 <div className="flex items-center gap-3">
                   <Shield className="w-6 h-6 text-blue-400" />
-                  <h3 className="text-xl font-semibold text-blue-200">Resistance DAO Member NFT</h3>
+                  <h3 className="text-xl font-semibold text-blue-200">
+                    {nftMetadata?.name || "Resistance DAO Member NFT"}
+                  </h3>
                 </div>
+                {nftMetadata?.image && (
+                  <div className="relative w-full h-48 rounded-lg overflow-hidden mb-4">
+                    <img 
+                      src={nftMetadata.image.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/')}
+                      alt={nftMetadata.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <p className="text-blue-300/60">
-                  This NFT represents your membership and voting power in the DAO
+                  {nftMetadata?.description || "This NFT represents your membership and voting power in the DAO"}
                 </p>
                 <div className="h-[2px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20" />
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-blue-300/60">Membership Type</span>
-                    <span className="text-blue-200">Member</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-blue-300/60">Voting Power</span>
-                    <span className="text-blue-200">1 vote</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-blue-300/60">Join Date</span>
-                    <span className="text-blue-200">{new Date().toLocaleDateString()}</span>
-                  </div>
+                  {nftMetadata?.attributes?.map((attr) => (
+                    <div key={attr.trait_type} className="flex justify-between text-sm">
+                      <span className="text-blue-300/60">{attr.trait_type}</span>
+                      <span className="text-blue-200">{attr.value}</span>
+                    </div>
+                  ))} 
                 </div>
               </div>
             </div>
@@ -336,15 +360,7 @@ export const AccessCoverOverlay = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          if (address) {
-                            navigator.clipboard.writeText(address);
-                            toast({
-                              title: "Address Copied",
-                              description: "Wallet address copied to clipboard",
-                            });
-                          }
-                        }}
+                        onClick={handleCopyAddress}
                         className="ml-2 hover:bg-blue-800/50"
                       >
                         <Copy className="w-4 h-4 text-blue-300" />
@@ -381,22 +397,6 @@ export const AccessCoverOverlay = () => {
           )}
         </motion.div>
       </div>
-
-      <style>
-        {`
-          @keyframes phoenixLook {
-            0%, 100% {
-              transform: rotate(0deg);
-            }
-            25% {
-              transform: rotate(-3deg);
-            }
-            75% {
-              transform: rotate(3deg);
-            }
-          }
-        `}
-      </style>
     </div>
   );
 };
