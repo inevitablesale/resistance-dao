@@ -125,13 +125,13 @@ export const useNFTMinting = () => {
       );
 
       const metadata = {
-        name: "Resistance DAO Member NFT",
-        description: "A member of the Resistance DAO community",
-        image: "ipfs://QmYourDefaultImageHash",
+        name: "Resistance DAO Membership NFT",
+        description: "An official member of the Resistance DAO community",
+        image: "ipfs://QmResistanceDAOImage", // Make sure to update with actual IPFS hash
         attributes: [
           {
             trait_type: "Membership Type",
-            value: "Standard"
+            value: "Member"
           },
           {
             trait_type: "Joined",
@@ -140,7 +140,7 @@ export const useNFTMinting = () => {
         ]
       };
 
-      const metadataUri = `ipfs://QmYourIPFSHash`;
+      const metadataUri = `ipfs://QmResistanceDAOMetadata`; // Make sure to update with actual IPFS hash
       console.log("Calling safeMint with URI:", metadataUri);
       const tx = await nftContract.safeMint(recipient, metadataUri);
       await tx.wait();
@@ -191,13 +191,13 @@ export const useNFTMinting = () => {
       );
 
       const metadata = {
-        name: "Resistance DAO Member NFT",
-        description: "A member of the Resistance DAO community",
-        image: "ipfs://QmYourDefaultImageHash",
+        name: "Resistance DAO Membership NFT",
+        description: "An official member of the Resistance DAO community",
+        image: "ipfs://QmResistanceDAOImage", // Make sure to update with actual IPFS hash
         attributes: [
           {
             trait_type: "Membership Type",
-            value: "Standard"
+            value: "Member"
           },
           {
             trait_type: "Joined",
@@ -206,7 +206,7 @@ export const useNFTMinting = () => {
         ]
       };
 
-      const metadataUri = `ipfs://QmYourIPFSHash`;
+      const metadataUri = `ipfs://QmResistanceDAOMetadata`; // Make sure to update with actual IPFS hash
       const tx = await nftContract.mintNFT(metadataUri);
       await tx.wait();
       
