@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -12,7 +13,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 const USDC_CONTRACT = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const NFT_CONTRACT = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
 const NFT_PRICE = ethers.utils.parseUnits("50", 6); // 50 USDC (6 decimals)
-const DEFAULT_TOKEN_URI = "ipfs://bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py"; // Metadata JSON CID
+const DEFAULT_TOKEN_URI = "ipfs://bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py";
 
 const USDCInterface = new ethers.utils.Interface([
   "function balanceOf(address owner) view returns (uint256)",
@@ -35,8 +36,8 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
   const { primaryWallet } = useDynamicContext();
-  const [usdcBalance, setUsdcBalance] = useState<string>("0");
-  const [usdcAllowance, setUsdcAllowance] = useState<string>("0");
+  const [usdcBalance, setUsdcBalance] = useState<ethers.BigNumber>(ethers.constants.Zero);
+  const [usdcAllowance, setUsdcAllowance] = useState<ethers.BigNumber>(ethers.constants.Zero);
   const [isApproving, setIsApproving] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -74,8 +75,8 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
             usdcContract.allowance(address, NFT_CONTRACT)
           ]);
           
-          setUsdcBalance(ethers.utils.formatUnits(balance, 6));
-          setUsdcAllowance(ethers.utils.formatUnits(allowance, 6));
+          setUsdcBalance(balance);
+          setUsdcAllowance(allowance);
 
           console.log("Balance check:", {
             balance: ethers.utils.formatUnits(balance, 6),
@@ -136,7 +137,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
           tokenConfig: {
             tokenAddress: USDC_CONTRACT,
             spenderAddress: NFT_CONTRACT,
-            amount: NFT_PRICE.toString(),
+            amount: NFT_PRICE,
             isApproval: true
           }
         }
@@ -145,7 +146,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       const signer = walletProvider.provider.getSigner();
       const usdcContract = new ethers.Contract(USDC_CONTRACT, USDCInterface, walletProvider.provider);
       const newAllowance = await usdcContract.allowance(await signer.getAddress(), NFT_CONTRACT);
-      setUsdcAllowance(ethers.utils.formatUnits(newAllowance, 6));
+      setUsdcAllowance(newAllowance);
 
       toast({
         title: "Success",

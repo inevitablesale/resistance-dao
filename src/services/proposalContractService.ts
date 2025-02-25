@@ -1,6 +1,6 @@
 
 import { ethers } from "ethers";
-import { DynamicContext as DynamicContextType } from "@dynamic-labs/sdk-react-core";
+import type { DynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ProposalInput } from "@/types/proposals";
 import { uploadToIPFS } from "./ipfsService";
 import { executeTransaction, TransactionConfig } from "./transactionManager";
@@ -10,10 +10,14 @@ import { approveExactAmount, checkTokenAllowance } from "./tokenService";
 export interface ContractStatus {
   treasury: string;
   isTestMode: boolean;
+  minTargetCapital: ethers.BigNumber;
+  maxTargetCapital: ethers.BigNumber;
+  minVotingDuration: number;
+  maxVotingDuration: number;
 }
 
 export const getContractStatus = async (
-  wallet: DynamicContextType["primaryWallet"]
+  wallet: NonNullable<DynamicContext["primaryWallet"]>
 ): Promise<ContractStatus> => {
   const walletClient = await wallet?.getWalletClient();
   if (!walletClient) throw new Error("No wallet client available");
@@ -23,21 +27,43 @@ export const getContractStatus = async (
   
   const factoryContract = new ethers.Contract(
     FACTORY_ADDRESS,
-    ["function treasury() view returns (address)"],
+    [
+      "function treasury() view returns (address)",
+      "function minTargetCapital() view returns (uint256)",
+      "function maxTargetCapital() view returns (uint256)",
+      "function minVotingDuration() view returns (uint256)",
+      "function maxVotingDuration() view returns (uint256)"
+    ],
     signer
   );
   
-  const treasury = await factoryContract.treasury();
+  const [
+    treasury,
+    minTargetCapital,
+    maxTargetCapital,
+    minVotingDuration,
+    maxVotingDuration
+  ] = await Promise.all([
+    factoryContract.treasury(),
+    factoryContract.minTargetCapital(),
+    factoryContract.maxTargetCapital(),
+    factoryContract.minVotingDuration(),
+    factoryContract.maxVotingDuration()
+  ]);
   
   return {
     treasury,
-    isTestMode: false // You can modify this based on your needs
+    isTestMode: false,
+    minTargetCapital,
+    maxTargetCapital,
+    minVotingDuration: minVotingDuration.toNumber(),
+    maxVotingDuration: maxVotingDuration.toNumber()
   };
 };
 
 export const createProposal = async (
   metadata: any,
-  wallet: DynamicContextType["primaryWallet"]
+  wallet: NonNullable<DynamicContext["primaryWallet"]>
 ): Promise<ethers.ContractTransaction> => {
   try {
     if (!wallet) throw new Error("No wallet connected");
