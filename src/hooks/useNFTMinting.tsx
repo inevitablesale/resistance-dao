@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletProvider } from "./useWalletProvider";
 
-const NFT_CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
+const NFT_CONTRACT_ADDRESS = "0x6527b171AF1c61AE43bf405ABe53861b0487A369";
 const USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"; // Polygon USDC
 const MINT_PRICE = ethers.utils.parseUnits("50", 6); // 50 USDC with 6 decimals
 
@@ -17,7 +17,8 @@ const NFT_ABI = [
 const USDC_ABI = [
   "function approve(address spender, uint256 amount) external returns (bool)",
   "function allowance(address owner, address spender) view returns (uint256)",
-  "function balanceOf(address owner) view returns (uint256)"
+  "function balanceOf(address owner) view returns (uint256)",
+  "function decimals() view returns (uint8)"
 ];
 
 export const useNFTMinting = () => {
@@ -29,6 +30,8 @@ export const useNFTMinting = () => {
   const checkUSDCApproval = async (address: string): Promise<boolean> => {
     try {
       const provider = await getProvider();
+      if (!provider?.provider) return false;
+
       const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
       const allowance = await usdcContract.allowance(address, NFT_CONTRACT_ADDRESS);
       return allowance.gte(MINT_PRICE);
@@ -41,9 +44,11 @@ export const useNFTMinting = () => {
   const getUSDCBalance = async (address: string): Promise<string> => {
     try {
       const provider = await getProvider();
+      if (!provider?.provider) return "0";
+
       const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
       const balance = await usdcContract.balanceOf(address);
-      return ethers.utils.formatUnits(balance, 6);
+      return ethers.utils.formatUnits(balance, 6); // USDC has 6 decimals
     } catch (error) {
       console.error("Error getting USDC balance:", error);
       return "0";
@@ -54,6 +59,8 @@ export const useNFTMinting = () => {
     setIsApproving(true);
     try {
       const provider = await getProvider();
+      if (!provider?.provider) throw new Error("No provider available");
+
       const usdcContract = new ethers.Contract(
         USDC_ADDRESS,
         USDC_ABI,
@@ -63,16 +70,12 @@ export const useNFTMinting = () => {
       const tx = await usdcContract.approve(NFT_CONTRACT_ADDRESS, MINT_PRICE);
       await tx.wait();
       
-      toast({
-        title: "USDC Approved",
-        description: "You can now mint your Resistance DAO Member NFT",
-      });
       return true;
     } catch (error) {
       console.error("Error approving USDC:", error);
       toast({
         title: "Approval Failed",
-        description: "Failed to approve USDC. Please try again.",
+        description: "Failed to approve USDC spending. Please try again.",
         variant: "destructive",
       });
       return false;
@@ -85,28 +88,54 @@ export const useNFTMinting = () => {
     setIsMinting(true);
     try {
       const provider = await getProvider();
+      if (!provider?.provider) throw new Error("No provider available");
+
+      const signer = provider.provider.getSigner();
+      const address = await signer.getAddress();
+      
+      // Double-check USDC balance and allowance before minting
+      const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
+      const balance = await usdcContract.balanceOf(address);
+      if (balance.lt(MINT_PRICE)) {
+        throw new Error(`Insufficient USDC balance. You need 50 USDC to mint.`);
+      }
+
+      const allowance = await usdcContract.allowance(address, NFT_CONTRACT_ADDRESS);
+      if (allowance.lt(MINT_PRICE)) {
+        throw new Error("USDC allowance too low. Please approve USDC first.");
+      }
+
       const nftContract = new ethers.Contract(
         NFT_CONTRACT_ADDRESS,
         NFT_ABI,
-        provider.provider.getSigner()
+        signer
       );
 
-      const tx = await nftContract.mintNFT("ipfs://QmYourIPFSHash"); // Replace with actual metadata URI
+      // Generate metadata with timestamp to ensure uniqueness
+      const metadata = {
+        name: "Resistance DAO Member NFT",
+        description: "A member of the Resistance DAO community",
+        image: "ipfs://QmYourDefaultImageHash", // Replace with your default image
+        attributes: [
+          {
+            trait_type: "Membership Type",
+            value: "Standard"
+          },
+          {
+            trait_type: "Joined",
+            value: new Date().toISOString()
+          }
+        ]
+      };
+
+      const metadataUri = `ipfs://QmYourIPFSHash`; // Replace with actual metadata URI generation
+      const tx = await nftContract.mintNFT(metadataUri);
       await tx.wait();
       
-      toast({
-        title: "NFT Minted!",
-        description: "Welcome to Resistance DAO!",
-      });
       return true;
     } catch (error) {
       console.error("Error minting NFT:", error);
-      toast({
-        title: "Minting Failed",
-        description: "Failed to mint NFT. Please try again.",
-        variant: "destructive",
-      });
-      return false;
+      throw error; // Let the component handle the error display
     } finally {
       setIsMinting(false);
     }
@@ -119,7 +148,6 @@ export const useNFTMinting = () => {
     getUSDCBalance,
     approveUSDC,
     mintNFT,
-    MINT_PRICE: "50",
+    MINT_PRICE: "50", // Human-readable price
   };
 };
-
