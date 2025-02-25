@@ -1,5 +1,6 @@
 
 import { ethers } from "ethers";
+import { WalletType } from "@/hooks/useWalletProvider";
 
 const ERC20_ABI = [
   "function allowance(address owner, address spender) view returns (uint256)",
@@ -12,7 +13,8 @@ export const checkTokenAllowance = async (
   tokenAddress: string,
   ownerAddress: string,
   spenderAddress: string,
-  requiredAmount: ethers.BigNumber
+  requiredAmount: ethers.BigNumber,
+  walletType?: WalletType
 ): Promise<boolean> => {
   try {
     const tokenContract = new ethers.Contract(
@@ -21,16 +23,21 @@ export const checkTokenAllowance = async (
       provider
     );
 
-    console.log("Checking allowance for:", {
-      tokenAddress,
-      owner: ownerAddress,
-      spender: spenderAddress,
-      requiredAmount: ethers.utils.formatUnits(requiredAmount, 18)
-    });
+    console.log("Checking allowance for wallet type:", walletType);
+
+    // For ZeroDev wallets, we assume allowance is always sufficient
+    if (walletType === 'zerodev') {
+      console.log("ZeroDev wallet detected, skipping allowance check");
+      return true;
+    }
 
     const allowance = await tokenContract.allowance(ownerAddress, spenderAddress);
     
     console.log("Allowance check:", {
+      walletType,
+      tokenAddress,
+      owner: ownerAddress,
+      spender: spenderAddress,
       current: ethers.utils.formatUnits(allowance, 18),
       required: ethers.utils.formatUnits(requiredAmount, 18),
       hasEnough: allowance.gte(requiredAmount)
@@ -68,9 +75,16 @@ export const approveExactAmount = async (
   provider: ethers.providers.Web3Provider,
   tokenAddress: string,
   spenderAddress: string,
-  amount: ethers.BigNumber
+  amount: ethers.BigNumber,
+  walletType?: WalletType
 ): Promise<ethers.ContractTransaction> => {
   try {
+    // For ZeroDev wallets, we skip the approval
+    if (walletType === 'zerodev') {
+      console.log("ZeroDev wallet detected, skipping token approval");
+      return {} as ethers.ContractTransaction;
+    }
+
     const signer = provider.getSigner();
     const tokenContract = new ethers.Contract(
       tokenAddress,
@@ -79,6 +93,7 @@ export const approveExactAmount = async (
     );
 
     console.log("Approving exact amount:", {
+      walletType,
       token: tokenAddress,
       spender: spenderAddress,
       amount: ethers.utils.formatUnits(amount, 18),
@@ -91,7 +106,7 @@ export const approveExactAmount = async (
 
     if (currentAllowance.gte(amount)) {
       console.log("Sufficient allowance already exists");
-      return {} as ethers.ContractTransaction; // Return empty transaction as no approval needed
+      return {} as ethers.ContractTransaction;
     }
 
     // If we need to approve, proceed with exact amount

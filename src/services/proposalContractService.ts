@@ -1,10 +1,10 @@
+
 import { ethers } from "ethers";
 import { DynamicContext } from "@dynamic-labs/sdk-react-core";
 import { IPFSContent } from "@/types/content";
 import { ContractProposal, ProposalConfig, ProposalInput } from "@/types/proposals";
 import { uploadToIPFS } from "./ipfsService";
 import { executeTransaction, TransactionConfig } from "./transactionManager";
-import { validateProposal } from "./proposalValidationService";
 import { RD_TOKEN_ADDRESS, FACTORY_ADDRESS } from "@/lib/constants";
 import { checkTokenAllowance } from "./tokenService";
 
@@ -22,8 +22,11 @@ export const createProposal = async (
     const signer = provider.getSigner();
     const signerAddress = await signer.getAddress();
 
-    // Validate the proposal
-    validateProposal(metadata);
+    // Detect if using ZeroDev
+    const isZeroDev = wallet.connector?.name?.toLowerCase().includes('zerodev');
+    const walletType = isZeroDev ? 'zerodev' : 'regular';
+
+    console.log("Creating proposal with wallet type:", walletType);
 
     // Upload metadata to IPFS
     const ipfsHash = await uploadToIPFS(metadata);
@@ -40,15 +43,17 @@ export const createProposal = async (
     };
 
     // Check allowance before proceeding
+    const submissionFee = ethers.utils.parseEther("25");
     const hasAllowance = await checkTokenAllowance(
       provider,
       RD_TOKEN_ADDRESS,
       signerAddress,
       FACTORY_ADDRESS,
-      ethers.utils.parseEther("25") // Fixed submission fee in wei
+      submissionFee,
+      walletType
     );
 
-    if (!hasAllowance) {
+    if (!hasAllowance && walletType !== 'zerodev') {
       throw new Error("Insufficient token allowance");
     }
 
@@ -61,7 +66,7 @@ export const createProposal = async (
       tokenConfig: {
         tokenAddress: RD_TOKEN_ADDRESS,
         spenderAddress: FACTORY_ADDRESS,
-        amount: ethers.utils.parseEther("25"), // Fixed submission fee in wei
+        amount: submissionFee,
         isTestMode: metadata.isTestMode
       }
     };
