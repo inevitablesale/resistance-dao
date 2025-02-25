@@ -189,28 +189,49 @@ export default function ThesisSubmission() {
       }
 
       const targetCapitalInWei = ethers.utils.parseEther(values.investment.targetCapital);
-
       const provider = new ethers.providers.Web3Provider(walletClient as any);
-      const signer = provider.getSigner();
       
-      const rdToken = new ethers.Contract(
+      toast({
+        title: "Checking Allowance...",
+        description: "Checking if approval is needed for token usage",
+      });
+
+      const signer = provider.getSigner();
+      const signerAddress = await signer.getAddress();
+
+      const hasAllowance = await checkTokenAllowance(
+        provider,
         RD_TOKEN_ADDRESS,
-        ["function approve(address spender, uint256 amount) external returns (bool)"],
-        signer
+        signerAddress,
+        FACTORY_ADDRESS,
+        ethers.utils.formatEther(SUBMISSION_FEE)
       );
 
-      toast({
-        title: "Approving Token Usage...",
-        description: "Please approve the transaction to allow token usage",
-      });
+      if (!hasAllowance) {
+        toast({
+          title: "Approving Token Usage...",
+          description: "Please approve the transaction to allow token usage",
+        });
 
-      const approveTx = await rdToken.approve(FACTORY_ADDRESS, SUBMISSION_FEE);
-      await approveTx.wait();
+        const approveTx = await approveExactAmount(
+          provider,
+          RD_TOKEN_ADDRESS,
+          FACTORY_ADDRESS,
+          ethers.utils.formatEther(SUBMISSION_FEE)
+        );
+        
+        toast({
+          title: "Waiting for Approval...",
+          description: "Please wait while the approval transaction is confirmed",
+        });
 
-      toast({
-        title: "Token Approved",
-        description: "Now creating your proposal...",
-      });
+        await approveTx.wait();
+
+        toast({
+          title: "Token Approved",
+          description: "Now creating your proposal...",
+        });
+      }
 
       const metadata: ProposalMetadata = {
         title: values.title,
@@ -259,19 +280,28 @@ export default function ThesisSubmission() {
         description: `Metadata uploaded to IPFS with hash: ${ipfsHash}`,
       });
 
+      const contract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
+
       toast({
         title: "Creating Proposal...",
         description: "Please approve the transaction in your wallet.",
       });
-      
-      const contract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
 
-      const tx = await contract.createProposal(
-        values.title,
-        `ipfs://${ipfsHash}`,
-        targetCapitalInWei,
-        values.votingDuration,
-        { gasLimit: 500000 }
+      const tx = await executeTransaction(
+        () => contract.createProposal(
+          values.title,
+          `ipfs://${ipfsHash}`,
+          targetCapitalInWei,
+          values.votingDuration,
+          { gasLimit: 1000000 }
+        ),
+        {
+          type: 'proposal',
+          description: `Creating proposal "${values.title}"`,
+          timeout: 180000,
+          maxRetries: 3,
+          backoffMs: 5000
+        }
       );
 
       toast({
