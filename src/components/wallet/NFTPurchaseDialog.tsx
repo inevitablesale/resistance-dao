@@ -1,5 +1,4 @@
-
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -47,6 +46,50 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   const [userAddress, setUserAddress] = useState<string>("");
   const [isContractOwner, setIsContractOwner] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+
+  const checkContractStatus = async () => {
+    try {
+      const walletProvider = await getProvider();
+      const signer = walletProvider.provider.getSigner();
+      const address = await signer.getAddress();
+      setUserAddress(address);
+      
+      console.log("Checking contract status for address:", address);
+      
+      const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, walletProvider.provider);
+      
+      try {
+        const ownerAddress = await nftContract.owner();
+        console.log("Contract owner address:", ownerAddress);
+        setIsContractOwner(ownerAddress.toLowerCase() === address.toLowerCase());
+      } catch (error) {
+        console.warn("Failed to check owner:", error);
+        setIsContractOwner(false);
+      }
+
+      try {
+        const contractPaused = await nftContract.paused();
+        console.log("Contract paused status:", contractPaused);
+        setIsPaused(contractPaused);
+      } catch (error) {
+        console.warn("Failed to check pause status:", error);
+        setIsPaused(false);
+      }
+
+      console.log("Contract status check complete:", {
+        owner: address,
+        isOwner: isContractOwner,
+        isPaused: isPaused
+      });
+    } catch (error) {
+      console.error("Error checking contract status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to check contract status",
+        variant: "destructive",
+      });
+    }
+  };
 
   const checkPendingRefund = async () => {
     try {
@@ -107,36 +150,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   };
 
   useEffect(() => {
-    const checkContractStatus = async () => {
-      try {
-        const walletProvider = await getProvider();
-        const signer = walletProvider.provider.getSigner();
-        const address = await signer.getAddress();
-        setUserAddress(address);
-        
-        const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, walletProvider.provider);
-        const ownerAddress = await nftContract.owner();
-        const contractPaused = await nftContract.paused();
-        
-        setIsContractOwner(ownerAddress.toLowerCase() === address.toLowerCase());
-        setIsPaused(contractPaused);
-
-        console.log("Contract status:", {
-          owner: ownerAddress,
-          userAddress: address,
-          isOwner: ownerAddress.toLowerCase() === address.toLowerCase(),
-          isPaused: contractPaused
-        });
-      } catch (error) {
-        console.error("Error checking contract status:", error);
-        toast({
-          title: "Error",
-          description: "Failed to check contract status",
-          variant: "destructive",
-        });
-      }
-    };
-
     const checkBalances = async () => {
       try {
         const walletProvider = await getProvider();
@@ -340,6 +353,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-[#0A0B2E] border border-blue-500/20 p-0 max-w-md w-[90%] overflow-hidden">
+        <DialogTitle className="sr-only">Purchase Member NFT</DialogTitle>
         <div className="p-4 space-y-4">
           <div className="relative rounded-lg overflow-hidden bg-[#111444] border border-blue-400/20" style={{ maxHeight: '240px' }}>
             <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent" />
