@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -44,56 +43,85 @@ async function getProvider(wallet: NonNullable<DynamicContextType['primaryWallet
   }
 }
 
-export const getContractStatus = async (wallet: NonNullable<DynamicContextType['primaryWallet']>): Promise<ContractStatus> => {
+export const createProposal = async (
+  metadata: ProposalMetadata,
+  wallet: NonNullable<DynamicContextType['primaryWallet']>
+): Promise<ethers.ContractTransaction> => {
+  console.log("Starting proposal creation with metadata:", metadata);
+  
   const provider = await getProvider(wallet);
-  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+  const signer = provider.getSigner();
+  const signerAddress = await signer.getAddress();
 
+  // Get network to verify we're on the correct chain
+  const network = await provider.getNetwork();
+  console.log("Current network:", network);
+
+  // Verify contract existence and code
+  const contractCode = await provider.getCode(FACTORY_ADDRESS);
+  if (contractCode === '0x') {
+    throw new Error(`No contract found at address ${FACTORY_ADDRESS}`);
+  }
+
+  console.log("Contract verified at:", FACTORY_ADDRESS);
+  console.log("Contract bytecode length:", contractCode.length);
+
+  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
+  
   try {
-    const [
-      submissionFee,
-      isPaused,
-      isTestMode,
-      treasury,
-      minTargetCapital,
-      maxTargetCapital,
-      minVotingDuration,
-      maxVotingDuration,
-      votingFee,
-      lgrTokenAddress,
-      owner,
-      tester
-    ] = await Promise.all([
-      factory.submissionFee(),
-      factory.paused(),
-      factory.testModeEnabled(),
-      factory.treasury(),
-      factory.MIN_TARGET_CAPITAL(),
-      factory.MAX_TARGET_CAPITAL(),
-      factory.MIN_VOTING_DURATION(),
-      factory.MAX_VOTING_DURATION(),
-      factory.VOTING_FEE(),
-      factory.LGR_TOKEN(),
-      factory.owner(),
-      factory.tester()
-    ]);
+    // Verify the contract is not paused
+    const isPaused = await factory.paused();
+    if (isPaused) {
+      throw new Error("Contract is currently paused");
+    }
 
-    return {
-      submissionFee,
-      isPaused,
-      isTestMode,
-      treasury,
-      minTargetCapital,
-      maxTargetCapital,
-      minVotingDuration: Number(minVotingDuration),
-      maxVotingDuration: Number(maxVotingDuration),
-      votingFee,
-      lgrTokenAddress,
-      owner,
-      tester
+    // Upload metadata to IPFS first
+    console.log("Uploading metadata to IPFS...");
+    const ipfsHash = await uploadToIPFS(metadata);
+    console.log("IPFS upload successful:", ipfsHash);
+
+    const contractInput: ProposalContractInput = {
+      title: metadata.title,
+      metadataURI: `ipfs://${ipfsHash}`,
+      targetCapital: ethers.utils.parseUnits(metadata.investment.targetCapital, 18),
+      votingDuration: metadata.votingDuration
     };
+
+    // Validate the input before sending
+    validateProposalInput(contractInput);
+
+    // Log important transaction details
+    console.log("Creating proposal with parameters:", {
+      title: contractInput.title,
+      metadataURI: contractInput.metadataURI,
+      targetCapital: ethers.utils.formatUnits(contractInput.targetCapital, 18),
+      votingDuration: contractInput.votingDuration,
+      senderAddress: signerAddress,
+      contractAddress: FACTORY_ADDRESS
+    });
+
+    // Submit proposal with explicit gas settings and proper error handling
+    return await executeTransaction(
+      () => factory.createProposal(
+        contractInput.title,
+        contractInput.metadataURI,
+        contractInput.targetCapital,
+        contractInput.votingDuration,
+        {
+          gasLimit: 1000000,
+        }
+      ),
+      {
+        type: 'proposal',
+        description: `Creating proposal "${contractInput.title}" with target capital ${ethers.utils.formatUnits(contractInput.targetCapital, 18)} RD`,
+        timeout: 180000,
+        maxRetries: 3,
+        backoffMs: 5000
+      }
+    );
   } catch (error) {
-    console.error("Error getting contract status:", error);
-    throw new Error("Failed to get contract status");
+    console.error("Error creating proposal:", error);
+    throw error;
   }
 };
 
@@ -177,74 +205,6 @@ function transformConfigToContractInput(config: ProposalConfig): ProposalContrac
   }
 }
 
-export const createProposal = async (
-  metadata: ProposalMetadata,
-  wallet: NonNullable<DynamicContextType['primaryWallet']>
-): Promise<ethers.ContractTransaction> => {
-  console.log("Starting proposal creation with metadata:", metadata);
-  
-  const provider = await getProvider(wallet);
-  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider.getSigner());
-  
-  try {
-    // Upload metadata to IPFS first
-    console.log("Uploading metadata to IPFS...");
-    const ipfsHash = await uploadToIPFS(metadata);
-    console.log("IPFS upload successful:", ipfsHash);
-
-    // Create the contract input with the required fields only
-    const contractInput: ProposalContractInput = {
-      title: processText(metadata.title),
-      metadataURI: `https://gateway.pinata.cloud/ipfs/${ipfsHash}`,
-      targetCapital: ethers.utils.parseUnits(metadata.investment.targetCapital, 18),
-      votingDuration: metadata.votingDuration
-    };
-
-    // Validate the input
-    validateProposalInput(contractInput);
-
-    // Transform to tuple for contract call
-    const tuple = transformToContractTuple(contractInput);
-
-    console.log("Creating proposal with parameters:", {
-      title: tuple.title,
-      metadataURI: tuple.metadataURI,
-      targetCapital: tuple.targetCapital,
-      votingDuration: tuple.votingDuration
-    });
-
-    // Submit proposal with explicit gas settings
-    return await executeTransaction(
-      () => factory.createProposal(
-        tuple.title,
-        tuple.metadataURI,
-        tuple.targetCapital,
-        tuple.votingDuration,
-        {
-          gasLimit: 1000000,
-        }
-      ),
-      {
-        type: 'erc721_mint',  // Changed from 'nft' to 'erc721_mint'
-        description: `Creating proposal with target capital ${ethers.utils.formatUnits(tuple.targetCapital, 18)} RD`,
-        timeout: 180000,
-        maxRetries: 3,
-        backoffMs: 5000,
-        nftConfig: {
-          tokenAddress: FACTORY_ADDRESS,
-          amount: 1,
-          standard: "ERC721",
-          symbol: "RDP",
-          name: "Resistance DAO Proposal"
-        }
-      }
-    );
-  } catch (error) {
-    console.error("Error creating proposal:", error);
-    throw error;
-  }
-};
-
 export const setTestMode = async (
   enabled: boolean,
   wallet: NonNullable<DynamicContextType['primaryWallet']>
@@ -307,5 +267,58 @@ export const estimateProposalGas = async (
   } catch (error) {
     console.error("Gas estimation error:", error);
     throw error;
+  }
+};
+
+export const getContractStatus = async (wallet: NonNullable<DynamicContextType['primaryWallet']>): Promise<ContractStatus> => {
+  const provider = await getProvider(wallet);
+  const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+
+  try {
+    const [
+      submissionFee,
+      isPaused,
+      isTestMode,
+      treasury,
+      minTargetCapital,
+      maxTargetCapital,
+      minVotingDuration,
+      maxVotingDuration,
+      votingFee,
+      lgrTokenAddress,
+      owner,
+      tester
+    ] = await Promise.all([
+      factory.submissionFee(),
+      factory.paused(),
+      factory.testModeEnabled(),
+      factory.treasury(),
+      factory.MIN_TARGET_CAPITAL(),
+      factory.MAX_TARGET_CAPITAL(),
+      factory.MIN_VOTING_DURATION(),
+      factory.MAX_VOTING_DURATION(),
+      factory.VOTING_FEE(),
+      factory.LGR_TOKEN(),
+      factory.owner(),
+      factory.tester()
+    ]);
+
+    return {
+      submissionFee,
+      isPaused,
+      isTestMode,
+      treasury,
+      minTargetCapital,
+      maxTargetCapital,
+      minVotingDuration: Number(minVotingDuration),
+      maxVotingDuration: Number(maxVotingDuration),
+      votingFee,
+      lgrTokenAddress,
+      owner,
+      tester
+    };
+  } catch (error) {
+    console.error("Error getting contract status:", error);
+    throw new Error("Failed to get contract status");
   }
 };
