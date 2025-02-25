@@ -1,10 +1,8 @@
-
 import { useState } from "react";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletProvider } from "./useWalletProvider";
 import { uploadToIPFS } from "@/services/ipfsService";
-import { IPFSContent } from "@/types/content";
 
 // Contract addresses on Polygon
 const NFT_CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
@@ -121,20 +119,18 @@ export const useNFTMinting = () => {
 
   const createNFTMetadata = async (isCoreTeam: boolean) => {
     const metadata = {
-      name: "Resistance DAO Member",
-      description: "Exclusive NFT for Resistance DAO members. Grants access to DAO governance, voting rights, and 2.5% shared rewards from all launched projects.",
-      image: "https://gateway.pinata.cloud/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi",
-      external_link: "http://resistancedao.xyz/",
-      seller_fee_basis_points: 250,
-      fee_recipient: "0x386f47AE974255c9486A2D4B91a3694E95A1EE81",
+      name: "Resistance DAO Member NFT",
+      description: "A member of the Resistance DAO community",
+      image: "ipfs://QmavmeeRNGXrxewZkHnv9Yyc2k2ZDpmVNwU4XAYQXDbsD6", // Default Resistance DAO logo
+      external_url: "https://resistancedao.xyz",
       attributes: [
         {
-          trait_type: "Member Type",
+          trait_type: "Membership Type",
           value: isCoreTeam ? "Core Member" : "Member"
         },
         {
-          trait_type: "Join Date",
-          value: new Date().toISOString().split('T')[0]
+          trait_type: "Joined",
+          value: new Date().toISOString().split('T')[0] // Just the date part
         },
         {
           trait_type: "Collection",
@@ -143,9 +139,8 @@ export const useNFTMinting = () => {
       ]
     };
 
-    console.log('Uploading NFT metadata to IPFS:', JSON.stringify(metadata, null, 2));
+    // Upload metadata to IPFS
     const ipfsHash = await uploadToIPFS(metadata);
-    console.log('Metadata uploaded to IPFS with hash:', ipfsHash);
     return `ipfs://${ipfsHash}`;
   };
 
@@ -156,30 +151,16 @@ export const useNFTMinting = () => {
       if (!provider?.provider) throw new Error("No provider available");
 
       const signer = provider.provider.getSigner();
-      const address = await signer.getAddress();
-      
-      console.log("Checking if address is owner:", address);
-      const ownerStatus = await checkIfOwner();
-      console.log("Is owner?", ownerStatus);
-
-      // If owner, use direct minting
-      if (ownerStatus) {
-        console.log("Owner detected, using safeMint");
-        return await ownerMint(address);
-      }
-
-      // Regular user minting with USDC payment
-      console.log("Regular user, proceeding with USDC payment mint");
       const nftContract = new ethers.Contract(
         NFT_CONTRACT_ADDRESS,
         NFT_ABI,
         signer
       );
 
-      const metadataUri = await createNFTMetadata(false);
-      console.log("Minting with metadata URI:", metadataUri);
+      const metadataUri = await createNFTMetadata(true);
+      console.log("Owner minting with metadata URI:", metadataUri);
       
-      const tx = await nftContract.mintNFT(metadataUri);
+      const tx = await nftContract.safeMint(recipient, metadataUri);
       const receipt = await tx.wait();
       
       const mintEvent = receipt.events?.find((e: any) => e.event === 'NFTMinted');

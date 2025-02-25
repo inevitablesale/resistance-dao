@@ -23,7 +23,8 @@ import { getTokenBalance } from '@/services/tokenService';
 import { 
   FACTORY_ADDRESS, 
   FACTORY_ABI, 
-  RD_TOKEN_ADDRESS
+  RD_TOKEN_ADDRESS,
+  MIN_LGR_REQUIRED 
 } from '@/lib/constants';
 import { getFromIPFS } from '@/services/ipfsService';
 import { loadingStates } from './ProposalLoadingCard';
@@ -40,6 +41,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
   const [proposalDetails, setProposalDetails] = useState<ProposalMetadata | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [hasMinimumLGR, setHasMinimumLGR] = useState<boolean | null>(null);
   const [pledgedAmount, setPledgedAmount] = useState<string>("0");
   const [backerCount, setBackerCount] = useState(0);
   const [pledgeInput, setPledgeInput] = useState("");
@@ -61,9 +63,64 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
   };
 
   useEffect(() => {
+    const checkLGRBalance = async () => {
+      console.log('Checking LGR balance...', { isConnected, address });
+      
+      if (!isConnected) {
+        console.log('Not connected, skipping LGR check');
+        setHasMinimumLGR(null);
+        return;
+      }
+
+      if (!address) {
+        console.log('No address available, skipping LGR check');
+        setHasMinimumLGR(null);
+        return;
+      }
+
+      try {
+        console.log('Getting wallet provider...');
+        const walletProvider = await getProvider();
+        console.log('Wallet provider obtained, checking balance...');
+        
+        const balance = await getTokenBalance(
+          walletProvider.provider,
+          RD_TOKEN_ADDRESS,
+          address
+        );
+
+        console.log('Balance retrieved:', balance);
+        
+        const hasEnough = ethers.utils.parseEther(balance).gte(
+          ethers.utils.parseEther(MIN_LGR_REQUIRED)
+        );
+        
+        console.log('LGR Balance check:', {
+          balance,
+          required: MIN_LGR_REQUIRED,
+          hasEnough
+        });
+        
+        setHasMinimumLGR(hasEnough);
+      } catch (error) {
+        console.error("Error checking LGR balance:", error);
+        toast({
+          title: "Error Checking Balance",
+          description: "Failed to verify your LGR balance. Please try again.",
+          variant: "destructive",
+        });
+        setHasMinimumLGR(null);
+      }
+    };
+
+    checkLGRBalance();
+  }, [isConnected, address, getProvider, toast]);
+
+  useEffect(() => {
     console.log('Proposal details effect running...', {
       tokenId,
-      isConnected
+      isConnected,
+      hasMinimumLGR
     });
 
     if (!tokenId) {
@@ -78,6 +135,11 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
     if (!isConnected) {
       console.log('Wallet not connected');
+      return;
+    }
+
+    if (hasMinimumLGR === false) {
+      console.log('Insufficient LGR balance');
       return;
     }
 
@@ -109,12 +171,10 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         const events = await factoryContract.queryFilter(filter);
         
         console.log('Token URI:', tokenUri);
-        const pledged = proposalData.totalPledged.toString();
-        console.log('Pledged amount:', pledged);
+        console.log('Pledged amount:', ethers.utils.formatEther(proposalData.totalPledged));
         console.log('Vote events count:', events.length);
         
-        // Ensure we're setting a valid format for ethers.js
-        setPledgedAmount(pledged === "0" ? "0" : pledged);
+        setPledgedAmount(ethers.utils.formatEther(proposalData.totalPledged));
         setBackerCount(events.length);
         setLoadingProgress(60);
 
@@ -148,7 +208,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
     };
 
     fetchProposalDetails();
-  }, [tokenId, isConnected, getProvider, toast]);
+  }, [tokenId, isConnected, hasMinimumLGR, getProvider, toast]);
 
   useEffect(() => {
     if (proposalDetails?.submissionTimestamp && proposalDetails?.votingDuration) {
@@ -257,6 +317,27 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
             >
               Connect Wallet
             </Button>
+          </motion.div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (hasMinimumLGR === false) {
+    return (
+      <Card className="bg-zinc-900/50 border-zinc-800/50 backdrop-blur-sm">
+        <CardContent className="p-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            <div className="w-16 h-16 bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Coins className="w-8 h-8 text-blue-400" />
+            </div>
+            <p className="text-zinc-400 text-lg">
+              You need at least {MIN_LGR_REQUIRED} LGR to view proposal details
+            </p>
           </motion.div>
         </CardContent>
       </Card>
