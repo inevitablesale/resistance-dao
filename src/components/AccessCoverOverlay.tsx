@@ -1,7 +1,6 @@
-
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Wallet, Loader2, Shield, CreditCard, Copy, LogOut, Check, ExternalLink, Coins } from "lucide-react";
+import { X, Wallet, Loader2, Shield, CreditCard, Copy, LogOut, Check, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
@@ -38,11 +37,12 @@ export const AccessCoverOverlay = () => {
   const [hasApproval, setHasApproval] = useState(false);
   const [isOpeningOnramp, setIsOpeningOnramp] = useState(false);
 
+  const { primaryWallet } = useDynamicContext();
+
   useEffect(() => {
     const fetchNFTMetadata = async () => {
       if (showNFTSuccess) {
         try {
-          // This is the IPFS hash we used in mintNFT function
           const metadata = await getFromIPFS<NFTMetadata>("QmResistanceDAOMetadata", "content");
           setNftMetadata(metadata);
         } catch (error) {
@@ -167,11 +167,13 @@ export const AccessCoverOverlay = () => {
 
   const handleLogout = async () => {
     try {
-      await logout();
-      toast({
-        title: "Logged Out",
-        description: "Successfully disconnected wallet",
-      });
+      if (primaryWallet?.disconnect) {
+        await primaryWallet.disconnect();
+        toast({
+          title: "Logged Out",
+          description: "Successfully disconnected wallet",
+        });
+      }
     } catch (error) {
       console.error('Logout error:', error);
       toast({
@@ -234,23 +236,13 @@ export const AccessCoverOverlay = () => {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3">
-              <Button 
-                onClick={handleBuyUSDC}
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 py-6 text-lg relative overflow-hidden group"
-              >
-                <div className="absolute inset-0 bg-blue-400/20 group-hover:animate-pulse" />
-                <Coins className="w-5 h-5 mr-2" />
-                Load Wallet with RD Tokens
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => setShowNFTSuccess(false)}
-                className="text-blue-300 hover:text-blue-200 hover:bg-blue-900/50"
-              >
-                Close
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              onClick={() => setShowNFTSuccess(false)}
+              className="text-blue-300 hover:text-blue-200 hover:bg-blue-900/50 w-full"
+            >
+              Close
+            </Button>
           </div>
         </motion.div>
       </div>
