@@ -109,10 +109,12 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         const events = await factoryContract.queryFilter(filter);
         
         console.log('Token URI:', tokenUri);
-        console.log('Pledged amount:', ethers.utils.formatEther(proposalData.totalPledged));
+        const pledged = proposalData.totalPledged.toString();
+        console.log('Pledged amount:', pledged);
         console.log('Vote events count:', events.length);
         
-        setPledgedAmount(ethers.utils.formatEther(proposalData.totalPledged));
+        // Ensure we're setting a valid format for ethers.js
+        setPledgedAmount(pledged === "0" ? "0" : pledged);
         setBackerCount(events.length);
         setLoadingProgress(60);
 
