@@ -27,12 +27,10 @@ const Index = () => {
   const navigate = useNavigate();
   const { data: stats, isLoading: isLoadingStats } = useProposalStats();
   
-  // Format large numbers with commas
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(Math.round(num));
   };
 
-  // Format currency
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -45,7 +43,6 @@ const Index = () => {
     <>
       <AccessCoverOverlay />
       <div className="min-h-screen bg-black text-white">
-        {/* Hero Section */}
         <section className="pt-32 pb-16 relative overflow-hidden">
           <div className="absolute inset-0">
             <div className="absolute w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl -top-48 -left-24" />
@@ -103,7 +100,6 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Live Activity Feed */}
               <div className="mt-12 bg-blue-950/40 border border-blue-500/20 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-mono text-blue-300">Live Activity</h3>
@@ -142,7 +138,6 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Market Stats */}
               <div className="grid md:grid-cols-3 gap-6 mt-8">
                 <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
                   <div className="flex items-center gap-4 mb-6">
@@ -165,7 +160,7 @@ const Index = () => {
                 <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="p-3 rounded-full bg-green-500/10">
-                      <Users className="w-6 h-6 text-green-300" />
+                      <FileText className="w-6 h-6 text-green-300" />
                     </div>
                     <div>
                       <div className="text-white/60 text-sm">Total Proposals</div>
@@ -173,13 +168,10 @@ const Index = () => {
                         {isLoadingStats ? (
                           <span className="animate-pulse">Loading...</span>
                         ) : (
-                          formatNumber(stats?.totalHolders || 0)
+                          formatNumber(stats?.recentActivities.filter(a => a.type === 'create').length || 0)
                         )}
                       </div>
                     </div>
-                  </div>
-                  <div className="h-1 bg-green-900/30 rounded-full mb-2">
-                    <div className="h-full w-[82%] bg-green-400 rounded-full" />
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-white/60">24h Users</span>
@@ -202,9 +194,6 @@ const Index = () => {
                         )}
                       </div>
                     </div>
-                  </div>
-                  <div className="h-1 bg-yellow-900/30 rounded-full mb-2">
-                    <div className="h-full w-[89%] bg-yellow-400 rounded-full" />
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-white/60">Success Rate</span>
