@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletProvider } from "./useWalletProvider";
@@ -37,6 +37,47 @@ export const useNFTMinting = () => {
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
 
+  // Memoized owner check function that doesn't set state
+  const checkOwnerStatus = useCallback(async () => {
+    try {
+      const provider = await getProvider();
+      if (!provider?.provider) return false;
+
+      const signer = provider.provider.getSigner();
+      const address = await signer.getAddress();
+      
+      const nftContract = new ethers.Contract(
+        NFT_CONTRACT_ADDRESS,
+        NFT_ABI,
+        provider.provider
+      );
+      
+      const ownerAddress = await nftContract.owner();
+      return address.toLowerCase() === ownerAddress.toLowerCase();
+    } catch (error) {
+      console.error("Error checking owner:", error);
+      return false;
+    }
+  }, [getProvider]);
+
+  // Effect to update isOwner state once
+  useEffect(() => {
+    let mounted = true;
+
+    const updateOwnerStatus = async () => {
+      const status = await checkOwnerStatus();
+      if (mounted) {
+        setIsOwner(status);
+      }
+    };
+
+    updateOwnerStatus();
+
+    return () => {
+      mounted = false;
+    };
+  }, [checkOwnerStatus]);
+
   const checkUSDCApproval = async (address: string): Promise<boolean> => {
     try {
       const provider = await getProvider();
@@ -58,7 +99,7 @@ export const useNFTMinting = () => {
 
       const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
       const balance = await usdcContract.balanceOf(address);
-      return ethers.utils.formatUnits(balance, 6); // USDC has 6 decimals
+      return ethers.utils.formatUnits(balance, 6);
     } catch (error) {
       console.error("Error getting USDC balance:", error);
       return "0";
@@ -137,30 +178,6 @@ export const useNFTMinting = () => {
     return `ipfs://${ipfsHash}`;
   };
 
-  const checkIfOwner = async () => {
-    try {
-      const provider = await getProvider();
-      if (!provider?.provider) return false;
-
-      const signer = provider.provider.getSigner();
-      const address = await signer.getAddress();
-      
-      const nftContract = new ethers.Contract(
-        NFT_CONTRACT_ADDRESS,
-        NFT_ABI,
-        provider.provider
-      );
-      
-      const ownerAddress = await nftContract.owner();
-      const isContractOwner = address.toLowerCase() === ownerAddress.toLowerCase();
-      setIsOwner(isContractOwner);
-      return isContractOwner;
-    } catch (error) {
-      console.error("Error checking owner:", error);
-      return false;
-    }
-  };
-
   const ownerMint = async (recipient: string) => {
     setIsMinting(true);
     try {
@@ -203,17 +220,12 @@ export const useNFTMinting = () => {
       const signer = provider.provider.getSigner();
       const address = await signer.getAddress();
       
-      console.log("Checking if address is owner:", address);
-      const ownerStatus = await checkIfOwner();
-      console.log("Is owner?", ownerStatus);
-
-      // If owner, use direct minting
-      if (ownerStatus) {
-        console.log("Owner detected, using safeMint");
+      // Use the cached owner status instead of checking again
+      if (isOwner) {
+        console.log("Using cached owner status - Owner detected, using safeMint");
         return await ownerMint(address);
       }
 
-      // Regular user minting with USDC payment
       console.log("Regular user, proceeding with USDC payment mint");
       const nftContract = new ethers.Contract(
         NFT_CONTRACT_ADDRESS,
@@ -250,7 +262,6 @@ export const useNFTMinting = () => {
     approveUSDC,
     mintNFT,
     ownerMint,
-    checkIfOwner,
     MINT_PRICE: "50",
   };
 };
