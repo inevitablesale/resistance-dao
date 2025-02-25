@@ -107,18 +107,16 @@ export const AccessCoverOverlay = () => {
     try {
       console.log('Attempting to open onramp with params:', {
         onrampProvider: OnrampProviders.Banxa,
-        token: 'USDC',
+        token: 'USDC.e',
         address: address,
-        defaultFiatAmount: '50',
-        defaultCrypto: 'USDC'
+        network: 'polygon'
       });
       
       await openOnramp({
         onrampProvider: OnrampProviders.Banxa,
-        token: 'USDC',
+        token: 'USDC.e',
         address: address,
-        defaultFiatAmount: '50',
-        defaultCrypto: 'USDC'
+        network: 'polygon'
       });
       
       console.log('Onramp opened successfully');
