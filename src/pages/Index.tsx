@@ -140,7 +140,7 @@ const Index = () => {
 
               <div className="grid md:grid-cols-3 gap-6 mt-8">
                 <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-                  <div className="flex items-center gap-4 mb-6">
+                  <div className="flex items-center gap-4">
                     <div className="p-3 rounded-full bg-blue-500/10">
                       <CircleDollarSign className="w-6 h-6 text-blue-300" />
                     </div>
@@ -158,7 +158,7 @@ const Index = () => {
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-                  <div className="flex items-center gap-4 mb-6">
+                  <div className="flex items-center gap-4">
                     <div className="p-3 rounded-full bg-green-500/10">
                       <FileText className="w-6 h-6 text-green-300" />
                     </div>
@@ -180,7 +180,7 @@ const Index = () => {
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
-                  <div className="flex items-center gap-4 mb-6">
+                  <div className="flex items-center gap-4">
                     <div className="p-3 rounded-full bg-yellow-500/10">
                       <Scale className="w-6 h-6 text-yellow-300" />
                     </div>
@@ -194,12 +194,6 @@ const Index = () => {
                         )}
                       </div>
                     </div>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-white/60">Success Rate</span>
-                    <span className="text-green-400">
-                      {isLoadingStats ? "..." : `${Math.round(stats?.successRate || 0)}%`}
-                    </span>
                   </div>
                 </div>
               </div>
