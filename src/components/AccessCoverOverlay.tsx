@@ -1,16 +1,18 @@
 
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Wallet, Loader2, Shield, Star } from "lucide-react";
+import { Wallet, Loader2, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useToast } from "@/hooks/use-toast";
+import { NFTPurchaseDialog } from "./wallet/NFTPurchaseDialog";
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0, isLoading: isCheckingNFT } = useNFTBalance(address);
@@ -100,7 +102,7 @@ export const AccessCoverOverlay = () => {
                         You need to own a Resistance DAO Member NFT to access the platform
                       </p>
                       <Button
-                        onClick={() => window.location.href = '/mint-nft'}
+                        onClick={() => setIsPurchaseOpen(true)}
                         className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-6 text-lg"
                       >
                         Get Member NFT
@@ -114,6 +116,11 @@ export const AccessCoverOverlay = () => {
           </motion.div>
         </div>
       </div>
+
+      <NFTPurchaseDialog 
+        open={isPurchaseOpen}
+        onOpenChange={setIsPurchaseOpen}
+      />
     </div>
   );
 };
