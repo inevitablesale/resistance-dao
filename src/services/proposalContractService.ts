@@ -225,7 +225,7 @@ export const createProposal = async (
         }
       ),
       {
-        type: 'nft',
+        type: 'erc721_mint',  // Changed from 'nft' to 'erc721_mint'
         description: `Creating proposal with target capital ${ethers.utils.formatUnits(tuple.targetCapital, 18)} RD`,
         timeout: 180000,
         maxRetries: 3,
