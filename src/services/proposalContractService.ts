@@ -1,12 +1,11 @@
 
 import { ethers } from "ethers";
 import { DynamicContext } from "@dynamic-labs/sdk-react-core";
-import { IPFSContent } from "@/types/content";
-import { ContractProposal, ProposalConfig, ProposalInput } from "@/types/proposals";
+import { ProposalInput } from "@/types/proposals";
 import { uploadToIPFS } from "./ipfsService";
 import { executeTransaction, TransactionConfig } from "./transactionManager";
 import { RD_TOKEN_ADDRESS, FACTORY_ADDRESS } from "@/lib/constants";
-import { checkTokenAllowance } from "./tokenService";
+import { approveExactAmount, checkTokenAllowance } from "./tokenService";
 
 export const createProposal = async (
   metadata: any,
@@ -47,7 +46,13 @@ export const createProposal = async (
     );
 
     if (!hasAllowance) {
-      throw new Error("Insufficient token allowance");
+      // If no allowance, approve the exact amount needed
+      await approveExactAmount(
+        provider,
+        RD_TOKEN_ADDRESS,
+        FACTORY_ADDRESS,
+        submissionFee
+      );
     }
 
     const transactionConfig: TransactionConfig = {
