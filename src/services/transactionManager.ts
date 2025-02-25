@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -22,7 +23,7 @@ export interface TransactionConfig {
   tokenConfig?: {
     tokenAddress: string;
     spenderAddress: string;
-    amount: ethers.BigNumber;
+    amount: string | ethers.BigNumber; // Allow both string and BigNumber
     isTestMode?: boolean;
     isApproval?: boolean;
   };
@@ -58,19 +59,18 @@ export const executeTransaction = async (
   });
 
   if (config.type === 'erc20_approval' && config.tokenConfig) {
+    const amountBN = ethers.BigNumber.isBigNumber(config.tokenConfig.amount)
+      ? config.tokenConfig.amount
+      : ethers.utils.parseUnits(config.tokenConfig.amount, 18);
+
     console.log('Token approval config:', {
       ...config.tokenConfig,
-      amount: ethers.utils.formatUnits(config.tokenConfig.amount, 18)
+      amount: ethers.utils.formatUnits(amountBN, 18)
     });
   }
 
   if (config.type === 'erc721_mint' && config.nftConfig) {
-    console.log('NFT mint config:', {
-      ...config.nftConfig,
-      tokenAddress: config.nftConfig.tokenAddress,
-      standard: config.nftConfig.standard,
-      amount: config.nftConfig.amount
-    });
+    console.log('NFT mint config:', config.nftConfig);
   }
 
   if (provider) {
@@ -85,12 +85,16 @@ export const executeTransaction = async (
     console.log('Checking token allowance...');
     const signerAddress = await provider.getSigner().getAddress();
     
+    const amountBN = ethers.BigNumber.isBigNumber(config.tokenConfig.amount)
+      ? config.tokenConfig.amount
+      : ethers.utils.parseUnits(config.tokenConfig.amount, 18);
+
     const hasAllowance = await checkTokenAllowance(
       provider,
       config.tokenConfig.tokenAddress,
       signerAddress,
       config.tokenConfig.spenderAddress,
-      config.tokenConfig.amount
+      amountBN
     );
 
     if (!hasAllowance) {
@@ -111,7 +115,7 @@ export const executeTransaction = async (
     description: config.description
   });
   
-  const result = await transactionQueue.processTransaction(txId, async () => {
+  return await transactionQueue.processTransaction(txId, async () => {
     try {
       console.log('Executing transaction...');
       const tx = await transaction();
@@ -162,15 +166,4 @@ export const executeTransaction = async (
       };
     }
   });
-
-  if (!result.success) {
-    throw new ProposalError({
-      category: 'transaction',
-      message: 'Transaction failed',
-      recoverySteps: ['Please try again', 'Check your wallet connection'],
-      technicalDetails: 'Transaction execution failed'
-    });
-  }
-
-  return result.transaction;
 };

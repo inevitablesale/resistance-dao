@@ -12,7 +12,7 @@ export const checkTokenAllowance = async (
   tokenAddress: string,
   ownerAddress: string,
   spenderAddress: string,
-  requiredAmount: ethers.BigNumber // Changed from string to BigNumber
+  requiredAmount: ethers.BigNumber
 ): Promise<boolean> => {
   try {
     const tokenContract = new ethers.Contract(
@@ -68,7 +68,7 @@ export const approveExactAmount = async (
   provider: ethers.providers.Web3Provider,
   tokenAddress: string,
   spenderAddress: string,
-  amount: ethers.BigNumber // Changed from string to BigNumber
+  amount: string | ethers.BigNumber // Allow both string and BigNumber input
 ): Promise<ethers.ContractTransaction> => {
   try {
     const signer = provider.getSigner();
@@ -78,18 +78,23 @@ export const approveExactAmount = async (
       signer
     );
 
+    // Convert string amount to BigNumber if needed
+    const amountBN = ethers.BigNumber.isBigNumber(amount) 
+      ? amount 
+      : ethers.utils.parseUnits(amount, 18);
+
     console.log("Approving exact amount:", {
       token: tokenAddress,
       spender: spenderAddress,
-      amountFormatted: ethers.utils.formatUnits(amount, 18),
-      amountWei: amount.toString()
+      amountFormatted: ethers.utils.formatUnits(amountBN, 18),
+      amountWei: amountBN.toString()
     });
 
     // First check if we already have sufficient allowance
     const ownerAddress = await signer.getAddress();
     const currentAllowance = await tokenContract.allowance(ownerAddress, spenderAddress);
 
-    if (currentAllowance.gte(amount)) {
+    if (currentAllowance.gte(amountBN)) {
       console.log("Sufficient allowance already exists");
       return {} as ethers.ContractTransaction; // Return empty transaction as no approval needed
     }
@@ -97,7 +102,7 @@ export const approveExactAmount = async (
     // If we need to approve, proceed with exact amount
     return await tokenContract.approve(
       spenderAddress, 
-      amount
+      amountBN
     );
   } catch (error) {
     console.error('Error approving tokens:', error);
