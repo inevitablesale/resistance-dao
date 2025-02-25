@@ -4,43 +4,39 @@ import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletProvider } from "./useWalletProvider";
 
-// Polygon Mainnet addresses
 const NFT_CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
 const USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
-const MINT_PRICE = ethers.utils.parseUnits("50", 6); // 50 USDC with 6 decimals
+const MINT_PRICE = ethers.utils.parseUnits("50", 6);
 
-// Updated ABI to match the actual contract
 const NFT_ABI = [
   "function mintNFT(string calldata tokenURI) external",
-  "function getPendingRefund(address user) external view returns (uint256)",
-  "function claimRefund() external",
+  "function safeMint(address recipient, string memory tokenURI) public",
+  "function bulkMint(address[] calldata recipients, string[] calldata tokenURIs) external",
+  "function owner() view returns (address)",
+  "function MINT_PRICE() view returns (uint256)",
   "function balanceOf(address owner) view returns (uint256)"
 ];
 
 const USDC_ABI = [
   "function approve(address spender, uint256 amount) external returns (bool)",
   "function allowance(address owner, address spender) view returns (uint256)",
-  "function balanceOf(address account) view returns (uint256)",
+  "function balanceOf(address owner) view returns (uint256)",
   "function decimals() view returns (uint8)"
 ];
 
 export const useNFTMinting = () => {
   const [isApproving, setIsApproving] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
 
-  const checkUSDCApproval = async (address: string) => {
+  const checkUSDCApproval = async (address: string): Promise<boolean> => {
     try {
       const provider = await getProvider();
       if (!provider?.provider) return false;
 
-      const usdcContract = new ethers.Contract(
-        USDC_ADDRESS,
-        USDC_ABI,
-        provider.provider
-      );
-
+      const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
       const allowance = await usdcContract.allowance(address, NFT_CONTRACT_ADDRESS);
       return allowance.gte(MINT_PRICE);
     } catch (error) {
@@ -49,17 +45,12 @@ export const useNFTMinting = () => {
     }
   };
 
-  const getUSDCBalance = async (address: string) => {
+  const getUSDCBalance = async (address: string): Promise<string> => {
     try {
       const provider = await getProvider();
       if (!provider?.provider) return "0";
 
-      const usdcContract = new ethers.Contract(
-        USDC_ADDRESS,
-        USDC_ABI,
-        provider.provider
-      );
-
+      const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
       const balance = await usdcContract.balanceOf(address);
       return ethers.utils.formatUnits(balance, 6);
     } catch (error) {
@@ -71,26 +62,21 @@ export const useNFTMinting = () => {
   const approveUSDC = async () => {
     setIsApproving(true);
     try {
-      console.log("Starting USDC approval process...");
       const provider = await getProvider();
       if (!provider?.provider) throw new Error("No provider available");
 
-      const signer = provider.provider.getSigner();
       const usdcContract = new ethers.Contract(
         USDC_ADDRESS,
         USDC_ABI,
-        signer
+        provider.provider.getSigner()
       );
 
-      console.log("Approving USDC amount:", ethers.utils.formatUnits(MINT_PRICE, 6));
       const tx = await usdcContract.approve(NFT_CONTRACT_ADDRESS, MINT_PRICE);
-      console.log("Approval transaction submitted:", tx.hash);
-
       await tx.wait();
-      console.log("USDC approval complete");
+      
       return true;
     } catch (error) {
-      console.error("USDC approval failed:", error);
+      console.error("Error approving USDC:", error);
       toast({
         title: "Approval Failed",
         description: "Failed to approve USDC spending. Please try again.",
@@ -102,10 +88,32 @@ export const useNFTMinting = () => {
     }
   };
 
-  const mintNFT = async () => {
+  const checkIfOwner = async () => {
+    try {
+      const provider = await getProvider();
+      if (!provider?.provider) return false;
+
+      const signer = provider.provider.getSigner();
+      const address = await signer.getAddress();
+      
+      const nftContract = new ethers.Contract(
+        NFT_CONTRACT_ADDRESS,
+        NFT_ABI,
+        provider.provider
+      );
+      
+      const ownerAddress = await nftContract.owner();
+      return address.toLowerCase() === ownerAddress.toLowerCase();
+    } catch (error) {
+      console.error("Error checking owner:", error);
+      return false;
+    }
+  };
+
+  const ownerMint = async (recipient: string) => {
+    console.log("Attempting owner mint for:", recipient);
     setIsMinting(true);
     try {
-      console.log("Starting NFT mint process...");
       const provider = await getProvider();
       if (!provider?.provider) throw new Error("No provider available");
 
@@ -116,33 +124,95 @@ export const useNFTMinting = () => {
         signer
       );
 
-      // IPFS metadata URI for the NFT
-      const tokenURI = "ipfs://bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py";
+      const metadata = {
+        name: "Resistance DAO Membership NFT",
+        description: "An official member of the Resistance DAO community",
+        image: "ipfs://QmResistanceDAOImage", // Make sure to update with actual IPFS hash
+        attributes: [
+          {
+            trait_type: "Membership Type",
+            value: "Member"
+          },
+          {
+            trait_type: "Joined",
+            value: new Date().toISOString()
+          }
+        ]
+      };
+
+      const metadataUri = `ipfs://QmResistanceDAOMetadata`; // Make sure to update with actual IPFS hash
+      console.log("Calling safeMint with URI:", metadataUri);
+      const tx = await nftContract.safeMint(recipient, metadataUri);
+      await tx.wait();
       
-      console.log("Minting NFT with tokenURI:", tokenURI);
-      const gasEstimate = await nftContract.estimateGas.mintNFT(tokenURI);
-      console.log("Estimated gas:", gasEstimate.toString());
-      
-      const tx = await nftContract.mintNFT(tokenURI, {
-        gasLimit: gasEstimate.mul(120).div(100) // Add 20% buffer to gas estimate
-      });
-      console.log("Mint transaction submitted:", tx.hash);
-
-      const receipt = await tx.wait();
-      console.log("NFT minted successfully:", receipt);
-
-      // Check if we need to claim a refund
-      const pendingRefund = await nftContract.getPendingRefund(await signer.getAddress());
-      if (pendingRefund.gt(0)) {
-        console.log("Claiming refund...");
-        const refundTx = await nftContract.claimRefund();
-        await refundTx.wait();
-        console.log("Refund claimed successfully");
-      }
-
       return true;
     } catch (error) {
-      console.error("NFT minting failed:", error);
+      console.error("Error in owner mint:", error);
+      throw error;
+    } finally {
+      setIsMinting(false);
+    }
+  };
+
+  const mintNFT = async () => {
+    setIsMinting(true);
+    try {
+      const provider = await getProvider();
+      if (!provider?.provider) throw new Error("No provider available");
+
+      const signer = provider.provider.getSigner();
+      const address = await signer.getAddress();
+      
+      console.log("Checking if address is owner:", address);
+      const ownerStatus = await checkIfOwner();
+      console.log("Is owner?", ownerStatus);
+
+      if (ownerStatus) {
+        console.log("Owner detected, using ownerMint");
+        return await ownerMint(address);
+      }
+
+      console.log("Not owner, proceeding with regular mint");
+      const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
+      const balance = await usdcContract.balanceOf(address);
+      if (balance.lt(MINT_PRICE)) {
+        throw new Error(`Insufficient USDC balance. You need 50 USDC to mint.`);
+      }
+
+      const allowance = await usdcContract.allowance(address, NFT_CONTRACT_ADDRESS);
+      if (allowance.lt(MINT_PRICE)) {
+        throw new Error("USDC allowance too low. Please approve USDC first.");
+      }
+
+      const nftContract = new ethers.Contract(
+        NFT_CONTRACT_ADDRESS,
+        NFT_ABI,
+        signer
+      );
+
+      const metadata = {
+        name: "Resistance DAO Membership NFT",
+        description: "An official member of the Resistance DAO community",
+        image: "ipfs://QmResistanceDAOImage", // Make sure to update with actual IPFS hash
+        attributes: [
+          {
+            trait_type: "Membership Type",
+            value: "Member"
+          },
+          {
+            trait_type: "Joined",
+            value: new Date().toISOString()
+          }
+        ]
+      };
+
+      const metadataUri = `ipfs://QmResistanceDAOMetadata`; // Make sure to update with actual IPFS hash
+      const tx = await nftContract.mintNFT(metadataUri);
+      await tx.wait();
+      
+      return true;
+    } catch (error) {
+      console.error("Error minting NFT:", error);
       throw error;
     } finally {
       setIsMinting(false);
@@ -156,6 +226,37 @@ export const useNFTMinting = () => {
     getUSDCBalance,
     approveUSDC,
     mintNFT,
-    MINT_PRICE: "50"
+    ownerMint,
+    bulkMint: async (recipients: string[], metadataUris: string[]) => {
+      setIsMinting(true);
+      try {
+        const provider = await getProvider();
+        if (!provider?.provider) throw new Error("No provider available");
+
+        const signer = provider.provider.getSigner();
+        const nftContract = new ethers.Contract(
+          NFT_CONTRACT_ADDRESS,
+          NFT_ABI,
+          signer
+        );
+
+        const isContractOwner = await checkIfOwner();
+        if (!isContractOwner) {
+          throw new Error("Only the contract owner can bulk mint");
+        }
+
+        const tx = await nftContract.bulkMint(recipients, metadataUris);
+        await tx.wait();
+        
+        return true;
+      } catch (error) {
+        console.error("Error in bulk mint:", error);
+        throw error;
+      } finally {
+        setIsMinting(false);
+      }
+    },
+    checkIfOwner,
+    MINT_PRICE: "50",
   };
 };

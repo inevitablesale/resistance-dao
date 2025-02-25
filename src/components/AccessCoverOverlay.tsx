@@ -1,7 +1,7 @@
 
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Wallet, Loader2, Shield, CreditCard, Copy, Check, ExternalLink, LogOut } from "lucide-react";
+import { X, Wallet, Loader2, Shield, CreditCard, Copy, LogOut, Check, ExternalLink, Coins } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
@@ -11,19 +11,14 @@ import { useNFTMinting } from "@/hooks/useNFTMinting";
 import { useDynamicContext, useOnramp } from "@dynamic-labs/sdk-react-core";
 import { OnrampProviders } from "@dynamic-labs/sdk-api-core";
 import { useToast } from "@/hooks/use-toast";
-import { getFromIPFS } from '@/services/ipfsService';
-import { NFTMetadata } from '@/types/proposals';
-
-const CONTRACT_OWNER = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [showNFTSuccess, setShowNFTSuccess] = useState(false);
-  const [nftMetadata, setNftMetadata] = useState<NFTMetadata | null>(null);
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
-  const { primaryWallet } = useDynamicContext();
+  const { logout } = useDynamicContext();
   const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
   const { toast } = useToast();
   const { 
@@ -39,23 +34,6 @@ export const AccessCoverOverlay = () => {
   const [usdcBalance, setUsdcBalance] = useState("0");
   const [hasApproval, setHasApproval] = useState(false);
   const [isOpeningOnramp, setIsOpeningOnramp] = useState(false);
-
-  useEffect(() => {
-    const fetchNFTMetadata = async () => {
-      if (showNFTSuccess) {
-        try {
-          console.log("Fetching NFT metadata from IPFS...");
-          const metadata = await getFromIPFS<NFTMetadata>("bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py", "content");
-          console.log("NFT metadata retrieved:", metadata);
-          setNftMetadata(metadata);
-        } catch (error) {
-          console.error("Error fetching NFT metadata:", error);
-        }
-      }
-    };
-
-    fetchNFTMetadata();
-  }, [showNFTSuccess]);
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -83,19 +61,16 @@ export const AccessCoverOverlay = () => {
     }
 
     try {
-      // Skip USDC approval check for contract owner
-      if (address.toLowerCase() !== CONTRACT_OWNER.toLowerCase()) {
-        if (!hasApproval) {
-          const approved = await approveUSDC();
-          if (approved) {
-            setHasApproval(true);
-            toast({
-              title: "USDC Approved",
-              description: "You can now mint your NFT",
-            });
-          }
-          return;
+      if (!hasApproval) {
+        const approved = await approveUSDC();
+        if (approved) {
+          setHasApproval(true);
+          toast({
+            title: "USDC Approved",
+            description: "You can now mint your NFT",
+          });
         }
+        return;
       }
       
       const minted = await mintNFT();
@@ -171,15 +146,13 @@ export const AccessCoverOverlay = () => {
     }
   };
 
-  const handleLogoutClick = async () => {
+  const handleLogout = async () => {
     try {
-      if (primaryWallet?.disconnect) {
-        await primaryWallet.disconnect();
-        toast({
-          title: "Logged Out",
-          description: "Successfully disconnected wallet",
-        });
-      }
+      await logout();
+      toast({
+        title: "Logged Out",
+        description: "Successfully disconnected wallet",
+      });
     } catch (error) {
       console.error('Logout error:', error);
       toast({
@@ -209,44 +182,37 @@ export const AccessCoverOverlay = () => {
               </p>
             </div>
 
-            <div className="relative overflow-hidden rounded-2xl bg-blue-950/40 border border-blue-500/10">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
-              <div className="relative p-6 space-y-4">
-                <div className="flex items-center gap-3">
-                  <Shield className="w-6 h-6 text-blue-400" />
-                  <h3 className="text-xl font-semibold text-blue-200">
-                    {nftMetadata?.name || "Resistance DAO Member NFT"}
-                  </h3>
-                </div>
-                <div className="relative w-full h-48 rounded-lg overflow-hidden mb-4">
-                  <img 
-                    src={`https://ipfs.io/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi`}
-                    alt="Member NFT"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <p className="text-blue-300/60">
-                  {nftMetadata?.description || "This NFT represents your membership and voting power in the DAO"}
+            <div className="p-6 bg-blue-950/40 rounded-xl border border-blue-500/10">
+              <img 
+                src="/lgr-logo.png"
+                alt="Member NFT"
+                className="w-full h-48 object-contain rounded-lg mb-4"
+              />
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold text-blue-200">Resistance DAO Member NFT</h3>
+                <p className="text-blue-300/60 text-sm">
+                  This NFT represents your membership and voting power in the DAO
                 </p>
-                <div className="h-[2px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20" />
-                <div className="space-y-2">
-                  {nftMetadata?.attributes?.map((attr) => (
-                    <div key={attr.trait_type} className="flex justify-between text-sm">
-                      <span className="text-blue-300/60">{attr.trait_type}</span>
-                      <span className="text-blue-200">{attr.value}</span>
-                    </div>
-                  ))} 
-                </div>
               </div>
             </div>
 
-            <Button
-              variant="ghost"
-              onClick={() => setShowNFTSuccess(false)}
-              className="text-blue-300 hover:text-blue-200 hover:bg-blue-900/50 w-full"
-            >
-              Close
-            </Button>
+            <div className="flex flex-col gap-3">
+              <Button 
+                onClick={handleBuyUSDC}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 py-6 text-lg relative overflow-hidden group"
+              >
+                <div className="absolute inset-0 bg-blue-400/20 group-hover:animate-pulse" />
+                <Coins className="w-5 h-5 mr-2" />
+                Load Wallet with RD Tokens
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setShowNFTSuccess(false)}
+                className="text-blue-300 hover:text-blue-200 hover:bg-blue-900/50"
+              >
+                Close
+              </Button>
+            </div>
           </div>
         </motion.div>
       </div>
@@ -260,7 +226,7 @@ export const AccessCoverOverlay = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleLogoutClick}
+            onClick={handleLogout}
             className="text-blue-300 hover:text-blue-200 hover:bg-blue-900/50"
           >
             <LogOut className="w-4 h-4 mr-2" />
@@ -338,65 +304,85 @@ export const AccessCoverOverlay = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-blue-300 mb-2">Member NFT</h3>
                 <p className="text-blue-200/80 mb-6">
-                  {address.toLowerCase() === CONTRACT_OWNER.toLowerCase() 
-                    ? "As contract owner, you can mint your NFT without USDC"
-                    : "Mint a Member NFT to join our community and get exclusive access"}
+                  Mint a Member NFT to join our community and get exclusive access
                 </p>
 
-                {address.toLowerCase() !== CONTRACT_OWNER.toLowerCase() && (
-                  <div className="space-y-4">
-                    <div className="text-left text-sm text-blue-300/60 space-y-1">
-                      <div>Price: {MINT_PRICE} USDC</div>
-                      <div>Your balance: {usdcBalance} USDC</div>
-                    </div>
-
-                    <div className="bg-blue-950/50 p-4 rounded-lg border border-blue-500/20">
-                      <p className="text-sm text-blue-300 mb-2 text-left">Transfer USDC to this address:</p>
-                      <div className="flex items-center justify-between bg-blue-900/30 p-3 rounded-md">
-                        <code className="text-xs md:text-sm text-blue-200 break-all text-left">
-                          {address}
-                        </code>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleCopyAddress}
-                          className="ml-2 hover:bg-blue-800/50"
-                        >
-                          <Copy className="w-4 h-4 text-blue-300" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {Number(usdcBalance) < Number(MINT_PRICE) && (
-                      <Button
-                        onClick={handleBuyUSDC}
-                        disabled={!onrampEnabled || isOpeningOnramp}
-                        className="w-full bg-gradient-to-r from-green-600 to-blue-600 py-6 text-lg mb-2"
-                      >
-                        <CreditCard className="w-5 h-5 mr-2" />
-                        Buy USDC with Card
-                      </Button>
-                    )}
+                <div className="space-y-4">
+                  <div className="text-left text-sm text-blue-300/60 space-y-1">
+                    <div>Price: {MINT_PRICE} USDC</div>
+                    <div>Your balance: {usdcBalance} USDC</div>
                   </div>
-                )}
-                
-                <Button
-                  onClick={handleMintClick}
-                  disabled={isMinting || isApproving}
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-6 text-lg"
-                >
-                  {isApproving || isMinting ? (
-                    <Loader2 className="w-6 h-6 mr-2 animate-spin" />
-                  ) : null}
-                  {isApproving ? "Approving USDC..." :
-                   isMinting ? "Minting NFT..." :
-                   !hasApproval && address.toLowerCase() !== CONTRACT_OWNER.toLowerCase() ? "Approve USDC" : "Mint Member NFT"}
-                </Button>
+
+                  <div className="bg-blue-950/50 p-4 rounded-lg border border-blue-500/20">
+                    <p className="text-sm text-blue-300 mb-2 text-left">Transfer USDC to this address:</p>
+                    <div className="flex items-center justify-between bg-blue-900/30 p-3 rounded-md">
+                      <code className="text-xs md:text-sm text-blue-200 break-all text-left">
+                        {address}
+                      </code>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          if (address) {
+                            navigator.clipboard.writeText(address);
+                            toast({
+                              title: "Address Copied",
+                              description: "Wallet address copied to clipboard",
+                            });
+                          }
+                        }}
+                        className="ml-2 hover:bg-blue-800/50"
+                      >
+                        <Copy className="w-4 h-4 text-blue-300" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {Number(usdcBalance) < Number(MINT_PRICE) && (
+                    <Button
+                      onClick={handleBuyUSDC}
+                      disabled={!onrampEnabled || isOpeningOnramp}
+                      className="w-full bg-gradient-to-r from-green-600 to-blue-600 py-6 text-lg mb-2"
+                    >
+                      <CreditCard className="w-5 h-5 mr-2" />
+                      Buy USDC with Card
+                    </Button>
+                  )}
+                  
+                  <Button
+                    onClick={handleMintClick}
+                    disabled={isMinting || isApproving}
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-6 text-lg"
+                  >
+                    {isApproving || isMinting ? (
+                      <Loader2 className="w-6 h-6 mr-2 animate-spin" />
+                    ) : null}
+                    {isApproving ? "Approving USDC..." :
+                     isMinting ? "Minting NFT..." :
+                     !hasApproval ? "Approve USDC" : "Mint Member NFT"}
+                  </Button>
+                </div>
               </div>
             </div>
           )}
         </motion.div>
       </div>
+
+      <style>
+        {`
+          @keyframes phoenixLook {
+            0%, 100% {
+              transform: rotate(0deg);
+            }
+            25% {
+              transform: rotate(-3deg);
+            }
+            75% {
+              transform: rotate(3deg);
+            }
+          }
+        `}
+      </style>
     </div>
   );
 };
