@@ -102,10 +102,9 @@ const dynamicSettings = {
     },
     shadowDOMEnabled: false,
     allowedDomains: [
-      "id-preview--20de67db-692b-43bc-8918-dfa81ea94ccd.lovable.app",
+      "resistancedao.xyz",
       "app.dynamicauth.com",
-      "localhost",
-      "www.resistancedao.xyz"
+      "localhost"
     ],
     tokens: [
       {
