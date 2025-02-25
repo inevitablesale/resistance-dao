@@ -1,7 +1,7 @@
 
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Wallet, Loader2, Shield } from "lucide-react";
+import { Wallet, Loader2, Shield, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
@@ -48,13 +48,17 @@ export const AccessCoverOverlay = () => {
                   <Shield className="w-8 h-8 text-blue-400" />
                 </div>
                 <div className="space-y-3">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Star className="w-5 h-5 text-yellow-400" />
+                    <span className="text-yellow-400 font-semibold">OG Holders get exclusive benefits</span>
+                  </div>
                   <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
                     Welcome to Resistance DAO
                   </h1>
                   <div className="flex flex-col gap-6 items-center">
                     <div className="space-y-4">
                       <p className="text-xl text-blue-200/80">
-                        Connect your wallet to access the platform
+                        Connect your wallet to access the platform and become an OG member
                       </p>
                       <div className="flex flex-col items-center gap-2">
                         <Button 
@@ -71,6 +75,7 @@ export const AccessCoverOverlay = () => {
                           )}
                           Connect Wallet
                         </Button>
+                        <p className="text-sm text-blue-200/60">Early supporters get exclusive rewards and benefits</p>
                       </div>
                     </div>
                   </div>
@@ -104,6 +109,7 @@ export const AccessCoverOverlay = () => {
                     >
                       Get Member NFT
                     </Button>
+                    <p className="text-sm text-blue-200/60 mt-4">Join now to become an OG holder with exclusive benefits</p>
                   </div>
                 </>
               )}
