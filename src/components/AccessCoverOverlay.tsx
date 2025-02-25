@@ -274,7 +274,7 @@ export const AccessCoverOverlay = () => {
                   
                   <Button
                     onClick={handleMintClick}
-                    disabled={isMinting || isApproving || Number(usdcBalance) < Number(MINT_PRICE)}
+                    disabled={isMinting || isApproving}
                     className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-6 text-lg"
                   >
                     {isApproving || isMinting ? (
