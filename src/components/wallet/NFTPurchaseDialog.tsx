@@ -1,12 +1,14 @@
+
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ethers } from "ethers";
-import { Loader2, Check, AlertCircle } from "lucide-react";
+import { Loader2, Check, AlertCircle, Copy, ExternalLink, Wallet } from "lucide-react";
 import { executeTransaction } from "@/services/transactionManager";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 const USDC_CONTRACT = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const NFT_CONTRACT = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
@@ -30,11 +32,13 @@ interface NFTPurchaseDialogProps {
 export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps) => {
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
+  const { primaryWallet, setShowOnRamp } = useDynamicContext();
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
   const [usdcAllowance, setUsdcAllowance] = useState<string>("0");
   const [isApproving, setIsApproving] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -146,6 +150,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
         description: "NFT minted successfully! Welcome to Resistance DAO",
       });
 
+      // Close both the purchase dialog and the overlay
       setTimeout(() => {
         onOpenChange(false);
       }, 2000);
@@ -159,6 +164,34 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     } finally {
       setIsMinting(false);
     }
+  };
+
+  const handleCopyAddress = async () => {
+    if (!primaryWallet?.address) return;
+    
+    try {
+      await navigator.clipboard.writeText(primaryWallet.address);
+      setIsCopied(true);
+      toast({
+        title: "Success",
+        description: "Address copied to clipboard",
+      });
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to copy address",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBuyUsdc = () => {
+    setShowOnRamp?.(true);
+  };
+
+  const handleOpenWallet = () => {
+    primaryWallet?.showWallet?.();
   };
 
   const needsApproval = Number(usdcAllowance) < 50;
@@ -175,6 +208,24 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Wallet Address Section */}
+          {primaryWallet?.address && (
+            <div className="bg-blue-950/30 rounded-lg p-4 flex items-center justify-between">
+              <div className="text-sm text-white/70">
+                {`${primaryWallet.address.slice(0, 6)}...${primaryWallet.address.slice(-4)}`}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCopyAddress}
+                className="text-blue-400 hover:text-blue-300"
+              >
+                {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+          )}
+
+          {/* NFT Preview */}
           <div className="relative aspect-square rounded-xl overflow-hidden border border-blue-500/20">
             <img
               src="https://gateway.pinata.cloud/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi"
@@ -184,54 +235,76 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           </div>
 
+          {/* Price and Balance */}
           <div className="space-y-2">
             <p className="text-white/70">Price: 50 USDC</p>
             <p className="text-white/70">Your Balance: {Number(usdcBalance).toFixed(2)} USDC</p>
           </div>
 
-          <AnimatePresence mode="wait">
-            {isSuccess ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="flex flex-col items-center gap-4 py-4"
-              >
-                <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
-                  <Check className="w-6 h-6 text-green-500" />
-                </div>
-                <p className="text-green-400 text-lg font-semibold">Welcome to Resistance DAO!</p>
-              </motion.div>
-            ) : !hasEnoughUSDC ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="flex flex-col items-center gap-4"
-              >
-                <AlertCircle className="w-8 h-8 text-yellow-500" />
-                <p className="text-yellow-500">Insufficient USDC balance</p>
-              </motion.div>
-            ) : needsApproval ? (
-              <Button
-                onClick={handleApproveUSDC}
-                disabled={isApproving}
-                className="w-full bg-blue-500 hover:bg-blue-600"
-              >
-                {isApproving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                Approve USDC
-              </Button>
-            ) : (
-              <Button
-                onClick={handleMintNFT}
-                disabled={isMinting}
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
-              >
-                {isMinting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {isMinting ? "Minting..." : "Buy Member NFT"}
-              </Button>
-            )}
-          </AnimatePresence>
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <Button
+              onClick={handleBuyUsdc}
+              className="w-full bg-purple-600 hover:bg-purple-700"
+              variant="secondary"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Buy USDC
+            </Button>
+
+            <Button
+              onClick={handleOpenWallet}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              variant="secondary"
+            >
+              <Wallet className="w-4 h-4 mr-2" />
+              Transfer
+            </Button>
+
+            <AnimatePresence mode="wait">
+              {isSuccess ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="flex flex-col items-center gap-4 py-4"
+                >
+                  <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <Check className="w-6 h-6 text-green-500" />
+                  </div>
+                  <p className="text-green-400 text-lg font-semibold">Welcome to Resistance DAO!</p>
+                </motion.div>
+              ) : !hasEnoughUSDC ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="flex flex-col items-center gap-4"
+                >
+                  <AlertCircle className="w-8 h-8 text-yellow-500" />
+                  <p className="text-yellow-500">Insufficient USDC balance</p>
+                </motion.div>
+              ) : needsApproval ? (
+                <Button
+                  onClick={handleApproveUSDC}
+                  disabled={isApproving}
+                  className="w-full bg-blue-500 hover:bg-blue-600"
+                >
+                  {isApproving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  Approve USDC
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleMintNFT}
+                  disabled={isMinting}
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                >
+                  {isMinting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  {isMinting ? "Minting..." : "Buy Member NFT"}
+                </Button>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
