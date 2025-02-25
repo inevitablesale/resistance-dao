@@ -197,61 +197,53 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-black/95 border border-blue-500/20">
-        <DialogHeader>
-          <DialogTitle className="text-blue-400">Get Member NFT</DialogTitle>
-          <DialogDescription>
-            Join Resistance DAO by minting your Member NFT
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          {primaryWallet?.address && (
-            <div className="bg-blue-950/30 rounded-lg p-4 flex items-center justify-between">
-              <div className="text-sm text-white/70">
-                {`${primaryWallet.address.slice(0, 6)}...${primaryWallet.address.slice(-4)}`}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCopyAddress}
-                className="text-blue-400 hover:text-blue-300"
-              >
-                {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              </Button>
-            </div>
-          )}
-
-          <div className="relative aspect-square rounded-xl overflow-hidden border border-blue-500/20">
+      <DialogContent className="bg-[#0A0B2E] border border-blue-500/20 p-0 max-w-xl w-[95%] overflow-hidden">
+        <div className="p-6 space-y-8">
+          {/* NFT Image Display */}
+          <div className="relative aspect-square rounded-xl overflow-hidden bg-[#111444] border border-blue-400/20">
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent" />
             <img
               src="https://gateway.pinata.cloud/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi"
               alt="Member NFT"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain p-4"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           </div>
 
-          <div className="space-y-2">
-            <p className="text-white/70">Price: 50 USDC</p>
-            <p className="text-white/70">Your Balance: {Number(usdcBalance).toFixed(2)} USDC</p>
+          {/* NFT Details */}
+          <div className="space-y-4 text-center">
+            <h2 className="text-2xl font-bold text-blue-100">Resistance DAO Member</h2>
+            <p className="text-blue-200/80 text-lg">
+              Guardian of Web3 innovation. Access platform features, vote on proposals, and earn from successful launches.
+            </p>
           </div>
 
+          {/* Price and Balance Display */}
+          <div className="space-y-2 bg-blue-950/30 rounded-lg p-4">
+            <div className="flex justify-between items-center text-blue-100">
+              <span>Price:</span>
+              <span className="font-semibold">50 USDC</span>
+            </div>
+            <div className="flex justify-between items-center text-blue-200">
+              <span>Your Balance:</span>
+              <span>{Number(usdcBalance).toFixed(2)} USDC</span>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
           <div className="space-y-3">
             <Button
               onClick={handleBuyUsdc}
-              className="w-full bg-purple-600 hover:bg-purple-700"
-              variant="secondary"
+              className="w-full bg-[#9B87F5] hover:bg-[#7E69AB] text-white py-6 text-lg font-medium rounded-xl flex items-center justify-center gap-2"
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
+              <ExternalLink className="w-5 h-5" />
               Buy USDC
             </Button>
 
             <Button
               onClick={handleOpenWallet}
-              className="w-full bg-blue-600 hover:bg-blue-700"
-              variant="secondary"
+              className="w-full bg-[#33C3F0] hover:bg-[#0EA5E9] text-white py-6 text-lg font-medium rounded-xl flex items-center justify-center gap-2"
             >
-              <Wallet className="w-4 h-4 mr-2" />
+              <Wallet className="w-5 h-5" />
               Transfer
             </Button>
 
@@ -282,18 +274,18 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
                 <Button
                   onClick={handleApproveUSDC}
                   disabled={isApproving}
-                  className="w-full bg-blue-500 hover:bg-blue-600"
+                  className="w-full bg-[#1EAEDB] hover:bg-[#0FA0CE] text-white py-6 text-lg font-medium rounded-xl"
                 >
-                  {isApproving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  {isApproving && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
                   Approve USDC
                 </Button>
               ) : (
                 <Button
                   onClick={handleMintNFT}
                   disabled={isMinting}
-                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                  className="w-full bg-gradient-to-r from-[#9B87F5] to-[#33C3F0] hover:from-[#7E69AB] hover:to-[#0EA5E9] text-white py-6 text-lg font-medium rounded-xl"
                 >
-                  {isMinting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  {isMinting && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
                   {isMinting ? "Minting..." : "Buy Member NFT"}
                 </Button>
               )}
