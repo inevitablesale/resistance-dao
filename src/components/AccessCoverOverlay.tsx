@@ -41,7 +41,7 @@ export const AccessCoverOverlay = () => {
             <div className="relative aspect-square rounded-2xl overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-transparent pointer-events-none" />
               <img 
-                src="https://blue-shaggy-halibut-668.mypinata.cloud/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi?pinataGatewayToken=LxW7Vt1WCzQk4x7VPUWYizgTK5BXllL4JMUQVXMeZEPqSYkovWPXI-jmwcFsZ3hs"
+                src="https://gateway.pinata.cloud/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi"
                 alt="Resistance DAO NFT"
                 className="w-full h-full object-cover"
               />
