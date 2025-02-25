@@ -97,7 +97,9 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
 
   const handleLogout = async () => {
     try {
-      await user?.logout?.();
+      if (primaryWallet?.disconnect) {
+        await primaryWallet.disconnect();
+      }
       onOpenChange(false);
       toast({
         title: "Success",
