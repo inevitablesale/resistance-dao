@@ -25,13 +25,18 @@ export const checkTokenAllowance = async (
       tokenAddress,
       owner: ownerAddress,
       spender: spenderAddress,
-      requiredAmount
+      requiredAmount: ethers.utils.formatUnits(requiredAmount, 18)
     });
 
     const allowance = await tokenContract.allowance(ownerAddress, spenderAddress);
-    const requiredAmountBN = ethers.utils.parseUnits(requiredAmount, 18);
+    const requiredAmountBN = ethers.BigNumber.from(requiredAmount);
     
-    console.log("Current allowance:", ethers.utils.formatUnits(allowance, 18));
+    console.log("Allowance check:", {
+      current: ethers.utils.formatUnits(allowance, 18),
+      required: ethers.utils.formatUnits(requiredAmountBN, 18),
+      hasEnough: allowance.gte(requiredAmountBN)
+    });
+
     return allowance.gte(requiredAmountBN);
   } catch (error) {
     console.error('Error checking token allowance:', error);
@@ -61,7 +66,7 @@ export const getTokenAllowance = async (
 };
 
 export const approveExactAmount = async (
-  provider: ethers.providers.Web3Provider, // Changed from Provider to Web3Provider
+  provider: ethers.providers.Web3Provider,
   tokenAddress: string,
   spenderAddress: string,
   amount: string
@@ -81,9 +86,20 @@ export const approveExactAmount = async (
       amountWei: ethers.utils.parseUnits(amount, 18).toString()
     });
 
+    // First check if we already have sufficient allowance
+    const ownerAddress = await signer.getAddress();
+    const currentAllowance = await tokenContract.allowance(ownerAddress, spenderAddress);
+    const requiredAmount = ethers.utils.parseUnits(amount, 18);
+
+    if (currentAllowance.gte(requiredAmount)) {
+      console.log("Sufficient allowance already exists");
+      return {} as ethers.ContractTransaction; // Return empty transaction as no approval needed
+    }
+
+    // If we need to approve, proceed with exact amount
     return await tokenContract.approve(
       spenderAddress, 
-      ethers.utils.parseUnits(amount, 18)
+      requiredAmount
     );
   } catch (error) {
     console.error('Error approving tokens:', error);

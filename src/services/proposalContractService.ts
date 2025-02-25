@@ -6,7 +6,7 @@ import { transactionQueue } from "./transactionQueueService";
 import { checkTokenAllowance } from "./tokenService";
 import { WalletType } from "@/hooks/useWalletProvider";
 import { executeTransaction } from "./transactionManager";
-import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS } from "@/lib/constants";
+import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS, SUBMISSION_FEE } from "@/lib/constants";
 import { uploadToIPFS } from "./ipfsService";
 import { 
   ProposalMetadata, 
@@ -73,6 +73,30 @@ export const createProposal = async (
     const isPaused = await factory.paused();
     if (isPaused) {
       throw new Error("Contract is currently paused");
+    }
+
+    // Check if user has enough RD token balance
+    const rdToken = new ethers.Contract(
+      RD_TOKEN_ADDRESS,
+      ["function balanceOf(address) view returns (uint256)"],
+      provider
+    );
+    const balance = await rdToken.balanceOf(signerAddress);
+    if (balance.lt(SUBMISSION_FEE)) {
+      throw new Error(`Insufficient RD balance. Required: ${ethers.utils.formatUnits(SUBMISSION_FEE, 18)} RD`);
+    }
+
+    // Check if factory contract has sufficient allowance
+    const hasAllowance = await checkTokenAllowance(
+      provider,
+      RD_TOKEN_ADDRESS,
+      signerAddress,
+      FACTORY_ADDRESS,
+      SUBMISSION_FEE.toString()
+    );
+
+    if (!hasAllowance) {
+      throw new Error("Please approve RD token spending first");
     }
 
     // Upload metadata to IPFS first
