@@ -150,7 +150,7 @@ const Index = () => {
                       <CircleDollarSign className="w-6 h-6 text-blue-300" />
                     </div>
                     <div>
-                      <div className="text-white/60 text-sm">Total Locked Value</div>
+                      <div className="text-white/60 text-sm">Total Soft Commitments</div>
                       <div className="text-2xl font-semibold text-white">
                         {isLoadingStats ? (
                           <span className="animate-pulse">Loading...</span>
@@ -159,13 +159,6 @@ const Index = () => {
                         )}
                       </div>
                     </div>
-                  </div>
-                  <div className="h-1 bg-blue-900/30 rounded-full mb-2">
-                    <div className="h-full w-[65%] bg-blue-400 rounded-full" />
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-white/60">24h Change</span>
-                    <span className="text-green-400">+12.5%</span>
                   </div>
                 </div>
 
