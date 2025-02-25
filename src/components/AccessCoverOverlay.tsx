@@ -10,6 +10,7 @@ import { useNFTMinting } from "@/hooks/useNFTMinting";
 import { useDynamicContext, useOnramp } from "@dynamic-labs/sdk-react-core";
 import { OnrampProviders } from "@dynamic-labs/sdk-api-core";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -32,6 +33,8 @@ export const AccessCoverOverlay = () => {
   const [usdcBalance, setUsdcBalance] = useState("0");
   const [hasApproval, setHasApproval] = useState(false);
   const [isOpeningOnramp, setIsOpeningOnramp] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -146,30 +149,29 @@ export const AccessCoverOverlay = () => {
 
   const handleLogout = async () => {
     try {
-      if (!primaryWallet) {
-        console.error('No wallet found to disconnect');
-        return;
-      }
-
       console.log('Starting logout process...');
       
-      // First disconnect the wallet
-      if (primaryWallet.disconnect) {
-        console.log('Disconnecting wallet...');
-        await primaryWallet.disconnect();
-        console.log('Wallet disconnected successfully');
-      }
-
-      // Then hide the auth flow
+      // First hide the auth flow to prevent any new connections
       if (setShowAuthFlow) {
         console.log('Hiding auth flow...');
         setShowAuthFlow(false);
+      }
+
+      // Then clear the wallet connection
+      if (primaryWallet) {
+        console.log('Clearing wallet connection...');
+        // Using the proper method to disconnect without blockchain interaction
+        await primaryWallet.disconnect({ clearCache: true });
+        console.log('Wallet connection cleared successfully');
       }
 
       toast({
         title: "Logged Out",
         description: "You have been successfully logged out",
       });
+
+      // Navigate to home page after logout
+      navigate('/');
     } catch (error) {
       console.error('Logout error:', error);
       toast({
