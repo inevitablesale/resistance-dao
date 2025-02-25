@@ -52,7 +52,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
   const formatUSDAmount = (rdAmount: string): string => {
     if (!rdAmount) return "$0.00";
-    // Remove the "RD" suffix if present and convert to number
     const amount = parseFloat(rdAmount.replace(' RD', ''));
     if (isNaN(amount)) return "$0.00";
     const RD_PRICE_USD = 0.10;
@@ -102,7 +101,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
 
         console.log(`Getting tokenURI, pledged amount, and vote events for token #${tokenId}`);
         
-        // Get proposal details from the proposals mapping
         const proposalData = await factoryContract.proposals(tokenId);
         const tokenUri = await factoryContract.tokenURI(tokenId);
         setLoadingProgress(50);
@@ -154,7 +152,8 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
   useEffect(() => {
     if (proposalDetails?.submissionTimestamp && proposalDetails?.votingDuration) {
       const updateTimeRemaining = () => {
-        const endTimestamp = proposalDetails.submissionTimestamp + (proposalDetails.votingDuration * 1000);
+        const submissionTimestamp = proposalDetails.submissionTimestamp || Math.floor(Date.now() / 1000);
+        const endTimestamp = (submissionTimestamp + proposalDetails.votingDuration) * 1000;
         const endDate = new Date(endTimestamp);
         
         if (isPast(endDate)) {
@@ -180,7 +179,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       const walletProvider = await getProvider();
       const signer = walletProvider.provider.getSigner();
       
-      // Convert input to proper BigNumber format
       const pledgeAmountBN = ethers.utils.parseEther(pledgeInput);
 
       const factoryContract = new ethers.Contract(
