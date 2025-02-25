@@ -1,3 +1,4 @@
+
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Wallet, Loader2, Shield, CreditCard } from "lucide-react";
@@ -79,7 +80,8 @@ export const AccessCoverOverlay = () => {
       onrampEnabled,
       address,
       walletConnected: !!primaryWallet?.isConnected?.(),
-      primaryWallet
+      walletState: primaryWallet?.state,
+      walletNetwork: primaryWallet?.network
     });
     
     if (!onrampEnabled) {
@@ -102,9 +104,28 @@ export const AccessCoverOverlay = () => {
       return;
     }
 
+    if (!primaryWallet?.isConnected?.()) {
+      console.error('Wallet not connected');
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please ensure your wallet is properly connected.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsOpeningOnramp(true);
     
     try {
+      console.log('Preparing to open onramp...');
+      toast({
+        title: "Opening Banxa",
+        description: "Please allow pop-ups if prompted by your browser.",
+      });
+
+      // Add a small delay before opening the onramp
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       console.log('Attempting to open onramp with params:', {
         onrampProvider: OnrampProviders.Banxa,
         token: 'USDC.e',
@@ -124,9 +145,15 @@ export const AccessCoverOverlay = () => {
       });
     } catch (error) {
       console.error('Failed to open onramp:', error);
+      
+      // More specific error message based on the error type
+      const errorMessage = error instanceof Error 
+        ? error.message
+        : 'Failed to open the purchase window. Please try again.';
+      
       toast({
         title: "Error Opening Onramp",
-        description: "Failed to open the purchase window. Please try again.",
+        description: `${errorMessage} Please ensure pop-ups are allowed for this site.`,
         variant: "destructive"
       });
     } finally {
