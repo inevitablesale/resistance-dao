@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -150,7 +149,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
         description: "NFT minted successfully! Welcome to Resistance DAO",
       });
 
-      // Close both the purchase dialog and the overlay
       setTimeout(() => {
         onOpenChange(false);
       }, 2000);
@@ -191,7 +189,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   };
 
   const handleOpenWallet = () => {
-    primaryWallet?.showWallet?.();
+    primaryWallet?.connector?.showWallet?.({ view: 'send' });
   };
 
   const needsApproval = Number(usdcAllowance) < 50;
@@ -208,7 +206,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Wallet Address Section */}
           {primaryWallet?.address && (
             <div className="bg-blue-950/30 rounded-lg p-4 flex items-center justify-between">
               <div className="text-sm text-white/70">
@@ -225,7 +222,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
             </div>
           )}
 
-          {/* NFT Preview */}
           <div className="relative aspect-square rounded-xl overflow-hidden border border-blue-500/20">
             <img
               src="https://gateway.pinata.cloud/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi"
@@ -235,13 +231,11 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           </div>
 
-          {/* Price and Balance */}
           <div className="space-y-2">
             <p className="text-white/70">Price: 50 USDC</p>
             <p className="text-white/70">Your Balance: {Number(usdcBalance).toFixed(2)} USDC</p>
           </div>
 
-          {/* Action Buttons */}
           <div className="space-y-3">
             <Button
               onClick={handleBuyUsdc}
