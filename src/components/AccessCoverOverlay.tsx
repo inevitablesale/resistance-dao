@@ -1,4 +1,3 @@
-
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Wallet, Loader2, Shield, CreditCard } from "lucide-react";
@@ -15,7 +14,7 @@ export const AccessCoverOverlay = () => {
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
-  const { setShowOnramp } = useDynamicContext();
+  const { showOnramp } = useDynamicContext();
   const { 
     isApproving,
     isMinting,
@@ -70,7 +69,7 @@ export const AccessCoverOverlay = () => {
   };
 
   const handleBuyUSDC = () => {
-    setShowOnramp?.(true);
+    showOnramp?.(true);
   };
 
   return (
