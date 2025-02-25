@@ -12,7 +12,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 const USDC_CONTRACT = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const NFT_CONTRACT = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
 const NFT_PRICE = ethers.utils.parseUnits("50", 6); // 50 USDC (6 decimals)
-const DEFAULT_GAS_LIMIT = 500000;
+const DEFAULT_TOKEN_URI = "ipfs://bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi";
 
 const USDCInterface = new ethers.utils.Interface([
   "function balanceOf(address owner) view returns (uint256)",
@@ -21,7 +21,8 @@ const USDCInterface = new ethers.utils.Interface([
 ]);
 
 const NFTInterface = new ethers.utils.Interface([
-  "function owner() view returns (address)"
+  "function owner() view returns (address)",
+  "function mintNFT(string calldata tokenURI) external"
 ]);
 
 interface NFTPurchaseDialogProps {
@@ -77,7 +78,8 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
 
           console.log("Balance check:", {
             balance: ethers.utils.formatUnits(balance, 6),
-            allowance: ethers.utils.formatUnits(allowance, 6)
+            allowance: ethers.utils.formatUnits(allowance, 6),
+            allowanceFor: NFT_CONTRACT
           });
         }
       } catch (error) {
@@ -177,11 +179,13 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       await executeTransaction(
         async () => {
           const signer = walletProvider.provider.getSigner();
-          return signer.sendTransaction({
-            to: NFT_CONTRACT,
-            data: "0x1249c58b", // mintNFT()
-            gasLimit: DEFAULT_GAS_LIMIT,
-          });
+          const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, signer);
+          
+          if (isContractOwner) {
+            return nftContract.safeMint(await signer.getAddress(), DEFAULT_TOKEN_URI);
+          } else {
+            return nftContract.mintNFT(DEFAULT_TOKEN_URI);
+          }
         },
         {
           type: 'erc721_mint',
