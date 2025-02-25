@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -5,8 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { ethers } from "ethers";
-import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS, RD_PRICE_USD } from "@/lib/constants";
-import { getTokenBalance } from "@/services/tokenService";
+import { FACTORY_ADDRESS, FACTORY_ABI, RD_PRICE_USD } from "@/lib/constants";
 import { getFromIPFS } from "@/services/ipfsService";
 import { ProposalMetadata, ProposalEvent } from "@/types/proposals";
 import { useToast } from "@/hooks/use-toast";
@@ -14,12 +14,9 @@ import { loadingStates } from "./LoadingStates";
 import { ProposalLoadingCard } from "./ProposalLoadingCard";
 import { ProposalListItem } from "./ProposalListItem";
 
-const MIN_RD_REQUIRED = "1";
-
-const formatRDAmount = (rdAmount: string): string => {
+const formatUSDAmount = (rdAmount: string): string => {
   const amount = parseFloat(rdAmount);
   if (isNaN(amount)) return "$0.00";
-  const RD_PRICE_USD = 0.10;
   const usdAmount = amount * RD_PRICE_USD;
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -31,21 +28,10 @@ export const ProposalsHistory = () => {
   const [proposalEvents, setProposalEvents] = useState<ProposalEvent[]>([]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [loadingStateIndex, setLoadingStateIndex] = useState(0);
-  const [hasMinimumRD, setHasMinimumRD] = useState<boolean | null>(null);
   const { isConnected, connect, address } = useWalletConnection();
   const { getProvider } = useWalletProvider();
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  const formatUSDAmount = (rdAmount: string): string => {
-    const amount = parseFloat(rdAmount);
-    if (isNaN(amount)) return "$0.00";
-    const usdAmount = amount * RD_PRICE_USD;
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(usdAmount);
-  };
 
   const updateProposalData = (tokenId: string, updates: Partial<ProposalEvent>) => {
     setProposalEvents(current =>
@@ -78,45 +64,6 @@ export const ProposalsHistory = () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
   }, [isInitialLoading]);
-
-  useEffect(() => {
-    const checkRDBalance = async () => {
-      if (!isConnected || !address) {
-        setHasMinimumRD(null);
-        return;
-      }
-
-      try {
-        const walletProvider = await getProvider();
-        const balance = await getTokenBalance(
-          walletProvider.provider,
-          RD_TOKEN_ADDRESS,
-          address
-        );
-
-        const hasEnough = ethers.utils.parseEther(balance).gte(
-          ethers.utils.parseEther(MIN_RD_REQUIRED)
-        );
-        
-        console.log('RD Balance check:', {
-          balance,
-          required: MIN_RD_REQUIRED,
-          hasEnough
-        });
-        
-        setHasMinimumRD(hasEnough);
-      } catch (error) {
-        console.error("Error checking RD balance:", error);
-        toast({
-          title: "Balance Check Failed",
-          description: "Failed to verify RD balance. Please try again.",
-          variant: "destructive",
-        });
-      }
-    };
-
-    checkRDBalance();
-  }, [isConnected, address, getProvider]);
 
   useEffect(() => {
     const fetchProposalMetadata = async (proposal: ProposalEvent, contract: ethers.Contract) => {
@@ -168,7 +115,7 @@ export const ProposalsHistory = () => {
     };
 
     const fetchProposalData = async () => {
-      if (!isConnected || !hasMinimumRD) return;
+      if (!isConnected) return;
 
       try {
         setIsInitialLoading(true);
@@ -186,8 +133,8 @@ export const ProposalsHistory = () => {
         const latestBlock = await walletProvider.provider.getBlockNumber();
         console.log('Current block:', latestBlock);
 
-        // Get event logs from the last 10000 blocks or from block 0 if chain is shorter
-        const fromBlock = Math.max(0, latestBlock - 10000);
+        // Get event logs from the last 50000 blocks or from block 0 if chain is shorter
+        const fromBlock = Math.max(0, latestBlock - 50000);
         console.log('Fetching events from block:', fromBlock);
 
         const filter = contract.filters.ProposalCreated();
@@ -258,7 +205,7 @@ export const ProposalsHistory = () => {
     };
 
     fetchProposalData();
-  }, [isConnected, hasMinimumRD, getProvider]);
+  }, [isConnected, getProvider]);
 
   if (!isConnected) {
     return (
@@ -268,16 +215,6 @@ export const ProposalsHistory = () => {
           <Button onClick={connect} className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600">
             Connect Wallet
           </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (hasMinimumRD === false) {
-    return (
-      <Card className="bg-black/40 border-white/10">
-        <CardContent className="p-6 text-center text-white/60">
-          <p>You need at least {MIN_RD_REQUIRED} RD to view proposals</p>
         </CardContent>
       </Card>
     );
