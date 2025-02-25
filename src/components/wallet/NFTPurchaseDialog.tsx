@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -21,6 +20,10 @@ const USDCInterface = new ethers.utils.Interface([
   "function approve(address spender, uint256 amount) returns (bool)"
 ]);
 
+const NFTInterface = new ethers.utils.Interface([
+  "function owner() view returns (address)"
+]);
+
 interface NFTPurchaseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -36,6 +39,20 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   const [isMinting, setIsMinting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [userAddress, setUserAddress] = useState<string>("");
+  const [isContractOwner, setIsContractOwner] = useState(false);
+
+  const checkOwnership = async (walletProvider: any, address: string) => {
+    try {
+      const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, walletProvider.provider);
+      const ownerAddress = await nftContract.owner();
+      const isOwner = ownerAddress.toLowerCase() === address.toLowerCase();
+      console.log("Contract ownership check:", { ownerAddress, userAddress: address, isOwner });
+      setIsContractOwner(isOwner);
+    } catch (error) {
+      console.error("Failed to check contract ownership:", error);
+      setIsContractOwner(false);
+    }
+  };
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -45,20 +62,24 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
         const address = await signer.getAddress();
         setUserAddress(address);
         
-        const usdcContract = new ethers.Contract(USDC_CONTRACT, USDCInterface, walletProvider.provider);
+        await checkOwnership(walletProvider, address);
         
-        const [balance, allowance] = await Promise.all([
-          usdcContract.balanceOf(address),
-          usdcContract.allowance(address, NFT_CONTRACT)
-        ]);
-        
-        setUsdcBalance(ethers.utils.formatUnits(balance, 6));
-        setUsdcAllowance(ethers.utils.formatUnits(allowance, 6));
+        if (!isContractOwner) {
+          const usdcContract = new ethers.Contract(USDC_CONTRACT, USDCInterface, walletProvider.provider);
+          
+          const [balance, allowance] = await Promise.all([
+            usdcContract.balanceOf(address),
+            usdcContract.allowance(address, NFT_CONTRACT)
+          ]);
+          
+          setUsdcBalance(ethers.utils.formatUnits(balance, 6));
+          setUsdcAllowance(ethers.utils.formatUnits(allowance, 6));
 
-        console.log("Balance check:", {
-          balance: ethers.utils.formatUnits(balance, 6),
-          allowance: ethers.utils.formatUnits(allowance, 6)
-        });
+          console.log("Balance check:", {
+            balance: ethers.utils.formatUnits(balance, 6),
+            allowance: ethers.utils.formatUnits(allowance, 6)
+          });
+        }
       } catch (error) {
         console.error("Error checking balances:", error);
         toast({
@@ -72,7 +93,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     if (open) {
       checkBalances();
     }
-  }, [open, getProvider, toast]);
+  }, [open, getProvider, toast, isContractOwner]);
 
   const handleOpenWallet = async () => {
     try {
@@ -140,7 +161,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   };
 
   const handleMintNFT = async () => {
-    if (Number(usdcBalance) < 50) {
+    if (!isContractOwner && Number(usdcBalance) < 50) {
       toast({
         title: "Error",
         description: "Insufficient USDC balance",
@@ -199,8 +220,8 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     }
   };
 
-  const needsApproval = Number(usdcAllowance) < 50;
-  const hasEnoughUSDC = Number(usdcBalance) >= 50;
+  const needsApproval = !isContractOwner && Number(usdcAllowance) < 50;
+  const hasEnoughUSDC = isContractOwner || Number(usdcBalance) >= 50;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -223,19 +244,21 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
             </p>
           </div>
 
-          <div className="space-y-1 bg-blue-950/30 rounded-lg p-3">
-            <div className="flex justify-between items-center text-blue-100 text-sm">
-              <span>Price:</span>
-              <span className="font-semibold">50 USDC</span>
+          {!isContractOwner && (
+            <div className="space-y-1 bg-blue-950/30 rounded-lg p-3">
+              <div className="flex justify-between items-center text-blue-100 text-sm">
+                <span>Price:</span>
+                <span className="font-semibold">50 USDC</span>
+              </div>
+              <div className="flex justify-between items-center text-blue-200 text-sm">
+                <span>Your Balance:</span>
+                <span>{Number(usdcBalance).toFixed(2)} USDC</span>
+              </div>
             </div>
-            <div className="flex justify-between items-center text-blue-200 text-sm">
-              <span>Your Balance:</span>
-              <span>{Number(usdcBalance).toFixed(2)} USDC</span>
-            </div>
-          </div>
+          )}
 
           <div className="space-y-2">
-            {!hasEnoughUSDC && (
+            {!hasEnoughUSDC && !isContractOwner && (
               <Button
                 onClick={handleOpenWallet}
                 className="w-full bg-[#33C3F0] hover:bg-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg flex items-center justify-center gap-2"
@@ -270,11 +293,11 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
               ) : (
                 <Button
                   onClick={handleMintNFT}
-                  disabled={isMinting || !hasEnoughUSDC}
+                  disabled={isMinting || (!isContractOwner && !hasEnoughUSDC)}
                   className="w-full bg-gradient-to-r from-[#9B87F5] to-[#33C3F0] hover:from-[#7E69AB] hover:to-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg"
                 >
                   {isMinting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  {isMinting ? "Minting..." : "Buy Member NFT"}
+                  {isMinting ? "Minting..." : isContractOwner ? "Mint NFT (Owner)" : "Buy Member NFT"}
                 </Button>
               )}
             </AnimatePresence>
