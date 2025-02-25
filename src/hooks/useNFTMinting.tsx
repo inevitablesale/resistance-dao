@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
@@ -120,16 +121,24 @@ export const useNFTMinting = () => {
 
   const createNFTMetadata = async (isCoreTeam: boolean) => {
     const metadata: IPFSContent = {
+      contentSchema: "nft-1.0.0",
+      contentType: "nft",
       title: "Resistance DAO Member NFT",
-      description: "A member of the Resistance DAO community",
-      image: "ipfs://QmavmeeRNGXrxewZkHnv9Yyc2k2ZDpmVNwU4XAYQXDbsD6", // Default Resistance DAO logo
-      content: {
+      content: JSON.stringify({
         type: "nft",
         properties: {
           membershipType: isCoreTeam ? "Core Member" : "Member",
           joinedDate: new Date().toISOString().split('T')[0],
           collection: "Resistance DAO Genesis"
         }
+      }),
+      metadata: {
+        author: "Resistance DAO",
+        publishedAt: Date.now(),
+        version: 1,
+        language: "en",
+        tags: ["membership", "dao", "nft"],
+        coverImage: "ipfs://QmavmeeRNGXrxewZkHnv9Yyc2k2ZDpmVNwU4XAYQXDbsD6" // Default Resistance DAO logo
       }
     };
 
