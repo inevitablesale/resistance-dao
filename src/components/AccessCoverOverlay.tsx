@@ -149,7 +149,7 @@ export const AccessCoverOverlay = () => {
     try {
       if (primaryWallet?.disconnect) {
         await primaryWallet.disconnect();
-        setShowAuthFlow(false); // Ensure auth flow is closed
+        setShowAuthFlow(false); // Close auth flow after disconnecting
       }
     } catch (error) {
       console.error('Logout error:', error);
@@ -264,15 +264,7 @@ export const AccessCoverOverlay = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          if (address) {
-                            navigator.clipboard.writeText(address);
-                            toast({
-                              title: "Address Copied",
-                              description: "Wallet address copied to clipboard",
-                            });
-                          }
-                        }}
+                        onClick={handleCopyAddress}
                         className="ml-2 hover:bg-blue-800/50"
                       >
                         <Copy className="w-4 h-4 text-blue-300" />
