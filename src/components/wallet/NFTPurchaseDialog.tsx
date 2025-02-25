@@ -1,7 +1,7 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Added useEffect import
 import { useToast } from "@/hooks/use-toast";
 import { ethers } from "ethers";
 import { Loader2, Check, AlertCircle, Wallet } from "lucide-react";
