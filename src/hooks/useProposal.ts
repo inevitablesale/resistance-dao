@@ -23,7 +23,13 @@ export const useProposal = (tokenId?: string) => {
       console.log('Fetching metadata from URI:', uri);
       
       const metadata = await getFromIPFS<ProposalMetadata>(uri.replace('ipfs://', ''), 'proposal');
-      return { ...data, metadata };
+
+      // Format the totalPledged amount before returning
+      return { 
+        ...data,
+        totalPledged: data.totalPledged ? ethers.utils.formatEther(data.totalPledged) : "0",
+        metadata 
+      };
     },
     enabled: !!tokenId,
     retry: 2

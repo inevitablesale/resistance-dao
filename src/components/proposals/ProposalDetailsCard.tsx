@@ -50,11 +50,13 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   const VOTING_FEE = ethers.utils.parseEther("10");
 
-  const formatUSDAmount = (lgrAmount: string): string => {
-    const amount = parseFloat(lgrAmount);
+  const formatUSDAmount = (rdAmount: string): string => {
+    if (!rdAmount) return "$0.00";
+    // Remove the "RD" suffix if present and convert to number
+    const amount = parseFloat(rdAmount.replace(' RD', ''));
     if (isNaN(amount)) return "$0.00";
-    const LGR_PRICE_USD = 0.10;
-    const usdAmount = amount * LGR_PRICE_USD;
+    const RD_PRICE_USD = 0.10;
+    const usdAmount = amount * RD_PRICE_USD;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
@@ -177,61 +179,32 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
     try {
       const walletProvider = await getProvider();
       const signer = walletProvider.provider.getSigner();
-
-      console.log('Checking balance for voting fee');
-      const balance = await getTokenBalance(
-        walletProvider.provider,
-        RD_TOKEN_ADDRESS,
-        address!
-      );
-      const userBalance = ethers.utils.parseEther(balance);
       
-      if (userBalance.lt(VOTING_FEE)) {
-        throw new Error("Insufficient RD balance. You need 10 RD to cover the voting fee.");
-      }
+      // Convert input to proper BigNumber format
+      const pledgeAmountBN = ethers.utils.parseEther(pledgeInput);
 
       const factoryContract = new ethers.Contract(
         FACTORY_ADDRESS,
         FACTORY_ABI,
-        walletProvider.provider.getSigner()
-      );
-
-      const rdToken = new ethers.Contract(
-        RD_TOKEN_ADDRESS,
-        ["function approve(address spender, uint256 amount) returns (bool)"],
         signer
       );
-      
-      console.log('Approving voting fee:', ethers.utils.formatEther(VOTING_FEE));
-      const approveTx = await rdToken.approve(FACTORY_ADDRESS, VOTING_FEE);
-      await approveTx.wait();
 
-      const pledgeAmountBN = ethers.utils.parseEther(pledgeInput);
+      console.log('Approving voting fee:', ethers.utils.formatEther(VOTING_FEE));
       const tx = await factoryContract.vote(tokenId, pledgeAmountBN);
       await tx.wait();
 
       toast({
         title: "Support Pledged Successfully",
-        description: `Your commitment of ${pledgeInput} RD has been recorded. The 10 RD voting fee has been processed.`,
+        description: `Your commitment of ${pledgeInput} RD has been recorded.`,
       });
 
-      setPledgedAmount(prev => {
-        const currentAmount = ethers.utils.parseEther(prev);
-        const newAmount = currentAmount.add(pledgeAmountBN);
-        return ethers.utils.formatEther(newAmount);
-      });
-      
-      setBackerCount(prev => prev + 1);
-      setPledgeInput("");
+      // Refresh the data instead of manual state updates
+      // The useProposal hook will handle the refresh
     } catch (error: any) {
       console.error("Pledging error:", error);
-      let errorMessage = error.message || "Failed to submit pledge. Please try again.";
-      if (error.message.includes("Voting fee transfer failed")) {
-        errorMessage = "Failed to transfer voting fee. Please ensure you have 10 RD available.";
-      }
       toast({
         title: "Pledging Failed",
-        description: errorMessage,
+        description: error.message || "Failed to submit pledge. Please try again.",
         variant: "destructive",
       });
     } finally {
