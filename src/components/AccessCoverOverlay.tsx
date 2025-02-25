@@ -8,14 +8,14 @@ import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNFTMinting } from "@/hooks/useNFTMinting";
-import { useDynamicContext, useDynamicModals } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
-  const { showOnramp } = useDynamicModals();
+  const { primaryWallet } = useDynamicContext();
   const { 
     isApproving,
     isMinting,
@@ -70,7 +70,12 @@ export const AccessCoverOverlay = () => {
   };
 
   const handleBuyUSDC = () => {
-    showOnramp();
+    // Instead of using showOnramp directly, we'll use the DynamicWidget
+    // which provides a more stable API for onramping
+    const element = document.querySelector('[data-dynamic="flow-handler"]');
+    if (element) {
+      element.dispatchEvent(new CustomEvent('dynamic:open'));
+    }
   };
 
   return (
@@ -204,6 +209,11 @@ export const AccessCoverOverlay = () => {
           }
         `}
       </style>
+      
+      {/* Hidden DynamicWidget for onramp functionality */}
+      <div className="hidden">
+        <DynamicWidget />
+      </div>
     </div>
   );
 };
