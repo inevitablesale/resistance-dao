@@ -70,13 +70,7 @@ const Index = () => {
                 <div className="flex gap-4 mb-8">
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 flex-1">
                     <div className="text-blue-400 text-sm mb-1">Total Hodlers</div>
-                    <div className="font-mono text-2xl">
-                      {isLoadingStats ? (
-                        <span className="animate-pulse">Loading...</span>
-                      ) : (
-                        formatNumber(stats?.totalHolders || 821)
-                      )}
-                    </div>
+                    <div className="font-mono text-2xl">821</div>
                   </div>
                   <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 flex-1">
                     <div className="text-green-400 text-sm mb-1">Community</div>
