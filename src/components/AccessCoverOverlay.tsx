@@ -182,17 +182,31 @@ export const AccessCoverOverlay = () => {
               </p>
             </div>
 
-            <div className="p-6 bg-blue-950/40 rounded-xl border border-blue-500/10">
-              <img 
-                src="/lgr-logo.png"
-                alt="Member NFT"
-                className="w-full h-48 object-contain rounded-lg mb-4"
-              />
-              <div className="space-y-2">
-                <h3 className="text-xl font-semibold text-blue-200">Resistance DAO Member NFT</h3>
-                <p className="text-blue-300/60 text-sm">
+            <div className="relative overflow-hidden rounded-2xl bg-blue-950/40 border border-blue-500/10">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
+              <div className="relative p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-6 h-6 text-blue-400" />
+                  <h3 className="text-xl font-semibold text-blue-200">Resistance DAO Member NFT</h3>
+                </div>
+                <p className="text-blue-300/60">
                   This NFT represents your membership and voting power in the DAO
                 </p>
+                <div className="h-[2px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20" />
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-blue-300/60">Membership Type</span>
+                    <span className="text-blue-200">Member</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-blue-300/60">Voting Power</span>
+                    <span className="text-blue-200">1 vote</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-blue-300/60">Join Date</span>
+                    <span className="text-blue-200">{new Date().toLocaleDateString()}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
