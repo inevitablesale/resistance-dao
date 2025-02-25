@@ -72,14 +72,29 @@ export const AccessCoverOverlay = () => {
   };
 
   const handleBuyUSDC = async () => {
-    if (!onrampEnabled || !address) return;
+    console.log('Buy USDC button clicked');
+    console.log('Onramp enabled:', onrampEnabled);
+    console.log('User address:', address);
+    
+    if (!onrampEnabled || !address) {
+      console.log('Cannot proceed: onramp disabled or no address');
+      return;
+    }
     
     try {
+      console.log('Attempting to open onramp with params:', {
+        onrampProvider: OnrampProviders.Banxa,
+        token: 'USDC',
+        address: address
+      });
+      
       await openOnramp({
         onrampProvider: OnrampProviders.Banxa,
         token: 'USDC',
         address: address
       });
+      
+      console.log('Onramp opened successfully');
     } catch (error) {
       console.error('Failed to open onramp:', error);
     }
