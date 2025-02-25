@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletProvider } from "./useWalletProvider";
 import { uploadToIPFS } from "@/services/ipfsService";
+import { IPFSContent } from "@/types/content";
 
 // Contract addresses on Polygon
 const NFT_CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
@@ -118,29 +119,23 @@ export const useNFTMinting = () => {
   };
 
   const createNFTMetadata = async (isCoreTeam: boolean) => {
-    const metadata = {
-      name: "Resistance DAO Member NFT",
+    const metadata: IPFSContent = {
+      title: "Resistance DAO Member NFT",
       description: "A member of the Resistance DAO community",
       image: "ipfs://QmavmeeRNGXrxewZkHnv9Yyc2k2ZDpmVNwU4XAYQXDbsD6", // Default Resistance DAO logo
-      external_url: "https://resistancedao.xyz",
-      attributes: [
-        {
-          trait_type: "Membership Type",
-          value: isCoreTeam ? "Core Member" : "Member"
-        },
-        {
-          trait_type: "Joined",
-          value: new Date().toISOString().split('T')[0] // Just the date part
-        },
-        {
-          trait_type: "Collection",
-          value: "Resistance DAO Genesis"
+      content: {
+        type: "nft",
+        properties: {
+          membershipType: isCoreTeam ? "Core Member" : "Member",
+          joinedDate: new Date().toISOString().split('T')[0],
+          collection: "Resistance DAO Genesis"
         }
-      ]
+      }
     };
 
-    // Upload metadata to IPFS
+    console.log('Uploading NFT metadata to IPFS:', JSON.stringify(metadata, null, 2));
     const ipfsHash = await uploadToIPFS(metadata);
+    console.log('Metadata uploaded to IPFS with hash:', ipfsHash);
     return `ipfs://${ipfsHash}`;
   };
 
@@ -151,16 +146,30 @@ export const useNFTMinting = () => {
       if (!provider?.provider) throw new Error("No provider available");
 
       const signer = provider.provider.getSigner();
+      const address = await signer.getAddress();
+      
+      console.log("Checking if address is owner:", address);
+      const ownerStatus = await checkIfOwner();
+      console.log("Is owner?", ownerStatus);
+
+      // If owner, use direct minting
+      if (ownerStatus) {
+        console.log("Owner detected, using safeMint");
+        return await ownerMint(address);
+      }
+
+      // Regular user minting with USDC payment
+      console.log("Regular user, proceeding with USDC payment mint");
       const nftContract = new ethers.Contract(
         NFT_CONTRACT_ADDRESS,
         NFT_ABI,
         signer
       );
 
-      const metadataUri = await createNFTMetadata(true);
-      console.log("Owner minting with metadata URI:", metadataUri);
+      const metadataUri = await createNFTMetadata(false);
+      console.log("Minting with metadata URI:", metadataUri);
       
-      const tx = await nftContract.safeMint(recipient, metadataUri);
+      const tx = await nftContract.mintNFT(metadataUri);
       const receipt = await tx.wait();
       
       const mintEvent = receipt.events?.find((e: any) => e.event === 'NFTMinted');
