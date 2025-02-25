@@ -20,7 +20,8 @@ const USDCInterface = new ethers.utils.Interface([
 ]);
 
 const NFTInterface = new ethers.utils.Interface([
-  "function mint(string memory tokenURI) external returns (uint256)"
+  "function mintNFT(string memory tokenURI) external",
+  "function owner() view returns (address)"
 ]);
 
 interface NFTPurchaseDialogProps {
@@ -179,7 +180,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
         async () => {
           const signer = walletProvider.provider.getSigner();
           const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, signer);
-          return nftContract.mint("bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py");
+          return nftContract.mintNFT("bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py");
         },
         {
           type: "nft",
