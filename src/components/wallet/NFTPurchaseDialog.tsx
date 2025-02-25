@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -37,7 +36,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   const [isMinting, setIsMinting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Check USDC balance and allowance
   useEffect(() => {
     const checkBalances = async () => {
       try {
@@ -83,6 +81,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
           description: "Approve USDC spending",
           timeout: 60000,
           maxRetries: 2,
+          backoffMs: 5000,
           tokenConfig: {
             tokenAddress: USDC_CONTRACT,
             spenderAddress: NFT_CONTRACT,
@@ -92,7 +91,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
         }
       );
 
-      // Update allowance after approval
       const signer = walletProvider.provider.getSigner();
       const address = await signer.getAddress();
       const usdcContract = new ethers.Contract(USDC_CONTRACT, USDCInterface, walletProvider.provider);
@@ -131,6 +129,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
           description: "Mint Member NFT",
           timeout: 120000,
           maxRetries: 2,
+          backoffMs: 5000,
           nftConfig: {
             tokenAddress: NFT_CONTRACT,
             amount: 1,
@@ -147,7 +146,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
         description: "NFT minted successfully! Welcome to Resistance DAO",
       });
 
-      // Auto-close after success
       setTimeout(() => {
         onOpenChange(false);
       }, 2000);
@@ -177,7 +175,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* NFT Preview */}
           <div className="relative aspect-square rounded-xl overflow-hidden border border-blue-500/20">
             <img
               src="https://gateway.pinata.cloud/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi"
@@ -187,13 +184,11 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           </div>
 
-          {/* Price and Balance */}
           <div className="space-y-2">
             <p className="text-white/70">Price: 50 USDC</p>
             <p className="text-white/70">Your Balance: {Number(usdcBalance).toFixed(2)} USDC</p>
           </div>
 
-          {/* Action Buttons */}
           <AnimatePresence mode="wait">
             {isSuccess ? (
               <motion.div
