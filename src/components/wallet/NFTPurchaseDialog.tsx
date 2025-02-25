@@ -1,10 +1,9 @@
-
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react"; // Added useEffect import
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ethers } from "ethers";
-import { Loader2, Check, AlertCircle, Wallet } from "lucide-react";
+import { Loader2, Check, AlertCircle, Wallet, Copy } from "lucide-react";
 import { executeTransaction } from "@/services/transactionManager";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { motion, AnimatePresence } from "framer-motion";
@@ -38,6 +37,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   const [isApproving, setIsApproving] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [userAddress, setUserAddress] = useState<string>("");
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -45,6 +45,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
         const walletProvider = await getProvider();
         const signer = walletProvider.provider.getSigner();
         const address = await signer.getAddress();
+        setUserAddress(address);
         
         const usdcContract = new ethers.Contract(USDC_CONTRACT, USDCInterface, walletProvider.provider);
         
@@ -67,6 +68,24 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       checkBalances();
     }
   }, [open, getProvider, toast]);
+
+  const handleOpenWallet = async () => {
+    try {
+      await navigator.clipboard.writeText(userAddress);
+      toast({
+        title: "Address Copied!",
+        description: "Your wallet address has been copied to clipboard",
+      });
+      primaryWallet?.connector?.showWallet?.({ view: 'send' });
+    } catch (error) {
+      console.error("Copy error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to copy address to clipboard",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleApproveUSDC = async () => {
     try {
@@ -173,10 +192,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     }
   };
 
-  const handleOpenWallet = () => {
-    primaryWallet?.connector?.showWallet?.({ view: 'send' });
-  };
-
   const needsApproval = Number(usdcAllowance) < 50;
   const hasEnoughUSDC = Number(usdcBalance) >= 50;
 
@@ -217,7 +232,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
                 onClick={handleOpenWallet}
                 className="w-full bg-[#33C3F0] hover:bg-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg flex items-center justify-center gap-2"
               >
-                <Wallet className="w-4 h-4" />
+                <Copy className="w-4 h-4" />
                 Transfer USDC From Wallet
               </Button>
             )}
