@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import { getFromIPFS } from '@/services/ipfsService';
 import { NFTMetadata } from '@/types/proposals';
 
+const CONTRACT_OWNER = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [showNFTSuccess, setShowNFTSuccess] = useState(false);
@@ -81,16 +83,19 @@ export const AccessCoverOverlay = () => {
     }
 
     try {
-      if (!hasApproval) {
-        const approved = await approveUSDC();
-        if (approved) {
-          setHasApproval(true);
-          toast({
-            title: "USDC Approved",
-            description: "You can now mint your NFT",
-          });
+      // Skip USDC approval check for contract owner
+      if (address.toLowerCase() !== CONTRACT_OWNER.toLowerCase()) {
+        if (!hasApproval) {
+          const approved = await approveUSDC();
+          if (approved) {
+            setHasApproval(true);
+            toast({
+              title: "USDC Approved",
+              description: "You can now mint your NFT",
+            });
+          }
+          return;
         }
-        return;
       }
       
       const minted = await mintNFT();
@@ -333,56 +338,60 @@ export const AccessCoverOverlay = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-blue-300 mb-2">Member NFT</h3>
                 <p className="text-blue-200/80 mb-6">
-                  Mint a Member NFT to join our community and get exclusive access
+                  {address.toLowerCase() === CONTRACT_OWNER.toLowerCase() 
+                    ? "As contract owner, you can mint your NFT without USDC"
+                    : "Mint a Member NFT to join our community and get exclusive access"}
                 </p>
 
-                <div className="space-y-4">
-                  <div className="text-left text-sm text-blue-300/60 space-y-1">
-                    <div>Price: {MINT_PRICE} USDC</div>
-                    <div>Your balance: {usdcBalance} USDC</div>
-                  </div>
-
-                  <div className="bg-blue-950/50 p-4 rounded-lg border border-blue-500/20">
-                    <p className="text-sm text-blue-300 mb-2 text-left">Transfer USDC to this address:</p>
-                    <div className="flex items-center justify-between bg-blue-900/30 p-3 rounded-md">
-                      <code className="text-xs md:text-sm text-blue-200 break-all text-left">
-                        {address}
-                      </code>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleCopyAddress}
-                        className="ml-2 hover:bg-blue-800/50"
-                      >
-                        <Copy className="w-4 h-4 text-blue-300" />
-                      </Button>
+                {address.toLowerCase() !== CONTRACT_OWNER.toLowerCase() && (
+                  <div className="space-y-4">
+                    <div className="text-left text-sm text-blue-300/60 space-y-1">
+                      <div>Price: {MINT_PRICE} USDC</div>
+                      <div>Your balance: {usdcBalance} USDC</div>
                     </div>
-                  </div>
 
-                  {Number(usdcBalance) < Number(MINT_PRICE) && (
-                    <Button
-                      onClick={handleBuyUSDC}
-                      disabled={!onrampEnabled || isOpeningOnramp}
-                      className="w-full bg-gradient-to-r from-green-600 to-blue-600 py-6 text-lg mb-2"
-                    >
-                      <CreditCard className="w-5 h-5 mr-2" />
-                      Buy USDC with Card
-                    </Button>
-                  )}
-                  
-                  <Button
-                    onClick={handleMintClick}
-                    disabled={isMinting || isApproving}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-6 text-lg"
-                  >
-                    {isApproving || isMinting ? (
-                      <Loader2 className="w-6 h-6 mr-2 animate-spin" />
-                    ) : null}
-                    {isApproving ? "Approving USDC..." :
-                     isMinting ? "Minting NFT..." :
-                     !hasApproval ? "Approve USDC" : "Mint Member NFT"}
-                  </Button>
-                </div>
+                    <div className="bg-blue-950/50 p-4 rounded-lg border border-blue-500/20">
+                      <p className="text-sm text-blue-300 mb-2 text-left">Transfer USDC to this address:</p>
+                      <div className="flex items-center justify-between bg-blue-900/30 p-3 rounded-md">
+                        <code className="text-xs md:text-sm text-blue-200 break-all text-left">
+                          {address}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleCopyAddress}
+                          className="ml-2 hover:bg-blue-800/50"
+                        >
+                          <Copy className="w-4 h-4 text-blue-300" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {Number(usdcBalance) < Number(MINT_PRICE) && (
+                      <Button
+                        onClick={handleBuyUSDC}
+                        disabled={!onrampEnabled || isOpeningOnramp}
+                        className="w-full bg-gradient-to-r from-green-600 to-blue-600 py-6 text-lg mb-2"
+                      >
+                        <CreditCard className="w-5 h-5 mr-2" />
+                        Buy USDC with Card
+                      </Button>
+                    )}
+                  </div>
+                )}
+                
+                <Button
+                  onClick={handleMintClick}
+                  disabled={isMinting || isApproving}
+                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-6 text-lg"
+                >
+                  {isApproving || isMinting ? (
+                    <Loader2 className="w-6 h-6 mr-2 animate-spin" />
+                  ) : null}
+                  {isApproving ? "Approving USDC..." :
+                   isMinting ? "Minting NFT..." :
+                   !hasApproval && address.toLowerCase() !== CONTRACT_OWNER.toLowerCase() ? "Approve USDC" : "Mint Member NFT"}
+                </Button>
               </div>
             </div>
           )}
