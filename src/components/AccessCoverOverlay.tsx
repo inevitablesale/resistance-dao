@@ -98,26 +98,37 @@ export const AccessCoverOverlay = () => {
                   <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
                     Welcome to Resistance DAO
                   </h1>
-                  <div className="flex flex-col gap-4 items-center">
-                    <p className="text-xl text-blue-200/80">
-                      Our members are driving the future of decentralized finance
-                    </p>
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="text-sm font-medium text-blue-300/60">Already a member?</span>
-                      <Button 
-                        size="lg"
-                        onClick={connectWallet}
-                        disabled={isInitializing}
-                        className="bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold px-8 py-6 text-lg relative overflow-hidden group"
-                      >
-                        <div className="absolute inset-0 bg-blue-400/20 group-hover:animate-pulse" />
-                        {isInitializing ? (
-                          <Loader2 className="w-6 h-6 mr-3 animate-spin" />
-                        ) : (
-                          <Wallet className="w-6 h-6 mr-3" />
-                        )}
-                        Connect Wallet
-                      </Button>
+                  <div className="flex flex-col gap-6 items-center">
+                    <div className="space-y-4">
+                      <p className="text-xl text-blue-200/80">
+                        Since 2021, our OG members have been at the forefront of DeFi innovation
+                      </p>
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-sm font-medium text-blue-300/60">OG Member? Welcome back</span>
+                        <Button 
+                          size="lg"
+                          onClick={connectWallet}
+                          disabled={isInitializing}
+                          className="bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold px-8 py-6 text-lg relative overflow-hidden group"
+                        >
+                          <div className="absolute inset-0 bg-blue-400/20 group-hover:animate-pulse" />
+                          {isInitializing ? (
+                            <Loader2 className="w-6 h-6 mr-3 animate-spin" />
+                          ) : (
+                            <Wallet className="w-6 h-6 mr-3" />
+                          )}
+                          Connect Wallet
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="w-full max-w-xl pt-8 border-t border-blue-500/20">
+                      <p className="text-lg text-blue-200/80 mb-4">
+                        New to Resistance? Join our community of DeFi pioneers
+                      </p>
+                      <p className="text-sm text-blue-300/60 mb-2">
+                        Connect your wallet to mint your Member NFT
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -126,7 +137,7 @@ export const AccessCoverOverlay = () => {
           ) : (
             <div className="space-y-8">
               <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
-                Join Our Community
+                Join Our DeFi Pioneers
               </h1>
               
               <div className="bg-blue-900/30 rounded-xl p-8 backdrop-blur border border-blue-500/20 max-w-xl mx-auto">
@@ -135,7 +146,7 @@ export const AccessCoverOverlay = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-blue-300 mb-2">Become a Member</h3>
                 <p className="text-blue-200/80 mb-8">
-                  Join our vibrant community of DeFi innovators by minting your Member NFT
+                  Join our established community of DeFi innovators by minting your Member NFT
                 </p>
                 <div className="space-y-4">
                   <div className="text-left text-sm text-blue-300/60 space-y-1">
