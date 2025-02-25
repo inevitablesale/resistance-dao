@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { executeTransaction } from "@/services/transactionManager";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { FACTORY_ADDRESS } from "@/lib/constants";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
@@ -40,7 +40,7 @@ export const ContractApprovalStatus = ({
       await executeTransaction(
         () => tokenContract.approve(spenderAddress, amount),
         {
-          type: 'erc20_approval',  // Changed from 'token' to 'erc20_approval'
+          type: 'erc20_approval',
           description: "Token approval for contract interaction",
           timeout: 60000,
           maxRetries: 2,
@@ -82,7 +82,7 @@ export const ContractApprovalStatus = ({
       >
         {isApproving ? (
           <>
-            <LoadingSpinner className="mr-2" />
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             Approving...
           </>
         ) : (
