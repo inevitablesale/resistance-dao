@@ -1,4 +1,3 @@
-
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Wallet, Loader2, Shield, CreditCard, Copy, LogOut } from "lucide-react";
@@ -147,10 +146,30 @@ export const AccessCoverOverlay = () => {
 
   const handleLogout = async () => {
     try {
-      if (primaryWallet?.disconnect) {
-        await primaryWallet.disconnect();
-        setShowAuthFlow(false); // Close auth flow after disconnecting
+      if (!primaryWallet) {
+        console.error('No wallet found to disconnect');
+        return;
       }
+
+      console.log('Starting logout process...');
+      
+      // First disconnect the wallet
+      if (primaryWallet.disconnect) {
+        console.log('Disconnecting wallet...');
+        await primaryWallet.disconnect();
+        console.log('Wallet disconnected successfully');
+      }
+
+      // Then hide the auth flow
+      if (setShowAuthFlow) {
+        console.log('Hiding auth flow...');
+        setShowAuthFlow(false);
+      }
+
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out",
+      });
     } catch (error) {
       console.error('Logout error:', error);
       toast({
