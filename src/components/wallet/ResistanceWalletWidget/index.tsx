@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Coins } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -20,7 +20,7 @@ export const ResistanceWalletWidget = () => {
   const { data: nftBalance = 0 } = useNFTBalance(address);
   const [isNftDialogOpen, setIsNftDialogOpen] = useState(false);
 
-  useState(() => {
+  useEffect(() => {
     const fetchBalances = async () => {
       if (!address) return;
 
@@ -110,4 +110,3 @@ export const ResistanceWalletWidget = () => {
 };
 
 export default ResistanceWalletWidget;
-
