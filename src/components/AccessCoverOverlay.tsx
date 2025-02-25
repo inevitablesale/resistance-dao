@@ -8,7 +8,8 @@ import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNFTMinting } from "@/hooks/useNFTMinting";
-import { useDynamicContext, DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, useOnramp } from "@dynamic-labs/sdk-react-core";
+import { OnrampProviders } from "@dynamic-labs/sdk-api-core";
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -16,6 +17,7 @@ export const AccessCoverOverlay = () => {
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
   const { primaryWallet } = useDynamicContext();
+  const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
   const { 
     isApproving,
     isMinting,
@@ -69,12 +71,17 @@ export const AccessCoverOverlay = () => {
     }
   };
 
-  const handleBuyUSDC = () => {
-    // Instead of using showOnramp directly, we'll use the DynamicWidget
-    // which provides a more stable API for onramping
-    const element = document.querySelector('[data-dynamic="flow-handler"]');
-    if (element) {
-      element.dispatchEvent(new CustomEvent('dynamic:open'));
+  const handleBuyUSDC = async () => {
+    if (!onrampEnabled || !address) return;
+    
+    try {
+      await openOnramp({
+        onrampProvider: OnrampProviders.Banxa,
+        token: 'USDC',
+        address: address
+      });
+    } catch (error) {
+      console.error('Failed to open onramp:', error);
     }
   };
 
@@ -168,6 +175,7 @@ export const AccessCoverOverlay = () => {
                   {Number(usdcBalance) < Number(MINT_PRICE) && (
                     <Button
                       onClick={handleBuyUSDC}
+                      disabled={!onrampEnabled}
                       className="w-full bg-gradient-to-r from-green-600 to-blue-600 py-6 text-lg mb-2"
                     >
                       <CreditCard className="w-5 h-5 mr-2" />
@@ -209,11 +217,6 @@ export const AccessCoverOverlay = () => {
           }
         `}
       </style>
-      
-      {/* Hidden DynamicWidget for onramp functionality */}
-      <div className="hidden">
-        <DynamicWidget />
-      </div>
     </div>
   );
 };
