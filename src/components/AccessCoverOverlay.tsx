@@ -1,3 +1,4 @@
+
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Wallet, Loader2, Shield, CreditCard } from "lucide-react";
@@ -7,14 +8,14 @@ import { useDynamicUtils } from "@/hooks/useDynamicUtils";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNFTMinting } from "@/hooks/useNFTMinting";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, useDynamicModals } from "@dynamic-labs/sdk-react-core";
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
-  const { showOnramp } = useDynamicContext();
+  const { showOnramp } = useDynamicModals();
   const { 
     isApproving,
     isMinting,
@@ -69,7 +70,7 @@ export const AccessCoverOverlay = () => {
   };
 
   const handleBuyUSDC = () => {
-    showOnramp?.(true);
+    showOnramp();
   };
 
   return (
