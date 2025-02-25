@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -24,7 +23,10 @@ const USDCInterface = new ethers.utils.Interface([
 const NFTInterface = new ethers.utils.Interface([
   "function mintNFT(string memory tokenURI) external",
   "function owner() view returns (address)",
-  "function paused() view returns (bool)"
+  "function paused() view returns (bool)",
+  "function getPendingRefund(address user) view returns (uint256)",
+  "function claimRefund() external",
+  "function treasury() view returns (address)"
 ]);
 
 interface NFTPurchaseDialogProps {
@@ -44,6 +46,64 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   const [userAddress, setUserAddress] = useState<string>("");
   const [isContractOwner, setIsContractOwner] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+
+  const checkPendingRefund = async () => {
+    try {
+      const walletProvider = await getProvider();
+      const signer = walletProvider.provider.getSigner();
+      const address = await signer.getAddress();
+      
+      const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, walletProvider.provider);
+      const pendingRefund = await nftContract.getPendingRefund(address);
+      
+      if (pendingRefund.gt(0)) {
+        toast({
+          title: "Pending Refund Available",
+          description: `You have ${ethers.utils.formatUnits(pendingRefund, 6)} USDC available for refund`,
+          action: (
+            <Button onClick={() => handleClaimRefund()} variant="outline">
+              Claim Refund
+            </Button>
+          ),
+        });
+      }
+    } catch (error) {
+      console.error("Error checking refund:", error);
+    }
+  };
+
+  const handleClaimRefund = async () => {
+    try {
+      const walletProvider = await getProvider();
+      const signer = walletProvider.provider.getSigner();
+      const nftContract = new ethers.Contract(NFT_CONTRACT, NFTInterface, signer);
+      
+      await executeTransaction(
+        async () => {
+          return nftContract.claimRefund();
+        },
+        {
+          type: 'contract',
+          description: "Claim USDC Refund",
+          timeout: 60000,
+          maxRetries: 2,
+          backoffMs: 5000
+        }
+      );
+
+      toast({
+        title: "Success",
+        description: "Refund claimed successfully",
+      });
+    } catch (error) {
+      console.error("Refund claim error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to claim refund",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     const checkContractStatus = async () => {
@@ -76,12 +136,6 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       }
     };
 
-    if (open) {
-      checkContractStatus();
-    }
-  }, [open, getProvider, toast]);
-
-  useEffect(() => {
     const checkBalances = async () => {
       try {
         const walletProvider = await getProvider();
@@ -114,7 +168,9 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
     };
 
     if (open) {
+      checkContractStatus();
       checkBalances();
+      checkPendingRefund();
     }
   }, [open, getProvider, toast]);
 
