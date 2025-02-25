@@ -3,18 +3,16 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletProvider } from "./useWalletProvider";
-import { uploadToIPFS } from "@/services/ipfsService";
-import { IPFSContent } from "@/types/content";
 
+// Polygon Mainnet addresses
 const NFT_CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
 const USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const MINT_PRICE = ethers.utils.parseUnits("50", 6); // 50 USDC with 6 decimals
 
 const NFT_ABI = [
-  "function mintNFT(string calldata tokenURI) external",
-  "function safeMint(address recipient, string memory tokenURI) public",
-  "function bulkMint(address[] calldata recipients, string[] calldata tokenURIs) external",
-  "function owner() view returns (address)",
+  "function mint(address to) external",
+  "function safeMint(address to, string memory uri) external",
+  "function setTokenURI(uint256 tokenId, string memory uri) external",
   "function tokenURI(uint256 tokenId) view returns (string)",
   "function balanceOf(address owner) view returns (uint256)"
 ];
@@ -22,7 +20,7 @@ const NFT_ABI = [
 const USDC_ABI = [
   "function approve(address spender, uint256 amount) external returns (bool)",
   "function allowance(address owner, address spender) view returns (uint256)",
-  "function balanceOf(address owner) view returns (uint256)",
+  "function balanceOf(address account) view returns (uint256)",
   "function decimals() view returns (uint8)"
 ];
 
@@ -32,12 +30,17 @@ export const useNFTMinting = () => {
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
 
-  const checkUSDCApproval = async (address: string): Promise<boolean> => {
+  const checkUSDCApproval = async (address: string) => {
     try {
       const provider = await getProvider();
       if (!provider?.provider) return false;
 
-      const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
+      const usdcContract = new ethers.Contract(
+        USDC_ADDRESS,
+        USDC_ABI,
+        provider.provider
+      );
+
       const allowance = await usdcContract.allowance(address, NFT_CONTRACT_ADDRESS);
       return allowance.gte(MINT_PRICE);
     } catch (error) {
@@ -46,12 +49,17 @@ export const useNFTMinting = () => {
     }
   };
 
-  const getUSDCBalance = async (address: string): Promise<string> => {
+  const getUSDCBalance = async (address: string) => {
     try {
       const provider = await getProvider();
       if (!provider?.provider) return "0";
 
-      const usdcContract = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider.provider);
+      const usdcContract = new ethers.Contract(
+        USDC_ADDRESS,
+        USDC_ABI,
+        provider.provider
+      );
+
       const balance = await usdcContract.balanceOf(address);
       return ethers.utils.formatUnits(balance, 6);
     } catch (error) {
@@ -63,33 +71,26 @@ export const useNFTMinting = () => {
   const approveUSDC = async () => {
     setIsApproving(true);
     try {
-      console.log("=== Starting USDC Approval Process ===");
+      console.log("Starting USDC approval process...");
       const provider = await getProvider();
       if (!provider?.provider) throw new Error("No provider available");
-      console.log("Provider obtained successfully");
 
       const signer = provider.provider.getSigner();
-      const address = await signer.getAddress();
-      console.log("Signer address:", address);
-
       const usdcContract = new ethers.Contract(
         USDC_ADDRESS,
         USDC_ABI,
         signer
       );
-      console.log("USDC contract instance created");
 
-      console.log("Approving USDC spend amount:", ethers.utils.formatUnits(MINT_PRICE, 6), "USDC");
+      console.log("Approving USDC amount:", ethers.utils.formatUnits(MINT_PRICE, 6));
       const tx = await usdcContract.approve(NFT_CONTRACT_ADDRESS, MINT_PRICE);
       console.log("Approval transaction submitted:", tx.hash);
 
-      console.log("Waiting for approval transaction confirmation...");
       await tx.wait();
-      console.log("=== USDC Approval Complete ===");
+      console.log("USDC approval complete");
       return true;
     } catch (error) {
-      console.error("=== USDC Approval Failed ===");
-      console.error("Error details:", error);
+      console.error("USDC approval failed:", error);
       toast({
         title: "Approval Failed",
         description: "Failed to approve USDC spending. Please try again.",
@@ -104,40 +105,28 @@ export const useNFTMinting = () => {
   const mintNFT = async () => {
     setIsMinting(true);
     try {
-      console.log("\n=== Starting NFT Minting Process ===");
+      console.log("Starting NFT mint process...");
       const provider = await getProvider();
       if (!provider?.provider) throw new Error("No provider available");
-      console.log("Provider obtained successfully");
 
       const signer = provider.provider.getSigner();
-      const address = await signer.getAddress();
-      console.log("Signer address:", address);
-
-      const metadataURI = "ipfs://bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py";
-      console.log("Using metadata URI:", metadataURI);
-      
-      console.log("Creating NFT contract instance...");
-      console.log("NFT Contract Address:", NFT_CONTRACT_ADDRESS);
       const nftContract = new ethers.Contract(
         NFT_CONTRACT_ADDRESS,
         NFT_ABI,
         signer
       );
-      console.log("NFT contract instance created");
 
-      console.log("Submitting mint transaction...");
-      const tx = await nftContract.mintNFT(metadataURI);
+      // First mint the token to the user
+      console.log("Minting NFT...");
+      const tx = await nftContract.mint(await signer.getAddress());
       console.log("Mint transaction submitted:", tx.hash);
 
-      console.log("Waiting for transaction confirmation...");
       const receipt = await tx.wait();
-      console.log("Transaction confirmed! Receipt:", receipt);
-      
-      console.log("=== NFT Minting Complete ===\n");
+      console.log("NFT minted successfully:", receipt);
+
       return true;
     } catch (error) {
-      console.error("\n=== NFT Minting Failed ===");
-      console.error("Error details:", error);
+      console.error("NFT minting failed:", error);
       throw error;
     } finally {
       setIsMinting(false);
