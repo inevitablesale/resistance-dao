@@ -32,7 +32,7 @@ interface NFTPurchaseDialogProps {
 export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps) => {
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
-  const { primaryWallet, user } = useDynamicContext();
+  const { primaryWallet, user, setShowAuthFlow } = useDynamicContext();
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
   const [usdcAllowance, setUsdcAllowance] = useState<string>("0");
   const [isApproving, setIsApproving] = useState(false);
@@ -42,7 +42,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
 
   const handleLogout = async () => {
     try {
-      await user?.logout();
+      await user?.logout?.();
       onOpenChange(false);
       toast({
         title: "Success",
