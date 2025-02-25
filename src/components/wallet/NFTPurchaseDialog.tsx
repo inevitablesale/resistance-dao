@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -197,53 +198,53 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#0A0B2E] border border-blue-500/20 p-0 max-w-xl w-[95%] overflow-hidden">
-        <div className="p-6 space-y-8">
+      <DialogContent className="bg-[#0A0B2E] border border-blue-500/20 p-0 max-w-md w-[90%] overflow-hidden">
+        <div className="p-4 space-y-4">
           {/* NFT Image Display */}
-          <div className="relative aspect-square rounded-xl overflow-hidden bg-[#111444] border border-blue-400/20">
+          <div className="relative rounded-lg overflow-hidden bg-[#111444] border border-blue-400/20" style={{ maxHeight: '240px' }}>
             <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent" />
             <img
               src="https://gateway.pinata.cloud/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi"
               alt="Member NFT"
-              className="w-full h-full object-contain p-4"
+              className="w-full h-full object-contain p-2"
             />
           </div>
 
           {/* NFT Details */}
-          <div className="space-y-4 text-center">
-            <h2 className="text-2xl font-bold text-blue-100">Resistance DAO Member</h2>
-            <p className="text-blue-200/80 text-lg">
+          <div className="space-y-2 text-center">
+            <h2 className="text-xl font-bold text-blue-100">Resistance DAO Member</h2>
+            <p className="text-blue-200/80 text-sm">
               Guardian of Web3 innovation. Access platform features, vote on proposals, and earn from successful launches.
             </p>
           </div>
 
           {/* Price and Balance Display */}
-          <div className="space-y-2 bg-blue-950/30 rounded-lg p-4">
-            <div className="flex justify-between items-center text-blue-100">
+          <div className="space-y-1 bg-blue-950/30 rounded-lg p-3">
+            <div className="flex justify-between items-center text-blue-100 text-sm">
               <span>Price:</span>
               <span className="font-semibold">50 USDC</span>
             </div>
-            <div className="flex justify-between items-center text-blue-200">
+            <div className="flex justify-between items-center text-blue-200 text-sm">
               <span>Your Balance:</span>
               <span>{Number(usdcBalance).toFixed(2)} USDC</span>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Button
               onClick={handleBuyUsdc}
-              className="w-full bg-[#9B87F5] hover:bg-[#7E69AB] text-white py-6 text-lg font-medium rounded-xl flex items-center justify-center gap-2"
+              className="w-full bg-[#9B87F5] hover:bg-[#7E69AB] text-white py-4 text-base font-medium rounded-lg flex items-center justify-center gap-2"
             >
-              <ExternalLink className="w-5 h-5" />
+              <ExternalLink className="w-4 h-4" />
               Buy USDC
             </Button>
 
             <Button
               onClick={handleOpenWallet}
-              className="w-full bg-[#33C3F0] hover:bg-[#0EA5E9] text-white py-6 text-lg font-medium rounded-xl flex items-center justify-center gap-2"
+              className="w-full bg-[#33C3F0] hover:bg-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg flex items-center justify-center gap-2"
             >
-              <Wallet className="w-5 h-5" />
+              <Wallet className="w-4 h-4" />
               Transfer
             </Button>
 
@@ -253,39 +254,39 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="flex flex-col items-center gap-4 py-4"
+                  className="flex flex-col items-center gap-3 py-2"
                 >
-                  <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <Check className="w-6 h-6 text-green-500" />
+                  <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <Check className="w-5 h-5 text-green-500" />
                   </div>
-                  <p className="text-green-400 text-lg font-semibold">Welcome to Resistance DAO!</p>
+                  <p className="text-green-400 text-base font-semibold">Welcome to Resistance DAO!</p>
                 </motion.div>
               ) : !hasEnoughUSDC ? (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="flex flex-col items-center gap-4"
+                  className="flex flex-col items-center gap-2"
                 >
-                  <AlertCircle className="w-8 h-8 text-yellow-500" />
-                  <p className="text-yellow-500">Insufficient USDC balance</p>
+                  <AlertCircle className="w-6 h-6 text-yellow-500" />
+                  <p className="text-yellow-500 text-sm">Insufficient USDC balance</p>
                 </motion.div>
               ) : needsApproval ? (
                 <Button
                   onClick={handleApproveUSDC}
                   disabled={isApproving}
-                  className="w-full bg-[#1EAEDB] hover:bg-[#0FA0CE] text-white py-6 text-lg font-medium rounded-xl"
+                  className="w-full bg-[#1EAEDB] hover:bg-[#0FA0CE] text-white py-4 text-base font-medium rounded-lg"
                 >
-                  {isApproving && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
+                  {isApproving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   Approve USDC
                 </Button>
               ) : (
                 <Button
                   onClick={handleMintNFT}
                   disabled={isMinting}
-                  className="w-full bg-gradient-to-r from-[#9B87F5] to-[#33C3F0] hover:from-[#7E69AB] hover:to-[#0EA5E9] text-white py-6 text-lg font-medium rounded-xl"
+                  className="w-full bg-gradient-to-r from-[#9B87F5] to-[#33C3F0] hover:from-[#7E69AB] hover:to-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg"
                 >
-                  {isMinting && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
+                  {isMinting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   {isMinting ? "Minting..." : "Buy Member NFT"}
                 </Button>
               )}
