@@ -1,6 +1,6 @@
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Wallet, Loader2, Shield, CreditCard, Copy } from "lucide-react";
+import { X, Wallet, Loader2, Shield, CreditCard, Copy, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
@@ -128,8 +128,24 @@ export const AccessCoverOverlay = () => {
     }
   };
 
+  const { disconnect } = useDynamicUtils();
+
   return (
     <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-blue-950 to-black">
+      {address && (
+        <div className="absolute top-4 right-4 z-10">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={disconnect}
+            className="text-blue-300 hover:text-blue-200 hover:bg-blue-900/50"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Logout
+          </Button>
+        </div>
+      )}
+      
       <div 
         className="absolute inset-0 bg-[url('/lovable-uploads/ca457542-e761-44f2-acbf-1bf9b4255b78.png')] bg-cover bg-center opacity-10"
         style={{
