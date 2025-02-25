@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
@@ -93,6 +94,49 @@ export const useNFTMinting = () => {
     }
   };
 
+  const createNFTMetadata = async (isCoreTeam: boolean) => {
+    const metadata = {
+      contentSchema: "nft-1.0.0",
+      contentType: "nft",
+      title: "Resistance DAO Member NFT",
+      description: "Exclusive NFT for Resistance DAO members. Grants access to DAO governance, voting rights, and 2.5% shared rewards from all launched projects.",
+      content: JSON.stringify({
+        name: "Resistance DAO Member",
+        image: "https://gateway.pinata.cloud/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi",
+        external_link: "http://resistancedao.xyz/",
+        seller_fee_basis_points: 250,
+        fee_recipient: "0x386f47AE974255c9486A2D4B91a3694E95A1EE81",
+        attributes: [
+          {
+            trait_type: "Member Type",
+            value: isCoreTeam ? "Core Member" : "Member"
+          },
+          {
+            trait_type: "Join Date",
+            value: new Date().toISOString().split('T')[0]
+          },
+          {
+            trait_type: "Collection",
+            value: "Resistance DAO Genesis"
+          }
+        ]
+      }),
+      metadata: {
+        author: "Resistance DAO",
+        publishedAt: Date.now(),
+        version: 1,
+        language: "en",
+        tags: ["membership", "dao", "nft"],
+        coverImage: "https://gateway.pinata.cloud/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi"
+      }
+    };
+
+    console.log('Uploading NFT metadata to IPFS:', JSON.stringify(metadata, null, 2));
+    const ipfsHash = await uploadToIPFS(metadata);
+    console.log('Metadata uploaded to IPFS with hash:', ipfsHash);
+    return `ipfs://${ipfsHash}`;
+  };
+
   const checkIfOwner = async () => {
     try {
       const provider = await getProvider();
@@ -115,33 +159,6 @@ export const useNFTMinting = () => {
       console.error("Error checking owner:", error);
       return false;
     }
-  };
-
-  const createNFTMetadata = async (isCoreTeam: boolean) => {
-    const metadata = {
-      name: "Resistance DAO Member NFT",
-      description: "A member of the Resistance DAO community",
-      image: "ipfs://QmavmeeRNGXrxewZkHnv9Yyc2k2ZDpmVNwU4XAYQXDbsD6", // Default Resistance DAO logo
-      external_url: "https://resistancedao.xyz",
-      attributes: [
-        {
-          trait_type: "Membership Type",
-          value: isCoreTeam ? "Core Member" : "Member"
-        },
-        {
-          trait_type: "Joined",
-          value: new Date().toISOString().split('T')[0] // Just the date part
-        },
-        {
-          trait_type: "Collection",
-          value: "Resistance DAO Genesis"
-        }
-      ]
-    };
-
-    // Upload metadata to IPFS
-    const ipfsHash = await uploadToIPFS(metadata);
-    return `ipfs://${ipfsHash}`;
   };
 
   const ownerMint = async (recipient: string) => {
