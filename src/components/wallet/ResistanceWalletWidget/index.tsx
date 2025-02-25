@@ -1,30 +1,26 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Coins, Info } from "lucide-react";
+import { Coins } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useOnramp } from "@dynamic-labs/sdk-react-core";
-import { OnrampProviders } from '@dynamic-labs/sdk-api-core';
-import { getWorkingProvider, getRdTokenContract, getUsdcContract, purchaseTokens } from "@/services/presaleContractService";
 import { ethers } from "ethers";
+import { getWorkingProvider, getRdTokenContract, getUsdcContract } from "@/services/presaleContractService";
 import { TokenBalanceDisplay } from "./TokenBalanceDisplay";
-import { BuyTokenSection } from "./BuyTokenSection";
 import { NFTDisplay } from "./NFTDisplay";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
+import { Button } from "@/components/ui/button";
+import { NFTPurchaseDialog } from "../NFTPurchaseDialog";
 
 export const ResistanceWalletWidget = () => {
   const { address } = useCustomWallet();
-  const { setShowAuthFlow, primaryWallet } = useDynamicContext();
-  const { enabled, open } = useOnramp();
+  const { primaryWallet } = useDynamicContext();
   const [rdBalance, setRdBalance] = useState<string>("0");
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
-  const { toast } = useToast();
   const { data: nftBalance = 0 } = useNFTBalance(address);
+  const [isNftDialogOpen, setIsNftDialogOpen] = useState(false);
 
-  useEffect(() => {
+  useState(() => {
     const fetchBalances = async () => {
       if (!address) return;
 
@@ -52,99 +48,8 @@ export const ResistanceWalletWidget = () => {
     return () => clearInterval(interval);
   }, [address]);
 
-  const handleBuyUsdc = async () => {
-    console.log("[Banxa] Starting USDC purchase flow...", {
-      isEnabled: enabled,
-      hasWallet: !!primaryWallet?.address,
-      walletAddress: primaryWallet?.address
-    });
-
-    if (!primaryWallet?.address) {
-      console.log("[Banxa] No wallet connected, showing auth flow");
-      setShowAuthFlow?.(true);
-      return;
-    }
-
-    if (!enabled) {
-      console.log("[Banxa] Onramp not enabled, current state:", { 
-        enabled, 
-        primaryWallet,
-        onrampConfig: {
-          provider: OnrampProviders.Banxa,
-          token: 'USDC',
-          address: primaryWallet.address,
-        }
-      });
-      
-      toast({
-        title: "Onramp Not Available",
-        description: "The onramp service is currently not available",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      console.log("[Banxa] Opening Banxa onramp with config:", {
-        provider: OnrampProviders.Banxa,
-        token: 'USDC',
-        address: primaryWallet.address,
-      });
-
-      await open({
-        onrampProvider: OnrampProviders.Banxa,
-        token: 'USDC',
-        address: primaryWallet.address,
-      });
-      
-      console.log("[Banxa] Onramp opened successfully");
-      
-      toast({
-        title: "Purchase Initiated",
-        description: "Your USDC purchase has been initiated successfully",
-      });
-    } catch (error) {
-      console.error("[Banxa] Onramp error:", {
-        error,
-        errorType: error instanceof Error ? error.constructor.name : typeof error,
-        errorMessage: error instanceof Error ? error.message : "Unknown error",
-        errorStack: error instanceof Error ? error.stack : undefined
-      });
-      
-      toast({
-        title: "Purchase Failed",
-        description: error instanceof Error ? error.message : "Failed to initiate purchase",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleBuyRd = async (purchaseAmount: string) => {
-    if (!primaryWallet?.address || !purchaseAmount) return;
-
-    try {
-      const walletClient = await primaryWallet.getWalletClient();
-      if (!walletClient) {
-        throw new Error("No wallet client available");
-      }
-
-      const provider = new ethers.providers.Web3Provider(walletClient as any);
-      const signer = provider.getSigner();
-      
-      const result = await purchaseTokens(signer, purchaseAmount);
-      
-      toast({
-        title: "Purchase Successful",
-        description: `Successfully purchased ${result.amount} RD tokens`,
-      });
-    } catch (error: any) {
-      console.error("Purchase error:", error);
-      toast({
-        title: "Purchase Failed",
-        description: error.message || "Failed to purchase tokens",
-        variant: "destructive",
-      });
-    }
+  const handleTransfer = () => {
+    primaryWallet?.connector?.showWallet?.({ view: 'send' });
   };
 
   return (
@@ -178,16 +83,31 @@ export const ResistanceWalletWidget = () => {
               className="py-2 border-t border-blue-500/10"
             />
 
-            <BuyTokenSection
-              usdcBalance={usdcBalance}
-              onBuyUsdc={handleBuyUsdc}
-              onBuyRd={handleBuyRd}
-            />
+            <div className="flex flex-col gap-2 pt-2">
+              <Button
+                onClick={handleTransfer}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold"
+              >
+                Transfer
+              </Button>
+              <Button
+                onClick={() => setIsNftDialogOpen(true)}
+                className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold"
+              >
+                Buy NFT
+              </Button>
+            </div>
           </div>
         </PopoverContent>
       </Popover>
+
+      <NFTPurchaseDialog 
+        open={isNftDialogOpen}
+        onOpenChange={setIsNftDialogOpen}
+      />
     </div>
   );
 };
 
 export default ResistanceWalletWidget;
+
