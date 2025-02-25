@@ -24,15 +24,32 @@ export const AccessCoverOverlay = () => {
     if (address && nftBalance > 0) {
       console.log("NFT membership detected, closing overlay");
       setIsOpen(false);
-      // Don't close the purchase dialog here
     }
   }, [address, nftBalance, isCheckingNFT]);
 
   const handleGetNFT = () => {
     setIsPurchaseOpen(true);
+    setIsOpen(false); // Close the overlay when opening the purchase dialog
   };
 
-  if (!isOpen) return null;
+  // Handle purchase dialog close
+  const handlePurchaseDialogClose = (open: boolean) => {
+    setIsPurchaseOpen(open);
+    if (!open && nftBalance === 0) {
+      // Only reopen the overlay if user hasn't minted an NFT
+      setIsOpen(true);
+    }
+  };
+
+  if (!isOpen) {
+    // Return just the purchase dialog when overlay is closed
+    return (
+      <NFTPurchaseDialog 
+        open={isPurchaseOpen}
+        onOpenChange={handlePurchaseDialogClose}
+      />
+    );
+  }
 
   return (
     <>
@@ -123,12 +140,6 @@ export const AccessCoverOverlay = () => {
           </div>
         </div>
       </div>
-
-      {/* Move NFTPurchaseDialog outside the main overlay div */}
-      <NFTPurchaseDialog 
-        open={isPurchaseOpen}
-        onOpenChange={setIsPurchaseOpen}
-      />
     </>
   );
 };
