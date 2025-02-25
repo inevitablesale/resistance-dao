@@ -120,26 +120,27 @@ export const useNFTMinting = () => {
   };
 
   const createNFTMetadata = async (isCoreTeam: boolean) => {
-    const metadata: IPFSContent = {
-      contentSchema: "nft-1.0.0",
-      contentType: "nft",
-      title: "Resistance DAO Member NFT",
-      content: JSON.stringify({
-        type: "nft",
-        properties: {
-          membershipType: isCoreTeam ? "Core Member" : "Member",
-          joinedDate: new Date().toISOString().split('T')[0],
-          collection: "Resistance DAO Genesis"
+    const metadata = {
+      name: "Resistance DAO Member",
+      description: "Exclusive NFT for Resistance DAO members. Grants access to DAO governance, voting rights, and 2.5% shared rewards from all launched projects.",
+      image: "https://gateway.pinata.cloud/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi",
+      external_link: "http://resistancedao.xyz/",
+      seller_fee_basis_points: 250,
+      fee_recipient: "0x386f47AE974255c9486A2D4B91a3694E95A1EE81",
+      attributes: [
+        {
+          trait_type: "Member Type",
+          value: isCoreTeam ? "Core Member" : "Member"
+        },
+        {
+          trait_type: "Join Date",
+          value: new Date().toISOString().split('T')[0]
+        },
+        {
+          trait_type: "Collection",
+          value: "Resistance DAO Genesis"
         }
-      }),
-      metadata: {
-        author: "Resistance DAO",
-        publishedAt: Date.now(),
-        version: 1,
-        language: "en",
-        tags: ["membership", "dao", "nft"],
-        coverImage: "ipfs://QmavmeeRNGXrxewZkHnv9Yyc2k2ZDpmVNwU4XAYQXDbsD6" // Default Resistance DAO logo
-      }
+      ]
     };
 
     console.log('Uploading NFT metadata to IPFS:', JSON.stringify(metadata, null, 2));
