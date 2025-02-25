@@ -128,8 +128,6 @@ export const AccessCoverOverlay = () => {
     }
   };
 
-  const { disconnect } = useDynamicUtils();
-
   return (
     <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-blue-950 to-black">
       {address && (
@@ -137,7 +135,7 @@ export const AccessCoverOverlay = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={disconnect}
+            onClick={() => primaryWallet?.disconnect()}
             className="text-blue-300 hover:text-blue-200 hover:bg-blue-900/50"
           >
             <LogOut className="w-4 h-4 mr-2" />
@@ -270,7 +268,7 @@ export const AccessCoverOverlay = () => {
                     ) : null}
                     {isApproving ? "Approving USDC..." :
                      isMinting ? "Minting NFT..." :
-                     !hasApproval ? "Approve USDC" : "Mint Member NFT"}
+                     !hasApproval ? "Buy NFT" : "Mint Member NFT"}
                   </Button>
                 </div>
               </div>
