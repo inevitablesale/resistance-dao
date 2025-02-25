@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -403,11 +404,11 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
               ) : (
                 <Button
                   onClick={handleMintNFT}
-                  disabled={isMinting || (!hasEnoughUSDC && !isContractOwner) || isPaused}
+                  disabled={isMinting || (!isContractOwner && !hasEnoughUSDC) || isPaused}
                   className="w-full bg-gradient-to-r from-[#9B87F5] to-[#33C3F0] hover:from-[#7E69AB] hover:to-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg"
                 >
                   {isMinting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  {isMinting ? "Minting..." : isPaused ? "Minting Paused" : "Buy Member NFT"}
+                  {isMinting ? "Minting..." : isPaused ? "Minting Paused" : isContractOwner ? "Mint Member NFT" : "Buy Member NFT"}
                 </Button>
               )}
             </AnimatePresence>
