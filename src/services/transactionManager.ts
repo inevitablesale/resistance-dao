@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -23,7 +22,7 @@ export interface TransactionConfig {
   tokenConfig?: {
     tokenAddress: string;
     spenderAddress: string;
-    amount: string;
+    amount: ethers.BigNumber;
     isTestMode?: boolean;
     isApproval?: boolean;
   };
@@ -49,17 +48,19 @@ export const executeTransaction = async (
   config: TransactionConfig,
   provider?: ethers.providers.Web3Provider
 ): Promise<ethers.ContractTransaction> => {
-  // Log transaction type and configuration
   console.log(`Executing ${config.type} transaction:`, {
     description: config.description,
-    tokenConfig: config.tokenConfig,
+    tokenConfig: config.tokenConfig && {
+      ...config.tokenConfig,
+      amount: config.tokenConfig.amount.toString()
+    },
     nftConfig: config.nftConfig
   });
 
   if (config.type === 'erc20_approval' && config.tokenConfig) {
     console.log('Token approval config:', {
       ...config.tokenConfig,
-      amount: ethers.utils.formatEther(config.tokenConfig.amount),
+      amount: ethers.utils.formatUnits(config.tokenConfig.amount, 18)
     });
   }
 
@@ -72,7 +73,6 @@ export const executeTransaction = async (
     });
   }
 
-  // Log network info
   if (provider) {
     const network = await provider.getNetwork();
     console.log('Current network:', {
@@ -81,7 +81,6 @@ export const executeTransaction = async (
     });
   }
 
-  // Skip allowance check for approval transactions
   if (config.type === 'erc20_transfer' && config.tokenConfig && provider && !config.tokenConfig.isTestMode) {
     console.log('Checking token allowance...');
     const signerAddress = await provider.getSigner().getAddress();
@@ -107,7 +106,6 @@ export const executeTransaction = async (
     console.log('Token allowance check passed');
   }
 
-  // Add to queue first
   const txId = await transactionQueue.addTransaction({
     type: config.type,
     description: config.description
