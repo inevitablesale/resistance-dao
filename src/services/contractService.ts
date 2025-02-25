@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { uploadMetadataToPinata } from "./pinataService";
 import { getGovernanceImageCID } from "@/utils/governancePowerMapping";
 
-const CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
+const CONTRACT_ADDRESS = "0x6527b171AF1c61AE43bf405ABe53861b0487A369";
 const CONTRACT_ABI = [
   "function safeMint(address to, string memory metadataCID) public payable returns (uint256)",
   "function updateMetadataCID(uint256 tokenId, string memory newCID)",

@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletProvider } from "./useWalletProvider";
 
-const NFT_CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
+const NFT_CONTRACT_ADDRESS = "0x6527b171AF1c61AE43bf405ABe53861b0487A369";
 const USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const MINT_PRICE = ethers.utils.parseUnits("50", 6);
 
@@ -125,13 +124,13 @@ export const useNFTMinting = () => {
       );
 
       const metadata = {
-        name: "Resistance DAO Membership NFT",
-        description: "An official member of the Resistance DAO community",
-        image: "ipfs://QmResistanceDAOImage", // Make sure to update with actual IPFS hash
+        name: "Resistance DAO Member NFT",
+        description: "A member of the Resistance DAO community",
+        image: "ipfs://QmYourDefaultImageHash",
         attributes: [
           {
             trait_type: "Membership Type",
-            value: "Member"
+            value: "Standard"
           },
           {
             trait_type: "Joined",
@@ -140,7 +139,7 @@ export const useNFTMinting = () => {
         ]
       };
 
-      const metadataUri = `ipfs://QmResistanceDAOMetadata`; // Make sure to update with actual IPFS hash
+      const metadataUri = `ipfs://QmYourIPFSHash`;
       console.log("Calling safeMint with URI:", metadataUri);
       const tx = await nftContract.safeMint(recipient, metadataUri);
       await tx.wait();
@@ -191,13 +190,13 @@ export const useNFTMinting = () => {
       );
 
       const metadata = {
-        name: "Resistance DAO Membership NFT",
-        description: "An official member of the Resistance DAO community",
-        image: "ipfs://QmResistanceDAOImage", // Make sure to update with actual IPFS hash
+        name: "Resistance DAO Member NFT",
+        description: "A member of the Resistance DAO community",
+        image: "ipfs://QmYourDefaultImageHash",
         attributes: [
           {
             trait_type: "Membership Type",
-            value: "Member"
+            value: "Standard"
           },
           {
             trait_type: "Joined",
@@ -206,7 +205,7 @@ export const useNFTMinting = () => {
         ]
       };
 
-      const metadataUri = `ipfs://QmResistanceDAOMetadata`; // Make sure to update with actual IPFS hash
+      const metadataUri = `ipfs://QmYourIPFSHash`;
       const tx = await nftContract.mintNFT(metadataUri);
       await tx.wait();
       
