@@ -16,7 +16,7 @@ export const AccessCoverOverlay = () => {
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
-  const { primaryWallet } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
   const { toast } = useToast();
   const { 
@@ -128,6 +128,20 @@ export const AccessCoverOverlay = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await primaryWallet?.disconnect();
+      setShowAuthFlow(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Logout Failed",
+        description: "Failed to disconnect wallet. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-blue-950 to-black">
       {address && (
@@ -135,7 +149,7 @@ export const AccessCoverOverlay = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => primaryWallet?.disconnect()}
+            onClick={handleLogout}
             className="text-blue-300 hover:text-blue-200 hover:bg-blue-900/50"
           >
             <LogOut className="w-4 h-4 mr-2" />
