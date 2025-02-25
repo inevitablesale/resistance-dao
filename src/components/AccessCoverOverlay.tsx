@@ -43,7 +43,8 @@ export const AccessCoverOverlay = () => {
     const fetchNFTMetadata = async () => {
       if (showNFTSuccess) {
         try {
-          const metadata = await getFromIPFS<NFTMetadata>("QmResistanceDAOMetadata", "content");
+          const metadata = await getFromIPFS<NFTMetadata>("QmYctf3BzCzqY1K6LiQPzZyWnM6rBwM9qvtonnEZZfb5DQ", "content");
+          console.log("Fetched NFT metadata:", metadata);
           setNftMetadata(metadata);
         } catch (error) {
           console.error("Error fetching NFT metadata:", error);
