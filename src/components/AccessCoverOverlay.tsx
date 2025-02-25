@@ -1,7 +1,7 @@
 
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Wallet, Loader2, Shield, CreditCard, Copy } from "lucide-react";
+import { X, Wallet, Loader2, Shield, CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
@@ -119,16 +119,6 @@ export const AccessCoverOverlay = () => {
     }
   };
 
-  const handleCopyAddress = () => {
-    if (address) {
-      navigator.clipboard.writeText(address);
-      toast({
-        title: "Address Copied",
-        description: "Wallet address copied to clipboard",
-      });
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-blue-950 to-black">
       <div 
@@ -210,24 +200,6 @@ export const AccessCoverOverlay = () => {
                 <p className="text-blue-200/80 mb-8">
                   Mint a Member NFT to join our community and get exclusive access
                 </p>
-
-                {/* Wallet Address Display */}
-                <div className="bg-blue-950/50 p-4 rounded-lg mb-6 border border-blue-500/20">
-                  <p className="text-sm text-blue-300 mb-2">Your Wallet Address (for USDC transfers):</p>
-                  <div className="flex items-center justify-between bg-blue-900/30 p-3 rounded-md">
-                    <code className="text-xs md:text-sm text-blue-200 break-all">
-                      {address}
-                    </code>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleCopyAddress}
-                      className="ml-2 hover:bg-blue-800/50"
-                    >
-                      <Copy className="w-4 h-4 text-blue-300" />
-                    </Button>
-                  </div>
-                </div>
 
                 <div className="space-y-4">
                   <div className="text-left text-sm text-blue-300/60 space-y-1">
