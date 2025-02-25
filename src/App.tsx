@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -82,8 +81,8 @@ const dynamicSettings = {
     appLogoUrl: "/favicon.ico",
     onramp: {
       providers: ['banxa'],
-      defaultFiatCurrency: 'USD',  // Add this line
-      banxaConfig: {  // Add this configuration
+      defaultFiatCurrency: 'USD',
+      banxaConfig: {
         environment: 'PRODUCTION'
       }
     },
@@ -112,12 +111,13 @@ const dynamicSettings = {
     allowedDomains: [
       "id-preview--20de67db-692b-43bc-8918-dfa81ea94ccd.lovable.app",
       "app.dynamicauth.com",
-      "localhost"
+      "localhost",
+      "www.resistancedao.xyz"
     ],
     tokens: [
       {
-        address: "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00",
-        symbol: "LGR",
+        address: "0x81137573408bCD23f801A56D68268cc0CE5206B5",
+        symbol: "RDT",
         decimals: 18,
         name: "Resistance Token",
         icon: "/favicon.ico",

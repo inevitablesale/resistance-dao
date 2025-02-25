@@ -50,11 +50,12 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   const VOTING_FEE = ethers.utils.parseEther("1");
 
+  const RD_PRICE_USD = 0.10;
+
   const formatUSDAmount = (rdAmount: string): string => {
     if (!rdAmount) return "$0.00";
     const amount = parseFloat(rdAmount.replace(' RD', ''));
     if (isNaN(amount)) return "$0.00";
-    const RD_PRICE_USD = 0.10;
     const usdAmount = amount * RD_PRICE_USD;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',

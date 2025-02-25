@@ -1,3 +1,4 @@
+<lov-code>
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -24,10 +25,26 @@ import { Card } from "@/components/ui/card";
 import { AccessCoverOverlay } from "@/components/AccessCoverOverlay";
 import { Progress } from "@/components/ui/progress";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
+import { useProposalStats } from "@/hooks/useProposalStats";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { data: stats, isLoading: isLoadingStats } = useProposalStats();
   
+  // Format large numbers with commas
+  const formatNumber = (num: number) => {
+    return new Intl.NumberFormat('en-US').format(Math.round(num));
+  };
+
+  // Format currency
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
   return (
     <>
       <AccessCoverOverlay />
@@ -40,7 +57,13 @@ const Index = () => {
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 <div>
                   <div className="text-white/50">Total Commitments</div>
-                  <div className="font-mono text-white">$2.5M USD</div>
+                  <div className="font-mono text-white">
+                    {isLoadingStats ? (
+                      <span className="animate-pulse">Loading...</span>
+                    ) : (
+                      formatCurrency(stats?.totalLockedValue || 0)
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -167,7 +190,13 @@ const Index = () => {
                     </div>
                     <div>
                       <div className="text-white/60 text-sm">Total Locked Value</div>
-                      <div className="text-2xl font-semibold text-white">$2.5M</div>
+                      <div className="text-2xl font-semibold text-white">
+                        {isLoadingStats ? (
+                          <span className="animate-pulse">Loading...</span>
+                        ) : (
+                          formatCurrency(stats?.totalLockedValue || 0)
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="h-1 bg-blue-900/30 rounded-full mb-2">
@@ -185,8 +214,14 @@ const Index = () => {
                       <Users className="w-6 h-6 text-green-300" />
                     </div>
                     <div>
-                      <div className="text-white/60 text-sm">Active Members</div>
-                      <div className="text-2xl font-semibold text-white">1.5K</div>
+                      <div className="text-white/60 text-sm">Total Projects</div>
+                      <div className="text-2xl font-semibold text-white">
+                        {isLoadingStats ? (
+                          <span className="animate-pulse">Loading...</span>
+                        ) : (
+                          formatNumber(stats?.totalProjects || 0)
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="h-1 bg-green-900/30 rounded-full mb-2">
@@ -205,7 +240,13 @@ const Index = () => {
                     </div>
                     <div>
                       <div className="text-white/60 text-sm">Active Proposals</div>
-                      <div className="text-2xl font-semibold text-white">24</div>
+                      <div className="text-2xl font-semibold text-white">
+                        {isLoadingStats ? (
+                          <span className="animate-pulse">Loading...</span>
+                        ) : (
+                          formatNumber(stats?.activeProposals || 0)
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="h-1 bg-yellow-900/30 rounded-full mb-2">
@@ -589,34 +630,3 @@ const Index = () => {
                 {
                   question: "What is Resistance DAO?",
                   answer: "Resistance DAO is a community-driven platform connecting Web3 innovators with early-stage capital and support."
-                },
-                {
-                  question: "How do I submit a proposal?",
-                  answer: "Simply mint a Resistance Proposal NFT for $25 and share your Web3 vision with our community."
-                },
-                {
-                  question: "What types of projects are accepted?",
-                  answer: "We welcome all Web3 projects including tokens, NFTs, DeFi platforms, and innovative blockchain applications."
-                },
-                {
-                  question: "How does voting work?",
-                  answer: "Community members can vote on proposals with a small fee to ensure genuine interest and prevent spam."
-                }
-              ].map((item, index) => (
-                <Card key={index} className="bg-black/30 border border-white/10 p-6">
-                  <h3 className="text-xl font-bold text-white mb-3">{item.question}</h3>
-                  <p className="text-white/70">{item.answer}</p>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Add the LGRFloatingWidget */}
-        <ResistanceWalletWidget />
-      </div>
-    </>
-  );
-};
-
-export default Index;
