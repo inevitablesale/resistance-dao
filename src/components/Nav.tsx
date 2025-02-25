@@ -126,7 +126,7 @@ const Nav = () => {
             >
               <Linked className="w-5 h-5" />
             </a>
-            <div className="relative">
+            <div className="relative z-[101]">
               <DynamicWidget />
             </div>
           </div>

@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -32,31 +31,39 @@ interface NFTPurchaseDialogProps {
 export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps) => {
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
-  const { primaryWallet, user, setShowAuthFlow } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
   const [usdcAllowance, setUsdcAllowance] = useState<string>("0");
   const [isApproving, setIsApproving] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [userAddress, setUserAddress] = useState<string>("");
+  const [isContractOwner, setIsContractOwner] = useState(false);
 
-  const handleLogout = async () => {
-    try {
-      await user?.logout?.();
-      onOpenChange(false);
-      toast({
-        title: "Success",
-        description: "Successfully logged out",
-      });
-    } catch (error) {
-      console.error("Logout error:", error);
-      toast({
-        title: "Error",
-        description: "Failed to logout",
-        variant: "destructive",
-      });
+  useEffect(() => {
+    const checkOwnerStatus = async () => {
+      try {
+        const walletProvider = await getProvider();
+        const signer = walletProvider.provider.getSigner();
+        const address = await signer.getAddress();
+        
+        const nftContract = new ethers.Contract(
+          NFT_CONTRACT, 
+          ["function owner() view returns (address)"],
+          walletProvider.provider
+        );
+        
+        const ownerAddress = await nftContract.owner();
+        setIsContractOwner(ownerAddress.toLowerCase() === address.toLowerCase());
+      } catch (error) {
+        console.error("Error checking owner status:", error);
+      }
+    };
+
+    if (open) {
+      checkOwnerStatus();
     }
-  };
+  }, [open, getProvider]);
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -87,6 +94,24 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
       checkBalances();
     }
   }, [open, getProvider, toast]);
+
+  const handleLogout = async () => {
+    try {
+      await user?.logout?.();
+      onOpenChange(false);
+      toast({
+        title: "Success",
+        description: "Successfully logged out",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to logout",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleOpenWallet = async () => {
     try {
@@ -155,7 +180,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   };
 
   const handleMintNFT = async () => {
-    if (Number(usdcBalance) < 50) {
+    if (!isContractOwner && Number(usdcBalance) < 50) {
       toast({
         title: "Error",
         description: "Insufficient USDC balance",
@@ -212,7 +237,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   };
 
   const needsApproval = Number(usdcAllowance) < 50;
-  const hasEnoughUSDC = Number(usdcBalance) >= 50;
+  const hasEnoughUSDC = isContractOwner || Number(usdcBalance) >= 50;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -256,7 +281,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
           </div>
 
           <div className="space-y-2">
-            {!hasEnoughUSDC && (
+            {!hasEnoughUSDC && !isContractOwner && (
               <Button
                 onClick={handleOpenWallet}
                 className="w-full bg-[#33C3F0] hover:bg-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg flex items-center justify-center gap-2"
@@ -279,10 +304,10 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
                   </div>
                   <p className="text-green-400 text-base font-semibold">Welcome to Resistance DAO!</p>
                 </motion.div>
-              ) : needsApproval ? (
+              ) : needsApproval && !isContractOwner ? (
                 <Button
                   onClick={handleApproveUSDC}
-                  disabled={isApproving || !hasEnoughUSDC}
+                  disabled={isApproving}
                   className="w-full bg-[#1EAEDB] hover:bg-[#0FA0CE] text-white py-4 text-base font-medium rounded-lg"
                 >
                   {isApproving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
@@ -291,7 +316,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
               ) : (
                 <Button
                   onClick={handleMintNFT}
-                  disabled={isMinting || !hasEnoughUSDC}
+                  disabled={isMinting || (!hasEnoughUSDC && !isContractOwner)}
                   className="w-full bg-gradient-to-r from-[#9B87F5] to-[#33C3F0] hover:from-[#7E69AB] hover:to-[#0EA5E9] text-white py-4 text-base font-medium rounded-lg"
                 >
                   {isMinting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
