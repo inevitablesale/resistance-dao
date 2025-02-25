@@ -9,12 +9,12 @@ const NFT_CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
 const USDC_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 const MINT_PRICE = ethers.utils.parseUnits("50", 6); // 50 USDC with 6 decimals
 
+// Updated ABI to match the actual contract
 const NFT_ABI = [
   "function mintNFT(string calldata tokenURI) external",
-  "function tokenURI(uint256 tokenId) view returns (string)",
-  "function balanceOf(address owner) view returns (uint256)",
+  "function getPendingRefund(address user) external view returns (uint256)",
   "function claimRefund() external",
-  "function getPendingRefund(address user) external view returns (uint256)"
+  "function balanceOf(address owner) view returns (uint256)"
 ];
 
 const USDC_ABI = [
@@ -116,11 +116,16 @@ export const useNFTMinting = () => {
         signer
       );
 
-      // Default tokenURI for now - this should be replaced with actual metadata URI
+      // IPFS metadata URI for the NFT
       const tokenURI = "ipfs://bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py";
       
-      console.log("Minting NFT with URI:", tokenURI);
-      const tx = await nftContract.mintNFT(tokenURI);
+      console.log("Minting NFT with tokenURI:", tokenURI);
+      const gasEstimate = await nftContract.estimateGas.mintNFT(tokenURI);
+      console.log("Estimated gas:", gasEstimate.toString());
+      
+      const tx = await nftContract.mintNFT(tokenURI, {
+        gasLimit: gasEstimate.mul(120).div(100) // Add 20% buffer to gas estimate
+      });
       console.log("Mint transaction submitted:", tx.hash);
 
       const receipt = await tx.wait();
