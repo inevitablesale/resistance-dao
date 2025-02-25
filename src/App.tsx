@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -9,14 +10,6 @@ import Nav from "./components/Nav";
 import { ScrollToTop } from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import GovernanceVoting from "./pages/GovernanceVoting";
-import MintNFT from "./pages/MintNFT";
-import ShareToEarn from "./pages/ShareToEarn";
-import Litepaper from "./pages/Litepaper";
-import GettingStarted from "./pages/GettingStarted";
-import KnowledgeArticle from "./pages/KnowledgeArticle";
-import ContentHub from "./pages/ContentHub";
-import { Marketplace } from "./pages/Marketplace";
 import ThesisSubmission from "./pages/ThesisSubmission";
 import ProposalDetails from "./pages/ProposalDetails";
 import Proposals from "./pages/Proposals";
@@ -145,14 +138,6 @@ function Layout() {
       <Nav />
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/governance-voting" element={<GovernanceVoting />} />
-        <Route path="/mint-nft" element={<MintNFT />} />
-        <Route path="/share-to-earn" element={<ShareToEarn />} />
-        <Route path="/litepaper" element={<Litepaper />} />
-        <Route path="/getting-started" element={<GettingStarted />} />
-        <Route path="/marketplace" element={<Marketplace />} />
-        <Route path="/marketplace/:category/:slug" element={<KnowledgeArticle />} />
-        <Route path="/content" element={<ContentHub />} />
         <Route path="/thesis" element={<ThesisSubmission />} />
         <Route path="/proposals" element={<Proposals />} />
         <Route path="/proposals/:tokenId" element={<ProposalDetails />} />
