@@ -1,6 +1,6 @@
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Wallet, Loader2, Shield, CreditCard, Copy, LogOut, Check, ExternalLink } from "lucide-react";
+import { X, Wallet, Loader2, Shield, CreditCard, Copy, Check, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
@@ -43,7 +43,7 @@ export const AccessCoverOverlay = () => {
     const fetchNFTMetadata = async () => {
       if (showNFTSuccess) {
         try {
-          const metadata = await getFromIPFS<NFTMetadata>("QmYctf3BzCzqY1K6LiQPzZyWnM6rBwM9qvtonnEZZfb5DQ", "content");
+          const metadata = await getFromIPFS<NFTMetadata>("bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py", "content");
           console.log("Fetched NFT metadata:", metadata);
           setNftMetadata(metadata);
         } catch (error) {
@@ -213,15 +213,13 @@ export const AccessCoverOverlay = () => {
                     {nftMetadata?.name || "Resistance DAO Member NFT"}
                   </h3>
                 </div>
-                {nftMetadata?.image && (
-                  <div className="relative w-full h-48 rounded-lg overflow-hidden mb-4">
-                    <img 
-                      src={nftMetadata.image.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/')}
-                      alt={nftMetadata.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
+                <div className="relative w-full h-48 rounded-lg overflow-hidden mb-4">
+                  <img 
+                    src={`https://ipfs.io/ipfs/bafybeifpkqs6hubctlfnk7fv4v27ot4rrr4szmgr7p5alwwiisylfakpbi`}
+                    alt="Member NFT"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <p className="text-blue-300/60">
                   {nftMetadata?.description || "This NFT represents your membership and voting power in the DAO"}
                 </p>

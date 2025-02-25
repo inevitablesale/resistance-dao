@@ -95,49 +95,15 @@ export const useNFTMinting = () => {
       if (!provider?.provider) throw new Error("No provider available");
 
       const signer = provider.provider.getSigner();
-      const address = await signer.getAddress();
-
-      console.log("Preparing NFT metadata...");
-      const metadata: IPFSContent = {
-        contentSchema: "nft-metadata-v1",
-        contentType: "application/json",
-        title: "Resistance DAO Member NFT",
-        content: JSON.stringify({
-          name: "Resistance DAO Member NFT",
-          description: "Official member of the Resistance DAO community",
-          image: "ipfs://QmYctf3BzCzqY1K6LiQPzZyWnM6rBwM9qvtonnEZZfb5DQ",
-          attributes: [
-            {
-              trait_type: "Membership Type",
-              value: "Member"
-            },
-            {
-              trait_type: "Join Date",
-              value: new Date().toISOString().split('T')[0]
-            }
-          ]
-        }),
-        metadata: {
-          author: address,
-          publishedAt: Date.now(),
-          version: 1,
-          language: "en",
-          tags: ["nft", "membership", "resistance-dao"]
-        }
-      };
-
-      console.log("Uploading metadata to IPFS...");
-      const metadataHash = await uploadToIPFS(metadata);
-      console.log("Metadata uploaded, hash:", metadataHash);
-
+      console.log("Minting NFT with metadata URI:", "ipfs://bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py");
+      
       const nftContract = new ethers.Contract(
         NFT_CONTRACT_ADDRESS,
         NFT_ABI,
         signer
       );
 
-      console.log("Minting NFT with metadata URI:", `ipfs://${metadataHash}`);
-      const tx = await nftContract.mintNFT(`ipfs://${metadataHash}`);
+      const tx = await nftContract.mintNFT("ipfs://bafkreib4ypwdplftehhyusbd4eltyubsgl6kwadlrdxw4j7g4o4wg6d6py");
       await tx.wait();
       
       console.log("NFT minted successfully!");
