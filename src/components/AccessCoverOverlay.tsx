@@ -1,6 +1,6 @@
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Wallet, Loader2, Shield, CreditCard, Copy, LogOut } from "lucide-react";
+import { X, Wallet, Loader2, Shield, CreditCard, Copy } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useDynamicUtils } from "@/hooks/useDynamicUtils";
@@ -16,7 +16,7 @@ export const AccessCoverOverlay = () => {
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0 } = useNFTBalance(address);
-  const { primaryWallet, setShowAuthFlow } = useDynamicContext();
+  const { primaryWallet, setShowAuthFlow, user } = useDynamicContext();
   const { enabled: onrampEnabled, open: openOnramp } = useOnramp();
   const { toast } = useToast();
   const { 
@@ -144,42 +144,6 @@ export const AccessCoverOverlay = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      if (!primaryWallet) {
-        console.error('No wallet found to disconnect');
-        return;
-      }
-
-      console.log('Starting logout process...');
-      
-      // First disconnect the wallet
-      if (primaryWallet.disconnect) {
-        console.log('Disconnecting wallet...');
-        await primaryWallet.disconnect();
-        console.log('Wallet disconnected successfully');
-      }
-
-      // Then hide the auth flow
-      if (setShowAuthFlow) {
-        console.log('Hiding auth flow...');
-        setShowAuthFlow(false);
-      }
-
-      toast({
-        title: "Logged Out",
-        description: "You have been successfully logged out",
-      });
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast({
-        title: "Logout Failed",
-        description: "Failed to disconnect wallet. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-blue-950 to-black">
       {address && (
@@ -187,11 +151,11 @@ export const AccessCoverOverlay = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleLogout}
+            onClick={() => setShowAuthFlow(true)}
             className="text-blue-300 hover:text-blue-200 hover:bg-blue-900/50"
           >
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
+            <Shield className="w-4 h-4 mr-2" />
+            Wallet
           </Button>
         </div>
       )}
@@ -320,22 +284,6 @@ export const AccessCoverOverlay = () => {
           )}
         </motion.div>
       </div>
-
-      <style>
-        {`
-          @keyframes phoenixLook {
-            0%, 100% {
-              transform: rotate(0deg);
-            }
-            25% {
-              transform: rotate(-3deg);
-            }
-            75% {
-              transform: rotate(3deg);
-            }
-          }
-        `}
-      </style>
     </div>
   );
 };
