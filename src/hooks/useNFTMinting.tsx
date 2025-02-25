@@ -1,8 +1,8 @@
-
 import { useState } from "react";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletProvider } from "./useWalletProvider";
+import { uploadToIPFS } from "@/services/ipfsService";
 
 // Contract addresses on Polygon
 const NFT_CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
@@ -117,6 +117,33 @@ export const useNFTMinting = () => {
     }
   };
 
+  const createNFTMetadata = async (isCoreTeam: boolean) => {
+    const metadata = {
+      name: "Resistance DAO Member NFT",
+      description: "A member of the Resistance DAO community",
+      image: "ipfs://QmavmeeRNGXrxewZkHnv9Yyc2k2ZDpmVNwU4XAYQXDbsD6", // Default Resistance DAO logo
+      external_url: "https://resistancedao.xyz",
+      attributes: [
+        {
+          trait_type: "Membership Type",
+          value: isCoreTeam ? "Core Member" : "Member"
+        },
+        {
+          trait_type: "Joined",
+          value: new Date().toISOString().split('T')[0] // Just the date part
+        },
+        {
+          trait_type: "Collection",
+          value: "Resistance DAO Genesis"
+        }
+      ]
+    };
+
+    // Upload metadata to IPFS
+    const ipfsHash = await uploadToIPFS(metadata);
+    return `ipfs://${ipfsHash}`;
+  };
+
   const ownerMint = async (recipient: string) => {
     setIsMinting(true);
     try {
@@ -130,23 +157,9 @@ export const useNFTMinting = () => {
         signer
       );
 
-      const metadata = {
-        name: "Resistance DAO Member NFT",
-        description: "A member of the Resistance DAO community",
-        image: "ipfs://QmYourDefaultImageHash",
-        attributes: [
-          {
-            trait_type: "Membership Type",
-            value: "Core Member"
-          },
-          {
-            trait_type: "Joined",
-            value: new Date().toISOString()
-          }
-        ]
-      };
-
-      const metadataUri = `ipfs://QmYourIPFSHash`;
+      const metadataUri = await createNFTMetadata(true);
+      console.log("Owner minting with metadata URI:", metadataUri);
+      
       const tx = await nftContract.safeMint(recipient, metadataUri);
       const receipt = await tx.wait();
       
@@ -191,23 +204,9 @@ export const useNFTMinting = () => {
         signer
       );
 
-      const metadata = {
-        name: "Resistance DAO Member NFT",
-        description: "A member of the Resistance DAO community",
-        image: "ipfs://QmYourDefaultImageHash",
-        attributes: [
-          {
-            trait_type: "Membership Type",
-            value: "Member"
-          },
-          {
-            trait_type: "Joined",
-            value: new Date().toISOString()
-          }
-        ]
-      };
-
-      const metadataUri = `ipfs://QmYourIPFSHash`;
+      const metadataUri = await createNFTMetadata(false);
+      console.log("Minting with metadata URI:", metadataUri);
+      
       const tx = await nftContract.mintNFT(metadataUri);
       const receipt = await tx.wait();
       
