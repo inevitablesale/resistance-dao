@@ -48,7 +48,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [isVotingEnded, setIsVotingEnded] = useState(false);
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
-  const VOTING_FEE = ethers.utils.parseEther("10");
+  const VOTING_FEE = ethers.utils.parseEther("1");
 
   const formatUSDAmount = (rdAmount: string): string => {
     if (!rdAmount) return "$0.00";
@@ -286,6 +286,16 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 <p className="text-lg text-zinc-400">{proposalDetails.description}</p>
               </div>
 
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mt-4">
+                <div className="flex items-center gap-3">
+                  <Info className="w-6 h-6 text-blue-400" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-blue-400">Important Notice</h3>
+                    <p className="text-white">Only a 1 RD voting fee is required to record your support. Your pledged amount represents your potential future investment.</p>
+                  </div>
+                </div>
+              </div>
+
               {(proposalDetails.team && proposalDetails.team.length > 0) && (
                 <div className="pt-4">
                   <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
@@ -506,7 +516,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 <CollapsibleContent className="p-4 bg-zinc-900/50 border border-zinc-800/50 rounded-lg mt-2">
                   <p className="text-sm text-zinc-300 leading-relaxed">
                     Express your interest by making a soft commitment. This is not an actual investment - 
-                    only a 10 RD voting fee will be charged to record your support. Your pledged amount shows how much 
+                    only a 1 RD voting fee will be charged to record your support. Your pledged amount shows how much 
                     you're potentially interested in investing later.
                   </p>
                 </CollapsibleContent>
@@ -529,7 +539,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   />
                   <p className="text-sm text-zinc-400 mt-2 flex items-center gap-2">
                     <Info className="w-4 h-4" />
-                    Only a 10 RD voting fee is required
+                    Only a 1 RD voting fee is required
                   </p>
                 </div>
                 <Button
