@@ -45,48 +45,6 @@ const Index = () => {
     <>
       <AccessCoverOverlay />
       <div className="min-h-screen bg-black text-white">
-        {/* Stats Bar */}
-        <div className="fixed top-0 left-0 right-0 z-10 bg-black/90 backdrop-blur-xl border-b border-white/10">
-          <div className="container mx-auto px-4 h-16 flex items-center justify-between text-sm">
-            <div className="flex items-center gap-8">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <div>
-                  <div className="text-white/50">Total Commitments</div>
-                  <div className="font-mono text-white">
-                    {isLoadingStats ? (
-                      <span className="animate-pulse">Loading...</span>
-                    ) : (
-                      formatCurrency(stats?.totalLockedValue || 0)
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                <div>
-                  <div className="text-white/50">24h Activity</div>
-                  <div className="font-mono text-white">$125.4K</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
-                <div>
-                  <div className="text-white/50">NFT Floor</div>
-                  <div className="font-mono text-white">25 LGR</div>
-                </div>
-              </div>
-            </div>
-            <Button 
-              onClick={() => navigate('/thesis')}
-              className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-mono"
-            >
-              <Rocket className="w-4 h-4 mr-2" />
-              Launch Proposal
-            </Button>
-          </div>
-        </div>
-
         {/* Hero Section */}
         <section className="pt-32 pb-16 relative overflow-hidden">
           <div className="absolute inset-0">
@@ -111,8 +69,14 @@ const Index = () => {
                 </h1>
                 <div className="flex gap-4 mb-8">
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 flex-1">
-                    <div className="text-blue-400 text-sm mb-1">Total Projects</div>
-                    <div className="font-mono text-2xl">800</div>
+                    <div className="text-blue-400 text-sm mb-1">Total Hodlers</div>
+                    <div className="font-mono text-2xl">
+                      {isLoadingStats ? (
+                        <span className="animate-pulse">Loading...</span>
+                      ) : (
+                        formatNumber(stats?.totalHolders || 821)
+                      )}
+                    </div>
                   </div>
                   <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 flex-1">
                     <div className="text-green-400 text-sm mb-1">Community</div>
@@ -155,25 +119,32 @@ const Index = () => {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  {[
-                    { action: "New Commitment", amount: "$5.2K", time: "2m ago", type: "buy" },
-                    { action: "Proposal Launched", amount: "$150K target", time: "5m ago", type: "new" },
-                    { action: "Target Reached", amount: "$75K", time: "12m ago", type: "success" }
-                  ].map((activity, i) => (
-                    <div key={i} className="flex items-center justify-between py-2 border-b border-blue-500/10 last:border-0">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-2 h-2 rounded-full ${
-                          activity.type === 'buy' ? 'bg-green-500' :
-                          activity.type === 'new' ? 'bg-blue-500' : 'bg-yellow-500'
-                        }`} />
-                        <span className="text-white/70">{activity.action}</span>
+                  {isLoadingStats ? (
+                    <div className="animate-pulse">Loading activities...</div>
+                  ) : (
+                    stats?.recentActivities.map((activity, i) => (
+                      <div key={i} className="flex items-center justify-between py-2 border-b border-blue-500/10 last:border-0">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 rounded-full ${
+                            activity.type === 'vote' ? 'bg-green-500' :
+                            activity.type === 'create' ? 'bg-blue-500' : 'bg-yellow-500'
+                          }`} />
+                          <span className="text-white/70">
+                            {activity.type === 'vote' ? 'New Commitment' :
+                             activity.type === 'create' ? 'Proposal Launched' :
+                             'Target Reached'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className="font-mono text-white">
+                            {activity.type === 'vote' || activity.type === 'complete' 
+                              ? formatCurrency(Number(activity.amount))
+                              : `#${activity.proposalId}`}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <span className="font-mono text-white">{activity.amount}</span>
-                        <span className="text-sm text-white/50">{activity.time}</span>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -210,12 +181,12 @@ const Index = () => {
                       <Users className="w-6 h-6 text-green-300" />
                     </div>
                     <div>
-                      <div className="text-white/60 text-sm">Total Projects</div>
+                      <div className="text-white/60 text-sm">Total Proposals</div>
                       <div className="text-2xl font-semibold text-white">
                         {isLoadingStats ? (
                           <span className="animate-pulse">Loading...</span>
                         ) : (
-                          formatNumber(stats?.totalProjects || 0)
+                          formatNumber(stats?.totalHolders || 0)
                         )}
                       </div>
                     </div>
@@ -250,7 +221,9 @@ const Index = () => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-white/60">Success Rate</span>
-                    <span className="text-green-400">89%</span>
+                    <span className="text-green-400">
+                      {isLoadingStats ? "..." : `${Math.round(stats?.successRate || 0)}%`}
+                    </span>
                   </div>
                 </div>
               </div>
