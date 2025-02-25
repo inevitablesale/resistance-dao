@@ -22,6 +22,27 @@ export const BuyTokenSection = ({ usdcBalance, onBuyUsdc, onBuyRd }: BuyTokenSec
     setPurchaseAmount("");
   };
 
+  const handleBuyUsdc = async () => {
+    console.log("[Banxa] Initiating USDC purchase flow...");
+    try {
+      console.log("[Banxa] Current component state:", {
+        purchaseAmount,
+        usdcBalance,
+        isConfirmOpen
+      });
+
+      console.log("[Banxa] Calling onBuyUsdc handler...");
+      await onBuyUsdc();
+      console.log("[Banxa] onBuyUsdc handler completed successfully");
+    } catch (error) {
+      console.error("[Banxa] Error in Buy USDC flow:", {
+        error,
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
+        errorStack: error instanceof Error ? error.stack : undefined
+      });
+    }
+  };
+
   return (
     <div className="space-y-3">
       <div className="text-sm text-gray-400">
@@ -38,7 +59,7 @@ export const BuyTokenSection = ({ usdcBalance, onBuyUsdc, onBuyRd }: BuyTokenSec
         </Button>
 
         <Button
-          onClick={onBuyUsdc}
+          onClick={handleBuyUsdc}
           className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold flex items-center justify-center gap-2"
         >
           <img 

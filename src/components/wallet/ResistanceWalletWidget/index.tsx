@@ -53,13 +53,29 @@ export const ResistanceWalletWidget = () => {
   }, [address]);
 
   const handleBuyUsdc = async () => {
+    console.log("[Banxa] Starting USDC purchase flow...", {
+      isEnabled: enabled,
+      hasWallet: !!primaryWallet?.address,
+      walletAddress: primaryWallet?.address
+    });
+
     if (!primaryWallet?.address) {
+      console.log("[Banxa] No wallet connected, showing auth flow");
       setShowAuthFlow?.(true);
       return;
     }
 
     if (!enabled) {
-      console.log("Onramp not enabled, current state:", { enabled, primaryWallet });
+      console.log("[Banxa] Onramp not enabled, current state:", { 
+        enabled, 
+        primaryWallet,
+        onrampConfig: {
+          provider: OnrampProviders.Banxa,
+          token: 'USDC',
+          address: primaryWallet.address,
+        }
+      });
+      
       toast({
         title: "Onramp Not Available",
         description: "The onramp service is currently not available",
@@ -69,7 +85,7 @@ export const ResistanceWalletWidget = () => {
     }
 
     try {
-      console.log("Opening Banxa onramp with config:", {
+      console.log("[Banxa] Opening Banxa onramp with config:", {
         provider: OnrampProviders.Banxa,
         token: 'USDC',
         address: primaryWallet.address,
@@ -81,12 +97,20 @@ export const ResistanceWalletWidget = () => {
         address: primaryWallet.address,
       });
       
+      console.log("[Banxa] Onramp opened successfully");
+      
       toast({
         title: "Purchase Initiated",
         description: "Your USDC purchase has been initiated successfully",
       });
     } catch (error) {
-      console.error("Onramp error:", error);
+      console.error("[Banxa] Onramp error:", {
+        error,
+        errorType: error instanceof Error ? error.constructor.name : typeof error,
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
+        errorStack: error instanceof Error ? error.stack : undefined
+      });
+      
       toast({
         title: "Purchase Failed",
         description: error instanceof Error ? error.message : "Failed to initiate purchase",
