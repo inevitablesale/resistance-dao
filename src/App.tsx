@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -80,7 +81,11 @@ const dynamicSettings = {
     appName: "Resistance",
     appLogoUrl: "/favicon.ico",
     onramp: {
-      providers: ['banxa']
+      providers: ['banxa'],
+      defaultFiatCurrency: 'USD',  // Add this line
+      banxaConfig: {  // Add this configuration
+        environment: 'PRODUCTION'
+      }
     },
     enableEmbeddedWallets: true,
     enableVisitTrackingOnConnectOnly: true,
