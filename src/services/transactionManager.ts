@@ -23,7 +23,7 @@ export interface TransactionConfig {
   tokenConfig?: {
     tokenAddress: string;
     spenderAddress: string;
-    amount: ethers.BigNumber;
+    amount: string;
     isTestMode?: boolean;
     isApproval?: boolean;
   };

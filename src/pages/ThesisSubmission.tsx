@@ -81,20 +81,6 @@ const requiredFormData = {
     description: "Funding for protocol development and security audits",
   },
   fundingBreakdown: [],
-  team: [
-    {
-      name: "Alice Johnson",
-      role: "Lead Developer",
-      linkedin: "https://linkedin.com/in/alice",
-      github: "https://github.com/alicejohnson"
-    },
-    {
-      name: "Bob Smith",
-      role: "Security Architect",
-      linkedin: "https://linkedin.com/in/bob",
-      github: "https://github.com/bobsmith"
-    }
-  ],
   votingDuration: 14 * 24 * 60 * 60, // 14 days
   linkedInURL: "https://linkedin.com/in/example",
   blockchain: ["Ethereum", "Polygon"],
@@ -215,7 +201,7 @@ export default function ThesisSubmission() {
         RD_TOKEN_ADDRESS,
         signerAddress,
         FACTORY_ADDRESS,
-        SUBMISSION_FEE
+        ethers.utils.formatEther(SUBMISSION_FEE)
       );
 
       if (!hasAllowance) {
@@ -228,7 +214,7 @@ export default function ThesisSubmission() {
           provider,
           RD_TOKEN_ADDRESS,
           FACTORY_ADDRESS,
-          SUBMISSION_FEE
+          ethers.utils.formatEther(SUBMISSION_FEE)
         );
         
         toast({
