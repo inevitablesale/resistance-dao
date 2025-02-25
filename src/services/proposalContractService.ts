@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -64,8 +65,7 @@ export const createProposal = async (
   }
 
   console.log("Contract verified at:", FACTORY_ADDRESS);
-  console.log("Contract bytecode length:", contractCode.length);
-
+  
   const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
   
   try {
@@ -80,10 +80,13 @@ export const createProposal = async (
     const ipfsHash = await uploadToIPFS(metadata);
     console.log("IPFS upload successful:", ipfsHash);
 
+    // Convert target capital to proper format
+    const targetCapital = ethers.utils.parseUnits(metadata.investment.targetCapital, 18);
+
     const contractInput: ProposalContractInput = {
       title: metadata.title,
       metadataURI: `ipfs://${ipfsHash}`,
-      targetCapital: ethers.utils.parseUnits(metadata.investment.targetCapital, 18),
+      targetCapital,
       votingDuration: metadata.votingDuration
     };
 
@@ -113,7 +116,7 @@ export const createProposal = async (
       ),
       {
         type: 'proposal',
-        description: `Creating proposal "${contractInput.title}" with target capital ${ethers.utils.formatUnits(contractInput.targetCapital, 18)} RD`,
+        description: `Creating proposal "${contractInput.title}"`,
         timeout: 180000,
         maxRetries: 3,
         backoffMs: 5000
@@ -154,7 +157,11 @@ function validateProposalInput(input: ProposalContractInput) {
       throw new Error("Metadata URI is required");
     }
 
-    const targetCapitalBN = ethers.BigNumber.from(input.targetCapital);
+    // Convert target capital to BigNumber if it isn't already
+    const targetCapitalBN = ethers.BigNumber.isBigNumber(input.targetCapital) 
+      ? input.targetCapital 
+      : ethers.BigNumber.from(input.targetCapital);
+
     const minTarget = ethers.utils.parseUnits("1000", 18); // 1,000 RD
     const maxTarget = ethers.utils.parseUnits("25000000", 18); // 25M RD
 

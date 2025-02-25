@@ -11,17 +11,14 @@ import { File, DollarSign, Users, MessageSquare, Timer, HelpCircle, Beaker } fro
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput, convertToWei } from "@/components/thesis/TargetCapitalInput";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { uploadToIPFS } from "@/services/ipfsService";
 import { ProposalMetadata } from "@/types/proposals";
 import { useToast } from "@/hooks/use-toast";
-import { waitForProposalCreation } from "@/services/eventListenerService";
-import { mainnet, polygon, polygonMumbai } from 'viem/chains';
-import { ethers } from 'ethers';
 import { useNavigate } from "react-router-dom";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
-import { FACTORY_ADDRESS, FACTORY_ABI, RD_TOKEN_ADDRESS, SUBMISSION_FEE } from "@/lib/constants";
+import { createProposal } from "@/services/proposalContractService";
+import { RD_TOKEN_ADDRESS, FACTORY_ADDRESS, SUBMISSION_FEE } from "@/lib/constants";
 import { checkTokenAllowance, approveExactAmount } from "@/services/tokenService";
-import { executeTransaction } from "@/services/transactionManager";
+import { ethers } from "ethers";
 
 const thesisFormSchema = z.object({
   title: z.string().min(2, {
@@ -190,16 +187,14 @@ export default function ThesisSubmission() {
         throw new Error("Wallet client not available");
       }
 
-      const targetCapitalInWei = ethers.utils.parseEther(values.investment.targetCapital);
       const provider = new ethers.providers.Web3Provider(walletClient as any);
-      
+      const signer = provider.getSigner();
+      const signerAddress = await signer.getAddress();
+
       toast({
         title: "Checking Allowance...",
         description: "Checking if approval is needed for token usage",
       });
-
-      const signer = provider.getSigner();
-      const signerAddress = await signer.getAddress();
 
       const hasAllowance = await checkTokenAllowance(
         provider,
@@ -271,68 +266,23 @@ export default function ThesisSubmission() {
       };
 
       toast({
-        title: "Uploading to IPFS...",
-        description: "Please wait while we upload your proposal metadata to IPFS.",
-      });
-      
-      const ipfsHash = await uploadToIPFS<ProposalMetadata>(metadata);
-      
-      toast({
-        title: "IPFS Upload Successful",
-        description: `Metadata uploaded to IPFS with hash: ${ipfsHash}`,
-      });
-
-      const contract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
-
-      toast({
         title: "Creating Proposal...",
-        description: "Please approve the transaction in your wallet.",
+        description: "Please wait while we process your submission.",
       });
 
-      const metadataURI = `ipfs://${ipfsHash}`;
+      const tx = await createProposal(metadata, primaryWallet);
 
-      const tx = await executeTransaction(
-        () => contract.createProposal(
-          values.title,
-          metadataURI,
-          targetCapitalInWei,
-          values.votingDuration,
-          { gasLimit: 1000000 }
-        ),
-        {
-          type: 'proposal',
-          description: `Creating proposal "${values.title}"`,
-          timeout: 180000,
-          maxRetries: 3,
-          backoffMs: 5000
-        }
-      );
-
-      toast({
-        title: "Transaction Sent",
-        description: `Transaction hash: ${tx.hash}`,
-      });
-
-      const eventConfig = {
-        provider,
-        contractAddress: FACTORY_ADDRESS,
-        abi: FACTORY_ABI,
-        eventName: 'ProposalCreated'
-      };
-
-      toast({
-        title: "Waiting for Confirmation...",
-        description: "Waiting for the proposal to be created on the blockchain.",
-      });
-      
-      const proposalEvent = await waitForProposalCreation(eventConfig, tx.hash);
-      
       toast({
         title: "Proposal Created!",
-        description: `Proposal created with token ID: ${proposalEvent.tokenId}`,
+        description: "Your proposal has been successfully created.",
       });
 
-      navigate(`/proposals/${proposalEvent.tokenId}`);
+      const receipt = await tx.wait();
+      const event = receipt.events?.find(e => e.event === 'ProposalCreated');
+      if (event && event.args) {
+        const tokenId = event.args.proposalId.toString();
+        navigate(`/proposals/${tokenId}`);
+      }
 
     } catch (error: any) {
       console.error("Error submitting thesis:", error);
