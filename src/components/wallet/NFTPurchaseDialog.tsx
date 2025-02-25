@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ethers } from "ethers";
-import { Loader2, Check, AlertCircle, Wallet, Copy } from "lucide-react";
+import { Loader2, Check, AlertCircle, Copy, LogOut } from "lucide-react";
 import { executeTransaction } from "@/services/transactionManager";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { motion, AnimatePresence } from "framer-motion";
@@ -31,13 +31,31 @@ interface NFTPurchaseDialogProps {
 export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps) => {
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
-  const { primaryWallet } = useDynamicContext();
+  const { primaryWallet, logout } = useDynamicContext();
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
   const [usdcAllowance, setUsdcAllowance] = useState<string>("0");
   const [isApproving, setIsApproving] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [userAddress, setUserAddress] = useState<string>("");
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      onOpenChange(false);
+      toast({
+        title: "Success",
+        description: "Successfully logged out",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to logout",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     const checkBalances = async () => {
@@ -198,6 +216,16 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-[#0A0B2E] border border-blue-500/20 p-0 max-w-md w-[90%] overflow-hidden">
+        <div className="absolute top-2 right-12 z-10">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleLogout}
+            className="text-gray-400 hover:text-white hover:bg-blue-500/20"
+          >
+            <LogOut className="h-5 w-5" />
+          </Button>
+        </div>
         <div className="p-4 space-y-4">
           <div className="relative rounded-lg overflow-hidden bg-[#111444] border border-blue-400/20" style={{ maxHeight: '240px' }}>
             <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent" />
