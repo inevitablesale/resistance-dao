@@ -20,11 +20,12 @@ export const AUTHORIZED_TEST_MODE_ADDRESS = "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac
 
 // Factory Contract ABI for RDProposalFactory
 export const FACTORY_ABI = [
-  // ERC721 functions from ERC721URIStorage
+  // View functions
   "function name() view returns (string)",
   "function symbol() view returns (string)",
   "function tokenURI(uint256 tokenId) view returns (string)",
   "function ownerOf(uint256 tokenId) view returns (address)",
+  "function paused() view returns (bool)", // Added this line
   
   // RDProposalFactory specific functions
   "function RD_TOKEN() view returns (address)",
