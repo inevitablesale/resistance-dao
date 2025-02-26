@@ -63,12 +63,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
     }).format(usdAmount);
   };
 
-  const calculateProgress = () => {
-    if (!pledgedAmount || !proposalDetails?.investment.targetCapital) return 0;
-    const progress = (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100;
-    return Math.min(100, Math.max(0, progress));
-  };
-
   useEffect(() => {
     console.log('Proposal details effect running...', {
       tokenId,
@@ -393,22 +387,17 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   <div>
                     <div className="flex justify-between text-sm text-zinc-400 mb-2">
                       <span>Progress Towards Target Capital</span>
-                      <span className="font-medium">
-                        {calculateProgress().toFixed(1)}%
+                      <span>
+                        {((Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100).toFixed(1)}%
                       </span>
                     </div>
                     <Progress 
-                      value={calculateProgress()}
+                      value={(Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100}
                       className="h-3 bg-zinc-800"
                     />
-                    <div className="flex justify-between text-sm mt-2">
-                      <span className="text-zinc-400">
-                        Pledged: {formatRDAmount(pledgedAmount)}
-                      </span>
-                      <span className="text-zinc-400">
-                        Target: {formatRDAmount(proposalDetails.investment.targetCapital)}
-                      </span>
-                    </div>
+                    <p className="text-sm text-zinc-400 mt-2">
+                      Target: {formatRDAmount(proposalDetails.investment.targetCapital)}
+                    </p>
                   </div>
                 </div>
               </div>
