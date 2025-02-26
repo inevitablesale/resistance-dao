@@ -451,6 +451,50 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               </div>
             )}
 
+            {proposalDetails.socials && (
+              <div className="bg-purple-900/10 rounded-lg p-6 border border-purple-900/20">
+                <h4 className="text-xl font-bold text-white flex items-center gap-2 mb-4">
+                  <Users className="w-5 h-5 text-purple-400" />
+                  Connect With Us
+                </h4>
+                <div className="flex flex-wrap gap-4">
+                  {proposalDetails.socials.twitter && (
+                    <a
+                      href={proposalDetails.socials.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 rounded-lg bg-purple-900/20 text-purple-400 hover:bg-purple-900/30 transition-colors"
+                    >
+                      <Twitter className="w-5 h-5 mr-2" />
+                      Twitter
+                    </a>
+                  )}
+                  {proposalDetails.socials.discord && (
+                    <a
+                      href={proposalDetails.socials.discord}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 rounded-lg bg-indigo-900/20 text-indigo-400 hover:bg-indigo-900/30 transition-colors"
+                    >
+                      <Users className="w-5 h-5 mr-2" />
+                      Discord
+                    </a>
+                  )}
+                  {proposalDetails.socials.telegram && (
+                    <a
+                      href={proposalDetails.socials.telegram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 rounded-lg bg-blue-900/20 text-blue-400 hover:bg-blue-900/30 transition-colors"
+                    >
+                      <ExternalLink className="w-5 h-5 mr-2" />
+                      Telegram
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="bg-indigo-900/10 p-6 rounded-xl backdrop-blur-sm space-y-4 border border-indigo-900/20">
               <h3 className="text-xl font-semibold text-indigo-300">Investment Strategy</h3>
               <p className="text-white/80 leading-relaxed">
