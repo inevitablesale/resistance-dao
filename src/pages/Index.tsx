@@ -22,6 +22,7 @@ import { AccessCoverOverlay } from "@/components/AccessCoverOverlay";
 import { Progress } from "@/components/ui/progress";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 import { useProposalStats } from "@/hooks/useProposalStats";
+import { BuyRDTokens } from "@/components/BuyRDTokens";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -56,6 +57,7 @@ const Index = () => {
               transition={{ duration: 0.5 }}
               className="max-w-4xl mx-auto"
             >
+              {/* Network Status and Title */}
               <div className="text-left mb-8">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-sm mb-4 font-mono">
                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
@@ -64,6 +66,8 @@ const Index = () => {
                 <h1 className="text-5xl md:text-6xl font-bold font-mono mb-6 bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">
                   DeFi-Powered Launch Platform
                 </h1>
+
+                {/* Metrics Cards */}
                 <div className="flex gap-4 mb-8">
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 flex-1">
                     <div className="text-blue-400 text-sm mb-1">Total Hodlers</div>
@@ -79,6 +83,10 @@ const Index = () => {
                   </div>
                 </div>
                 
+                {/* Add Buy RD Tokens component here */}
+                <BuyRDTokens />
+                
+                {/* Action Buttons */}
                 <div className="flex flex-wrap gap-4">
                   <Button 
                     size="lg"
