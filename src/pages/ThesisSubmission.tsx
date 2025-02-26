@@ -215,7 +215,7 @@ export default function ThesisSubmission() {
         RD_TOKEN_ADDRESS,
         signerAddress,
         FACTORY_ADDRESS,
-        "25" // Exact amount needed for submission
+        ethers.utils.formatEther(SUBMISSION_FEE) // Convert wei to human readable for the check
       );
 
       if (!hasAllowance) {
@@ -228,7 +228,7 @@ export default function ThesisSubmission() {
           provider,
           RD_TOKEN_ADDRESS,
           FACTORY_ADDRESS,
-          "25" // Exact amount needed for submission
+          ethers.utils.formatEther(SUBMISSION_FEE) // Convert wei to human readable for the approval
         );
         
         toast({
