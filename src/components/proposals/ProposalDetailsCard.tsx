@@ -179,26 +179,51 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
     try {
       const walletProvider = await getProvider();
       const signer = walletProvider.provider.getSigner();
+      const signerAddress = await signer.getAddress();
       
-      const pledgeAmountBN = ethers.utils.parseEther(pledgeInput);
+      // First check RD token approval
+      const rdToken = new ethers.Contract(
+        RD_TOKEN_ADDRESS,
+        ["function approve(address,uint256) returns (bool)", "function allowance(address,address) view returns (uint256)"],
+        signer
+      );
+      
+      console.log('Checking RD token approval...');
+      const currentAllowance = await rdToken.allowance(signerAddress, FACTORY_ADDRESS);
+      
+      if (currentAllowance.lt(VOTING_FEE)) {
+        console.log('Approving voting fee:', ethers.utils.formatEther(VOTING_FEE));
+        const approveTx = await rdToken.approve(FACTORY_ADDRESS, VOTING_FEE);
+        await approveTx.wait();
+        console.log('Approval transaction confirmed');
+      } else {
+        console.log('Sufficient allowance exists');
+      }
 
+      const pledgeAmountBN = ethers.utils.parseEther(pledgeInput);
       const factoryContract = new ethers.Contract(
         FACTORY_ADDRESS,
         FACTORY_ABI,
         signer
       );
 
-      console.log('Approving voting fee:', ethers.utils.formatEther(VOTING_FEE));
-      const tx = await factoryContract.vote(tokenId, pledgeAmountBN);
-      await tx.wait();
+      console.log('Submitting vote transaction...');
+      const voteTx = await factoryContract.vote(tokenId, pledgeAmountBN, {
+        gasLimit: 500000 // Explicit gas limit to prevent estimation issues
+      });
+      
+      console.log('Vote transaction submitted:', voteTx.hash);
+      await voteTx.wait();
 
       toast({
         title: "Support Pledged Successfully",
         description: `Your commitment of ${pledgeInput} RD has been recorded.`,
       });
 
-      // Refresh the data instead of manual state updates
-      // The useProposal hook will handle the refresh
+      // Refresh pledge amount display
+      const updatedProposal = await factoryContract.proposals(tokenId);
+      setPledgedAmount(ethers.utils.formatEther(updatedProposal.totalPledged));
+      
     } catch (error: any) {
       console.error("Pledging error:", error);
       toast({
