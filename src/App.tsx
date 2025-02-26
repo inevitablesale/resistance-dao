@@ -13,6 +13,8 @@ import ThesisSubmission from "./pages/ThesisSubmission";
 import ProposalDetails from "./pages/ProposalDetails";
 import Proposals from "./pages/Proposals";
 import { Toaster } from "./components/ui/toaster";
+import { useLocation } from 'react-router-dom';
+import { useCustomWallet } from './hooks/useCustomWallet';
 
 const zeroDevConfig = {
   projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -139,9 +141,15 @@ const dynamicSettings = {
 const queryClient = new QueryClient();
 
 function Layout() {
+  const location = useLocation();
+  const { isConnected } = useCustomWallet();
+  const isIndexPage = location.pathname === '/';
+  
+  const showNav = !isIndexPage || isConnected;
+
   return (
     <>
-      <Nav />
+      {showNav && <Nav />}
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/thesis" element={<ThesisSubmission />} />
