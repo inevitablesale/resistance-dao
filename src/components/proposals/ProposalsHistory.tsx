@@ -72,16 +72,16 @@ export const ProposalsHistory = () => {
         
         updateProposalData(proposal.tokenId, { isLoading: true });
 
-        // Get token URI
-        console.log('Getting token URI from contract...');
-        const tokenUri = await contract.tokenURI(proposal.tokenId);
-        console.log('Token URI:', tokenUri);
+        // Get token URI and pledged amount in parallel
+        const [tokenUri, proposalData, voteEvents] = await Promise.all([
+          contract.tokenURI(proposal.tokenId),
+          contract.proposals(proposal.tokenId),
+          contract.queryFilter(contract.filters.ProposalVoted(proposal.tokenId))
+        ]);
 
-        // Get pledged amount from proposals mapping
-        console.log('Getting pledged amount...');
-        const proposalData = await contract.proposals(proposal.tokenId);
-        const pledgedAmount = proposalData.totalPledged;
-        console.log('Pledged amount:', ethers.utils.formatEther(pledgedAmount), 'RD');
+        console.log('Token URI:', tokenUri);
+        console.log('Pledged amount:', ethers.utils.formatEther(proposalData.totalPledged), 'RD');
+        console.log('Vote events:', voteEvents.length);
 
         if (tokenUri) {
           console.log('Fetching IPFS data...');
@@ -92,10 +92,16 @@ export const ProposalsHistory = () => {
             );
             console.log('IPFS metadata retrieved:', metadata);
 
+            // Calculate total pledged from events
+            const totalPledged = voteEvents.reduce((sum, event) => {
+              return sum.add(event.args?.pledgeAmount || 0);
+            }, ethers.BigNumber.from(0));
+
             updateProposalData(proposal.tokenId, {
               metadata,
-              pledgedAmount: ethers.utils.formatEther(pledgedAmount),
-              isLoading: false
+              pledgedAmount: ethers.utils.formatEther(totalPledged),
+              isLoading: false,
+              voteCount: voteEvents.length
             });
           } catch (ipfsError) {
             console.error('IPFS fetch error:', ipfsError);
@@ -133,13 +139,12 @@ export const ProposalsHistory = () => {
         const latestBlock = await walletProvider.provider.getBlockNumber();
         console.log('Current block:', latestBlock);
 
-        // Get event logs from the last 50000 blocks or from block 0 if chain is shorter
-        const fromBlock = Math.max(0, latestBlock - 50000);
-        console.log('Fetching events from block:', fromBlock);
+        // Fetch ALL historical events from block 0
+        console.log('Fetching events from genesis block');
 
         const filter = contract.filters.ProposalCreated();
         console.log('Querying ProposalCreated events...');
-        const events = await contract.queryFilter(filter, fromBlock, latestBlock);
+        const events = await contract.queryFilter(filter, 0, latestBlock);
         console.log('Found events:', events.length);
         
         console.log('Event details:', events.map(e => ({
