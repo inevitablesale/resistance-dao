@@ -9,8 +9,6 @@ import { getWorkingProvider, getRdTokenContract, getUsdcContract } from "@/servi
 import { TokenBalanceDisplay } from "./TokenBalanceDisplay";
 import { NFTDisplay } from "./NFTDisplay";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
-import { Button } from "@/components/ui/button";
-import { NFTPurchaseDialog } from "../NFTPurchaseDialog";
 
 export const ResistanceWalletWidget = () => {
   const { address } = useCustomWallet();
@@ -18,7 +16,6 @@ export const ResistanceWalletWidget = () => {
   const [rdBalance, setRdBalance] = useState<string>("0");
   const [usdcBalance, setUsdcBalance] = useState<string>("0");
   const { data: nftBalance = 0 } = useNFTBalance(address);
-  const [isNftDialogOpen, setIsNftDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -47,10 +44,6 @@ export const ResistanceWalletWidget = () => {
     const interval = setInterval(fetchBalances, 30000);
     return () => clearInterval(interval);
   }, [address]);
-
-  const handleTransfer = () => {
-    primaryWallet?.connector?.showWallet?.({ view: 'send' });
-  };
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
@@ -82,29 +75,9 @@ export const ResistanceWalletWidget = () => {
               iconUrl="https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
               className="py-2 border-t border-blue-500/10"
             />
-
-            <div className="flex flex-col gap-2 pt-2">
-              <Button
-                onClick={handleTransfer}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold"
-              >
-                Transfer From Wallet
-              </Button>
-              <Button
-                onClick={() => setIsNftDialogOpen(true)}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold"
-              >
-                Buy NFT
-              </Button>
-            </div>
           </div>
         </PopoverContent>
       </Popover>
-
-      <NFTPurchaseDialog 
-        open={isNftDialogOpen}
-        onOpenChange={setIsNftDialogOpen}
-      />
     </div>
   );
 };
