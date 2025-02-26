@@ -6,6 +6,10 @@ import { useCustomWallet } from '@/hooks/useCustomWallet';
 const Nav = () => {
   const { isConnected } = useCustomWallet();
   const location = useLocation();
+  const isIndexPage = location.pathname === '/';
+
+  // Hide DynamicWidget on index page when not connected
+  const showDynamicWidget = !isIndexPage || isConnected;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-lg border-b border-white/10">
@@ -16,7 +20,9 @@ const Nav = () => {
           </Link>
           
           <div className="flex items-center gap-4">
-            {isConnected && <DynamicWidget />}
+            {showDynamicWidget && (
+              <DynamicWidget />
+            )}
           </div>
         </div>
       </div>
