@@ -186,4 +186,5 @@ export interface ProposalEvent {
   nftMetadata?: NFTMetadata;
   pledgedAmount?: string;
   error?: string;
+  voteCount?: number;  // Added this property
 }
