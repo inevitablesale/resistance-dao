@@ -1,7 +1,9 @@
+
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { ethers } from "ethers";
@@ -247,21 +249,23 @@ export const ProposalsHistory = () => {
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4">
-        {proposalEvents.map((event, index) => (
-          <ProposalListItem
-            key={event.tokenId}
-            index={index}
-            tokenId={event.tokenId}
-            metadata={event.metadata}
-            pledgedAmount={event.pledgedAmount}
-            blockNumber={event.blockNumber}
-            formatUSDAmount={formatUSDAmount}
-            isLoading={event.isLoading}
-            error={event.error}
-          />
-        ))}
-      </div>
+      <ScrollArea className="h-[650px] rounded-md">
+        <div className="grid gap-4 pr-4">
+          {proposalEvents.map((event, index) => (
+            <ProposalListItem
+              key={event.tokenId}
+              index={index}
+              tokenId={event.tokenId}
+              metadata={event.metadata}
+              pledgedAmount={event.pledgedAmount}
+              blockNumber={event.blockNumber}
+              formatUSDAmount={formatUSDAmount}
+              isLoading={event.isLoading}
+              error={event.error}
+            />
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 };
