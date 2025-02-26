@@ -23,6 +23,7 @@ import { Progress } from "@/components/ui/progress";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 import { useProposalStats } from "@/hooks/useProposalStats";
 import { BuyRDTokens } from "@/components/BuyRDTokens";
+import { FACTORY_ADDRESS, RD_TOKEN_ADDRESS } from "@/lib/constants";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -584,7 +585,28 @@ const Index = () => {
                 },
                 {
                   question: "Is it secure?",
-                  answer: "Yes, our platform uses smart contracts and secure protocols to ensure the safety of your project."
+                  answer: (
+                    <span>
+                      Yes, our platform uses verified smart contracts and secure protocols to ensure the safety of your project. View our contracts on Polyscan: {' '}
+                      <a 
+                        href={`https://polygonscan.com/address/${FACTORY_ADDRESS}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300 underline"
+                      >
+                        Proposal Factory
+                      </a>
+                      {' '} and {' '}
+                      <a 
+                        href={`https://polygonscan.com/address/${RD_TOKEN_ADDRESS}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300 underline"
+                      >
+                        RD Token
+                      </a>
+                    </span>
+                  )
                 },
                 {
                   question: "Benefits?",
@@ -593,7 +615,9 @@ const Index = () => {
               ].map((item, index) => (
                 <div key={index} className="bg-black/30 border border-white/10 p-6 hover:border-green-400/20 transition-all duration-300">
                   <h3 className="text-xl font-bold text-white mb-3">{item.question}</h3>
-                  <p className="text-white/70">{item.answer}</p>
+                  <p className="text-white/70">
+                    {typeof item.answer === 'string' ? item.answer : item.answer}
+                  </p>
                 </div>
               ))}
             </div>
