@@ -86,13 +86,13 @@ export const createProposal = async (
       throw new Error(`Insufficient RD balance. Required: ${ethers.utils.formatUnits(SUBMISSION_FEE, 18)} RD`);
     }
 
-    // Check if factory contract has sufficient allowance
+    // Check if factory contract has sufficient allowance using human readable amount
     const hasAllowance = await checkTokenAllowance(
       provider,
       RD_TOKEN_ADDRESS,
       signerAddress,
       FACTORY_ADDRESS,
-      SUBMISSION_FEE.toString()
+      ethers.utils.formatUnits(SUBMISSION_FEE, 18)
     );
 
     if (!hasAllowance) {
