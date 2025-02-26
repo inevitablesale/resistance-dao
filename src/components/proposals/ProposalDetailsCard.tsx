@@ -527,26 +527,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 </p>
               </div>
 
-              <Collapsible>
-                <CollapsibleTrigger className="w-full">
-                  <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
-                    <div className="flex items-center justify-between text-white">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <Info className="w-5 h-5 text-blue-400" />
-                        About Supporting Proposals
-                      </h4>
-                      <ChevronDown className="w-5 h-5 text-zinc-400" />
-                    </div>
-                  </div>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="p-4 bg-zinc-900/50 border border-zinc-800/50 rounded-lg mt-2">
-                  <p className="text-sm text-zinc-300 leading-relaxed">
-                    Express your interest by making a soft commitment. This is not an actual investment - 
-                    only a 1 RD voting fee will be charged to record your support. Your pledged amount shows how much 
-                    you're potentially interested in investing later.
-                  </p>
-                </CollapsibleContent>
-              </Collapsible>
+              
               
               <div className="flex flex-col md:flex-row gap-4 mt-6">
                 <div className="flex-1">
