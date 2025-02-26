@@ -294,217 +294,115 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
           <CardHeader>
             <div className="space-y-6">
               <div className="flex flex-wrap items-center gap-2">
-                <div className="inline-flex items-center space-x-2 bg-blue-900/20 rounded-full px-4 py-2">
-                  <BrainCircuit className="w-4 h-4 text-blue-400" />
-                  <span className="text-sm text-blue-400">{proposalDetails.category}</span>
+                <div className="inline-flex items-center space-x-2 bg-indigo-900/20 rounded-full px-4 py-2">
+                  <BrainCircuit className="w-4 h-4 text-indigo-400" />
+                  <span className="text-sm text-indigo-400">{proposalDetails.category}</span>
                 </div>
                 {proposalDetails.blockchain?.map((chain) => (
-                  <span key={chain} className="px-3 py-1 text-xs font-medium bg-blue-900/20 text-blue-400 rounded-full">
+                  <span key={chain} className="px-3 py-1 text-xs font-medium bg-purple-900/20 text-purple-400 rounded-full">
                     {chain}
                   </span>
                 ))}
               </div>
               
               <div>
-                <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
+                <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
                   {proposalDetails.title}
                 </h1>
                 <p className="text-lg text-zinc-400">{proposalDetails.description}</p>
               </div>
 
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mt-4">
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 mt-4">
                 <div className="flex items-center gap-3">
-                  <Info className="w-6 h-6 text-blue-400" />
+                  <Info className="w-6 h-6 text-emerald-400" />
                   <div>
-                    <h3 className="text-lg font-semibold text-blue-400">Important Notice</h3>
+                    <h3 className="text-lg font-semibold text-emerald-400">Important Notice</h3>
                     <p className="text-white">Only a 1 RD voting fee is required to record your support. Your pledged amount represents your potential future investment.</p>
                   </div>
                 </div>
               </div>
 
-              {(proposalDetails.roadmap && proposalDetails.roadmap.length > 0) && (
-                <div className="pt-4">
-                  <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Calendar className="w-6 h-6 text-blue-400" />
-                    Roadmap
-                  </h3>
-                  <div className="space-y-4">
-                    {proposalDetails.roadmap.map((milestone, index) => (
-                      <div key={index} className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="text-white font-medium">{milestone.milestone}</p>
-                            <p className="text-zinc-400 text-sm">Expected: {milestone.expectedDate}</p>
-                          </div>
-                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                            milestone.status === 'Completed' ? 'bg-green-900/20 text-green-400' :
-                            milestone.status === 'In Progress' ? 'bg-blue-900/20 text-blue-400' :
-                            'bg-zinc-800 text-zinc-400'
-                          }`}>
-                            {milestone.status}
-                          </span>
-                        </div>
+              <div className="relative">
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <Coins className="w-6 h-6 text-amber-400" />
+                        Support This Proposal
+                      </h3>
+                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-900/20 border border-purple-900/40">
+                        <Clock className="w-5 h-5 text-purple-400" />
+                        <span className={`text-lg font-medium ${isVotingEnded ? 'text-red-400' : 'text-purple-400'}`}>
+                          {timeRemaining}
+                        </span>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </div>
-              )}
-
-              {proposalDetails.backerIncentives && (
-                <div className="pt-4">
-                  <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Gift className="w-6 h-6 text-blue-400" />
-                    Backer Incentives
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {proposalDetails.backerIncentives.utility && (
-                      <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
-                        <p className="text-zinc-400 text-sm">Utility</p>
-                        <p className="text-white">{proposalDetails.backerIncentives.utility}</p>
-                      </div>
-                    )}
-                    {proposalDetails.backerIncentives.governance && (
-                      <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
-                        <p className="text-zinc-400 text-sm">Governance</p>
-                        <p className="text-white">{proposalDetails.backerIncentives.governance}</p>
-                      </div>
-                    )}
-                    {proposalDetails.backerIncentives.NFTRewards && (
-                      <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
-                        <p className="text-zinc-400 text-sm">NFT Rewards</p>
-                        <p className="text-white">{proposalDetails.backerIncentives.NFTRewards}</p>
-                      </div>
-                    )}
-                    {proposalDetails.backerIncentives.tokenAllocation && (
-                      <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
-                        <p className="text-zinc-400 text-sm">Token Allocation</p>
-                        <p className="text-white">{proposalDetails.backerIncentives.tokenAllocation}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {proposalDetails.socials && (
-                <div className="flex flex-wrap gap-3">
-                  {proposalDetails.socials.twitter && (
-                    <a href={proposalDetails.socials.twitter} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-900/20 hover:bg-blue-900/40 transition-colors text-blue-400">
-                      <Twitter className="w-4 h-4" />
-                      <span className="text-sm">Twitter</span>
-                    </a>
-                  )}
-                  {proposalDetails.socials.discord && (
-                    <a href={proposalDetails.socials.discord} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-900/20 hover:bg-blue-900/40 transition-colors text-blue-400">
-                      <ArrowUpRight className="w-4 h-4" />
-                      <span className="text-sm">Discord</span>
-                    </a>
-                  )}
-                  {proposalDetails.socials.telegram && (
-                    <a href={proposalDetails.socials.telegram} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-900/20 hover:bg-blue-900/40 transition-colors text-blue-400">
-                      <ArrowUpRight className="w-4 h-4" />
-                      <span className="text-sm">Telegram</span>
-                    </a>
-                  )}
-                </div>
-              )}
-            </div>
-          </CardHeader>
-          
-          <CardContent className="p-8 space-y-8">
-            <div className="relative">
-              <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
-                <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                      <Coins className="w-6 h-6 text-blue-400" />
-                      Support This Proposal
-                    </h3>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-900/20 border border-blue-900/40">
-                      <Clock className="w-5 h-5 text-blue-400" />
-                      <span className={`text-lg font-medium ${isVotingEnded ? 'text-red-400' : 'text-blue-400'}`}>
-                        {timeRemaining}
+                  <div className="text-center md:text-right">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-900/20 backdrop-blur-sm">
+                      <p className="text-2xl font-bold text-white">
+                        {formatRDAmount(pledgedAmount)}
+                      </p>
+                      <span className="text-sm text-zinc-400 border-l border-zinc-700 pl-2">
+                        {backerCount} supporter{backerCount !== 1 ? 's' : ''}
                       </span>
                     </div>
                   </div>
-                  <div className="text-sm text-zinc-400">
-                    Submitted {new Date(proposalDetails.submissionTimestamp * 1000).toLocaleDateString()}
-                  </div>
                 </div>
-                <div className="text-center md:text-right">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-900/20 backdrop-blur-sm">
-                    <p className="text-2xl font-bold text-white">
-                      {formatRDAmount(pledgedAmount)}
-                    </p>
-                    <span className="text-sm text-zinc-400 border-l border-zinc-700 pl-2">
-                      {backerCount} supporter{backerCount !== 1 ? 's' : ''}
-                    </span>
-                  </div>
-                </div>
-              </div>
 
-              <div className="space-y-6 mb-8">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1">
-                    <Label htmlFor="pledgeAmount" className="text-zinc-400 mb-2 block">
-                      Commitment Amount (RD)
-                    </Label>
-                    <Input
-                      id="pledgeAmount"
-                      type="number"
-                      min="0"
-                      step="0.1"
-                      value={pledgeInput}
-                      onChange={(e) => setPledgeInput(e.target.value)}
-                      placeholder="Enter RD amount you want to commit"
-                      className="bg-zinc-900/50 border-zinc-800/50 text-white h-12"
+                <div className="space-y-6">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex-1">
+                      <Label htmlFor="pledgeAmount" className="text-zinc-400 mb-2 block">
+                        Commitment Amount (RD)
+                      </Label>
+                      <Input
+                        id="pledgeAmount"
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        value={pledgeInput}
+                        onChange={(e) => setPledgeInput(e.target.value)}
+                        placeholder="Enter RD amount you want to commit"
+                        className="bg-zinc-900/50 border-zinc-800/50 text-white h-12"
+                      />
+                    </div>
+                    <Button
+                      onClick={handlePledge}
+                      disabled={isPledging || !pledgeInput}
+                      size="lg"
+                      className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold h-12 mt-8 md:mt-0"
+                    >
+                      {isPledging ? (
+                        "Recording..."
+                      ) : (
+                        <>
+                          <Coins className="w-5 h-5 mr-2" />
+                          Record Support
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-sm text-zinc-400 mb-2">
+                      <span>Progress Towards Target Capital</span>
+                      <span>
+                        {((Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <Progress 
+                      value={(Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100}
+                      className="h-3 bg-zinc-800"
                     />
-                    <p className="text-sm text-zinc-400 mt-2 flex items-center gap-2">
-                      <Info className="w-4 h-4" />
-                      Only a 1 RD voting fee is required
+                    <p className="text-sm text-zinc-400 mt-2">
+                      Target: {formatRDAmount(proposalDetails.investment.targetCapital)}
                     </p>
                   </div>
-                  <Button
-                    onClick={handlePledge}
-                    disabled={isPledging || !pledgeInput}
-                    size="lg"
-                    className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold h-12 mt-8 md:mt-0"
-                  >
-                    {isPledging ? (
-                      "Recording..."
-                    ) : (
-                      <>
-                        <Coins className="w-5 h-5 mr-2" />
-                        Record Support
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-sm text-zinc-400 mb-2">
-                    <span>Progress Towards Target Capital</span>
-                    <span>
-                      {proposalDetails?.investment?.targetCapital 
-                        ? ((Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100).toFixed(1) 
-                        : 0}%
-                    </span>
-                  </div>
-                  <Progress 
-                    value={proposalDetails?.investment?.targetCapital 
-                      ? (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100 
-                      : 0}
-                    className="h-3 bg-zinc-800"
-                  />
-                  <p className="text-sm text-zinc-400 mt-2">
-                    Target: {formatRDAmount(proposalDetails.investment.targetCapital)}
-                  </p>
                 </div>
               </div>
             </div>
-          </CardContent>
+          </CardHeader>
         </Card>
       </motion.div>
     );
@@ -519,7 +417,7 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
       >
         <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-white">
+            <CardTitle className="text-2xl font-bold text-gradient-primary">
               {proposalDetails?.title}
             </CardTitle>
           </CardHeader>
@@ -527,28 +425,22 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
             {(proposalDetails.team && proposalDetails.team.length > 0) && (
               <div>
                 <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                  <Users className="w-6 h-6 text-blue-400" />
+                  <Users className="w-6 h-6 text-purple-400" />
                   Team
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {proposalDetails.team.map((member, index) => (
-                    <div key={index} className="bg-white/10 rounded-lg p-4">
+                    <div key={index} className="bg-purple-900/10 rounded-lg p-4 border border-purple-900/20">
                       <div className="flex items-start justify-between">
                         <div>
                           <p className="text-white font-medium">{member.name}</p>
-                          <p className="text-white/60 text-sm">{member.role}</p>
+                          <p className="text-purple-300/80 text-sm">{member.role}</p>
                         </div>
                         <div className="flex gap-2">
                           {member.linkedin && (
                             <a href={member.linkedin} target="_blank" rel="noopener noreferrer"
-                              className="p-2 rounded-full bg-blue-900/20 hover:bg-blue-900/40 transition-colors">
-                              <ExternalLink className="w-4 h-4 text-blue-400" />
-                            </a>
-                          )}
-                          {member.github && (
-                            <a href={member.github} target="_blank" rel="noopener noreferrer"
-                              className="p-2 rounded-full bg-blue-900/20 hover:bg-blue-900/40 transition-colors">
-                              <Github className="w-4 h-4 text-blue-400" />
+                              className="p-2 rounded-full bg-purple-900/20 hover:bg-purple-900/40 transition-colors">
+                              <ExternalLink className="w-4 h-4 text-purple-400" />
                             </a>
                           )}
                         </div>
@@ -559,8 +451,8 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               </div>
             )}
 
-            <div className="bg-white/5 p-6 rounded-xl backdrop-blur-sm space-y-4">
-              <h3 className="text-xl font-semibold text-white">Investment Strategy</h3>
+            <div className="bg-indigo-900/10 p-6 rounded-xl backdrop-blur-sm space-y-4 border border-indigo-900/20">
+              <h3 className="text-xl font-semibold text-indigo-300">Investment Strategy</h3>
               <p className="text-white/80 leading-relaxed">
                 {proposalDetails.investment.description}
               </p>
@@ -583,14 +475,14 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-white">Investment Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white/5 p-4 rounded-lg">
-                  <p className="text-white/60 text-sm">Target Capital</p>
+                <div className="bg-amber-900/10 p-4 rounded-lg border border-amber-900/20">
+                  <p className="text-amber-300/80 text-sm">Target Capital</p>
                   <p className="text-white text-lg font-medium">
                     {formatRDAmount(proposalDetails.investment.targetCapital)}
                   </p>
                 </div>
-                <div className="bg-white/5 p-4 rounded-lg">
-                  <p className="text-white/60 text-sm">Total Pledged</p>
+                <div className="bg-emerald-900/10 p-4 rounded-lg border border-emerald-900/20">
+                  <p className="text-emerald-300/80 text-sm">Total Pledged</p>
                   <p className="text-white text-lg font-medium">
                     {formatRDAmount(pledgedAmount)}
                   </p>
@@ -599,15 +491,15 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
             </div>
 
             {proposalDetails.fundingBreakdown && (
-              <div className="bg-white/5 rounded-lg p-6">
+              <div className="bg-purple-900/10 rounded-lg p-6 border border-purple-900/20">
                 <h4 className="text-xl font-bold text-white flex items-center gap-2 mb-4">
-                  <PieChart className="w-5 h-5 text-blue-400" />
+                  <PieChart className="w-5 h-5 text-purple-400" />
                   Funding Breakdown
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {proposalDetails.fundingBreakdown.map((item, index) => (
-                    <div key={index} className="bg-white/10 rounded-lg p-4">
-                      <p className="text-white/60 text-sm">{item.category}</p>
+                    <div key={index} className="bg-purple-900/20 rounded-lg p-4">
+                      <p className="text-purple-300/80 text-sm">{item.category}</p>
                       <p className="text-white font-medium">{formatRDAmount(item.amount)}</p>
                     </div>
                   ))}
@@ -615,33 +507,15 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               </div>
             )}
 
-            <div className="bg-white/5 rounded-lg p-6 space-y-4">
+            <div className="bg-indigo-900/10 rounded-lg p-6 border border-indigo-900/20">
               <h4 className="text-xl font-bold text-white flex items-center gap-2">
-                <Info className="w-5 h-5 text-blue-400" />
+                <Info className="w-5 h-5 text-indigo-400" />
                 Investment Purpose
               </h4>
-              <p className="text-white/80 leading-relaxed">
+              <p className="text-white/80 leading-relaxed mt-4">
                 {proposalDetails.investment.description}
               </p>
             </div>
-
-            {proposalDetails?.linkedInURL && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <a 
-                  href={proposalDetails.linkedInURL} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-6 py-3 rounded-xl bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition-colors text-lg"
-                >
-                  View LinkedIn Profile 
-                  <ExternalLink className="w-5 h-5 ml-2" />
-                </a>
-              </motion.div>
-            )}
           </CardContent>
         </Card>
       </motion.div>
