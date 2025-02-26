@@ -77,7 +77,7 @@ export const ProposalListItem = ({
                     <div className="flex items-center gap-2">
                       <Target className="w-4 h-4" />
                       <span>
-                        {metadata.investment.targetCapital} LGR Target
+                        {metadata.investment.targetCapital} RD Target
                         <span className="text-white/40 ml-1">
                           ({formatUSDAmount(metadata.investment.targetCapital)})
                         </span>
@@ -88,7 +88,7 @@ export const ProposalListItem = ({
                     <div className="flex items-center gap-2">
                       <Users className="w-4 h-4" />
                       <span>
-                        {pledgedAmount} LGR Pledged
+                        {pledgedAmount} RD Pledged
                         <span className="text-white/40 ml-1">
                           ({formatUSDAmount(pledgedAmount)})
                         </span>
