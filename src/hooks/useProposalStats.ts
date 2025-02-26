@@ -79,7 +79,7 @@ export const useProposalStats = () => {
           }
         }
 
-        // Get recent activities (last 10 events, sorted by timestamp)
+        // Get recent activities (last 5 events, sorted by timestamp)
         const allActivities = [
           ...voteEvents.map(event => ({
             type: 'vote' as const,
@@ -99,7 +99,7 @@ export const useProposalStats = () => {
             timestamp: event.args ? event.args.timestamp.toNumber() : 0,
             proposalId: event.args ? event.args.proposalId.toString() : '0'
           }))
-        ].sort((a, b) => b.timestamp - a.timestamp).slice(0, 10);
+        ].sort((a, b) => b.timestamp - a.timestamp).slice(0, 5); // Changed from 10 to 5
 
         // Calculate success rate
         const successRate = completeEvents.length > 0 
