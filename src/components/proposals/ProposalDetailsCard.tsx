@@ -480,24 +480,63 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 </div>
               </div>
 
-              <div className="mb-8">
-                <div className="flex justify-between text-sm text-zinc-400 mb-2">
-                  <span>Progress Towards Target Capital</span>
-                  <span>
-                    {proposalDetails?.investment?.targetCapital 
-                      ? ((Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100).toFixed(1) 
-                      : 0}%
-                  </span>
+              <div className="space-y-6 mb-8">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-1">
+                    <Label htmlFor="pledgeAmount" className="text-zinc-400 mb-2 block">
+                      Commitment Amount (RD)
+                    </Label>
+                    <Input
+                      id="pledgeAmount"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      value={pledgeInput}
+                      onChange={(e) => setPledgeInput(e.target.value)}
+                      placeholder="Enter RD amount you want to commit"
+                      className="bg-zinc-900/50 border-zinc-800/50 text-white h-12"
+                    />
+                    <p className="text-sm text-zinc-400 mt-2 flex items-center gap-2">
+                      <Info className="w-4 h-4" />
+                      Only a 1 RD voting fee is required
+                    </p>
+                  </div>
+                  <Button
+                    onClick={handlePledge}
+                    disabled={isPledging || !pledgeInput}
+                    size="lg"
+                    className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold h-12 mt-8 md:mt-0"
+                  >
+                    {isPledging ? (
+                      "Recording..."
+                    ) : (
+                      <>
+                        <Coins className="w-5 h-5 mr-2" />
+                        Record Support
+                      </>
+                    )}
+                  </Button>
                 </div>
-                <Progress 
-                  value={proposalDetails?.investment?.targetCapital 
-                    ? (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100 
-                    : 0}
-                  className="h-3 bg-zinc-800"
-                />
-                <p className="text-sm text-zinc-400 mt-2">
-                  Target: {formatRDAmount(proposalDetails.investment.targetCapital)}
-                </p>
+
+                <div>
+                  <div className="flex justify-between text-sm text-zinc-400 mb-2">
+                    <span>Progress Towards Target Capital</span>
+                    <span>
+                      {proposalDetails?.investment?.targetCapital 
+                        ? ((Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100).toFixed(1) 
+                        : 0}%
+                    </span>
+                  </div>
+                  <Progress 
+                    value={proposalDetails?.investment?.targetCapital 
+                      ? (Number(pledgedAmount) / Number(proposalDetails.investment.targetCapital)) * 100 
+                      : 0}
+                    className="h-3 bg-zinc-800"
+                  />
+                  <p className="text-sm text-zinc-400 mt-2">
+                    Target: {formatRDAmount(proposalDetails.investment.targetCapital)}
+                  </p>
+                </div>
               </div>
 
               {proposalDetails.fundingBreakdown && (
@@ -525,45 +564,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 <p className="text-zinc-300 leading-relaxed">
                   {proposalDetails.investment.description}
                 </p>
-              </div>
-
-              
-              
-              <div className="flex flex-col md:flex-row gap-4 mt-6">
-                <div className="flex-1">
-                  <Label htmlFor="pledgeAmount" className="text-zinc-400 mb-2 block">
-                    Commitment Amount (RD)
-                  </Label>
-                  <Input
-                    id="pledgeAmount"
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    value={pledgeInput}
-                    onChange={(e) => setPledgeInput(e.target.value)}
-                    placeholder="Enter RD amount you want to commit"
-                    className="bg-zinc-900/50 border-zinc-800/50 text-white h-12"
-                  />
-                  <p className="text-sm text-zinc-400 mt-2 flex items-center gap-2">
-                    <Info className="w-4 h-4" />
-                    Only a 1 RD voting fee is required
-                  </p>
-                </div>
-                <Button
-                  onClick={handlePledge}
-                  disabled={isPledging || !pledgeInput}
-                  size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold h-12 mt-8 md:mt-0"
-                >
-                  {isPledging ? (
-                    "Recording..."
-                  ) : (
-                    <>
-                      <Coins className="w-5 h-5 mr-2" />
-                      Record Support
-                    </>
-                  )}
-                </Button>
               </div>
             </div>
           </CardContent>
