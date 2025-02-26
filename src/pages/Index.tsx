@@ -5,15 +5,15 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { AccessCoverOverlay } from "@/components/AccessCoverOverlay";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, GitPullRequest } from "lucide-react";
-import WhatWeBuilding from "@/components/WhatWeBuilding";
-import HowItWorks from "@/components/HowItWorks";
-import Partners from "@/components/Partners";
-import FAQ from "@/components/FAQ";
-import CallToAction from "@/components/CallToAction";
-import AlternativeToEquity from "@/components/AlternativeToEquity";
-import SystemWeDeserve from "@/components/SystemWeDeserve";
-import ReclaimControl from "@/components/ReclaimControl";
-import LedgerFrens from "@/components/LedgerFrens";
+import { WhatWeBuilding } from "@/components/WhatWeBuilding";
+import { HowItWorks } from "@/components/HowItWorks";
+import { Partners } from "@/components/Partners";
+import { FAQ } from "@/components/FAQ";
+import { CallToAction } from "@/components/CallToAction";
+import { AlternativeToEquity } from "@/components/AlternativeToEquity";
+import { SystemWeDeserve } from "@/components/SystemWeDeserve";
+import { ReclaimControl } from "@/components/ReclaimControl";
+import { LedgerFrens } from "@/components/LedgerFrens";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 
 const Index = () => {
