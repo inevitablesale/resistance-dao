@@ -416,11 +416,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
         className="space-y-6"
       >
         <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-gradient-primary">
-              {proposalDetails?.title}
-            </CardTitle>
-          </CardHeader>
           <CardContent className="p-8 space-y-8">
             {(proposalDetails.team && proposalDetails.team.length > 0) && (
               <div>
