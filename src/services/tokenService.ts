@@ -78,3 +78,23 @@ export const approveExactAmount = async (
     throw error;
   }
 };
+
+export const getTokenBalance = async (
+  provider: ethers.providers.Web3Provider,
+  tokenAddress: string,
+  accountAddress: string
+): Promise<string> => {
+  try {
+    const tokenContract = new ethers.Contract(
+      tokenAddress,
+      ["function balanceOf(address) view returns (uint256)"],
+      provider
+    );
+
+    const balance = await tokenContract.balanceOf(accountAddress);
+    return ethers.utils.formatUnits(balance, 18);
+  } catch (error) {
+    console.error("Error getting token balance:", error);
+    throw error;
+  }
+};
