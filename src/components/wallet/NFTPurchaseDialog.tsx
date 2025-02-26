@@ -235,7 +235,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#0A0B2E] border border-blue-500/20 p-0 max-w-md w-[90%] overflow-hidden z-[200] relative">
+      <DialogContent className="bg-[#0A0B2E] border border-blue-500/20 p-0 max-w-md w-[90%] overflow-hidden">
         <DialogTitle className="sr-only">Purchase Member NFT</DialogTitle>
         <div className="p-4 space-y-4">
           <div className="relative rounded-lg overflow-hidden bg-[#111444] border border-blue-400/20" style={{ maxHeight: '240px' }}>
@@ -255,7 +255,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
           </div>
 
           {!isContractOwner && (
-            <div className="space-y-1 bg-blue-950/30 rounded-lg p-3 relative z-[201]">
+            <div className="space-y-1 bg-blue-950/30 rounded-lg p-3">
               <div className="flex justify-between items-center text-blue-100 text-sm">
                 <span>Price:</span>
                 <span className="font-semibold">50 USDC</span>
@@ -267,7 +267,7 @@ export const NFTPurchaseDialog = ({ open, onOpenChange }: NFTPurchaseDialogProps
             </div>
           )}
 
-          <div className="space-y-2 relative z-[201]">
+          <div className="space-y-2">
             {!hasEnoughUSDC && !isContractOwner && (
               <Button
                 onClick={handleOpenWallet}
