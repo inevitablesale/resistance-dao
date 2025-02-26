@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError, handleError } from "./errorHandlingService";
 import { EventConfig, waitForProposalCreation } from "./eventListenerService";
@@ -86,13 +85,13 @@ export const createProposal = async (
       throw new Error(`Insufficient RD balance. Required: ${ethers.utils.formatUnits(SUBMISSION_FEE, 18)} RD`);
     }
 
-    // Check if factory contract has sufficient allowance using human readable amount
+    // Check token allowance using the raw wei amount
     const hasAllowance = await checkTokenAllowance(
       provider,
       RD_TOKEN_ADDRESS,
       signerAddress,
       FACTORY_ADDRESS,
-      ethers.utils.formatUnits(SUBMISSION_FEE, 18)
+      SUBMISSION_FEE.toString()
     );
 
     if (!hasAllowance) {
