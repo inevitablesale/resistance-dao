@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { purchaseTokens } from "@/services/presaleContractService";
+import { ethers } from "ethers"; // Add direct import
 
 export const BuyRDTokens = () => {
   const [amount, setAmount] = useState("");
@@ -18,7 +19,12 @@ export const BuyRDTokens = () => {
 
     setIsLoading(true);
     try {
-      const provider = new window.ethers.providers.Web3Provider(window.ethereum);
+      // Use ethereum from window object and create provider
+      if (!window.ethereum) {
+        throw new Error("No ethereum provider found");
+      }
+      
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       
       const tx = await purchaseTokens(signer, amount);
