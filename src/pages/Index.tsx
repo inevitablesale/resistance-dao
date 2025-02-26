@@ -579,16 +579,16 @@ const Index = () => {
                   answer: "Our platform allows you to submit a proposal, collect soft commitments, and launch your project with confidence."
                 },
                 {
-                  question: "What are the benefits?",
-                  answer: "Join our community and access capital, support, and visibility to grow your project."
+                  question: "What are the fees?",
+                  answer: "The platform has three fee components: 25 RD tokens to list a project, 1 RD token to vote on proposals, and 2.5% of project tokens distributed to DAO holders upon launch."
                 },
                 {
                   question: "Is it secure?",
                   answer: "Yes, our platform uses smart contracts and secure protocols to ensure the safety of your project."
                 },
                 {
-                  question: "What are the fees?",
-                  answer: "Our platform is free to use, but we may charge fees for certain services or features."
+                  question: "Benefits?",
+                  answer: "Join our community and access capital, support, and visibility to grow your project."
                 }
               ].map((item, index) => (
                 <div key={index} className="bg-black/30 border border-white/10 p-6 hover:border-green-400/20 transition-all duration-300">
