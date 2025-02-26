@@ -9,10 +9,10 @@ const Progress = React.forwardRef<
 >(({ className, value, ...props }, ref) => {
   // Calculate the gradient color based on progress percentage
   const getProgressColor = (percentage: number) => {
-    if (percentage <= 25) return 'from-rose-400 to-pink-500';
-    if (percentage <= 50) return 'from-amber-400 to-orange-500';
-    if (percentage <= 75) return 'from-blue-400 to-indigo-500';
-    return 'from-emerald-400 to-teal-500';
+    if (percentage <= 25) return 'from-red-500 to-red-600';
+    if (percentage <= 50) return 'from-yellow-500 to-yellow-600';
+    if (percentage <= 75) return 'from-blue-500 to-blue-600';
+    return 'from-green-500 to-green-600';
   };
 
   const percentage = value || 0;
