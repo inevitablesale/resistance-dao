@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { Building2, ChevronLeft, FileText, Target, Users, Info, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,10 +20,7 @@ const ProposalDetails = () => {
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center space-y-4">
           <h1 className="text-2xl text-white mb-4">Connect your wallet to view proposal details</h1>
-          <Button 
-            onClick={connect}
-            className="bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white font-medium shadow-lg shadow-indigo-500/25 border-0"
-          >
+          <Button onClick={connect} className="bg-blue-600 hover:bg-blue-700">
             Connect Wallet
           </Button>
         </div>
@@ -47,7 +45,7 @@ const ProposalDetails = () => {
             <Button 
               variant="ghost" 
               onClick={() => navigate('/proposals')}
-              className="bg-white/10 hover:bg-white/20 text-white font-medium transition-all duration-200 group"
+              className="text-white/60 hover:text-white hover:bg-white/5 transition-colors group"
             >
               <ChevronLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
               Back to Proposals
