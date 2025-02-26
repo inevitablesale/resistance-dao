@@ -322,41 +322,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                 </div>
               </div>
 
-              {(proposalDetails.team && proposalDetails.team.length > 0) && (
-                <div className="pt-4">
-                  <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Users className="w-6 h-6 text-blue-400" />
-                    Team
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {proposalDetails.team.map((member, index) => (
-                      <div key={index} className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="text-white font-medium">{member.name}</p>
-                            <p className="text-zinc-400 text-sm">{member.role}</p>
-                          </div>
-                          <div className="flex gap-2">
-                            {member.linkedin && (
-                              <a href={member.linkedin} target="_blank" rel="noopener noreferrer"
-                                className="p-2 rounded-full bg-blue-900/20 hover:bg-blue-900/40 transition-colors">
-                                <ExternalLink className="w-4 h-4 text-blue-400" />
-                              </a>
-                            )}
-                            {member.github && (
-                              <a href={member.github} target="_blank" rel="noopener noreferrer"
-                                className="p-2 rounded-full bg-blue-900/20 hover:bg-blue-900/40 transition-colors">
-                                <Github className="w-4 h-4 text-blue-400" />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {(proposalDetails.roadmap && proposalDetails.roadmap.length > 0) && (
                 <div className="pt-4">
                   <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
@@ -558,7 +523,42 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
               {proposalDetails?.title}
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-8">
+          <CardContent className="p-8 space-y-8">
+            {(proposalDetails.team && proposalDetails.team.length > 0) && (
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                  <Users className="w-6 h-6 text-blue-400" />
+                  Team
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {proposalDetails.team.map((member, index) => (
+                    <div key={index} className="bg-white/10 rounded-lg p-4">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-white font-medium">{member.name}</p>
+                          <p className="text-white/60 text-sm">{member.role}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          {member.linkedin && (
+                            <a href={member.linkedin} target="_blank" rel="noopener noreferrer"
+                              className="p-2 rounded-full bg-blue-900/20 hover:bg-blue-900/40 transition-colors">
+                              <ExternalLink className="w-4 h-4 text-blue-400" />
+                            </a>
+                          )}
+                          {member.github && (
+                            <a href={member.github} target="_blank" rel="noopener noreferrer"
+                              className="p-2 rounded-full bg-blue-900/20 hover:bg-blue-900/40 transition-colors">
+                              <Github className="w-4 h-4 text-blue-400" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="bg-white/5 p-6 rounded-xl backdrop-blur-sm space-y-4">
               <h3 className="text-xl font-semibold text-white">Investment Strategy</h3>
               <p className="text-white/80 leading-relaxed">
