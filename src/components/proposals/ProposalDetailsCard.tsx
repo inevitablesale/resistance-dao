@@ -538,33 +538,6 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   </p>
                 </div>
               </div>
-
-              {proposalDetails.fundingBreakdown && (
-                <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-6 mb-6">
-                  <h4 className="text-xl font-bold text-white flex items-center gap-2 mb-4">
-                    <PieChart className="w-5 h-5 text-blue-400" />
-                    Funding Breakdown
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {proposalDetails.fundingBreakdown.map((item, index) => (
-                      <div key={index} className="bg-zinc-800/50 rounded-lg p-4">
-                        <p className="text-zinc-400 text-sm">{item.category}</p>
-                        <p className="text-white font-medium">{formatRDAmount(item.amount)}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-6 space-y-4 mb-6">
-                <h4 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Info className="w-5 h-5 text-blue-400" />
-                  Investment Purpose
-                </h4>
-                <p className="text-zinc-300 leading-relaxed">
-                  {proposalDetails.investment.description}
-                </p>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -623,6 +596,33 @@ export const ProposalDetailsCard = ({ tokenId, view = 'overview' }: ProposalDeta
                   </p>
                 </div>
               </div>
+            </div>
+
+            {proposalDetails.fundingBreakdown && (
+              <div className="bg-white/5 rounded-lg p-6">
+                <h4 className="text-xl font-bold text-white flex items-center gap-2 mb-4">
+                  <PieChart className="w-5 h-5 text-blue-400" />
+                  Funding Breakdown
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {proposalDetails.fundingBreakdown.map((item, index) => (
+                    <div key={index} className="bg-white/10 rounded-lg p-4">
+                      <p className="text-white/60 text-sm">{item.category}</p>
+                      <p className="text-white font-medium">{formatRDAmount(item.amount)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="bg-white/5 rounded-lg p-6 space-y-4">
+              <h4 className="text-xl font-bold text-white flex items-center gap-2">
+                <Info className="w-5 h-5 text-blue-400" />
+                Investment Purpose
+              </h4>
+              <p className="text-white/80 leading-relaxed">
+                {proposalDetails.investment.description}
+              </p>
             </div>
 
             {proposalDetails?.linkedInURL && (
