@@ -249,23 +249,27 @@ export const ProposalsHistory = () => {
 
   return (
     <div className="space-y-4">
-      <ScrollArea className="h-[650px] rounded-md">
-        <div className="grid gap-4 pr-4">
-          {proposalEvents.map((event, index) => (
-            <ProposalListItem
-              key={event.tokenId}
-              index={index}
-              tokenId={event.tokenId}
-              metadata={event.metadata}
-              pledgedAmount={event.pledgedAmount}
-              blockNumber={event.blockNumber}
-              formatUSDAmount={formatUSDAmount}
-              isLoading={event.isLoading}
-              error={event.error}
-            />
-          ))}
-        </div>
-      </ScrollArea>
+      <Card className="bg-black/40 border-white/10">
+        <CardContent className="p-6">
+          <ScrollArea className="h-[calc(7*152px)] pr-4 rounded-md">
+            <div className="grid gap-4">
+              {proposalEvents.map((event, index) => (
+                <ProposalListItem
+                  key={event.tokenId}
+                  index={index}
+                  tokenId={event.tokenId}
+                  metadata={event.metadata}
+                  pledgedAmount={event.pledgedAmount}
+                  blockNumber={event.blockNumber}
+                  formatUSDAmount={formatUSDAmount}
+                  isLoading={event.isLoading}
+                  error={event.error}
+                />
+              ))}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
     </div>
   );
 };
