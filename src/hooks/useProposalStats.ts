@@ -26,18 +26,26 @@ export const useProposalStats = () => {
 
         // Get latest block for reference
         const latestBlock = await provider.getBlockNumber();
-        const fromBlock = Math.max(0, latestBlock - 50000); // Last ~7 days
+        console.log('Current block for stats:', latestBlock);
 
-        // Get all proposal events
+        // Get all events from genesis block
         const proposalFilter = contract.filters.ProposalCreated();
         const voteFilter = contract.filters.ProposalVoted();
         const completeFilter = contract.filters.ProposalFullyPledged();
 
+        console.log('Fetching all historical events for stats...');
+        
         const [proposalEvents, voteEvents, completeEvents] = await Promise.all([
-          contract.queryFilter(proposalFilter, fromBlock, latestBlock),
-          contract.queryFilter(voteFilter, fromBlock, latestBlock),
-          contract.queryFilter(completeFilter, fromBlock, latestBlock)
+          contract.queryFilter(proposalFilter, 0, latestBlock),
+          contract.queryFilter(voteFilter, 0, latestBlock),
+          contract.queryFilter(completeFilter, 0, latestBlock)
         ]);
+
+        console.log('Found events:', {
+          proposals: proposalEvents.length,
+          votes: voteEvents.length,
+          completes: completeEvents.length
+        });
 
         // Get unique addresses (holders) from all events
         const uniqueAddresses = new Set<string>();
@@ -48,8 +56,15 @@ export const useProposalStats = () => {
           if (event.args) uniqueAddresses.add(event.args.creator);
         });
 
-        // Calculate total locked value and active proposals
+        // Calculate total locked value from all vote events
         let totalLockedValue = ethers.BigNumber.from(0);
+        voteEvents.forEach(event => {
+          if (event.args) {
+            totalLockedValue = totalLockedValue.add(event.args.pledgeAmount);
+          }
+        });
+
+        // Get active proposals count
         let activeProposals = 0;
         const currentTime = Math.floor(Date.now() / 1000);
 
@@ -59,8 +74,6 @@ export const useProposalStats = () => {
           const proposalId = event.args.proposalId.toString();
           const proposalData = await contract.proposals(proposalId);
           
-          totalLockedValue = totalLockedValue.add(proposalData.totalPledged);
-
           if (proposalData.votingEnds.toNumber() > currentTime) {
             activeProposals++;
           }
@@ -95,6 +108,14 @@ export const useProposalStats = () => {
 
         // Convert total locked value to USD
         const totalLockedValueUSD = Number(ethers.utils.formatEther(totalLockedValue)) * RD_PRICE_USD;
+
+        console.log('Stats calculated:', {
+          holders: uniqueAddresses.size,
+          lockedValue: totalLockedValueUSD,
+          activeProposals,
+          activities: allActivities.length,
+          successRate
+        });
 
         return {
           totalHolders: uniqueAddresses.size,
