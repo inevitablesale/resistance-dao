@@ -1,4 +1,3 @@
-
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Wallet, Loader2, Shield, Gift } from "lucide-react";
@@ -59,12 +58,17 @@ export const AccessCoverOverlay = () => {
     );
   }
 
+  if (address && !nftBalance && !isCheckingNFT) {
+    return (
+      <div className="fixed inset-0 bg-black" />
+    );
+  }
+
   return (
     <>
-      <div className="fixed inset-0 z-[90] bg-black/90 flex items-center justify-center overflow-hidden pointer-events-auto">
+      <div className="fixed inset-0 bg-black/90 flex items-center justify-center overflow-hidden">
         <div className="container max-w-7xl mx-auto px-4 relative">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            {/* Left side - NFT Display */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -82,7 +86,6 @@ export const AccessCoverOverlay = () => {
               </div>
             </motion.div>
 
-            {/* Right side - Content */}
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -145,27 +148,7 @@ export const AccessCoverOverlay = () => {
                   <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
                   <p className="text-blue-200">Checking membership status...</p>
                 </div>
-              ) : (
-                <div className="space-y-6">
-                  <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
-                    Membership Required
-                  </h1>
-                  
-                  <div className="bg-black/50 backdrop-blur rounded-xl p-8 border border-blue-500/20 max-w-xl mx-auto md:mx-0">
-                    <h3 className="text-2xl font-bold text-blue-300 mb-4">Member NFT Required</h3>
-                    <p className="text-blue-200/80 mb-6">
-                      You need to own a Resistance DAO Member NFT to access the platform
-                    </p>
-                    <Button
-                      onClick={handleGetNFT}
-                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 py-6 text-lg"
-                    >
-                      Get Member NFT
-                    </Button>
-                    <p className="text-sm text-blue-200/60 mt-4">Join now to become an OG holder with exclusive benefits</p>
-                  </div>
-                </div>
-              )}
+              ) : null}
             </motion.div>
           </div>
         </div>
@@ -173,4 +156,3 @@ export const AccessCoverOverlay = () => {
     </>
   );
 };
-
