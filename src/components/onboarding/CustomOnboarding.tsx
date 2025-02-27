@@ -29,7 +29,7 @@ export const CustomOnboarding = () => {
     subdomain: { isValid: false, message: "", isChecking: false, isUnique: false }
   });
   const { toast } = useToast();
-  const [authFlowComplete, setAuthFlowComplete] = useState(false);
+  const [isDynamicInitialized, setIsDynamicInitialized] = useState(false);
 
   const debounce = (func: Function, wait: number) => {
     let timeout: NodeJS.Timeout;
@@ -203,143 +203,92 @@ export const CustomOnboarding = () => {
   };
 
   useEffect(() => {
-    const handleMetadataUpdate = async () => {
-      console.log("[Metadata Update] Checking conditions:", {
-        isAwaitingVerification,
-        hasUser: !!user,
-        hasPrimaryWallet: !!primaryWallet,
-        authFlowComplete
-      });
-
-      if (isAwaitingVerification && user && primaryWallet && authFlowComplete) {
+    const checkDynamicInit = async () => {
+      if (primaryWallet) {
         try {
-          console.log("[Metadata Update] Starting update process", {
-            linkedInUrl,
-            subdomain,
-            currentMetadata: user.metadata
-          });
-
-          console.log("[Metadata Update] Getting wallet client...");
-          const walletClient = await primaryWallet.getWalletClient();
-          console.log("[Metadata Update] Wallet client obtained:", !!walletClient);
-          
-          const updatedMetadata = {
-            ...user.metadata,
-            "LinkedIn Profile URL": linkedInUrl,
-            "name-service-subdomain-handle": subdomain
-          };
-
-          console.log("[Metadata Update] Prepared metadata:", updatedMetadata);
-
-          if (walletClient) {
-            console.log("[Metadata Update] Updating metadata...");
-            await walletClient.updateAuthenticatedUserMetadata(updatedMetadata);
-            console.log("[Metadata Update] Update successful!");
-
-            toast({
-              title: "Profile Updated",
-              description: "Your profile has been successfully updated",
-              variant: "default"
-            });
-            console.log("[Metadata Update] Success toast shown");
-
-            setIsAwaitingVerification(false);
-            setIsSubmitting(false);
-            setAuthFlowComplete(false);
-            console.log("[Metadata Update] States reset");
-
-            console.log("[Metadata Update] Scheduling auth flow close...");
-            setTimeout(() => {
-              setShowAuthFlow?.(false);
-              console.log("[Metadata Update] Auth flow closed");
-            }, 2000);
-          } else {
-            throw new Error("Wallet client not available");
-          }
+          const isConnected = await primaryWallet.isConnected();
+          console.log("[Dynamic Init] Wallet connection status:", isConnected);
+          setIsDynamicInitialized(true);
         } catch (error) {
-          console.error("[Metadata Update] Error:", error);
-          console.log("[Metadata Update] Full error details:", {
-            message: error instanceof Error ? error.message : "Unknown error",
-            stack: error instanceof Error ? error.stack : undefined
-          });
-
+          console.error("[Dynamic Init] Failed to initialize:", error);
+          setIsDynamicInitialized(false);
           toast({
-            title: "Update Failed",
-            description: "Failed to save your information. Please try again.",
+            title: "Connection Error",
+            description: "Failed to initialize wallet connection. Please refresh the page.",
             variant: "destructive"
           });
-          console.log("[Metadata Update] Error toast shown");
-
-          setIsAwaitingVerification(false);
-          setIsSubmitting(false);
-          setAuthFlowComplete(false);
-          console.log("[Metadata Update] States reset after error");
         }
       }
     };
 
-    handleMetadataUpdate();
-  }, [isAwaitingVerification, user, primaryWallet, linkedInUrl, subdomain, toast, setShowAuthFlow, authFlowComplete]);
-
-  useEffect(() => {
-    console.log("[Auth Flow] Checking completion:", {
-      hasUser: !!user,
-      hasPrimaryWallet: !!primaryWallet,
-      isAwaitingVerification,
-      walletConnected: primaryWallet?.isConnected?.()
-    });
-
-    if (user && primaryWallet && isAwaitingVerification) {
-      const isAuthenticated = primaryWallet.isConnected?.() && user;
-      console.log("[Auth Flow] Authentication status:", isAuthenticated);
-      
-      if (isAuthenticated) {
-        console.log("[Auth Flow] Setting auth flow complete");
-        setAuthFlowComplete(true);
-      }
-    }
-  }, [user, primaryWallet, isAwaitingVerification]);
-
-  if (!isConnected || (user?.metadata?.["LinkedIn Profile URL"] && user?.metadata?.["name-service-subdomain-handle"])) {
-    return null;
-  }
-
-  const debouncedLinkedInCheck = debounce(checkLinkedInUniqueness, 500);
-  const debouncedSubdomainCheck = debounce(checkSubdomainAvailability, 500);
+    checkDynamicInit();
+  }, [primaryWallet, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("[Form Submit] Starting submission", {
-      linkedInValidation: validation.linkedin,
-      subdomainValidation: validation.subdomain
-    });
+    console.log("[Form Submit] Starting submission");
 
-    if (!validation.linkedin.isValid || !validation.linkedin.isUnique || 
-        !validation.subdomain.isValid || !validation.subdomain.isUnique ||
-        validation.linkedin.isChecking || validation.subdomain.isChecking) {
-      console.log("[Form Submit] Validation failed");
+    if (!isDynamicInitialized) {
+      console.error("[Form Submit] Dynamic SDK not initialized");
+      toast({
+        title: "Cannot Submit",
+        description: "Wallet connection not initialized. Please refresh and try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!primaryWallet) {
+      console.error("[Form Submit] No wallet connected");
+      toast({
+        title: "Cannot Submit",
+        description: "Please connect your wallet first.",
+        variant: "destructive"
+      });
       return;
     }
 
     setIsSubmitting(true);
-    setIsAwaitingVerification(true);
-    setAuthFlowComplete(false);
-    console.log("[Form Submit] States set for submission");
     
     try {
-      console.log("[Form Submit] Starting auth flow");
-      setShowAuthFlow?.(true);
-    } catch (error) {
-      console.error("[Form Submit] Auth flow error:", error);
-      setIsAwaitingVerification(false);
+      console.log("[Form Submit] Getting wallet client");
+      const walletClient = await primaryWallet.getWalletClient();
+      
+      if (!walletClient) {
+        throw new Error("Wallet client not available");
+      }
+
+      console.log("[Form Submit] Updating metadata");
+      const updatedMetadata = {
+        ...user?.metadata,
+        "LinkedIn Profile URL": linkedInUrl,
+        "name-service-subdomain-handle": subdomain
+      };
+
+      await walletClient.updateAuthenticatedUserMetadata(updatedMetadata);
+      
+      toast({
+        title: "Success",
+        description: "Your profile has been updated successfully.",
+        variant: "default"
+      });
+
       setIsSubmitting(false);
+      setShowAuthFlow?.(false);
+    } catch (error) {
+      console.error("[Form Submit] Error:", error);
       toast({
         title: "Update Failed",
-        description: "Failed to start the authentication flow. Please try again.",
+        description: "Failed to update profile. Please try again.",
         variant: "destructive"
       });
+      setIsSubmitting(false);
     }
   };
+
+  if (!isConnected) {
+    return null;
+  }
 
   return (
     <AnimatePresence>
@@ -426,6 +375,7 @@ export const CustomOnboarding = () => {
               type="submit"
               className="w-full"
               disabled={
+                !isDynamicInitialized ||
                 !validation.linkedin.isValid ||
                 !validation.linkedin.isUnique ||
                 !validation.subdomain.isValid ||
