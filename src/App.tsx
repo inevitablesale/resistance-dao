@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -98,7 +97,7 @@ const dynamicSettings = {
       theme: "dark",
       displaySiweStatement: false
     },
-    shadowDOMEnabled: true, // Changed from false to true
+    shadowDOMEnabled: true,
     allowedDomains: [
       "resistancedao.xyz",
       "app.dynamicauth.com",
@@ -170,4 +169,3 @@ function App() {
 }
 
 export default App;
-

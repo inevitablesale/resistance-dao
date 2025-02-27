@@ -9,21 +9,25 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useToast } from "@/hooks/use-toast";
 import { NFTPurchaseDialog } from "./wallet/NFTPurchaseDialog";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [showOptions, setShowOptions] = useState(false);
   const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
+  const [isInVerificationFlow, setIsInVerificationFlow] = useState(false);
   const { connectWallet, isInitializing } = useDynamicUtils();
   const { address } = useCustomWallet();
   const { data: nftBalance = 0, isLoading: isCheckingNFT } = useNFTBalance(address);
   const { toast } = useToast();
+  const { setShowAuthFlow } = useDynamicContext();
 
   useEffect(() => {
     if (isCheckingNFT) return;
     
     if (address && nftBalance > 0) {
       setShowOptions(true);
+      setIsInVerificationFlow(false);
     }
   }, [address, nftBalance, isCheckingNFT]);
 
@@ -50,6 +54,28 @@ export const AccessCoverOverlay = () => {
     }
   };
 
+  const handleConnect = async () => {
+    setIsInVerificationFlow(true);
+    try {
+      await connectWallet();
+    } catch (error) {
+      setIsInVerificationFlow(false);
+      toast({
+        title: "Connection Failed",
+        description: "Failed to connect wallet. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Clean up verification flow state when component unmounts
+  useEffect(() => {
+    return () => {
+      setIsInVerificationFlow(false);
+      setShowAuthFlow?.(false);
+    };
+  }, [setShowAuthFlow]);
+
   if (!isOpen) {
     return (
       <NFTPurchaseDialog 
@@ -62,8 +88,12 @@ export const AccessCoverOverlay = () => {
   return (
     <>
       <div className="fixed inset-0 z-[90] overflow-hidden">
-        {/* Backdrop - pointer-events enabled */}
-        <div className="absolute inset-0 bg-black/90 pointer-events-auto" />
+        {/* Backdrop - pointer-events conditionally enabled */}
+        <div 
+          className={`absolute inset-0 bg-black/90 transition-opacity duration-300 ${
+            isInVerificationFlow ? 'pointer-events-none opacity-70' : 'pointer-events-auto opacity-90'
+          }`} 
+        />
         
         {/* Content Container - pointer-events only on interactive elements */}
         <div className="relative w-full h-full flex items-center justify-center">
@@ -105,8 +135,8 @@ export const AccessCoverOverlay = () => {
                     <div className="flex flex-col items-center md:items-start gap-2 w-full">
                       <Button 
                         size="lg"
-                        onClick={connectWallet}
-                        disabled={isInitializing}
+                        onClick={handleConnect}
+                        disabled={isInitializing || isInVerificationFlow}
                         className="bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold px-8 py-6 text-lg relative overflow-hidden group w-full md:w-auto"
                       >
                         {isInitializing ? (
