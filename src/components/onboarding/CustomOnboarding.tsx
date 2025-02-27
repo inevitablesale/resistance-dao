@@ -40,11 +40,17 @@ export const CustomOnboarding = () => {
   };
 
   const checkLinkedInUniqueness = async (url: string) => {
-    if (!url || !validation.linkedin.isValid) return;
+    if (!url || !validation.linkedin.isValid) {
+      setValidation(prev => ({
+        ...prev,
+        linkedin: { ...prev.linkedin, isChecking: false, message: "" }
+      }));
+      return;
+    }
 
     setValidation(prev => ({
       ...prev,
-      linkedin: { ...prev.linkedin, isChecking: true }
+      linkedin: { ...prev.linkedin, isChecking: true, message: "Checking availability..." }
     }));
 
     try {
@@ -63,15 +69,18 @@ export const CustomOnboarding = () => {
       }
 
       const isUnique = true;
-      setValidation(prev => ({
-        ...prev,
-        linkedin: {
-          ...prev.linkedin,
-          isChecking: false,
-          isUnique,
-          message: isUnique ? "Valid LinkedIn URL" : "This LinkedIn URL is already registered"
-        }
-      }));
+      
+      setTimeout(() => {
+        setValidation(prev => ({
+          ...prev,
+          linkedin: {
+            ...prev.linkedin,
+            isChecking: false,
+            isUnique,
+            message: isUnique ? "Valid LinkedIn URL" : "This LinkedIn URL is already registered"
+          }
+        }));
+      }, 500);
     } catch (error) {
       console.error("LinkedIn uniqueness check error:", error);
       setValidation(prev => ({
@@ -87,11 +96,17 @@ export const CustomOnboarding = () => {
   };
 
   const checkSubdomainAvailability = async (name: string) => {
-    if (!name || !validation.subdomain.isValid) return;
+    if (!name || !validation.subdomain.isValid) {
+      setValidation(prev => ({
+        ...prev,
+        subdomain: { ...prev.subdomain, isChecking: false, message: "" }
+      }));
+      return;
+    }
 
     setValidation(prev => ({
       ...prev,
-      subdomain: { ...prev.subdomain, isChecking: true }
+      subdomain: { ...prev.subdomain, isChecking: true, message: "Checking availability..." }
     }));
 
     try {
@@ -110,15 +125,18 @@ export const CustomOnboarding = () => {
       }
 
       const isAvailable = true;
-      setValidation(prev => ({
-        ...prev,
-        subdomain: {
-          ...prev.subdomain,
-          isChecking: false,
-          isUnique: isAvailable,
-          message: isAvailable ? "Valid subdomain" : "This subdomain is already taken"
-        }
-      }));
+      
+      setTimeout(() => {
+        setValidation(prev => ({
+          ...prev,
+          subdomain: {
+            ...prev.subdomain,
+            isChecking: false,
+            isUnique: isAvailable,
+            message: isAvailable ? "Valid subdomain" : "This subdomain is already taken"
+          }
+        }));
+      }, 500);
     } catch (error) {
       console.error("Subdomain availability check error:", error);
       setValidation(prev => ({
@@ -130,6 +148,57 @@ export const CustomOnboarding = () => {
           message: "Error checking subdomain availability"
         }
       }));
+    }
+  };
+
+  const validateLinkedIn = (url: string) => {
+    const pattern = /^https:\/\/([\w-]+\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/;
+    if (!url) {
+      return { isValid: false, message: "LinkedIn profile URL is required", isChecking: false };
+    }
+    if (!pattern.test(url)) {
+      return { isValid: false, message: "Please enter a valid LinkedIn profile URL", isChecking: false };
+    }
+    return { isValid: true, message: "Checking availability...", isChecking: true };
+  };
+
+  const validateSubdomain = (name: string) => {
+    const pattern = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/;
+    if (!name) {
+      return { isValid: false, message: "Subdomain is required", isChecking: false };
+    }
+    if (name.length < 1 || name.length > 32) {
+      return { isValid: false, message: "Subdomain must be between 1 and 32 characters", isChecking: false };
+    }
+    if (!pattern.test(name)) {
+      return { isValid: false, message: "Only lowercase letters, numbers, and hyphens allowed", isChecking: false };
+    }
+    return { isValid: true, message: "Checking availability...", isChecking: true };
+  };
+
+  const handleLinkedInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    setLinkedInUrl(url);
+    const validationResult = validateLinkedIn(url);
+    setValidation(prev => ({
+      ...prev,
+      linkedin: { ...validationResult, isUnique: false }
+    }));
+    if (validationResult.isValid) {
+      checkLinkedInUniqueness(url);
+    }
+  };
+
+  const handleSubdomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value.toLowerCase();
+    setSubdomain(name);
+    const validationResult = validateSubdomain(name);
+    setValidation(prev => ({
+      ...prev,
+      subdomain: { ...validationResult, isUnique: false }
+    }));
+    if (validationResult.isValid) {
+      checkSubdomainAvailability(name);
     }
   };
 
@@ -235,59 +304,8 @@ export const CustomOnboarding = () => {
     return null;
   }
 
-  const validateLinkedIn = (url: string) => {
-    const pattern = /^https:\/\/([\w-]+\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/;
-    if (!url) {
-      return { isValid: false, message: "LinkedIn profile URL is required" };
-    }
-    if (!pattern.test(url)) {
-      return { isValid: false, message: "Please enter a valid LinkedIn profile URL" };
-    }
-    return { isValid: true, message: "Checking availability..." };
-  };
-
-  const validateSubdomain = (name: string) => {
-    const pattern = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/;
-    if (!name) {
-      return { isValid: false, message: "Subdomain is required" };
-    }
-    if (name.length < 1 || name.length > 32) {
-      return { isValid: false, message: "Subdomain must be between 1 and 32 characters" };
-    }
-    if (!pattern.test(name)) {
-      return { isValid: false, message: "Only lowercase letters, numbers, and hyphens allowed" };
-    }
-    return { isValid: true, message: "Checking availability..." };
-  };
-
   const debouncedLinkedInCheck = debounce(checkLinkedInUniqueness, 500);
   const debouncedSubdomainCheck = debounce(checkSubdomainAvailability, 500);
-
-  const handleLinkedInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const url = e.target.value;
-    setLinkedInUrl(url);
-    const validationResult = validateLinkedIn(url);
-    setValidation(prev => ({
-      ...prev,
-      linkedin: { ...validationResult, isChecking: validationResult.isValid }
-    }));
-    if (validationResult.isValid) {
-      debouncedLinkedInCheck(url);
-    }
-  };
-
-  const handleSubdomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.value.toLowerCase();
-    setSubdomain(name);
-    const validationResult = validateSubdomain(name);
-    setValidation(prev => ({
-      ...prev,
-      subdomain: { ...validationResult, isChecking: validationResult.isValid }
-    }));
-    if (validationResult.isValid) {
-      debouncedSubdomainCheck(name);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
