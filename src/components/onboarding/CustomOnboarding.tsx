@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { motion, AnimatePresence } from "framer-motion";
@@ -143,24 +144,36 @@ export const CustomOnboarding = () => {
             userMetadata: user.metadata
           });
 
-          await primaryWallet.updateUserMetadata({
+          // Get the wallet client to interact with Dynamic
+          const walletClient = await primaryWallet.getWalletClient();
+          
+          // Update the metadata on the user object
+          const updatedMetadata = {
+            ...user.metadata,
             "LinkedIn Profile URL": linkedInUrl,
             "name-service-subdomain-handle": subdomain
-          });
+          };
 
-          toast({
-            title: "Profile Updated",
-            description: "Your profile has been successfully updated",
-            variant: "default"
-          });
+          // Set the updated metadata
+          if (walletClient) {
+            await walletClient.updateAuthenticatedUserMetadata(updatedMetadata);
 
-          setIsAwaitingVerification(false);
-          setIsSubmitting(false);
-          setAuthFlowComplete(false);
+            toast({
+              title: "Profile Updated",
+              description: "Your profile has been successfully updated",
+              variant: "default"
+            });
 
-          setTimeout(() => {
-            setShowAuthFlow?.(false);
-          }, 2000);
+            setIsAwaitingVerification(false);
+            setIsSubmitting(false);
+            setAuthFlowComplete(false);
+
+            setTimeout(() => {
+              setShowAuthFlow?.(false);
+            }, 2000);
+          } else {
+            throw new Error("Wallet client not available");
+          }
         } catch (error) {
           console.error("Error updating metadata:", error);
           toast({
