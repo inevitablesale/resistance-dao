@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { motion, AnimatePresence } from "framer-motion";
@@ -136,54 +135,76 @@ export const CustomOnboarding = () => {
 
   useEffect(() => {
     const handleMetadataUpdate = async () => {
+      console.log("[Metadata Update] Checking conditions:", {
+        isAwaitingVerification,
+        hasUser: !!user,
+        hasPrimaryWallet: !!primaryWallet,
+        authFlowComplete
+      });
+
       if (isAwaitingVerification && user && primaryWallet && authFlowComplete) {
         try {
-          console.log("Updating user metadata...", {
+          console.log("[Metadata Update] Starting update process", {
             linkedInUrl,
             subdomain,
-            userMetadata: user.metadata
+            currentMetadata: user.metadata
           });
 
-          // Get the wallet client to interact with Dynamic
+          console.log("[Metadata Update] Getting wallet client...");
           const walletClient = await primaryWallet.getWalletClient();
+          console.log("[Metadata Update] Wallet client obtained:", !!walletClient);
           
-          // Update the metadata on the user object
           const updatedMetadata = {
             ...user.metadata,
             "LinkedIn Profile URL": linkedInUrl,
             "name-service-subdomain-handle": subdomain
           };
 
-          // Set the updated metadata
+          console.log("[Metadata Update] Prepared metadata:", updatedMetadata);
+
           if (walletClient) {
+            console.log("[Metadata Update] Updating metadata...");
             await walletClient.updateAuthenticatedUserMetadata(updatedMetadata);
+            console.log("[Metadata Update] Update successful!");
 
             toast({
               title: "Profile Updated",
               description: "Your profile has been successfully updated",
               variant: "default"
             });
+            console.log("[Metadata Update] Success toast shown");
 
             setIsAwaitingVerification(false);
             setIsSubmitting(false);
             setAuthFlowComplete(false);
+            console.log("[Metadata Update] States reset");
 
+            console.log("[Metadata Update] Scheduling auth flow close...");
             setTimeout(() => {
               setShowAuthFlow?.(false);
+              console.log("[Metadata Update] Auth flow closed");
             }, 2000);
           } else {
             throw new Error("Wallet client not available");
           }
         } catch (error) {
-          console.error("Error updating metadata:", error);
+          console.error("[Metadata Update] Error:", error);
+          console.log("[Metadata Update] Full error details:", {
+            message: error instanceof Error ? error.message : "Unknown error",
+            stack: error instanceof Error ? error.stack : undefined
+          });
+
           toast({
             title: "Update Failed",
             description: "Failed to save your information. Please try again.",
             variant: "destructive"
           });
+          console.log("[Metadata Update] Error toast shown");
+
           setIsAwaitingVerification(false);
           setIsSubmitting(false);
           setAuthFlowComplete(false);
+          console.log("[Metadata Update] States reset after error");
         }
       }
     };
@@ -192,9 +213,19 @@ export const CustomOnboarding = () => {
   }, [isAwaitingVerification, user, primaryWallet, linkedInUrl, subdomain, toast, setShowAuthFlow, authFlowComplete]);
 
   useEffect(() => {
+    console.log("[Auth Flow] Checking completion:", {
+      hasUser: !!user,
+      hasPrimaryWallet: !!primaryWallet,
+      isAwaitingVerification,
+      walletConnected: primaryWallet?.isConnected?.()
+    });
+
     if (user && primaryWallet && isAwaitingVerification) {
       const isAuthenticated = primaryWallet.isConnected?.() && user;
+      console.log("[Auth Flow] Authentication status:", isAuthenticated);
+      
       if (isAuthenticated) {
+        console.log("[Auth Flow] Setting auth flow complete");
         setAuthFlowComplete(true);
       }
     }
@@ -260,21 +291,28 @@ export const CustomOnboarding = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("[Form Submit] Starting submission", {
+      linkedInValidation: validation.linkedin,
+      subdomainValidation: validation.subdomain
+    });
+
     if (!validation.linkedin.isValid || !validation.linkedin.isUnique || 
         !validation.subdomain.isValid || !validation.subdomain.isUnique ||
         validation.linkedin.isChecking || validation.subdomain.isChecking) {
+      console.log("[Form Submit] Validation failed");
       return;
     }
 
     setIsSubmitting(true);
     setIsAwaitingVerification(true);
     setAuthFlowComplete(false);
+    console.log("[Form Submit] States set for submission");
     
     try {
-      console.log("Starting auth flow for metadata update...");
+      console.log("[Form Submit] Starting auth flow");
       setShowAuthFlow?.(true);
     } catch (error) {
-      console.error("Error in auth flow:", error);
+      console.error("[Form Submit] Auth flow error:", error);
       setIsAwaitingVerification(false);
       setIsSubmitting(false);
       toast({
