@@ -97,7 +97,7 @@ const dynamicSettings = {
       theme: "dark",
       displaySiweStatement: false
     },
-    shadowDOMEnabled: true,
+    shadowDOMEnabled: false,
     allowedDomains: [
       "resistancedao.xyz",
       "app.dynamicauth.com",
