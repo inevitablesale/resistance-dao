@@ -145,7 +145,7 @@ export const CustomOnboarding = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80"
       >
         <div className="w-full max-w-md p-6 bg-background rounded-lg shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-6">
