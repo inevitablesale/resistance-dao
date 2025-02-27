@@ -93,8 +93,8 @@ const Nav = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100]">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-md border-b border-white/5" />
+    <nav className="fixed top-0 left-0 right-0 z-[90]">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-md border-b border-white/5 pointer-events-none" />
       <div className="container h-full mx-auto px-4 relative">
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-4">
@@ -126,7 +126,7 @@ const Nav = () => {
             >
               <Linked className="w-5 h-5" />
             </a>
-            <div className="relative z-[101] flex items-center">
+            <div className="z-[200]">
               <DynamicWidget />
             </div>
           </div>
