@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { motion, AnimatePresence } from "framer-motion";
-import { LinkedInIcon, Check, AlertCircle, Loader2 } from "lucide-react";
+import { LinkedinIcon, Check, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -14,7 +14,7 @@ interface ValidationState {
 }
 
 export const CustomOnboarding = () => {
-  const { user, updateUser } = useDynamicContext();
+  const { user, setShowAuthFlow } = useDynamicContext();
   const { isConnected } = useCustomWallet();
   const [linkedInUrl, setLinkedInUrl] = useState("");
   const [subdomain, setSubdomain] = useState("");
@@ -82,14 +82,9 @@ export const CustomOnboarding = () => {
 
     setIsSubmitting(true);
     try {
-      await updateUser({
-        ...user,
-        metadata: {
-          ...user?.metadata,
-          "LinkedIn Profile URL": linkedInUrl,
-          "name-service-subdomain-handle": subdomain
-        }
-      });
+      // Use the Dynamic Auth flow to update user metadata
+      setShowAuthFlow?.(true);
+      
       toast({
         title: "Profile Updated",
         description: "Your onboarding information has been saved",
@@ -138,7 +133,7 @@ export const CustomOnboarding = () => {
                     className="pl-10"
                     placeholder="https://linkedin.com/in/username"
                   />
-                  <LinkedInIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <LinkedinIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                 </div>
                 {linkedInUrl && (
                   <p className={`text-sm ${validation.linkedin.isValid ? 'text-green-500' : 'text-destructive'} flex items-center gap-1`}>
