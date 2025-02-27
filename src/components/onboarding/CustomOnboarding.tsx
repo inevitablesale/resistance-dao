@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { motion, AnimatePresence } from "framer-motion";
 import { LinkedinIcon, Check, AlertCircle, Loader2 } from "lucide-react";
@@ -14,11 +14,12 @@ interface ValidationState {
 }
 
 export const CustomOnboarding = () => {
-  const { user, setShowAuthFlow } = useDynamicContext();
+  const { user, primaryWallet, setShowAuthFlow } = useDynamicContext();
   const { isConnected } = useCustomWallet();
   const [linkedInUrl, setLinkedInUrl] = useState("");
   const [subdomain, setSubdomain] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAwaitingVerification, setIsAwaitingVerification] = useState(false);
   const [validation, setValidation] = useState<{
     linkedin: ValidationState;
     subdomain: ValidationState;
@@ -27,6 +28,41 @@ export const CustomOnboarding = () => {
     subdomain: { isValid: false, message: "" }
   });
   const { toast } = useToast();
+
+  // Effect to handle metadata updates after auth flow completes
+  useEffect(() => {
+    const handleMetadataUpdate = async () => {
+      if (isAwaitingVerification && user && primaryWallet) {
+        try {
+          console.log("Updating user metadata...");
+          await primaryWallet.updateUserMetadata({
+            "LinkedIn Profile URL": linkedInUrl,
+            "name-service-subdomain-handle": subdomain
+          });
+          
+          toast({
+            title: "Profile Updated",
+            description: "Your onboarding information has been saved",
+            variant: "default"
+          });
+          
+          setIsAwaitingVerification(false);
+          setIsSubmitting(false);
+        } catch (error) {
+          console.error("Error updating metadata:", error);
+          toast({
+            title: "Update Failed",
+            description: "Failed to save your information. Please try again.",
+            variant: "destructive"
+          });
+          setIsAwaitingVerification(false);
+          setIsSubmitting(false);
+        }
+      }
+    };
+
+    handleMetadataUpdate();
+  }, [isAwaitingVerification, user, primaryWallet, linkedInUrl, subdomain, toast]);
 
   // Skip if user already onboarded or not connected
   if (!isConnected || (user?.metadata?.["LinkedIn Profile URL"] && user?.metadata?.["name-service-subdomain-handle"])) {
@@ -81,24 +117,21 @@ export const CustomOnboarding = () => {
     if (!validation.linkedin.isValid || !validation.subdomain.isValid) return;
 
     setIsSubmitting(true);
+    setIsAwaitingVerification(true);
+    
     try {
-      // Use the Dynamic Auth flow to update user metadata
+      // Trigger Dynamic's auth flow
+      console.log("Starting auth flow for metadata update...");
       setShowAuthFlow?.(true);
-      
-      toast({
-        title: "Profile Updated",
-        description: "Your onboarding information has been saved",
-        variant: "default"
-      });
     } catch (error) {
-      console.error("Error updating user:", error);
+      console.error("Error in auth flow:", error);
+      setIsAwaitingVerification(false);
+      setIsSubmitting(false);
       toast({
         title: "Update Failed",
-        description: "Failed to save your information. Please try again.",
+        description: "Failed to start the authentication flow. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
