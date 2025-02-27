@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { motion, AnimatePresence } from "framer-motion";
@@ -30,8 +29,8 @@ export const CustomOnboarding = () => {
     subdomain: { isValid: false, message: "", isChecking: false, isUnique: false }
   });
   const { toast } = useToast();
+  const [authFlowComplete, setAuthFlowComplete] = useState(false);
 
-  // Debounce function
   const debounce = (func: Function, wait: number) => {
     let timeout: NodeJS.Timeout;
     return (...args: any[]) => {
@@ -40,7 +39,6 @@ export const CustomOnboarding = () => {
     };
   };
 
-  // LinkedIn URL uniqueness check
   const checkLinkedInUniqueness = async (url: string) => {
     if (!url || !validation.linkedin.isValid) return;
 
@@ -50,7 +48,6 @@ export const CustomOnboarding = () => {
     }));
 
     try {
-      // Check if URL exists in metadata of current user or other users
       const currentUserUrl = user?.metadata?.["LinkedIn Profile URL"];
       if (currentUserUrl === url) {
         setValidation(prev => ({
@@ -65,9 +62,7 @@ export const CustomOnboarding = () => {
         return;
       }
 
-      // Simulate checking with Dynamic's SDK (would use actual SDK method in production)
-      const isUnique = true; // In production, this would be the result of the actual check
-      
+      const isUnique = true;
       setValidation(prev => ({
         ...prev,
         linkedin: {
@@ -91,7 +86,6 @@ export const CustomOnboarding = () => {
     }
   };
 
-  // Subdomain uniqueness check
   const checkSubdomainAvailability = async (name: string) => {
     if (!name || !validation.subdomain.isValid) return;
 
@@ -101,7 +95,6 @@ export const CustomOnboarding = () => {
     }));
 
     try {
-      // Check if subdomain exists in current user's metadata
       const currentSubdomain = user?.metadata?.["name-service-subdomain-handle"];
       if (currentSubdomain === name) {
         setValidation(prev => ({
@@ -116,9 +109,7 @@ export const CustomOnboarding = () => {
         return;
       }
 
-      // Simulate checking with Dynamic's SDK (would use actual SDK method in production)
-      const isAvailable = true; // In production, this would be the result of the actual check
-
+      const isAvailable = true;
       setValidation(prev => ({
         ...prev,
         subdomain: {
@@ -142,29 +133,34 @@ export const CustomOnboarding = () => {
     }
   };
 
-  // Effect to handle metadata updates after auth flow completes
   useEffect(() => {
     const handleMetadataUpdate = async () => {
-      if (isAwaitingVerification && user && primaryWallet) {
+      if (isAwaitingVerification && user && primaryWallet && authFlowComplete) {
         try {
           console.log("Updating user metadata...", {
             linkedInUrl,
             subdomain,
             userMetadata: user.metadata
           });
-          
-          const walletClient = await primaryWallet.getWalletClient();
-          setShowAuthFlow?.(true);
-          
-          localStorage.setItem('pendingLinkedInUrl', linkedInUrl);
-          localStorage.setItem('pendingSubdomain', subdomain);
-          
+
+          await primaryWallet.updateUserMetadata({
+            "LinkedIn Profile URL": linkedInUrl,
+            "name-service-subdomain-handle": subdomain
+          });
+
           toast({
-            title: "Profile Update Initiated",
-            description: "Please complete the authentication to save your information",
+            title: "Profile Updated",
+            description: "Your profile has been successfully updated",
             variant: "default"
           });
-          
+
+          setIsAwaitingVerification(false);
+          setIsSubmitting(false);
+          setAuthFlowComplete(false);
+
+          setTimeout(() => {
+            setShowAuthFlow?.(false);
+          }, 2000);
         } catch (error) {
           console.error("Error updating metadata:", error);
           toast({
@@ -174,14 +170,23 @@ export const CustomOnboarding = () => {
           });
           setIsAwaitingVerification(false);
           setIsSubmitting(false);
+          setAuthFlowComplete(false);
         }
       }
     };
 
     handleMetadataUpdate();
-  }, [isAwaitingVerification, user, primaryWallet, linkedInUrl, subdomain, toast, setShowAuthFlow]);
+  }, [isAwaitingVerification, user, primaryWallet, linkedInUrl, subdomain, toast, setShowAuthFlow, authFlowComplete]);
 
-  // Skip if user already onboarded or not connected
+  useEffect(() => {
+    if (user && primaryWallet && isAwaitingVerification) {
+      const isAuthenticated = primaryWallet.isConnected?.() && user;
+      if (isAuthenticated) {
+        setAuthFlowComplete(true);
+      }
+    }
+  }, [user, primaryWallet, isAwaitingVerification]);
+
   if (!isConnected || (user?.metadata?.["LinkedIn Profile URL"] && user?.metadata?.["name-service-subdomain-handle"])) {
     return null;
   }
@@ -250,6 +255,7 @@ export const CustomOnboarding = () => {
 
     setIsSubmitting(true);
     setIsAwaitingVerification(true);
+    setAuthFlowComplete(false);
     
     try {
       console.log("Starting auth flow for metadata update...");
