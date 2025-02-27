@@ -1,3 +1,4 @@
+
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Wallet, Loader2, Shield, Gift } from "lucide-react";
@@ -8,6 +9,7 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useToast } from "@/hooks/use-toast";
 import { NFTPurchaseDialog } from "./wallet/NFTPurchaseDialog";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 export const AccessCoverOverlay = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -17,6 +19,7 @@ export const AccessCoverOverlay = () => {
   const { address } = useCustomWallet();
   const { data: nftBalance = 0, isLoading: isCheckingNFT } = useNFTBalance(address);
   const { toast } = useToast();
+  const { isAuthenticated } = useDynamicContext();
 
   useEffect(() => {
     if (isCheckingNFT) return;
@@ -48,6 +51,11 @@ export const AccessCoverOverlay = () => {
       setIsOpen(true);
     }
   };
+
+  // Don't show anything if wallet is not connected yet
+  if (!isAuthenticated) {
+    return null;
+  }
 
   if (!isOpen) {
     return (
@@ -86,32 +94,7 @@ export const AccessCoverOverlay = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-center md:text-left space-y-8 relative"
             >
-              {!address ? (
-                <div className="flex flex-col items-center md:items-start gap-6">
-                  <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
-                    Welcome to Resistance DAO
-                  </h1>
-                  <p className="text-xl text-blue-200/80 max-w-2xl">
-                    Join 2,500+ members shaping the future
-                  </p>
-                  <div className="flex flex-col items-center md:items-start gap-2 w-full">
-                    <Button 
-                      size="lg"
-                      onClick={connectWallet}
-                      disabled={isInitializing}
-                      className="bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold px-8 py-6 text-lg relative overflow-hidden group w-full md:w-auto"
-                    >
-                      {isInitializing ? (
-                        <Loader2 className="w-6 h-6 mr-3 animate-spin" />
-                      ) : (
-                        <Wallet className="w-6 h-6 mr-3" />
-                      )}
-                      Enter
-                    </Button>
-                    <p className="text-sm text-blue-200/60">Early supporters get exclusive rewards and benefits</p>
-                  </div>
-                </div>
-              ) : showOptions ? (
+              {showOptions ? (
                 <div className="space-y-6">
                   <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300">
                     Welcome Back!
