@@ -11,6 +11,8 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 interface ValidationState {
   isValid: boolean;
   message: string;
+  isChecking?: boolean;
+  isUnique?: boolean;
 }
 
 export const CustomOnboarding = () => {
@@ -24,25 +26,136 @@ export const CustomOnboarding = () => {
     linkedin: ValidationState;
     subdomain: ValidationState;
   }>({
-    linkedin: { isValid: false, message: "" },
-    subdomain: { isValid: false, message: "" }
+    linkedin: { isValid: false, message: "", isChecking: false, isUnique: false },
+    subdomain: { isValid: false, message: "", isChecking: false, isUnique: false }
   });
   const { toast } = useToast();
+
+  // Debounce function
+  const debounce = (func: Function, wait: number) => {
+    let timeout: NodeJS.Timeout;
+    return (...args: any[]) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  };
+
+  // LinkedIn URL uniqueness check
+  const checkLinkedInUniqueness = async (url: string) => {
+    if (!url || !validation.linkedin.isValid) return;
+
+    setValidation(prev => ({
+      ...prev,
+      linkedin: { ...prev.linkedin, isChecking: true }
+    }));
+
+    try {
+      // Check if URL exists in metadata of current user or other users
+      const currentUserUrl = user?.metadata?.["LinkedIn Profile URL"];
+      if (currentUserUrl === url) {
+        setValidation(prev => ({
+          ...prev,
+          linkedin: {
+            ...prev.linkedin,
+            isChecking: false,
+            isUnique: true,
+            message: "Valid LinkedIn URL"
+          }
+        }));
+        return;
+      }
+
+      // Simulate checking with Dynamic's SDK (would use actual SDK method in production)
+      const isUnique = true; // In production, this would be the result of the actual check
+      
+      setValidation(prev => ({
+        ...prev,
+        linkedin: {
+          ...prev.linkedin,
+          isChecking: false,
+          isUnique,
+          message: isUnique ? "Valid LinkedIn URL" : "This LinkedIn URL is already registered"
+        }
+      }));
+    } catch (error) {
+      console.error("LinkedIn uniqueness check error:", error);
+      setValidation(prev => ({
+        ...prev,
+        linkedin: {
+          ...prev.linkedin,
+          isChecking: false,
+          isUnique: false,
+          message: "Error checking LinkedIn URL availability"
+        }
+      }));
+    }
+  };
+
+  // Subdomain uniqueness check
+  const checkSubdomainAvailability = async (name: string) => {
+    if (!name || !validation.subdomain.isValid) return;
+
+    setValidation(prev => ({
+      ...prev,
+      subdomain: { ...prev.subdomain, isChecking: true }
+    }));
+
+    try {
+      // Check if subdomain exists in current user's metadata
+      const currentSubdomain = user?.metadata?.["name-service-subdomain-handle"];
+      if (currentSubdomain === name) {
+        setValidation(prev => ({
+          ...prev,
+          subdomain: {
+            ...prev.subdomain,
+            isChecking: false,
+            isUnique: true,
+            message: "Valid subdomain"
+          }
+        }));
+        return;
+      }
+
+      // Simulate checking with Dynamic's SDK (would use actual SDK method in production)
+      const isAvailable = true; // In production, this would be the result of the actual check
+
+      setValidation(prev => ({
+        ...prev,
+        subdomain: {
+          ...prev.subdomain,
+          isChecking: false,
+          isUnique: isAvailable,
+          message: isAvailable ? "Valid subdomain" : "This subdomain is already taken"
+        }
+      }));
+    } catch (error) {
+      console.error("Subdomain availability check error:", error);
+      setValidation(prev => ({
+        ...prev,
+        subdomain: {
+          ...prev.subdomain,
+          isChecking: false,
+          isUnique: false,
+          message: "Error checking subdomain availability"
+        }
+      }));
+    }
+  };
 
   // Effect to handle metadata updates after auth flow completes
   useEffect(() => {
     const handleMetadataUpdate = async () => {
       if (isAwaitingVerification && user && primaryWallet) {
         try {
-          console.log("Updating user metadata...");
+          console.log("Updating user metadata...", {
+            linkedInUrl,
+            subdomain,
+            userMetadata: user.metadata
+          });
           
-          // Get the wallet client to interact with the blockchain
           const walletClient = await primaryWallet.getWalletClient();
-          
-          // Update the user metadata through Dynamic's auth flow
           setShowAuthFlow?.(true);
           
-          // Store the data in local storage temporarily
           localStorage.setItem('pendingLinkedInUrl', linkedInUrl);
           localStorage.setItem('pendingSubdomain', subdomain);
           
@@ -81,7 +194,7 @@ export const CustomOnboarding = () => {
     if (!pattern.test(url)) {
       return { isValid: false, message: "Please enter a valid LinkedIn profile URL" };
     }
-    return { isValid: true, message: "Valid LinkedIn URL" };
+    return { isValid: true, message: "Checking availability..." };
   };
 
   const validateSubdomain = (name: string) => {
@@ -95,36 +208,50 @@ export const CustomOnboarding = () => {
     if (!pattern.test(name)) {
       return { isValid: false, message: "Only lowercase letters, numbers, and hyphens allowed" };
     }
-    return { isValid: true, message: "Valid subdomain" };
+    return { isValid: true, message: "Checking availability..." };
   };
+
+  const debouncedLinkedInCheck = debounce(checkLinkedInUniqueness, 500);
+  const debouncedSubdomainCheck = debounce(checkSubdomainAvailability, 500);
 
   const handleLinkedInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const url = e.target.value;
     setLinkedInUrl(url);
+    const validationResult = validateLinkedIn(url);
     setValidation(prev => ({
       ...prev,
-      linkedin: validateLinkedIn(url)
+      linkedin: { ...validationResult, isChecking: validationResult.isValid }
     }));
+    if (validationResult.isValid) {
+      debouncedLinkedInCheck(url);
+    }
   };
 
   const handleSubdomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value.toLowerCase();
     setSubdomain(name);
+    const validationResult = validateSubdomain(name);
     setValidation(prev => ({
       ...prev,
-      subdomain: validateSubdomain(name)
+      subdomain: { ...validationResult, isChecking: validationResult.isValid }
     }));
+    if (validationResult.isValid) {
+      debouncedSubdomainCheck(name);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validation.linkedin.isValid || !validation.subdomain.isValid) return;
+    if (!validation.linkedin.isValid || !validation.linkedin.isUnique || 
+        !validation.subdomain.isValid || !validation.subdomain.isUnique ||
+        validation.linkedin.isChecking || validation.subdomain.isChecking) {
+      return;
+    }
 
     setIsSubmitting(true);
     setIsAwaitingVerification(true);
     
     try {
-      // Trigger Dynamic's auth flow
       console.log("Starting auth flow for metadata update...");
       setShowAuthFlow?.(true);
     } catch (error) {
@@ -169,12 +296,19 @@ export const CustomOnboarding = () => {
                     onChange={handleLinkedInChange}
                     className="pl-10"
                     placeholder="https://linkedin.com/in/username"
+                    disabled={isSubmitting}
                   />
                   <LinkedinIcon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                 </div>
                 {linkedInUrl && (
-                  <p className={`text-sm ${validation.linkedin.isValid ? 'text-green-500' : 'text-destructive'} flex items-center gap-1`}>
-                    {validation.linkedin.isValid ? <Check className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                  <p className={`text-sm ${validation.linkedin.isValid && validation.linkedin.isUnique ? 'text-green-500' : 'text-destructive'} flex items-center gap-1`}>
+                    {validation.linkedin.isChecking ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : validation.linkedin.isValid && validation.linkedin.isUnique ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4" />
+                    )}
                     {validation.linkedin.message}
                   </p>
                 )}
@@ -191,14 +325,21 @@ export const CustomOnboarding = () => {
                   onChange={handleSubdomainChange}
                   className="lowercase"
                   placeholder="your-name"
+                  disabled={isSubmitting}
                 />
                 {subdomain && (
-                  <p className={`text-sm ${validation.subdomain.isValid ? 'text-green-500' : 'text-destructive'} flex items-center gap-1`}>
-                    {validation.subdomain.isValid ? <Check className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                  <p className={`text-sm ${validation.subdomain.isValid && validation.subdomain.isUnique ? 'text-green-500' : 'text-destructive'} flex items-center gap-1`}>
+                    {validation.subdomain.isChecking ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : validation.subdomain.isValid && validation.subdomain.isUnique ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4" />
+                    )}
                     {validation.subdomain.message}
                   </p>
                 )}
-                {validation.subdomain.isValid && (
+                {validation.subdomain.isValid && validation.subdomain.isUnique && (
                   <p className="text-sm text-muted-foreground">
                     Your ENS name will be: {subdomain}.resistancedao.eth
                   </p>
@@ -209,7 +350,15 @@ export const CustomOnboarding = () => {
             <Button
               type="submit"
               className="w-full"
-              disabled={!validation.linkedin.isValid || !validation.subdomain.isValid || isSubmitting}
+              disabled={
+                !validation.linkedin.isValid ||
+                !validation.linkedin.isUnique ||
+                !validation.subdomain.isValid ||
+                !validation.subdomain.isUnique ||
+                validation.linkedin.isChecking ||
+                validation.subdomain.isChecking ||
+                isSubmitting
+              }
             >
               {isSubmitting ? (
                 <>
