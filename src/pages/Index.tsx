@@ -43,7 +43,6 @@ const Index = () => {
 
   return (
     <>
-      <AccessCoverOverlay />
       <div className="min-h-screen bg-black text-white">
         <section className="pt-32 pb-16 relative overflow-hidden">
           <div className="absolute inset-0">
@@ -624,6 +623,7 @@ const Index = () => {
           </div>
         </section>
       </div>
+      <AccessCoverOverlay />
     </>
   );
 };
