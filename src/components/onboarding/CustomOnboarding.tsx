@@ -35,19 +35,23 @@ export const CustomOnboarding = () => {
       if (isAwaitingVerification && user && primaryWallet) {
         try {
           console.log("Updating user metadata...");
-          await primaryWallet.updateUserMetadata({
-            "LinkedIn Profile URL": linkedInUrl,
-            "name-service-subdomain-handle": subdomain
-          });
+          
+          // Get the wallet client to interact with the blockchain
+          const walletClient = await primaryWallet.getWalletClient();
+          
+          // Update the user metadata through Dynamic's auth flow
+          setShowAuthFlow?.(true);
+          
+          // Store the data in local storage temporarily
+          localStorage.setItem('pendingLinkedInUrl', linkedInUrl);
+          localStorage.setItem('pendingSubdomain', subdomain);
           
           toast({
-            title: "Profile Updated",
-            description: "Your onboarding information has been saved",
+            title: "Profile Update Initiated",
+            description: "Please complete the authentication to save your information",
             variant: "default"
           });
           
-          setIsAwaitingVerification(false);
-          setIsSubmitting(false);
         } catch (error) {
           console.error("Error updating metadata:", error);
           toast({
@@ -62,7 +66,7 @@ export const CustomOnboarding = () => {
     };
 
     handleMetadataUpdate();
-  }, [isAwaitingVerification, user, primaryWallet, linkedInUrl, subdomain, toast]);
+  }, [isAwaitingVerification, user, primaryWallet, linkedInUrl, subdomain, toast, setShowAuthFlow]);
 
   // Skip if user already onboarded or not connected
   if (!isConnected || (user?.metadata?.["LinkedIn Profile URL"] && user?.metadata?.["name-service-subdomain-handle"])) {
