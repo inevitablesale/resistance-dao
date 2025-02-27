@@ -13,6 +13,7 @@ import ThesisSubmission from "./pages/ThesisSubmission";
 import ProposalDetails from "./pages/ProposalDetails";
 import Proposals from "./pages/Proposals";
 import { Toaster } from "./components/ui/toaster";
+import { CustomOnboarding } from "./components/onboarding/CustomOnboarding";
 
 const zeroDevConfig = {
   projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -93,6 +94,11 @@ const dynamicSettings = {
         }
       }
     },
+    enabledSettings: {
+      customizationOptions: {
+        hideWalletList: true
+      }
+    },
     style: {
       theme: "dark",
       displaySiweStatement: false
@@ -142,6 +148,7 @@ function Layout() {
   return (
     <>
       <Nav />
+      <CustomOnboarding />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/thesis" element={<ThesisSubmission />} />
