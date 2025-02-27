@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -319,10 +320,10 @@ export default function ThesisSubmission() {
               🚀 Launch Your Web3 Project
             </div>
             <h1 className="text-5xl font-bold text-white font-mono">
-              Submit Your Proposal
+              Submit Your Project
             </h1>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Join the Resistance DAO and shape the future of web3 accounting. Present your proposal to our community of seasoned professionals and find co-builders who share your vision.
+              Join the Resistance DAO and shape the future of web3 accounting. Present your project to our community of seasoned professionals and find co-builders who share your vision.
             </p>
             <div className="flex items-center justify-center gap-4">
               <Button
