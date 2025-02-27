@@ -1,4 +1,3 @@
-
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Wallet, Loader2, Shield, Gift } from "lucide-react";
@@ -61,8 +60,8 @@ export const AccessCoverOverlay = () => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/90 flex items-center justify-center overflow-hidden pointer-events-none">
-        <div className="container max-w-7xl mx-auto px-4 relative pointer-events-auto">
+      <div className="fixed inset-0 bg-black/90 flex items-center justify-center overflow-hidden pointer-events-auto">
+        <div className="container max-w-7xl mx-auto px-4 relative">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
