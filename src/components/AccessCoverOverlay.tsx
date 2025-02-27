@@ -61,7 +61,7 @@ export const AccessCoverOverlay = () => {
 
   return (
     <>
-      <div className="fixed inset-0 z-[90] bg-black/90 flex items-center justify-center overflow-hidden pointer-events-auto">
+      <div className="fixed inset-0 z-10 bg-black/90 flex items-center justify-center overflow-hidden pointer-events-auto">
         <div className="container max-w-7xl mx-auto px-4 relative">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             {/* Left side - NFT Display */}
@@ -173,4 +173,3 @@ export const AccessCoverOverlay = () => {
     </>
   );
 };
-

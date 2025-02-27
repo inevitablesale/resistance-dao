@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
@@ -93,7 +92,7 @@ const Nav = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100]">
+    <nav className="fixed top-0 left-0 right-0" style={{ zIndex: 20 }}>
       <div className="absolute inset-0 bg-black/80 backdrop-blur-md border-b border-white/5" />
       <div className="container h-full mx-auto px-4 relative">
         <div className="flex items-center justify-between h-full">
@@ -126,9 +125,7 @@ const Nav = () => {
             >
               <Linked className="w-5 h-5" />
             </a>
-            <div className="relative z-[101] flex items-center pointer-events-auto">
-              <DynamicWidget />
-            </div>
+            <DynamicWidget />
           </div>
         </div>
       </div>
