@@ -8,12 +8,12 @@ export const useCustomWallet = () => {
   const isFullyConnected = !!primaryWallet?.address && !!user;
   
   // Get the subdomain/ENS value from user data
-  // First check for the nameServiceSubdomainHandle field
+  // First check for the name-service-subdomain-handle field
   // Then fall back to other possible sources
   const subdomain = user?.['name-service-subdomain-handle'] || 
+                    user?.alias || 
                     user?.verifications?.customFields?.["LinkedIn Profile URL"] || 
                     user?.metadata?.["LinkedIn Profile URL"] || 
-                    user?.alias || 
                     null;
 
   return {
