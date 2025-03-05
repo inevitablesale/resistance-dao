@@ -1,4 +1,3 @@
-
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -88,20 +87,17 @@ export const useWalletConnection = () => {
   };
 
   useEffect(() => {
-    if (primaryWallet?.isConnected?.()) {
-      setShowAuthFlow(false);
+    if (primaryWallet?.address) {
+      setShowAuthFlow?.(false);
       
-      // Check if this is the first time the user has connected
       const hasConnectedBefore = localStorage.getItem('wallet_has_connected');
       
-      // If this is the first connection, redirect to settings page
       if (!hasConnectedBefore && primaryWallet.address) {
         console.log("First-time wallet connection detected. Redirecting to settings page.");
         localStorage.setItem('wallet_has_connected', 'true');
         navigate('/settings');
       }
       
-      // Log LinkedIn URL when wallet connects
       console.log("Wallet connected - User data:", {
         linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"],
         userVerifications: user?.verifications,
@@ -112,7 +108,7 @@ export const useWalletConnection = () => {
   }, [primaryWallet, setShowAuthFlow, user, navigate]);
 
   return {
-    isConnected: !!primaryWallet?.isConnected?.(),
+    isConnected: !!primaryWallet?.address,
     isConnecting,
     connect,
     disconnect,
@@ -121,6 +117,6 @@ export const useWalletConnection = () => {
     setShowOnRamp,
     setShowAuthFlow,
     wallet: primaryWallet,
-    user // Also expose user in the hook return
+    user
   };
 };

@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
@@ -17,9 +18,8 @@ import {
 
 const Nav = () => {
   const { primaryWallet } = useDynamicContext();
-  const { setShowAuthFlow } = useWalletConnection();
+  const { setShowAuthFlow, isConnected } = useWalletConnection();
   const location = useLocation();
-  const hasWallet = !!primaryWallet?.address;
   
   const hideHomeRoutes = ['/', '/thesis'];
 
@@ -134,7 +134,7 @@ const Nav = () => {
               <Linked className="w-5 h-5" />
             </a>
             <div className="relative z-[101] flex items-center pointer-events-auto">
-              {hasWallet ? (
+              {isConnected ? (
                 <DynamicWidget />
               ) : (
                 <Button 
