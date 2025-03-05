@@ -1,6 +1,6 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import Twitter from "./icons/Twitter";
 import Linked from "./icons/Linked";
@@ -132,23 +132,23 @@ const Nav = () => {
             >
               <Linked className="w-5 h-5" />
             </a>
-            <div className="relative z-[101] flex items-center pointer-events-auto">
-              {isPendingInitialization ? (
-                <Button disabled className="opacity-50">
-                  Initializing...
-                </Button>
-              ) : isConnected ? (
-                <DynamicWidget />
-              ) : (
-                <Button 
-                  onClick={handleLaunchClick}
-                  className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-medium px-4 py-2 rounded-md transition-all duration-200 transform hover:scale-105"
-                >
-                  <Rocket className="mr-2 h-4 w-4" />
-                  Launch dApp
-                </Button>
-              )}
-            </div>
+            {!isConnected && (
+              <div className="relative z-[101] flex items-center pointer-events-auto">
+                {isPendingInitialization ? (
+                  <Button disabled className="opacity-50">
+                    Initializing...
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={handleLaunchClick}
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-medium px-4 py-2 rounded-md transition-all duration-200 transform hover:scale-105"
+                  >
+                    <Rocket className="mr-2 h-4 w-4" />
+                    Launch dApp
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
