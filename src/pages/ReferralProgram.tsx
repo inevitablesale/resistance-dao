@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,16 @@ const ReferralProgram: React.FC = () => {
   const { isConnected, address } = useCustomWallet();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
+  const [isFirstVisit, setIsFirstVisit] = useState(false);
+  
+  // Check if this is the first visit after connecting wallet
+  useEffect(() => {
+    const hasVisitedReferral = localStorage.getItem('has_visited_referral');
+    if (!hasVisitedReferral && isConnected) {
+      setIsFirstVisit(true);
+      localStorage.setItem('has_visited_referral', 'true');
+    }
+  }, [isConnected]);
   
   // Generate a referral link using the wallet address or a placeholder
   const referralLink = isConnected && address 
@@ -95,6 +105,24 @@ const ReferralProgram: React.FC = () => {
         </div>
 
         <div className="container mx-auto py-8 px-4 max-w-6xl pt-32 relative z-10">
+          {isFirstVisit && (
+            <Card className="mb-8 bg-black/40 border-blue-500/30 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <h2 className="text-2xl font-bold text-blue-300 mb-2">Welcome to Resistance DAO!</h2>
+                <p className="text-white/80 mb-4">
+                  You've been automatically redirected to your referral dashboard. 
+                  This is where you can invite new members and earn rewards for growing the community.
+                </p>
+                <div className="flex items-center gap-2">
+                  <div className="w-1 h-8 bg-blue-500 rounded-full" />
+                  <p className="text-blue-200 font-medium">
+                    Share your unique link below to start earning rewards!
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">Your Affiliate Dashboard</h1>
             <Button variant="outline" className="border-blue-500 text-blue-400 hover:bg-blue-500/10">

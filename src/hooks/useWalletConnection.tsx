@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 import { getContractStatus } from "@/services/proposalContractService";
 import { useWalletProvider } from "./useWalletProvider";
 import { handleDynamicError } from "@/services/dynamicErrorHandler";
+import { useNavigate } from "react-router-dom";
 
 const LGR_TOKEN_ADDRESS = "0xf12145c01e4b252677a91bbf81fa8f36deb5ae00";
 
@@ -14,6 +15,7 @@ export const useWalletConnection = () => {
   const { getProvider, validateNetwork, getWalletType } = useWalletProvider();
   const [isConnecting, setIsConnecting] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const connect = async () => {
     try {
@@ -88,6 +90,17 @@ export const useWalletConnection = () => {
   useEffect(() => {
     if (primaryWallet?.isConnected?.()) {
       setShowAuthFlow(false);
+      
+      // Check if this is the first time the user has connected
+      const hasConnectedBefore = localStorage.getItem('wallet_has_connected');
+      
+      // If this is the first connection, redirect to referral page
+      if (!hasConnectedBefore && primaryWallet.address) {
+        console.log("First-time wallet connection detected. Redirecting to referral page.");
+        localStorage.setItem('wallet_has_connected', 'true');
+        navigate('/referral');
+      }
+      
       // Log LinkedIn URL when wallet connects
       console.log("Wallet connected - User data:", {
         linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"],
@@ -96,7 +109,7 @@ export const useWalletConnection = () => {
         fullUser: user
       });
     }
-  }, [primaryWallet, setShowAuthFlow, user]);
+  }, [primaryWallet, setShowAuthFlow, user, navigate]);
 
   return {
     isConnected: !!primaryWallet?.isConnected?.(),
@@ -111,4 +124,3 @@ export const useWalletConnection = () => {
     user // Also expose user in the hook return
   };
 };
-
