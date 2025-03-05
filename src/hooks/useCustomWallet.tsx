@@ -10,7 +10,7 @@ export const useCustomWallet = () => {
   // Get the subdomain/ENS value from user data
   // First check for the nameServiceSubdomainHandle field
   // Then fall back to other possible sources
-  const subdomain = user?.nameServiceSubdomainHandle || 
+  const subdomain = user?.['name-service-subdomain-handle'] || 
                     user?.verifications?.customFields?.["LinkedIn Profile URL"] || 
                     user?.metadata?.["LinkedIn Profile URL"] || 
                     user?.alias || 

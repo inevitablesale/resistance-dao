@@ -7,6 +7,7 @@ declare module "@dynamic-labs/sdk-react-core" {
   export interface UserProfile {
     alias?: string;
     email?: string;
+    'name-service-subdomain-handle'?: string;
     metadata?: {
       "LinkedIn Profile URL"?: string;
       [key: string]: any;
@@ -124,4 +125,3 @@ declare module "@dynamic-labs/sdk-react-core" {
     stack?: string;
   }
 }
-
