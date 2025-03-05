@@ -117,42 +117,42 @@ const ReferralProgram: React.FC = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-8">
             <Button 
               variant="outline" 
-              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5"
+              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
               onClick={copyToClipboard}
             >
               <Copy size={16} /> Copy Link
             </Button>
             <Button 
               variant="outline" 
-              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5"
+              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
               onClick={() => shareViaChannel('twitter')}
             >
               <Share2 size={16} /> Share on X
             </Button>
             <Button 
               variant="outline" 
-              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5"
+              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
               onClick={() => shareViaChannel('facebook')}
             >
               <Facebook size={16} /> Share on Facebook
             </Button>
             <Button 
               variant="outline" 
-              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5"
+              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
               onClick={() => shareViaChannel('telegram')}
             >
               <ExternalLink size={16} /> Share on Telegram
             </Button>
             <Button 
               variant="outline" 
-              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5"
+              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
               onClick={() => shareViaChannel('instagram')}
             >
               <Instagram size={16} /> Share on Instagram
             </Button>
             <Button 
               variant="outline" 
-              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5"
+              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
               onClick={() => shareViaChannel('sms')}
             >
               <MessageSquare size={16} /> Share via SMS
