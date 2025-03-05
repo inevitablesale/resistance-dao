@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -171,6 +170,14 @@ const Settings: React.FC = () => {
                       key !== 'verifications' && 
                       key !== 'metadata'
                     ).join(', ') : 'No properties'}</p>
+                    
+                  <p><span className="font-bold">Raw user object:</span></p>
+                  <pre className="bg-black/50 p-2 rounded text-xs overflow-auto max-h-40">
+                    {user ? JSON.stringify(user, (key, value) => {
+                      if (typeof value === 'function') return '[Function]';
+                      return value;
+                    }, 2) : 'No user data'}
+                  </pre>
                 </div>
               </CardContent>
             </Card>

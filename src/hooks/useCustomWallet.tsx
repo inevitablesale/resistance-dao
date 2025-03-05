@@ -21,6 +21,28 @@ export const useCustomWallet = () => {
       
       // Log all available user properties for debugging
       console.log("[useCustomWallet] User properties:", userProps);
+      
+      // Try multiple variations of the property name
+      const possibleSubdomainProps = [
+        'name-service-subdomain-handle',
+        'nameServiceSubdomainHandle',
+        'name-service-subdomain',
+        'nameServiceSubdomain',
+        'ens',
+        'ensName',
+        'domain',
+        'name',
+        'handle'
+      ];
+      
+      const subdomainValues: Record<string, any> = {};
+      possibleSubdomainProps.forEach(prop => {
+        subdomainValues[prop] = user[prop as keyof typeof user];
+      });
+      
+      console.log("[useCustomWallet] Checking all possible subdomain properties:", subdomainValues);
+      
+      // Check if the property exists using various methods
       console.log("[useCustomWallet] Direct check for name-service fields:", {
         // Try different case variations to find the right property
         nameServiceSubdomainHandle: user?.['name-service-subdomain-handle'],
@@ -42,6 +64,14 @@ export const useCustomWallet = () => {
         customFieldsKeys: user?.verifications?.customFields ? Object.keys(user?.verifications?.customFields) : [],
         metadataKeys: user?.metadata ? Object.keys(user?.metadata) : []
       });
+      
+      // Check if there are any properties with "name" or "subdomain" in their key
+      const nameRelatedProps = userProps.filter(prop => 
+        prop.toLowerCase().includes('name') || 
+        prop.toLowerCase().includes('subdomain') ||
+        prop.toLowerCase().includes('ens')
+      );
+      console.log("[useCustomWallet] Name-related properties:", nameRelatedProps);
       
       // Get the subdomain/ENS value from user data
       // First check for the name-service-subdomain-handle field
@@ -71,8 +101,20 @@ export const useCustomWallet = () => {
       const nameServiceField = user?.['name-service-subdomain-handle'];
       console.log("[useCustomWallet] Subdomain access result:", nameServiceField);
       
-      // Print the user object type
+      // Print the user object type and prototype chain
       console.log("[useCustomWallet] User object type:", typeof user, user.constructor?.name);
+      
+      // Use a defensive approach by checking the prototype
+      let proto = Object.getPrototypeOf(user);
+      const prototypeChain = [];
+      while (proto !== null) {
+        prototypeChain.push({
+          constructor: proto.constructor?.name,
+          props: Object.getOwnPropertyNames(proto)
+        });
+        proto = Object.getPrototypeOf(proto);
+      }
+      console.log("[useCustomWallet] User prototype chain:", prototypeChain);
     }
   }, [user]);
 
