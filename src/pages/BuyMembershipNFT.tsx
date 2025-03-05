@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Shield, Check, ArrowRight } from "lucide-react";
+import { ShoppingCart, Shield, Check, ArrowRight, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const BuyMembershipNFT: React.FC = () => {
@@ -66,11 +66,13 @@ const BuyMembershipNFT: React.FC = () => {
                 <div className="bg-blue-950/30 rounded-xl p-6 mb-6">
                   <div className="flex justify-between items-center mb-4">
                     <div className="text-white/70">Price</div>
-                    <div className="text-2xl font-bold text-white">0.1 ETH</div>
+                    <div className="flex items-center">
+                      <CreditCard className="w-5 h-5 mr-2 text-green-400" />
+                      <div className="text-2xl font-bold text-white">$50 USDC</div>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <div className="text-white/70">Supply</div>
-                    <div className="text-white">Limited to 1,000</div>
+                  <div className="text-white/60 text-sm">
+                    Pay with USDC on Ethereum or Polygon networks
                   </div>
                 </div>
 
