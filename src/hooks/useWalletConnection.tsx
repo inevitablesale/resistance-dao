@@ -16,6 +16,8 @@ export const useWalletConnection = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const [isSdkInitialized, setIsSdkInitialized] = useState(false);
+
   const connect = async () => {
     try {
       setIsConnecting(true);
@@ -88,28 +90,37 @@ export const useWalletConnection = () => {
 
   useEffect(() => {
     if (primaryWallet?.address) {
-      setShowAuthFlow?.(false);
-      
-      const hasConnectedBefore = localStorage.getItem('wallet_has_connected');
-      
-      if (!hasConnectedBefore && primaryWallet.address) {
-        console.log("First-time wallet connection detected. Redirecting to settings page.");
-        localStorage.setItem('wallet_has_connected', 'true');
-        navigate('/settings');
+      if (user) {
+        setShowAuthFlow?.(false);
+        setIsSdkInitialized(true);
+        
+        const hasConnectedBefore = localStorage.getItem('wallet_has_connected');
+        
+        if (!hasConnectedBefore) {
+          console.log("First-time wallet connection detected. Redirecting to settings page.");
+          localStorage.setItem('wallet_has_connected', 'true');
+          navigate('/settings');
+        }
+      } else {
+        console.log("Wallet connected but waiting for user initialization...");
+        setIsSdkInitialized(false);
       }
       
-      console.log("Wallet connected - User data:", {
+      console.log("Wallet connection state:", {
+        walletAddress: primaryWallet.address,
+        userExists: !!user,
+        sdkInitialized: isSdkInitialized,
         linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"],
         userVerifications: user?.verifications,
-        customFields: user?.verifications?.customFields,
-        fullUser: user
+        customFields: user?.verifications?.customFields
       });
     }
   }, [primaryWallet, setShowAuthFlow, user, navigate]);
 
   return {
-    isConnected: !!primaryWallet?.address,
+    isConnected: !!primaryWallet?.address && !!user && isSdkInitialized,
     isConnecting,
+    isPendingInitialization: !!primaryWallet?.address && !user,
     connect,
     disconnect,
     address: primaryWallet?.address,
