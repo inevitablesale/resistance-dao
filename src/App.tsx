@@ -15,6 +15,7 @@ import ProposalDetails from "./pages/ProposalDetails";
 import Proposals from "./pages/Proposals";
 import Settings from "./pages/Settings";
 import BuyMembershipNFT from "./pages/BuyMembershipNFT";
+import ReferralRedirect from "./pages/ReferralRedirect";
 import { Toaster } from "./components/ui/toaster";
 
 const zeroDevConfig = {
@@ -152,6 +153,7 @@ function Layout() {
         <Route path="/proposals/:tokenId" element={<ProposalDetails />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/buy-membership-nft" element={<BuyMembershipNFT />} />
+        <Route path="/r/:referrerAddress" element={<ReferralRedirect />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

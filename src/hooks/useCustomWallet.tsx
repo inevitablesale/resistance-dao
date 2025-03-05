@@ -20,11 +20,17 @@ export const useCustomWallet = () => {
     }
   }, [user, primaryWallet]);
 
+  // Get stored referrer from localStorage if available
+  const getReferrer = () => {
+    return localStorage.getItem("referrer_address") || null;
+  };
+
   return {
     isConnected: isFullyConnected,
     isPendingUser: !!primaryWallet?.address && !user,
     address: primaryWallet?.address,
     user,
-    isSmartWallet: primaryWallet?.connector?.name?.toLowerCase().includes('zerodev')
+    isSmartWallet: primaryWallet?.connector?.name?.toLowerCase().includes('zerodev'),
+    getReferrer
   };
 };
