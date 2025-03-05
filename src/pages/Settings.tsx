@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,9 +8,11 @@ import { Copy, Facebook, Instagram, MessageSquare, Share2, ExternalLink, Shield,
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNavigate } from "react-router-dom";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 const Settings: React.FC = () => {
   const { isConnected, address, subdomain } = useCustomWallet();
+  const { user } = useDynamicContext();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [isFirstVisit, setIsFirstVisit] = useState(false);
@@ -26,6 +29,20 @@ const Settings: React.FC = () => {
       localStorage.setItem('has_visited_referral', 'true');
     }
   }, [isConnected]);
+  
+  // Debug user data fields availability
+  useEffect(() => {
+    if (user) {
+      console.log("[Settings] User data available:", {
+        nameServiceSubdomain: user?.['name-service-subdomain-handle'],
+        alias: user?.alias,
+        linkedInURL: user?.verifications?.customFields?.["LinkedIn Profile URL"],
+        hasVerifications: !!user?.verifications,
+        customFieldsKeys: user?.verifications?.customFields ? Object.keys(user.verifications.customFields) : [],
+        metadataKeys: user?.metadata ? Object.keys(user.metadata) : []
+      });
+    }
+  }, [user]);
   
   // Generate a referral link using the subdomain or a placeholder
   const referralLink = isConnected && subdomain
@@ -137,6 +154,21 @@ const Settings: React.FC = () => {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">Account Settings</h1>
           </div>
+
+          {/* Subdomain Debug Card (only in development) */}
+          {isConnected && process.env.NODE_ENV === 'development' && (
+            <Card className="mb-8 bg-black/40 border-yellow-500/30 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <h2 className="text-xl font-semibold mb-4 text-yellow-300">User Data Debug</h2>
+                <div className="space-y-2 text-white/80 text-sm">
+                  <p><span className="font-bold">name-service-subdomain-handle:</span> {user?.['name-service-subdomain-handle'] || 'Not set'}</p>
+                  <p><span className="font-bold">alias:</span> {user?.alias || 'Not set'}</p>
+                  <p><span className="font-bold">LinkedIn URL:</span> {user?.verifications?.customFields?.["LinkedIn Profile URL"] || user?.metadata?.["LinkedIn Profile URL"] || 'Not set'}</p>
+                  <p><span className="font-bold">Resolved subdomain:</span> {subdomain || 'Using address fallback'}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Membership NFT Status */}
           <Card className="mb-8 bg-black/40 border-white/10 backdrop-blur-sm">

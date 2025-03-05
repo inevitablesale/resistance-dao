@@ -1,3 +1,4 @@
+
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ethers } from "ethers";
 import { useToast } from "@/hooks/use-toast";
@@ -55,6 +56,7 @@ export const useWalletProvider = () => {
       console.log('[Provider] Current user object:', {
         userExists: !!user,
         walletAddress: primaryWallet?.address,
+        subdomain: user?.['name-service-subdomain-handle'],
         linkedInUrl: {
           value: linkedInInfo.url,
           source: linkedInInfo.source
@@ -69,6 +71,10 @@ export const useWalletProvider = () => {
           customFieldsExist: !!user?.verifications?.customFields,
           keys: user?.verifications?.customFields ? Object.keys(user.verifications.customFields) : [],
           linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"]
+        },
+        nameServiceSubdomainHandle: {
+          exists: user?.hasOwnProperty('name-service-subdomain-handle'),
+          value: user?.['name-service-subdomain-handle']
         }
       });
       hasLoggedRef.current = true;

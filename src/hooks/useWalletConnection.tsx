@@ -94,6 +94,16 @@ export const useWalletConnection = () => {
         setShowAuthFlow?.(false);
         setIsSdkInitialized(true);
         
+        console.log("[useWalletConnection] User initialized:", {
+          nameServiceSubdomain: user?.['name-service-subdomain-handle'],
+          alias: user?.alias, 
+          linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"] || 
+                       user?.metadata?.["LinkedIn Profile URL"],
+          availableFields: Object.keys(user).filter(key => 
+            typeof user[key as keyof typeof user] !== 'function'
+          )
+        });
+        
         const hasConnectedBefore = localStorage.getItem('wallet_has_connected');
         
         if (!hasConnectedBefore) {
@@ -112,10 +122,11 @@ export const useWalletConnection = () => {
         sdkInitialized: isSdkInitialized,
         linkedInUrl: user?.verifications?.customFields?.["LinkedIn Profile URL"],
         userVerifications: user?.verifications,
-        customFields: user?.verifications?.customFields
+        customFields: user?.verifications?.customFields,
+        nameServiceSubdomain: user?.['name-service-subdomain-handle']
       });
     }
-  }, [primaryWallet, setShowAuthFlow, user, navigate]);
+  }, [primaryWallet, setShowAuthFlow, user, navigate, isSdkInitialized]);
 
   return {
     isConnected: !!primaryWallet?.address && !!user && isSdkInitialized,
