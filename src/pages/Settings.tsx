@@ -32,7 +32,7 @@ const Settings: React.FC = () => {
     ? `https://www.resistancedao.xyz/${subdomain}`
     : isConnected && address 
       ? `https://www.resistancedao.xyz/${address?.substring(0, 8)}`
-      : "https://www.resistancedao.xyz/connect-wallet";
+      : "";
 
   const stats = {
     linkClicks: 2,
@@ -116,7 +116,7 @@ const Settings: React.FC = () => {
         </div>
 
         <div className="container mx-auto py-8 px-4 max-w-6xl pt-32 relative z-10">
-          {isFirstVisit && (
+          {isFirstVisit && isConnected && (
             <Card className="mb-8 bg-black/40 border-blue-500/30 backdrop-blur-sm">
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold text-blue-300 mb-2">Welcome to Resistance DAO!</h2>
@@ -169,63 +169,67 @@ const Settings: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Referral Link Section */}
-          <Card className="mb-6 bg-black/40 border-white/10 backdrop-blur-sm">
-            <CardContent className="p-4">
-              <h2 className="text-xl font-semibold mb-4 text-white">Your Referral Link</h2>
-              <Input 
-                value={referralLink}
-                readOnly
-                className="bg-black/40 border-white/10 text-white p-4"
-              />
-            </CardContent>
-          </Card>
+          {/* Only show Referral Link Section when connected */}
+          {isConnected && referralLink && (
+            <>
+              <Card className="mb-6 bg-black/40 border-white/10 backdrop-blur-sm">
+                <CardContent className="p-4">
+                  <h2 className="text-xl font-semibold mb-4 text-white">Your Referral Link</h2>
+                  <Input 
+                    value={referralLink}
+                    readOnly
+                    className="bg-black/40 border-white/10 text-white p-4"
+                  />
+                </CardContent>
+              </Card>
 
-          {/* Sharing Options */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-8">
-            <Button 
-              variant="outline" 
-              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
-              onClick={copyToClipboard}
-            >
-              <Copy size={16} /> Copy Link
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
-              onClick={() => shareViaChannel('twitter')}
-            >
-              <Share2 size={16} /> Share on X
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
-              onClick={() => shareViaChannel('facebook')}
-            >
-              <Facebook size={16} /> Share on Facebook
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
-              onClick={() => shareViaChannel('telegram')}
-            >
-              <ExternalLink size={16} /> Share on Telegram
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
-              onClick={() => shareViaChannel('instagram')}
-            >
-              <Instagram size={16} /> Share on Instagram
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
-              onClick={() => shareViaChannel('sms')}
-            >
-              <MessageSquare size={16} /> Share via SMS
-            </Button>
-          </div>
+              {/* Sharing Options */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-8">
+                <Button 
+                  variant="outline" 
+                  className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
+                  onClick={copyToClipboard}
+                >
+                  <Copy size={16} /> Copy Link
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
+                  onClick={() => shareViaChannel('twitter')}
+                >
+                  <Share2 size={16} /> Share on X
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
+                  onClick={() => shareViaChannel('facebook')}
+                >
+                  <Facebook size={16} /> Share on Facebook
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
+                  onClick={() => shareViaChannel('telegram')}
+                >
+                  <ExternalLink size={16} /> Share on Telegram
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
+                  onClick={() => shareViaChannel('instagram')}
+                >
+                  <Instagram size={16} /> Share on Instagram
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
+                  onClick={() => shareViaChannel('sms')}
+                >
+                  <MessageSquare size={16} /> Share via SMS
+                </Button>
+              </div>
+            </>
+          )}
 
           {/* Email Notifications */}
           <Card className="mb-8 bg-black/40 border-white/10 backdrop-blur-sm">
