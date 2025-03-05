@@ -1,25 +1,39 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Facebook, Instagram, MessageSquare, Share2, ExternalLink, Shield, ChevronRight } from "lucide-react";
+import { Copy, Facebook, Instagram, MessageSquare, Share2, ExternalLink, Shield, ChevronRight, Save } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNavigate } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 const Settings: React.FC = () => {
   const { isConnected, address, subdomain } = useCustomWallet();
   const { user } = useDynamicContext();
+  const { profileData, isLoading: isProfileLoading, updateProfile, isSaving } = useUserProfile();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [subdomainHandle, setSubdomainHandle] = useState("");
   const [isFirstVisit, setIsFirstVisit] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
   
   const { data: nftBalance, isLoading: isLoadingNFT } = useNFTBalance(address);
   const hasMembershipNFT = nftBalance && nftBalance > 0;
+  
+  // Load profile data into form
+  useEffect(() => {
+    if (profileData) {
+      setEmail(profileData.email || "");
+      setLinkedinUrl(profileData.linkedinUrl || "");
+      setSubdomainHandle(profileData.subdomainHandle || "");
+    }
+  }, [profileData]);
   
   // Check if this is the first visit after connecting wallet
   useEffect(() => {
@@ -45,8 +59,8 @@ const Settings: React.FC = () => {
   }, [user]);
   
   // Generate a referral link using the subdomain or a placeholder
-  const referralLink = isConnected && subdomain
-    ? `https://www.resistancedao.xyz/${subdomain}`
+  const referralLink = isConnected && profileData?.subdomainHandle
+    ? `https://www.resistancedao.xyz/${profileData.subdomainHandle}`
     : isConnected && address 
       ? `https://www.resistancedao.xyz/${address?.substring(0, 8)}`
       : "";
@@ -101,23 +115,16 @@ const Settings: React.FC = () => {
     }
   };
 
-  const handleAddEmail = () => {
-    if (!email || !email.includes('@')) {
-      toast({
-        title: "Invalid email",
-        description: "Please enter a valid email address",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    toast({
-      title: "Email added",
-      description: "You'll now receive notifications about your referrals"
+  const handleSaveProfile = async () => {
+    const success = await updateProfile({
+      linkedinUrl,
+      subdomainHandle,
+      email: email || null
     });
     
-    // Reset email field
-    setEmail("");
+    if (success) {
+      setIsEditing(false);
+    }
   };
 
   const handleBuyNFT = () => {
@@ -161,14 +168,94 @@ const Settings: React.FC = () => {
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4 text-yellow-300">User Data Debug</h2>
                 <div className="space-y-2 text-white/80 text-sm">
-                  <p><span className="font-bold">name-service-subdomain-handle:</span> {user?.['name-service-subdomain-handle'] || 'Not set'}</p>
-                  <p><span className="font-bold">alias:</span> {user?.alias || 'Not set'}</p>
-                  <p><span className="font-bold">LinkedIn URL:</span> {user?.verifications?.customFields?.["LinkedIn Profile URL"] || user?.metadata?.["LinkedIn Profile URL"] || 'Not set'}</p>
-                  <p><span className="font-bold">Resolved subdomain:</span> {subdomain || 'Using address fallback'}</p>
+                  <p><span className="font-bold">Dynamic SDK - name-service-subdomain-handle:</span> {user?.['name-service-subdomain-handle'] || 'Not set'}</p>
+                  <p><span className="font-bold">Dynamic SDK - alias:</span> {user?.alias || 'Not set'}</p>
+                  <p><span className="font-bold">Dynamic SDK - LinkedIn URL:</span> {user?.verifications?.customFields?.["LinkedIn Profile URL"] || user?.metadata?.["LinkedIn Profile URL"] || 'Not set'}</p>
+                  <p><span className="font-bold">useCustomWallet - subdomain:</span> {subdomain || 'Using address fallback'}</p>
+                  <p><span className="font-bold">Supabase - subdomainHandle:</span> {profileData?.subdomainHandle || 'Not set'}</p>
+                  <p><span className="font-bold">Supabase - linkedinUrl:</span> {profileData?.linkedinUrl || 'Not set'}</p>
                 </div>
               </CardContent>
             </Card>
           )}
+
+          {/* Profile Information Card */}
+          <Card className="mb-8 bg-black/40 border-white/10 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-white">Profile Information</h2>
+                {!isEditing ? (
+                  <Button
+                    onClick={() => setIsEditing(true)}
+                    variant="outline"
+                    className="bg-black/40 border-white/10 hover:bg-white/5 text-white text-sm"
+                  >
+                    Edit Profile
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleSaveProfile}
+                    disabled={isSaving}
+                    className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 text-sm"
+                  >
+                    {isSaving ? 'Saving...' : 'Save Changes'} {!isSaving && <Save className="h-4 w-4" />}
+                  </Button>
+                )}
+              </div>
+              
+              {isProfileLoading ? (
+                <div className="text-white/60 py-4">Loading profile information...</div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="subdomain" className="text-white mb-2">Subdomain Handle</Label>
+                    <Input
+                      id="subdomain"
+                      value={subdomainHandle}
+                      onChange={(e) => setSubdomainHandle(e.target.value)}
+                      placeholder="your.subdomain.eth"
+                      disabled={!isEditing}
+                      className="bg-black/40 border-white/10 text-white"
+                    />
+                    {!isEditing && subdomainHandle && (
+                      <p className="text-white/60 text-sm mt-1">
+                        This is your unique identifier for your referral link
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="linkedin" className="text-white mb-2">LinkedIn Profile URL</Label>
+                    <Input
+                      id="linkedin"
+                      value={linkedinUrl}
+                      onChange={(e) => setLinkedinUrl(e.target.value)}
+                      placeholder="https://www.linkedin.com/in/yourprofile"
+                      disabled={!isEditing}
+                      className="bg-black/40 border-white/10 text-white"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="email" className="text-white mb-2">Email Address</Label>
+                    <Input
+                      id="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      disabled={!isEditing}
+                      className="bg-black/40 border-white/10 text-white"
+                    />
+                    {!isEditing && email && (
+                      <p className="text-white/60 text-sm mt-1">
+                        Your email is used for notifications about your referrals
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Membership NFT Status */}
           <Card className="mb-8 bg-black/40 border-white/10 backdrop-blur-sm">
@@ -276,7 +363,7 @@ const Settings: React.FC = () => {
                 />
                 <Button 
                   className="bg-blue-600 hover:bg-blue-700 text-white"
-                  onClick={handleAddEmail}
+                  onClick={() => handleAddEmail()}
                 >
                   Add Email
                 </Button>
@@ -341,6 +428,25 @@ const Settings: React.FC = () => {
       </div>
     </div>
   );
+
+  function handleAddEmail() {
+    if (!email || !email.includes('@')) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    toast({
+      title: "Email added",
+      description: "You'll now receive notifications about your referrals"
+    });
+    
+    // Reset email field
+    setEmail("");
+  }
 };
 
 export default Settings;
