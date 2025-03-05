@@ -87,144 +87,153 @@ const ReferralProgram: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-purple-400">Your Affiliate Dashboard</h1>
-        <Button variant="outline" className="border-purple-500 text-purple-400">
-          Transaction History
-        </Button>
-      </div>
+    <div className="min-h-screen bg-[#0A0A0A]">
+      <div className="relative">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-900/20 to-transparent" />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJub25lIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9zdmc+')] opacity-10" />
+        </div>
 
-      {/* Referral Link Section */}
-      <Card className="mb-6 bg-gray-900 border-gray-800">
-        <CardContent className="p-4">
-          <Input 
-            value={referralLink}
-            readOnly
-            className="bg-gray-900 border-gray-700 text-white p-4"
-          />
-        </CardContent>
-      </Card>
-
-      {/* Sharing Options */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-8">
-        <Button 
-          variant="outline" 
-          className="flex items-center justify-center gap-2 bg-gray-800 border-gray-700 hover:bg-gray-700"
-          onClick={copyToClipboard}
-        >
-          <Copy size={16} /> Copy Link
-        </Button>
-        <Button 
-          variant="outline" 
-          className="flex items-center justify-center gap-2 bg-gray-800 border-gray-700 hover:bg-gray-700"
-          onClick={() => shareViaChannel('twitter')}
-        >
-          <Share2 size={16} /> Share on X
-        </Button>
-        <Button 
-          variant="outline" 
-          className="flex items-center justify-center gap-2 bg-gray-800 border-gray-700 hover:bg-gray-700"
-          onClick={() => shareViaChannel('facebook')}
-        >
-          <Facebook size={16} /> Share on Facebook
-        </Button>
-        <Button 
-          variant="outline" 
-          className="flex items-center justify-center gap-2 bg-gray-800 border-gray-700 hover:bg-gray-700"
-          onClick={() => shareViaChannel('telegram')}
-        >
-          <ExternalLink size={16} /> Share on Telegram
-        </Button>
-        <Button 
-          variant="outline" 
-          className="flex items-center justify-center gap-2 bg-gray-800 border-gray-700 hover:bg-gray-700"
-          onClick={() => shareViaChannel('instagram')}
-        >
-          <Instagram size={16} /> Share on Instagram
-        </Button>
-        <Button 
-          variant="outline" 
-          className="flex items-center justify-center gap-2 bg-gray-800 border-gray-700 hover:bg-gray-700"
-          onClick={() => shareViaChannel('sms')}
-        >
-          <MessageSquare size={16} /> Share via SMS
-        </Button>
-      </div>
-
-      {/* Email Notifications */}
-      <Card className="mb-8 bg-gray-900 border-gray-800">
-        <CardContent className="p-4">
-          <h2 className="text-xl font-semibold mb-4 text-white">Email Notifications</h2>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Input 
-              placeholder="No email provided for notifications" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex-grow bg-gray-800 border-gray-700 text-white"
-            />
-            <Button 
-              className="bg-purple-600 hover:bg-purple-700 text-white"
-              onClick={handleAddEmail}
-            >
-              Add Email
+        <div className="container mx-auto py-8 px-4 max-w-6xl pt-32 relative z-10">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">Your Affiliate Dashboard</h1>
+            <Button variant="outline" className="border-blue-500 text-blue-400 hover:bg-blue-500/10">
+              Transaction History
             </Button>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-gray-400 mb-2">Link Clicks</span>
-            <span className="text-3xl font-bold text-purple-400">{stats.linkClicks}</span>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-gray-400 mb-2">Appointments</span>
-            <span className="text-3xl font-bold text-purple-400">{stats.appointments}</span>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-gray-400 mb-2">Invoices Billed</span>
-            <span className="text-3xl font-bold text-purple-400">{stats.invoicesBilled}</span>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-gray-400 mb-2">Invoices Paid</span>
-            <span className="text-3xl font-bold text-purple-400">{stats.invoicesPaid}</span>
-          </CardContent>
-        </Card>
-      </div>
+          {/* Referral Link Section */}
+          <Card className="mb-6 bg-black/40 border-white/10 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <Input 
+                value={referralLink}
+                readOnly
+                className="bg-black/40 border-white/10 text-white p-4"
+              />
+            </CardContent>
+          </Card>
 
-      {/* Rewards Sections */}
-      <div className="space-y-4">
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="p-6 flex justify-between items-center">
-            <span className="text-xl text-gray-300">Pending Rewards</span>
-            <span className="text-2xl font-bold">
-              <span className="text-blue-500">{stats.pendingRewards}</span>
-              <span className="text-purple-400"> USDC</span>
-            </span>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gray-900 border-gray-800">
-          <CardContent className="p-6 flex justify-between items-center">
-            <span className="text-xl text-gray-300">Paid Rewards</span>
-            <span className="text-2xl font-bold">
-              <span className="text-blue-500">{stats.paidRewards}</span>
-              <span className="text-purple-400"> USDC</span>
-            </span>
-          </CardContent>
-        </Card>
+          {/* Sharing Options */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-8">
+            <Button 
+              variant="outline" 
+              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5"
+              onClick={copyToClipboard}
+            >
+              <Copy size={16} /> Copy Link
+            </Button>
+            <Button 
+              variant="outline" 
+              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5"
+              onClick={() => shareViaChannel('twitter')}
+            >
+              <Share2 size={16} /> Share on X
+            </Button>
+            <Button 
+              variant="outline" 
+              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5"
+              onClick={() => shareViaChannel('facebook')}
+            >
+              <Facebook size={16} /> Share on Facebook
+            </Button>
+            <Button 
+              variant="outline" 
+              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5"
+              onClick={() => shareViaChannel('telegram')}
+            >
+              <ExternalLink size={16} /> Share on Telegram
+            </Button>
+            <Button 
+              variant="outline" 
+              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5"
+              onClick={() => shareViaChannel('instagram')}
+            >
+              <Instagram size={16} /> Share on Instagram
+            </Button>
+            <Button 
+              variant="outline" 
+              className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5"
+              onClick={() => shareViaChannel('sms')}
+            >
+              <MessageSquare size={16} /> Share via SMS
+            </Button>
+          </div>
+
+          {/* Email Notifications */}
+          <Card className="mb-8 bg-black/40 border-white/10 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <h2 className="text-xl font-semibold mb-4 text-white">Email Notifications</h2>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Input 
+                  placeholder="No email provided for notifications" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-grow bg-black/40 border-white/10 text-white"
+                />
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={handleAddEmail}
+                >
+                  Add Email
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+              <CardContent className="p-6 flex flex-col items-center justify-center">
+                <span className="text-gray-400 mb-2">Link Clicks</span>
+                <span className="text-3xl font-bold text-blue-400">{stats.linkClicks}</span>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+              <CardContent className="p-6 flex flex-col items-center justify-center">
+                <span className="text-gray-400 mb-2">Appointments</span>
+                <span className="text-3xl font-bold text-blue-400">{stats.appointments}</span>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+              <CardContent className="p-6 flex flex-col items-center justify-center">
+                <span className="text-gray-400 mb-2">Invoices Billed</span>
+                <span className="text-3xl font-bold text-blue-400">{stats.invoicesBilled}</span>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+              <CardContent className="p-6 flex flex-col items-center justify-center">
+                <span className="text-gray-400 mb-2">Invoices Paid</span>
+                <span className="text-3xl font-bold text-blue-400">{stats.invoicesPaid}</span>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Rewards Sections */}
+          <div className="space-y-4">
+            <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+              <CardContent className="p-6 flex justify-between items-center">
+                <span className="text-xl text-gray-300">Pending Rewards</span>
+                <span className="text-2xl font-bold">
+                  <span className="text-blue-500">{stats.pendingRewards}</span>
+                  <span className="text-blue-400"> USDC</span>
+                </span>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
+              <CardContent className="p-6 flex justify-between items-center">
+                <span className="text-xl text-gray-300">Paid Rewards</span>
+                <span className="text-2xl font-bold">
+                  <span className="text-blue-500">{stats.paidRewards}</span>
+                  <span className="text-blue-400"> USDC</span>
+                </span>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
