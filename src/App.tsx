@@ -13,7 +13,8 @@ import NotFound from "./pages/NotFound";
 import ThesisSubmission from "./pages/ThesisSubmission";
 import ProposalDetails from "./pages/ProposalDetails";
 import Proposals from "./pages/Proposals";
-import ReferralProgram from "./pages/ReferralProgram";
+import Settings from "./pages/Settings";
+import BuyMembershipNFT from "./pages/BuyMembershipNFT";
 import { Toaster } from "./components/ui/toaster";
 
 const zeroDevConfig = {
@@ -149,7 +150,8 @@ function Layout() {
         <Route path="/thesis" element={<ThesisSubmission />} />
         <Route path="/proposals" element={<Proposals />} />
         <Route path="/proposals/:tokenId" element={<ProposalDetails />} />
-        <Route path="/referral" element={<ReferralProgram />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/buy-membership-nft" element={<BuyMembershipNFT />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

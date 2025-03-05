@@ -13,7 +13,8 @@ import {
   ChevronRight as ArrowIcon,
   Clock,
   Target,
-  Wallet
+  Wallet,
+  RefreshCw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -109,9 +110,19 @@ const Index = () => {
             <div className="mt-12 bg-blue-950/40 border border-blue-500/20 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-mono text-blue-300">Live Activity</h3>
-                <div className="flex items-center gap-2 text-sm text-blue-400">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                  Real-time Updates
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 text-sm text-blue-400">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                    Real-time Updates
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => window.location.reload()}
+                    className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
               <div className="space-y-4">

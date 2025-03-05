@@ -1,17 +1,22 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Facebook, Instagram, MessageSquare, Share2, ExternalLink } from "lucide-react";
+import { Copy, Facebook, Instagram, MessageSquare, Share2, ExternalLink, Shield, ChevronRight } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
+import { useNFTBalance } from "@/hooks/useNFTBalance";
+import { useNavigate } from "react-router-dom";
 
-const ReferralProgram: React.FC = () => {
+const Settings: React.FC = () => {
   const { isConnected, address } = useCustomWallet();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [isFirstVisit, setIsFirstVisit] = useState(false);
+  const navigate = useNavigate();
+  
+  const { data: nftBalance, isLoading: isLoadingNFT } = useNFTBalance(address);
+  const hasMembershipNFT = nftBalance && nftBalance > 0;
   
   // Check if this is the first visit after connecting wallet
   useEffect(() => {
@@ -96,6 +101,10 @@ const ReferralProgram: React.FC = () => {
     setEmail("");
   };
 
+  const handleBuyNFT = () => {
+    navigate('/buy-membership-nft');
+  };
+
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
       <div className="relative">
@@ -110,8 +119,8 @@ const ReferralProgram: React.FC = () => {
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold text-blue-300 mb-2">Welcome to Resistance DAO!</h2>
                 <p className="text-white/80 mb-4">
-                  You've been automatically redirected to your referral dashboard. 
-                  This is where you can invite new members and earn rewards for growing the community.
+                  This is your settings dashboard where you can manage your account, 
+                  referrals, and membership status.
                 </p>
                 <div className="flex items-center gap-2">
                   <div className="w-1 h-8 bg-blue-500 rounded-full" />
@@ -124,15 +133,44 @@ const ReferralProgram: React.FC = () => {
           )}
           
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">Your Affiliate Dashboard</h1>
-            <Button variant="outline" className="border-blue-500 text-blue-400 hover:bg-blue-500/10">
-              Transaction History
-            </Button>
+            <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">Account Settings</h1>
           </div>
+
+          {/* Membership NFT Status */}
+          <Card className="mb-8 bg-black/40 border-white/10 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4 text-white">Membership Status</h2>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-6 h-6 text-blue-400" />
+                  <div>
+                    <div className="text-white font-medium">DAO Membership NFT</div>
+                    <div className="text-white/60 text-sm">Required for governance and rewards</div>
+                  </div>
+                </div>
+                
+                {isLoadingNFT ? (
+                  <div className="text-white/60">Loading...</div>
+                ) : hasMembershipNFT ? (
+                  <div className="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-medium">
+                    Active Member
+                  </div>
+                ) : (
+                  <Button 
+                    onClick={handleBuyNFT}
+                    className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+                  >
+                    Get Membership <ChevronRight className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Referral Link Section */}
           <Card className="mb-6 bg-black/40 border-white/10 backdrop-blur-sm">
             <CardContent className="p-4">
+              <h2 className="text-xl font-semibold mb-4 text-white">Your Referral Link</h2>
               <Input 
                 value={referralLink}
                 readOnly
@@ -267,4 +305,4 @@ const ReferralProgram: React.FC = () => {
   );
 };
 
-export default ReferralProgram;
+export default Settings;

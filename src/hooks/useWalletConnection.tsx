@@ -94,11 +94,11 @@ export const useWalletConnection = () => {
       // Check if this is the first time the user has connected
       const hasConnectedBefore = localStorage.getItem('wallet_has_connected');
       
-      // If this is the first connection, redirect to referral page
+      // If this is the first connection, redirect to settings page
       if (!hasConnectedBefore && primaryWallet.address) {
-        console.log("First-time wallet connection detected. Redirecting to referral page.");
+        console.log("First-time wallet connection detected. Redirecting to settings page.");
         localStorage.setItem('wallet_has_connected', 'true');
-        navigate('/referral');
+        navigate('/settings');
       }
       
       // Log LinkedIn URL when wallet connects
