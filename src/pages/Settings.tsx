@@ -9,7 +9,7 @@ import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNavigate } from "react-router-dom";
 
 const Settings: React.FC = () => {
-  const { isConnected, address } = useCustomWallet();
+  const { isConnected, address, subdomain } = useCustomWallet();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [isFirstVisit, setIsFirstVisit] = useState(false);
@@ -27,10 +27,12 @@ const Settings: React.FC = () => {
     }
   }, [isConnected]);
   
-  // Generate a referral link using the wallet address or a placeholder
-  const referralLink = isConnected && address 
-    ? `https://refer.resistancedao.xyz/${address?.substring(0, 8)}`
-    : "https://refer.resistancedao.xyz/connect-wallet";
+  // Generate a referral link using the subdomain or a placeholder
+  const referralLink = isConnected && subdomain
+    ? `https://www.resistancedao.xyz/${subdomain}`
+    : isConnected && address 
+      ? `https://www.resistancedao.xyz/${address?.substring(0, 8)}`
+      : "https://www.resistancedao.xyz/connect-wallet";
 
   const stats = {
     linkClicks: 2,

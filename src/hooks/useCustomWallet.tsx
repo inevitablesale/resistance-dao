@@ -7,11 +7,18 @@ export const useCustomWallet = () => {
   // Only consider connected if we have both wallet and user data
   const isFullyConnected = !!primaryWallet?.address && !!user;
   
+  // Get the subdomain/ENS value from user data
+  const subdomain = user?.verifications?.customFields?.["LinkedIn Profile URL"] || 
+                    user?.metadata?.["LinkedIn Profile URL"] || 
+                    user?.alias || 
+                    null;
+
   return {
     isConnected: isFullyConnected,
     isPendingUser: !!primaryWallet?.address && !user,
     address: primaryWallet?.address,
     user,
+    subdomain,
     isSmartWallet: primaryWallet?.connector?.name?.toLowerCase().includes('zerodev')
   };
 };
