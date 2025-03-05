@@ -1,15 +1,21 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Shield, Check, ArrowRight, CreditCard } from "lucide-react";
+import { ShoppingCart, Shield, Check, ArrowRight, CreditCard, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { executeTransaction } from "@/services/transactionManager";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { ethers } from "ethers";
+import { checkTokenAllowance, approveExactAmount, getTokenBalance } from "@/services/tokenService";
+
+// NFT contract and USDC token addresses
+const NFT_CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
+const USDC_TOKEN_ADDRESS = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"; // Polygon USDC
+const NFT_PRICE_USDC = "50"; // $50 worth of USDC
 
 const BuyMembershipNFT: React.FC = () => {
   const { isConnected, address } = useCustomWallet();
@@ -18,13 +24,139 @@ const BuyMembershipNFT: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
+  
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+  const [needsApproval, setNeedsApproval] = useState(true);
+  const [usdcBalance, setUsdcBalance] = useState("0");
+  const [hasEnoughBalance, setHasEnoughBalance] = useState(false);
+
+  // Check USDC balance and allowance when component loads
+  useEffect(() => {
+    const checkBalanceAndAllowance = async () => {
+      if (!isConnected || !address) return;
+      
+      try {
+        const provider = await getProvider();
+        
+        // Get USDC balance
+        const balance = await getTokenBalance(provider.provider, USDC_TOKEN_ADDRESS, address);
+        setUsdcBalance(balance);
+        
+        // Check if user has enough USDC
+        const hasEnough = parseFloat(balance) >= parseFloat(NFT_PRICE_USDC);
+        setHasEnoughBalance(hasEnough);
+        
+        // Check if NFT contract is approved to spend USDC
+        const hasAllowance = await checkTokenAllowance(
+          provider.provider,
+          USDC_TOKEN_ADDRESS,
+          address,
+          NFT_CONTRACT_ADDRESS,
+          NFT_PRICE_USDC
+        );
+        
+        setNeedsApproval(!hasAllowance);
+        
+        console.log("USDC status check:", {
+          balance,
+          hasEnoughBalance: hasEnough,
+          needsApproval: !hasAllowance
+        });
+      } catch (error) {
+        console.error("Error checking USDC status:", error);
+      }
+    };
+    
+    checkBalanceAndAllowance();
+  }, [isConnected, address, getProvider]);
+
+  const handleApproveUSDC = async () => {
+    if (!isConnected) {
+      toast({
+        title: "Wallet not connected",
+        description: "Please connect your wallet to approve USDC",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsApproving(true);
+      toast({
+        title: "Approval initiated",
+        description: "Please approve USDC spending in your wallet",
+      });
+      
+      const provider = await getProvider();
+      
+      const tx = await executeTransaction(
+        async () => {
+          return await approveExactAmount(
+            provider.provider,
+            USDC_TOKEN_ADDRESS,
+            NFT_CONTRACT_ADDRESS,
+            ethers.utils.parseUnits(NFT_PRICE_USDC, 6).toString() // USDC has 6 decimals
+          );
+        },
+        {
+          type: 'erc20_approval',
+          description: 'Approving USDC for Resistance DAO Membership NFT',
+          timeout: 120000,
+          maxRetries: 3,
+          backoffMs: 5000,
+          tokenConfig: {
+            tokenAddress: USDC_TOKEN_ADDRESS,
+            spenderAddress: NFT_CONTRACT_ADDRESS,
+            amount: ethers.utils.parseUnits(NFT_PRICE_USDC, 6).toString(),
+            isApproval: true
+          }
+        },
+        provider.provider
+      );
+      
+      toast({
+        title: "Approval successful!",
+        description: "You can now purchase the membership NFT",
+        variant: "default" 
+      });
+      
+      setNeedsApproval(false);
+    } catch (error) {
+      console.error("USDC approval error:", error);
+      toast({
+        title: "Approval failed",
+        description: error.message || "There was an error approving USDC",
+        variant: "destructive"
+      });
+    } finally {
+      setIsApproving(false);
+    }
+  };
 
   const handleBuyNFT = async () => {
     if (!isConnected) {
       toast({
         title: "Wallet not connected",
         description: "Please connect your wallet to purchase a membership NFT",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!hasEnoughBalance) {
+      toast({
+        title: "Insufficient USDC balance",
+        description: `You need at least ${NFT_PRICE_USDC} USDC to purchase the membership NFT`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (needsApproval) {
+      toast({
+        title: "USDC approval required",
+        description: "Please approve USDC spending before purchasing",
         variant: "destructive"
       });
       return;
@@ -38,20 +170,22 @@ const BuyMembershipNFT: React.FC = () => {
       });
       
       const provider = await getProvider();
-      const signer = provider.getSigner();
+      const signer = provider.provider.getSigner();
       
-      const NFT_CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
-      
-      const mintInterface = ["function mint(address to) external payable"];
+      // NFT contract interface with payWithToken function
+      const nftInterface = ["function mintWithToken(address _token, uint256 _price) external"];
       
       const nftContract = new ethers.Contract(
         NFT_CONTRACT_ADDRESS,
-        mintInterface,
+        nftInterface,
         signer
       );
       
       const tx = await executeTransaction(
-        () => nftContract.mint(address, { value: ethers.utils.parseEther("0") }),
+        () => nftContract.mintWithToken(
+          USDC_TOKEN_ADDRESS,
+          ethers.utils.parseUnits(NFT_PRICE_USDC, 6) // USDC has 6 decimals
+        ),
         {
           type: 'erc721_mint',
           description: 'Minting Resistance DAO Membership NFT',
@@ -124,7 +258,7 @@ const BuyMembershipNFT: React.FC = () => {
                     <div className="text-white/70">Price</div>
                     <div className="flex items-center">
                       <CreditCard className="w-5 h-5 mr-2 text-green-400" />
-                      <div className="text-2xl font-bold text-white">$50 USDC</div>
+                      <div className="text-2xl font-bold text-white">${NFT_PRICE_USDC} USDC</div>
                     </div>
                   </div>
                   <div className="text-white/60 text-sm mb-2">
@@ -134,6 +268,22 @@ const BuyMembershipNFT: React.FC = () => {
                     <Check className="w-4 h-4 mr-2 text-blue-400" />
                     Limited supply: Only 10,000 membership NFTs will be minted
                   </div>
+                  
+                  {isConnected && (
+                    <div className={`text-sm px-3 py-2 rounded-md mt-2 flex items-center ${hasEnoughBalance ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
+                      {hasEnoughBalance ? (
+                        <>
+                          <Check className="w-4 h-4 mr-2" />
+                          Balance: {parseFloat(usdcBalance).toFixed(2)} USDC
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="w-4 h-4 mr-2" />
+                          Insufficient balance: {parseFloat(usdcBalance).toFixed(2)} USDC
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-3 mb-6">
@@ -163,14 +313,29 @@ const BuyMembershipNFT: React.FC = () => {
                       Back to Settings
                     </Button>
                   </div>
+                ) : isConnected && needsApproval ? (
+                  <Button 
+                    onClick={handleApproveUSDC}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    disabled={isApproving || !hasEnoughBalance}
+                  >
+                    {isApproving ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Approving USDC...</>
+                    ) : (
+                      <>
+                        <Shield className="mr-2 h-4 w-4" />
+                        Approve USDC Spending
+                      </>
+                    )}
+                  </Button>
                 ) : (
                   <Button 
                     onClick={handleBuyNFT}
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                    disabled={isPurchasing}
+                    disabled={isPurchasing || needsApproval || !hasEnoughBalance}
                   >
                     {isPurchasing ? (
-                      <>Processing...</>
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</>
                     ) : (
                       <>
                         <ShoppingCart className="mr-2 h-4 w-4" />
