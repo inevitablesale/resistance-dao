@@ -1,9 +1,11 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 import Twitter from "./icons/Twitter";
 import Linked from "./icons/Linked";
+import { Button } from "@/components/ui/button";
+import { Rocket } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,6 +17,7 @@ import {
 
 const Nav = () => {
   const { primaryWallet } = useDynamicContext();
+  const { setShowAuthFlow } = useWalletConnection();
   const location = useLocation();
   const hasWallet = !!primaryWallet?.address;
   
@@ -92,6 +95,10 @@ const Nav = () => {
     return null;
   };
 
+  const handleLaunchClick = () => {
+    setShowAuthFlow(true);
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100]">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-md border-b border-white/5" />
@@ -127,7 +134,17 @@ const Nav = () => {
               <Linked className="w-5 h-5" />
             </a>
             <div className="relative z-[101] flex items-center pointer-events-auto">
-              <DynamicWidget />
+              {hasWallet ? (
+                <DynamicWidget />
+              ) : (
+                <Button 
+                  onClick={handleLaunchClick}
+                  className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-medium px-4 py-2 rounded-md transition-all duration-200 transform hover:scale-105"
+                >
+                  <Rocket className="mr-2 h-4 w-4" />
+                  Launch dApp
+                </Button>
+              )}
             </div>
           </div>
         </div>
