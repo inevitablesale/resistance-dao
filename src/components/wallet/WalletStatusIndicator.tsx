@@ -14,7 +14,13 @@ export const WalletStatusIndicator: React.FC<WalletStatusIndicatorProps> = ({ cl
   const { setShowAuthFlow } = useDynamicContext();
   
   const shortAddress = address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : '';
-  const subdomain = user?.verifiedCredentials?.[0]?.address || 'No subdomain';
+  
+  // Fix subdomain access - look for it in the user object structure
+  // Try to get it from the custom fields in verifications, or use a fallback
+  const subdomain = user?.verifications?.customFields?.["LinkedIn Profile URL"] || 
+                    user?.metadata?.["LinkedIn Profile URL"] || 
+                    user?.alias || 
+                    'No subdomain';
 
   const handleClick = () => {
     setShowAuthFlow(true);
