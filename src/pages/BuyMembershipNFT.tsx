@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { executeTransaction } from "@/services/transactionManager";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { ethers } from "ethers";
+import { WalletStatusIndicator } from "@/components/wallet/WalletStatusIndicator";
 
 const BuyMembershipNFT: React.FC = () => {
   const { isConnected, address } = useCustomWallet();
@@ -99,7 +100,12 @@ const BuyMembershipNFT: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0A0A0A] pt-32 pb-16">
       <div className="container mx-auto px-4 max-w-6xl">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 relative">
+          {isConnected && (
+            <div className="absolute right-0 top-0">
+              <WalletStatusIndicator />
+            </div>
+          )}
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent mb-4">
             Resistance DAO Membership
           </h1>

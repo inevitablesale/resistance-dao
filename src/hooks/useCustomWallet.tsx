@@ -12,6 +12,8 @@ export const useCustomWallet = () => {
     isPendingUser: !!primaryWallet?.address && !user,
     address: primaryWallet?.address,
     user,
-    isSmartWallet: primaryWallet?.connector?.name?.toLowerCase().includes('zerodev')
+    isSmartWallet: primaryWallet?.connector?.name?.toLowerCase().includes('zerodev'),
+    walletProvider: primaryWallet?.connector?.name || 'Unknown',
+    chainId: primaryWallet?.chainId
   };
 };
