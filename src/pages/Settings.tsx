@@ -13,7 +13,6 @@ const Settings: React.FC = () => {
   const { isConnected, address } = useCustomWallet();
   const { user } = useDynamicContext();
   const { toast } = useToast();
-  const [email, setEmail] = useState("");
   const [isFirstVisit, setIsFirstVisit] = useState(false);
   const navigate = useNavigate();
   
@@ -68,7 +67,6 @@ const Settings: React.FC = () => {
         shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedMessage}`;
         break;
       case 'instagram':
-        // Instagram doesn't have a direct share URL, but we can show a toast
         toast({
           title: "Instagram Sharing",
           description: "Copy the link and share it on Instagram",
@@ -82,25 +80,6 @@ const Settings: React.FC = () => {
     if (shareUrl) {
       window.open(shareUrl, '_blank');
     }
-  };
-
-  const handleAddEmail = () => {
-    if (!email || !email.includes('@')) {
-      toast({
-        title: "Invalid email",
-        description: "Please enter a valid email address",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    toast({
-      title: "Email added",
-      description: "You'll now receive notifications about your referrals"
-    });
-    
-    // Reset email field
-    setEmail("");
   };
 
   const handleBuyNFT = () => {
@@ -186,25 +165,27 @@ const Settings: React.FC = () => {
           {isConnected && referralLink && (
             <>
               <Card className="mb-6 bg-black/40 border-white/10 backdrop-blur-sm">
-                <CardContent className="p-4">
+                <CardContent className="p-6">
                   <h2 className="text-xl font-semibold mb-4 text-white">Your Referral Link</h2>
-                  <Input 
-                    value={referralLink}
-                    readOnly
-                    className="bg-black/40 border-white/10 text-white p-4"
-                  />
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input 
+                      value={referralLink}
+                      readOnly
+                      className="bg-black/40 border-white/10 text-white p-4 flex-grow"
+                    />
+                    <Button 
+                      onClick={copyToClipboard}
+                      className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+                    >
+                      <Copy className="h-4 w-4" /> Copy Link
+                    </Button>
+                  </div>
+                  <p className="mt-2 text-sm text-blue-300">This referral is stored permanently once a user visits your link</p>
                 </CardContent>
               </Card>
 
               {/* Sharing Options */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-8">
-                <Button 
-                  variant="outline" 
-                  className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
-                  onClick={copyToClipboard}
-                >
-                  <Copy size={16} /> Copy Link
-                </Button>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mb-8">
                 <Button 
                   variant="outline" 
                   className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
@@ -243,27 +224,6 @@ const Settings: React.FC = () => {
               </div>
             </>
           )}
-
-          {/* Email Notifications */}
-          <Card className="mb-8 bg-black/40 border-white/10 backdrop-blur-sm">
-            <CardContent className="p-4">
-              <h2 className="text-xl font-semibold mb-4 text-white">Email Notifications</h2>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Input 
-                  placeholder="No email provided for notifications" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-grow bg-black/40 border-white/10 text-white"
-                />
-                <Button 
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                  onClick={handleAddEmail}
-                >
-                  Add Email
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
