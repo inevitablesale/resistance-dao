@@ -4,14 +4,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Facebook, Instagram, MessageSquare, Share2, ExternalLink, Shield, ChevronRight, Bug } from "lucide-react";
+import { Copy, Facebook, Instagram, MessageSquare, Share2, ExternalLink, Shield, ChevronRight } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNavigate } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 const Settings: React.FC = () => {
-  const { isConnected, address, subdomain, debugInfo } = useCustomWallet();
+  const { isConnected, address, subdomain } = useCustomWallet();
   const { user } = useDynamicContext();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
@@ -30,22 +30,14 @@ const Settings: React.FC = () => {
     }
   }, [isConnected]);
   
-  // Debug user data fields availability - enhanced with more detailed logging
+  // Debug user data fields availability
   useEffect(() => {
     if (user) {
-      // Log the entire user object to see all available fields
-      console.log("[Settings] Complete user object:", user);
-      
-      // Check if the name-service-subdomain-handle exists directly on the user object
-      const hasSubdomainField = Object.prototype.hasOwnProperty.call(user, 'name-service-subdomain-handle');
-      
       console.log("[Settings] User data available:", {
         nameServiceSubdomain: user?.['name-service-subdomain-handle'],
-        nameServiceExists: hasSubdomainField,
         alias: user?.alias,
         linkedInURL: user?.verifications?.customFields?.["LinkedIn Profile URL"],
         hasVerifications: !!user?.verifications,
-        userKeys: Object.keys(user),
         customFieldsKeys: user?.verifications?.customFields ? Object.keys(user.verifications.customFields) : [],
         metadataKeys: user?.metadata ? Object.keys(user.metadata) : []
       });
@@ -163,28 +155,16 @@ const Settings: React.FC = () => {
             <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 bg-clip-text text-transparent">Account Settings</h1>
           </div>
 
-          {/* Enhanced Debug Card (always visible in development) */}
-          {process.env.NODE_ENV === 'development' && (
+          {/* Subdomain Debug Card (only in development) */}
+          {isConnected && process.env.NODE_ENV === 'development' && (
             <Card className="mb-8 bg-black/40 border-yellow-500/30 backdrop-blur-sm">
               <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Bug className="h-5 w-5 text-yellow-300" />
-                  <h2 className="text-xl font-semibold text-yellow-300">User Data Debug</h2>
-                </div>
-                
+                <h2 className="text-xl font-semibold mb-4 text-yellow-300">User Data Debug</h2>
                 <div className="space-y-2 text-white/80 text-sm">
-                  <p><span className="font-bold">name-service-subdomain-handle exists:</span> {debugInfo?.nameServiceExists ? 'Yes' : 'No'}</p>
-                  <p><span className="font-bold">name-service-subdomain-handle value:</span> {debugInfo?.nameServiceSubdomain || 'Not set'}</p>
-                  <p><span className="font-bold">alias:</span> {debugInfo?.alias || 'Not set'}</p>
-                  <p><span className="font-bold">LinkedIn URL:</span> {debugInfo?.linkedInFromVerifications || debugInfo?.linkedInFromMetadata || 'Not set'}</p>
+                  <p><span className="font-bold">name-service-subdomain-handle:</span> {user?.['name-service-subdomain-handle'] || 'Not set'}</p>
+                  <p><span className="font-bold">alias:</span> {user?.alias || 'Not set'}</p>
+                  <p><span className="font-bold">LinkedIn URL:</span> {user?.verifications?.customFields?.["LinkedIn Profile URL"] || user?.metadata?.["LinkedIn Profile URL"] || 'Not set'}</p>
                   <p><span className="font-bold">Resolved subdomain:</span> {subdomain || 'Using address fallback'}</p>
-                  <p><span className="font-bold">User properties:</span> {debugInfo?.userKeys?.join(', ') || 'None'}</p>
-                </div>
-                
-                <div className="mt-4 p-3 bg-black/30 rounded border border-yellow-500/20 overflow-auto max-h-48">
-                  <pre className="text-xs text-white/70 whitespace-pre-wrap">
-                    {JSON.stringify(debugInfo, null, 2)}
-                  </pre>
                 </div>
               </CardContent>
             </Card>
