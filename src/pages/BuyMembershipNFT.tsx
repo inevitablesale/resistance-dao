@@ -148,7 +148,7 @@ const BuyMembershipNFT: React.FC = () => {
               </div>
             </Card>
 
-            <Card className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-blue-500/20 backdrop-blur-sm p-6">
+            <Card className="bg-gradient-to-br from-blue-950/80 to-purple-950/80 border-blue-500/20 backdrop-blur-sm p-6">
               <h3 className="text-xl font-bold text-white mb-2">DAO Treasury Sharing</h3>
               <p className="text-white/70">
                 Membership NFT holders receive a proportional share of the DAO's revenue from platform fees, 
