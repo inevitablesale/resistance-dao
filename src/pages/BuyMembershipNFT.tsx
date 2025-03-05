@@ -122,6 +122,9 @@ const BuyMembershipNFT: React.FC = () => {
               <p className="text-white/70 mb-6">
                 As a membership NFT holder, you become an integral part of the Resistance DAO ecosystem, 
                 with the power to shape its future through governance and receive rewards from the DAO's activities.
+                <span className="block mt-2 text-blue-400 font-medium">
+                  Your membership includes the Project Creator pass, allowing you to submit fund proposals!
+                </span>
               </p>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
