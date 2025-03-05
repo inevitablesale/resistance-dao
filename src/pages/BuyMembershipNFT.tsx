@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -90,6 +91,8 @@ const BuyMembershipNFT: React.FC = () => {
     "Access to exclusive opportunities",
     "Share in platform revenue",
     "Priority access to new features",
+    "Earn RD tokens through our referral program",
+    "Sponsor projects as an organizer",
     "NFT holder rewards and airdrops"
   ];
 
@@ -124,8 +127,12 @@ const BuyMembershipNFT: React.FC = () => {
                       <div className="text-2xl font-bold text-white">$50 USDC</div>
                     </div>
                   </div>
-                  <div className="text-white/60 text-sm">
-                    Pay with USDC on Ethereum or Polygon networks
+                  <div className="text-white/60 text-sm mb-2">
+                    Pay with USDC on Polygon network
+                  </div>
+                  <div className="text-white/60 text-sm bg-blue-900/30 px-3 py-2 rounded-md mt-2 flex items-center">
+                    <Check className="w-4 h-4 mr-2 text-blue-400" />
+                    Limited supply: Only 10,000 membership NFTs will be minted
                   </div>
                 </div>
 
