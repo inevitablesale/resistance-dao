@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
@@ -7,6 +6,9 @@ import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNavigate } from "react-router-dom";
 import { ShoppingCart, Shield, Check, ArrowRight, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { executeTransaction } from "@/services/transactionManager";
+import { useWalletProvider } from "@/hooks/useWalletProvider";
+import { ethers } from "ethers";
 
 const BuyMembershipNFT: React.FC = () => {
   const { isConnected, address } = useCustomWallet();
@@ -14,22 +16,73 @@ const BuyMembershipNFT: React.FC = () => {
   const hasMembershipNFT = nftBalance && nftBalance > 0;
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { getProvider } = useWalletProvider();
+  const [isPurchasing, setIsPurchasing] = useState(false);
 
-  const handleBuyNFT = () => {
-    // This is a placeholder for the actual purchase functionality
-    toast({
-      title: "Purchase initiated",
-      description: "Redirecting to payment gateway...",
-    });
-    
-    // For demo purposes, we'll just show a success message
-    setTimeout(() => {
+  const handleBuyNFT = async () => {
+    if (!isConnected) {
+      toast({
+        title: "Wallet not connected",
+        description: "Please connect your wallet to purchase a membership NFT",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsPurchasing(true);
+      toast({
+        title: "Purchase initiated",
+        description: "Preparing your membership NFT transaction...",
+      });
+      
+      const provider = await getProvider();
+      const signer = provider.getSigner();
+      
+      const NFT_CONTRACT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
+      
+      const mintInterface = ["function mint(address to) external payable"];
+      
+      const nftContract = new ethers.Contract(
+        NFT_CONTRACT_ADDRESS,
+        mintInterface,
+        signer
+      );
+      
+      const tx = await executeTransaction(
+        () => nftContract.mint(address, { value: ethers.utils.parseEther("0") }),
+        {
+          type: 'erc721_mint',
+          description: 'Minting Resistance DAO Membership NFT',
+          timeout: 120000,
+          maxRetries: 3,
+          backoffMs: 5000,
+          nftConfig: {
+            tokenAddress: NFT_CONTRACT_ADDRESS,
+            amount: 1,
+            standard: "ERC721",
+            name: "DAO Membership NFT"
+          }
+        },
+        provider.provider
+      );
+      
       toast({
         title: "Purchase successful!",
-        description: "Your membership NFT has been minted.",
-        variant: "default" // Changed from "success" to "default"
+        description: "Your membership NFT has been minted. Transaction: " + tx.hash.substring(0, 6) + "...",
+        variant: "default" 
       });
-    }, 2000);
+      
+    } catch (error) {
+      console.error("NFT purchase error:", error);
+      toast({
+        title: "Purchase failed",
+        description: error.message || "There was an error processing your purchase",
+        variant: "destructive"
+      });
+    } finally {
+      setIsPurchasing(false);
+    }
   };
 
   const benefits = [
@@ -107,9 +160,16 @@ const BuyMembershipNFT: React.FC = () => {
                   <Button 
                     onClick={handleBuyNFT}
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    disabled={isPurchasing}
                   >
-                    <ShoppingCart className="mr-2 h-4 w-4" />
-                    Purchase Membership NFT
+                    {isPurchasing ? (
+                      <>Processing...</>
+                    ) : (
+                      <>
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        Purchase Membership NFT
+                      </>
+                    )}
                   </Button>
                 )}
               </CardFooter>
