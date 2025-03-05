@@ -1,11 +1,9 @@
 
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useEffect, useState } from "react";
-import { useUserProfile } from "./useUserProfile";
 
 export const useCustomWallet = () => {
   const { primaryWallet, user } = useDynamicContext();
-  const { profileData } = useUserProfile();
   const [subdomain, setSubdomain] = useState<string | null>(null);
 
   // Only consider connected if we have both wallet and user data
@@ -22,18 +20,13 @@ export const useCustomWallet = () => {
         linkedInFromMetadata: user?.metadata?.["LinkedIn Profile URL"],
         hasVerifications: !!user?.verifications,
         customFieldsKeys: user?.verifications?.customFields ? Object.keys(user?.verifications?.customFields) : [],
-        metadataKeys: user?.metadata ? Object.keys(user?.metadata) : [],
-        profileDataSubdomain: profileData?.subdomainHandle
+        metadataKeys: user?.metadata ? Object.keys(user?.metadata) : []
       });
       
-      // Priority order for subdomain:
-      // 1. User-entered subdomain from profileData (Supabase)
-      // 2. Dynamic SDK name-service-subdomain-handle
-      // 3. Dynamic SDK alias
-      // 4. LinkedIn URL (from either source)
-      // 5. null
-      const userSubdomain = profileData?.subdomainHandle || 
-                          user?.['name-service-subdomain-handle'] || 
+      // Get the subdomain/ENS value from user data
+      // First check for the name-service-subdomain-handle field
+      // Then fall back to other possible sources
+      const userSubdomain = user?.['name-service-subdomain-handle'] || 
                           user?.alias || 
                           user?.verifications?.customFields?.["LinkedIn Profile URL"] || 
                           user?.metadata?.["LinkedIn Profile URL"] || 
@@ -41,15 +34,13 @@ export const useCustomWallet = () => {
       
       setSubdomain(userSubdomain);
       
-      if (profileData?.subdomainHandle) {
-        console.log("[useCustomWallet] Using user-entered subdomain from profile:", profileData.subdomainHandle);
-      } else if (user?.['name-service-subdomain-handle']) {
-        console.log("[useCustomWallet] Using name-service-subdomain-handle:", user?.['name-service-subdomain-handle']);
+      if (!user?.['name-service-subdomain-handle']) {
+        console.log("[useCustomWallet] name-service-subdomain-handle not found, using fallback:", userSubdomain);
       } else {
-        console.log("[useCustomWallet] No subdomain found from primary sources, using fallback:", userSubdomain);
+        console.log("[useCustomWallet] Using name-service-subdomain-handle:", user?.['name-service-subdomain-handle']);
       }
     }
-  }, [user, profileData]);
+  }, [user]);
 
   return {
     isConnected: isFullyConnected,
