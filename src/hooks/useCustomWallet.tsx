@@ -12,9 +12,29 @@ export const useCustomWallet = () => {
   // Effect to handle subdomain retrieval and logging
   useEffect(() => {
     if (user) {
-      // Log available user data for debugging
-      console.log("[useCustomWallet] User data:", {
-        nameServiceSubdomain: user?.['name-service-subdomain-handle'],
+      // Check each property on the user object to find subdomain-related fields
+      const userProps = Object.keys(user).filter(key => 
+        typeof user[key as keyof typeof user] !== 'function' && 
+        key !== 'verifications' && 
+        key !== 'metadata'
+      );
+      
+      // Log all available user properties for debugging
+      console.log("[useCustomWallet] User properties:", userProps);
+      console.log("[useCustomWallet] Direct check for name-service fields:", {
+        // Try different case variations to find the right property
+        nameServiceSubdomainHandle: user?.['name-service-subdomain-handle'],
+        nameServiceSubdomain: user?.['name-service-subdomain'],
+        nameService: user?.['name-service'],
+        // Check if the property exists by looking at property descriptor
+        hasNameServiceSubdomainHandle: Object.getOwnPropertyDescriptor(user, 'name-service-subdomain-handle') !== undefined,
+        // Check using hasOwnProperty method
+        hasOwnNameServiceProperty: user.hasOwnProperty('name-service-subdomain-handle')
+      });
+      
+      // Check nested properties
+      console.log("[useCustomWallet] User data structure:", {
+        nameServiceSubdomainHandle: user?.['name-service-subdomain-handle'],
         alias: user?.alias,
         linkedInFromVerifications: user?.verifications?.customFields?.["LinkedIn Profile URL"],
         linkedInFromMetadata: user?.metadata?.["LinkedIn Profile URL"],
@@ -39,6 +59,20 @@ export const useCustomWallet = () => {
       } else {
         console.log("[useCustomWallet] Using name-service-subdomain-handle:", user?.['name-service-subdomain-handle']);
       }
+    }
+  }, [user]);
+
+  // Additional logging when user object changes
+  useEffect(() => {
+    if (user) {
+      console.log("[useCustomWallet] User object updated, checking for subdomain field...");
+      
+      // Try to access the field with different methods
+      const nameServiceField = user?.['name-service-subdomain-handle'];
+      console.log("[useCustomWallet] Subdomain access result:", nameServiceField);
+      
+      // Print the user object type
+      console.log("[useCustomWallet] User object type:", typeof user, user.constructor?.name);
     }
   }, [user]);
 

@@ -161,10 +161,16 @@ const Settings: React.FC = () => {
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4 text-yellow-300">User Data Debug</h2>
                 <div className="space-y-2 text-white/80 text-sm">
+                  <p><span className="font-bold">User object type:</span> {typeof user} / {user?.constructor?.name}</p>
                   <p><span className="font-bold">name-service-subdomain-handle:</span> {user?.['name-service-subdomain-handle'] || 'Not set'}</p>
                   <p><span className="font-bold">alias:</span> {user?.alias || 'Not set'}</p>
                   <p><span className="font-bold">LinkedIn URL:</span> {user?.verifications?.customFields?.["LinkedIn Profile URL"] || user?.metadata?.["LinkedIn Profile URL"] || 'Not set'}</p>
                   <p><span className="font-bold">Resolved subdomain:</span> {subdomain || 'Using address fallback'}</p>
+                  <p><span className="font-bold">Available properties:</span> {user ? Object.keys(user).filter(key => 
+                      typeof user[key as keyof typeof user] !== 'function' && 
+                      key !== 'verifications' && 
+                      key !== 'metadata'
+                    ).join(', ') : 'No properties'}</p>
                 </div>
               </CardContent>
             </Card>
