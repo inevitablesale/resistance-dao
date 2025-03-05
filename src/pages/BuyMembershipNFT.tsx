@@ -27,7 +27,7 @@ const BuyMembershipNFT: React.FC = () => {
       toast({
         title: "Purchase successful!",
         description: "Your membership NFT has been minted.",
-        variant: "success"
+        variant: "default" // Changed from "success" to "default"
       });
     }, 2000);
   };
