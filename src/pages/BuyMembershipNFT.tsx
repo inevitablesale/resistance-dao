@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { executeTransaction } from "@/services/transactionManager";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
 import { ethers } from "ethers";
+import { useFormoTracking } from "@/hooks/useFormoTracking";
 
 const BuyMembershipNFT: React.FC = () => {
   const { isConnected, address } = useCustomWallet();
@@ -19,6 +19,7 @@ const BuyMembershipNFT: React.FC = () => {
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const { trackNFTPurchase } = useFormoTracking();
 
   const handleBuyNFT = async () => {
     if (!isConnected) {
@@ -67,6 +68,8 @@ const BuyMembershipNFT: React.FC = () => {
         },
         provider.provider
       );
+      
+      trackNFTPurchase(tx.hash);
       
       toast({
         title: "Purchase successful!",

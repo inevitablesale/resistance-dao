@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNavigate } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { useFormoTracking } from "@/hooks/useFormoTracking";
 
 const Settings: React.FC = () => {
   const { isConnected, address } = useCustomWallet();
@@ -19,6 +19,8 @@ const Settings: React.FC = () => {
   
   const { data: nftBalance, isLoading: isLoadingNFT } = useNFTBalance(address);
   const hasMembershipNFT = nftBalance && nftBalance > 0;
+  
+  const { trackReferralLinkGenerated, trackReferralLinkShared } = useFormoTracking();
   
   // Check if this is the first visit after connecting wallet
   useEffect(() => {
@@ -34,6 +36,13 @@ const Settings: React.FC = () => {
     ? `https://www.resistancedao.xyz/r/${address}`
     : "";
 
+  // Track referral link generation when it becomes available
+  useEffect(() => {
+    if (isConnected && address && referralLink) {
+      trackReferralLinkGenerated();
+    }
+  }, [isConnected, address, referralLink, trackReferralLinkGenerated]);
+
   const stats = {
     linkClicks: 0, // Reset to 0 as requested
     walletsSignedUp: 0, // Changed from appointments
@@ -44,6 +53,7 @@ const Settings: React.FC = () => {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);
+    trackReferralLinkShared('clipboard');
     toast({
       title: "Link copied!",
       description: "Referral link copied to clipboard",
@@ -71,6 +81,7 @@ const Settings: React.FC = () => {
           title: "Instagram Sharing",
           description: "Copy the link and share it on Instagram",
         });
+        trackReferralLinkShared('instagram');
         return;
       case 'sms':
         shareUrl = `sms:?body=${encodedMessage} ${encodedUrl}`;
@@ -78,6 +89,7 @@ const Settings: React.FC = () => {
     }
     
     if (shareUrl) {
+      trackReferralLinkShared(channel);
       window.open(shareUrl, '_blank');
     }
   };
