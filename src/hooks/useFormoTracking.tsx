@@ -1,4 +1,3 @@
-
 import { useFormoAnalytics } from '@formo/analytics';
 import { useEffect } from 'react';
 import { useCustomWallet } from './useCustomWallet';
@@ -24,11 +23,10 @@ export const useFormoTracking = () => {
   // Track wallet connection status
   useEffect(() => {
     if (analytics && isConnected && address) {
-      // Formo Analytics SDK expects a user object with address property
+      // Formo Analytics SDK expects a user object with only specific properties
       analytics.identify({
         address: address,
-        providerName: 'wallet',
-        connectionTimestamp: new Date().toISOString()
+        providerName: 'wallet'
       });
       console.log(`[Formo] Wallet identified: ${address}`);
     }
