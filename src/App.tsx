@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -34,8 +33,8 @@ const evmNetworks = [
     displayName: 'Polygon',
     nativeCurrency: {
       decimals: 18,
-      name: 'MATIC',
-      symbol: 'MATIC',
+      name: 'POL',
+      symbol: 'POL',
       iconUrl: 'https://app.dynamic.xyz/assets/networks/polygon.svg',
     },
     networkId: 137,
