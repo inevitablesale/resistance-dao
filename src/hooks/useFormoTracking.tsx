@@ -24,11 +24,14 @@ export const useFormoTracking = () => {
   // Track wallet connection status
   useEffect(() => {
     if (analytics && isConnected && address) {
-      // The identify method should have a user ID (address) as first argument 
-      // and traits object as an optional second argument
-      analytics.identify(address, {
-        walletAddress: address,
-        connectionTimestamp: new Date().toISOString(),
+      // In the Formo Analytics SDK, identify() might only accept a single argument
+      // that contains both the ID and traits in one object
+      analytics.identify({
+        id: address,
+        traits: {
+          walletAddress: address,
+          connectionTimestamp: new Date().toISOString(),
+        }
       });
       console.log(`[Formo] Wallet identified: ${address}`);
     }
