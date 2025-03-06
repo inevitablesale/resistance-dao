@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Facebook, Instagram, MessageSquare, Share2, ExternalLink, Shield, ChevronRight } from "lucide-react";
+import { Copy, Facebook, Instagram, MessageSquare, Share2, ExternalLink, Shield, ChevronRight, AlertCircle } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNavigate } from "react-router-dom";
@@ -34,10 +35,9 @@ const Settings: React.FC = () => {
     : "";
 
   const stats = {
-    linkClicks: 2,
-    appointments: 0,
-    invoicesBilled: 0,
-    invoicesPaid: 0,
+    linkClicks: 0, // Reset to 0 as requested
+    walletsSignedUp: 0, // Changed from appointments
+    nftsPurchased: 0, // Changed from invoicesBilled
     pendingRewards: "0.00",
     paidRewards: "0.00"
   };
@@ -95,6 +95,16 @@ const Settings: React.FC = () => {
         </div>
 
         <div className="container mx-auto py-8 px-4 max-w-6xl pt-32 relative z-10">
+          {/* Under Construction Notice */}
+          <Card className="mb-8 bg-yellow-900/30 border-yellow-500/30 backdrop-blur-sm">
+            <CardContent className="p-6 flex items-center gap-3">
+              <AlertCircle className="h-6 w-6 text-yellow-400 flex-shrink-0" />
+              <p className="text-yellow-200">
+                This page is currently under construction. Some features may not be fully functional.
+              </p>
+            </CardContent>
+          </Card>
+          
           {isFirstVisit && isConnected && (
             <Card className="mb-8 bg-black/40 border-blue-500/30 backdrop-blur-sm">
               <CardContent className="p-6">
@@ -225,8 +235,8 @@ const Settings: React.FC = () => {
             </>
           )}
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {/* Stats Cards - Updated labels and removed Invoices Paid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
               <CardContent className="p-6 flex flex-col items-center justify-center">
                 <span className="text-gray-400 mb-2">Link Clicks</span>
@@ -236,22 +246,15 @@ const Settings: React.FC = () => {
             
             <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
               <CardContent className="p-6 flex flex-col items-center justify-center">
-                <span className="text-gray-400 mb-2">Appointments</span>
-                <span className="text-3xl font-bold text-blue-400">{stats.appointments}</span>
+                <span className="text-gray-400 mb-2">Wallets Signed Up</span>
+                <span className="text-3xl font-bold text-blue-400">{stats.walletsSignedUp}</span>
               </CardContent>
             </Card>
             
             <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
               <CardContent className="p-6 flex flex-col items-center justify-center">
-                <span className="text-gray-400 mb-2">Invoices Billed</span>
-                <span className="text-3xl font-bold text-blue-400">{stats.invoicesBilled}</span>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
-              <CardContent className="p-6 flex flex-col items-center justify-center">
-                <span className="text-gray-400 mb-2">Invoices Paid</span>
-                <span className="text-3xl font-bold text-blue-400">{stats.invoicesPaid}</span>
+                <span className="text-gray-400 mb-2">NFTs Purchased</span>
+                <span className="text-3xl font-bold text-blue-400">{stats.nftsPurchased}</span>
               </CardContent>
             </Card>
           </div>
