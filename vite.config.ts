@@ -12,7 +12,9 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      jsxRuntime: 'automatic',
+    }),
     mode === 'development' &&
     componentTagger(),
     nodePolyfills({
@@ -32,7 +34,8 @@ export default defineConfig(({ mode }) => ({
     include: [
       '@dynamic-labs/sdk-react-core',
       '@dynamic-labs/ethereum',
-      '@dynamic-labs/ethereum-aa'
+      '@dynamic-labs/ethereum-aa',
+      '@mailchain/sdk'
     ],
     esbuildOptions: {
       // Node.js global to browser globalThis
