@@ -24,6 +24,8 @@ export const useFormoTracking = () => {
   // Track wallet connection status
   useEffect(() => {
     if (analytics && isConnected && address) {
+      // The identify method should have a user ID (address) as first argument 
+      // and traits object as an optional second argument
       analytics.identify(address, {
         walletAddress: address,
         connectionTimestamp: new Date().toISOString(),
