@@ -26,7 +26,7 @@ export function TerminalMini({ minimized = false, onToggleMinimize }: TerminalMi
   const handleCommand = (cmd: string) => {
     const lowerCmd = cmd.toLowerCase().trim();
     
-    addLine(`> ${cmd}`);
+    addLine(`${'>'}' ${cmd}`);
     
     // Basic command responses
     switch(lowerCmd) {
@@ -109,7 +109,7 @@ export function TerminalMini({ minimized = false, onToggleMinimize }: TerminalMi
               </div>
               
               <form onSubmit={handleSubmit} className="flex">
-                <span className="text-toxic-neon mr-2 font-mono">></span>
+                <span className="text-toxic-neon mr-2 font-mono">{`>`}</span>
                 <input
                   type="text"
                   value={inputValue}
@@ -123,7 +123,7 @@ export function TerminalMini({ minimized = false, onToggleMinimize }: TerminalMi
           
           {minimized && (
             <div className="bg-black border border-toxic-neon/30 rounded p-2 font-mono text-sm text-toxic-neon">
-              >> Terminal in standby mode. Click to interact.
+              {`>>`} Terminal in standby mode. Click to interact.
             </div>
           )}
         </div>
