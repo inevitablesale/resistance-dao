@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -24,19 +23,6 @@ const Index = () => {
   const [terminalStage, setTerminalStage] = useState<AppStage>("typing");
   const [showEmergencyTransmission, setShowEmergencyTransmission] = useState(false);
   const [authStage, setAuthStage] = useState<AuthStage>("pre-boot");
-  
-  // Check for existing authentication on mount
-  useEffect(() => {
-    const isAuthenticated = localStorage.getItem('resistance_authenticated') === 'true';
-    if (isAuthenticated) {
-      setAuthStage("authenticated");
-    }
-  }, []);
-  
-  // Debug terminalStage changes
-  useEffect(() => {
-    console.log("Terminal stage changed to:", terminalStage);
-  }, [terminalStage]);
   
   // Community activity simulation
   useEffect(() => {

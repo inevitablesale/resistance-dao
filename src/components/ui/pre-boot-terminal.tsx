@@ -167,7 +167,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         );
         
         setTimeout(() => {
-          localStorage.setItem('resistance_authenticated', 'true');
           onAuthenticated();
         }, 2000);
       } else {
