@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -313,6 +312,29 @@ const Index = () => {
                     <Share2 className="w-5 h-5 mr-2" />
                     Scout Settlements
                   </ToxicButton>
+                </div>
+
+                <div className="mb-6 p-4 bg-black/50 border border-apocalypse-red/30 rounded-lg relative">
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-apocalypse-red/20 flex items-center justify-center">
+                      <Radiation className="w-6 h-6 text-apocalypse-red" />
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-mono text-apocalypse-red mb-2">Resource Allocation Protocol</h4>
+                      <p className="text-white/80 mb-3 text-sm">
+                        <span className="text-apocalypse-red font-semibold">Request Mission Sponsorship</span> - Survivors with vital projects can request Resistance support. 
+                        Present your mission to gather support and resources from the collective. Projects that strengthen our network receive priority allocation.
+                      </p>
+                      <p className="text-white/80 mb-3 text-sm">
+                        <span className="text-toxic-neon font-semibold">Scout Settlements</span> - Browse existing Resistance outposts and missions. 
+                        Support vital projects with your Resistance Dollars and gain influence in the territories you help establish.
+                      </p>
+                      <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
+                        <span className="text-toxic-neon font-semibold block mb-1">» SURVIVAL DIRECTIVE «</span>
+                        All Resistance projects undergo rigorous community vetting before receiving support. Only projects with sustainable survival value will be approved.
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-6 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
@@ -633,107 +655,3 @@ const Index = () => {
                     <CircleDollarSign className="w-6 h-6 text-toxic-neon" />
                   </div>
                   <div>
-                    <div className="text-toxic-neon/70 text-sm">Community Support</div>
-                    <div className="text-2xl font-semibold text-white">
-                      {isLoadingStats ? (
-                        <span className="animate-pulse">Calculating...</span>
-                      ) : (
-                        formatCurrency(stats?.totalLockedValue || 0)
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </ToxicCard>
-
-              <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-full bg-toxic-neon/10">
-                    <Users className="w-6 h-6 text-toxic-neon" />
-                  </div>
-                  <div>
-                    <div className="text-toxic-neon/70 text-sm">Surviving Members</div>
-                    <div className="text-2xl font-semibold text-white">
-                      {isLoadingStats ? (
-                        <span className="animate-pulse">Counting...</span>
-                      ) : (
-                        formatNumber(stats?.totalHolders || 0)
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </ToxicCard>
-
-              <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-full bg-toxic-neon/10">
-                    <Scale className="w-6 h-6 text-toxic-neon" />
-                  </div>
-                  <div>
-                    <div className="text-toxic-neon/70 text-sm">Active Settlements</div>
-                    <div className="text-2xl font-semibold text-white">
-                      {isLoadingStats ? (
-                        <span className="animate-pulse">Searching...</span>
-                      ) : (
-                        formatNumber(stats?.activeProposals || 0)
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </ToxicCard>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="py-24 relative radiation-bg">
-        <div className="container px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-toxic-neon toxic-glow">
-              Test Market Interest, Then Launch With Confidence
-            </h2>
-            <p className="text-xl text-white/70 mb-12">
-              Collect soft commitments from interested supporters and build your launch community before investing in development.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <ToxicCard>
-              <ToxicCardContent>
-                <div className="mb-4">
-                  <CircleDollarSign className="w-8 h-8 text-toxic-neon" />
-                </div>
-                <p className="text-white/70">
-                  Supporters indicate their potential investment amount through soft pledges with a voting fee to RD. Test your project's market interest verified without requiring immediate investment.
-                </p>
-              </ToxicCardContent>
-            </ToxicCard>
-
-            <ToxicCard>
-              <ToxicCardContent>
-                <div className="mb-4">
-                  <Share2 className="w-8 h-8 text-toxic-neon" />
-                </div>
-                <p className="text-white/70">
-                  Connect directly with interested supporters and track their soft commitment amounts. Build reports that provide concrete proof of market interest.
-                </p>
-              </ToxicCardContent>
-            </ToxicCard>
-
-            <ToxicCard>
-              <ToxicCardContent>
-                <div className="mb-4">
-                  <CircleDollarSign className="w-8 h-8 text-toxic-neon" />
-                </div>
-                <p className="text-white/70">
-                  Once interest is proven, launch with confidence knowing there's a committed community ready to support your project from day one.
-                </p>
-              </ToxicCardContent>
-            </ToxicCard>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-};
-
-export default Index;

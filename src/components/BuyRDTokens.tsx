@@ -30,16 +30,16 @@ export const BuyRDTokens = () => {
       const tx = await purchaseTokens(signer, amount);
       
       toast({
-        title: "Bounty Funded",
-        description: `Successfully contributed ${tx.amount} RD tokens to the bounty pool.`,
+        title: "Conversion Complete",
+        description: `Successfully converted ${tx.amount} USDC to RD tokens to fuel the resistance.`,
       });
       
       setAmount("");
     } catch (error: any) {
       console.error("Purchase error:", error);
       toast({
-        title: "Funding Failed",
-        description: error.message || "Failed to fund bounty. Please try again.",
+        title: "Conversion Failed",
+        description: error.message || "Failed to convert to resistance dollars. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -51,11 +51,11 @@ export const BuyRDTokens = () => {
     <div className="flex flex-col md:flex-row items-center gap-4 my-8 p-4 bg-apocalypse-charcoal/80 rounded-xl border border-apocalypse-red/30">
       <div className="flex-1 min-w-0">
         <h3 className="text-xl font-mono text-apocalypse-red flex items-center gap-2 mb-2">
-          <Target className="w-5 h-5" />
-          Fund Bounty Hunters
+          <Coins className="w-5 h-5" />
+          Convert to Resistance Dollars
         </h3>
         <p className="text-white/70 text-sm mb-4">
-          Support bounty hunters tracking mutant protocol criminals across the wasteland
+          Transform your Old World currency (USDC) into Resistance Dollars (RD) - the only currency survivors trust in the wasteland
         </p>
         {isConnected ? (
           <div className="flex gap-3">
@@ -72,7 +72,7 @@ export const BuyRDTokens = () => {
               className="bg-gradient-to-r from-apocalypse-red to-apocalypse-rust hover:from-apocalypse-red/90 hover:to-apocalypse-rust/90 min-w-[120px]"
             >
               <Shield className="w-4 h-4 mr-2" />
-              {isLoading ? "Processing..." : "Fund Bounty"}
+              {isLoading ? "Converting..." : "Convert Currency"}
             </Button>
           </div>
         ) : (
