@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
-import { Radiation, Target, Shield, Terminal, Zap, AlertTriangle, RotateCw, Check, Skull, Binary } from "lucide-react";
+import { Radiation, Target, Shield, Terminal, Zap, AlertTriangle, RotateCw, Check } from "lucide-react";
 import { ToxicButton } from "./toxic-button";
 
 interface TerminalTypewriterProps {
@@ -31,33 +31,32 @@ type AssessmentQuestion = {
   }[];
 };
 
-// Enhanced boot messages with better narrative
 const BOOT_MESSAGES = {
   initializing: [
-    "RESISTANCE OS v3.2.1 INITIALIZING...",
-    "CHECKING BLOCKCHAIN INTEGRITY...",
-    "DETECTING SURVIVING PROTOCOLS...",
+    "SYSTEM INITIALIZING...",
+    "CHECKING MEMORY INTEGRITY...",
+    "DETECTING HARDWARE COMPONENTS...",
     "RADIATION LEVELS: HIGH BUT TOLERABLE",
-    "LOADING DECENTRALIZED CORE MODULES..."
+    "LOADING CORE MODULES..."
   ],
   diagnosing: [
-    "SCANNING FOR HOSTILE ENTITIES...",
-    "NEURAL NETWORK STATUS: DEGRADED BUT FUNCTIONAL",
+    "DIAGNOSTIC CHECK INITIATED...",
+    "NEURAL NETWORK STATUS: DEGRADED",
     "CHECKING QUANTUM ENCRYPTION CELLS...",
-    "BLOCKCHAIN INTEGRITY: 62% CORRUPTED",
-    "INITIATING WASTELAND SURVIVAL PROTOCOLS..."
+    "DATA STORAGE: 62% CORRUPTED",
+    "ATTEMPTING AUTO-REPAIR SEQUENCES..."
   ],
   connecting: [
-    "ESTABLISHING SECURE P2P CONNECTION...",
+    "ESTABLISHING SECURE CONNECTION...",
     "SCANNING FOR SURVIVOR OUTPOSTS...",
-    "ACCESSING BOUNTY HUNTER DATABASE...",
-    "VALIDATING RESISTANCE DAO MEMBERSHIP...",
+    "BOUNTY HUNTER DATABASE DETECTED...",
+    "TRADING NETWORKS LOCATED...",
     "SYNCHRONIZING WITH WASTELAND ECONOMY..."
   ],
   complete: [
     "SYSTEM RECOVERY COMPLETE",
     "WELCOME TO THE RESISTANCE NETWORK",
-    "THE OLD FINANCIAL WORLD DIED. WE SURVIVE AMONG ITS RUINS.",
+    "THE OLD WORLD DIED. WE LIVE AMONG ITS RUINS.",
     "JOIN US TO REBUILD FROM THE ASHES."
   ]
 };
@@ -196,11 +195,10 @@ export function TerminalTypewriter({
   const [questionnaireStarted, setQuestionnaireStarted] = useState(false);
   const [typingStarted, setTypingStarted] = useState(false);
   const [typingComplete, setTypingComplete] = useState(false);
-  const [progressFlicker, setProgressFlicker] = useState(false);
   
   const terminalRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
 
+  // Setup boot sequence
   useEffect(() => {
     if (!showBootSequence) {
       setBootStage("complete");
@@ -215,14 +213,16 @@ export function TerminalTypewriter({
       setBootProgress(0);
     }
     
-    // Smoother progress bar with occasional flickers
-    let lastProgress = 0;
-    let progressIncrement = 1;
-    const maxProgress = 100;
     const bootInterval = setInterval(() => {
       setBootProgress(prev => {
-        // Ensure we reach exactly 100% by the end
-        if (prev >= maxProgress) {
+        const newProgress = prev + (Math.random() * 3 + 1);
+        
+        if (Math.random() < 0.15) {
+          setBootGlitch(true);
+          setTimeout(() => setBootGlitch(false), 150);
+        }
+        
+        if (newProgress >= 100) {
           clearInterval(bootInterval);
           
           setTimeout(() => {
@@ -232,57 +232,20 @@ export function TerminalTypewriter({
               setBootStage("complete");
               setIsComplete(true);
             }
-          }, 500);
-          
-          return maxProgress;
+          }, 1000);
         }
         
-        // Smoother, more natural progress increments with gradual acceleration
-        const remainingProgress = maxProgress - prev;
-        const timeLeft = bootMessages.length - currentBootMessage;
-        
-        // Adjust increment based on remaining progress and time
-        if (remainingProgress > 50 && timeLeft > 3) {
-          progressIncrement = Math.sin(prev / 25) * 2 + Math.random() * 1.5 + 1;
-        } else if (remainingProgress > 20 && timeLeft > 1) {
-          progressIncrement = Math.sin(prev / 25) * 2.5 + Math.random() * 2 + 2;
-        } else {
-          // Final sprint to ensure we reach 100%
-          progressIncrement = remainingProgress / (timeLeft + 1);
-          if (progressIncrement < 3) progressIncrement = 3;
-        }
-        
-        // Ensure we don't go over 100%
-        const newProgress = Math.min(prev + progressIncrement, maxProgress);
-        
-        // Occasional progress bar glitch
-        if (Math.random() < 0.1 && newProgress - lastProgress > 5) {
-          setProgressFlicker(true);
-          setTimeout(() => setProgressFlicker(false), 100);
-        }
-        lastProgress = newProgress;
-        
-        // Terminal glitch effect
-        if (Math.random() < 0.15) {
-          setBootGlitch(true);
-          setTimeout(() => setBootGlitch(false), 150);
-        }
-        
-        return newProgress;
+        return newProgress > 100 ? 100 : newProgress;
       });
-    }, 70);
+    }, 100);
     
-    // Message typing effect 
     const messageInterval = setInterval(() => {
       if (currentBootMessage < bootMessages.length - 1) {
         setCurrentBootMessage(prev => prev + 1);
       } else {
         clearInterval(messageInterval);
-        
-        // Ensure we reach 100% if we're at the last message
-        setBootProgress(maxProgress);
       }
-    }, 600);
+    }, 1200);
     
     return () => {
       clearInterval(bootInterval);
@@ -290,6 +253,7 @@ export function TerminalTypewriter({
     };
   }, [bootStage, showBootSequence]);
   
+  // Setup cursor blinking
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setCursorVisible(prev => !prev);
@@ -298,6 +262,7 @@ export function TerminalTypewriter({
     return () => clearInterval(cursorInterval);
   }, []);
   
+  // Setup typing animation
   useEffect(() => {
     if (!isComplete || bootStage !== "complete" || typingStarted) {
       return;
@@ -330,7 +295,7 @@ export function TerminalTypewriter({
           onTypingComplete();
         }
       }
-    }, 8000); // Give more time for the typing animation
+    }, textToType.length * typeDelay + 5000);
     
     return () => {
       clearInterval(typingInterval);
@@ -338,6 +303,7 @@ export function TerminalTypewriter({
     };
   }, [textToType, typeDelay, bootStage, isComplete, onTypingComplete, typingStarted, typingComplete]);
   
+  // Auto-start questionnaire if showQuestionnaire is true
   useEffect(() => {
     if (showQuestionnaire && !questionnaireStarted && !selectedRole) {
       setQuestionnaireStarted(true);
@@ -391,7 +357,6 @@ export function TerminalTypewriter({
         )}
       >
         <div className="scanline absolute inset-0 pointer-events-none"></div>
-        <div className="crt-screen-effect absolute inset-0 pointer-events-none"></div>
         
         {showBootSequence && (bootStage === "initializing" || bootStage === "diagnosing" || bootStage === "connecting") && (
           <div className="mb-4">
@@ -400,8 +365,8 @@ export function TerminalTypewriter({
                 <RotateCw className={`h-4 w-4 mr-2 ${bootProgress < 100 ? 'animate-spin' : ''}`} />
                 <span>
                   {bootStage === "initializing" && "SYSTEM INITIALIZATION"}
-                  {bootStage === "diagnosing" && "WASTELAND DIAGNOSTICS"}
-                  {bootStage === "connecting" && "RESISTANCE NETWORK CONNECTION"}
+                  {bootStage === "diagnosing" && "SYSTEM DIAGNOSTICS"}
+                  {bootStage === "connecting" && "NETWORK CONNECTION"}
                 </span>
               </div>
               <div className="text-toxic-neon font-mono text-sm">
@@ -411,8 +376,7 @@ export function TerminalTypewriter({
             
             <div className="w-full bg-black/60 h-2 rounded-full overflow-hidden border border-toxic-neon/30">
               <div 
-                ref={progressRef}
-                className={`h-full transition-all ${progressFlicker ? 'opacity-50' : 'opacity-100'} bg-toxic-neon/70 rounded-full`}
+                className="h-full bg-toxic-neon/70 rounded-full transition-all duration-100"
                 style={{ width: `${bootProgress}%` }}
               ></div>
             </div>
@@ -432,11 +396,11 @@ export function TerminalTypewriter({
               <div className="mt-4 p-2 border border-apocalypse-red/40 bg-apocalypse-red/10 rounded">
                 <div className="flex items-center text-apocalypse-red mb-1">
                   <AlertTriangle className="h-4 w-4 mr-1" />
-                  <span className="text-sm font-bold">WARNING: DECENTRALIZED SYSTEMS COMPROMISED</span>
+                  <span className="text-sm font-bold">WARNING: SYSTEM DEGRADED</span>
                 </div>
                 <p className="text-white/70 text-xs">
-                  Multiple critical protocols corrupted. Running in emergency mode.
-                  Token bridges down. Full consensus recovery required.
+                  Multiple critical systems compromised. Running in emergency mode.
+                  Protocol corruption detected. Full system recovery required.
                 </p>
               </div>
             )}
@@ -458,27 +422,14 @@ export function TerminalTypewriter({
           <div className="assessment-container mt-4">
             {calculatingResult ? (
               <div className="text-center py-8">
-                <div className="inline-block relative">
-                  <div className="rounded-full h-16 w-16 border-4 border-toxic-neon/30 border-t-toxic-neon animate-spin mb-4"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Binary className="h-6 w-6 text-toxic-neon/50" />
-                  </div>
-                </div>
+                <div className="inline-block rounded-full h-16 w-16 border-4 border-toxic-neon/30 border-t-toxic-neon animate-spin mb-4"></div>
                 <h3 className="text-toxic-neon text-xl mb-2">Analyzing Survival Profile</h3>
                 <p className="text-white/70">Calculating optimal wasteland role based on your responses...</p>
-                <div className="mt-4 flex justify-center gap-2">
-                  <div className="px-3 py-1 bg-black/50 border border-toxic-neon/20 text-toxic-neon/60 text-xs">
-                    <span className="font-mono">SCANNING NEURAL PATTERNS</span>
-                  </div>
-                  <div className="px-3 py-1 bg-black/50 border border-apocalypse-red/20 text-apocalypse-red/60 text-xs">
-                    <span className="font-mono">EVALUATING SURVIVAL TRAITS</span>
-                  </div>
-                </div>
               </div>
             ) : (
               <div className="assessment-content">
                 <div className="text-center mb-6">
-                  <h3 className="text-xl text-toxic-neon mb-2 broken-glass inline-block px-2 py-1">Wasteland Adaptation Protocol</h3>
+                  <h3 className="text-xl text-toxic-neon mb-2">Wasteland Adaptation Protocol</h3>
                   <p className="text-white/70">
                     To determine your optimal role in the Resistance, complete this wasteland survival assessment.
                   </p>
@@ -493,7 +444,7 @@ export function TerminalTypewriter({
                   </div>
                   <div className="w-full h-1 bg-black/60 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-toxic-neon rounded-full transition-all duration-500 ease-out"
+                      className="h-full bg-toxic-neon rounded-full transition-all"
                       style={{ width: `${((currentQuestion) / ASSESSMENT_QUESTIONS.length) * 100}%` }}
                     ></div>
                   </div>
@@ -506,10 +457,10 @@ export function TerminalTypewriter({
                     {ASSESSMENT_QUESTIONS[currentQuestion].options.map((option, index) => (
                       <button
                         key={index}
-                        className={`w-full text-left p-3 rounded transition-all relative ${
+                        className={`w-full text-left p-3 rounded border transition-all ${
                           answers[currentQuestion] === index 
-                            ? 'bg-toxic-neon/20 border-toxic-neon text-toxic-neon shadow-[0_0_10px_rgba(80,250,123,0.2)]' 
-                            : 'bg-black/40 border border-toxic-neon/30 text-white/80 hover:bg-black/60 hover:border-toxic-neon/60'
+                            ? 'bg-toxic-neon/20 border-toxic-neon text-toxic-neon' 
+                            : 'bg-black/40 border-toxic-neon/30 text-white/80 hover:bg-black/60 hover:border-toxic-neon/60'
                         }`}
                         onClick={() => handleSelectAnswer(currentQuestion, index)}
                       >
@@ -525,12 +476,6 @@ export function TerminalTypewriter({
                           </div>
                           <span>{option.text}</span>
                         </div>
-                        
-                        {answers[currentQuestion] === index && (
-                          <div className="absolute top-0 right-0 p-1">
-                            <Check className="h-4 w-4 text-toxic-neon" />
-                          </div>
-                        )}
                       </button>
                     ))}
                   </div>
@@ -545,7 +490,7 @@ export function TerminalTypewriter({
             <h3 className="text-2xl text-toxic-neon mb-4">Wasteland Role Assessment Complete</h3>
             
             <div className="flex items-center justify-center gap-4 mb-6">
-              <div className={`p-4 rounded-lg border ${selectedRole === 'bounty-hunter' ? 'border-apocalypse-red bg-apocalypse-red/10 shadow-[0_0_15px_rgba(234,56,76,0.2)]' : 'border-white/10 bg-black/30'}`}>
+              <div className={`p-4 rounded-lg border ${selectedRole === 'bounty-hunter' ? 'border-apocalypse-red bg-apocalypse-red/10' : 'border-white/10 bg-black/30'}`}>
                 <Target className={`h-12 w-12 mx-auto mb-2 ${selectedRole === 'bounty-hunter' ? 'text-apocalypse-red' : 'text-white/30'}`} />
                 <div className={`text-center ${selectedRole === 'bounty-hunter' ? 'text-apocalypse-red' : 'text-white/50'}`}>
                   <div className="font-bold">Bounty Hunter</div>
@@ -553,7 +498,7 @@ export function TerminalTypewriter({
                 </div>
               </div>
               
-              <div className={`p-4 rounded-lg border ${selectedRole === 'survivor' ? 'border-toxic-neon bg-toxic-neon/10 shadow-[0_0_15px_rgba(80,250,123,0.2)]' : 'border-white/10 bg-black/30'}`}>
+              <div className={`p-4 rounded-lg border ${selectedRole === 'survivor' ? 'border-toxic-neon bg-toxic-neon/10' : 'border-white/10 bg-black/30'}`}>
                 <Shield className={`h-12 w-12 mx-auto mb-2 ${selectedRole === 'survivor' ? 'text-toxic-neon' : 'text-white/30'}`} />
                 <div className={`text-center ${selectedRole === 'survivor' ? 'text-toxic-neon' : 'text-white/50'}`}>
                   <div className="font-bold">Survivor</div>
@@ -562,9 +507,7 @@ export function TerminalTypewriter({
               </div>
             </div>
             
-            <div className="mb-6 p-4 rounded-lg border border-toxic-neon/30 bg-black/40 text-left relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 rust-overlay pointer-events-none"></div>
-              
+            <div className="mb-6 p-4 rounded-lg border border-toxic-neon/30 bg-black/40 text-left">
               <h4 className="font-bold text-toxic-neon mb-2">
                 {selectedRole === 'bounty-hunter' ? 'Your Bounty Hunter Profile' : 'Your Survivor Profile'}
               </h4>
