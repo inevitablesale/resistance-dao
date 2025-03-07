@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Shield, Target, Radiation } from "lucide-react";
+import { Shield, Target, Radiation, FileText, Map } from "lucide-react";
 import { TerminalMonitor } from "@/components/ui/terminal-monitor";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { DrippingSlime } from "@/components/ui/dripping-slime";
@@ -23,10 +22,8 @@ import { PostAuthLayout } from "@/components/ui/post-auth-layout";
 import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
 import { ProgressIndicator } from "@/components/ui/progress-indicator";
 
-// Define the authentication states
 type AuthStage = "pre-boot" | "authenticating" | "breach-transition" | "post-breach" | "authenticated";
 
-// Define the application stages
 type AppStage = "typing" | "desktop-environment" | "nft-selection" | "questionnaire" | "completed";
 
 const Index = () => {
@@ -40,7 +37,6 @@ const Index = () => {
   const [showDesktopEnvironment, setShowDesktopEnvironment] = useState(false);
   const [initialAppOpened, setInitialAppOpened] = useState(false);
   
-  // Community activity simulation
   useEffect(() => {
     const interval = setInterval(() => {
       setCommunityActivity(Math.floor(Math.random() * 100));
@@ -49,7 +45,6 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Auto-open Network Status app after post-breach
   useEffect(() => {
     if (authStage === "post-breach" && terminalStage === "desktop-environment" && !initialAppOpened) {
       console.log("Auto-opening Network Status app");
@@ -90,7 +85,6 @@ const Index = () => {
     setShowEmergencyTransmission(true);
   };
 
-  // Function to handle authentication completion
   const handleAuthenticated = () => {
     setAuthStage("authenticating");
     
@@ -100,12 +94,13 @@ const Index = () => {
       setTimeout(() => {
         setAuthStage("post-breach");
         
-        // Typing animation will now happen in the post-breach stage
+        setTimeout(() => {
+          setTerminalStage("typing");
+        }, 2500);
       }, 2500);
     }, 500);
   };
 
-  // Prepare sidebar content for authenticated state
   const renderLeftSidebar = () => (
     <>
       <TerminalMini 
@@ -124,10 +119,8 @@ const Index = () => {
     </>
   );
 
-  // Render pre-authentication content
-  const renderPreAuthContent = () => null; // Hide all pre-auth content
+  const renderPreAuthContent = () => null;
 
-  // Render terminal typewriter content
   const renderTypewriterContent = () => (
     <div className="w-full px-4 py-6">
       <TerminalTypewriter 
@@ -137,7 +130,6 @@ const Index = () => {
     </div>
   );
 
-  // Main content with desktop environment
   const renderDesktopEnvironment = () => (
     <div className="w-full px-4 py-6">
       <TerminalMonitor
@@ -148,7 +140,6 @@ const Index = () => {
     </div>
   );
 
-  // Main content with NFT showcase
   const renderNFTContent = () => (
     <NFTShowcase 
       onRoleSelect={handleRoleSelect}
@@ -156,10 +147,8 @@ const Index = () => {
     />
   );
 
-  // Determine what content to show based on the stages
   const renderMainContent = () => {
     if (authStage === "authenticated" || authStage === "post-breach") {
-      // If post-breach or authenticated, show different content based on terminal stage
       if (terminalStage === "nft-selection") {
         console.log("Showing NFT selection content");
         return renderNFTContent();
@@ -167,17 +156,37 @@ const Index = () => {
         console.log("Showing desktop environment");
         return renderDesktopEnvironment();
       } else if (terminalStage === "typing") {
-        // Show terminal typewriter in the authenticated state
         return renderTypewriterContent();
       }
     } else if (authStage === "pre-boot" || authStage === "authenticating" || authStage === "breach-transition") {
-      // Pre-authentication shows nothing
       return renderPreAuthContent();
     }
     
-    // Default fallback (should not reach here)
     return null;
   };
+
+  const journalStages = [
+    { 
+      id: "boot", 
+      label: "System Access Established", 
+      completed: authStage !== "pre-boot" 
+    },
+    { 
+      id: "breach", 
+      label: "Network Security Bypassed", 
+      completed: authStage === "post-breach" || authStage === "authenticated" 
+    },
+    { 
+      id: "desktop", 
+      label: "Resistance Interface Connected", 
+      completed: terminalStage !== "typing" && (authStage === "post-breach" || authStage === "authenticated") 
+    },
+    { 
+      id: "role", 
+      label: "Survivor Identity Confirmed", 
+      completed: userRole !== null 
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
@@ -185,7 +194,6 @@ const Index = () => {
       <div className="dust-particles"></div>
       <div className="fog-overlay"></div>
 
-      {/* Emergency Transmission Popup - only show when authenticated */}
       {(authStage === "authenticated" || authStage === "post-breach") && (
         <EmergencyTransmission 
           isOpen={showEmergencyTransmission} 
@@ -193,16 +201,8 @@ const Index = () => {
         />
       )}
 
-      {/* Progress Indicator */}
       <div className="fixed top-4 right-4 z-50">
-        <ProgressIndicator 
-          stages={[
-            { id: "boot", label: "Boot", completed: authStage !== "pre-boot" },
-            { id: "breach", label: "System Breach", completed: authStage === "post-breach" || authStage === "authenticated" },
-            { id: "desktop", label: "Interface", completed: terminalStage !== "typing" && (authStage === "post-breach" || authStage === "authenticated") },
-            { id: "role", label: "Role Selection", completed: userRole !== null }
-          ]}
-        />
+        <ProgressIndicator stages={journalStages} />
       </div>
 
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -224,7 +224,6 @@ const Index = () => {
             transition={{ duration: 1 }}
             className="w-full"
           >
-            {/* Only show header elements if post-breach or authenticated */}
             {(authStage === "authenticated" || authStage === "post-breach") && (
               <div className="text-center mb-4 flex justify-between items-center">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm font-mono broken-glass">
@@ -244,8 +243,8 @@ const Index = () => {
                   </ToxicButton>
                   
                   <ToxicButton variant="outline" size="sm">
-                    <Shield className="w-4 h-4 mr-2" />
-                    System Status
+                    <FileText className="w-4 h-4 mr-2" />
+                    Journal Entries
                   </ToxicButton>
                 </div>
               </div>
@@ -257,12 +256,11 @@ const Index = () => {
               </div>
               
               <div className="relative z-10 p-6 md:p-8">
-                {/* Only show this header if post-breach or authenticated */}
                 {(authStage === "authenticated" || authStage === "post-breach") && (
                   <div className="flex items-center justify-between mb-4 border-b border-toxic-neon/20 pb-2">
                     <div className="flex items-center">
-                      <Radiation className="h-5 w-5 mr-2 text-toxic-neon" />
-                      <span className="text-toxic-neon font-mono text-lg">RESISTANCE_NETWORK</span>
+                      <FileText className="h-5 w-5 mr-2 text-toxic-neon" />
+                      <span className="text-toxic-neon font-mono text-lg">WASTELAND_JOURNAL</span>
                     </div>
                     
                     <div className="flex gap-1">
@@ -273,7 +271,6 @@ const Index = () => {
                 )}
                 
                 <div className="mb-6">
-                  {/* Conditional rendering based on authentication state */}
                   {authStage === "pre-boot" && (
                     <PreBootTerminal onAuthenticated={handleAuthenticated} />
                   )}
@@ -289,55 +286,5 @@ const Index = () => {
                   )}
                 </div>
                 
-                {/* Show skip button for typing terminal stage only */}
-                {(authStage === "post-breach" || (authStage === "authenticated" && terminalStage === "typing")) && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 2 }}
-                    className="mt-4 text-center"
-                  >
-                    <p className="text-white/70 text-sm mb-3">
-                      Complete the terminal sequence to access the Resistance Network
-                    </p>
-                    <ToxicButton 
-                      onClick={handleTerminalComplete}
-                      variant="ghost"
-                      size="sm"
-                      className="hover:bg-toxic-neon/20 transition-all duration-300"
-                    >
-                      <Radiation className="w-4 h-4 mr-2" />
-                      Skip Intro Sequence
-                    </ToxicButton>
-                  </motion.div>
-                )}
-                
-                {/* Show continue button for desktop environment */}
-                {(authStage === "post-breach" || authStage === "authenticated") && terminalStage === "desktop-environment" && initialAppOpened && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 8 }}
-                    className="mt-4 text-center"
-                  >
-                    <ToxicButton 
-                      onClick={handleDesktopExplored}
-                      variant="default"
-                      size="lg"
-                      className="animate-pulse-subtle"
-                    >
-                      <Target className="w-5 h-5 mr-2" />
-                      Continue to Resistance Role Selection
-                    </ToxicButton>
-                  </motion.div>
-                )}
-              </div>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
-    </div>
-  );
-};
+                {(
 
-export default Index;
