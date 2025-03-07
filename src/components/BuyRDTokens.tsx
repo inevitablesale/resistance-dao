@@ -52,10 +52,10 @@ export const BuyRDTokens = () => {
       <div className="flex-1 min-w-0">
         <h3 className="text-xl font-mono text-blue-300 flex items-center gap-2 mb-2">
           <Coins className="w-5 h-5" />
-          Buy RD Tokens
+          Convert Old World Paper Money
         </h3>
         <p className="text-white/70 text-sm mb-4">
-          Purchase tokens to vote on proposals and support projects
+          Support the war effort and acquire tokens to participate in the new order
         </p>
         {isConnected ? (
           <div className="flex gap-3">
@@ -71,7 +71,7 @@ export const BuyRDTokens = () => {
               disabled={!amount || isLoading}
               className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 min-w-[120px]"
             >
-              {isLoading ? "Processing..." : "Buy"}
+              {isLoading ? "Processing..." : "Convert"}
             </Button>
           </div>
         ) : (
@@ -79,7 +79,7 @@ export const BuyRDTokens = () => {
             onClick={connect}
             className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
           >
-            Connect Wallet
+            Connect Survival Beacon
           </Button>
         )}
       </div>
