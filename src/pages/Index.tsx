@@ -62,8 +62,6 @@ const Index = () => {
     }).format(amount);
   };
 
-  const emergencyTransmissionText = "EMERGENCY TRANSMISSION: IF YOU'RE READING THIS, YOU'VE SURVIVED THE COLLAPSE. THE OLD FINANCIAL WORLD HAS BEEN DESTROYED. WE ARE BUILDING FROM THE ASHES. THE RESISTANCE NEEDS YOU. SHALL WE PLAY A GAME?";
-
   const nftCollection = [
     {
       id: 1,
@@ -127,7 +125,7 @@ const Index = () => {
               
               <div className="mb-6">
                 <TerminalTypewriter 
-                  textToType={emergencyTransmissionText}
+                  textToType=""
                   isConnected={isConnected}
                   onConnect={handleConnectWallet}
                   className="mb-4"

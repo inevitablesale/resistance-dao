@@ -22,6 +22,11 @@ export const TerminalTypewriter = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cursorVisible, setCursorVisible] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
+  const [showFullMessage, setShowFullMessage] = useState(false);
+  
+  const firstPartOfMessage = "EMERGENCY TRANSMISSION: IF YOU'RE READING THIS, YOU'VE SURVIVED THE COLLAPSE. THE OLD FINANCIAL WORLD HAS BEEN DESTROYED. ";
+  const pressEnterMessage = "PRESS [ENTER] TO CONTINUE...";
+  const remainingMessage = "WE ARE BUILDING FROM THE ASHES. THE RESISTANCE NEEDS YOU. SHALL WE PLAY A GAME?";
 
   // Handle cursor blinking
   useEffect(() => {
@@ -32,16 +37,32 @@ export const TerminalTypewriter = ({
     return () => clearInterval(cursorInterval);
   }, []);
 
-  // Handle text typing effect when connected
+  // Handle text typing effect
   useEffect(() => {
     if (!isConnected || isTyping) return;
     
     setIsTyping(true);
     
+    // Reset for reconnection
+    if (currentIndex === 0) {
+      setDisplayedText('');
+      setShowFullMessage(false);
+    }
+    
+    const textToShow = showFullMessage ? 
+      (firstPartOfMessage + remainingMessage) : 
+      (currentIndex >= firstPartOfMessage.length ? 
+        firstPartOfMessage + pressEnterMessage :
+        firstPartOfMessage.substring(0, currentIndex));
+    
     const typeNextChar = () => {
-      if (currentIndex < textToType.length) {
-        setDisplayedText(prev => prev + textToType.charAt(currentIndex));
+      if (currentIndex < (showFullMessage ? (firstPartOfMessage + remainingMessage).length : firstPartOfMessage.length)) {
+        setDisplayedText(textToShow.substring(0, currentIndex + 1));
         setCurrentIndex(prevIndex => prevIndex + 1);
+      } else if (!showFullMessage && currentIndex >= firstPartOfMessage.length) {
+        // We've reached the point to show PRESS ENTER
+        setDisplayedText(firstPartOfMessage + pressEnterMessage);
+        setIsTyping(false);
       } else {
         setIsTyping(false);
       }
@@ -50,7 +71,7 @@ export const TerminalTypewriter = ({
     const typingInterval = setInterval(typeNextChar, typingSpeed);
     
     return () => clearInterval(typingInterval);
-  }, [isConnected, currentIndex, textToType, typingSpeed, isTyping]);
+  }, [isConnected, currentIndex, typingSpeed, isTyping, showFullMessage, firstPartOfMessage, remainingMessage, pressEnterMessage]);
 
   // Reset typing when disconnected
   useEffect(() => {
@@ -58,8 +79,43 @@ export const TerminalTypewriter = ({
       setDisplayedText('');
       setCurrentIndex(0);
       setIsTyping(false);
+      setShowFullMessage(false);
     }
   }, [isConnected]);
+
+  const handleEnterClick = () => {
+    if (!isTyping && !showFullMessage && currentIndex >= firstPartOfMessage.length) {
+      setShowFullMessage(true);
+      setCurrentIndex(0); // Reset to start typing the full message
+      setIsTyping(false); // Allow the typing effect to restart
+    }
+  };
+
+  // Function to parse the displayed text and render the ENTER button inline
+  const renderDisplayedText = () => {
+    if (!isConnected) return null;
+    
+    const enterButtonIndex = displayedText.indexOf('[ENTER]');
+    
+    if (enterButtonIndex === -1) {
+      return <span>{displayedText}</span>;
+    }
+    
+    return (
+      <>
+        <span>{displayedText.substring(0, enterButtonIndex)}</span>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleEnterClick}
+          className="px-2 py-0 h-auto text-xs font-mono bg-apocalypse-red/30 hover:bg-apocalypse-red/50 text-apocalypse-red mx-1 border border-apocalypse-red/50"
+        >
+          ENTER
+        </Button>
+        <span>{displayedText.substring(enterButtonIndex + 7)}</span>
+      </>
+    );
+  };
 
   return (
     <div className={`terminal-container ${className}`}>
@@ -88,7 +144,7 @@ export const TerminalTypewriter = ({
                   <span className="text-xs text-apocalypse-red/70">[DECRYPTION COMPLETE]</span>
                 </div>
                 <div className="flex">
-                  <span>{displayedText}</span>
+                  {renderDisplayedText()}
                   <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
                 </div>
               </div>
