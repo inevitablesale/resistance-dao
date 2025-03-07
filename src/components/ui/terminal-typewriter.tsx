@@ -37,9 +37,9 @@ export const TerminalTypewriter = ({
     return () => clearInterval(cursorInterval);
   }, []);
 
-  // Handle text typing effect
+  // Handle text typing effect - now works regardless of connection state
   useEffect(() => {
-    if (!isConnected || isTyping) return;
+    if (isTyping) return;
     
     setIsTyping(true);
     
@@ -71,17 +71,7 @@ export const TerminalTypewriter = ({
     const typingInterval = setInterval(typeNextChar, typingSpeed);
     
     return () => clearInterval(typingInterval);
-  }, [isConnected, currentIndex, typingSpeed, isTyping, showFullMessage, firstPartOfMessage, remainingMessage, pressEnterMessage]);
-
-  // Reset typing when disconnected
-  useEffect(() => {
-    if (!isConnected) {
-      setDisplayedText('');
-      setCurrentIndex(0);
-      setIsTyping(false);
-      setShowFullMessage(false);
-    }
-  }, [isConnected]);
+  }, [currentIndex, typingSpeed, isTyping, showFullMessage, firstPartOfMessage, remainingMessage, pressEnterMessage]);
 
   const handleEnterClick = () => {
     if (!isTyping && !showFullMessage && currentIndex >= firstPartOfMessage.length) {
@@ -93,8 +83,6 @@ export const TerminalTypewriter = ({
 
   // Function to parse the displayed text and render the ENTER button inline
   const renderDisplayedText = () => {
-    if (!isConnected) return null;
-    
     const enterButtonIndex = displayedText.indexOf('[ENTER]');
     
     if (enterButtonIndex === -1) {
@@ -123,17 +111,30 @@ export const TerminalTypewriter = ({
         <AlertTriangle className="h-5 w-5 text-apocalypse-red animate-pulse" />
         <div className="overflow-hidden w-full">
           {!isConnected ? (
-            <div className="flex items-center justify-center">
-              <Lock className="h-4 w-4 mr-2 text-apocalypse-red animate-pulse" />
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={onConnect}
-                className="text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-3 py-1 h-auto text-xs font-mono"
-              >
-                WOPR MAINFRAME: CONNECT WALLET TO DECRYPT EMERGENCY TRANSMISSION
-              </Button>
-              <Lock className="h-4 w-4 ml-2 text-apocalypse-red animate-pulse" />
+            <div className="typing-text text-apocalypse-red">
+              <div className="flex items-start">
+                <Lock className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
+                <div>
+                  <div className="flex items-center font-bold mb-1">
+                    <span className="mr-2 tracking-wider">WOPR MAINFRAME:</span>
+                    <span className="text-xs text-apocalypse-red/70">[ENCRYPTED TRANSMISSION]</span>
+                  </div>
+                  <div className="flex">
+                    {renderDisplayedText()}
+                    <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
+                  </div>
+                  <div className="mt-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={onConnect}
+                      className="text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-3 py-1 h-auto text-xs font-mono"
+                    >
+                      CONNECT WALLET TO DECRYPT FULL TRANSMISSION
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="typing-text flex items-start text-apocalypse-red">
