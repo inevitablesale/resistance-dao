@@ -24,9 +24,9 @@ export const TerminalTypewriter = ({
   const [isTyping, setIsTyping] = useState(false);
   const [showFullMessage, setShowFullMessage] = useState(false);
   
-  const firstPartOfMessage = "EMERGENCY TRANSMISSION: IF YOU'RE READING THIS, YOU'VE SURVIVED THE COLLAPSE. THE OLD FINANCIAL WORLD HAS BEEN DESTROYED. ";
+  const firstPartOfMessage = "EMERGENCY BROADCAST: SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE. ";
   const pressEnterMessage = "PRESS [ENTER] TO CONTINUE...";
-  const remainingMessage = "WE ARE BUILDING FROM THE ASHES. THE RESISTANCE NEEDS YOU. SHALL WE PLAY A GAME?";
+  const remainingMessage = "THE RESISTANCE NEEDS YOUR HELP. THE OLD WORLD IS GONE. WE ARE BUILDING FROM THE ASHES. SHALL WE PLAY A GAME?";
 
   // Handle cursor blinking
   useEffect(() => {
@@ -37,7 +37,7 @@ export const TerminalTypewriter = ({
     return () => clearInterval(cursorInterval);
   }, []);
 
-  // Handle text typing effect - now works regardless of connection state
+  // Handle text typing effect - works regardless of connection state
   useEffect(() => {
     if (isTyping) return;
     
@@ -116,8 +116,8 @@ export const TerminalTypewriter = ({
                 <Lock className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
                 <div>
                   <div className="flex items-center font-bold mb-1">
-                    <span className="mr-2 tracking-wider">WOPR MAINFRAME:</span>
-                    <span className="text-xs text-apocalypse-red/70">[ENCRYPTED TRANSMISSION]</span>
+                    <span className="mr-2 tracking-wider">EMERGENCY TRANSMISSION:</span>
+                    <span className="text-xs text-apocalypse-red/70 animate-pulse">[SIGNAL WEAK]</span>
                   </div>
                   <div className="flex">
                     {renderDisplayedText()}
@@ -128,9 +128,9 @@ export const TerminalTypewriter = ({
                       variant="ghost" 
                       size="sm" 
                       onClick={onConnect}
-                      className="text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-3 py-1 h-auto text-xs font-mono"
+                      className="text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-3 py-1 h-auto text-xs font-mono border border-apocalypse-red/50 animate-pulse"
                     >
-                      CONNECT WALLET TO DECRYPT FULL TRANSMISSION
+                      CONNECT WALLET FOR SECURE TRANSMISSION
                     </Button>
                   </div>
                 </div>
@@ -141,8 +141,8 @@ export const TerminalTypewriter = ({
               <Unlock className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
               <div>
                 <div className="flex items-center font-bold mb-1">
-                  <span className="mr-2 tracking-wider">WOPR MAINFRAME:</span>
-                  <span className="text-xs text-apocalypse-red/70">[DECRYPTION COMPLETE]</span>
+                  <span className="mr-2 tracking-wider">EMERGENCY TRANSMISSION:</span>
+                  <span className="text-xs text-apocalypse-red/70">[SIGNAL SECURE]</span>
                 </div>
                 <div className="flex">
                   {renderDisplayedText()}
