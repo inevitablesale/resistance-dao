@@ -9,6 +9,7 @@ import { Card } from './card';
 import { useNFTBalance } from '@/hooks/useNFTBalance';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
 import { toast } from 'sonner';
+import { GroupDetailsModal } from './group-details-modal';
 
 interface NFTShowcaseProps {
   onRoleSelect: (role: "bounty-hunter" | "survivor") => void;
@@ -18,6 +19,8 @@ interface NFTShowcaseProps {
 export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
   const [hoverState, setHoverState] = useState<"bounty-hunter" | "survivor" | null>(null);
   const [showParticles, setShowParticles] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<"bounty-hunter" | "survivor" | null>(null);
   const { address } = useCustomWallet();
   const { data: nftBalance, isLoading } = useNFTBalance(address);
   
@@ -39,6 +42,11 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
     });
   };
 
+  const handleCardClick = (role: "bounty-hunter" | "survivor") => {
+    setSelectedGroup(role);
+    setShowDetailsModal(true);
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -46,6 +54,18 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
       exit={{ opacity: 0 }}
       className="relative w-full h-full flex flex-col justify-center items-center"
     >
+      {/* Group details modal */}
+      <AnimatePresence>
+        {showDetailsModal && (
+          <GroupDetailsModal 
+            isOpen={showDetailsModal}
+            onClose={() => setShowDetailsModal(false)}
+            groupType={selectedGroup}
+            onSelect={handleNFTSelect}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Background atmosphere effects */}
       {showParticles && (
         <>
@@ -74,7 +94,7 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
         >
           <h2 className="text-2xl md:text-3xl font-mono text-toxic-neon mb-2 tracking-tight">
             <Radiation className="inline-block w-6 h-6 mr-2 mb-1" />
-            SELECT YOUR WASTELAND IDENTITY
+            SELECT YOUR RESISTANCE IDENTITY
           </h2>
           <p className="text-white/70 max-w-2xl mx-auto">
             Your choice determines your role in the post-apocalyptic crypto wasteland. Choose wisely.
@@ -95,14 +115,17 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
             onMouseEnter={() => setHoverState("bounty-hunter")}
             onMouseLeave={() => setHoverState(null)}
           >
-            <Card className={cn(
-              "bg-black/90 border-2 transition-all duration-300 h-full",
-              selectedRole === "bounty-hunter" 
-                ? "border-apocalypse-red shadow-[0_0_25px_rgba(234,56,76,0.4)]" 
-                : hoverState === "bounty-hunter"
-                  ? "border-apocalypse-red/60 shadow-[0_0_15px_rgba(234,56,76,0.3)]"
-                  : "border-apocalypse-red/20"
-            )}>
+            <Card 
+              className={cn(
+                "bg-black/90 border-2 transition-all duration-300 h-full cursor-pointer",
+                selectedRole === "bounty-hunter" 
+                  ? "border-apocalypse-red shadow-[0_0_25px_rgba(234,56,76,0.4)]" 
+                  : hoverState === "bounty-hunter"
+                    ? "border-apocalypse-red/60 shadow-[0_0_15px_rgba(234,56,76,0.3)]"
+                    : "border-apocalypse-red/20"
+              )}
+              onClick={() => handleCardClick("bounty-hunter")}
+            >
               <div className="p-6 flex flex-col h-full">
                 {/* NFT Header */}
                 <div className="flex items-center justify-between mb-4">
@@ -175,7 +198,10 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
                 
                 {/* Select Button */}
                 <ToxicButton 
-                  onClick={() => handleNFTSelect("bounty-hunter")}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNFTSelect("bounty-hunter");
+                  }}
                   disabled={selectedRole !== null && selectedRole !== "bounty-hunter"}
                   className={cn(
                     "mt-4 w-full",
@@ -229,14 +255,17 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
             onMouseEnter={() => setHoverState("survivor")}
             onMouseLeave={() => setHoverState(null)}
           >
-            <Card className={cn(
-              "bg-black/90 border-2 transition-all duration-300 h-full",
-              selectedRole === "survivor" 
-                ? "border-toxic-neon shadow-[0_0_25px_rgba(80,250,123,0.4)]" 
-                : hoverState === "survivor"
-                  ? "border-toxic-neon/60 shadow-[0_0_15px_rgba(80,250,123,0.3)]"
-                  : "border-toxic-neon/20"
-            )}>
+            <Card 
+              className={cn(
+                "bg-black/90 border-2 transition-all duration-300 h-full cursor-pointer",
+                selectedRole === "survivor" 
+                  ? "border-toxic-neon shadow-[0_0_25px_rgba(80,250,123,0.4)]" 
+                  : hoverState === "survivor"
+                    ? "border-toxic-neon/60 shadow-[0_0_15px_rgba(80,250,123,0.3)]"
+                    : "border-toxic-neon/20"
+              )}
+              onClick={() => handleCardClick("survivor")}
+            >
               <div className="p-6 flex flex-col h-full">
                 {/* NFT Header */}
                 <div className="flex items-center justify-between mb-4">
@@ -309,7 +338,10 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
                 
                 {/* Select Button */}
                 <ToxicButton 
-                  onClick={() => handleNFTSelect("survivor")}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNFTSelect("survivor");
+                  }}
                   disabled={selectedRole !== null && selectedRole !== "survivor"}
                   className={cn(
                     "mt-4 w-full",
