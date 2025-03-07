@@ -44,8 +44,8 @@ export function JournalDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (
         
       if (error) throw error;
       
-      // Use type assertion to handle the data
-      setJournalEntries(data as JournalEntry[]);
+      // Use type assertion with unknown as intermediate step
+      setJournalEntries((data as unknown) as JournalEntry[]);
     } catch (error) {
       console.error('Error fetching journal entries:', error);
       toast.error('Failed to load survivor messages');

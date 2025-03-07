@@ -191,9 +191,9 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   const handleWalletHack = async () => {
     setIsHackMode(true);
     // Trigger wallet connection using the correct Dynamic SDK method
-    if (dynamicContext && dynamicContext.openWalletConnectModal) {
+    if (dynamicContext && dynamicContext.setShowAuthFlow) {
       try {
-        await dynamicContext.openWalletConnectModal();
+        dynamicContext.setShowAuthFlow(true);
         // Handle successful wallet connection
         handlePasswordSubmit(new Event('submit') as any);
       } catch (error) {
