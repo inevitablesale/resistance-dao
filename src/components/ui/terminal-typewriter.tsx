@@ -78,12 +78,12 @@ export function TerminalTypewriter({
     <div className={cn("terminal-container relative", className)}>
       <div 
         ref={terminalRef} 
-        className="terminal-output bg-black/80 text-toxic-neon p-4 font-mono border border-toxic-neon/30 rounded-md relative overflow-hidden"
+        className="terminal-output bg-black/80 text-toxic-neon p-4 font-mono border border-toxic-neon/30 rounded-md relative overflow-hidden min-h-[300px]"
       >
         <div className="scanline absolute inset-0 pointer-events-none"></div>
         
         {/* Boot sequence lines with increased vertical spacing */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           {bootLines.slice(0, bootSequence).map((line, index) => (
             <div key={index} className="terminal-line">
               <span className={index === 2 ? "text-apocalypse-red/90" : "text-toxic-neon/80"}>
@@ -95,8 +95,8 @@ export function TerminalTypewriter({
           
           {/* Main message typing animation */}
           {bootSequence >= bootLines.length && (
-            <div className="terminal-line h-6 mt-4">
-              <span className="block">
+            <div className="terminal-line h-auto mt-6">
+              <span className="block leading-relaxed">
                 {displayText}
                 {cursorVisible && <span className="cursor">_</span>}
               </span>
@@ -117,10 +117,12 @@ export function TerminalTypewriter({
               </div>
               <ToxicButton
                 onClick={onConnect}
-                className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+                className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80 relative"
               >
-                <Radiation className="w-4 h-4 mr-2 text-toxic-neon" />
-                <span className="flash-beacon">ACTIVATE SURVIVAL BEACON</span>
+                {/* Flashing light effect behind the icon */}
+                <div className="absolute left-4 w-6 h-6 rounded-full bg-yellow-500/80 animate-[pulse_1s_ease-in-out_infinite] blur-[3px]"></div>
+                <Radiation className="w-4 h-4 mr-2 text-toxic-neon relative z-10" />
+                <span className="relative z-10">ACTIVATE SURVIVAL BEACON</span>
               </ToxicButton>
             </div>
           ) : (
@@ -128,10 +130,12 @@ export function TerminalTypewriter({
               <div className="text-white/70 mb-3">WITHOUT IDENTIFICATION, YOU'RE JUST ANOTHER TARGET IN THE WASTELAND...</div>
               <ToxicButton
                 onClick={onConnect}
-                className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+                className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80 relative"
               >
-                <Radiation className="w-4 h-4 mr-2 text-toxic-neon" />
-                <span className="flash-beacon">ACTIVATE SURVIVAL BEACON</span>
+                {/* Flashing light effect behind the icon */}
+                <div className="absolute left-4 w-6 h-6 rounded-full bg-yellow-500/80 animate-[pulse_1s_ease-in-out_infinite] blur-[3px]"></div>
+                <Radiation className="w-4 h-4 mr-2 text-toxic-neon relative z-10" />
+                <span className="relative z-10">ACTIVATE SURVIVAL BEACON</span>
               </ToxicButton>
             </div>
           )}
