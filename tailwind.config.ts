@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -92,7 +91,7 @@ export default {
         "scale-in": "scale-in 0.5s ease-out forwards",
         "wave": "wave 8s ease-in-out infinite",
         "wave-slow": "wave 12s ease-in-out infinite",
-        "gradient": "gradient 8s ease infinite",
+        "gradient": "gradient 3s ease infinite",
         "singularity": "singularity 20s ease-in-out infinite",
         "cosmic-pulse": "cosmic-pulse 4s ease-in-out infinite",
         "star-field": "star-field 30s linear infinite",

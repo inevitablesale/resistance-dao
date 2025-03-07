@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
@@ -5,7 +6,7 @@ import { useWalletConnection } from "@/hooks/useWalletConnection";
 import Twitter from "./icons/Twitter";
 import Linked from "./icons/Linked";
 import { Button } from "@/components/ui/button";
-import { Rocket } from "lucide-react";
+import { AlertTriangle, Rocket } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -100,6 +101,24 @@ const Nav = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100]">
+      {location.pathname === '/' && (
+        <div className="relative">
+          <div className="absolute top-0 left-0 right-0 bg-black border-b border-apocalypse-red/50 z-[101] overflow-hidden">
+            <div className="px-4 py-2 bg-black/80 backdrop-blur-sm animate-pulse">
+              <div className="flex items-center justify-center gap-2 text-apocalypse-red font-mono text-sm">
+                <AlertTriangle className="h-4 w-4 animate-pulse" />
+                <div className="overflow-hidden">
+                  <p className="whitespace-nowrap animate-pulse">
+                    <span className="font-bold tracking-wider">EMERGENCY TRANSMISSION:</span> IF YOU'RE READING THIS, YOU'VE SURVIVED THE COLLAPSE
+                  </p>
+                </div>
+                <AlertTriangle className="h-4 w-4 animate-pulse" />
+              </div>
+            </div>
+            <div className="h-[2px] bg-gradient-to-r from-black via-apocalypse-red to-black animate-gradient"></div>
+          </div>
+        </div>
+      )}
       <div className="absolute inset-0 bg-black/80 backdrop-blur-md border-b border-white/5" />
       <div className="container h-full mx-auto px-4 relative">
         <div className="flex items-center justify-between h-full">
