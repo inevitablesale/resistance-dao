@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -285,6 +286,13 @@ const Index = () => {
                     renderMainContent()
                   )}
                 </div>
-                
-                {(
+              </div>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  );
+};
 
+export default Index;
