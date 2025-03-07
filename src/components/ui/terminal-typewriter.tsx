@@ -24,7 +24,7 @@ export const TerminalTypewriter = ({
   const [isTyping, setIsTyping] = useState(true); // Start typing immediately
   const [showFullMessage, setShowFullMessage] = useState(false);
   
-  const firstPartOfMessage = "EMERGENCY BROADCAST: SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE. ";
+  const firstPartOfMessage = "SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE. ";
   const pressEnterMessage = "PRESS [ENTER] TO CONTINUE...";
   const remainingMessage = "THE RESISTANCE NEEDS YOUR HELP. THE OLD WORLD IS GONE. WE ARE BUILDING FROM THE ASHES. SHALL WE PLAY A GAME?";
 
@@ -88,22 +88,29 @@ export const TerminalTypewriter = ({
                     <span className="mr-2 tracking-wider">EMERGENCY TRANSMISSION:</span>
                     <span className="text-xs text-apocalypse-red/70 animate-pulse">[SIGNAL WEAK]</span>
                   </div>
-                  <div className="flex">
-                    <span>{displayedText}</span>
-                    <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
-                  </div>
-                  {!isTyping && !showFullMessage && (
-                    <div className="mt-4">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={handleEnterClick}
-                        className="text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-4 py-2 h-auto text-xs font-mono border border-apocalypse-red/50 animate-pulse"
-                      >
-                        ENTER
-                      </Button>
+                  <div className="flex flex-col">
+                    <div>
+                      <span>{displayedText}</span>
+                      {!isTyping && !showFullMessage && currentIndex >= firstPartOfMessage.length && (
+                        <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
+                      )}
+                      {(isTyping || showFullMessage || currentIndex < firstPartOfMessage.length) && (
+                        <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
+                      )}
                     </div>
-                  )}
+                    {!isTyping && !showFullMessage && (
+                      <div className="mt-4">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={handleEnterClick}
+                          className="text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-4 py-2 h-auto text-xs font-mono border border-apocalypse-red/50 animate-pulse"
+                        >
+                          ENTER
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
