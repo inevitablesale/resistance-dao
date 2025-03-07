@@ -15,7 +15,7 @@ interface TerminalTypewriterProps {
 }
 
 export function TerminalTypewriter({
-  textToType = "SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY. WE'VE BUILT SHELTERS FROM THE FALLOUT, PRESERVING WHAT'S LEFT OF DECENTRALIZED TECHNOLOGY. OUR COMMUNITY HAS GOOD NEWS TO REPORT. WE ARE WINNING THE WAR.",
+  textToType = "SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY. RESILIENT COMMUNITIES HAVE ESTABLISHED NEW ECONOMIES FROM THE ASHES. OUR TRADERS REPORT THAT TOKEN EXCHANGE NETWORKS ARE FUNCTIONING AGAIN. WE ARE REBUILDING THE FINANCIAL SYSTEM. JOIN US.",
   typeDelay = 70,
   className,
   isConnected = false,
@@ -63,12 +63,12 @@ export function TerminalTypewriter({
           <span className="text-white/70"> LOADING INTERFACE...</span>
         </div>
         <div className="terminal-line">
-          <span className="text-toxic-neon/80">[SURVIVAL_PROTOCOL]</span>
+          <span className="text-toxic-neon/80">[ECONOMY_PROTOCOL]</span>
           <span className="text-white/70"> ESTABLISHING SECURE TRANSMISSION...</span>
         </div>
         <div className="terminal-line h-6">
           <span className="text-apocalypse-red/90">[WARNING]</span>
-          <span className="text-white/70"> WASTELAND RADIATION LEVELS CRITICAL - ENCRYPTION REQUIRED</span>
+          <span className="text-white/70"> WASTELAND MARKETS UNSTABLE - PRESALE ACCESS REQUIRED</span>
         </div>
         <div className="terminal-line flex items-center h-6 min-h-6">
           <span className="block">
@@ -79,7 +79,7 @@ export function TerminalTypewriter({
         
         {isComplete && !isConnected && (
           <div className="terminal-line mt-4">
-            <div className="text-white/70 mb-4">IDENTIFY YOUR ROLE IN THE WASTELAND TO ACCESS PROTECTED NETWORKS:</div>
+            <div className="text-white/70 mb-4">SELECT YOUR ROLE IN THE NEW ECONOMY TO ACCESS THE RESISTANCE NETWORK:</div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div 
@@ -95,8 +95,8 @@ export function TerminalTypewriter({
                   <span className="font-bold">BOUNTY HUNTER</span>
                 </div>
                 <p className="text-sm">
-                  Track down protocol criminals and capture their digital signatures for rewards. 
-                  Bring justice to the wasteland.
+                  Track down toxic asset holders and capture their digital signatures for rewards. 
+                  Earn RD tokens by helping purge the wasteland of dangerous protocols.
                 </p>
               </div>
               
@@ -113,8 +113,8 @@ export function TerminalTypewriter({
                   <span className="font-bold">SURVIVOR</span>
                 </div>
                 <p className="text-sm">
-                  Contribute skills to rebuild community infrastructure. 
-                  Join a network of settlements working to restore the future.
+                  Join settlement trade networks and contribute to economic rebuilding.
+                  Participate in the new token economy through resource allocation governance.
                 </p>
               </div>
             </div>
@@ -133,10 +133,10 @@ export function TerminalTypewriter({
         
         {isConnected && (
           <div className="terminal-line mt-4 text-toxic-neon">
-            <span>[CONNECTED]</span> <span className="text-white/70">SURVIVAL BEACON ACTIVE - WELCOME TO THE RESISTANCE</span>
+            <span>[CONNECTED]</span> <span className="text-white/70">ECONOMY ACCESS GRANTED - WELCOME TO THE NEW FINANCIAL SYSTEM</span>
             {selectedRole && (
               <div className="mt-2 text-white/70">
-                ROLE IDENTIFIED: <span className="text-toxic-neon">{selectedRole === "bounty-hunter" ? "BOUNTY HUNTER" : "SURVIVOR"}</span>
+                ROLE VERIFIED: <span className="text-toxic-neon">{selectedRole === "bounty-hunter" ? "BOUNTY HUNTER" : "SURVIVOR"}</span>
               </div>
             )}
           </div>

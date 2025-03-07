@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { ToxicButton } from "@/components/ui/toxic-button";
-import { Wallet, Radiation, ArrowRightLeft, CornerRightDown } from 'lucide-react';
+import { Wallet, Radiation, ArrowRightLeft, CornerRightDown, Coins } from 'lucide-react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 
 interface BuyRDTokensProps {
@@ -23,10 +23,13 @@ export const BuyRDTokens = ({ onConnectWallet }: BuyRDTokensProps) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
         <div className="p-6">
           <h3 className="text-2xl font-mono text-toxic-neon mb-4 toxic-glow flex items-center">
-            <Radiation className="w-6 h-6 mr-2" /> Fund Bounty Hunters
+            <Radiation className="w-6 h-6 mr-2" /> Fuel The New Economy
           </h3>
+          <p className="text-white/70 mb-2">
+            <span className="text-toxic-neon font-semibold">PRESALE NOW ACTIVE</span> - Join the first wave of wasteland rebuilders.
+          </p>
           <p className="text-white/70 mb-4">
-            Convert your <span className="text-apocalypse-red font-semibold">Old World currency (USDC)</span> into <span className="text-toxic-neon font-semibold">Resistance Dollars (RD)</span> to support bounty hunters tracking mutant protocol criminals across the wasteland.
+            Convert your <span className="text-apocalypse-red font-semibold">Old World currency (USDC)</span> into <span className="text-toxic-neon font-semibold">Resistance Dollars (RD)</span> to establish trade networks and power the post-apocalyptic economy.
           </p>
           
           <div className="mb-4">
@@ -36,7 +39,7 @@ export const BuyRDTokens = ({ onConnectWallet }: BuyRDTokensProps) => {
                 <span className="text-white font-mono">1 USDC = 1 RD</span>
               </div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-toxic-neon font-mono">Minimum Transfer</span>
+                <span className="text-toxic-neon font-mono">Minimum Contribution</span>
                 <span className="text-white font-mono">10 USDC</span>
               </div>
               <div className="flex items-center justify-between">
@@ -86,21 +89,21 @@ export const BuyRDTokens = ({ onConnectWallet }: BuyRDTokensProps) => {
             size="lg"
             onClick={onConnectWallet}
           >
-            <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
-            <span className="text-lg font-mono flash-beacon">ACTIVATE SURVIVAL BEACON</span>
+            <Coins className="w-5 h-5 mr-2 text-toxic-neon" />
+            <span className="text-lg font-mono flash-beacon">JOIN THE RESISTANCE ECONOMY</span>
           </ToxicButton>
         </div>
         
         <div className="bg-toxic-neon/5 p-6 border-l border-toxic-neon/20">
-          <h3 className="text-xl font-mono text-toxic-neon mb-4">Why Join The Resistance?</h3>
+          <h3 className="text-xl font-mono text-toxic-neon mb-4">Presale Benefits</h3>
           <ul className="space-y-4">
             <li className="flex gap-3">
               <div className="flex-shrink-0 bg-toxic-neon/10 w-8 h-8 rounded-full flex items-center justify-center">
-                <Wallet className="w-4 h-4 text-toxic-neon" />
+                <Coins className="w-4 h-4 text-toxic-neon" />
               </div>
               <div>
-                <h4 className="text-white font-mono mb-1">Secure Asset Storage</h4>
-                <p className="text-white/70 text-sm">Your RD tokens are stored in radiation-hardened vaults secured by battle-tested smart contracts.</p>
+                <h4 className="text-white font-mono mb-1">Economic Pioneer Status</h4>
+                <p className="text-white/70 text-sm">Early adopters receive special pioneer status in the wasteland registry, providing enhanced trading privileges.</p>
               </div>
             </li>
             <li className="flex gap-3">
@@ -108,8 +111,8 @@ export const BuyRDTokens = ({ onConnectWallet }: BuyRDTokensProps) => {
                 <Radiation className="w-4 h-4 text-toxic-neon" />
               </div>
               <div>
-                <h4 className="text-white font-mono mb-1">Governance Rights</h4>
-                <p className="text-white/70 text-sm">RD token holders vote on Resistance initiatives and resource allocation throughout the wasteland.</p>
+                <h4 className="text-white font-mono mb-1">Resource Allocation Rights</h4>
+                <p className="text-white/70 text-sm">RD token holders vote on crucial resource allocation and trade route governance throughout wasteland territories.</p>
               </div>
             </li>
             <li className="flex gap-3">
@@ -117,11 +120,17 @@ export const BuyRDTokens = ({ onConnectWallet }: BuyRDTokensProps) => {
                 <CornerRightDown className="w-4 h-4 text-toxic-neon" />
               </div>
               <div>
-                <h4 className="text-white font-mono mb-1">Priority Access</h4>
-                <p className="text-white/70 text-sm">Early access to new Resistance technology and survival protocols before they're released to the wasteland.</p>
+                <h4 className="text-white font-mono mb-1">Supply Chain Access</h4>
+                <p className="text-white/70 text-sm">Privileged access to scarce goods and wasteland supply chains before they're available in general settlement markets.</p>
               </div>
             </li>
           </ul>
+          
+          <div className="mt-6 p-3 bg-apocalypse-red/10 border border-apocalypse-red/30 rounded-lg">
+            <p className="text-white/80 text-sm font-mono">
+              <span className="text-apocalypse-red font-bold">PRESALE WARNING:</span> The nuclear wasteland economy is still stabilizing. Early adopters face higher risks but stand to gain the most when full trade networks are established.
+            </p>
+          </div>
         </div>
       </div>
     </ToxicCard>
