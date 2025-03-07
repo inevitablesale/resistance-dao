@@ -79,34 +79,54 @@ export function TerminalTypewriter({
         
         {isComplete && !isConnected && (
           <div className="terminal-line mt-4">
-            {selectedRole ? (
-              <div>
-                <div className="mb-3 text-white/70">
-                  {selectedRole === "bounty-hunter" ? (
-                    <span>BOUNTY HUNTER STATUS: <span className="text-toxic-neon">UNVERIFIED</span></span>
-                  ) : (
-                    <span>SURVIVOR STATUS: <span className="text-toxic-neon">UNVERIFIED</span></span>
-                  )}
+            <div className="text-white/70 mb-4">IDENTIFY YOUR ROLE IN THE WASTELAND TO ACCESS PROTECTED NETWORKS:</div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div 
+                className={`p-4 border rounded-md cursor-pointer transition-all ${
+                  selectedRole === "bounty-hunter" 
+                    ? "border-apocalypse-red bg-black/60 text-apocalypse-red" 
+                    : "border-white/20 bg-black/40 text-white/60 hover:border-white/40 hover:text-white/80"
+                }`}
+                onClick={() => onRoleSelect?.("bounty-hunter")}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Target className="h-5 w-5" />
+                  <span className="font-bold">BOUNTY HUNTER</span>
                 </div>
-                <ToxicButton
-                  onClick={onConnect}
-                  className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
-                >
-                  <Radiation className="w-4 h-4 mr-2 text-toxic-neon" />
-                  <span className="flash-beacon">ACTIVATE SURVIVAL BEACON</span>
-                </ToxicButton>
+                <p className="text-sm">
+                  Track down protocol criminals and capture their digital signatures for rewards. 
+                  Bring justice to the wasteland.
+                </p>
               </div>
-            ) : (
-              <div>
-                <div className="text-white/70 mb-3">WITHOUT IDENTIFICATION, YOU'RE JUST ANOTHER TARGET IN THE WASTELAND...</div>
-                <ToxicButton
-                  onClick={onConnect}
-                  className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
-                >
-                  <Radiation className="w-4 h-4 mr-2 text-toxic-neon" />
-                  <span className="flash-beacon">ACTIVATE SURVIVAL BEACON</span>
-                </ToxicButton>
+              
+              <div 
+                className={`p-4 border rounded-md cursor-pointer transition-all ${
+                  selectedRole === "survivor" 
+                    ? "border-toxic-neon bg-black/60 text-toxic-neon" 
+                    : "border-white/20 bg-black/40 text-white/60 hover:border-white/40 hover:text-white/80"
+                }`}
+                onClick={() => onRoleSelect?.("survivor")}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="h-5 w-5" />
+                  <span className="font-bold">SURVIVOR</span>
+                </div>
+                <p className="text-sm">
+                  Contribute skills to rebuild community infrastructure. 
+                  Join a network of settlements working to restore the future.
+                </p>
               </div>
+            </div>
+            
+            {selectedRole && (
+              <ToxicButton
+                onClick={onConnect}
+                className="w-full mt-2 bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+              >
+                <Radiation className="w-4 h-4 mr-2 text-toxic-neon" />
+                <span className="flash-beacon">ACTIVATE {selectedRole.toUpperCase()} PROTOCOL</span>
+              </ToxicButton>
             )}
           </div>
         )}
