@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Coins, Target } from "lucide-react";
+import { Coins, Target, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
