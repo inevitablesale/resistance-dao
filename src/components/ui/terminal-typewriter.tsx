@@ -74,30 +74,6 @@ export const TerminalTypewriter = ({
     }
   };
 
-  // Function to parse the displayed text and render the ENTER button inline
-  const renderDisplayedText = () => {
-    const enterButtonIndex = displayedText.indexOf('[ENTER]');
-    
-    if (enterButtonIndex === -1) {
-      return <span>{displayedText}</span>;
-    }
-    
-    return (
-      <>
-        <span>{displayedText.substring(0, enterButtonIndex)}</span>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleEnterClick}
-          className="px-2 py-0 h-auto text-xs font-mono bg-apocalypse-red/30 hover:bg-apocalypse-red/50 text-apocalypse-red mx-1 border border-apocalypse-red/50"
-        >
-          ENTER
-        </Button>
-        <span>{displayedText.substring(enterButtonIndex + 7)}</span>
-      </>
-    );
-  };
-
   return (
     <div className={`terminal-container ${className}`}>
       <div className="flex items-center gap-2 px-4 py-3 bg-black/90 border border-apocalypse-red/50 rounded-md overflow-hidden font-mono">
@@ -118,19 +94,21 @@ export const TerminalTypewriter = ({
                     <span className="text-apocalypse-red font-bold ml-2">Critical</span>
                   </div>
                   <div className="flex">
-                    {renderDisplayedText()}
+                    <span>{displayedText}</span>
                     <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
                   </div>
-                  <div className="mt-2">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={onConnect}
-                      className="text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-3 py-1 h-auto text-xs font-mono border border-apocalypse-red/50 animate-pulse"
-                    >
-                      CONNECT WALLET FOR SECURE TRANSMISSION
-                    </Button>
-                  </div>
+                  {!isTyping && !showFullMessage && (
+                    <div className="mt-4">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={handleEnterClick}
+                        className="text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-4 py-2 h-auto text-xs font-mono border border-apocalypse-red/50 animate-pulse"
+                      >
+                        ENTER
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -148,7 +126,7 @@ export const TerminalTypewriter = ({
                   <span className="text-apocalypse-red font-bold ml-2">Critical</span>
                 </div>
                 <div className="flex">
-                  {renderDisplayedText()}
+                  <span>{displayedText}</span>
                   <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
                 </div>
               </div>
