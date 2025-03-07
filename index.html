@@ -17,6 +17,23 @@
 
       gtag('config', 'G-56548T9LMJ');
     </script>
+    <!-- Formo Analytics -->
+    <script>
+      const script = document.createElement('script');
+      const writeKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmlnaW4iOiJodHRwczovL3d3dy5yZXNpc3RhbmNlZGFvLnh5ei8iLCJwcm9qZWN0X2lkIjoiak8zeVFYSU5fZm11TVQ3OWJ0d0tpIiwiaWF0IjoxNzQxMjMwNDIzfQ.fuNvgWDIl0cRAqPPw_RxNZJBu4_3E87z8rF4UAaYCBU';
+
+      script.src = 'https://unpkg.com/@formo/analytics';
+      script.onload = function () {
+        FormoAnalytics.init(writeKey)
+          .then((formo) => {
+            window.formo = formo;
+          })
+          .catch((error) => {
+            console.error('Error initializing FormoAnalytics:', error);
+          });
+      };
+      document.head.appendChild(script);
+    </script>
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://resistancedao.xyz" />
