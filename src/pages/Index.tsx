@@ -69,6 +69,9 @@ const Index = () => {
       
       setTimeout(() => {
         setAuthStage("authenticated");
+        // Important change: Immediately set terminal stage to nft-selection after authentication
+        setTerminalStage("nft-selection");
+        
         toast.success("Access granted", {
           description: "Welcome to the Resistance Network terminal",
           duration: 3000,
@@ -79,8 +82,9 @@ const Index = () => {
 
   // Determine what content to show based on the stages
   const renderMainContent = () => {
-    if (!userRole && authStage === "authenticated") {
-      if (terminalStage === "nft-selection") {
+    if (authStage === "authenticated") {
+      // If authenticated but no role selected yet, show NFT showcase
+      if (!userRole) {
         return (
           <NFTShowcase 
             onRoleSelect={handleRoleSelect}
@@ -88,9 +92,10 @@ const Index = () => {
           />
         );
       } else {
+        // If role is selected, show terminal with completed state
         return (
           <TerminalMonitor
-            showQuestionnaire={terminalStage === "questionnaire"}
+            showQuestionnaire={false}
             onTypingComplete={handleTerminalComplete}
             onRoleSelect={handleRoleSelect}
             selectedRole={userRole}
@@ -99,20 +104,12 @@ const Index = () => {
           />
         );
       }
-    } else if (userRole || terminalStage === "completed") {
-      return (
-        <TerminalMonitor
-          showQuestionnaire={false}
-          onTypingComplete={handleTerminalComplete}
-          onRoleSelect={handleRoleSelect}
-          selectedRole={userRole}
-          className="w-full" 
-          skipBootSequence={true}
-        />
-      );
+    } else if (authStage === "pre-boot" || authStage === "authenticating" || authStage === "system-breach") {
+      // Authentication flow content
+      return null;
     }
     
-    // Default return if none of the conditions match
+    // Default fallback
     return (
       <TerminalMonitor
         showQuestionnaire={terminalStage === "questionnaire"}
@@ -198,11 +195,11 @@ const Index = () => {
                 
                 <div className="mb-6">
                   {/* Conditional rendering based on authentication state */}
-                  {authStage === "pre-boot" || authStage === "authenticating" ? (
+                  {authStage === "pre-boot" && (
                     <PreBootTerminal onAuthenticated={handleAuthenticated} />
-                  ) : (
-                    renderMainContent()
                   )}
+                  
+                  {authStage === "authenticated" && renderMainContent()}
                 </div>
                 
                 {/* Only show this if the user is authenticated but doesn't have access to the desktop yet */}
