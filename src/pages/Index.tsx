@@ -1,26 +1,22 @@
-
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Shield, Target, Radiation, Zap, Biohazard, Users, Activity, Clock, MessageSquare } from "lucide-react";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
-import { DrippingSlime, ToxicPuddle } from "@/components/ui/dripping-slime";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { DrippingSlime } from "@/components/ui/dripping-slime";
 import { Card } from "@/components/ui/card";
 import { ToxicSlider } from "@/components/ui/toxic-slider";
 import { toast } from "sonner";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { setShowAuthFlow, isConnected } = useWalletConnection();
   const [userRole, setUserRole] = useState<"bounty-hunter" | "survivor" | null>(null);
-  const [audioEnabled, setAudioEnabled] = useState(false);
   const [communityActivity, setCommunityActivity] = useState(0);
   const [showCommunityChallenges, setShowCommunityChallenges] = useState(false);
+  const [terminalStage, setTerminalStage] = useState<"typing" | "questionnaire" | "completed">("typing");
   
-  useEffect(() => {
-    // Simulate community activity changing over time
+  React.useEffect(() => {
     const interval = setInterval(() => {
       setCommunityActivity(Math.floor(Math.random() * 100));
     }, 5000);
@@ -28,33 +24,13 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
   
-  const handleConnectWallet = () => {
-    setShowAuthFlow(true);
-    
-    if (audioEnabled) {
-      const audio = new Audio("/sounds/connection-initiated.mp3");
-      audio.volume = 0.3;
-      audio.play().catch(() => {});
-    }
-  };
-  
   const handleRoleSelect = (role: "bounty-hunter" | "survivor") => {
     setUserRole(role);
-    
-    if (audioEnabled) {
-      const audio = new Audio("/sounds/role-selected.mp3");
-      audio.volume = 0.3;
-      audio.play().catch(() => {});
-    }
     
     toast.success(`${role === "bounty-hunter" ? "Bounty Hunter" : "Survivor"} role activated`, {
       description: `Your wasteland profile has been configured for ${role === "bounty-hunter" ? "tracking down crypto criminals" : "rebuilding communities"}`,
       duration: 4000,
     });
-  };
-  
-  const handleEnableAudio = () => {
-    setAudioEnabled(true);
   };
   
   const handleJoinChallenge = () => {
@@ -64,7 +40,15 @@ const Index = () => {
     });
   };
   
-  // Terminal text content for immersive experience
+  const handleTerminalComplete = () => {
+    setTerminalStage("questionnaire");
+  };
+  
+  const handleQuestionnaireComplete = (role: "bounty-hunter" | "survivor") => {
+    setUserRole(role);
+    setTerminalStage("completed");
+  };
+  
   const terminalIntroText = `SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY. RESILIENT COMMUNITIES HAVE ESTABLISHED NEW ECONOMIES FROM THE ASHES. OUR TRADERS REPORT THAT TOKEN EXCHANGE NETWORKS ARE FUNCTIONING AGAIN. WE ARE REBUILDING THE FINANCIAL SYSTEM. JOIN US.`;
 
   return (
@@ -105,37 +89,27 @@ const Index = () => {
                     <span className="text-toxic-neon font-mono text-lg">RESISTANCE_NETWORK</span>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    {!audioEnabled && (
-                      <button
-                        onClick={handleEnableAudio}
-                        className="text-toxic-neon/70 hover:text-toxic-neon text-xs flex items-center"
-                      >
-                        <Zap className="h-3 w-3 mr-1" />
-                        ENABLE AUDIO
-                      </button>
-                    )}
-                    <div className="flex gap-1">
-                      <div className="h-3 w-3 rounded-full bg-apocalypse-red animate-pulse"></div>
-                      <div className="h-3 w-3 rounded-full bg-toxic-neon/70"></div>
-                    </div>
+                  <div className="flex gap-1">
+                    <div className="h-3 w-3 rounded-full bg-apocalypse-red animate-pulse"></div>
+                    <div className="h-3 w-3 rounded-full bg-toxic-neon/70"></div>
                   </div>
                 </div>
                 
                 <div className="mb-6">
                   <TerminalTypewriter 
                     textToType={terminalIntroText}
-                    isConnected={isConnected}
-                    onConnect={handleConnectWallet}
-                    onRoleSelect={handleRoleSelect}
+                    showBootSequence={true}
+                    typeDelay={20}
+                    onTypingComplete={handleTerminalComplete}
+                    showQuestionnaire={terminalStage === "questionnaire"}
+                    onRoleSelect={handleQuestionnaireComplete}
                     selectedRole={userRole}
-                    onAssessmentComplete={handleRoleSelect}
                     className="w-full" 
                   />
                 </div>
                 
                 {userRole && (
-                  <div className="mt-6 border-t border-toxic-neon/20 pt-6">
+                  <div className="mt-6 border-t border-toxic-neen/20 pt-6">
                     <div className="flex justify-between items-center mb-4">
                       <div className="flex items-center">
                         {userRole === "survivor" ? (
@@ -225,7 +199,6 @@ const Index = () => {
                         </ToxicButton>
                       </div>
                       
-                      {/* Survivor Testimonial */}
                       <div className="p-3 bg-black/70 border border-toxic-neon/20 rounded-lg mb-4">
                         <div className="flex items-start gap-3">
                           <div className="w-10 h-10 rounded-full bg-toxic-neon/20 border border-toxic-neon/40 flex items-center justify-center">
@@ -406,13 +379,13 @@ const Index = () => {
                     
                     <ToxicButton 
                       size="lg"
-                      onClick={handleConnectWallet}
+                      onClick={() => navigate('/proposals')}
                       variant="glowing"
                       className="w-full bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
                     >
                       <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
                       <span className="flash-beacon">
-                        {isConnected ? "ACCESS YOUR WASTELAND PROFILE" : "CONNECT TO THE RESISTANCE NETWORK"}
+                        ACCESS THE WASTELAND NETWORK
                       </span>
                     </ToxicButton>
                   </div>
