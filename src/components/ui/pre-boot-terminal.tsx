@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle, Lock } from 'lucide-react';
@@ -324,7 +325,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                     />
                     
                     <div className="relative py-3 px-4 bg-black/70 backdrop-blur-sm rounded border border-toxic-neon/10 inline-block group">
-                      <div className="access-code-message text-toxic-neon/60 font-mono text-sm mb-2">// Access code is "resistance"</div>
+                      <div className="access-code-message text-toxic-neon/60 font-mono text-sm mb-2">// Access codes are distributed to resistance members only</div>
                       <a 
                         href="https://www.linkedin.com/groups/12657922/" 
                         target="_blank" 
