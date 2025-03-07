@@ -31,6 +31,18 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
   
+  // Force questionnaire display after a delay
+  useEffect(() => {
+    if (terminalStage === "typing") {
+      const forceQuestionnaireTimeout = setTimeout(() => {
+        console.log("Force timeout: Switching to questionnaire stage");
+        setTerminalStage("questionnaire");
+      }, 15000); // Force after 15 seconds
+      
+      return () => clearTimeout(forceQuestionnaireTimeout);
+    }
+  }, [terminalStage]);
+  
   const handleRoleSelect = (role: "bounty-hunter" | "survivor") => {
     setUserRole(role);
     

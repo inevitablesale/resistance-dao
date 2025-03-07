@@ -18,7 +18,6 @@ interface TerminalTypewriterProps {
 type BootStage = 
   | "initializing" 
   | "diagnosing" 
-  | "recovering" 
   | "connecting" 
   | "complete";
 
@@ -46,13 +45,6 @@ const BOOT_MESSAGES = {
     "CHECKING QUANTUM ENCRYPTION CELLS...",
     "DATA STORAGE: 62% CORRUPTED",
     "ATTEMPTING AUTO-REPAIR SEQUENCES..."
-  ],
-  recovering: [
-    "RECOVERY MODE ACTIVATED",
-    "RESTORING CRITICAL SYSTEMS...",
-    "REBUILDING PROTOCOL DATABASE...",
-    "PURGING TOXIC DATA FRAGMENTS...",
-    "RESISTANCE NETWORK PROTOCOLS RESTORED"
   ],
   connecting: [
     "ESTABLISHING SECURE CONNECTION...",
@@ -248,8 +240,7 @@ export function TerminalTypewriter({
           
           setTimeout(() => {
             if (bootStage === "initializing") setBootStage("diagnosing");
-            else if (bootStage === "diagnosing") setBootStage("recovering");
-            else if (bootStage === "recovering") setBootStage("connecting");
+            else if (bootStage === "diagnosing") setBootStage("connecting");
             else if (bootStage === "connecting") {
               setBootStage("complete");
               setIsComplete(true);
@@ -284,7 +275,7 @@ export function TerminalTypewriter({
     return () => clearInterval(cursorInterval);
   }, []);
   
-  // Text typing effect - improved version
+  // Text typing effect - improved version with forced completion
   useEffect(() => {
     // Only start typing when boot is complete
     if (!isComplete || bootStage !== "complete" || typingStarted) {
@@ -311,8 +302,40 @@ export function TerminalTypewriter({
       }
     }, typeDelay);
     
-    return () => clearInterval(typingInterval);
-  }, [textToType, typeDelay, bootStage, isComplete, onTypingComplete, typingStarted]);
+    // Force completion after a timeout in case the animation gets stuck
+    const forceCompletionTimeout = setTimeout(() => {
+      if (!typingComplete) {
+        console.log("Forcing typing completion");
+        clearInterval(typingInterval);
+        setDisplayText(textToType);
+        setTypingComplete(true);
+        
+        if (onTypingComplete) {
+          onTypingComplete();
+        }
+      }
+    }, textToType.length * typeDelay + 5000); // Add extra buffer time
+    
+    return () => {
+      clearInterval(typingInterval);
+      clearTimeout(forceCompletionTimeout);
+    };
+  }, [textToType, typeDelay, bootStage, isComplete, onTypingComplete, typingStarted, typingComplete]);
+  
+  // Separate useEffect to force questionnaire display if not showing after a delay
+  useEffect(() => {
+    if (isComplete && showQuestionnaire && !questionnaireStarted && !typingComplete) {
+      const forceQuestionnaireTimeout = setTimeout(() => {
+        console.log("Forcing questionnaire display");
+        setTypingComplete(true);
+        if (onTypingComplete) {
+          onTypingComplete();
+        }
+      }, 10000); // Force after 10 seconds
+      
+      return () => clearTimeout(forceQuestionnaireTimeout);
+    }
+  }, [isComplete, showQuestionnaire, questionnaireStarted, typingComplete, onTypingComplete]);
   
   const handleStartAssessment = () => {
     console.log("Starting assessment questionnaire");
@@ -376,7 +399,7 @@ export function TerminalTypewriter({
           </div>
         </div>
         
-        {showBootSequence && (bootStage === "initializing" || bootStage === "diagnosing" || bootStage === "recovering" || bootStage === "connecting") && (
+        {showBootSequence && (bootStage === "initializing" || bootStage === "diagnosing" || bootStage === "connecting") && (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <div className="text-white/70 flex items-center">
@@ -384,7 +407,6 @@ export function TerminalTypewriter({
                 <span>
                   {bootStage === "initializing" && "SYSTEM INITIALIZATION"}
                   {bootStage === "diagnosing" && "SYSTEM DIAGNOSTICS"}
-                  {bootStage === "recovering" && "RECOVERY PROTOCOL"}
                   {bootStage === "connecting" && "NETWORK CONNECTION"}
                 </span>
               </div>
@@ -480,6 +502,25 @@ export function TerminalTypewriter({
             
             <ToxicButton
               onClick={handleStartAssessment}
+              className="w-full mt-2 bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+              size="lg"
+            >
+              <Terminal className="w-5 h-5 mr-2 text-toxic-neon" />
+              <span className="flash-beacon">BEGIN WASTELAND ROLE ASSESSMENT</span>
+            </ToxicButton>
+          </div>
+        )}
+        
+        {/* Force display questionnaire button if showQuestionnaire is true but not started yet */}
+        {showQuestionnaire && !questionnaireStarted && !typingComplete && bootStage === "complete" && isComplete && displayText.length > 0 && (
+          <div className="terminal-line mt-6">
+            <div className="text-white/70 mb-4">BEFORE JOINING THE RESISTANCE, WE MUST DETERMINE YOUR ROLE IN THE NEW ECONOMY:</div>
+            
+            <ToxicButton
+              onClick={() => {
+                setTypingComplete(true);
+                handleStartAssessment();
+              }}
               className="w-full mt-2 bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
               size="lg"
             >
