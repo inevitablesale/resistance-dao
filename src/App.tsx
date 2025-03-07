@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -15,6 +16,7 @@ import Proposals from "./pages/Proposals";
 import Settings from "./pages/Settings";
 import BuyMembershipNFT from "./pages/BuyMembershipNFT";
 import ReferralRedirect from "./pages/ReferralRedirect";
+import ToxicTheme from "./pages/ToxicTheme";
 import { Toaster } from "./components/ui/toaster";
 
 const zeroDevConfig = {
@@ -153,6 +155,7 @@ function Layout() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/buy-membership-nft" element={<BuyMembershipNFT />} />
         <Route path="/r/:referrerAddress" element={<ReferralRedirect />} />
+        <Route path="/toxic-theme" element={<ToxicTheme />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

@@ -23,6 +23,13 @@ export default {
           primary: "#8247E5",
           secondary: "#A379FF",
         },
+        toxic: {
+          neon: "#39FF14",
+          glow: "#00FF41",
+          dark: "#0D1F0F",
+          muted: "#00BB13",
+          faint: "rgba(57, 255, 20, 0.25)",
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -84,6 +91,11 @@ export default {
         "orbit": "orbit 20s linear infinite",
         "pulse": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "bounce": "bounce 1s infinite",
+        "toxic-pulse": "toxic-pulse 2s ease-in-out infinite",
+        "toxic-drip": "toxic-drip 5s ease-in-out infinite",
+        "scanline": "scanline 8s linear infinite",
+        "radiation": "radiation 4s ease-in-out infinite",
+        "glitch": "glitch 3s ease-in-out infinite",
       },
       keyframes: {
         "accordion-down": {
@@ -148,6 +160,36 @@ export default {
             transform: 'none',
             animationTimingFunction: 'cubic-bezier(0,0,0.2,1)',
           },
+        },
+        "toxic-pulse": {
+          "0%, 100%": { boxShadow: "0 0 5px rgba(57, 255, 20, 0.3), 0 0 10px rgba(57, 255, 20, 0.2), 0 0 15px rgba(57, 255, 20, 0.1)" },
+          "50%": { boxShadow: "0 0 10px rgba(57, 255, 20, 0.5), 0 0 20px rgba(57, 255, 20, 0.4), 0 0 30px rgba(57, 255, 20, 0.3)" },
+        },
+        "toxic-drip": {
+          "0%": { transform: "translateY(-100%)", opacity: "0" },
+          "20%": { opacity: "1" },
+          "80%": { opacity: "1" },
+          "100%": { transform: "translateY(100%)", opacity: "0" },
+        },
+        "scanline": {
+          "0%": { transform: "translateY(-100%)" },
+          "100%": { transform: "translateY(100%)" },
+        },
+        "radiation": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.1)" },
+        },
+        "glitch": {
+          "0%, 100%": { transform: "translate(0)" },
+          "10%": { transform: "translate(-2px, 2px)" },
+          "20%": { transform: "translate(2px, -2px)" },
+          "30%": { transform: "translate(-2px, -2px)" },
+          "40%": { transform: "translate(2px, 2px)" },
+          "50%": { transform: "translate(-2px, 2px)" },
+          "60%": { transform: "translate(2px, -2px)" },
+          "70%": { transform: "translate(-2px, -2px)" },
+          "80%": { transform: "translate(2px, 2px)" },
+          "90%": { transform: "translate(-2px, 2px)" },
         },
       }
     },
