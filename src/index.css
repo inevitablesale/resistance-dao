@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -208,4 +209,136 @@
 .animate-gradient {
   background-size: 200% 200%;
   animation: gradient 3s ease infinite;
+}
+
+/* Dripping slime styles */
+.dripping-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.toxic-drips-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.toxic-drips-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  overflow: hidden;
+  z-index: 1;
+  transform: rotate(180deg);
+}
+
+.drip {
+  position: absolute;
+  top: 0;
+  height: 60px;
+  width: 6px;
+  border-radius: 0 0 50% 50%;
+  background: rgba(0, 255, 0, 0.5);
+  filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.3));
+  animation: dripping infinite;
+}
+
+.drip.toxic-green {
+  background: rgba(57, 255, 20, 0.7);
+  filter: drop-shadow(0 0 5px rgba(57, 255, 20, 0.4));
+}
+
+.drip.post-apocalyptic {
+  background: rgba(234, 56, 76, 0.7);
+  filter: drop-shadow(0 0 5px rgba(234, 56, 76, 0.4));
+}
+
+.toxic-puddle {
+  position: absolute;
+  height: 5px;
+  width: 40px;
+  background: rgba(0, 255, 0, 0.4);
+  border-radius: 50%;
+  filter: blur(2px);
+  animation: pulse 4s ease-in-out infinite;
+}
+
+.toxic-puddle.toxic-green {
+  background: rgba(57, 255, 20, 0.4);
+}
+
+.toxic-puddle.post-apocalyptic {
+  background: rgba(234, 56, 76, 0.4);
+}
+
+@keyframes dripping {
+  0% {
+    height: 0;
+    top: 0;
+    opacity: 0;
+  }
+  30% {
+    height: 30px;
+    opacity: 1;
+  }
+  60% {
+    height: 45px;
+  }
+  70% {
+    top: 0;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scanline {
+  0% {
+    top: 0%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+.animate-radiation {
+  animation: rotate 10s linear infinite;
 }

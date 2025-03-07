@@ -102,7 +102,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
-      <DrippingSlime position="top" dripsCount={15} showIcons={true} toxicGreen={true} />
+      <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} />
       <div className="dust-particles"></div>
       <div className="fog-overlay"></div>
 
@@ -135,7 +135,7 @@ const Index = () => {
               </div>
               
               <h1 className="text-5xl md:text-6xl font-bold font-mono mb-6 text-toxic-neon toxic-glow">
-                Post-Apocalyptic Launch Platform
+                Resistance Survivor Launchpad
               </h1>
 
               <div className="flex gap-4 mb-8">
@@ -292,7 +292,7 @@ const Index = () => {
                       From the remnants of the old world, we built something new. The Resistance DAO became a beacon in the wasteland - a community united by shared principles: decentralization, transparency, and user sovereignty.
                     </p>
                     <p className="text-white/70 mb-6">
-                      Our Post-Apocalyptic Launch Platform isn't just a place to build - it's a manifesto. We validate projects through community consensus, require transparent governance, and ensure value flows back to the ecosystem that nurtures them.
+                      Our Resistance Survivor Launchpad isn't just a place to build - it's a manifesto. We validate projects through community consensus, require transparent governance, and ensure value flows back to the ecosystem that nurtures them.
                     </p>
                     <ToxicButton 
                       variant="outline" 
@@ -364,7 +364,7 @@ const Index = () => {
                         <div className="absolute inset-0 flex items-center justify-center">
                           <Image className="w-20 h-20 text-toxic-neon/50" />
                         </div>
-                        <DrippingSlime position="top" dripsCount={5} toxicGreen={true} />
+                        <DrippingSlime position="top" dripsCount={5} toxicGreen={true} showIcons={false} />
                         <div className="absolute top-2 right-2">
                           <div className="px-2 py-1 rounded-full bg-toxic-neon/20 text-xs text-toxic-neon font-mono">
                             #{nft.tokenId}
