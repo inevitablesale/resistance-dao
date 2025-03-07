@@ -9,20 +9,34 @@ import { DrippingSlime } from "@/components/ui/dripping-slime";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { EmergencyTransmission } from "@/components/ui/emergency-transmission";
+import { PreBootTerminal } from "@/components/ui/pre-boot-terminal";
+
+// Define the authentication states
+type AuthStage = "pre-boot" | "authenticated";
+
+// Define the application stages
+type AppStage = "typing" | "questionnaire" | "completed";
 
 const Index = () => {
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState<"bounty-hunter" | "survivor" | null>(null);
   const [communityActivity, setCommunityActivity] = useState(0);
-  const [terminalStage, setTerminalStage] = useState<"typing" | "questionnaire" | "completed">("typing");
+  const [terminalStage, setTerminalStage] = useState<AppStage>("typing");
   const [showEmergencyTransmission, setShowEmergencyTransmission] = useState(false);
+  const [authStage, setAuthStage] = useState<AuthStage>("pre-boot");
+  
+  // Check for existing authentication on mount
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem('resistance_authenticated') === 'true';
+    if (isAuthenticated) {
+      setAuthStage("authenticated");
+    }
+  }, []);
   
   // Debug terminalStage changes
   useEffect(() => {
     console.log("Terminal stage changed to:", terminalStage);
   }, [terminalStage]);
-  
-  // Removed automatic emergency transmission display
   
   // Community activity simulation
   useEffect(() => {
@@ -58,6 +72,15 @@ const Index = () => {
     setShowEmergencyTransmission(true);
   };
 
+  // Function to handle authentication completion
+  const handleAuthenticated = () => {
+    setAuthStage("authenticated");
+    toast.success("Access granted", {
+      description: "Welcome to the Resistance Network terminal",
+      duration: 3000,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
       <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} />
@@ -88,11 +111,14 @@ const Index = () => {
                 <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
                 <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Network Status: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
               </div>
-              {/* Button to manually show emergency transmission */}
-              <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission} className="ml-2">
-                <Radiation className="w-4 h-4 mr-2" />
-                View Emergency Transmission
-              </ToxicButton>
+              
+              {/* Only show emergency transmission button when authenticated */}
+              {authStage === "authenticated" && (
+                <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission} className="ml-2">
+                  <Radiation className="w-4 h-4 mr-2" />
+                  View Emergency Transmission
+                </ToxicButton>
+              )}
             </div>
 
             <Card className="w-full bg-black/80 border-toxic-neon/30 p-0 relative overflow-hidden">
@@ -114,18 +140,23 @@ const Index = () => {
                 </div>
                 
                 <div className="mb-6">
-                  <TerminalMonitor
-                    showQuestionnaire={terminalStage === "questionnaire"}
-                    onTypingComplete={handleTerminalComplete}
-                    onRoleSelect={handleRoleSelect}
-                    selectedRole={userRole}
-                    className="w-full" 
-                    skipBootSequence={true}
-                  />
+                  {/* Conditional rendering based on authentication state */}
+                  {authStage === "pre-boot" ? (
+                    <PreBootTerminal onAuthenticated={handleAuthenticated} />
+                  ) : (
+                    <TerminalMonitor
+                      showQuestionnaire={terminalStage === "questionnaire"}
+                      onTypingComplete={handleTerminalComplete}
+                      onRoleSelect={handleRoleSelect}
+                      selectedRole={userRole}
+                      className="w-full" 
+                      skipBootSequence={true}
+                    />
+                  )}
                 </div>
                 
-                {/* Only show this if the user doesn't have access to the desktop yet */}
-                {!userRole && terminalStage !== "completed" && (
+                {/* Only show this if the user is authenticated but doesn't have access to the desktop yet */}
+                {authStage === "authenticated" && !userRole && terminalStage !== "completed" && (
                   <div className="mt-4 text-center">
                     <p className="text-white/70 text-sm mb-3">
                       Complete the terminal sequence to access the Resistance Network

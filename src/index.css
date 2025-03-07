@@ -186,7 +186,40 @@
   pointer-events: none;
 }
 
-/* Scanline effect */
+/* Terminal cursor blinking */
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background-color: hsl(142, 84%, 65%);
+  animation: blink 1s step-end infinite;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Terminal prompt styling */
+.terminal-prompt {
+  color: hsl(142, 84%, 65%);
+  margin-right: 8px;
+}
+
+/* Shake animation for invalid password */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Scanlines effect */
 .scanline {
   pointer-events: none;
   position: absolute;
