@@ -272,7 +272,7 @@ const Index = () => {
                     className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
                   >
                     <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
-                    Sponsor a Settlement
+                    Request Mission Sponsorship
                   </ToxicButton>
                   <ToxicButton 
                     size="lg"
@@ -549,12 +549,12 @@ const Index = () => {
               <div className="scanline"></div>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-mono text-toxic-neon flex items-center">
-                  <Radiation className="h-5 w-5 mr-2" /> Wasteland Activity
+                  <Radiation className="h-5 w-5 mr-2" /> Resistance Updates
                 </h3>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 text-sm text-toxic-neon/70">
                     <div className="w-2 h-2 bg-toxic-neon rounded-full animate-pulse" />
-                    Emergency Updates
+                    Emergency Broadcasts
                   </div>
                   <ToxicButton 
                     variant="ghost" 
@@ -603,7 +603,7 @@ const Index = () => {
                     <CircleDollarSign className="w-6 h-6 text-toxic-neon" />
                   </div>
                   <div>
-                    <div className="text-toxic-neon/70 text-sm">Total Resource Pledges</div>
+                    <div className="text-toxic-neon/70 text-sm">Community Support</div>
                     <div className="text-2xl font-semibold text-white">
                       {isLoadingStats ? (
                         <span className="animate-pulse">Calculating...</span>
@@ -692,4 +692,18 @@ const Index = () => {
             <ToxicCard>
               <ToxicCardContent>
                 <div className="mb-4">
-                  <CircleDollarSign className="w-8 h-8
+                  <CircleDollarSign className="w-8 h-8 text-toxic-neon" />
+                </div>
+                <p className="text-white/70">
+                  Once interest is proven, launch with confidence knowing there's a committed community ready to support your project from day one.
+                </p>
+              </ToxicCardContent>
+            </ToxicCard>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Index;
