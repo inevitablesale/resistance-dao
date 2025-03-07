@@ -76,11 +76,55 @@ export function DrippingSlime({
           (postApocalyptic ? "toxic-drips-top post-apocalyptic" : "toxic-drips-top")
         }></div>}
       
+      {showIcons && (
+        <div className="toxic-icons absolute inset-x-0 top-0 flex justify-around overflow-hidden pointer-events-none">
+          {[...Array(5)].map((_, index) => {
+            const IconComponent = index % 5 === 0 ? Radiation : 
+                               index % 5 === 1 ? Biohazard : 
+                               index % 5 === 2 ? Skull : 
+                               index % 5 === 3 ? Zap : Shield;
+            
+            const leftPosition = (index * 20) + Math.random() * 10;
+            const delay = Math.random() * 5;
+            const duration = 5 + Math.random() * 10;
+            
+            return (
+              <div 
+                key={index}
+                className={`absolute ${iconGlowClass}`}
+                style={{
+                  left: `${leftPosition}%`,
+                  top: `-20px`,
+                  animationDelay: `${delay}s`,
+                  animationDuration: `${duration}s`,
+                  animation: `floating-icon ${duration}s ease-in-out ${delay}s infinite`
+                }}
+              >
+                <IconComponent className={`h-6 w-6 ${iconColor}`} />
+              </div>
+            );
+          })}
+        </div>
+      )}
+      
       {(position === 'bottom' || position === 'both') && 
         <div ref={bottomDripsRef} className={
           toxicGreen ? "toxic-drips-bottom toxic-green" : 
           (postApocalyptic ? "toxic-drips-bottom post-apocalyptic" : "toxic-drips-bottom")
         }></div>}
+      
+      {/* Add puddles at the bottom if top position */}
+      {(position === 'top' || position === 'both') && (
+        <div className="puddle-container absolute bottom-0 left-0 right-0 h-10 overflow-hidden">
+          {[...Array(Math.floor(dripsCount / 2))].map((_, index) => (
+            <ToxicPuddle 
+              key={index} 
+              postApocalyptic={postApocalyptic} 
+              toxicGreen={toxicGreen} 
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -15,6 +15,7 @@ const Index = () => {
   const [communityActivity, setCommunityActivity] = useState(0);
   const [terminalStage, setTerminalStage] = useState<"typing" | "questionnaire" | "completed">("typing");
   const [ambientNoiseEnabled, setAmbientNoiseEnabled] = useState(true);
+  const [bootComplete, setBootComplete] = useState(false);
   
   // Debug terminalStage changes
   useEffect(() => {
@@ -65,6 +66,7 @@ const Index = () => {
   const handleTerminalComplete = () => {
     console.log("Typing animation complete, showing questionnaire");
     setTerminalStage("questionnaire");
+    setBootComplete(true);
   };
 
   const handleDisableAmbientNoise = () => {
@@ -73,7 +75,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg overflow-hidden">
-      <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} className="z-50" />
+      <DrippingSlime position="top" dripsCount={15} showIcons={true} toxicGreen={true} className="absolute inset-x-0 top-0 z-50" />
       
       {/* Ambient Effects */}
       <div className="screen-flicker absolute inset-0 bg-apocalypse-red/10 opacity-0 pointer-events-none z-10"></div>
@@ -132,7 +134,7 @@ const Index = () => {
                       onRoleSelect={handleRoleSelect}
                       selectedRole={userRole}
                       className="w-full" 
-                      skipBootSequence={false}
+                      skipBootSequence={bootComplete}
                     />
                   </div>
                   
@@ -149,7 +151,10 @@ const Index = () => {
                       </p>
                       <div className="flex flex-wrap justify-center gap-3">
                         <ToxicButton 
-                          onClick={() => setTerminalStage("questionnaire")}
+                          onClick={() => {
+                            setTerminalStage("questionnaire");
+                            setBootComplete(true);
+                          }}
                           variant="ghost"
                           size="sm"
                         >
@@ -175,6 +180,8 @@ const Index = () => {
           </AnimatePresence>
         </div>
       </section>
+      
+      <DrippingSlime position="bottom" dripsCount={10} showIcons={false} toxicGreen={true} className="absolute inset-x-0 bottom-0 z-50" />
     </div>
   );
 };
