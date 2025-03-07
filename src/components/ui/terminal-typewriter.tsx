@@ -26,23 +26,46 @@ export function TerminalTypewriter({
   const [displayText, setDisplayText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
   const [isComplete, setIsComplete] = useState(false);
+  const [bootSequence, setBootSequence] = useState(0);
   const terminalRef = useRef<HTMLDivElement>(null);
   
-  useEffect(() => {
-    let i = 0;
-    const interval = setInterval(() => {
-      if (i <= textToType.length) {
-        setDisplayText(textToType.substring(0, i));
-        i++;
-      } else {
-        clearInterval(interval);
-        setIsComplete(true);
-      }
-    }, typeDelay);
-    
-    return () => clearInterval(interval);
-  }, [textToType, typeDelay]);
+  // Boot sequence lines
+  const bootLines = [
+    "[RESISTANCE_OS v3.2.1] LOADING INTERFACE...",
+    "[SURVIVAL_PROTOCOL] ESTABLISHING SECURE TRANSMISSION...",
+    "[WARNING] WASTELAND RADIATION LEVELS CRITICAL - ENCRYPTION REQUIRED"
+  ];
   
+  // Handle boot sequence animation
+  useEffect(() => {
+    if (bootSequence < bootLines.length) {
+      const timer = setTimeout(() => {
+        setBootSequence(prev => prev + 1);
+      }, 1000); // 1 second delay between boot sequence lines
+      
+      return () => clearTimeout(timer);
+    }
+  }, [bootSequence, bootLines.length]);
+  
+  // Handle message typing animation after boot sequence completes
+  useEffect(() => {
+    if (bootSequence >= bootLines.length) {
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i <= textToType.length) {
+          setDisplayText(textToType.substring(0, i));
+          i++;
+        } else {
+          clearInterval(interval);
+          setIsComplete(true);
+        }
+      }, typeDelay);
+      
+      return () => clearInterval(interval);
+    }
+  }, [textToType, typeDelay, bootSequence, bootLines.length]);
+  
+  // Handle cursor blinking
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setCursorVisible(prev => !prev);
@@ -58,61 +81,65 @@ export function TerminalTypewriter({
         className="terminal-output bg-black/80 text-toxic-neon p-4 font-mono border border-toxic-neon/30 rounded-md relative overflow-hidden"
       >
         <div className="scanline absolute inset-0 pointer-events-none"></div>
-        <div className="terminal-line">
-          <span className="text-toxic-neon/80">[RESISTANCE_OS v3.2.1]</span>
-          <span className="text-white/70"> LOADING INTERFACE...</span>
-        </div>
-        <div className="terminal-line">
-          <span className="text-toxic-neon/80">[SURVIVAL_PROTOCOL]</span>
-          <span className="text-white/70"> ESTABLISHING SECURE TRANSMISSION...</span>
-        </div>
-        <div className="terminal-line h-6">
-          <span className="text-apocalypse-red/90">[WARNING]</span>
-          <span className="text-white/70"> WASTELAND RADIATION LEVELS CRITICAL - ENCRYPTION REQUIRED</span>
-        </div>
-        <div className="terminal-line flex items-center h-6 min-h-6">
-          <span className="block">
-            {displayText}
-            {cursorVisible && <span className="cursor">_</span>}
-          </span>
+        
+        {/* Boot sequence lines with increased vertical spacing */}
+        <div className="space-y-4">
+          {bootLines.slice(0, bootSequence).map((line, index) => (
+            <div key={index} className="terminal-line">
+              <span className={index === 2 ? "text-apocalypse-red/90" : "text-toxic-neon/80"}>
+                {line.split("] ")[0]}]
+              </span>
+              <span className="text-white/70"> {line.split("] ")[1]}</span>
+            </div>
+          ))}
+          
+          {/* Main message typing animation */}
+          {bootSequence >= bootLines.length && (
+            <div className="terminal-line h-6 mt-4">
+              <span className="block">
+                {displayText}
+                {cursorVisible && <span className="cursor">_</span>}
+              </span>
+            </div>
+          )}
         </div>
         
-        {isComplete && !isConnected && (
-          <div className="terminal-line mt-4">
-            {selectedRole ? (
-              <div>
-                <div className="mb-3 text-white/70">
-                  {selectedRole === "bounty-hunter" ? (
-                    <span>BOUNTY HUNTER STATUS: <span className="text-toxic-neon">UNVERIFIED</span></span>
-                  ) : (
-                    <span>SURVIVOR STATUS: <span className="text-toxic-neon">UNVERIFIED</span></span>
-                  )}
-                </div>
-                <ToxicButton
-                  onClick={onConnect}
-                  className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
-                >
-                  <Radiation className="w-4 h-4 mr-2 text-toxic-neon" />
-                  <span className="flash-beacon">ACTIVATE SURVIVAL BEACON</span>
-                </ToxicButton>
+        {/* Always show the Activate Survivor Beacon button */}
+        <div className="terminal-line mt-8">
+          {selectedRole ? (
+            <div>
+              <div className="mb-3 text-white/70">
+                {selectedRole === "bounty-hunter" ? (
+                  <span>BOUNTY HUNTER STATUS: <span className="text-toxic-neon">UNVERIFIED</span></span>
+                ) : (
+                  <span>SURVIVOR STATUS: <span className="text-toxic-neon">UNVERIFIED</span></span>
+                )}
               </div>
-            ) : (
-              <div>
-                <div className="text-white/70 mb-3">WITHOUT IDENTIFICATION, YOU'RE JUST ANOTHER TARGET IN THE WASTELAND...</div>
-                <ToxicButton
-                  onClick={onConnect}
-                  className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
-                >
-                  <Radiation className="w-4 h-4 mr-2 text-toxic-neon" />
-                  <span className="flash-beacon">ACTIVATE SURVIVAL BEACON</span>
-                </ToxicButton>
-              </div>
-            )}
-          </div>
-        )}
+              <ToxicButton
+                onClick={onConnect}
+                className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+              >
+                <Radiation className="w-4 h-4 mr-2 text-toxic-neon" />
+                <span className="flash-beacon">ACTIVATE SURVIVAL BEACON</span>
+              </ToxicButton>
+            </div>
+          ) : (
+            <div>
+              <div className="text-white/70 mb-3">WITHOUT IDENTIFICATION, YOU'RE JUST ANOTHER TARGET IN THE WASTELAND...</div>
+              <ToxicButton
+                onClick={onConnect}
+                className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+              >
+                <Radiation className="w-4 h-4 mr-2 text-toxic-neon" />
+                <span className="flash-beacon">ACTIVATE SURVIVAL BEACON</span>
+              </ToxicButton>
+            </div>
+          )}
+        </div>
         
+        {/* Connected state display */}
         {isConnected && (
-          <div className="terminal-line mt-4 text-toxic-neon">
+          <div className="terminal-line mt-6 text-toxic-neon">
             <span>[CONNECTED]</span> <span className="text-white/70">SURVIVAL BEACON ACTIVE - WELCOME TO THE RESISTANCE</span>
             {selectedRole && (
               <div className="mt-2 text-white/70">
