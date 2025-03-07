@@ -67,6 +67,11 @@ export const TerminalTypewriter = ({
       setShowFullMessage(true);
       setCurrentIndex(0);
       setIsTyping(true);
+      
+      // After showing the full message, connect the wallet
+      setTimeout(() => {
+        onConnect();
+      }, (remainingMessage.length * typingSpeed) + 500); // Wait for the message to finish typing
     }
   };
 
