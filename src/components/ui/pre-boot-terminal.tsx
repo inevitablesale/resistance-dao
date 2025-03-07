@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle, Lock } from 'lucide-react';
+import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle, Lock, Zap, Code } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './button';
 import { Input } from './input';
 import { DrippingSlime } from './dripping-slime';
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 interface PreBootTerminalProps {
   onAuthenticated: () => void;
@@ -18,8 +19,10 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   const [authStatus, setAuthStatus] = useState<'idle' | 'checking' | 'success' | 'error'>('idle');
   const [forgotHovered, setForgotHovered] = useState(false);
   const [terminalEffect, setTerminalEffect] = useState<'flicker' | 'glitch' | 'normal'>('normal');
+  const [isHackMode, setIsHackMode] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
+  const { handleConnect } = useDynamicContext();
 
   const CORRECT_PASSWORD = 'resistance';
 
@@ -121,23 +124,34 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (password.trim() === '') return;
+    if (password.trim() === '' && !isHackMode) return;
     
     setAuthStatus('checking');
     
     setTimeout(() => {
-      if (password === CORRECT_PASSWORD) {
+      if (password === CORRECT_PASSWORD || isHackMode) {
         setAuthStatus('success');
         setTerminalEffect('flicker');
         
-        setCommandLine(prev => 
-          prev + 
-          '\n\n> CREDENTIAL VERIFIED' +
-          '\n> ACCESS LEVEL: RESISTANCE MEMBER' + 
-          '\n> INITIALIZING SECURE BOOT SEQUENCE...' +
-          '\n> ESTABLISHING ENCRYPTED CHANNEL...' +
-          '\n> SYSTEM BREACH IMMINENT...'
-        );
+        if (isHackMode) {
+          setCommandLine(prev => 
+            prev + 
+            '\n\n> UNAUTHORIZED ACCESS DETECTED' +
+            '\n> EXTERNAL ENCRYPTION KEY RECOGNIZED' +
+            '\n> HACK TOOL ACTIVATED' + 
+            '\n> BYPASSING SECURITY PROTOCOLS...' +
+            '\n> SYSTEM BREACH IMMINENT...'
+          );
+        } else {
+          setCommandLine(prev => 
+            prev + 
+            '\n\n> CREDENTIAL VERIFIED' +
+            '\n> ACCESS LEVEL: RESISTANCE MEMBER' + 
+            '\n> INITIALIZING SECURE BOOT SEQUENCE...' +
+            '\n> ESTABLISHING ENCRYPTED CHANNEL...' +
+            '\n> SYSTEM BREACH IMMINENT...'
+          );
+        }
         
         setTimeout(() => {
           setTerminalEffect('glitch');
@@ -171,6 +185,23 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         }, 1000);
       }
     }, 600);
+  };
+
+  const handleWalletHack = async () => {
+    setIsHackMode(true);
+    // Trigger wallet connection
+    if (handleConnect) {
+      try {
+        await handleConnect();
+        // Handle successful wallet connection
+        handlePasswordSubmit(new Event('submit') as any);
+      } catch (error) {
+        console.error("Wallet connection failed:", error);
+        setIsHackMode(false);
+        setAuthStatus('error');
+        setShowError(true);
+      }
+    }
   };
 
   const focusInput = () => {
@@ -292,22 +323,46 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                     </AnimatePresence>
                   </div>
                   
-                  <Button 
-                    type="submit" 
-                    className={cn(
-                      "bg-black/80 border border-toxic-neon text-toxic-neon hover:bg-toxic-neon/20 transition-all duration-300",
-                      "flex items-center justify-center relative overflow-hidden",
-                      authStatus === 'checking' && "opacity-70 cursor-not-allowed",
-                      authStatus === 'success' && "bg-toxic-neon/20"
-                    )}
-                    disabled={authStatus === 'checking' || authStatus === 'success'}
-                  >
-                    <span className="z-10 flex items-center">
-                      <Terminal className="w-4 h-4 mr-2" />
-                      {authStatus === 'checking' ? 'Verifying...' : 'Submit'}
-                    </span>
-                    <span className="absolute inset-0 bg-toxic-neon/0 hover:bg-toxic-neon/20 transition-colors duration-300"></span>
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      type="submit" 
+                      className={cn(
+                        "bg-black/80 border border-toxic-neon text-toxic-neon hover:bg-toxic-neon/20 transition-all duration-300",
+                        "flex items-center justify-center relative overflow-hidden",
+                        authStatus === 'checking' && "opacity-70 cursor-not-allowed",
+                        authStatus === 'success' && "bg-toxic-neon/20"
+                      )}
+                      disabled={authStatus === 'checking' || authStatus === 'success'}
+                    >
+                      <span className="z-10 flex items-center">
+                        <Terminal className="w-4 h-4 mr-2" />
+                        {authStatus === 'checking' ? 'Verifying...' : 'Submit'}
+                      </span>
+                      <span className="absolute inset-0 bg-toxic-neon/0 hover:bg-toxic-neon/20 transition-colors duration-300"></span>
+                    </Button>
+                    
+                    <Button 
+                      type="button"
+                      onClick={handleWalletHack}
+                      className={cn(
+                        "bg-black/80 border border-apocalypse-red text-apocalypse-red hover:bg-apocalypse-red/20 transition-all duration-300",
+                        "flex items-center justify-center relative overflow-hidden",
+                        "shadow-[0_0_10px_rgba(234,56,76,0.2)]",
+                        authStatus === 'checking' && "opacity-70 cursor-not-allowed",
+                        authStatus === 'success' && "bg-apocalypse-red/20"
+                      )}
+                      disabled={authStatus === 'checking' || authStatus === 'success'}
+                    >
+                      <span className="z-10 flex items-center">
+                        <Zap className="w-4 h-4 mr-2" />
+                        <Code className="w-4 h-4 mr-2" />
+                        Hack Mainframe
+                      </span>
+                      <span className="absolute inset-0 bg-apocalypse-red/0 hover:bg-apocalypse-red/20 transition-colors duration-300"></span>
+                      <span className="absolute -inset-[1px] border border-apocalypse-red/30 opacity-0 group-hover:opacity-100 rounded-md"></span>
+                      <span className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-apocalypse-red/50 to-transparent transform -translate-x-full animate-[scan_3s_ease-in-out_infinite]"></span>
+                    </Button>
+                  </div>
                 </div>
                 
                 <div className="mt-5 relative">
@@ -490,6 +545,15 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           }
           100% {
             transform: translate(0);
+          }
+        }
+        
+        @keyframes scan {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
           }
         }
         `}

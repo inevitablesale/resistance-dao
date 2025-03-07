@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Shield, Target, Radiation } from "lucide-react";
+import { Shield, Target, Radiation, MessageSquare } from "lucide-react";
 import { TerminalMonitor } from "@/components/ui/terminal-monitor";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { DrippingSlime } from "@/components/ui/dripping-slime";
@@ -22,6 +22,8 @@ import { SettlementMap } from "@/components/ui/settlement-map";
 import { PostAuthLayout } from "@/components/ui/post-auth-layout";
 import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
 import { ProgressIndicator } from "@/components/ui/progress-indicator";
+import { JournalDialog } from "@/components/ui/journal-dialog";
+import { useCustomWallet } from "@/hooks/useCustomWallet";
 
 // Define the authentication states
 type AuthStage = "pre-boot" | "authenticating" | "breach-transition" | "post-breach" | "authenticated";
@@ -31,6 +33,7 @@ type AppStage = "typing" | "desktop-environment" | "nft-selection" | "questionna
 
 const Index = () => {
   const navigate = useNavigate();
+  const { isConnected } = useCustomWallet();
   const [userRole, setUserRole] = useState<"bounty-hunter" | "survivor" | null>(null);
   const [communityActivity, setCommunityActivity] = useState(0);
   const [terminalStage, setTerminalStage] = useState<AppStage>("typing");
@@ -39,6 +42,17 @@ const Index = () => {
   const [terminalMinimized, setTerminalMinimized] = useState(false);
   const [showDesktopEnvironment, setShowDesktopEnvironment] = useState(false);
   const [initialAppOpened, setInitialAppOpened] = useState(false);
+  const [showJournalDialog, setShowJournalDialog] = useState(false);
+  
+  // Show journal dialog when wallet connects
+  useEffect(() => {
+    if (isConnected && (authStage === "authenticated" || authStage === "post-breach")) {
+      const timer = setTimeout(() => {
+        setShowJournalDialog(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isConnected, authStage]);
   
   // Community activity simulation
   useEffect(() => {
@@ -185,6 +199,12 @@ const Index = () => {
       <div className="dust-particles"></div>
       <div className="fog-overlay"></div>
 
+      {/* Journal Dialog - shown after wallet connection */}
+      <JournalDialog 
+        isOpen={showJournalDialog}
+        onClose={() => setShowJournalDialog(false)}
+      />
+
       {/* Emergency Transmission Popup - only show when authenticated */}
       {(authStage === "authenticated" || authStage === "post-breach") && (
         <EmergencyTransmission 
@@ -236,10 +256,20 @@ const Index = () => {
                   <ToxicButton 
                     variant="ghost" 
                     size="sm" 
+                    onClick={() => setShowJournalDialog(true)}
+                    className="animate-pulse-subtle hover:animate-none"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Survivor Messages
+                  </ToxicButton>
+                  
+                  <ToxicButton 
+                    variant="ghost" 
+                    size="sm" 
                     onClick={handleShowEmergencyTransmission}
                     className="animate-pulse-subtle hover:animate-none"
                   >
-                    <Radiation className="w-4 h-4 mr-2" />
+                    <Radiation className="w-4 w-4 mr-2" />
                     Emergency Transmission
                   </ToxicButton>
                   
