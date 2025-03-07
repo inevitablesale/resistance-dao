@@ -1,17 +1,20 @@
 
 import React, { useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
+import { Radiation, Biohazard, Skull, Zap, Shield } from "lucide-react";
 
 interface DrippingSlimeProps {
   position?: 'top' | 'bottom' | 'both';
   dripsCount?: number;
   className?: string;
+  showIcons?: boolean;
 }
 
 export function DrippingSlime({ 
   position = 'top', 
   dripsCount = 8,
-  className 
+  className,
+  showIcons = false
 }: DrippingSlimeProps) {
   const topDripsRef = useRef<HTMLDivElement>(null);
   const bottomDripsRef = useRef<HTMLDivElement>(null);
@@ -53,6 +56,43 @@ export function DrippingSlime({
     <div className={cn("dripping-container", className)}>
       {(position === 'top' || position === 'both') && 
         <div ref={topDripsRef} className="toxic-drips-top"></div>}
+      
+      {showIcons && (
+        <div className="toxic-symbols">
+          <div className="toxic-symbol" style={{ 
+            left: '10%', 
+            animationDelay: '0.5s',
+            top: position === 'bottom' ? 'auto' : '20%',
+            bottom: position === 'bottom' ? '20%' : 'auto'
+          }}>
+            <Radiation className="h-8 w-8 text-toxic-neon animate-pulse" />
+          </div>
+          <div className="toxic-symbol" style={{ 
+            left: '30%', 
+            animationDelay: '2.5s',
+            top: position === 'bottom' ? 'auto' : '40%',
+            bottom: position === 'bottom' ? '50%' : 'auto'
+          }}>
+            <Skull className="h-6 w-6 text-toxic-neon animate-pulse" />
+          </div>
+          <div className="toxic-symbol" style={{ 
+            left: '55%', 
+            animationDelay: '1.5s',
+            top: position === 'bottom' ? 'auto' : '15%',
+            bottom: position === 'bottom' ? '30%' : 'auto'
+          }}>
+            <Zap className="h-7 w-7 text-toxic-neon animate-pulse" />
+          </div>
+          <div className="toxic-symbol" style={{ 
+            left: '75%', 
+            animationDelay: '3.5s',
+            top: position === 'bottom' ? 'auto' : '35%',
+            bottom: position === 'bottom' ? '10%' : 'auto'
+          }}>
+            <Shield className="h-8 w-8 text-toxic-neon animate-pulse" />
+          </div>
+        </div>
+      )}
       
       {(position === 'bottom' || position === 'both') && 
         <div ref={bottomDripsRef} className="toxic-drips-bottom"></div>}

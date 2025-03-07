@@ -52,7 +52,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black text-white relative">
-      <DrippingSlime position="top" dripsCount={15} />
+      <DrippingSlime position="top" dripsCount={15} showIcons={true} />
 
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0">
@@ -71,7 +71,7 @@ const Index = () => {
             <div className="text-left mb-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono">
                 <span className="w-2 h-2 bg-toxic-neon rounded-full animate-pulse" />
-                Network Status: Active
+                <Radiation className="h-4 w-4 mr-1" /> Network Status: Active
               </div>
               <h1 className="text-5xl md:text-6xl font-bold font-mono mb-6 text-toxic-neon toxic-glow">
                 DeFi-Powered Launch Platform
@@ -81,17 +81,23 @@ const Index = () => {
               <div className="flex gap-4 mb-8">
                 <div className="bg-toxic-dark/70 border border-toxic-neon/20 rounded-lg p-4 flex-1 relative overflow-hidden">
                   <div className="scanline"></div>
-                  <div className="text-toxic-neon text-sm mb-1">Total Hodlers</div>
+                  <div className="text-toxic-neon text-sm mb-1 flex items-center">
+                    <Shield className="h-4 w-4 mr-2" /> Total Hodlers
+                  </div>
                   <div className="font-mono text-2xl text-white">821</div>
                 </div>
                 <div className="bg-toxic-dark/70 border border-toxic-neon/20 rounded-lg p-4 flex-1 relative overflow-hidden">
                   <div className="scanline"></div>
-                  <div className="text-toxic-neon text-sm mb-1">Community</div>
+                  <div className="text-toxic-neon text-sm mb-1 flex items-center">
+                    <Users className="h-4 w-4 mr-2" /> Community
+                  </div>
                   <div className="font-mono text-2xl text-white">2.5K</div>
                 </div>
                 <div className="bg-toxic-dark/70 border border-toxic-neon/20 rounded-lg p-4 flex-1 relative overflow-hidden">
                   <div className="scanline"></div>
-                  <div className="text-toxic-neon text-sm mb-1">Newsletter</div>
+                  <div className="text-toxic-neon text-sm mb-1 flex items-center">
+                    <Zap className="h-4 w-4 mr-2" /> Newsletter
+                  </div>
                   <div className="font-mono text-2xl text-white">2.7K</div>
                 </div>
               </div>
@@ -126,7 +132,9 @@ const Index = () => {
             <div className="mt-12 bg-toxic-dark/40 border border-toxic-neon/20 rounded-xl p-6 relative">
               <div className="scanline"></div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-mono text-toxic-neon">Live Activity</h3>
+                <h3 className="text-lg font-mono text-toxic-neon flex items-center">
+                  <Radiation className="h-5 w-5 mr-2" /> Live Activity
+                </h3>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 text-sm text-toxic-muted">
                     <div className="w-2 h-2 bg-toxic-neon rounded-full animate-pulse" />
@@ -231,11 +239,11 @@ const Index = () => {
       </section>
 
       <section className="py-24 relative radiation-bg">
-        <DrippingSlime position="both" dripsCount={6} className="absolute inset-x-0 h-full" />
+        <DrippingSlime position="both" dripsCount={6} showIcons={true} className="absolute inset-x-0 h-full" />
         <div className="container px-4">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-toxic-neon/20 bg-toxic-dark/40 text-toxic-neon mb-4">
-              <Clock className="w-4 h-4" />
+              <Radiation className="w-5 h-5" />
               <span className="text-sm font-mono">3-Step Process</span>
             </div>
             <h2 className="text-3xl font-bold font-mono mb-4 text-toxic-neon toxic-glow">
@@ -286,7 +294,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Keep the rest of the sections, updating styling to match the toxic theme */}
       <section className="py-24 relative radiation-bg">
         <div className="container px-4">
           <div className="text-center mb-16">
@@ -335,7 +342,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Keep remaining sections with updated toxic theme styling */}
       <section className="py-24 relative overflow-hidden radiation-bg">
         <ToxicPuddle className="absolute bottom-20 left-1/3" />
         <ToxicPuddle className="absolute bottom-40 right-1/4" />
@@ -672,7 +678,7 @@ const Index = () => {
         </div>
       </section>
 
-      <DrippingSlime position="bottom" dripsCount={12} className="absolute inset-x-0 bottom-0" />
+      <DrippingSlime position="bottom" dripsCount={12} showIcons={true} className="absolute inset-x-0 bottom-0" />
     </div>
   );
 };

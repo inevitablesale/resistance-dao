@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -114,6 +115,24 @@
   }
   50% {
     box-shadow: 0 0 20px var(--node-color, #14b8a6);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes rotate-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -245,4 +264,20 @@
 
 .cosmic-box.active::after {
   opacity: var(--energy-opacity, 0.8);
+}
+
+.toxic-symbols {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.toxic-symbol {
+  position: absolute;
+  animation: float 6s ease-in-out infinite;
+}
+
+.toxic-symbol svg {
+  filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.7));
 }
