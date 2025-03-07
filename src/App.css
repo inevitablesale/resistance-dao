@@ -285,6 +285,14 @@
   filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.8));
 }
 
+.toxic-symbol svg.toxic-green-glow {
+  filter: drop-shadow(0 0 12px rgba(132, 255, 56, 0.9));
+}
+
+.text-toxic-green {
+  color: #84ff38;
+}
+
 .post-apocalyptic-bg {
   position: relative;
   background-color: #1a1a1a;
@@ -340,6 +348,11 @@
 .drip.post-apocalyptic {
   background: rgba(250, 204, 21, 0.7);
   filter: drop-shadow(0 0 5px rgba(250, 204, 21, 0.4));
+}
+
+.drip.toxic-green {
+  background: rgba(132, 255, 56, 0.9);
+  filter: drop-shadow(0 0 8px rgba(132, 255, 56, 0.8));
 }
 
 @keyframes drip-fall {
@@ -400,6 +413,11 @@
 .toxic-puddle.post-apocalyptic {
   background: rgba(250, 204, 21, 0.4);
   filter: blur(3px) drop-shadow(0 0 5px rgba(250, 204, 21, 0.6));
+}
+
+.toxic-puddle.toxic-green {
+  background: rgba(132, 255, 56, 0.6);
+  filter: blur(3px) drop-shadow(0 0 8px rgba(132, 255, 56, 0.8));
 }
 
 @keyframes puddle-pulse {

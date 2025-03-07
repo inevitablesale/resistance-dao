@@ -52,7 +52,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
-      <DrippingSlime position="top" dripsCount={15} showIcons={true} postApocalyptic={true} />
+      <DrippingSlime position="top" dripsCount={15} showIcons={true} toxicGreen={true} />
       <div className="dust-particles"></div>
       <div className="fog-overlay"></div>
 
@@ -107,7 +107,7 @@ const Index = () => {
               {/* Add Buy RD Tokens component here */}
               <div className="relative mb-8">
                 <BuyRDTokens />
-                <ToxicPuddle className="absolute -bottom-2 -right-10" postApocalyptic={true} />
+                <ToxicPuddle className="absolute -bottom-2 -right-10" toxicGreen={true} />
               </div>
               
               {/* Action Buttons */}
@@ -244,7 +244,7 @@ const Index = () => {
       </section>
 
       <section className="py-24 relative radiation-bg">
-        <DrippingSlime position="both" dripsCount={6} showIcons={true} className="absolute inset-x-0 h-full" postApocalyptic={true} />
+        <DrippingSlime position="both" dripsCount={6} showIcons={true} className="absolute inset-x-0 h-full" toxicGreen={true} />
         <div className="container px-4">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-yellow-500/20 bg-black/40 text-yellow-300 mb-4">
@@ -348,8 +348,8 @@ const Index = () => {
       </section>
 
       <section className="py-24 relative overflow-hidden radiation-bg">
-        <ToxicPuddle className="absolute bottom-20 left-1/3" />
-        <ToxicPuddle className="absolute bottom-40 right-1/4" />
+        <ToxicPuddle className="absolute bottom-20 left-1/3" toxicGreen={true} />
+        <ToxicPuddle className="absolute bottom-40 right-1/4" toxicGreen={true} />
         <div className="container px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-yellow-300 toxic-glow">
@@ -683,7 +683,7 @@ const Index = () => {
         </div>
       </section>
 
-      <DrippingSlime position="bottom" dripsCount={12} showIcons={true} className="absolute inset-x-0 bottom-0" postApocalyptic={true} />
+      <DrippingSlime position="bottom" dripsCount={12} showIcons={true} className="absolute inset-x-0 bottom-0" toxicGreen={true} />
     </div>
   );
 };

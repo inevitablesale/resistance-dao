@@ -9,6 +9,7 @@ interface DrippingSlimeProps {
   className?: string;
   showIcons?: boolean;
   postApocalyptic?: boolean;
+  toxicGreen?: boolean;
 }
 
 export function DrippingSlime({ 
@@ -16,7 +17,8 @@ export function DrippingSlime({
   dripsCount = 8,
   className,
   showIcons = false,
-  postApocalyptic = false
+  postApocalyptic = false,
+  toxicGreen = false
 }: DrippingSlimeProps) {
   const topDripsRef = useRef<HTMLDivElement>(null);
   const bottomDripsRef = useRef<HTMLDivElement>(null);
@@ -38,7 +40,14 @@ export function DrippingSlime({
     
     for (let i = 0; i < count; i++) {
       const drip = document.createElement('div');
-      drip.className = postApocalyptic ? 'drip post-apocalyptic' : 'drip';
+      
+      if (toxicGreen) {
+        drip.className = 'drip toxic-green';
+      } else if (postApocalyptic) {
+        drip.className = 'drip post-apocalyptic';
+      } else {
+        drip.className = 'drip';
+      }
       
       // Randomize drip properties
       const left = Math.random() * 100;
@@ -54,13 +63,16 @@ export function DrippingSlime({
     }
   };
   
-  const iconColor = postApocalyptic ? "text-yellow-300" : "text-toxic-neon";
-  const iconGlowClass = postApocalyptic ? "yellow-glow" : "toxic-glow";
+  const iconColor = toxicGreen ? "text-toxic-green" : (postApocalyptic ? "text-yellow-300" : "text-toxic-neon");
+  const iconGlowClass = toxicGreen ? "toxic-green-glow" : (postApocalyptic ? "yellow-glow" : "toxic-glow");
   
   return (
     <div className={cn("dripping-container", className)}>
       {(position === 'top' || position === 'both') && 
-        <div ref={topDripsRef} className={postApocalyptic ? "toxic-drips-top post-apocalyptic" : "toxic-drips-top"}></div>}
+        <div ref={topDripsRef} className={
+          toxicGreen ? "toxic-drips-top toxic-green" : 
+          (postApocalyptic ? "toxic-drips-top post-apocalyptic" : "toxic-drips-top")
+        }></div>}
       
       {showIcons && (
         <div className="toxic-symbols">
@@ -100,12 +112,23 @@ export function DrippingSlime({
       )}
       
       {(position === 'bottom' || position === 'both') && 
-        <div ref={bottomDripsRef} className={postApocalyptic ? "toxic-drips-bottom post-apocalyptic" : "toxic-drips-bottom"}></div>}
+        <div ref={bottomDripsRef} className={
+          toxicGreen ? "toxic-drips-bottom toxic-green" : 
+          (postApocalyptic ? "toxic-drips-bottom post-apocalyptic" : "toxic-drips-bottom")
+        }></div>}
     </div>
   );
 }
 
-export function ToxicPuddle({ className, postApocalyptic = false }: { className?: string, postApocalyptic?: boolean }) {
+export function ToxicPuddle({ 
+  className, 
+  postApocalyptic = false,
+  toxicGreen = false 
+}: { 
+  className?: string, 
+  postApocalyptic?: boolean,
+  toxicGreen?: boolean 
+}) {
   const puddleRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -117,7 +140,12 @@ export function ToxicPuddle({ className, postApocalyptic = false }: { className?
     }
   }, []);
   
-  const puddleClass = postApocalyptic ? "toxic-puddle post-apocalyptic" : "toxic-puddle";
+  let puddleClass = "toxic-puddle";
+  if (toxicGreen) {
+    puddleClass = "toxic-puddle toxic-green";
+  } else if (postApocalyptic) {
+    puddleClass = "toxic-puddle post-apocalyptic";
+  }
   
   return <div ref={puddleRef} className={cn(puddleClass, className)}></div>;
 }
