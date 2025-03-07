@@ -47,7 +47,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
-      <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} />
+      <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} className="z-50" />
       <div className="dust-particles"></div>
       <div className="fog-overlay"></div>
 
@@ -96,7 +96,7 @@ const Index = () => {
                     onRoleSelect={handleRoleSelect}
                     selectedRole={userRole}
                     className="w-full" 
-                    skipBootSequence={true}
+                    skipBootSequence={false}
                   />
                 </div>
                 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { Radiation, Target, Shield, Terminal, Zap, AlertTriangle, RotateCw, Check } from "lucide-react";
@@ -198,7 +197,6 @@ export function TerminalTypewriter({
   
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  // Setup boot sequence
   useEffect(() => {
     if (!showBootSequence) {
       setBootStage("complete");
@@ -215,7 +213,7 @@ export function TerminalTypewriter({
     
     const bootInterval = setInterval(() => {
       setBootProgress(prev => {
-        const newProgress = prev + (Math.random() * 3 + 1);
+        const newProgress = prev + (Math.random() * 6 + 2);
         
         if (Math.random() < 0.15) {
           setBootGlitch(true);
@@ -232,12 +230,12 @@ export function TerminalTypewriter({
               setBootStage("complete");
               setIsComplete(true);
             }
-          }, 1000);
+          }, 300);
         }
         
         return newProgress > 100 ? 100 : newProgress;
       });
-    }, 100);
+    }, 50);
     
     const messageInterval = setInterval(() => {
       if (currentBootMessage < bootMessages.length - 1) {
@@ -245,7 +243,7 @@ export function TerminalTypewriter({
       } else {
         clearInterval(messageInterval);
       }
-    }, 1200);
+    }, 300);
     
     return () => {
       clearInterval(bootInterval);
@@ -253,7 +251,6 @@ export function TerminalTypewriter({
     };
   }, [bootStage, showBootSequence]);
   
-  // Setup cursor blinking
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setCursorVisible(prev => !prev);
@@ -262,7 +259,6 @@ export function TerminalTypewriter({
     return () => clearInterval(cursorInterval);
   }, []);
   
-  // Setup typing animation
   useEffect(() => {
     if (!isComplete || bootStage !== "complete" || typingStarted) {
       return;
@@ -295,7 +291,7 @@ export function TerminalTypewriter({
           onTypingComplete();
         }
       }
-    }, textToType.length * typeDelay + 5000);
+    }, 2000);
     
     return () => {
       clearInterval(typingInterval);
@@ -303,7 +299,6 @@ export function TerminalTypewriter({
     };
   }, [textToType, typeDelay, bootStage, isComplete, onTypingComplete, typingStarted, typingComplete]);
   
-  // Auto-start questionnaire if showQuestionnaire is true
   useEffect(() => {
     if (showQuestionnaire && !questionnaireStarted && !selectedRole) {
       setQuestionnaireStarted(true);
