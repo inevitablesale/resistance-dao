@@ -59,7 +59,6 @@ const Index = () => {
   
   const handleTerminalComplete = () => {
     console.log("Typing animation complete, showing NFT selection");
-    setAuthStage("authenticated");
     setTerminalStage("nft-selection");
   };
 
@@ -129,10 +128,15 @@ const Index = () => {
   // Determine what content to show based on the stages
   const renderMainContent = () => {
     if (authStage === "authenticated") {
-      // If authenticated, show the NFT selection in the main content
-      return renderNFTContent();
+      // If authenticated, show different content based on terminal stage
+      if (terminalStage === "nft-selection") {
+        return renderNFTContent();
+      } else if (terminalStage === "typing") {
+        // Show terminal typewriter in the authenticated state
+        return renderTypewriterContent();
+      }
     } else if (authStage === "post-breach") {
-      // Show terminal typewriter after breach
+      // Always show terminal typewriter after breach
       return renderTypewriterContent();
     } else if (authStage === "pre-boot" || authStage === "authenticating" || authStage === "breach-transition") {
       // Pre-authentication shows nothing
@@ -236,8 +240,8 @@ const Index = () => {
                   )}
                 </div>
                 
-                {/* Only show this if the user is in post-breach stage but not showing NFT selection yet */}
-                {authStage === "post-breach" && terminalStage !== "nft-selection" && (
+                {/* Only show this if the user is in post-breach stage or typing terminal stage */}
+                {(authStage === "post-breach" || (authStage === "authenticated" && terminalStage === "typing")) && (
                   <div className="mt-4 text-center">
                     <p className="text-white/70 text-sm mb-3">
                       Complete the terminal sequence to access the Resistance Network
