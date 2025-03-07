@@ -21,7 +21,7 @@ export const TerminalTypewriter = ({
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cursorVisible, setCursorVisible] = useState(true);
-  const [isTyping, setIsTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(true); // Start typing immediately
   const [showFullMessage, setShowFullMessage] = useState(false);
   
   const firstPartOfMessage = "EMERGENCY BROADCAST: SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE. ";
@@ -37,18 +37,11 @@ export const TerminalTypewriter = ({
     return () => clearInterval(cursorInterval);
   }, []);
 
-  // Handle text typing effect - ensure it starts immediately on component mount
+  // Handle text typing effect
   useEffect(() => {
-    if (isTyping) return;
+    if (!isTyping) return;
     
-    setIsTyping(true);
-    
-    // Reset for reconnection
-    if (currentIndex === 0) {
-      setDisplayedText('');
-      setShowFullMessage(false);
-    }
-    
+    // Determine what text to show based on current state
     const textToShow = showFullMessage ? 
       (firstPartOfMessage + remainingMessage) : 
       (currentIndex >= firstPartOfMessage.length ? 
@@ -77,7 +70,7 @@ export const TerminalTypewriter = ({
     if (!isTyping && !showFullMessage && currentIndex >= firstPartOfMessage.length) {
       setShowFullMessage(true);
       setCurrentIndex(0); // Reset to start typing the full message
-      setIsTyping(false); // Allow the typing effect to restart
+      setIsTyping(true); // Allow the typing effect to restart
     }
   };
 
