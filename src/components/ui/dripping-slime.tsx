@@ -8,13 +8,15 @@ interface DrippingSlimeProps {
   dripsCount?: number;
   className?: string;
   showIcons?: boolean;
+  postApocalyptic?: boolean;
 }
 
 export function DrippingSlime({ 
   position = 'top', 
   dripsCount = 8,
   className,
-  showIcons = false
+  showIcons = false,
+  postApocalyptic = false
 }: DrippingSlimeProps) {
   const topDripsRef = useRef<HTMLDivElement>(null);
   const bottomDripsRef = useRef<HTMLDivElement>(null);
@@ -36,7 +38,7 @@ export function DrippingSlime({
     
     for (let i = 0; i < count; i++) {
       const drip = document.createElement('div');
-      drip.className = 'drip';
+      drip.className = postApocalyptic ? 'drip post-apocalyptic' : 'drip';
       
       // Randomize drip properties
       const left = Math.random() * 100;
@@ -52,10 +54,13 @@ export function DrippingSlime({
     }
   };
   
+  const iconColor = postApocalyptic ? "text-yellow-300" : "text-toxic-neon";
+  const iconGlowClass = postApocalyptic ? "yellow-glow" : "toxic-glow";
+  
   return (
     <div className={cn("dripping-container", className)}>
       {(position === 'top' || position === 'both') && 
-        <div ref={topDripsRef} className="toxic-drips-top"></div>}
+        <div ref={topDripsRef} className={postApocalyptic ? "toxic-drips-top post-apocalyptic" : "toxic-drips-top"}></div>}
       
       {showIcons && (
         <div className="toxic-symbols">
@@ -65,7 +70,7 @@ export function DrippingSlime({
             top: position === 'bottom' ? 'auto' : '20%',
             bottom: position === 'bottom' ? '20%' : 'auto'
           }}>
-            <Radiation className="h-8 w-8 text-toxic-neon animate-pulse" />
+            <Radiation className={`h-8 w-8 ${iconColor} animate-pulse ${iconGlowClass}`} />
           </div>
           <div className="toxic-symbol" style={{ 
             left: '30%', 
@@ -73,7 +78,7 @@ export function DrippingSlime({
             top: position === 'bottom' ? 'auto' : '40%',
             bottom: position === 'bottom' ? '50%' : 'auto'
           }}>
-            <Skull className="h-6 w-6 text-toxic-neon animate-pulse" />
+            <Skull className={`h-6 w-6 ${iconColor} animate-pulse ${iconGlowClass}`} />
           </div>
           <div className="toxic-symbol" style={{ 
             left: '55%', 
@@ -81,7 +86,7 @@ export function DrippingSlime({
             top: position === 'bottom' ? 'auto' : '15%',
             bottom: position === 'bottom' ? '30%' : 'auto'
           }}>
-            <Zap className="h-7 w-7 text-toxic-neon animate-pulse" />
+            <Zap className={`h-7 w-7 ${iconColor} animate-pulse ${iconGlowClass}`} />
           </div>
           <div className="toxic-symbol" style={{ 
             left: '75%', 
@@ -89,18 +94,18 @@ export function DrippingSlime({
             top: position === 'bottom' ? 'auto' : '35%',
             bottom: position === 'bottom' ? '10%' : 'auto'
           }}>
-            <Shield className="h-8 w-8 text-toxic-neon animate-pulse" />
+            <Shield className={`h-8 w-8 ${iconColor} animate-pulse ${iconGlowClass}`} />
           </div>
         </div>
       )}
       
       {(position === 'bottom' || position === 'both') && 
-        <div ref={bottomDripsRef} className="toxic-drips-bottom"></div>}
+        <div ref={bottomDripsRef} className={postApocalyptic ? "toxic-drips-bottom post-apocalyptic" : "toxic-drips-bottom"}></div>}
     </div>
   );
 }
 
-export function ToxicPuddle({ className }: { className?: string }) {
+export function ToxicPuddle({ className, postApocalyptic = false }: { className?: string, postApocalyptic?: boolean }) {
   const puddleRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -112,5 +117,7 @@ export function ToxicPuddle({ className }: { className?: string }) {
     }
   }, []);
   
-  return <div ref={puddleRef} className={cn("toxic-puddle", className)}></div>;
+  const puddleClass = postApocalyptic ? "toxic-puddle post-apocalyptic" : "toxic-puddle";
+  
+  return <div ref={puddleRef} className={cn(puddleClass, className)}></div>;
 }
