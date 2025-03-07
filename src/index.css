@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -275,4 +274,29 @@
 
 .border-apocalypse-red {
   border-color: hsl(350, 82%, 57%);
+}
+
+/* Terminal scrollbar styling */
+.terminal-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.terminal-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.terminal-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(80, 250, 123, 0.3);
+  border-radius: 3px;
+}
+
+.terminal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(80, 250, 123, 0.5);
+}
+
+/* Limit the height of app windows to prevent vertical overflow */
+.terminal-app-content {
+  max-height: calc(100% - 40px);
+  overflow-y: auto;
 }

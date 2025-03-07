@@ -35,7 +35,7 @@ const Index = () => {
       const forceQuestionnaireTimeout = setTimeout(() => {
         console.log("Force timeout: Switching to questionnaire stage");
         setTerminalStage("questionnaire");
-      }, 15000); // Force after 15 seconds
+      }, 10000); // Force after 10 seconds for demo purposes
       
       return () => clearTimeout(forceQuestionnaireTimeout);
     }
@@ -125,6 +125,14 @@ const Index = () => {
                       <Radiation className="w-4 h-4 mr-2" />
                       Skip Intro Sequence
                     </ToxicButton>
+                  </div>
+                )}
+                
+                {userRole && (
+                  <div className="mt-4 text-center">
+                    <p className="text-toxic-neon text-sm mb-3">
+                      Click on desktop icons to explore the Resistance Network
+                    </p>
                   </div>
                 )}
               </div>

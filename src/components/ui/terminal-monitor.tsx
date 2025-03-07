@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Minimize2, Maximize2, X, Monitor, Shield, Target, Radio, Users, Clock, AlertTriangle, BookOpen, Radiation } from 'lucide-react';
+import { Minimize2, Maximize2, X, Monitor, Shield, Target, Radio, Users, Clock, AlertTriangle, BookOpen, Radiation, AppWindow } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TerminalTypewriter } from './terminal-typewriter';
 import { Button } from './button';
@@ -41,7 +41,7 @@ const TerminalApp: React.FC<TerminalAppProps> = ({
             "absolute border border-toxic-neon/40 bg-black/90 rounded-md overflow-hidden",
             isMaximized 
               ? "inset-4" 
-              : "w-[85%] h-[85%] top-[8%] left-[8%]"
+              : "w-[85%] h-[80%] top-[10%] left-[8%]"
           )}
           style={{ zIndex }}
         >
@@ -71,7 +71,7 @@ const TerminalApp: React.FC<TerminalAppProps> = ({
               </button>
             </div>
           </div>
-          <div className="p-4 h-[calc(100%-40px)] overflow-auto">
+          <div className="p-4 h-[calc(100%-40px)] overflow-auto terminal-scrollbar">
             {children}
           </div>
         </motion.div>
@@ -92,16 +92,16 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({ icon, label, onClick, isActiv
     <div 
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center p-2 rounded-md cursor-pointer group",
+        "flex flex-col items-center p-1 rounded-md cursor-pointer group",
         isActive ? "bg-toxic-neon/20" : "hover:bg-toxic-neon/10"
       )}
     >
-      <div className="w-12 h-12 rounded-md bg-black/80 border border-toxic-neon/30 flex items-center justify-center mb-1 group-hover:border-toxic-neon/60">
+      <div className="w-10 h-10 rounded-md bg-black/80 border border-toxic-neon/30 flex items-center justify-center mb-1 group-hover:border-toxic-neon/60">
         <div className="text-toxic-neon">
           {icon}
         </div>
       </div>
-      <span className="text-toxic-neon/80 text-xs font-mono text-center group-hover:text-toxic-neon">
+      <span className="text-toxic-neon/80 text-xs font-mono text-center group-hover:text-toxic-neon max-w-[60px] truncate">
         {label}
       </span>
     </div>
@@ -130,7 +130,15 @@ export function TerminalMonitor({
   const [activeApp, setActiveApp] = useState<string | null>(null);
   const [appZIndex, setAppZIndex] = useState<Record<string, number>>({});
   const [nextZIndex, setNextZIndex] = useState(10);
+  const [showDesktopIcons, setShowDesktopIcons] = useState(false);
 
+  // Show desktop icons after a role is selected or when explicitly enabled
+  useEffect(() => {
+    if (selectedRole) {
+      setShowDesktopIcons(true);
+    }
+  }, [selectedRole]);
+  
   const handleOpenApp = (appId: string) => {
     if (!openApps.includes(appId)) {
       setOpenApps([...openApps, appId]);
@@ -154,17 +162,24 @@ export function TerminalMonitor({
     }
   };
 
+  const handleMinimizeApp = (appId: string) => {
+    // Just close for now as we don't have a taskbar minimized state
+    handleCloseApp(appId);
+  };
+
   const handleMaximizeApp = (appId: string) => {
     setMaximizedApp(maximizedApp === appId ? null : appId);
   };
 
   const handleAppFocus = (appId: string) => {
-    setActiveApp(appId);
-    setAppZIndex({
-      ...appZIndex,
-      [appId]: nextZIndex
-    });
-    setNextZIndex(nextZIndex + 1);
+    if (openApps.includes(appId)) {
+      setActiveApp(appId);
+      setAppZIndex({
+        ...appZIndex,
+        [appId]: nextZIndex
+      });
+      setNextZIndex(nextZIndex + 1);
+    }
   };
 
   // Apps content based on user's suggestions
@@ -474,6 +489,37 @@ export function TerminalMonitor({
           </div>
         </div>
       )
+    },
+    'thesis-test': {
+      title: 'THESIS TESTING',
+      icon: <AppWindow size={16} />,
+      content: (
+        <div className="p-2">
+          <div className="border border-toxic-neon/30 rounded-md p-4 bg-black/70 mb-6">
+            <h3 className="text-toxic-neon font-mono mb-3 text-lg">Test Market Interest, Then Launch With Confidence</h3>
+            <p className="text-white/80 mb-4 text-sm">
+              Collect soft commitments from interested supporters and build your launch community before investing in development.
+            </p>
+            
+            <p className="text-white/80 mb-4 text-sm">
+              Supporters indicate their potential investment amount through soft pledges with a voting fee to RD. Test your project's market interest verified without requiring immediate investment.
+            </p>
+            
+            <p className="text-white/80 mb-4 text-sm">
+              Connect directly with interested supporters and track their soft commitment amounts. Build reports that provide concrete proof of market interest.
+            </p>
+            
+            <p className="text-white/80 mb-4 text-sm">
+              Once interest is proven, launch with confidence knowing there's a committed community ready to support your project from day one.
+            </p>
+            
+            <Button variant="default" className="w-full mt-4">
+              <Target className="w-4 h-4 mr-2" />
+              Submit Your Thesis
+            </Button>
+          </div>
+        </div>
+      )
     }
   };
 
@@ -482,17 +528,17 @@ export function TerminalMonitor({
       {/* Monitor frame */}
       <div className="monitor-frame bg-black/90 border-2 border-toxic-neon/40 rounded-lg overflow-hidden shadow-[0_0_15px_rgba(80,250,123,0.2)] relative">
         {/* Monitor screen */}
-        <div className="monitor-screen bg-black p-1 md:p-2 relative min-h-[500px]">
+        <div className="monitor-screen bg-black p-1 md:p-2 relative min-h-[500px] max-h-[600px] overflow-hidden">
           <div className="monitor-scanlines absolute inset-0 pointer-events-none"></div>
           <div className="monitor-glow absolute inset-0 pointer-events-none"></div>
           
           {/* Monitor bezel elements */}
-          <div className="absolute top-2 left-2 flex items-center gap-1">
+          <div className="absolute top-2 left-2 flex items-center gap-1 z-30">
             <div className="w-2 h-2 rounded-full bg-apocalypse-red animate-pulse"></div>
             <div className="w-2 h-2 rounded-full bg-toxic-neon/70"></div>
           </div>
           
-          <div className="absolute top-2 right-2 text-toxic-neon/50 text-xs font-mono">
+          <div className="absolute top-2 right-2 text-toxic-neon/50 text-xs font-mono z-30">
             RSTNC_OS v3.2.1
           </div>
           
@@ -508,26 +554,32 @@ export function TerminalMonitor({
                 />
               </div>
             ) : (
-              <div className="desktop-environment h-full">
+              <div className="desktop-environment h-full relative">
                 {/* Desktop Icons */}
-                <div className="grid grid-cols-3 gap-2 p-4">
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-1 p-2 absolute top-0 left-0 z-10">
                   <DesktopIcon 
-                    icon={<AlertTriangle size={24} />} 
+                    icon={<AlertTriangle size={20} />} 
                     label="Network Status"
                     onClick={() => handleOpenApp('network-status')}
                     isActive={activeApp === 'network-status'}
                   />
                   <DesktopIcon 
-                    icon={<Target size={24} />} 
+                    icon={<Target size={20} />} 
                     label="Bounty List"
                     onClick={() => handleOpenApp('bounty-hunter')}
                     isActive={activeApp === 'bounty-hunter'}
                   />
                   <DesktopIcon 
-                    icon={<BookOpen size={24} />} 
+                    icon={<BookOpen size={20} />} 
                     label="Archives"
                     onClick={() => handleOpenApp('archives')}
                     isActive={activeApp === 'archives'}
+                  />
+                  <DesktopIcon 
+                    icon={<AppWindow size={20} />} 
+                    label="Thesis Test"
+                    onClick={() => handleOpenApp('thesis-test')}
+                    isActive={activeApp === 'thesis-test'}
                   />
                 </div>
                 
@@ -539,7 +591,7 @@ export function TerminalMonitor({
                     icon={app.icon}
                     isOpen={openApps.includes(appId)}
                     onClose={() => handleCloseApp(appId)}
-                    onMinimize={() => handleCloseApp(appId)}
+                    onMinimize={() => handleMinimizeApp(appId)}
                     onMaximize={() => handleMaximizeApp(appId)}
                     isMaximized={maximizedApp === appId}
                     zIndex={appZIndex[appId] || 10}
@@ -548,35 +600,37 @@ export function TerminalMonitor({
                 ))}
                 
                 {/* Task Bar */}
-                <div className="absolute bottom-0 left-0 right-0 bg-black/80 border-t border-toxic-neon/30 h-10 flex items-center px-2">
-                  <div className="flex items-center gap-2">
+                <div className="absolute bottom-0 left-0 right-0 bg-black/80 border-t border-toxic-neon/30 h-10 flex items-center px-2 z-20">
+                  <div className="flex items-center gap-2 overflow-x-auto terminal-scrollbar flex-1">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 text-xs text-toxic-neon"
+                      className="h-8 text-xs text-toxic-neon flex-shrink-0"
                       onClick={() => {}}
                     >
                       <Radiation className="w-4 h-4 mr-1" />
                       Start
                     </Button>
                     
-                    <div className="h-6 border-r border-toxic-neon/20"></div>
+                    {openApps.length > 0 && (
+                      <div className="h-6 border-r border-toxic-neon/20 flex-shrink-0"></div>
+                    )}
                     
                     {openApps.map(appId => (
                       <Button
                         key={appId}
                         variant={activeApp === appId ? "secondary" : "ghost"}
                         size="sm"
-                        className="h-8 text-xs text-toxic-neon"
+                        className="h-8 text-xs text-toxic-neon flex-shrink-0"
                         onClick={() => handleAppFocus(appId)}
                       >
                         {appContent[appId].icon}
-                        <span className="ml-1 max-w-32 truncate">{appContent[appId].title}</span>
+                        <span className="ml-1 max-w-20 truncate">{appContent[appId].title}</span>
                       </Button>
                     ))}
                   </div>
                   
-                  <div className="ml-auto flex items-center text-toxic-neon">
+                  <div className="ml-auto flex items-center text-toxic-neon flex-shrink-0">
                     <Clock size={14} className="mr-2" />
                     <span className="text-xs font-mono">
                       {new Date().toLocaleTimeString()}
