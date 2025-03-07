@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -303,14 +302,14 @@ const Index = () => {
                   {authStage === "pre-boot" && (
                     <>
                       <PreBootTerminal onAuthenticated={handleAuthenticated} />
-                      {/* Progress Indicator only shown during pre-boot and typing stages */}
+                      {/* Progress Indicator only shown during pre-boot stage */}
                       {showProgressIndicator && (
                         <div className="mt-6">
                           <ProgressIndicator 
                             stages={[
                               { id: "boot", label: "Boot", completed: authStage !== "pre-boot" },
                               { id: "breach", label: "System Breach", completed: authStage === "post-breach" || authStage === "authenticated" },
-                              { id: "desktop", label: "Interface", completed: terminalStage !== "typing" && (authStage === "post-breach" || authStage === "authenticated") },
+                              { id: "desktop", label: "Interface", completed: terminalStage !== "typing" },
                               { id: "role", label: "Role Selection", completed: userRole !== null }
                             ]}
                           />
@@ -319,7 +318,7 @@ const Index = () => {
                     </>
                   )}
                   
-                  {(authStage === "post-breach" || authStage === "authenticated") ? (
+                  {(authStage === "post-breach" || authStage === "authenticated") && (
                     <>
                       <PostAuthLayout
                         leftSidebar={renderLeftSidebar()}
@@ -340,7 +339,9 @@ const Index = () => {
                         </div>
                       )}
                     </>
-                  ) : (
+                  )}
+                  
+                  {authStage !== "pre-boot" && authStage !== "post-breach" && authStage !== "authenticated" && (
                     renderMainContent()
                   )}
                 </div>
