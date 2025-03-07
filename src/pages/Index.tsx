@@ -20,9 +20,10 @@ import { BountyBoard } from "@/components/ui/bounty-board";
 import { TerminalMini } from "@/components/ui/terminal-mini";
 import { SettlementMap } from "@/components/ui/settlement-map";
 import { PostAuthLayout } from "@/components/ui/post-auth-layout";
+import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
 
 // Define the authentication states
-type AuthStage = "pre-boot" | "authenticating" | "authenticated" | "system-breach";
+type AuthStage = "pre-boot" | "authenticating" | "breach-transition" | "post-breach" | "authenticated";
 
 // Define the application stages
 type AppStage = "typing" | "nft-selection" | "questionnaire" | "completed";
@@ -58,6 +59,7 @@ const Index = () => {
   
   const handleTerminalComplete = () => {
     console.log("Typing animation complete, showing NFT selection");
+    setAuthStage("authenticated");
     setTerminalStage("nft-selection");
   };
 
@@ -74,17 +76,12 @@ const Index = () => {
     setAuthStage("authenticating");
     
     setTimeout(() => {
-      setAuthStage("system-breach");
+      setAuthStage("breach-transition");
       
       setTimeout(() => {
-        setAuthStage("authenticated");
-        // Still set terminal stage to nft-selection after authentication
-        setTerminalStage("nft-selection");
+        setAuthStage("post-breach");
         
-        toast.success("Access granted", {
-          description: "Welcome to the Resistance Network terminal",
-          duration: 3000,
-        });
+        // Typing animation will now happen in the post-breach stage
       }, 2500);
     }, 500);
   };
@@ -111,6 +108,16 @@ const Index = () => {
   // Render pre-authentication content
   const renderPreAuthContent = () => null; // Hide all pre-auth content
 
+  // Render terminal typewriter content
+  const renderTypewriterContent = () => (
+    <div className="w-full px-4 py-6">
+      <TerminalTypewriter 
+        showBootSequence={false}
+        onTypingComplete={handleTerminalComplete}
+      />
+    </div>
+  );
+
   // Main content with NFT showcase
   const renderNFTContent = () => (
     <NFTShowcase 
@@ -124,7 +131,10 @@ const Index = () => {
     if (authStage === "authenticated") {
       // If authenticated, show the NFT selection in the main content
       return renderNFTContent();
-    } else if (authStage === "pre-boot" || authStage === "authenticating" || authStage === "system-breach") {
+    } else if (authStage === "post-breach") {
+      // Show terminal typewriter after breach
+      return renderTypewriterContent();
+    } else if (authStage === "pre-boot" || authStage === "authenticating" || authStage === "breach-transition") {
       // Pre-authentication shows nothing
       return renderPreAuthContent();
     }
@@ -140,7 +150,7 @@ const Index = () => {
       <div className="fog-overlay"></div>
 
       {/* Emergency Transmission Popup - only show when authenticated */}
-      {authStage === "authenticated" && (
+      {(authStage === "authenticated" || authStage === "post-breach") && (
         <EmergencyTransmission 
           isOpen={showEmergencyTransmission} 
           onClose={handleCloseEmergencyTransmission} 
@@ -154,20 +164,20 @@ const Index = () => {
         </div>
         
         <AnimatePresence mode="wait">
-          {authStage === "system-breach" && (
+          {authStage === "breach-transition" && (
             <SystemBreachTransition />
           )}
         </AnimatePresence>
         
-        <div className={`container px-4 relative w-full mx-auto h-full py-10 transition-all duration-500 ${authStage === "authenticated" ? "max-w-[95%]" : "max-w-5xl"}`}>
+        <div className={`container px-4 relative w-full mx-auto h-full py-10 transition-all duration-500 ${(authStage === "authenticated" || authStage === "post-breach") ? "max-w-[95%]" : "max-w-5xl"}`}>
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
             className="w-full"
           >
-            {/* Only show header elements if authenticated */}
-            {authStage === "authenticated" && (
+            {/* Only show header elements if post-breach or authenticated */}
+            {(authStage === "authenticated" || authStage === "post-breach") && (
               <div className="text-center mb-4 flex justify-between items-center">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm font-mono broken-glass">
                   <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
@@ -188,14 +198,14 @@ const Index = () => {
               </div>
             )}
 
-            <Card className={`w-full bg-black/80 border-toxic-neon/30 p-0 relative overflow-hidden transition-all duration-500 ${authStage === "authenticated" ? "min-h-[80vh]" : "min-h-[50vh]"}`}>
+            <Card className={`w-full bg-black/80 border-toxic-neon/30 p-0 relative overflow-hidden transition-all duration-500 ${(authStage === "authenticated" || authStage === "post-breach") ? "min-h-[80vh]" : "min-h-[50vh]"}`}>
               <div className="absolute inset-0 z-0 rust-overlay broken-glass">
                 <div className="scanline absolute inset-0"></div>
               </div>
               
               <div className="relative z-10 p-6 md:p-8">
-                {/* Only show this header if authenticated */}
-                {authStage === "authenticated" && (
+                {/* Only show this header if post-breach or authenticated */}
+                {(authStage === "authenticated" || authStage === "post-breach") && (
                   <div className="flex items-center justify-between mb-4 border-b border-toxic-neon/20 pb-2">
                     <div className="flex items-center">
                       <Radiation className="h-5 w-5 mr-2 text-toxic-neon" />
@@ -215,7 +225,7 @@ const Index = () => {
                     <PreBootTerminal onAuthenticated={handleAuthenticated} />
                   )}
                   
-                  {authStage === "authenticated" ? (
+                  {(authStage === "authenticated" || authStage === "post-breach") ? (
                     <PostAuthLayout
                       leftSidebar={renderLeftSidebar()}
                       mainContent={renderMainContent()}
@@ -226,14 +236,14 @@ const Index = () => {
                   )}
                 </div>
                 
-                {/* Only show this if the user is authenticated but doesn't have access to the desktop yet */}
-                {authStage === "authenticated" && !userRole && terminalStage !== "nft-selection" && terminalStage !== "completed" && (
+                {/* Only show this if the user is in post-breach stage but not showing NFT selection yet */}
+                {authStage === "post-breach" && terminalStage !== "nft-selection" && (
                   <div className="mt-4 text-center">
                     <p className="text-white/70 text-sm mb-3">
                       Complete the terminal sequence to access the Resistance Network
                     </p>
                     <ToxicButton 
-                      onClick={() => setTerminalStage("nft-selection")}
+                      onClick={handleTerminalComplete}
                       variant="ghost"
                       size="sm"
                     >
