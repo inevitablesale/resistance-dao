@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -173,7 +172,7 @@
   z-index: 0;
 }
 
-/* Rest of your existing CSS */
+/* Broken Glass Effect */
 .broken-glass {
   position: relative;
   overflow: hidden;
@@ -383,4 +382,14 @@
 
 .animate-radiation {
   animation: rotate 10s linear infinite;
+}
+
+/* Flashing Beacon Light */
+@keyframes beacon-flash {
+  0%, 100% { opacity: 1; box-shadow: 0 0 10px #f1c40f, 0 0 15px #f1c40f; }
+  50% { opacity: 0.3; box-shadow: 0 0 5px #f1c40f; }
+}
+
+.beacon-flash {
+  animation: beacon-flash 1s ease-in-out infinite;
 }

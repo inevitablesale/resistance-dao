@@ -26,7 +26,7 @@ export const TerminalTypewriter = ({
   const [identityConfirmed, setIdentityConfirmed] = useState(false);
   
   const firstPartOfMessage = "SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY. WE'VE BUILT SHELTERS FROM THE FALLOUT, PRESERVING WHAT'S LEFT OF DECENTRALIZED TECHNOLOGY. OUR COMMUNITY HAS GOOD NEWS TO REPORT. WE ARE WINNING THE WAR. ";
-  const pressEnterMessage = "PRESS [CONNECT SURVIVAL BEACON] TO CONTINUE...";
+  const pressEnterMessage = "PRESS [ACTIVATE SURVIVAL BEACON] TO CONTINUE...";
   const identityConfirmedMessage = "IDENTITY CONFIRMED. PROCEEDING WITH TRANSMISSION...";
   const remainingMessage = "THE RESISTANCE NEEDS YOUR HELP. THE OLD WORLD IS GONE. WE ARE BUILDING FROM THE ASHES. SHALL WE PLAY A GAME?";
 
@@ -111,18 +111,17 @@ export const TerminalTypewriter = ({
                         <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
                       )}
                     </div>
-                    {!isTyping && !showFullMessage && (
-                      <div className="mt-4">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={handleBeaconConnect}
-                          className="text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-4 py-2 h-auto text-xs font-mono border border-apocalypse-red/50 animate-pulse"
-                        >
-                          CONNECT SURVIVAL BEACON
-                        </Button>
-                      </div>
-                    )}
+                    <div className="mt-4">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={handleBeaconConnect}
+                        className="relative text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-4 py-2 h-auto text-xs font-mono border border-apocalypse-red/50 animate-pulse"
+                      >
+                        <span className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-yellow-400 beacon-flash"></span>
+                        ACTIVATE SURVIVAL BEACON
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
