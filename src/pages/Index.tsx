@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -172,7 +171,7 @@ const Index = () => {
 
   // Determine what content to show based on the stages
   const renderMainContent = () => {
-    if (authStage === "authenticated" || authStage === "post-breach") {
+    if (authStage === "post-breach" || authStage === "authenticated") {
       // If post-breach or authenticated, show different content based on terminal stage
       if (terminalStage === "nft-selection") {
         console.log("Showing NFT selection content");
@@ -184,7 +183,7 @@ const Index = () => {
         // Show terminal typewriter in the authenticated state
         return renderTypewriterContent();
       }
-    } else if (authStage === "pre-boot" || authStage === "authenticating" || authStage === "breach-transition") {
+    } else {
       // Pre-authentication shows nothing
       return renderPreAuthContent();
     }
@@ -212,8 +211,6 @@ const Index = () => {
           onClose={handleCloseEmergencyTransmission} 
         />
       )}
-
-      {/* Progress Indicator has been removed from here */}
 
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0">
@@ -336,7 +333,7 @@ const Index = () => {
                 </div>
                 
                 {/* Show skip button for typing terminal stage only */}
-                {(authStage === "post-breach" || (authStage === "authenticated" && terminalStage === "typing")) && (
+                {(authStage === "post-breach" || authStage === "authenticated") && terminalStage === "typing" && (
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
