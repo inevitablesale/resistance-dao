@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle, Lock, Zap, Code } from 'lucide-react';
@@ -262,7 +261,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           {terminalReady && (
             <form onSubmit={handlePasswordSubmit} className="mt-2">
               <div>
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative flex-1 group">
                     <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
                       <Lock className={cn(
@@ -324,30 +323,17 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                     </AnimatePresence>
                   </div>
                   
-                  <div className="flex gap-2">
-                    <Button 
-                      type="submit" 
-                      className={cn(
-                        "bg-black/80 border border-toxic-neon text-toxic-neon hover:bg-toxic-neon/20 transition-all duration-300",
-                        "flex items-center justify-center relative overflow-hidden",
-                        authStatus === 'checking' && "opacity-70 cursor-not-allowed",
-                        authStatus === 'success' && "bg-toxic-neon/20"
-                      )}
-                      disabled={authStatus === 'checking' || authStatus === 'success'}
-                    >
-                      <span className="z-10 flex items-center">
-                        <Terminal className="w-4 h-4 mr-2" />
-                        {authStatus === 'checking' ? 'Verifying...' : 'Submit'}
-                      </span>
-                      <span className="absolute inset-0 bg-toxic-neon/0 hover:bg-toxic-neon/20 transition-colors duration-300"></span>
-                    </Button>
-                    
+                  <div className="flex items-center justify-center">
+                    <div className="text-toxic-neon/60 font-mono text-sm px-4">OR</div>
+                  </div>
+                  
+                  <div className="flex">
                     <Button 
                       type="button"
                       onClick={handleWalletHack}
                       className={cn(
                         "bg-black/80 border border-apocalypse-red text-apocalypse-red hover:bg-apocalypse-red/20 transition-all duration-300",
-                        "flex items-center justify-center relative overflow-hidden",
+                        "flex items-center justify-center relative overflow-hidden w-full",
                         "shadow-[0_0_10px_rgba(234,56,76,0.2)]",
                         authStatus === 'checking' && "opacity-70 cursor-not-allowed",
                         authStatus === 'success' && "bg-apocalypse-red/20"
@@ -380,7 +366,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                     />
                     
                     <div className="relative py-3 px-4 bg-black/70 backdrop-blur-sm rounded border border-toxic-neon/10 inline-block group">
-                      <div className="access-code-message text-toxic-neon/60 font-mono text-sm mb-2">// Access code is "resistance"</div>
                       <a 
                         href="https://www.linkedin.com/groups/12657922/" 
                         target="_blank" 
@@ -396,7 +381,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                           forgotHovered ? "animate-pulse text-toxic-neon" : "text-toxic-neon/90"
                         )} />
                         <span className="relative font-bold group-hover:underline">
-                          Join Resistance LinkedIn Group
+                          Join Resistance LinkedIn Group to get access code
                         </span>
                       </a>
                     </div>
