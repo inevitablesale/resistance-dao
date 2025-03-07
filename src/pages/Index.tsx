@@ -37,11 +37,18 @@ import { DrippingSlime, ToxicPuddle } from "@/components/ui/dripping-slime";
 import { ToxicBadge } from "@/components/ui/toxic-badge";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { NFTDisplay } from "@/components/wallet/ResistanceWalletWidget/NFTDisplay";
+import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 const Index = () => {
   const navigate = useNavigate();
   const { data: stats, isLoading: isLoadingStats } = useProposalStats();
   const { data: nftBalance = 0, isLoading: isLoadingNFT } = useNFTBalance("0x1234..."); // Demo address
+  const { setShowAuthFlow, isConnected } = useWalletConnection();
+  
+  const handleConnectWallet = () => {
+    setShowAuthFlow(true);
+  };
   
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(Math.round(num));
@@ -54,6 +61,8 @@ const Index = () => {
       maximumFractionDigits: 0
     }).format(amount);
   };
+
+  const emergencyTransmissionText = "EMERGENCY TRANSMISSION: IF YOU'RE READING THIS, YOU'VE SURVIVED THE COLLAPSE. THE OLD FINANCIAL WORLD HAS BEEN DESTROYED. WE ARE BUILDING FROM THE ASHES. THE RESISTANCE NEEDS YOU. SHALL WE PLAY A GAME?";
 
   const nftCollection = [
     {
@@ -115,6 +124,16 @@ const Index = () => {
                 <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
                 <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Network Status: <span className="text-apocalypse-red font-bold animate-pulse">Critical</span>
               </div>
+              
+              <div className="mb-6">
+                <TerminalTypewriter 
+                  textToType={emergencyTransmissionText}
+                  isConnected={isConnected}
+                  onConnect={handleConnectWallet}
+                  className="mb-4"
+                />
+              </div>
+              
               <h1 className="text-5xl md:text-6xl font-bold font-mono mb-6 text-toxic-neon toxic-glow">
                 Post-Apocalyptic Launch Platform
               </h1>
