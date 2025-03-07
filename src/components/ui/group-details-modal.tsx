@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Target, Radiation, X, CheckCircle } from 'lucide-react';
+import { Shield, Target, Radiation, X, CheckCircle, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ToxicButton } from './toxic-button';
 
@@ -12,12 +12,42 @@ interface GroupDetailsModalProps {
   onSelect: (role: "bounty-hunter" | "survivor") => void;
 }
 
+// Character data for each group
+const bountyHunterCharacters = [
+  { name: "Commander Vex", role: "Guild Leader", bio: "A former military strategist who established the first Bounty Hunter guild in the wasteland. Known for tactical precision and an unwavering moral code." },
+  { name: "Cipher", role: "Blockchain Tracker", bio: "Can trace any transaction through the most complex mixing services. Has recovered millions in stolen assets using proprietary tracking algorithms." },
+  { name: "Raven", role: "Intelligence Officer", bio: "Specializes in gathering information on scam operations before they launch. Has prevented countless rug pulls through early intervention." },
+  { name: "Ironclad", role: "Asset Recovery Specialist", bio: "Expert in smart contract vulnerabilities and exploitation techniques. Uses the same methods as hackers to recover stolen funds." },
+  { name: "Echo", role: "Field Operative", bio: "Works undercover to infiltrate criminal organizations. Has taken down three major scam syndicates from the inside." },
+  { name: "Nexus", role: "Network Security", bio: "Maintains the secure communication channels used by all Bounty Hunters. Developed an unhackable encryption protocol." },
+  { name: "Forge", role: "Weapons Engineer", bio: "Creates specialized digital tools for neutralizing threats. Their exploit prevention system is standard issue for all hunters." },
+  { name: "Phantom", role: "Ghost Protocol Agent", bio: "Specializes in making criminals' ill-gotten gains vanish from their wallets. Can execute precision extractions within seconds." },
+  { name: "Warden", role: "Boundary Enforcer", bio: "Patrols the edges of the network, identifying and neutralizing threats before they reach valuable assets." },
+  { name: "Avalanche", role: "Heavy Tactical", bio: "When diplomatic approaches fail, Avalanche is sent in. Specializes in overwhelming force against the most dangerous criminals." }
+];
+
+const survivorCharacters = [
+  { name: "Elder Thalia", role: "Haven Founder", bio: "Established the first sustainable post-collapse settlement. Her governance framework has been adopted by dozens of communities." },
+  { name: "Gaia", role: "Resource Director", bio: "Has an uncanny ability to locate essential resources in depleted areas. Her mapping system has saved countless communities from resource wars." },
+  { name: "Spark", role: "Energy Specialist", bio: "Developed a decentralized power grid that keeps settlements operational even during severe network disruptions." },
+  { name: "Root", role: "Agricultural Lead", bio: "Created growing techniques that work in radiation-contaminated soil. Their methods have eliminated food scarcity in multiple regions." },
+  { name: "Beacon", role: "Communications Expert", bio: "Maintains the emergency broadcast system that connects all survivor settlements, ensuring no community is ever truly isolated." },
+  { name: "Sanctuary", role: "Defense Coordinator", bio: "Designs non-violent security systems that protect settlements without escalating conflicts with outsiders." },
+  { name: "Chronicle", role: "Knowledge Keeper", bio: "Has memorized thousands of pre-collapse technologies and ensures this information is preserved for future generations." },
+  { name: "Junction", role: "Trade Master", bio: "Established the first inter-settlement commerce routes. Their economic models have created stable currencies in dozens of regions." },
+  { name: "Remedy", role: "Medical Director", bio: "Combines pre-collapse medical knowledge with wasteland innovations to provide healthcare in resource-limited environments." },
+  { name: "Horizon", role: "Futures Planner", bio: "Specializes in long-term community development. Their 100-year reconstruction plans have become the foundation of the new society." }
+];
+
 export function GroupDetailsModal({ 
   isOpen, 
   onClose, 
   groupType,
   onSelect
 }: GroupDetailsModalProps) {
+  const [currentCharacterIndex, setCurrentCharacterIndex] = useState(0);
+  const [showCharacterView, setShowCharacterView] = useState(false);
+  
   if (!isOpen || !groupType) return null;
   
   const isHunter = groupType === "bounty-hunter";
@@ -27,6 +57,21 @@ export function GroupDetailsModal({
   const glowColor = isHunter 
     ? "shadow-[0_0_25px_rgba(234,56,76,0.4)]" 
     : "shadow-[0_0_25px_rgba(80,250,123,0.4)]";
+  
+  const characters = isHunter ? bountyHunterCharacters : survivorCharacters;
+  const currentCharacter = characters[currentCharacterIndex];
+  
+  const nextCharacter = () => {
+    setCurrentCharacterIndex((prev) => (prev + 1) % characters.length);
+  };
+  
+  const prevCharacter = () => {
+    setCurrentCharacterIndex((prev) => (prev - 1 + characters.length) % characters.length);
+  };
+  
+  const toggleView = () => {
+    setShowCharacterView(!showCharacterView);
+  };
   
   return (
     <motion.div
@@ -81,14 +126,103 @@ export function GroupDetailsModal({
               {isHunter ? "Offensive specialists" : "Defensive community builders"}
             </p>
           </div>
+          
+          {/* Toggle view button */}
+          <button 
+            onClick={toggleView}
+            className={cn(
+              "ml-auto p-2 rounded-md transition-colors",
+              isHunter ? "bg-apocalypse-red/10 hover:bg-apocalypse-red/20" : "bg-toxic-neon/10 hover:bg-toxic-neon/20"
+            )}
+          >
+            <span className={cn("text-sm font-mono", primaryColor)}>
+              {showCharacterView ? "GROUP INFO" : "CHARACTERS"}
+            </span>
+          </button>
         </div>
         
         {/* Content */}
         <div className="p-6 max-h-[70vh] overflow-y-auto">
-          {isHunter ? (
-            <BountyHunterDetails />
+          {showCharacterView ? (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className={cn("text-xl font-mono", primaryColor)}>
+                  <User className="inline-block w-5 h-5 mr-2" />
+                  RESISTANCE PERSONNEL ({currentCharacterIndex + 1}/{characters.length})
+                </h3>
+                
+                <div className="flex gap-2">
+                  <button 
+                    onClick={prevCharacter}
+                    className={cn(
+                      "p-2 rounded-full transition-colors",
+                      isHunter ? "hover:bg-apocalypse-red/20" : "hover:bg-toxic-neon/20"
+                    )}
+                  >
+                    <ChevronLeft className={cn("w-5 h-5", primaryColor)} />
+                  </button>
+                  <button 
+                    onClick={nextCharacter}
+                    className={cn(
+                      "p-2 rounded-full transition-colors",
+                      isHunter ? "hover:bg-apocalypse-red/20" : "hover:bg-toxic-neon/20"
+                    )}
+                  >
+                    <ChevronRight className={cn("w-5 h-5", primaryColor)} />
+                  </button>
+                </div>
+              </div>
+              
+              <motion.div
+                key={currentCharacterIndex}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className={cn(
+                  "p-6 rounded-lg border",
+                  isHunter ? "bg-apocalypse-red/10 border-apocalypse-red/30" : "bg-toxic-neon/10 border-toxic-neon/30"
+                )}
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={cn(
+                    "w-16 h-16 rounded-full flex items-center justify-center",
+                    isHunter ? "bg-apocalypse-red/20" : "bg-toxic-neon/20"
+                  )}>
+                    <User className={cn("w-8 h-8", primaryColor)} />
+                  </div>
+                  <div>
+                    <h4 className={cn("text-xl font-bold", primaryColor)}>{currentCharacter.name}</h4>
+                    <p className="text-white/70">{currentCharacter.role}</p>
+                  </div>
+                </div>
+                
+                <p className="text-white/80 leading-relaxed">
+                  {currentCharacter.bio}
+                </p>
+              </motion.div>
+              
+              <div className="flex justify-center mt-4">
+                {characters.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentCharacterIndex(index)}
+                    className={cn(
+                      "w-2 h-2 mx-1 rounded-full transition-all",
+                      currentCharacterIndex === index
+                        ? isHunter ? "bg-apocalypse-red" : "bg-toxic-neon"
+                        : "bg-gray-500"
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
           ) : (
-            <SurvivorDetails />
+            isHunter ? (
+              <BountyHunterDetails />
+            ) : (
+              <SurvivorDetails />
+            )
           )}
           
           {/* Footer with action button */}
