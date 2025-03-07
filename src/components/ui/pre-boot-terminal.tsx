@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle } from 'lucide-react';
@@ -23,8 +22,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   const terminalRef = useRef<HTMLDivElement>(null);
 
   const CORRECT_PASSWORD = 'resistance';
-
-  // Removed cursor blinking effect completely
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -229,7 +226,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           >
             {commandLine}
             {terminalReady && <span className="terminal-prompt block mt-2">resistance@secure:~$</span>}
-            {terminalReady && <span className="cursor">▌</span>}
           </div>
           
           {terminalReady && (
@@ -316,25 +312,25 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                       className="pointer-events-none absolute inset-x-0 top-0 h-0"
                     />
                     
-                    <div className="relative py-2 px-3 bg-black/70 backdrop-blur-sm rounded border border-toxic-neon/10 inline-block">
+                    <div className="relative py-3 px-4 bg-black/70 backdrop-blur-sm rounded border border-toxic-neon/10 inline-block">
                       <a 
                         href="https://www.linkedin.com/groups/12657922/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="group flex items-center text-sm text-toxic-neon/90 hover:text-toxic-neon transition-colors duration-300 relative broken-glass"
+                        className="group flex items-center text-base text-toxic-neon hover:text-toxic-neon transition-colors duration-300 relative broken-glass"
                       >
                         <span className={cn(
                           "absolute inset-0 bg-toxic-neon/5 opacity-0 transition-opacity duration-300",
                           forgotHovered && "opacity-100"
                         )}></span>
                         <ExternalLink className={cn(
-                          "h-4 w-4 mr-2",
+                          "h-5 w-5 mr-2",
                           forgotHovered ? "animate-pulse text-toxic-neon" : "text-toxic-neon/90"
                         )} />
-                        <span className="relative font-semibold">
+                        <span className="relative font-bold">
                           Need password?
                           <span className={cn(
-                            "ml-1.5 text-apocalypse-red/90 transition-all duration-300",
+                            "ml-2 text-apocalypse-red transition-all duration-300",
                             forgotHovered && "text-apocalypse-red flash-critical"
                           )}>[RESISTANCE GROUP]</span>
                         </span>
@@ -415,18 +411,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           90% { opacity: 0; }
           95% { opacity: 0.3; }
           100% { opacity: 0; }
-        }
-        
-        /* Remove cursor blinking animation */
-        .cursor {
-          display: inline-block;
-          width: 8px;
-          height: 15px;
-          background-color: hsl(142, 84%, 65%);
-          vertical-align: middle;
-          margin-left: 2px;
-          position: relative;
-          box-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
         }
         `}
       </style>
