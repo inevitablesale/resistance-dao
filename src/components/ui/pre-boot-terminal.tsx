@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle, Lock, Zap, Code } from 'lucide-react';
@@ -25,6 +26,19 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   const dynamicContext = useDynamicContext();
 
   const CORRECT_PASSWORD = 'resistance';
+
+  // Check if wallet is already connected when component mounts
+  useEffect(() => {
+    if (dynamicContext.primaryWallet && dynamicContext.user) {
+      console.log("Wallet already connected, bypassing authentication");
+      setAuthStatus('success');
+      setTerminalEffect('glitch');
+      
+      setTimeout(() => {
+        onAuthenticated();
+      }, 500);
+    }
+  }, [dynamicContext.primaryWallet, dynamicContext.user, onAuthenticated]);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -288,6 +302,12 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                       )}
                       disabled={authStatus === 'checking' || authStatus === 'success'}
                       autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handlePasswordSubmit(e);
+                        }
+                      }}
                     />
                     
                     <AnimatePresence>
