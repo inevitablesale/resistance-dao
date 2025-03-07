@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -672,4 +673,44 @@ const Index = () => {
 
       <section className="py-24 relative overflow-hidden radiation-bg">
         <div className="absolute inset-0">
-          <div className="absolute w-[600px] h
+          <div className="absolute w-[600px] h-[600px] bg-toxic-neon/5 rounded-full blur-3xl -top-96 -left-20" />
+          <div className="absolute w-[600px] h-[600px] bg-toxic-neon/5 rounded-full blur-3xl -bottom-96 -right-20" />
+        </div>
+        <div className="container px-4 relative">
+          <div className="max-w-4xl mx-auto bg-black/50 border border-toxic-neon/30 rounded-xl p-8 backdrop-blur-sm">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold mb-4 text-toxic-neon toxic-glow">
+                Ready to Start Your Project?
+              </h2>
+              <p className="text-lg text-white/70">
+                Join the community of survivors building the next generation of resilient projects
+              </p>
+            </div>
+            <div className="flex flex-col md:flex-row gap-4 justify-center">
+              <ToxicButton 
+                size="lg"
+                onClick={() => navigate('/thesis')}
+                variant="glowing"
+                className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+              >
+                <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
+                Start a Project
+              </ToxicButton>
+              <ToxicButton 
+                size="lg"
+                variant="outline"
+                onClick={() => navigate('/proposals')}
+                className="border-toxic-neon/50 text-toxic-neon hover:bg-toxic-dark/30"
+              >
+                <Share2 className="w-5 h-5 mr-2" />
+                Explore Projects
+              </ToxicButton>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Index;
