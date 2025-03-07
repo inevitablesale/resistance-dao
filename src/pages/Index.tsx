@@ -44,15 +44,21 @@ import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { NFTDisplay } from "@/components/wallet/ResistanceWalletWidget/NFTDisplay";
 import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useState } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { data: stats, isLoading: isLoadingStats } = useProposalStats();
   const { data: nftBalance = 0, isLoading: isLoadingNFT } = useNFTBalance("0x1234..."); // Demo address
   const { setShowAuthFlow, isConnected } = useWalletConnection();
+  const [userRole, setUserRole] = useState<"bounty-hunter" | "survivor" | null>(null);
   
   const handleConnectWallet = () => {
     setShowAuthFlow(true);
+  };
+  
+  const handleRoleSelect = (role: "bounty-hunter" | "survivor") => {
+    setUserRole(role);
   };
   
   const formatNumber = (num: number) => {
@@ -67,7 +73,7 @@ const Index = () => {
     }).format(amount);
   };
 
-  const nftCollection = [
+  const bountyHunterCollection = [
     {
       id: 1,
       name: "Mutant Zero X-35",
@@ -106,6 +112,47 @@ const Index = () => {
     }
   ];
 
+  const survivorCollection = [
+    {
+      id: 1,
+      name: "Medic Unit S-12",
+      skill: "Radiation Treatment",
+      tokenId: 12,
+      contribution: "Supply Chain",
+      attributes: [
+        { trait: "Medical Expertise", value: "Advanced" },
+        { trait: "Resource Management", value: "High" },
+        { trait: "Community Standing", value: "Respected" }
+      ]
+    },
+    {
+      id: 2,
+      name: "Engineer K-19",
+      skill: "Shelter Construction",
+      tokenId: 19,
+      contribution: "Infrastructure",
+      attributes: [
+        { trait: "Technical Knowledge", value: "Expert" },
+        { trait: "Material Scavenging", value: "Efficient" },
+        { trait: "Community Standing", value: "Essential" }
+      ]
+    },
+    {
+      id: 3,
+      name: "Scout V-07",
+      skill: "Safe Route Mapping",
+      tokenId: 7,
+      contribution: "Reconnaissance",
+      attributes: [
+        { trait: "Stealth", value: "Superior" },
+        { trait: "Environmental Knowledge", value: "Comprehensive" },
+        { trait: "Community Standing", value: "Trusted" }
+      ]
+    }
+  ];
+
+  const displayCollection = userRole === "survivor" ? survivorCollection : bountyHunterCollection;
+
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
       <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} />
@@ -136,6 +183,8 @@ const Index = () => {
                   textToType=""
                   isConnected={isConnected}
                   onConnect={handleConnectWallet}
+                  onRoleSelect={handleRoleSelect}
+                  selectedRole={userRole}
                   className="mb-4"
                 />
               </div>
@@ -168,16 +217,35 @@ const Index = () => {
                 <div className="scanline"></div>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
-                    <Crosshair className="h-5 w-5 mr-2" /> Resistance BOUNTY LIST
+                    <Crosshair className="h-5 w-5 mr-2" /> 
+                    {userRole === "survivor" ? "Resistance SURVIVOR NETWORK" : "Resistance BOUNTY LIST"}
                   </h3>
-                  <ToxicButton 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => navigate('/marketplace')}
-                    className="text-toxic-neon hover:bg-toxic-dark/20 border-toxic-neon/50"
-                  >
-                    View All <ArrowIcon className="h-4 w-4 ml-1" />
-                  </ToxicButton>
+                  <div className="flex items-center gap-4">
+                    <div className="flex bg-black/60 border border-toxic-neon/20 rounded-lg overflow-hidden">
+                      <button 
+                        className={`px-4 py-2 flex items-center gap-2 transition-all ${userRole === 'bounty-hunter' ? 'bg-toxic-neon/20 text-toxic-neon' : 'text-white/60 hover:text-white/80'}`}
+                        onClick={() => handleRoleSelect('bounty-hunter')}
+                      >
+                        <Target className="w-4 h-4" />
+                        <span>Bounty Hunter</span>
+                      </button>
+                      <button 
+                        className={`px-4 py-2 flex items-center gap-2 transition-all ${userRole === 'survivor' ? 'bg-toxic-neon/20 text-toxic-neon' : 'text-white/60 hover:text-white/80'}`}
+                        onClick={() => handleRoleSelect('survivor')}
+                      >
+                        <Shield className="w-4 h-4" />
+                        <span>Survivor</span>
+                      </button>
+                    </div>
+                    <ToxicButton 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => navigate('/marketplace')}
+                      className="text-toxic-neon hover:bg-toxic-dark/20 border-toxic-neon/50"
+                    >
+                      View All <ArrowIcon className="h-4 w-4 ml-1" />
+                    </ToxicButton>
+                  </div>
                 </div>
                 
                 <div className="mb-6 p-4 bg-black/50 border border-apocalypse-red/30 rounded-lg relative">
@@ -186,58 +254,106 @@ const Index = () => {
                   </div>
                   <div className="flex gap-3">
                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-apocalypse-red/20 flex items-center justify-center">
-                      <UserX className="w-6 h-6 text-apocalypse-red" />
+                      {userRole === "survivor" ? (
+                        <Shield className="w-6 h-6 text-apocalypse-red" />
+                      ) : (
+                        <UserX className="w-6 h-6 text-apocalypse-red" />
+                      )}
                     </div>
                     <div>
-                      <h4 className="text-lg font-mono text-apocalypse-red mb-2">Bounty Hunter Protocol</h4>
-                      <p className="text-white/80 mb-3 text-sm">
-                        After the collapse, a dangerous new breed emerged from the toxic wastelands - <span className="text-apocalypse-red font-semibold">Mutant Protocol Criminals</span>. 
-                        Former CEOs, lead developers, and treasury managers who survived by mutating their code to drain liquidity 
-                        from the survivors' remaining assets.
-                      </p>
-                      <p className="text-white/80 mb-3 text-sm">
-                        The Resistance fights back through our elite <span className="text-toxic-neon font-semibold">Bounty Hunter Program</span>. 
-                        Each captured criminal's digital signature is minted as an NFT trophy, with their stolen funds 
-                        redirected to fuel the Resistance's operations.
-                      </p>
-                      <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
-                        <span className="text-toxic-neon font-semibold block mb-1">» CRITICAL DIRECTIVE «</span>
-                        To join the Resistance, each survivor must capture at least one criminal. Your first successful 
-                        capture proves your commitment and grants you full Resistance membership privileges.
-                      </div>
+                      {userRole === "survivor" ? (
+                        <>
+                          <h4 className="text-lg font-mono text-apocalypse-red mb-2">Survivor Network Protocol</h4>
+                          <p className="text-white/80 mb-3 text-sm">
+                            The wasteland is unforgiving to those who journey alone. As a <span className="text-toxic-neon font-semibold">Survivor</span>, 
+                            your skills and resources are vital to building a new future from the ashes of the old world.
+                          </p>
+                          <p className="text-white/80 mb-3 text-sm">
+                            Each survivor contributes according to their abilities - medical experts, engineers, scouts, and 
+                            farmers all play crucial roles in our fragile network of settlements. Your survivor NFT represents 
+                            your standing within the Resistance.
+                          </p>
+                          <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
+                            <span className="text-toxic-neon font-semibold block mb-1">» CRITICAL DIRECTIVE «</span>
+                            Survivors must maintain a positive contribution ratio to access Resistance resources. Regular 
+                            participation in community projects strengthens your position and unlocks greater benefits for all.
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <h4 className="text-lg font-mono text-apocalypse-red mb-2">Bounty Hunter Protocol</h4>
+                          <p className="text-white/80 mb-3 text-sm">
+                            After the collapse, a dangerous new breed emerged from the toxic wastelands - <span className="text-apocalypse-red font-semibold">Mutant Protocol Criminals</span>. 
+                            Former CEOs, lead developers, and treasury managers who survived by mutating their code to drain liquidity 
+                            from the survivors' remaining assets.
+                          </p>
+                          <p className="text-white/80 mb-3 text-sm">
+                            The Resistance fights back through our elite <span className="text-toxic-neon font-semibold">Bounty Hunter Program</span>. 
+                            Each captured criminal's digital signature is minted as an NFT trophy, with their stolen funds 
+                            redirected to fuel the Resistance's operations.
+                          </p>
+                          <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
+                            <span className="text-toxic-neon font-semibold block mb-1">» CRITICAL DIRECTIVE «</span>
+                            To join the Resistance, each bounty hunter must capture at least one criminal. Your first successful 
+                            capture proves your commitment and grants you full Resistance membership privileges.
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {nftCollection.map((nft) => (
-                    <ToxicCard key={nft.id} className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all">
+                  {displayCollection.map((item) => (
+                    <ToxicCard key={item.id} className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all">
                       <ToxicCardContent className="p-0">
                         <div className="relative h-48 bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-t-lg overflow-hidden">
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <Skull className="w-20 h-20 text-toxic-neon/50" />
+                            {userRole === "survivor" ? (
+                              <Shield className="w-20 h-20 text-toxic-neon/50" />
+                            ) : (
+                              <Skull className="w-20 h-20 text-toxic-neon/50" />
+                            )}
                           </div>
                           <DrippingSlime position="top" dripsCount={5} toxicGreen={true} showIcons={false} />
                           <div className="absolute top-2 right-2">
                             <div className="px-2 py-1 rounded-full bg-apocalypse-red/20 text-xs text-apocalypse-red font-mono">
-                              #{nft.tokenId}
+                              #{item.tokenId}
                             </div>
                           </div>
                           <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60">
                             <div className="flex items-center justify-between">
-                              <span className="text-apocalypse-red text-xs font-mono">WANTED</span>
-                              <span className="text-toxic-neon text-xs font-mono">BOUNTY: {nft.bounty}</span>
+                              {userRole === "survivor" ? (
+                                <>
+                                  <span className="text-toxic-neon text-xs font-mono">SURVIVOR</span>
+                                  <span className="text-toxic-neon text-xs font-mono">{(item as any).contribution}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-apocalypse-red text-xs font-mono">WANTED</span>
+                                  <span className="text-toxic-neon text-xs font-mono">BOUNTY: {(item as any).bounty}</span>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
                         <div className="p-4">
-                          <h4 className="text-xl font-mono text-toxic-neon mb-1">{nft.name}</h4>
+                          <h4 className="text-xl font-mono text-toxic-neon mb-1">{item.name}</h4>
                           <div className="flex items-center mb-3">
-                            <ShieldX className="h-4 w-4 text-apocalypse-red mr-2" />
-                            <span className="text-apocalypse-red text-sm">{nft.crime}</span>
+                            {userRole === "survivor" ? (
+                              <>
+                                <Shield className="h-4 w-4 text-toxic-neon mr-2" />
+                                <span className="text-toxic-neon text-sm">{(item as any).skill}</span>
+                              </>
+                            ) : (
+                              <>
+                                <ShieldX className="h-4 w-4 text-apocalypse-red mr-2" />
+                                <span className="text-apocalypse-red text-sm">{(item as any).crime}</span>
+                              </>
+                            )}
                           </div>
                           <div className="space-y-2 mb-4">
-                            {nft.attributes.map((attr, idx) => (
+                            {item.attributes.map((attr, idx) => (
                               <div key={idx} className="flex justify-between text-xs">
                                 <span className="text-white/60">{attr.trait}</span>
                                 <span className="text-toxic-neon/90">{attr.value}</span>
@@ -249,7 +365,15 @@ const Index = () => {
                             size="sm"
                             onClick={handleConnectWallet}
                           >
-                            <Target className="h-4 w-4 mr-1" /> Claim Bounty
+                            {userRole === "survivor" ? (
+                              <>
+                                <Shield className="h-4 w-4 mr-1" /> Join Network
+                              </>
+                            ) : (
+                              <>
+                                <Target className="h-4 w-4 mr-1" /> Claim Bounty
+                              </>
+                            )}
                           </ToxicButton>
                         </div>
                       </ToxicCardContent>
@@ -260,11 +384,20 @@ const Index = () => {
                 <div className="mt-6 pt-6 border-t border-toxic-neon/20">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
-                      <Shield className="h-5 w-5 text-toxic-neon" />
-                      <span className="text-lg font-mono text-toxic-neon">Your Captured Bounties</span>
+                      {userRole === "survivor" ? (
+                        <>
+                          <Shield className="h-5 w-5 text-toxic-neon" />
+                          <span className="text-lg font-mono text-toxic-neon">Your Survivor Status</span>
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="h-5 w-5 text-toxic-neon" />
+                          <span className="text-lg font-mono text-toxic-neon">Your Captured Bounties</span>
+                        </>
+                      )}
                     </div>
                     <div className="bg-toxic-neon/10 px-3 py-1 rounded-full text-toxic-neon text-sm font-mono">
-                      {isLoadingNFT ? "Loading..." : `${nftBalance} Captures`}
+                      {isLoadingNFT ? "Loading..." : `${nftBalance} ${userRole === "survivor" ? "Badges" : "Captures"}`}
                     </div>
                   </div>
                   
@@ -273,14 +406,18 @@ const Index = () => {
                     
                     {nftBalance === 0 && (
                       <div className="text-center py-6 bg-toxic-neon/5 rounded-lg mt-4">
-                        <p className="text-white/70 mb-4">You haven't captured any mutant criminals yet</p>
+                        {userRole === "survivor" ? (
+                          <p className="text-white/70 mb-4">You haven't joined any survivor networks yet</p>
+                        ) : (
+                          <p className="text-white/70 mb-4">You haven't captured any mutant criminals yet</p>
+                        )}
                         <ToxicButton 
                           variant="default"
                           onClick={handleConnectWallet}
                           className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
                         >
                           <Radiation className="h-4 w-4 mr-2" />
-                          Hunt Your First Target
+                          {userRole === "survivor" ? "Join Survivor Network" : "Hunt Your First Target"}
                         </ToxicButton>
                       </div>
                     )}
