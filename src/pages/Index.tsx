@@ -217,7 +217,7 @@ const Index = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
                     <Crosshair className="h-5 w-5 mr-2" /> 
-                    {userRole === "survivor" ? "Resistance SURVIVOR NETWORK" : "Resistance BOUNTY LIST"}
+                    Are you here to fund the Resistance or create a Settlement?
                   </h3>
                   <div className="flex items-center gap-4">
                     <div className="flex bg-black/60 border border-toxic-neon/20 rounded-lg overflow-hidden">
@@ -226,14 +226,14 @@ const Index = () => {
                         onClick={() => handleRoleSelect('bounty-hunter')}
                       >
                         <Target className="w-4 h-4" />
-                        <span>Bounty Hunter</span>
+                        <span>Fund Resistance</span>
                       </button>
                       <button 
                         className={`px-4 py-2 flex items-center gap-2 transition-all ${userRole === 'survivor' ? 'bg-toxic-neon/20 text-toxic-neon' : 'text-white/60 hover:text-white/80'}`}
                         onClick={() => handleRoleSelect('survivor')}
                       >
                         <Shield className="w-4 h-4" />
-                        <span>Survivor</span>
+                        <span>Create Settlement</span>
                       </button>
                     </div>
                     <ToxicButton 
