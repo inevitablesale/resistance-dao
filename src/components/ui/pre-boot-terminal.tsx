@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle } from 'lucide-react';
@@ -23,13 +24,16 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
 
   const CORRECT_PASSWORD = 'resistance';
 
+  // Only use cursor blinking for command line, not for first screen
   useEffect(() => {
+    if (!terminalReady) return;
+    
     const cursorInterval = setInterval(() => {
       setCursorVisible(prev => !prev);
     }, 530);
 
     return () => clearInterval(cursorInterval);
-  }, []);
+  }, [terminalReady]);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -234,7 +238,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           >
             {commandLine}
             {terminalReady && <span className="terminal-prompt block mt-2">resistance@secure:~$</span>}
-            {cursorVisible && <span className="cursor">▌</span>}
+            {terminalReady && cursorVisible && <span className="cursor">▌</span>}
           </div>
           
           {terminalReady && (
@@ -337,7 +341,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                           forgotHovered ? "animate-pulse text-toxic-neon" : "text-toxic-neon/70"
                         )} />
                         <span className="relative">
-                          Forgot Password?
+                          Need password?
                           <span className={cn(
                             "ml-1.5 text-apocalypse-red/80 transition-all duration-300",
                             forgotHovered && "text-apocalypse-red flash-critical"
