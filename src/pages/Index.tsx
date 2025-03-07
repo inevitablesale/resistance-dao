@@ -11,12 +11,13 @@ import { toast } from "sonner";
 import { EmergencyTransmission } from "@/components/ui/emergency-transmission";
 import { PreBootTerminal } from "@/components/ui/pre-boot-terminal";
 import { SystemBreachTransition } from "@/components/ui/system-breach-transition";
+import { NFTShowcase } from "@/components/ui/nft-showcase";
 
 // Define the authentication states
 type AuthStage = "pre-boot" | "authenticating" | "authenticated" | "system-breach";
 
 // Define the application stages
-type AppStage = "typing" | "questionnaire" | "completed";
+type AppStage = "typing" | "nft-selection" | "questionnaire" | "completed";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -47,8 +48,8 @@ const Index = () => {
   };
   
   const handleTerminalComplete = () => {
-    console.log("Typing animation complete, showing questionnaire");
-    setTerminalStage("questionnaire");
+    console.log("Typing animation complete, showing NFT selection");
+    setTerminalStage("nft-selection");
   };
 
   const handleCloseEmergencyTransmission = () => {
@@ -74,6 +75,54 @@ const Index = () => {
         });
       }, 2500);
     }, 500);
+  };
+
+  // Determine what content to show based on the stages
+  const renderMainContent = () => {
+    if (!userRole && authStage === "authenticated") {
+      if (terminalStage === "nft-selection") {
+        return (
+          <NFTShowcase 
+            onRoleSelect={handleRoleSelect}
+            selectedRole={userRole}
+          />
+        );
+      } else {
+        return (
+          <TerminalMonitor
+            showQuestionnaire={terminalStage === "questionnaire"}
+            onTypingComplete={handleTerminalComplete}
+            onRoleSelect={handleRoleSelect}
+            selectedRole={userRole}
+            className="w-full" 
+            skipBootSequence={true}
+          />
+        );
+      }
+    } else if (userRole || terminalStage === "completed") {
+      return (
+        <TerminalMonitor
+          showQuestionnaire={false}
+          onTypingComplete={handleTerminalComplete}
+          onRoleSelect={handleRoleSelect}
+          selectedRole={userRole}
+          className="w-full" 
+          skipBootSequence={true}
+        />
+      );
+    }
+    
+    // Default return if none of the conditions match
+    return (
+      <TerminalMonitor
+        showQuestionnaire={terminalStage === "questionnaire"}
+        onTypingComplete={handleTerminalComplete}
+        onRoleSelect={handleRoleSelect}
+        selectedRole={userRole}
+        className="w-full" 
+        skipBootSequence={true}
+      />
+    );
   };
 
   return (
@@ -152,25 +201,18 @@ const Index = () => {
                   {authStage === "pre-boot" || authStage === "authenticating" ? (
                     <PreBootTerminal onAuthenticated={handleAuthenticated} />
                   ) : (
-                    <TerminalMonitor
-                      showQuestionnaire={terminalStage === "questionnaire"}
-                      onTypingComplete={handleTerminalComplete}
-                      onRoleSelect={handleRoleSelect}
-                      selectedRole={userRole}
-                      className="w-full" 
-                      skipBootSequence={true}
-                    />
+                    renderMainContent()
                   )}
                 </div>
                 
                 {/* Only show this if the user is authenticated but doesn't have access to the desktop yet */}
-                {authStage === "authenticated" && !userRole && terminalStage !== "completed" && (
+                {authStage === "authenticated" && !userRole && terminalStage !== "nft-selection" && terminalStage !== "completed" && (
                   <div className="mt-4 text-center">
                     <p className="text-white/70 text-sm mb-3">
                       Complete the terminal sequence to access the Resistance Network
                     </p>
                     <ToxicButton 
-                      onClick={() => setTerminalStage("questionnaire")}
+                      onClick={() => setTerminalStage("nft-selection")}
                       variant="ghost"
                       size="sm"
                     >
