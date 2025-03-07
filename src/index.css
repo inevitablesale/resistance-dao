@@ -109,6 +109,26 @@
   animation: flicker 4s infinite;
 }
 
+/* Network Status Critical Flickering */
+.status-critical {
+  animation: critical-flicker 1.5s infinite;
+  text-shadow: 0 0 10px rgba(234, 56, 76, 0.9);
+}
+
+@keyframes critical-flicker {
+  0%, 100% { opacity: 1; }
+  10% { opacity: 0.7; }
+  15% { opacity: 1; }
+  25% { opacity: 0.3; }
+  30% { opacity: 1; }
+  40% { opacity: 0.5; }
+  50% { opacity: 1; }
+  60% { opacity: 0.3; }
+  70% { opacity: 1; }
+  80% { opacity: 0.8; }
+  90% { opacity: 1; }
+}
+
 /* CRT Screen Effect */
 .terminal-container::before {
   content: '';

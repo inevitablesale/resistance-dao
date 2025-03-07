@@ -85,11 +85,11 @@ export const TerminalTypewriter = ({
                 <Lock className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
                 <div>
                   <div className="flex items-center font-bold mb-1">
-                    <span className="mr-2 tracking-wider">EMERGENCY TRANSMISSION:</span>
+                    <span className="mr-2 tracking-wider text-lg">EMERGENCY TRANSMISSION:</span>
                     <span className="text-xs text-apocalypse-red/70 animate-pulse">[SIGNAL WEAK]</span>
                   </div>
                   <div className="flex flex-col">
-                    <div>
+                    <div className="text-base">
                       <span>{displayedText}</span>
                       {!isTyping && !showFullMessage && (
                         <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
@@ -119,11 +119,11 @@ export const TerminalTypewriter = ({
               <Unlock className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
               <div>
                 <div className="flex items-center font-bold mb-1">
-                  <span className="mr-2 tracking-wider">EMERGENCY TRANSMISSION:</span>
+                  <span className="mr-2 tracking-wider text-lg">EMERGENCY TRANSMISSION:</span>
                   <span className="text-xs text-apocalypse-red/70">[SIGNAL SECURE]</span>
                 </div>
                 <div className="flex">
-                  <span>{displayedText}</span>
+                  <span className="text-base">{displayedText}</span>
                   <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
                 </div>
               </div>
