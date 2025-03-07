@@ -2,180 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 0%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 272.9 73.7% 56.7%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 211 78.9% 13.7%;
-    --sidebar-accent-foreground: 215 20.2% 65.1%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 240 3.7% 15.9%;
-  }
-
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
-  }
+body {
+  @apply bg-black text-white;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+/* Post-Apocalyptic Background Styles */
+.post-apocalyptic-bg {
+  background: url('/images/bg/wasteland-bg.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-/* Terminal Typewriter Effect */
-.terminal-container {
-  font-family: 'Courier New', monospace;
+.dust-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: url('/images/overlays/dust-particles.gif');
+  background-size: cover;
+  opacity: 0.4;
+  z-index: 1;
+}
+
+.rust-overlay {
   position: relative;
 }
 
-.typing-text {
-  position: relative;
-  line-height: 1.5;
-}
-
-.cursor {
-  animation: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-/* Flickering Light Effect */
-@keyframes flicker {
-  0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(234, 56, 76, 0.8); }
-  5% { opacity: 0.3; }
-  10% { opacity: 1; }
-  15% { opacity: 0.3; }
-  20% { opacity: 1; }
-  25% { opacity: 1; }
-  30% { opacity: 0.3; }
-  35% { opacity: 1; }
-  40% { opacity: 0.8; }
-  45% { opacity: 1; }
-  60% { opacity: 0.3; }
-  70% { opacity: 1; }
-  80% { opacity: 0.2; }
-  90% { opacity: 1; }
-}
-
-.animate-flicker {
-  animation: flicker 4s infinite;
-}
-
-/* Network Status Critical Flickering */
-.status-critical {
-  animation: critical-flicker 1.5s infinite;
-  text-shadow: 0 0 10px rgba(234, 56, 76, 0.9);
-}
-
-@keyframes critical-flicker {
-  0%, 100% { opacity: 1; }
-  10% { opacity: 0.7; }
-  15% { opacity: 1; }
-  25% { opacity: 0.3; }
-  30% { opacity: 1; }
-  40% { opacity: 0.5; }
-  50% { opacity: 1; }
-  60% { opacity: 0.3; }
-  70% { opacity: 1; }
-  80% { opacity: 0.8; }
-  90% { opacity: 1; }
-}
-
-/* CRT Screen Effect */
-.terminal-container::before {
+.rust-overlay::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.1) 50%
-  );
-  background-size: 100% 4px;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Existing styles */
-.post-apocalyptic-bg {
-  background-color: black;
-  position: relative;
-}
-
-.dust-particles {
-  position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='10' cy='10' r='1'/%3E%3Ccircle cx='30' cy='5' r='0.5'/%3E%3Ccircle cx='50' cy='50' r='0.7'/%3E%3Ccircle cx='70' cy='20' r='0.5'/%3E%3Ccircle cx='90' cy='80' r='0.8'/%3E%3Ccircle cx='40' cy='85' r='0.6'/%3E%3Ccircle cx='25' cy='65' r='0.4'/%3E%3Ccircle cx='80' cy='30' r='0.3'/%3E%3C/g%3E%3C/svg%3E");
-  opacity: 0.6;
-  z-index: 0;
+  background: url('/images/overlays/rust-texture.png');
+  background-size: cover;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .fog-overlay {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
-  z-index: 0;
+  pointer-events: none;
+  background: url('/images/overlays/fog-overlay.png');
+  background-size: cover;
+  opacity: 0.3;
+  z-index: 3;
 }
 
-/* Broken Glass Effect */
 .broken-glass {
   position: relative;
-  overflow: hidden;
 }
 
 .broken-glass::before {
@@ -183,213 +67,142 @@
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
-  backdrop-filter: blur(10px);
-  z-index: -1;
+  width: 100%;
+  height: 100%;
+  background: url('/images/overlays/broken-glass.png');
+  background-size: cover;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 4;
 }
 
-.radiation-bg {
+/* Terminal Styles */
+.terminal-output {
+  font-family: monospace;
   position: relative;
-  overflow: hidden;
+  line-height: 1.5;
 }
 
-.radiation-bg::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at center, rgba(57, 255, 20, 0.05) 0%, transparent 70%),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.8) 100%);
-  z-index: -1;
+.terminal-line {
+  margin-bottom: 0.5rem;
 }
 
-.toxic-glow {
-  text-shadow: 0 0 5px rgba(57, 255, 20, 0.5), 0 0 10px rgba(57, 255, 20, 0.3);
+.cursor {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  from, to {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 .scanline {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: rgba(57, 255, 20, 0.15);
-  opacity: 0.75;
-  z-index: 1;
-  animation: scanline 8s linear infinite;
+  background: linear-gradient(
+    to bottom,
+    rgba(122, 255, 165, 0),
+    rgba(122, 255, 165, 0.1) 50%,
+    rgba(122, 255, 165, 0)
+  );
+  pointer-events: none;
+  animation: scanlines 2s linear infinite;
 }
 
-.rust-overlay::after {
+@keyframes scanlines {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+.flash-beacon {
+  animation: flash 2s infinite;
+}
+
+@keyframes flash {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.flash-critical {
+  animation: critical-flash 1s infinite;
+}
+
+@keyframes critical-flash {
+  0% {
+    opacity: 1;
+    box-shadow: 0 0 5px rgba(234, 56, 76, 0.7);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 10px rgba(234, 56, 76, 1);
+  }
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 5px rgba(234, 56, 76, 0.7);
+  }
+}
+
+.status-critical {
+  animation: text-flash 1s infinite;
+}
+
+@keyframes text-flash {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.toxic-glow {
+  text-shadow: 0 0 5px rgba(122, 255, 165, 0.5);
+}
+
+/* Role Selection Styles */
+.role-option {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.role-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(122, 255, 165, 0.3);
+}
+
+.role-option::before {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23751a00' fill-opacity='0.05'%3E%3Cpath d='M0 0h200v200H0z'/%3E%3C/g%3E%3C/svg%3E");
-  z-index: -1;
-  opacity: 0.2;
-}
-
-@keyframes flash-critical {
-  0%, 100% { box-shadow: 0 0 10px rgba(234, 56, 76, 0.8), 0 0 20px rgba(234, 56, 76, 0.6); }
-  50% { box-shadow: 0 0 5px rgba(234, 56, 76, 0.3), 0 0 10px rgba(234, 56, 76, 0.2); }
-}
-
-@keyframes gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient 3s ease infinite;
-}
-
-/* Dripping slime styles */
-.dripping-container {
-  position: relative;
+  left: -100%;
   width: 100%;
   height: 100%;
-  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(122, 255, 165, 0.2),
+    transparent
+  );
+  transition: 0.5s;
 }
 
-.toxic-drips-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 80px;
-  overflow: hidden;
-  z-index: 1;
-}
-
-.toxic-drips-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 50px;
-  overflow: hidden;
-  z-index: 1;
-  transform: rotate(180deg);
-}
-
-.drip {
-  position: absolute;
-  top: 0;
-  height: 60px;
-  width: 6px;
-  border-radius: 0 0 50% 50%;
-  background: rgba(0, 255, 0, 0.5);
-  filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.3));
-  animation: dripping infinite;
-}
-
-.drip.toxic-green {
-  background: rgba(57, 255, 20, 0.7);
-  filter: drop-shadow(0 0 5px rgba(57, 255, 20, 0.4));
-}
-
-.drip.post-apocalyptic {
-  background: rgba(234, 56, 76, 0.7);
-  filter: drop-shadow(0 0 5px rgba(234, 56, 76, 0.4));
-}
-
-.toxic-puddle {
-  position: absolute;
-  height: 5px;
-  width: 40px;
-  background: rgba(0, 255, 0, 0.4);
-  border-radius: 50%;
-  filter: blur(2px);
-  animation: pulse 4s ease-in-out infinite;
-}
-
-.toxic-puddle.toxic-green {
-  background: rgba(57, 255, 20, 0.4);
-}
-
-.toxic-puddle.post-apocalyptic {
-  background: rgba(234, 56, 76, 0.4);
-}
-
-@keyframes dripping {
-  0% {
-    height: 0;
-    top: 0;
-    opacity: 0;
-  }
-  30% {
-    height: 30px;
-    opacity: 1;
-  }
-  60% {
-    height: 45px;
-  }
-  70% {
-    top: 0;
-  }
-  100% {
-    top: 100%;
-    opacity: 0;
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.9;
-  }
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes scanline {
-  0% {
-    top: 0%;
-  }
-  100% {
-    top: 100%;
-  }
-}
-
-.animate-radiation {
-  animation: rotate 10s linear infinite;
-}
-
-/* Flashing Beacon Light */
-@keyframes beacon-flash {
-  0%, 100% { opacity: 1; box-shadow: 0 0 10px #f1c40f, 0 0 15px #f1c40f; }
-  50% { opacity: 0.3; box-shadow: 0 0 5px #f1c40f; }
-}
-
-.beacon-flash {
-  animation: beacon-flash 1s ease-in-out infinite;
+.role-option:hover::before {
+  left: 100%;
 }

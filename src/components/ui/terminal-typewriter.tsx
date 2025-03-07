@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
-import { Radiation } from "lucide-react";
+import { Radiation, Target, Shield } from "lucide-react";
 import { ToxicButton } from "./toxic-button";
 
 interface TerminalTypewriterProps {
@@ -22,6 +22,7 @@ export function TerminalTypewriter({
   const [displayText, setDisplayText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
   const [isComplete, setIsComplete] = useState(false);
+  const [userRole, setUserRole] = useState<"bounty-hunter" | "survivor" | null>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -46,6 +47,10 @@ export function TerminalTypewriter({
     
     return () => clearInterval(cursorInterval);
   }, []);
+
+  const handleRoleSelect = (role: "bounty-hunter" | "survivor") => {
+    setUserRole(role);
+  };
   
   return (
     <div className={cn("terminal-container relative", className)}>
@@ -73,8 +78,38 @@ export function TerminalTypewriter({
           </span>
         </div>
         
-        {isComplete && !isConnected && (
+        {isComplete && !isConnected && !userRole && (
           <div className="terminal-line mt-4">
+            <div className="text-white/70 mb-3">IDENTIFY YOUR ROLE IN THE WASTELAND:</div>
+            <div className="flex gap-3">
+              <ToxicButton
+                onClick={() => handleRoleSelect("bounty-hunter")}
+                className="flex-1 bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+              >
+                <Target className="w-4 h-4 mr-2 text-toxic-neon" />
+                <span className="text-toxic-neon">BOUNTY HUNTER</span>
+              </ToxicButton>
+              
+              <ToxicButton
+                onClick={() => handleRoleSelect("survivor")}
+                className="flex-1 bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+              >
+                <Shield className="w-4 h-4 mr-2 text-toxic-neon" />
+                <span className="text-toxic-neon">SURVIVOR</span>
+              </ToxicButton>
+            </div>
+          </div>
+        )}
+        
+        {isComplete && !isConnected && userRole && (
+          <div className="terminal-line mt-4">
+            <div className="mb-3 text-white/70">
+              {userRole === "bounty-hunter" ? (
+                <span>BOUNTY HUNTER STATUS: <span className="text-toxic-neon">UNVERIFIED</span></span>
+              ) : (
+                <span>SURVIVOR STATUS: <span className="text-toxic-neon">UNVERIFIED</span></span>
+              )}
+            </div>
             <ToxicButton
               onClick={onConnect}
               className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
@@ -88,6 +123,11 @@ export function TerminalTypewriter({
         {isConnected && (
           <div className="terminal-line mt-4 text-toxic-neon">
             <span>[CONNECTED]</span> <span className="text-white/70">SURVIVAL BEACON ACTIVE - WELCOME TO THE RESISTANCE</span>
+            {userRole && (
+              <div className="mt-2 text-white/70">
+                ROLE IDENTIFIED: <span className="text-toxic-neon">{userRole === "bounty-hunter" ? "BOUNTY HUNTER" : "SURVIVOR"}</span>
+              </div>
+            )}
           </div>
         )}
       </div>
