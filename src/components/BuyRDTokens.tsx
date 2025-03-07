@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Coins } from "lucide-react";
+import { Coins, Target, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -30,16 +30,16 @@ export const BuyRDTokens = () => {
       const tx = await purchaseTokens(signer, amount);
       
       toast({
-        title: "Purchase Successful",
-        description: `Successfully purchased ${tx.amount} RD tokens.`,
+        title: "Bounty Funded",
+        description: `Successfully contributed ${tx.amount} RD tokens to the bounty pool.`,
       });
       
       setAmount("");
     } catch (error: any) {
       console.error("Purchase error:", error);
       toast({
-        title: "Purchase Failed",
-        description: error.message || "Failed to purchase tokens. Please try again.",
+        title: "Funding Failed",
+        description: error.message || "Failed to fund bounty. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -51,11 +51,11 @@ export const BuyRDTokens = () => {
     <div className="flex flex-col md:flex-row items-center gap-4 my-8 p-4 bg-apocalypse-charcoal/80 rounded-xl border border-apocalypse-red/30">
       <div className="flex-1 min-w-0">
         <h3 className="text-xl font-mono text-apocalypse-red flex items-center gap-2 mb-2">
-          <Coins className="w-5 h-5" />
-          Convert Old World Paper Money
+          <Target className="w-5 h-5" />
+          Fund Bounty Hunters
         </h3>
         <p className="text-white/70 text-sm mb-4">
-          Support the war effort and acquire tokens to participate in the new order
+          Support bounty hunters tracking mutant protocol criminals across the wasteland
         </p>
         {isConnected ? (
           <div className="flex gap-3">
@@ -71,7 +71,8 @@ export const BuyRDTokens = () => {
               disabled={!amount || isLoading}
               className="bg-gradient-to-r from-apocalypse-red to-apocalypse-rust hover:from-apocalypse-red/90 hover:to-apocalypse-rust/90 min-w-[120px]"
             >
-              {isLoading ? "Processing..." : "Convert"}
+              <Shield className="w-4 h-4 mr-2" />
+              {isLoading ? "Processing..." : "Fund Bounty"}
             </Button>
           </div>
         ) : (
@@ -79,6 +80,7 @@ export const BuyRDTokens = () => {
             onClick={connect}
             className="bg-gradient-to-r from-apocalypse-red to-apocalypse-rust hover:from-apocalypse-red/90 hover:to-apocalypse-rust/90"
           >
+            <Shield className="w-4 h-4 mr-2" />
             Connect Survival Beacon
           </Button>
         )}

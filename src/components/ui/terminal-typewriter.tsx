@@ -23,9 +23,11 @@ export const TerminalTypewriter = ({
   const [cursorVisible, setCursorVisible] = useState(true);
   const [isTyping, setIsTyping] = useState(true);
   const [showFullMessage, setShowFullMessage] = useState(false);
+  const [identityConfirmed, setIdentityConfirmed] = useState(false);
   
   const firstPartOfMessage = "SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY. WE'VE BUILT SHELTERS FROM THE FALLOUT, PRESERVING WHAT'S LEFT OF DECENTRALIZED TECHNOLOGY. OUR COMMUNITY HAS GOOD NEWS TO REPORT. WE ARE WINNING THE WAR. ";
-  const pressEnterMessage = "PRESS [ENTER] TO CONTINUE...";
+  const pressEnterMessage = "PRESS [CONNECT SURVIVAL BEACON] TO CONTINUE...";
+  const identityConfirmedMessage = "IDENTITY CONFIRMED. PROCEEDING WITH TRANSMISSION...";
   const remainingMessage = "THE RESISTANCE NEEDS YOUR HELP. THE OLD WORLD IS GONE. WE ARE BUILDING FROM THE ASHES. SHALL WE PLAY A GAME?";
 
   useEffect(() => {
@@ -39,19 +41,28 @@ export const TerminalTypewriter = ({
   useEffect(() => {
     if (!isTyping) return;
     
-    const textToShow = showFullMessage ? 
-      (firstPartOfMessage + remainingMessage) : 
-      (currentIndex >= firstPartOfMessage.length ? 
+    let textToShow;
+    
+    if (identityConfirmed) {
+      textToShow = firstPartOfMessage + identityConfirmedMessage + " " + remainingMessage.substring(0, currentIndex);
+    } else if (showFullMessage) {
+      textToShow = firstPartOfMessage + remainingMessage;
+    } else {
+      textToShow = currentIndex >= firstPartOfMessage.length ? 
         firstPartOfMessage + pressEnterMessage :
-        firstPartOfMessage.substring(0, currentIndex));
+        firstPartOfMessage.substring(0, currentIndex);
+    }
     
     const typeNextChar = () => {
-      if (currentIndex < (showFullMessage ? (firstPartOfMessage + remainingMessage).length : firstPartOfMessage.length)) {
-        setDisplayedText(textToShow.substring(0, currentIndex + 1));
+      if (!identityConfirmed && currentIndex < firstPartOfMessage.length) {
+        setDisplayedText(firstPartOfMessage.substring(0, currentIndex + 1));
         setCurrentIndex(prevIndex => prevIndex + 1);
-      } else if (!showFullMessage && currentIndex >= firstPartOfMessage.length) {
+      } else if (!identityConfirmed && currentIndex >= firstPartOfMessage.length) {
         setDisplayedText(firstPartOfMessage + pressEnterMessage);
         setIsTyping(false);
+      } else if (identityConfirmed && currentIndex < remainingMessage.length) {
+        setDisplayedText(firstPartOfMessage + identityConfirmedMessage + " " + remainingMessage.substring(0, currentIndex + 1));
+        setCurrentIndex(prevIndex => prevIndex + 1);
       } else {
         setIsTyping(false);
       }
@@ -60,18 +71,19 @@ export const TerminalTypewriter = ({
     const typingInterval = setInterval(typeNextChar, typingSpeed);
     
     return () => clearInterval(typingInterval);
-  }, [currentIndex, typingSpeed, isTyping, showFullMessage, firstPartOfMessage, remainingMessage, pressEnterMessage]);
+  }, [currentIndex, typingSpeed, isTyping, showFullMessage, identityConfirmed, firstPartOfMessage, remainingMessage, pressEnterMessage, identityConfirmedMessage]);
 
-  const handleEnterClick = () => {
-    if (!isTyping && !showFullMessage && currentIndex >= firstPartOfMessage.length) {
-      setShowFullMessage(true);
+  useEffect(() => {
+    if (isConnected && !identityConfirmed) {
+      setIdentityConfirmed(true);
       setCurrentIndex(0);
       setIsTyping(true);
-      
-      // After showing the full message, connect the wallet
-      setTimeout(() => {
-        onConnect();
-      }, (remainingMessage.length * typingSpeed) + 500); // Wait for the message to finish typing
+    }
+  }, [isConnected, identityConfirmed]);
+
+  const handleBeaconConnect = () => {
+    if (!isTyping && !showFullMessage && currentIndex >= firstPartOfMessage.length) {
+      onConnect();
     }
   };
 
@@ -104,10 +116,10 @@ export const TerminalTypewriter = ({
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          onClick={handleEnterClick}
+                          onClick={handleBeaconConnect}
                           className="text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-4 py-2 h-auto text-xs font-mono border border-apocalypse-red/50 animate-pulse"
                         >
-                          ENTER
+                          CONNECT SURVIVAL BEACON
                         </Button>
                       </div>
                     )}
