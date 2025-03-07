@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -324,16 +323,20 @@ const Index = () => {
                     <div>
                       <h4 className="text-lg font-mono text-apocalypse-red mb-2">Resource Allocation Protocol</h4>
                       <p className="text-white/80 mb-3 text-sm">
-                        <span className="text-apocalypse-red font-semibold">Request Mission Sponsorship</span> - Survivors with vital projects can request Resistance support. 
-                        Present your mission to gather support and resources from the collective. Projects that strengthen our network receive priority allocation.
+                        <span className="text-apocalypse-red font-semibold">Request Mission Sponsorship</span> - In the wasteland, 
+                        lone survivors rarely last. Your mission might be vital to our collective survival, but resources are scarce. 
+                        Present your plans to the Council and fellow survivors will vote with their Resistance Dollars to back missions 
+                        that strengthen our foothold in this hostile world.
                       </p>
                       <p className="text-white/80 mb-3 text-sm">
-                        <span className="text-toxic-neon font-semibold">Scout Settlements</span> - Browse existing Resistance outposts and missions. 
-                        Support vital projects with your Resistance Dollars and gain influence in the territories you help establish.
+                        <span className="text-toxic-neon font-semibold">Scout Settlements</span> - Our network of outposts and safe zones grows 
+                        with each passing day. Browse the mission board to discover initiatives from fellow survivors - from radiation-resistant 
+                        crop research to mutant defense systems. Contribute your expertise and RD tokens to missions that align with your survival strategy.
                       </p>
                       <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
                         <span className="text-toxic-neon font-semibold block mb-1">» SURVIVAL DIRECTIVE «</span>
-                        All Resistance projects undergo rigorous community vetting before receiving support. Only projects with sustainable survival value will be approved.
+                        The old world fell because resources flowed to the greedy, not the worthy. The Resistance vets all projects through 
+                        decentralized consensus - your voice matters in determining what gets built and who receives support. Choose wisely, survivor.
                       </div>
                     </div>
                   </div>

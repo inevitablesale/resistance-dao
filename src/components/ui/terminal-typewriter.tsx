@@ -60,13 +60,13 @@ export function TerminalTypewriter({
         </div>
         <div className="terminal-line">
           <span className="text-toxic-neon/80">[SURVIVAL_PROTOCOL]</span>
-          <span className="text-white/70"> ESTABLISHING CONNECTION...</span>
+          <span className="text-white/70"> ESTABLISHING SECURE TRANSMISSION...</span>
         </div>
         <div className="terminal-line h-6">
           <span className="text-apocalypse-red/90">[WARNING]</span>
-          <span className="text-white/70"> SECURE CHANNEL REQUIRED FOR COMMUNICATION</span>
+          <span className="text-white/70"> WASTELAND RADIATION LEVELS CRITICAL - ENCRYPTION REQUIRED</span>
         </div>
-        <div className="terminal-line flex items-center h-6">
+        <div className="terminal-line flex items-center h-6 min-h-6">
           <span className="block">
             {displayText}
             {cursorVisible && <span className="cursor">_</span>}
