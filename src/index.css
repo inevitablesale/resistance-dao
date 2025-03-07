@@ -1,208 +1,278 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-black text-white;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 262.1 83.3% 57.8%;
+    --radius: 0.5rem;
+    
+    /* Custom colors */
+    --toxic-neon: 142, 84%, 65%;
+    --apocalypse-red: 350, 82%, 57%;
+  }
+
+  .dark {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 20% 98%;
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 263.4 70% 50.4%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 263.4 70% 50.4%;
+  }
 }
 
-/* Post-Apocalyptic Background Styles */
-.post-apocalyptic-bg {
-  background: url('/images/bg/wasteland-bg.webp');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
-.dust-particles {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  background: url('/images/overlays/dust-particles.gif');
-  background-size: cover;
-  opacity: 0.4;
-  z-index: 1;
-}
-
-.rust-overlay {
+/* Custom classes for the terminal monitor */
+.terminal-monitor .monitor-frame {
   position: relative;
+  box-shadow: 0 0 20px rgba(80, 250, 123, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.rust-overlay::before {
-  content: '';
+.terminal-monitor .monitor-screen {
+  position: relative;
+  width: 100%;
+  min-height: 600px;
+  background-color: #000;
+  overflow: hidden;
+}
+
+/* Scanlines effect */
+.terminal-monitor .monitor-scanlines:before {
+  content: "";
   position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.05) 51%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* CRT glow effect */
+.terminal-monitor .monitor-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: inset 0 0 60px rgba(80, 250, 123, 0.1);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Post-apocalyptic background styling */
+.post-apocalyptic-bg {
+  background-color: #000;
+  background-image: 
+    radial-gradient(circle at 30% 20%, rgba(80, 250, 123, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(234, 56, 76, 0.05) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Dust particles effect */
+.dust-particles {
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: url('/images/overlays/rust-texture.png');
-  background-size: cover;
-  opacity: 0.15;
   pointer-events: none;
-  z-index: 2;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='rgba(255, 255, 255, 0.3)' /%3E%3Ccircle cx='30' cy='40' r='0.5' fill='rgba(255, 255, 255, 0.3)' /%3E%3Ccircle cx='60' cy='20' r='0.75' fill='rgba(255, 255, 255, 0.3)' /%3E%3Ccircle cx='80' cy='70' r='0.5' fill='rgba(255, 255, 255, 0.3)' /%3E%3Ccircle cx='22' cy='73' r='0.75' fill='rgba(255, 255, 255, 0.3)' /%3E%3Ccircle cx='45' cy='90' r='0.5' fill='rgba(255, 255, 255, 0.3)' /%3E%3C/svg%3E");
+  opacity: 0.4;
 }
 
+/* Fog overlay */
 .fog-overlay {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
   pointer-events: none;
-  background: url('/images/overlays/fog-overlay.png');
-  background-size: cover;
-  opacity: 0.3;
-  z-index: 3;
 }
 
+/* Broken glass effect */
 .broken-glass {
   position: relative;
+  overflow: hidden;
 }
 
 .broken-glass::before {
-  content: '';
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='10' y1='10' x2='40' y2='40' stroke='rgba(255, 255, 255, 0.1)' stroke-width='0.5' /%3E%3Cline x1='50' y1='20' x2='70' y2='0' stroke='rgba(255, 255, 255, 0.1)' stroke-width='0.5' /%3E%3Cline x1='80' y1='50' x2='100' y2='30' stroke='rgba(255, 255, 255, 0.1)' stroke-width='0.5' /%3E%3Cline x1='0' y1='70' x2='30' y2='90' stroke='rgba(255, 255, 255, 0.1)' stroke-width='0.5' /%3E%3Cline x1='60' y1='80' x2='90' y2='100' stroke='rgba(255, 255, 255, 0.1)' stroke-width='0.5' /%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Rust overlay */
+.rust-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+/* Scanline effect */
+.scanline {
+  pointer-events: none;
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: url('/images/overlays/broken-glass.png');
-  background-size: cover;
-  opacity: 0.1;
-  pointer-events: none;
-  z-index: 4;
-}
-
-/* Terminal Styles */
-.terminal-output {
-  font-family: monospace;
-  position: relative;
-  line-height: 1.5;
-}
-
-.terminal-line {
-  margin-bottom: 0.5rem;
-}
-
-.cursor {
-  animation: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-  from, to {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-.scanline {
   background: linear-gradient(
     to bottom,
-    rgba(122, 255, 165, 0),
-    rgba(122, 255, 165, 0.1) 50%,
-    rgba(122, 255, 165, 0)
+    transparent,
+    transparent 50%,
+    rgba(80, 250, 123, 0.02) 50%,
+    rgba(80, 250, 123, 0.02)
   );
-  pointer-events: none;
-  animation: scanlines 2s linear infinite;
+  background-size: 100% 4px;
+  z-index: 2;
 }
 
-@keyframes scanlines {
-  from {
-    transform: translateY(-100%);
+/* Critical status flash */
+.flash-critical {
+  animation: flash-red 2s infinite;
+}
+
+@keyframes flash-red {
+  0%, 49% {
+    background-color: rgba(234, 56, 76, 0.6);
   }
-  to {
-    transform: translateY(100%);
+  50%, 100% {
+    background-color: rgba(234, 56, 76, 1);
   }
 }
 
+/* Toxic glow for elements */
+.toxic-glow {
+  filter: drop-shadow(0 0 2px rgba(80, 250, 123, 0.6));
+}
+
+/* Typing animation */
+.typing-text {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 1s steps(60, end);
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+/* Beacon flash for important buttons */
 .flash-beacon {
-  animation: flash 2s infinite;
+  position: relative;
+  animation: flash-glow 3s infinite;
 }
 
-@keyframes flash {
-  0% {
+@keyframes flash-glow {
+  0%, 100% {
+    text-shadow: 0 0 0px rgba(80, 250, 123, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(80, 250, 123, 1);
+  }
+}
+
+/* Status indicators */
+.status-critical {
+  position: relative;
+  animation: status-critical 1s infinite;
+}
+
+@keyframes status-critical {
+  0%, 100% {
     opacity: 1;
   }
   50% {
     opacity: 0.5;
   }
-  100% {
-    opacity: 1;
-  }
 }
 
-.flash-critical {
-  animation: critical-flash 1s infinite;
+/* Add Apocalypse theme colors */
+.text-apocalypse-red {
+  color: hsl(350, 82%, 57%);
 }
 
-@keyframes critical-flash {
-  0% {
-    opacity: 1;
-    box-shadow: 0 0 5px rgba(234, 56, 76, 0.7);
-  }
-  50% {
-    opacity: 0.7;
-    box-shadow: 0 0 10px rgba(234, 56, 76, 1);
-  }
-  100% {
-    opacity: 1;
-    box-shadow: 0 0 5px rgba(234, 56, 76, 0.7);
-  }
+.bg-apocalypse-red {
+  background-color: hsl(350, 82%, 57%);
 }
 
-.status-critical {
-  animation: text-flash 1s infinite;
+.text-toxic-neon {
+  color: hsl(142, 84%, 65%);
 }
 
-@keyframes text-flash {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 1;
-  }
+.bg-toxic-neon {
+  background-color: hsl(142, 84%, 65%);
 }
 
-.toxic-glow {
-  text-shadow: 0 0 5px rgba(122, 255, 165, 0.5);
+.bg-toxic-dark {
+  background-color: rgba(10, 15, 20, 0.8);
 }
 
-/* Role Selection Styles */
-.role-option {
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
+.border-toxic-neon {
+  border-color: hsl(142, 84%, 65%);
 }
 
-.role-option:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(122, 255, 165, 0.3);
-}
-
-.role-option::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(122, 255, 165, 0.2),
-    transparent
-  );
-  transition: 0.5s;
-}
-
-.role-option:hover::before {
-  left: 100%;
+.border-apocalypse-red {
+  border-color: hsl(350, 82%, 57%);
 }
