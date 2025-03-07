@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -42,6 +43,7 @@ const Index = () => {
   const [showDesktopEnvironment, setShowDesktopEnvironment] = useState(false);
   const [initialAppOpened, setInitialAppOpened] = useState(false);
   const [showJournalDialog, setShowJournalDialog] = useState(false);
+  const [showProgressIndicator, setShowProgressIndicator] = useState(true);
   
   // Show journal dialog when wallet connects
   useEffect(() => {
@@ -71,6 +73,13 @@ const Index = () => {
       }, 1500);
     }
   }, [authStage, terminalStage, initialAppOpened]);
+  
+  // Hide progress indicator after the terminal stage is completed
+  useEffect(() => {
+    if (terminalStage !== "typing") {
+      setShowProgressIndicator(false);
+    }
+  }, [terminalStage]);
   
   const handleRoleSelect = (role: "bounty-hunter" | "survivor") => {
     console.log("Role selected in Index component:", role);
@@ -205,7 +214,7 @@ const Index = () => {
       />
 
       {/* Emergency Transmission Popup - only show when authenticated */}
-      {(authStage === "authenticated" || authStage === "post-breach") && (
+      {(authStage === "post-breach" || authStage === "authenticated") && (
         <EmergencyTransmission 
           isOpen={showEmergencyTransmission} 
           onClose={handleCloseEmergencyTransmission} 
@@ -232,7 +241,7 @@ const Index = () => {
             className="w-full"
           >
             {/* Only show header elements if post-breach or authenticated */}
-            {(authStage === "authenticated" || authStage === "post-breach") && (
+            {(authStage === "post-breach" || authStage === "authenticated") && (
               <div className="text-center mb-4 flex justify-between items-center">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm font-mono broken-glass">
                   <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
@@ -275,7 +284,7 @@ const Index = () => {
               
               <div className="relative z-10 p-6 md:p-8">
                 {/* Only show this header if post-breach or authenticated */}
-                {(authStage === "authenticated" || authStage === "post-breach") && (
+                {(authStage === "post-breach" || authStage === "authenticated") && (
                   <div className="flex items-center justify-between mb-4 border-b border-toxic-neon/20 pb-2">
                     <div className="flex items-center">
                       <Radiation className="h-5 w-5 mr-2 text-toxic-neon" />
@@ -294,38 +303,42 @@ const Index = () => {
                   {authStage === "pre-boot" && (
                     <>
                       <PreBootTerminal onAuthenticated={handleAuthenticated} />
-                      {/* Progress Indicator moved here, below the terminal */}
-                      <div className="mt-6">
-                        <ProgressIndicator 
-                          stages={[
-                            { id: "boot", label: "Boot", completed: authStage !== "pre-boot" },
-                            { id: "breach", label: "System Breach", completed: authStage === "post-breach" || authStage === "authenticated" },
-                            { id: "desktop", label: "Interface", completed: terminalStage !== "typing" && (authStage === "post-breach" || authStage === "authenticated") },
-                            { id: "role", label: "Role Selection", completed: userRole !== null }
-                          ]}
-                        />
-                      </div>
+                      {/* Progress Indicator only shown during pre-boot and typing stages */}
+                      {showProgressIndicator && (
+                        <div className="mt-6">
+                          <ProgressIndicator 
+                            stages={[
+                              { id: "boot", label: "Boot", completed: authStage !== "pre-boot" },
+                              { id: "breach", label: "System Breach", completed: authStage === "post-breach" || authStage === "authenticated" },
+                              { id: "desktop", label: "Interface", completed: terminalStage !== "typing" && (authStage === "post-breach" || authStage === "authenticated") },
+                              { id: "role", label: "Role Selection", completed: userRole !== null }
+                            ]}
+                          />
+                        </div>
+                      )}
                     </>
                   )}
                   
-                  {(authStage === "authenticated" || authStage === "post-breach") ? (
+                  {(authStage === "post-breach" || authStage === "authenticated") ? (
                     <>
                       <PostAuthLayout
                         leftSidebar={renderLeftSidebar()}
                         mainContent={renderMainContent()}
                         rightSidebar={renderRightSidebar()}
                       />
-                      {/* Progress Indicator shown below the PostAuthLayout too */}
-                      <div className="mt-6">
-                        <ProgressIndicator 
-                          stages={[
-                            { id: "boot", label: "Boot", completed: authStage !== "pre-boot" },
-                            { id: "breach", label: "System Breach", completed: authStage === "post-breach" || authStage === "authenticated" },
-                            { id: "desktop", label: "Interface", completed: terminalStage !== "typing" && (authStage === "post-breach" || authStage === "authenticated") },
-                            { id: "role", label: "Role Selection", completed: userRole !== null }
-                          ]}
-                        />
-                      </div>
+                      {/* Progress Indicator only shown during typing stage after breach */}
+                      {showProgressIndicator && terminalStage === "typing" && (
+                        <div className="mt-6">
+                          <ProgressIndicator 
+                            stages={[
+                              { id: "boot", label: "Boot", completed: true },
+                              { id: "breach", label: "System Breach", completed: true },
+                              { id: "desktop", label: "Interface", completed: terminalStage !== "typing" },
+                              { id: "role", label: "Role Selection", completed: userRole !== null }
+                            ]}
+                          />
+                        </div>
+                      )}
                     </>
                   ) : (
                     renderMainContent()
