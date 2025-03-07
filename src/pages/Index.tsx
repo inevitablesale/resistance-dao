@@ -50,6 +50,7 @@ const Index = () => {
     console.log("Role selected in Index component:", role);
     setUserRole(role);
     setTerminalStage("completed");
+    setAuthStage("authenticated");
     
     toast.success(`${role === "bounty-hunter" ? "Bounty Hunter" : "Survivor"} role activated`, {
       description: `Your wasteland profile has been configured for ${role === "bounty-hunter" ? "tracking down crypto criminals" : "rebuilding communities"}`,
@@ -60,6 +61,7 @@ const Index = () => {
   const handleTerminalComplete = () => {
     console.log("Typing animation complete, showing NFT selection");
     setTerminalStage("nft-selection");
+    setAuthStage("authenticated");
   };
 
   const handleCloseEmergencyTransmission = () => {
@@ -130,6 +132,7 @@ const Index = () => {
     if (authStage === "authenticated") {
       // If authenticated, show different content based on terminal stage
       if (terminalStage === "nft-selection") {
+        console.log("Showing NFT selection content");
         return renderNFTContent();
       } else if (terminalStage === "typing") {
         // Show terminal typewriter in the authenticated state
