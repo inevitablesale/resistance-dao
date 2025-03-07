@@ -373,4 +373,9 @@
   filter: drop-shadow(0 0 2px rgba(57, 255, 20, 0.7));
 }
 
-/* System
+/* System access code message */
+.access-code-message {
+  font-family: monospace;
+  color: hsl(142, 84%, 65%);
+  text-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
+}
