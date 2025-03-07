@@ -48,9 +48,9 @@ export const BuyRDTokens = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-center gap-4 my-8 p-4 bg-blue-500/5 rounded-xl border border-blue-500/20">
+    <div className="flex flex-col md:flex-row items-center gap-4 my-8 p-4 bg-apocalypse-charcoal/80 rounded-xl border border-apocalypse-red/30">
       <div className="flex-1 min-w-0">
-        <h3 className="text-xl font-mono text-blue-300 flex items-center gap-2 mb-2">
+        <h3 className="text-xl font-mono text-apocalypse-red flex items-center gap-2 mb-2">
           <Coins className="w-5 h-5" />
           Convert Old World Paper Money
         </h3>
@@ -64,12 +64,12 @@ export const BuyRDTokens = () => {
               placeholder="Amount in USDC"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="bg-black/20 border-blue-500/20 text-white placeholder:text-white/40"
+              className="bg-black/20 border-apocalypse-red/20 text-white placeholder:text-white/40"
             />
             <Button
               onClick={handlePurchase}
               disabled={!amount || isLoading}
-              className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 min-w-[120px]"
+              className="bg-gradient-to-r from-apocalypse-red to-apocalypse-rust hover:from-apocalypse-red/90 hover:to-apocalypse-rust/90 min-w-[120px]"
             >
               {isLoading ? "Processing..." : "Convert"}
             </Button>
@@ -77,7 +77,7 @@ export const BuyRDTokens = () => {
         ) : (
           <Button
             onClick={connect}
-            className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+            className="bg-gradient-to-r from-apocalypse-red to-apocalypse-rust hover:from-apocalypse-red/90 hover:to-apocalypse-rust/90"
           >
             Connect Survival Beacon
           </Button>
