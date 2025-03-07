@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -111,7 +110,6 @@ const Index = () => {
             transition={{ duration: 0.5 }}
             className="max-w-4xl mx-auto"
           >
-            {/* Network Status and Title */}
             <div className="text-left mb-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
                 <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
@@ -121,7 +119,6 @@ const Index = () => {
                 Post-Apocalyptic Launch Platform
               </h1>
 
-              {/* Metrics Cards */}
               <div className="flex gap-4 mb-8">
                 <div className="bg-black/70 border border-toxic-neon/20 rounded-lg p-4 flex-1 relative overflow-hidden rust-overlay">
                   <div className="scanline"></div>
@@ -146,15 +143,13 @@ const Index = () => {
                 </div>
               </div>
               
-              {/* Add Buy RD Tokens component here */}
               <div className="relative mb-8">
                 <BuyRDTokens />
                 <ToxicPuddle className="absolute -bottom-2 -right-10" toxicGreen={true} />
               </div>
               
-              {/* THE RESISTANCE STORY - MOVED HERE */}
-              <div className="mb-12 bg-black/50 border border-apocalypse-red/30 rounded-xl p-6 relative">
-                <div className="text-center">
+              <div className="mb-12 relative">
+                <div className="text-center mb-16">
                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-apocalypse-red/30 bg-black/60 text-apocalypse-red mb-4">
                     <Radiation className="w-5 h-5" />
                     <span className="text-sm font-mono">HISTORICAL ARCHIVES</span>
@@ -162,23 +157,148 @@ const Index = () => {
                   <h2 className="text-4xl font-bold font-mono mb-6 text-toxic-neon toxic-glow">
                     The Resistance Story
                   </h2>
-                  <p className="text-xl text-white/70 max-w-3xl mx-auto">
+                  <p className="text-xl text-white/70 max-w-3xl mx-auto mb-12">
                     How we survived the crypto nuclear winter and built a new world from the ashes
                   </p>
-                  <div className="mt-8">
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-16 items-center mb-16">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-toxic-neon/5 rounded-2xl blur-xl"></div>
+                    <div className="relative bg-black/60 rounded-xl overflow-hidden border border-apocalypse-ash p-1">
+                      <div className="aspect-video bg-apocalypse-dark rounded-lg overflow-hidden relative">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Image className="w-32 h-32 text-apocalypse-ash/30" />
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        <div className="absolute bottom-0 left-0 p-4">
+                          <div className="text-xs text-apocalypse-ash/70 font-mono mb-1">DAY 0</div>
+                          <div className="text-lg text-toxic-neon font-mono">The Fall</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-apocalypse-red/20">
+                        <Skull className="h-4 w-4 text-apocalypse-red" />
+                      </div>
+                      <h3 className="text-xl font-bold text-toxic-neon font-mono">The Crypto Nuclear Winter</h3>
+                    </div>
+                    <p className="text-white/70 mb-4">
+                      It began with the great crashes of 2022-2023. Major protocols imploded one by one, like a chain of nuclear detonations across the digital landscape. FTX, Terra Luna, 3AC - each collapse sent toxic fallout across the ecosystem.
+                    </p>
+                    <p className="text-white/70 mb-6">
+                      User trust was obliterated. Capital fled in panic. Development froze as the crypto nuclear winter descended. Weakened by greed and centralization, the old world wasn't sustainable - it had to burn for something new to emerge.
+                    </p>
                     <ToxicButton 
                       variant="outline" 
-                      size="lg" 
+                      size="sm" 
                       className="border-apocalypse-red/30 text-toxic-neon hover:bg-apocalypse-red/10"
-                      onClick={() => navigate('/resistance-origins')}
+                      onClick={() => navigate('/crypto-history')}
                     >
-                      Read Our Story <ArrowIcon className="ml-2 h-5 w-5" />
+                      Historical Records <ArrowIcon className="ml-2 h-4 w-4" />
                     </ToxicButton>
                   </div>
                 </div>
+
+                <div className="grid md:grid-cols-2 gap-16 items-center mb-16 md:mt-24">
+                  <div className="order-2 md:order-1">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-toxic-neon/20">
+                        <Radiation className="h-4 w-4 text-toxic-neon" />
+                      </div>
+                      <h3 className="text-xl font-bold text-toxic-neon font-mono">The First Survivors</h3>
+                    </div>
+                    <p className="text-white/70 mb-4">
+                      As institutional players abandoned the wasteland, a resilient community began to form. We were the builders who stayed - developing during the depths of winter, convinced of the technology's potential despite the destruction.
+                    </p>
+                    <p className="text-white/70 mb-6">
+                      Operating with minimal resources, we formed underground networks for mutual support. Skills were shared, protocols were hardened against radiation, and new models of trust were forged in the crucible of catastrophe.
+                    </p>
+                    <ToxicButton 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10"
+                      onClick={() => navigate('/resistance-origins')}
+                    >
+                      Survivor Stories <ArrowIcon className="ml-2 h-4 w-4" />
+                    </ToxicButton>
+                  </div>
+
+                  <div className="order-1 md:order-2 relative">
+                    <div className="absolute inset-0 bg-toxic-neon/5 rounded-2xl blur-xl"></div>
+                    <div className="relative bg-black/60 rounded-xl overflow-hidden border border-apocalypse-ash p-1">
+                      <div className="aspect-video bg-apocalypse-dark rounded-lg overflow-hidden relative">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Image className="w-32 h-32 text-apocalypse-ash/30" />
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        <div className="absolute bottom-0 left-0 p-4">
+                          <div className="text-xs text-apocalypse-ash/70 font-mono mb-1">DAY 248</div>
+                          <div className="text-lg text-toxic-neon font-mono">First Resistance</div>
+                        </div>
+                        <DrippingSlime position="bottom" dripsCount={3} showIcons={false} toxicGreen={true} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-16 items-center">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-toxic-neon/5 rounded-2xl blur-xl"></div>
+                    <div className="relative bg-black/60 rounded-xl overflow-hidden border border-apocalypse-ash p-1">
+                      <div className="aspect-video bg-apocalypse-dark rounded-lg overflow-hidden relative">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Image className="w-32 h-32 text-apocalypse-ash/30" />
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        <div className="absolute bottom-0 left-0 p-4">
+                          <div className="text-xs text-apocalypse-ash/70 font-mono mb-1">DAY 621</div>
+                          <div className="text-lg text-toxic-neon font-mono">The New Dawn</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-toxic-neon/20">
+                        <Shield className="h-4 w-4 text-toxic-neon" />
+                      </div>
+                      <h3 className="text-xl font-bold text-toxic-neon font-mono">The Resistance DAO</h3>
+                    </div>
+                    <p className="text-white/70 mb-4">
+                      From the remnants of the old world, we built something new. The Resistance DAO became a beacon in the wasteland - a community united by shared principles: decentralization, transparency, and user sovereignty.
+                    </p>
+                    <p className="text-white/70 mb-6">
+                      Our Post-Apocalyptic Launch Platform isn't just a place to build - it's a manifesto. We validate projects through community consensus, require transparent governance, and ensure value flows back to the ecosystem that nurtures them.
+                    </p>
+                    <ToxicButton 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10"
+                      onClick={() => navigate('/manifesto')}
+                    >
+                      Resistance Manifesto <ArrowIcon className="ml-2 h-4 w-4" />
+                    </ToxicButton>
+                  </div>
+                </div>
+
+                <div className="flex justify-center mt-16">
+                  <ToxicButton 
+                    size="lg"
+                    onClick={() => navigate('/join-resistance')}
+                    variant="glowing"
+                    className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+                  >
+                    <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
+                    Join The Resistance
+                  </ToxicButton>
+                </div>
               </div>
               
-              {/* Action Buttons */}
               <div className="flex flex-wrap gap-4">
                 <ToxicButton 
                   size="lg"
@@ -201,7 +321,6 @@ const Index = () => {
               </div>
             </div>
 
-            {/* NFT Collection Showcase - NEW SECTION */}
             <div className="mt-12 mb-12 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
               <div className="scanline"></div>
               <div className="flex items-center justify-between mb-6">
@@ -401,163 +520,6 @@ const Index = () => {
             </div>
           </motion.div>
         </div>
-      </section>
-
-      {/* NEW SECTION: The Resistance Story */}
-      <section className="py-24 relative overflow-hidden radiation-bg">
-        <div className="scanline"></div>
-        <div className="container px-4 relative z-10">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-apocalypse-red/30 bg-black/60 text-apocalypse-red mb-4">
-              <Radiation className="w-5 h-5" />
-              <span className="text-sm font-mono">HISTORICAL ARCHIVES</span>
-            </div>
-            <h2 className="text-4xl font-bold font-mono mb-6 text-toxic-neon toxic-glow">
-              The Resistance Story
-            </h2>
-            <p className="text-xl text-white/70 max-w-3xl mx-auto mb-12">
-              How we survived the crypto nuclear winter and built a new world from the ashes
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-16 items-center mb-16">
-            <div className="relative">
-              <div className="absolute inset-0 bg-toxic-neon/5 rounded-2xl blur-xl"></div>
-              <div className="relative bg-black/60 rounded-xl overflow-hidden border border-apocalypse-ash p-1">
-                <div className="aspect-video bg-apocalypse-dark rounded-lg overflow-hidden relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Image className="w-32 h-32 text-apocalypse-ash/30" />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 p-4">
-                    <div className="text-xs text-apocalypse-ash/70 font-mono mb-1">DAY 0</div>
-                    <div className="text-lg text-toxic-neon font-mono">The Fall</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-apocalypse-red/20">
-                  <Skull className="h-4 w-4 text-apocalypse-red" />
-                </div>
-                <h3 className="text-xl font-bold text-toxic-neon font-mono">The Crypto Nuclear Winter</h3>
-              </div>
-              <p className="text-white/70 mb-4">
-                It began with the great crashes of 2022-2023. Major protocols imploded one by one, like a chain of nuclear detonations across the digital landscape. FTX, Terra Luna, 3AC - each collapse sent toxic fallout across the ecosystem.
-              </p>
-              <p className="text-white/70 mb-6">
-                User trust was obliterated. Capital fled in panic. Development froze as the crypto nuclear winter descended. Weakened by greed and centralization, the old world wasn't sustainable - it had to burn for something new to emerge.
-              </p>
-              <ToxicButton 
-                variant="outline" 
-                size="sm" 
-                className="border-apocalypse-red/30 text-toxic-neon hover:bg-apocalypse-red/10"
-                onClick={() => navigate('/crypto-history')}
-              >
-                Historical Records <ArrowIcon className="ml-2 h-4 w-4" />
-              </ToxicButton>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 md:mt-24">
-            <div className="order-2 md:order-1">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-toxic-neon/20">
-                  <Radiation className="h-4 w-4 text-toxic-neon" />
-                </div>
-                <h3 className="text-xl font-bold text-toxic-neon font-mono">The First Survivors</h3>
-              </div>
-              <p className="text-white/70 mb-4">
-                As institutional players abandoned the wasteland, a resilient community began to form. We were the builders who stayed - developing during the depths of winter, convinced of the technology's potential despite the destruction.
-              </p>
-              <p className="text-white/70 mb-6">
-                Operating with minimal resources, we formed underground networks for mutual support. Skills were shared, protocols were hardened against radiation, and new models of trust were forged in the crucible of catastrophe.
-              </p>
-              <ToxicButton 
-                variant="outline" 
-                size="sm" 
-                className="border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10"
-                onClick={() => navigate('/resistance-origins')}
-              >
-                Survivor Stories <ArrowIcon className="ml-2 h-4 w-4" />
-              </ToxicButton>
-            </div>
-
-            <div className="order-1 md:order-2 relative">
-              <div className="absolute inset-0 bg-toxic-neon/5 rounded-2xl blur-xl"></div>
-              <div className="relative bg-black/60 rounded-xl overflow-hidden border border-apocalypse-ash p-1">
-                <div className="aspect-video bg-apocalypse-dark rounded-lg overflow-hidden relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Image className="w-32 h-32 text-apocalypse-ash/30" />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 p-4">
-                    <div className="text-xs text-apocalypse-ash/70 font-mono mb-1">DAY 248</div>
-                    <div className="text-lg text-toxic-neon font-mono">First Resistance</div>
-                  </div>
-                  <DrippingSlime position="bottom" dripsCount={3} showIcons={false} toxicGreen={true} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div className="relative">
-              <div className="absolute inset-0 bg-toxic-neon/5 rounded-2xl blur-xl"></div>
-              <div className="relative bg-black/60 rounded-xl overflow-hidden border border-apocalypse-ash p-1">
-                <div className="aspect-video bg-apocalypse-dark rounded-lg overflow-hidden relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Image className="w-32 h-32 text-apocalypse-ash/30" />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 p-4">
-                    <div className="text-xs text-apocalypse-ash/70 font-mono mb-1">DAY 621</div>
-                    <div className="text-lg text-toxic-neon font-mono">The New Dawn</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-toxic-neon/20">
-                  <Shield className="h-4 w-4 text-toxic-neon" />
-                </div>
-                <h3 className="text-xl font-bold text-toxic-neon font-mono">The Resistance DAO</h3>
-              </div>
-              <p className="text-white/70 mb-4">
-                From the remnants of the old world, we built something new. The Resistance DAO became a beacon in the wasteland - a community united by shared principles: decentralization, transparency, and user sovereignty.
-              </p>
-              <p className="text-white/70 mb-6">
-                Our Post-Apocalyptic Launch Platform isn't just a place to build - it's a manifesto. We validate projects through community consensus, require transparent governance, and ensure value flows back to the ecosystem that nurtures them.
-              </p>
-              <ToxicButton 
-                variant="outline" 
-                size="sm" 
-                className="border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10"
-                onClick={() => navigate('/manifesto')}
-              >
-                Resistance Manifesto <ArrowIcon className="ml-2 h-4 w-4" />
-              </ToxicButton>
-            </div>
-          </div>
-
-          <div className="flex justify-center mt-16">
-            <ToxicButton 
-              size="lg"
-              onClick={() => navigate('/join-resistance')}
-              variant="glowing"
-              className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
-            >
-              <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
-              Join The Resistance
-            </ToxicButton>
-          </div>
-        </div>
-        <ToxicPuddle className="absolute bottom-32 left-1/4" toxicGreen={true} />
-        <ToxicPuddle className="absolute top-40 right-1/3" toxicGreen={true} />
       </section>
 
       <section className="py-24 relative radiation-bg">
