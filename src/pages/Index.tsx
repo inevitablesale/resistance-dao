@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -166,7 +167,7 @@ const Index = () => {
               
               <div className="mb-12 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
                 <div className="scanline"></div>
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-4">
                   <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
                     <Crosshair className="h-5 w-5 mr-2" /> Resistance BOUNTY LIST
                   </h3>
@@ -178,6 +179,35 @@ const Index = () => {
                   >
                     View All <ArrowIcon className="h-4 w-4 ml-1" />
                   </ToxicButton>
+                </div>
+                
+                <div className="mb-6 p-4 bg-black/50 border border-apocalypse-red/30 rounded-lg relative">
+                  <div className="absolute -top-2 -right-2 px-2 py-1 bg-apocalypse-red text-xs text-black font-mono rotate-3">
+                    TOP SECRET
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-apocalypse-red/20 flex items-center justify-center">
+                      <UserX className="w-6 h-6 text-apocalypse-red" />
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-mono text-apocalypse-red mb-2">Bounty Hunter Protocol</h4>
+                      <p className="text-white/80 mb-3 text-sm">
+                        After the collapse, a dangerous new breed emerged from the toxic wastelands - <span className="text-apocalypse-red font-semibold">Mutant Protocol Criminals</span>. 
+                        Former CEOs, lead developers, and treasury managers who survived by mutating their code to drain liquidity 
+                        from the survivors' remaining assets.
+                      </p>
+                      <p className="text-white/80 mb-3 text-sm">
+                        The Resistance fights back through our elite <span className="text-toxic-neon font-semibold">Bounty Hunter Program</span>. 
+                        Each captured criminal's digital signature is minted as an NFT trophy, with their stolen funds 
+                        redirected to fuel the Resistance's operations.
+                      </p>
+                      <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
+                        <span className="text-toxic-neon font-semibold block mb-1">» CRITICAL DIRECTIVE «</span>
+                        To join the Resistance, each survivor must capture at least one criminal. Your first successful 
+                        capture proves your commitment and grants you full Resistance membership privileges.
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
