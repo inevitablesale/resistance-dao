@@ -202,8 +202,21 @@ export function TerminalTypewriter({
   const [calculatingResult, setCalculatingResult] = useState(false);
   const [questionnaireStarted, setQuestionnaireStarted] = useState(false);
   const [typingStarted, setTypingStarted] = useState(false);
+  const [typingComplete, setTypingComplete] = useState(false);
   
   const terminalRef = useRef<HTMLDivElement>(null);
+
+  // Debug logging for component state
+  useEffect(() => {
+    console.log("Terminal state:", { 
+      bootStage, 
+      isComplete, 
+      typingStarted, 
+      typingComplete, 
+      displayTextLength: displayText.length,
+      showQuestionnaire
+    });
+  }, [bootStage, isComplete, typingStarted, typingComplete, displayText, showQuestionnaire]);
   
   // Boot sequence handling
   useEffect(() => {
@@ -271,7 +284,7 @@ export function TerminalTypewriter({
     return () => clearInterval(cursorInterval);
   }, []);
   
-  // Text typing effect - fixed version
+  // Text typing effect - improved version
   useEffect(() => {
     // Only start typing when boot is complete
     if (!isComplete || bootStage !== "complete" || typingStarted) {
@@ -289,10 +302,11 @@ export function TerminalTypewriter({
         i++;
       } else {
         clearInterval(typingInterval);
+        setTypingComplete(true);
+        console.log("Typing complete, calling onTypingComplete callback");
+        
         if (onTypingComplete) {
-          setTimeout(() => {
-            onTypingComplete();
-          }, 1000);
+          onTypingComplete();
         }
       }
     }, typeDelay);
@@ -301,6 +315,7 @@ export function TerminalTypewriter({
   }, [textToType, typeDelay, bootStage, isComplete, onTypingComplete, typingStarted]);
   
   const handleStartAssessment = () => {
+    console.log("Starting assessment questionnaire");
     setQuestionnaireStarted(true);
     setCurrentQuestion(0);
     setAnswers([]);
@@ -328,8 +343,9 @@ export function TerminalTypewriter({
       
       setTimeout(() => {
         setCalculatingResult(false);
-        
         const role = bountyHunterScore > survivorScore ? "bounty-hunter" : "survivor";
+        console.log(`Assessment complete, determined role: ${role}`);
+        
         if (onRoleSelect) {
           onRoleSelect(role);
         }
@@ -458,7 +474,7 @@ export function TerminalTypewriter({
           </>
         )}
         
-        {showQuestionnaire && !questionnaireStarted && displayText.length > 0 && (
+        {showQuestionnaire && !questionnaireStarted && typingComplete && (
           <div className="terminal-line mt-6">
             <div className="text-white/70 mb-4">BEFORE JOINING THE RESISTANCE, WE MUST DETERMINE YOUR ROLE IN THE NEW ECONOMY:</div>
             

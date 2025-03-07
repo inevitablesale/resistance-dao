@@ -1,8 +1,8 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Shield, Target, Radiation, Zap, Biohazard, Users, Activity, Clock, MessageSquare } from "lucide-react";
+import { Shield, Target, Radiation, Zap, Biohazard, Users, Activity, Clock, MessageSquare, Terminal } from "lucide-react";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
 import { DrippingSlime } from "@/components/ui/dripping-slime";
@@ -17,7 +17,13 @@ const Index = () => {
   const [showCommunityChallenges, setShowCommunityChallenges] = useState(false);
   const [terminalStage, setTerminalStage] = useState<"typing" | "questionnaire" | "completed">("typing");
   
-  React.useEffect(() => {
+  // Debug terminalStage changes
+  useEffect(() => {
+    console.log("Terminal stage changed to:", terminalStage);
+  }, [terminalStage]);
+  
+  // Community activity simulation
+  useEffect(() => {
     const interval = setInterval(() => {
       setCommunityActivity(Math.floor(Math.random() * 100));
     }, 5000);
@@ -42,10 +48,12 @@ const Index = () => {
   };
   
   const handleTerminalComplete = () => {
+    console.log("Typing animation complete, showing questionnaire");
     setTerminalStage("questionnaire");
   };
   
   const handleQuestionnaireComplete = (role: "bounty-hunter" | "survivor") => {
+    console.log("Questionnaire complete, setting role:", role);
     setUserRole(role);
     setTerminalStage("completed");
   };
