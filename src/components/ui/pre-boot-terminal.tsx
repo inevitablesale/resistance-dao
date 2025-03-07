@@ -57,6 +57,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         if (isPunctuation) delay += 30;
         if (isSpace) delay += 10;
         
+        // Occasionally add glitch effect during typing
         if (Math.random() < 0.03) {
           setTerminalEffect('glitch');
           setTimeout(() => setTerminalEffect('normal'), 120);
@@ -105,6 +106,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   useEffect(() => {
     if (!terminalReady) return;
     
+    // More frequent and dramatic flicker effects
     const flickerInterval = setInterval(() => {
       const terminalEl = terminalRef.current;
       if (!terminalEl) return;
@@ -192,8 +194,10 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         <div className={cn("crt-flicker", terminalEffect === 'flicker' && "active-flicker")}></div>
         <div className="crt-vignette"></div>
         
+        {/* Add subtle animated background patterns */}
         <div className="terminal-matrix-bg absolute inset-0 opacity-10 z-0 pointer-events-none"></div>
         
+        {/* Scanline effect that continuously scrolls */}
         <div className="scanner-active-line absolute left-0 right-0 h-[2px] bg-toxic-neon/20 z-10 pointer-events-none"></div>
       </div>
       
@@ -325,7 +329,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                     />
                     
                     <div className="relative py-3 px-4 bg-black/70 backdrop-blur-sm rounded border border-toxic-neon/10 inline-block group">
-                      <div className="access-code-message text-toxic-neon/60 font-mono text-sm mb-2">// Access codes are distributed to resistance members only</div>
+                      <div className="access-code-message text-toxic-neon/60 font-mono text-sm mb-2">// Access code is "resistance"</div>
                       <a 
                         href="https://www.linkedin.com/groups/12657922/" 
                         target="_blank" 
@@ -353,7 +357,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         </div>
       </div>
       
-      <style>{`
+      <style jsx>{`
         .crt-scanline::before {
           content: '';
           position: absolute;
