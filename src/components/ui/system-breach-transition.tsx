@@ -9,11 +9,11 @@ export const SystemBreachTransition = () => {
   const [securityLines, setSecurityLines] = useState<string[]>([]);
 
   useEffect(() => {
-    // Stage transition timings
+    // Reduced stage transition timings for faster experience
     const stageTimings = {
-      initial: 200,
-      breach: 800,
-      expand: 1000
+      initial: 100,  // Faster initial stage
+      breach: 500,   // Shorter breach phase
+      expand: 500    // Shorter expand phase
     };
     
     // Security message lines to display during the breach
@@ -29,7 +29,7 @@ export const SystemBreachTransition = () => {
     // Start breach sequence
     setTimeout(() => setStage('breach'), stageTimings.initial);
     
-    // Display security messages
+    // Display security messages faster
     let messageIndex = 0;
     const messageInterval = setInterval(() => {
       if (messageIndex < securityMessages.length) {
@@ -38,7 +38,7 @@ export const SystemBreachTransition = () => {
       } else {
         clearInterval(messageInterval);
       }
-    }, 300);
+    }, 150); // Faster messages
     
     // Glitch text effect
     const glitchInterval = setInterval(() => {
@@ -50,7 +50,7 @@ export const SystemBreachTransition = () => {
         'SYSTEM BREACH'
       ];
       setGlitchText(glitchOptions[Math.floor(Math.random() * glitchOptions.length)]);
-    }, 100);
+    }, 70); // Faster glitch effect
     
     // Move to expand stage
     setTimeout(() => {
@@ -86,7 +86,7 @@ export const SystemBreachTransition = () => {
           opacity: stage === 'complete' ? 0 : 1 
         }}
         transition={{ 
-          duration: stage === 'expand' ? 1 : 0.3,
+          duration: stage === 'expand' ? 0.5 : 0.2, // Faster animations
           ease: "easeInOut"
         }}
         className="relative max-w-2xl w-full p-8 bg-black/70 border border-apocalypse-red rounded-lg overflow-hidden"
@@ -102,10 +102,10 @@ export const SystemBreachTransition = () => {
                 x: Math.random() > 0.5 ? [-100, 800] : [100, -800]
               }}
               transition={{ 
-                duration: 0.5 + Math.random() * 1,
-                delay: Math.random() * 1,
+                duration: 0.3 + Math.random() * 0.7, // Faster animations
+                delay: Math.random() * 0.3, // Quicker delays
                 repeat: Infinity,
-                repeatDelay: Math.random() * 3
+                repeatDelay: Math.random() * 1.5
               }}
               className="absolute h-px bg-apocalypse-red/70"
               style={{ 
@@ -136,7 +136,7 @@ export const SystemBreachTransition = () => {
             animate={{ 
               x: stage === 'breach' ? [0, -10, 10, -5, 5, 0] : 0 
             }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3 }} // Faster animation
             className="text-center py-6"
           >
             <h1 className={`text-4xl md:text-5xl font-bold font-mono text-apocalypse-red mb-4 glitch-text ${stage === 'breach' ? 'animate-pulse' : ''}`}>
@@ -147,7 +147,7 @@ export const SystemBreachTransition = () => {
               <motion.div 
                 initial={{ width: "0%" }}
                 animate={{ width: stage === 'initial' ? "0%" : "100%" }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 0.4 }} // Faster progress bar
                 className="h-full bg-apocalypse-red"
               />
             </div>
@@ -158,7 +158,7 @@ export const SystemBreachTransition = () => {
                   key={index}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.2 }}
+                  transition={{ delay: index * 0.1 }} // Faster text appearance
                   className="flex items-start"
                 >
                   <span className="text-toxic-neon mr-2">&gt;</span>
@@ -171,7 +171,7 @@ export const SystemBreachTransition = () => {
           <div className="absolute bottom-0 left-0 w-full h-1/3 pointer-events-none overflow-hidden">
             <motion.div
               animate={{ y: stage === 'expand' ? [100, 0] : 100 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={{ duration: 0.3, delay: 0.2 }} // Faster glow animation
               className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-toxic-neon/30 to-transparent"
             />
           </div>

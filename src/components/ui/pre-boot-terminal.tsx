@@ -34,6 +34,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
       'Authentication required:',
     ];
 
+    // Reduced typing speed and delay between messages for faster boot
     const typeMessage = (messageIndex: number = 0, charIndex: number = 0) => {
       if (messageIndex >= bootMessages.length) {
         setTerminalReady(true);
@@ -51,16 +52,18 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         
         const isSpace = currentMessage[charIndex] === ' ';
         const isPunctuation = ['.', ',', ':', ';', '!', '?'].includes(currentMessage[charIndex] || '');
-        let delay = 15 + Math.random() * 10;
+        // Reduced delay between characters
+        let delay = 5 + Math.random() * 5;
         
-        if (isPunctuation) delay += 100;
-        if (isSpace) delay += 25;
+        if (isPunctuation) delay += 30;
+        if (isSpace) delay += 10;
         
         timeout = setTimeout(() => {
           typeMessage(messageIndex, charIndex + 1);
         }, delay);
       } else {
-        const pauseTime = currentMessage.includes('WARNING') ? 500 : 250; 
+        // Reduced pause time between messages
+        const pauseTime = currentMessage.includes('WARNING') ? 150 : 50; 
         timeout = setTimeout(() => {
           setCommandLine(prev => prev + '\n');
           typeMessage(messageIndex + 1, 0);
@@ -68,48 +71,22 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
       }
     };
 
-    const addNoise = () => {
-      if (!terminalReady) {
-        setCommandLine(prev => {
-          if (prev.split('\n').length < bootMessages.length) {
-            const lines = prev.split('\n');
-            const randomIndex = Math.floor(Math.random() * lines.length);
-            if (lines[randomIndex]) {
-              const chars = "!@#$%^&*()_+-=[]\\{}|;':\",./<>?`~";
-              const randomChar = chars[Math.floor(Math.random() * chars.length)];
-              const position = Math.floor(Math.random() * lines[randomIndex].length);
-              
-              const newLine = lines[randomIndex].substring(0, position) + 
-                              randomChar + 
-                              lines[randomIndex].substring(position + 1);
-              
-              lines[randomIndex] = newLine;
-              
-              setTimeout(() => {
-                setCommandLine(prev => {
-                  const currentLines = prev.split('\n');
-                  if (currentLines[randomIndex] && currentLines.length === lines.length) {
-                    currentLines[randomIndex] = bootMessages[randomIndex]?.substring(0, newLine.length) || '';
-                    return currentLines.join('\n');
-                  }
-                  return prev;
-                });
-              }, 75);
-              
-              return lines.join('\n');
-            }
-          }
-          return prev;
-        });
-        
-        setTimeout(addNoise, 1000 + Math.random() * 1500);
-      }
-    };
-
+    // Start typing faster
     typeMessage();
-    setTimeout(addNoise, 500);
+    
+    // Force complete boot in 2 seconds
+    const forceCompleteTimeout = setTimeout(() => {
+      if (!terminalReady) {
+        clearTimeout(timeout);
+        setCommandLine(bootMessages.join('\n'));
+        setTerminalReady(true);
+      }
+    }, 2000);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      clearTimeout(forceCompleteTimeout);
+    };
   }, []);
 
   useEffect(() => {
@@ -314,6 +291,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                     />
                     
                     <div className="relative py-3 px-4 bg-black/70 backdrop-blur-sm rounded border border-toxic-neon/10 inline-block">
+                      <div className="access-code-message text-center mb-2">Need access code: join LinkedIn group</div>
                       <a 
                         href="https://www.linkedin.com/groups/12657922/" 
                         target="_blank" 
