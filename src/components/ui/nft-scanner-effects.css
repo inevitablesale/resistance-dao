@@ -78,3 +78,6 @@
     opacity: 0.3;
   }
 }
+
+/* Import map grid styles */
+@import url('./map-grid.css');

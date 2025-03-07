@@ -12,6 +12,14 @@ import { EmergencyTransmission } from "@/components/ui/emergency-transmission";
 import { PreBootTerminal } from "@/components/ui/pre-boot-terminal";
 import { SystemBreachTransition } from "@/components/ui/system-breach-transition";
 import { NFTShowcase } from "@/components/ui/nft-showcase";
+import { HistoricalRecords } from "@/components/ui/historical-records";
+import { NetworkStats } from "@/components/ui/network-stats";
+import { EmergencyTicker } from "@/components/ui/emergency-ticker";
+import { SurvivorNotifications } from "@/components/ui/survivor-notifications";
+import { BountyBoard } from "@/components/ui/bounty-board";
+import { TerminalMini } from "@/components/ui/terminal-mini";
+import { SettlementMap } from "@/components/ui/settlement-map";
+import { PostAuthLayout } from "@/components/ui/post-auth-layout";
 
 // Define the authentication states
 type AuthStage = "pre-boot" | "authenticating" | "authenticated" | "system-breach";
@@ -26,6 +34,7 @@ const Index = () => {
   const [terminalStage, setTerminalStage] = useState<AppStage>("typing");
   const [showEmergencyTransmission, setShowEmergencyTransmission] = useState(false);
   const [authStage, setAuthStage] = useState<AuthStage>("pre-boot");
+  const [terminalMinimized, setTerminalMinimized] = useState(false);
   
   // Community activity simulation
   useEffect(() => {
@@ -69,7 +78,7 @@ const Index = () => {
       
       setTimeout(() => {
         setAuthStage("authenticated");
-        // Important change: Immediately set terminal stage to nft-selection after authentication
+        // Still set terminal stage to nft-selection after authentication
         setTerminalStage("nft-selection");
         
         toast.success("Access granted", {
@@ -80,36 +89,58 @@ const Index = () => {
     }, 500);
   };
 
+  // Prepare sidebar content for authenticated state
+  const renderLeftSidebar = () => (
+    <>
+      <TerminalMini 
+        minimized={terminalMinimized}
+        onToggleMinimize={() => setTerminalMinimized(!terminalMinimized)}
+      />
+      <NetworkStats />
+      <SettlementMap />
+    </>
+  );
+  
+  const renderRightSidebar = () => (
+    <>
+      <SurvivorNotifications />
+      <BountyBoard />
+    </>
+  );
+
+  // Render pre-authentication content
+  const renderPreAuthContent = () => (
+    <div className="w-full max-w-4xl mx-auto space-y-6">
+      <EmergencyTicker />
+      <HistoricalRecords />
+      <NetworkStats />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <SurvivorNotifications />
+        <BountyBoard />
+      </div>
+      <SettlementMap />
+    </div>
+  );
+
+  // Main content with NFT showcase
+  const renderNFTContent = () => (
+    <NFTShowcase 
+      onRoleSelect={handleRoleSelect}
+      selectedRole={userRole}
+    />
+  );
+
   // Determine what content to show based on the stages
   const renderMainContent = () => {
     if (authStage === "authenticated") {
-      // If authenticated but no role selected yet, show NFT showcase
-      if (!userRole) {
-        return (
-          <NFTShowcase 
-            onRoleSelect={handleRoleSelect}
-            selectedRole={userRole}
-          />
-        );
-      } else {
-        // If role is selected, show terminal with completed state
-        return (
-          <TerminalMonitor
-            showQuestionnaire={false}
-            onTypingComplete={handleTerminalComplete}
-            onRoleSelect={handleRoleSelect}
-            selectedRole={userRole}
-            className="w-full" 
-            skipBootSequence={true}
-          />
-        );
-      }
+      // If authenticated, show the NFT selection in the main content
+      return renderNFTContent();
     } else if (authStage === "pre-boot" || authStage === "authenticating" || authStage === "system-breach") {
-      // Authentication flow content
-      return null;
+      // Pre-authentication shows informational components
+      return renderPreAuthContent();
     }
     
-    // Default fallback
+    // Default fallback (should not reach here)
     return (
       <TerminalMonitor
         showQuestionnaire={terminalStage === "questionnaire"}
@@ -159,23 +190,23 @@ const Index = () => {
                 <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Network Status: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
               </div>
               
-              {/* Only show emergency transmission button when authenticated */}
-              {authStage === "authenticated" && (
-                <div className="flex space-x-2">
-                  <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission}>
-                    <Radiation className="w-4 h-4 mr-2" />
-                    Emergency Transmission
-                  </ToxicButton>
-                  
+              {/* Always show emergency transmission button */}
+              <div className="flex space-x-2">
+                <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission}>
+                  <Radiation className="w-4 h-4 mr-2" />
+                  Emergency Transmission
+                </ToxicButton>
+                
+                {authStage === "authenticated" && (
                   <ToxicButton variant="outline" size="sm">
                     <Shield className="w-4 h-4 mr-2" />
                     System Status
                   </ToxicButton>
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
-            <Card className={`w-full bg-black/80 border-toxic-neon/30 p-0 relative overflow-hidden transition-all duration-500 ${authStage === "authenticated" ? "min-h-[80vh]" : ""}`}>
+            <Card className={`w-full bg-black/80 border-toxic-neon/30 p-0 relative overflow-hidden transition-all duration-500 ${authStage === "authenticated" ? "min-h-[80vh]" : "min-h-[50vh]"}`}>
               <div className="absolute inset-0 z-0 rust-overlay broken-glass">
                 <div className="scanline absolute inset-0"></div>
               </div>
@@ -199,7 +230,15 @@ const Index = () => {
                     <PreBootTerminal onAuthenticated={handleAuthenticated} />
                   )}
                   
-                  {authStage === "authenticated" && renderMainContent()}
+                  {authStage === "authenticated" ? (
+                    <PostAuthLayout
+                      leftSidebar={renderLeftSidebar()}
+                      mainContent={renderMainContent()}
+                      rightSidebar={renderRightSidebar()}
+                    />
+                  ) : (
+                    renderMainContent()
+                  )}
                 </div>
                 
                 {/* Only show this if the user is authenticated but doesn't have access to the desktop yet */}
