@@ -9,35 +9,40 @@ import { DrippingSlime } from "@/components/ui/dripping-slime";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { EmergencyTransmission } from "@/components/ui/emergency-transmission";
+import { useCustomWallet } from "@/hooks/useCustomWallet";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { isConnected } = useCustomWallet();
+  const { connect } = useWalletConnection();
   const [userRole, setUserRole] = useState<"bounty-hunter" | "survivor" | null>(null);
   const [communityActivity, setCommunityActivity] = useState(0);
   const [terminalStage, setTerminalStage] = useState<"typing" | "questionnaire" | "completed">("typing");
   const [showEmergencyTransmission, setShowEmergencyTransmission] = useState(false);
+  const [hasShownWalletPrompt, setHasShownWalletPrompt] = useState(false);
   
   // Debug terminalStage changes
   useEffect(() => {
     console.log("Terminal stage changed to:", terminalStage);
   }, [terminalStage]);
   
-  // Show emergency transmission once on initial load
+  // Show emergency transmission for non-connected wallets
   useEffect(() => {
-    // Check if we've already shown the transmission in this session
-    const hasSeenTransmission = sessionStorage.getItem("hasSeenEmergencyTransmission");
-    
-    if (!hasSeenTransmission) {
+    // Only show the wallet connection prompt if:
+    // 1. User is not connected
+    // 2. We haven't shown it yet in this session
+    // 3. We haven't shown it yet in this component lifecycle
+    if (!isConnected && !hasShownWalletPrompt) {
       // Add a small delay for dramatic effect
       const timer = setTimeout(() => {
         setShowEmergencyTransmission(true);
-        // Set session storage to prevent showing again
-        sessionStorage.setItem("hasSeenEmergencyTransmission", "true");
+        setHasShownWalletPrompt(true);
       }, 2000);
       
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [isConnected, hasShownWalletPrompt]);
   
   // Community activity simulation
   useEffect(() => {
@@ -67,6 +72,11 @@ const Index = () => {
   const handleCloseEmergencyTransmission = () => {
     setShowEmergencyTransmission(false);
   };
+  
+  const handleConnectWallet = () => {
+    connect();
+    setShowEmergencyTransmission(false);
+  };
 
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
@@ -77,7 +87,8 @@ const Index = () => {
       {/* Emergency Transmission Popup */}
       <EmergencyTransmission 
         isOpen={showEmergencyTransmission} 
-        onClose={handleCloseEmergencyTransmission} 
+        onClose={handleCloseEmergencyTransmission}
+        onConnectWallet={handleConnectWallet}
       />
 
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -125,7 +136,7 @@ const Index = () => {
                     onRoleSelect={handleRoleSelect}
                     selectedRole={userRole}
                     className="w-full" 
-                    skipBootSequence={true}
+                    skipBootSequence={false}
                   />
                 </div>
                 

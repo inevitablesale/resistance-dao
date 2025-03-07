@@ -7,9 +7,10 @@ import { motion, AnimatePresence } from "framer-motion";
 interface EmergencyTransmissionProps {
   isOpen: boolean;
   onClose: () => void;
+  onConnectWallet: () => void;
 }
 
-export function EmergencyTransmission({ isOpen, onClose }: EmergencyTransmissionProps) {
+export function EmergencyTransmission({ isOpen, onClose, onConnectWallet }: EmergencyTransmissionProps) {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -53,9 +54,9 @@ export function EmergencyTransmission({ isOpen, onClose }: EmergencyTransmission
                 </div>
                 
                 <div className="flex justify-center">
-                  <Button variant="destructive" className="w-full" onClick={onClose}>
+                  <Button variant="destructive" className="w-full" onClick={onConnectWallet}>
                     <Radio className="w-4 h-4 mr-2" />
-                    CONNECT TO NETWORK
+                    ACTIVATE SURVIVAL BEACON
                   </Button>
                 </div>
               </div>
