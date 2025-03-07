@@ -22,22 +22,7 @@ const Index = () => {
     console.log("Terminal stage changed to:", terminalStage);
   }, [terminalStage]);
   
-  // Show emergency transmission once on initial load
-  useEffect(() => {
-    // Check if we've already shown the transmission in this session
-    const hasSeenTransmission = sessionStorage.getItem("hasSeenEmergencyTransmission");
-    
-    if (!hasSeenTransmission) {
-      // Add a small delay for dramatic effect
-      const timer = setTimeout(() => {
-        setShowEmergencyTransmission(true);
-        // Set session storage to prevent showing again
-        sessionStorage.setItem("hasSeenEmergencyTransmission", "true");
-      }, 2000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, []);
+  // Removed automatic emergency transmission display
   
   // Community activity simulation
   useEffect(() => {
@@ -66,6 +51,11 @@ const Index = () => {
 
   const handleCloseEmergencyTransmission = () => {
     setShowEmergencyTransmission(false);
+  };
+
+  // Added function to manually show the emergency transmission
+  const handleShowEmergencyTransmission = () => {
+    setShowEmergencyTransmission(true);
   };
 
   return (
@@ -98,6 +88,11 @@ const Index = () => {
                 <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
                 <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Network Status: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
               </div>
+              {/* Added button to manually show emergency transmission */}
+              <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission} className="ml-2">
+                <Radiation className="w-4 h-4 mr-2" />
+                View Emergency Transmission
+              </ToxicButton>
             </div>
 
             <Card className="w-full bg-black/80 border-toxic-neon/30 p-0 relative overflow-hidden">
