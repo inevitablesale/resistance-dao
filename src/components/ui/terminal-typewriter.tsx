@@ -119,9 +119,10 @@ export const TerminalTypewriter = ({
                     <span className="mr-2 tracking-wider">EMERGENCY TRANSMISSION:</span>
                     <span className="text-xs text-apocalypse-red/70 animate-pulse">[SIGNAL WEAK]</span>
                   </div>
-                  <div className="flex items-center mb-1">
-                    <span className="mr-2">Network Status:</span> 
-                    <span className="text-apocalypse-red font-bold animate-flicker">Critical</span>
+                  <div className="flex items-center mb-1 animate-flicker bg-black/80 px-3 py-1 rounded-full border border-apocalypse-red/30 inline-flex w-auto">
+                    <div className="w-2 h-2 rounded-full bg-apocalypse-red mr-2"></div>
+                    <span className="mr-2 text-toxic-green">Network Status:</span> 
+                    <span className="text-apocalypse-red font-bold">Critical</span>
                   </div>
                   <div className="flex">
                     {renderDisplayedText()}
@@ -148,9 +149,10 @@ export const TerminalTypewriter = ({
                   <span className="mr-2 tracking-wider">EMERGENCY TRANSMISSION:</span>
                   <span className="text-xs text-apocalypse-red/70">[SIGNAL SECURE]</span>
                 </div>
-                <div className="flex items-center mb-1">
-                  <span className="mr-2">Network Status:</span> 
-                  <span className="text-apocalypse-red font-bold animate-flicker">Critical</span>
+                <div className="flex items-center mb-1 animate-flicker bg-black/80 px-3 py-1 rounded-full border border-apocalypse-red/30 inline-flex w-auto">
+                  <div className="w-2 h-2 rounded-full bg-apocalypse-red mr-2"></div>
+                  <span className="mr-2 text-toxic-green">Network Status:</span> 
+                  <span className="text-apocalypse-red font-bold">Critical</span>
                 </div>
                 <div className="flex">
                   {renderDisplayedText()}
