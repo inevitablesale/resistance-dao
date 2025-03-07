@@ -115,6 +115,8 @@ interface TerminalMonitorProps {
   selectedRole?: "bounty-hunter" | "survivor" | null;
   className?: string;
   skipBootSequence?: boolean;
+  initialAppOpened?: boolean;
+  onDesktopExplored?: () => void;
 }
 
 export function TerminalMonitor({
@@ -124,7 +126,9 @@ export function TerminalMonitor({
   onRoleSelect,
   selectedRole,
   className,
-  skipBootSequence = false
+  skipBootSequence = false,
+  initialAppOpened = false,
+  onDesktopExplored
 }: TerminalMonitorProps) {
   const [openApps, setOpenApps] = useState<string[]>([]);
   const [maximizedApp, setMaximizedApp] = useState<string | null>(null);
@@ -133,8 +137,24 @@ export function TerminalMonitor({
   const [nextZIndex, setNextZIndex] = useState(10);
   const [showDesktopIcons, setShowDesktopIcons] = useState(skipBootSequence);
   const [bootComplete, setBootComplete] = useState(skipBootSequence);
-
-  // Removed auto-open app on desktop load
+  
+  // Auto-open Network Status app when initialAppOpened prop changes
+  useEffect(() => {
+    if (initialAppOpened && showDesktopIcons && !openApps.includes('network-status')) {
+      console.log("Auto-opening Network Status app");
+      handleOpenApp('network-status');
+      
+      // Auto-open Archives app after a delay
+      setTimeout(() => {
+        handleOpenApp('archives');
+        
+        // Auto-open Bounty Hunter app after another delay
+        setTimeout(() => {
+          handleOpenApp('bounty-hunter');
+        }, 5000);
+      }, 4000);
+    }
+  }, [initialAppOpened, showDesktopIcons, openApps]);
 
   // Show desktop icons after boot sequence or role selection
   useEffect(() => {
@@ -620,7 +640,7 @@ export function TerminalMonitor({
                   />
                 ))}
                 
-                {/* Task Bar */}
+                {/* Task Bar with pulsing effect on app buttons */}
                 {showDesktopIcons && (
                   <div className="absolute bottom-0 left-0 right-0 bg-black/80 border-t border-toxic-neon/30 h-10 flex items-center px-2 z-20">
                     <div className="flex items-center gap-2 overflow-x-auto terminal-scrollbar flex-1">
@@ -643,7 +663,10 @@ export function TerminalMonitor({
                           key={appId}
                           variant={activeApp === appId ? "secondary" : "ghost"}
                           size="sm"
-                          className="h-8 text-xs text-toxic-neon flex-shrink-0"
+                          className={cn(
+                            "h-8 text-xs text-toxic-neon flex-shrink-0",
+                            activeApp !== appId && "animate-pulse-subtle"
+                          )}
                           onClick={() => handleAppFocus(appId)}
                         >
                           {appContent[appId].icon}

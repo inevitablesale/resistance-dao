@@ -21,12 +21,13 @@ import { TerminalMini } from "@/components/ui/terminal-mini";
 import { SettlementMap } from "@/components/ui/settlement-map";
 import { PostAuthLayout } from "@/components/ui/post-auth-layout";
 import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
+import { ProgressIndicator } from "@/components/ui/progress-indicator";
 
 // Define the authentication states
 type AuthStage = "pre-boot" | "authenticating" | "breach-transition" | "post-breach" | "authenticated";
 
 // Define the application stages
-type AppStage = "typing" | "nft-selection" | "questionnaire" | "completed";
+type AppStage = "typing" | "desktop-environment" | "nft-selection" | "questionnaire" | "completed";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -36,6 +37,8 @@ const Index = () => {
   const [showEmergencyTransmission, setShowEmergencyTransmission] = useState(false);
   const [authStage, setAuthStage] = useState<AuthStage>("pre-boot");
   const [terminalMinimized, setTerminalMinimized] = useState(false);
+  const [showDesktopEnvironment, setShowDesktopEnvironment] = useState(false);
+  const [initialAppOpened, setInitialAppOpened] = useState(false);
   
   // Community activity simulation
   useEffect(() => {
@@ -45,6 +48,16 @@ const Index = () => {
     
     return () => clearInterval(interval);
   }, []);
+
+  // Auto-open Network Status app after post-breach
+  useEffect(() => {
+    if (authStage === "post-breach" && terminalStage === "desktop-environment" && !initialAppOpened) {
+      console.log("Auto-opening Network Status app");
+      setTimeout(() => {
+        setInitialAppOpened(true);
+      }, 1500);
+    }
+  }, [authStage, terminalStage, initialAppOpened]);
   
   const handleRoleSelect = (role: "bounty-hunter" | "survivor") => {
     console.log("Role selected in Index component:", role);
@@ -59,9 +72,14 @@ const Index = () => {
   };
   
   const handleTerminalComplete = () => {
-    console.log("Typing animation complete, showing NFT selection");
+    console.log("Typing animation complete, showing desktop environment");
+    setTerminalStage("desktop-environment");
+    setShowDesktopEnvironment(true);
+  };
+
+  const handleDesktopExplored = () => {
+    console.log("Desktop exploration complete, proceeding to NFT selection");
     setTerminalStage("nft-selection");
-    setAuthStage("authenticated");
   };
 
   const handleCloseEmergencyTransmission = () => {
@@ -119,6 +137,17 @@ const Index = () => {
     </div>
   );
 
+  // Main content with desktop environment
+  const renderDesktopEnvironment = () => (
+    <div className="w-full px-4 py-6">
+      <TerminalMonitor
+        skipBootSequence={true}
+        initialAppOpened={initialAppOpened}
+        onDesktopExplored={handleDesktopExplored}
+      />
+    </div>
+  );
+
   // Main content with NFT showcase
   const renderNFTContent = () => (
     <NFTShowcase 
@@ -129,18 +158,18 @@ const Index = () => {
 
   // Determine what content to show based on the stages
   const renderMainContent = () => {
-    if (authStage === "authenticated") {
-      // If authenticated, show different content based on terminal stage
+    if (authStage === "authenticated" || authStage === "post-breach") {
+      // If post-breach or authenticated, show different content based on terminal stage
       if (terminalStage === "nft-selection") {
         console.log("Showing NFT selection content");
         return renderNFTContent();
+      } else if (terminalStage === "desktop-environment") {
+        console.log("Showing desktop environment");
+        return renderDesktopEnvironment();
       } else if (terminalStage === "typing") {
         // Show terminal typewriter in the authenticated state
         return renderTypewriterContent();
       }
-    } else if (authStage === "post-breach") {
-      // Always show terminal typewriter after breach
-      return renderTypewriterContent();
     } else if (authStage === "pre-boot" || authStage === "authenticating" || authStage === "breach-transition") {
       // Pre-authentication shows nothing
       return renderPreAuthContent();
@@ -163,6 +192,18 @@ const Index = () => {
           onClose={handleCloseEmergencyTransmission} 
         />
       )}
+
+      {/* Progress Indicator */}
+      <div className="fixed top-4 right-4 z-50">
+        <ProgressIndicator 
+          stages={[
+            { id: "boot", label: "Boot", completed: authStage !== "pre-boot" },
+            { id: "breach", label: "System Breach", completed: authStage === "post-breach" || authStage === "authenticated" },
+            { id: "desktop", label: "Interface", completed: terminalStage !== "typing" && (authStage === "post-breach" || authStage === "authenticated") },
+            { id: "role", label: "Role Selection", completed: userRole !== null }
+          ]}
+        />
+      </div>
 
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0">
@@ -192,7 +233,12 @@ const Index = () => {
                 </div>
                 
                 <div className="flex space-x-2">
-                  <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission}>
+                  <ToxicButton 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleShowEmergencyTransmission}
+                    className="animate-pulse-subtle hover:animate-none"
+                  >
                     <Radiation className="w-4 h-4 mr-2" />
                     Emergency Transmission
                   </ToxicButton>
@@ -243,9 +289,14 @@ const Index = () => {
                   )}
                 </div>
                 
-                {/* Only show this if the user is in post-breach stage or typing terminal stage */}
+                {/* Show skip button for typing terminal stage only */}
                 {(authStage === "post-breach" || (authStage === "authenticated" && terminalStage === "typing")) && (
-                  <div className="mt-4 text-center">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 2 }}
+                    className="mt-4 text-center"
+                  >
                     <p className="text-white/70 text-sm mb-3">
                       Complete the terminal sequence to access the Resistance Network
                     </p>
@@ -253,11 +304,32 @@ const Index = () => {
                       onClick={handleTerminalComplete}
                       variant="ghost"
                       size="sm"
+                      className="hover:bg-toxic-neon/20 transition-all duration-300"
                     >
                       <Radiation className="w-4 h-4 mr-2" />
                       Skip Intro Sequence
                     </ToxicButton>
-                  </div>
+                  </motion.div>
+                )}
+                
+                {/* Show continue button for desktop environment */}
+                {(authStage === "post-breach" || authStage === "authenticated") && terminalStage === "desktop-environment" && initialAppOpened && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 8 }}
+                    className="mt-4 text-center"
+                  >
+                    <ToxicButton 
+                      onClick={handleDesktopExplored}
+                      variant="default"
+                      size="lg"
+                      className="animate-pulse-subtle"
+                    >
+                      <Target className="w-5 h-5 mr-2" />
+                      Continue to Resistance Role Selection
+                    </ToxicButton>
+                  </motion.div>
                 )}
               </div>
             </Card>
