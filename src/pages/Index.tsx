@@ -272,7 +272,7 @@ const Index = () => {
                     className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
                   >
                     <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
-                    Start Project
+                    Sponsor a Settlement
                   </ToxicButton>
                   <ToxicButton 
                     size="lg"
@@ -281,7 +281,7 @@ const Index = () => {
                     className="border-toxic-neon/50 text-toxic-neon hover:bg-toxic-dark/30"
                   >
                     <Share2 className="w-5 h-5 mr-2" />
-                    View Projects
+                    Scout Settlements
                   </ToxicButton>
                 </div>
 
@@ -289,12 +289,12 @@ const Index = () => {
                   <div className="scanline"></div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-mono text-toxic-neon flex items-center">
-                      <Radiation className="h-5 w-5 mr-2" /> Wasteland Activity
+                      <Radiation className="h-5 w-5 mr-2" /> Resistance Updates
                     </h3>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2 text-sm text-toxic-neon/70">
                         <div className="w-2 h-2 bg-toxic-neon rounded-full animate-pulse" />
-                        Emergency Updates
+                        Emergency Broadcasts
                       </div>
                       <ToxicButton 
                         variant="ghost" 
@@ -343,7 +343,7 @@ const Index = () => {
                         <CircleDollarSign className="w-6 h-6 text-toxic-neon" />
                       </div>
                       <div>
-                        <div className="text-toxic-neon/70 text-sm">Total Resource Pledges</div>
+                        <div className="text-toxic-neon/70 text-sm">Community Support</div>
                         <div className="text-2xl font-semibold text-white">
                           {isLoadingStats ? (
                             <span className="animate-pulse">Calculating...</span>
@@ -361,7 +361,7 @@ const Index = () => {
                         <Users className="w-6 h-6 text-toxic-neon" />
                       </div>
                       <div>
-                        <div className="text-toxic-neon/70 text-sm">Surviving Members</div>
+                        <div className="text-toxic-neon/70 text-sm">Resistance Fighters</div>
                         <div className="text-2xl font-semibold text-white">
                           {isLoadingStats ? (
                             <span className="animate-pulse">Counting...</span>
@@ -379,7 +379,7 @@ const Index = () => {
                         <Scale className="w-6 h-6 text-toxic-neon" />
                       </div>
                       <div>
-                        <div className="text-toxic-neon/70 text-sm">Active Settlements</div>
+                        <div className="text-toxic-neon/70 text-sm">Established Colonies</div>
                         <div className="text-2xl font-semibold text-white">
                           {isLoadingStats ? (
                             <span className="animate-pulse">Searching...</span>
@@ -692,120 +692,4 @@ const Index = () => {
             <ToxicCard>
               <ToxicCardContent>
                 <div className="mb-4">
-                  <CircleDollarSign className="w-8 h-8 text-toxic-neon" />
-                </div>
-                <p className="text-white/70">
-                  Once you hit your soft commitment target, re-engage supporters for their pledged investments. Launch with confidence knowing you have verified interest and committed capital.
-                </p>
-              </ToxicCardContent>
-            </ToxicCard>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 relative overflow-hidden radiation-bg">
-        <ToxicPuddle className="absolute bottom-20 left-1/3" toxicGreen={true} />
-        <ToxicPuddle className="absolute bottom-40 right-1/4" toxicGreen={true} />
-        <div className="container px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-toxic-neon toxic-glow">
-              How Soft Commitments & Voting Work
-            </h2>
-            <p className="text-xl text-white/70 mb-12">
-              Our unique two-step process helps you validate market interest and build a community of committed supporters before launch.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            <ToxicCard>
-              <ToxicCardContent>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-toxic-neon/10 flex items-center justify-center">
-                    <Coins className="w-6 h-6 text-toxic-neon" />
-                  </div>
-                  <h3 className="text-xl font-bold text-toxic-neon">Initial Voting</h3>
-                </div>
-                <ul className="space-y-4">
-                  {[
-                    "$1 Voting Fee: Small fee to ensure genuine interest and prevent spam",
-                    "Soft Commitment Amount: Supporters indicate how much they'd potentially invest",
-                    "No Lock-in: Soft commitments are non-binding to encourage honest feedback"
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start gap-3 text-white/70">
-                      <Check className="w-5 h-5 text-toxic-neon mt-1 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </ToxicCardContent>
-            </ToxicCard>
-
-            <ToxicCard>
-              <ToxicCardContent>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-toxic-neon/10 flex items-center justify-center">
-                    <Rocket className="w-6 h-6 text-toxic-neon" />
-                  </div>
-                  <h3 className="text-xl font-bold text-toxic-neon">Launch Process</h3>
-                </div>
-                <ul className="space-y-4">
-                  {[
-                    "Target Reached: Once your soft commitment goal is met, begin the launch phase",
-                    "Direct Communication: Re-engage supporters who showed interest through voting",
-                    "Convert Interest: Turn soft commitments into actual investments"
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start gap-3 text-white/70">
-                      <Check className="w-5 h-5 text-toxic-neon mt-1 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </ToxicCardContent>
-            </ToxicCard>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 relative overflow-hidden radiation-bg">
-        <div className="absolute inset-0">
-          <div className="absolute w-[600px] h-[600px] bg-toxic-neon/5 rounded-full blur-3xl -top-96 -left-20" />
-          <div className="absolute w-[600px] h-[600px] bg-toxic-neon/5 rounded-full blur-3xl -bottom-96 -right-20" />
-        </div>
-        <div className="container px-4 relative">
-          <div className="max-w-4xl mx-auto bg-black/50 border border-toxic-neon/30 rounded-xl p-8 backdrop-blur-sm">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-4 text-toxic-neon toxic-glow">
-                Ready to Start Your Project?
-              </h2>
-              <p className="text-lg text-white/70">
-                Join the community of survivors building the next generation of resilient projects
-              </p>
-            </div>
-            <div className="flex flex-col md:flex-row gap-4 justify-center">
-              <ToxicButton 
-                size="lg"
-                onClick={() => navigate('/thesis')}
-                variant="glowing"
-                className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
-              >
-                <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
-                Start a Project
-              </ToxicButton>
-              <ToxicButton 
-                size="lg"
-                variant="outline"
-                onClick={() => navigate('/proposals')}
-                className="border-toxic-neon/50 text-toxic-neon hover:bg-toxic-dark/30"
-              >
-                <Share2 className="w-5 h-5 mr-2" />
-                Explore Projects
-              </ToxicButton>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-};
-
-export default Index;
+                  <CircleDollarSign className="w-8 h-8

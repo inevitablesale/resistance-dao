@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { purchaseTokens } from "@/services/presaleContractService";
-import { ethers } from "ethers"; // Add direct import
+import { ethers } from "ethers";
 
 export const BuyRDTokens = () => {
   const [amount, setAmount] = useState("");
