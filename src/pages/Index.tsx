@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -264,6 +263,136 @@ const Index = () => {
                 <ToxicPuddle className="absolute -bottom-2 -right-10" toxicGreen={true} />
               </div>
               
+              <div className="mb-8">
+                <div className="flex flex-wrap gap-4 mb-8">
+                  <ToxicButton 
+                    size="lg"
+                    onClick={() => navigate('/thesis')}
+                    variant="glowing"
+                    className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+                  >
+                    <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
+                    Start Project
+                  </ToxicButton>
+                  <ToxicButton 
+                    size="lg"
+                    variant="outline"
+                    onClick={() => navigate('/proposals')}
+                    className="border-toxic-neon/50 text-toxic-neon hover:bg-toxic-dark/30"
+                  >
+                    <Share2 className="w-5 h-5 mr-2" />
+                    View Projects
+                  </ToxicButton>
+                </div>
+
+                <div className="mt-6 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
+                  <div className="scanline"></div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-mono text-toxic-neon flex items-center">
+                      <Radiation className="h-5 w-5 mr-2" /> Wasteland Activity
+                    </h3>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2 text-sm text-toxic-neon/70">
+                        <div className="w-2 h-2 bg-toxic-neon rounded-full animate-pulse" />
+                        Emergency Updates
+                      </div>
+                      <ToxicButton 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => window.location.reload()}
+                        className="text-toxic-neon hover:bg-toxic-dark/20"
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                      </ToxicButton>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {isLoadingStats ? (
+                      <div className="animate-pulse">Scanning wasteland...</div>
+                    ) : (
+                      stats?.recentActivities.map((activity, i) => (
+                        <div key={i} className="flex items-center justify-between py-2 border-b border-toxic-neon/10 last:border-0">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-2 h-2 rounded-full ${
+                              activity.type === 'vote' ? 'bg-toxic-neon' :
+                              activity.type === 'create' ? 'bg-toxic-neon/70' : 'bg-toxic-muted'
+                            }`} />
+                            <span className="text-white/70">
+                              {activity.type === 'vote' ? 'New Survivor Pledge' :
+                              activity.type === 'create' ? 'Settlement Initiative' :
+                              'Resource Goal Reached'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="font-mono text-toxic-neon">
+                              {activity.type === 'vote' || activity.type === 'complete' 
+                                ? formatCurrency(Number(activity.amount))
+                                : `#${activity.proposalId}`}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-8 mt-8">
+                  <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-full bg-toxic-neon/10">
+                        <CircleDollarSign className="w-6 h-6 text-toxic-neon" />
+                      </div>
+                      <div>
+                        <div className="text-toxic-neon/70 text-sm">Total Resource Pledges</div>
+                        <div className="text-2xl font-semibold text-white">
+                          {isLoadingStats ? (
+                            <span className="animate-pulse">Calculating...</span>
+                          ) : (
+                            formatCurrency(stats?.totalLockedValue || 0)
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </ToxicCard>
+
+                  <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-full bg-toxic-neon/10">
+                        <Users className="w-6 h-6 text-toxic-neon" />
+                      </div>
+                      <div>
+                        <div className="text-toxic-neon/70 text-sm">Surviving Members</div>
+                        <div className="text-2xl font-semibold text-white">
+                          {isLoadingStats ? (
+                            <span className="animate-pulse">Counting...</span>
+                          ) : (
+                            formatNumber(stats?.totalHolders || 0)
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </ToxicCard>
+
+                  <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-full bg-toxic-neon/10">
+                        <Scale className="w-6 h-6 text-toxic-neon" />
+                      </div>
+                      <div>
+                        <div className="text-toxic-neon/70 text-sm">Active Settlements</div>
+                        <div className="text-2xl font-semibold text-white">
+                          {isLoadingStats ? (
+                            <span className="animate-pulse">Searching...</span>
+                          ) : (
+                            formatNumber(stats?.activeProposals || 0)
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </ToxicCard>
+                </div>
+              </div>
+
               <div className="mb-12 relative">
                 <div className="text-center mb-16">
                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-apocalypse-red/30 bg-black/60 text-apocalypse-red mb-4">
@@ -413,27 +542,6 @@ const Index = () => {
                     Join The Resistance
                   </ToxicButton>
                 </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-4">
-                <ToxicButton 
-                  size="lg"
-                  onClick={() => navigate('/thesis')}
-                  variant="glowing"
-                  className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
-                >
-                  <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
-                  Start Project
-                </ToxicButton>
-                <ToxicButton 
-                  size="lg"
-                  variant="outline"
-                  onClick={() => navigate('/proposals')}
-                  className="border-toxic-neon/50 text-toxic-neon hover:bg-toxic-dark/30"
-                >
-                  <Share2 className="w-5 h-5 mr-2" />
-                  View Projects
-                </ToxicButton>
               </div>
             </div>
 
