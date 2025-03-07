@@ -9,10 +9,10 @@ const Progress = React.forwardRef<
 >(({ className, value, ...props }, ref) => {
   // Calculate the gradient color based on progress percentage
   const getProgressColor = (percentage: number) => {
-    if (percentage <= 25) return 'from-red-500 to-red-600';
-    if (percentage <= 50) return 'from-yellow-500 to-yellow-600';
+    if (percentage <= 25) return 'from-red-500 to-apocalypse-red';
+    if (percentage <= 50) return 'from-apocalypse-red to-apocalypse-rust';
     if (percentage <= 75) return 'from-toxic-muted to-toxic-neon';
-    return 'from-green-500 to-green-600';
+    return 'from-toxic-neon to-toxic-glow';
   };
 
   const percentage = value || 0;
@@ -22,7 +22,7 @@ const Progress = React.forwardRef<
     <ProgressPrimitive.Root
       ref={ref}
       className={cn(
-        "relative h-4 w-full overflow-hidden rounded-full bg-gray-800/50 border border-gray-700",
+        "relative h-4 w-full overflow-hidden rounded-full bg-apocalypse-dark border border-apocalypse-ash",
         className
       )}
       {...props}

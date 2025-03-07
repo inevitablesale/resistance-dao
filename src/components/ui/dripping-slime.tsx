@@ -85,28 +85,44 @@ export function DrippingSlime({
             <Radiation className={`h-8 w-8 ${iconColor} animate-pulse ${iconGlowClass}`} />
           </div>
           <div className="toxic-symbol" style={{ 
-            left: '30%', 
+            left: '25%', 
             animationDelay: '2.5s',
             top: position === 'bottom' ? 'auto' : '40%',
             bottom: position === 'bottom' ? '50%' : 'auto'
           }}>
-            <Skull className={`h-6 w-6 ${iconColor} animate-pulse ${iconGlowClass}`} />
+            <Biohazard className={`h-8 w-8 ${iconColor} animate-pulse ${iconGlowClass}`} />
           </div>
           <div className="toxic-symbol" style={{ 
-            left: '55%', 
+            left: '40%', 
             animationDelay: '1.5s',
             top: position === 'bottom' ? 'auto' : '15%',
             bottom: position === 'bottom' ? '30%' : 'auto'
           }}>
-            <Zap className={`h-7 w-7 ${iconColor} animate-pulse ${iconGlowClass}`} />
+            <Radiation className={`h-7 w-7 ${iconColor} animate-pulse ${iconGlowClass}`} />
           </div>
           <div className="toxic-symbol" style={{ 
-            left: '75%', 
-            animationDelay: '3.5s',
+            left: '55%', 
+            animationDelay: '1.0s',
             top: position === 'bottom' ? 'auto' : '35%',
+            bottom: position === 'bottom' ? '15%' : 'auto'
+          }}>
+            <Biohazard className={`h-8 w-8 ${iconColor} animate-radiation ${iconGlowClass}`} />
+          </div>
+          <div className="toxic-symbol" style={{ 
+            left: '70%', 
+            animationDelay: '3.5s',
+            top: position === 'bottom' ? 'auto' : '25%',
+            bottom: position === 'bottom' ? '40%' : 'auto'
+          }}>
+            <Radiation className={`h-8 w-8 ${iconColor} animate-radiation ${iconGlowClass}`} />
+          </div>
+          <div className="toxic-symbol" style={{ 
+            left: '85%', 
+            animationDelay: '2.0s',
+            top: position === 'bottom' ? 'auto' : '30%',
             bottom: position === 'bottom' ? '10%' : 'auto'
           }}>
-            <Shield className={`h-8 w-8 ${iconColor} animate-pulse ${iconGlowClass}`} />
+            <Biohazard className={`h-7 w-7 ${iconColor} animate-pulse ${iconGlowClass}`} />
           </div>
         </div>
       )}
