@@ -16,26 +16,13 @@ const Index = () => {
   const [communityActivity, setCommunityActivity] = useState(0);
   const [terminalStage, setTerminalStage] = useState<"typing" | "questionnaire" | "completed">("typing");
   const [showEmergencyTransmission, setShowEmergencyTransmission] = useState(false);
-  const [forceBootComplete, setForceBootComplete] = useState(false);
   
   // Debug terminalStage changes
   useEffect(() => {
     console.log("Terminal stage changed to:", terminalStage);
   }, [terminalStage]);
   
-  // Setup force boot completion after a timeout
-  useEffect(() => {
-    // Failsafe: If terminal doesn't complete after 15 seconds, force completion
-    const forceBootTimeout = setTimeout(() => {
-      if (terminalStage === "typing") {
-        console.log("Force completing boot sequence after timeout");
-        setForceBootComplete(true);
-        setTerminalStage("questionnaire");
-      }
-    }, 15000);
-    
-    return () => clearTimeout(forceBootTimeout);
-  }, [terminalStage]);
+  // Removed automatic emergency transmission display
   
   // Community activity simulation
   useEffect(() => {
@@ -99,8 +86,7 @@ const Index = () => {
             <div className="text-center mb-4">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
                 <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
-                <Radiation className="h-4 w-4 mr-1 toxic-glow" />
-                <span className="text-apocalypse-red font-bold status-critical">CONNECTING...</span>
+                <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Network Status: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
               </div>
               {/* Button to manually show emergency transmission */}
               <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission} className="ml-2">
@@ -129,13 +115,12 @@ const Index = () => {
                 
                 <div className="mb-6">
                   <TerminalMonitor
-                    showQuestionnaire={terminalStage === "questionnaire" || forceBootComplete}
+                    showQuestionnaire={terminalStage === "questionnaire"}
                     onTypingComplete={handleTerminalComplete}
                     onRoleSelect={handleRoleSelect}
                     selectedRole={userRole}
                     className="w-full" 
-                    skipBootSequence={false}
-                    forceBootComplete={forceBootComplete}
+                    skipBootSequence={true}
                   />
                 </div>
                 
@@ -146,10 +131,7 @@ const Index = () => {
                       Complete the terminal sequence to access the Resistance Network
                     </p>
                     <ToxicButton 
-                      onClick={() => {
-                        setForceBootComplete(true);
-                        setTerminalStage("questionnaire");
-                      }}
+                      onClick={() => setTerminalStage("questionnaire")}
                       variant="ghost"
                       size="sm"
                     >

@@ -115,7 +115,6 @@ interface TerminalMonitorProps {
   selectedRole?: "bounty-hunter" | "survivor" | null;
   className?: string;
   skipBootSequence?: boolean;
-  forceBootComplete?: boolean;
 }
 
 export function TerminalMonitor({
@@ -125,8 +124,7 @@ export function TerminalMonitor({
   onRoleSelect,
   selectedRole,
   className,
-  skipBootSequence = false,
-  forceBootComplete = false
+  skipBootSequence = false
 }: TerminalMonitorProps) {
   const [openApps, setOpenApps] = useState<string[]>([]);
   const [maximizedApp, setMaximizedApp] = useState<string | null>(null);
@@ -136,33 +134,14 @@ export function TerminalMonitor({
   const [showDesktopIcons, setShowDesktopIcons] = useState(skipBootSequence);
   const [bootComplete, setBootComplete] = useState(skipBootSequence);
 
-  useEffect(() => {
-    if (forceBootComplete) {
-      console.log("Force completing boot from parent");
-      setBootComplete(true);
-      setShowDesktopIcons(true);
-    }
-  }, [forceBootComplete]);
+  // Removed auto-open app on desktop load
 
+  // Show desktop icons after boot sequence or role selection
   useEffect(() => {
     if (selectedRole || bootComplete) {
-      console.log("Setting showDesktopIcons to true due to selectedRole or bootComplete");
       setShowDesktopIcons(true);
     }
   }, [selectedRole, bootComplete]);
-  
-  useEffect(() => {
-    if (!bootComplete && !skipBootSequence) {
-      console.log("Setting up boot completion failsafe timer");
-      const bootFailsafeTimer = setTimeout(() => {
-        console.log("Boot failsafe timer triggered");
-        setBootComplete(true);
-        setShowDesktopIcons(true);
-      }, 20000); // 20s failsafe
-      
-      return () => clearTimeout(bootFailsafeTimer);
-    }
-  }, [bootComplete, skipBootSequence]);
   
   const handleOpenApp = (appId: string) => {
     if (!openApps.includes(appId)) {
@@ -188,6 +167,7 @@ export function TerminalMonitor({
   };
 
   const handleMinimizeApp = (appId: string) => {
+    // Just close for now as we don't have a taskbar minimized state
     handleCloseApp(appId);
   };
 
@@ -207,13 +187,13 @@ export function TerminalMonitor({
   };
 
   const handleCompleteBootSequence = () => {
-    console.log("Boot sequence complete callback triggered");
-    setBootComplete(true);
     if (onTypingComplete) {
       onTypingComplete();
     }
+    setBootComplete(true);
   };
 
+  // Apps content based on user's suggestions
   const appContent: Record<string, { title: string, icon: React.ReactNode, content: React.ReactNode }> = {
     'network-status': {
       title: 'NETWORK STATUS',
@@ -560,11 +540,14 @@ export function TerminalMonitor({
 
   return (
     <div className={cn("terminal-monitor relative", className)}>
+      {/* Monitor frame */}
       <div className="monitor-frame bg-black/90 border-2 border-toxic-neon/40 rounded-lg overflow-hidden shadow-[0_0_15px_rgba(80,250,123,0.2)] relative">
+        {/* Monitor screen */}
         <div className="monitor-screen bg-black p-1 md:p-2 relative overflow-hidden" style={{ minHeight: "400px", height: "60vh", maxHeight: "600px" }}>
           <div className="monitor-scanlines absolute inset-0 pointer-events-none"></div>
           <div className="monitor-glow absolute inset-0 pointer-events-none"></div>
           
+          {/* Monitor bezel elements */}
           <div className="absolute top-2 left-2 flex items-center gap-1 z-30">
             <div className="w-2 h-2 rounded-full bg-apocalypse-red animate-pulse"></div>
             <div className="w-2 h-2 rounded-full bg-toxic-neon/70"></div>
@@ -574,8 +557,9 @@ export function TerminalMonitor({
             RSTNC_OS v3.2.1
           </div>
           
+          {/* Terminal content */}
           <div className="relative p-2 h-full">
-            {!bootComplete && !selectedRole && !skipBootSequence && !forceBootComplete ? (
+            {!bootComplete && !selectedRole && !skipBootSequence ? (
               <div className="w-full h-full">
                 <TerminalTypewriter
                   showBootSequence={true}
@@ -584,7 +568,8 @@ export function TerminalMonitor({
               </div>
             ) : (
               <div className="desktop-environment h-full relative">
-                {(showDesktopIcons || forceBootComplete) && (
+                {/* Desktop Icons */}
+                {showDesktopIcons && (
                   <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 p-2 absolute top-0 left-0 z-10">
                     <DesktopIcon 
                       icon={<AlertTriangle size={20} />} 
@@ -619,6 +604,7 @@ export function TerminalMonitor({
                   </div>
                 )}
                 
+                {/* Desktop Apps */}
                 {Object.entries(appContent).map(([appId, app]) => (
                   <TerminalApp
                     key={appId}
@@ -634,7 +620,8 @@ export function TerminalMonitor({
                   />
                 ))}
                 
-                {(showDesktopIcons || forceBootComplete) && (
+                {/* Task Bar */}
+                {showDesktopIcons && (
                   <div className="absolute bottom-0 left-0 right-0 bg-black/80 border-t border-toxic-neon/30 h-10 flex items-center px-2 z-20">
                     <div className="flex items-center gap-2 overflow-x-auto terminal-scrollbar flex-1">
                       <Button
