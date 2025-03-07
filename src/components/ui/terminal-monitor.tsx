@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Minimize2, Maximize2, X, Monitor, Shield, Target, Radio, Users, Clock, AlertTriangle, BookOpen, Radiation, AppWindow, FileQuestion } from 'lucide-react';
@@ -195,12 +196,10 @@ export function TerminalMonitor({
   };
 
   const handleCompleteBootSequence = () => {
-    console.log("Boot sequence complete, showing desktop");
     if (onTypingComplete) {
       onTypingComplete();
     }
     setBootComplete(true);
-    setShowDesktopIcons(true);
   };
 
   // Apps content based on user's suggestions

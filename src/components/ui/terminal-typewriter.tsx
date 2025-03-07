@@ -269,7 +269,6 @@ export function TerminalTypewriter({
     }
     
     setTypingStarted(true);
-    console.log("Starting typing animation");
     
     let i = 0;
     const typingInterval = setInterval(() => {
@@ -279,7 +278,6 @@ export function TerminalTypewriter({
       } else {
         clearInterval(typingInterval);
         setTypingComplete(true);
-        console.log("Typing complete, calling onTypingComplete");
         
         if (onTypingComplete) {
           onTypingComplete();
@@ -292,7 +290,6 @@ export function TerminalTypewriter({
         clearInterval(typingInterval);
         setDisplayText(textToType);
         setTypingComplete(true);
-        console.log("Force completion timeout triggered");
         
         if (onTypingComplete) {
           onTypingComplete();
