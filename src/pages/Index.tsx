@@ -44,7 +44,9 @@ const Index = () => {
   }, [terminalStage]);
   
   const handleRoleSelect = (role: "bounty-hunter" | "survivor") => {
+    console.log("Role selected in Index component:", role);
     setUserRole(role);
+    setTerminalStage("completed");
     
     toast.success(`${role === "bounty-hunter" ? "Bounty Hunter" : "Survivor"} role activated`, {
       description: `Your wasteland profile has been configured for ${role === "bounty-hunter" ? "tracking down crypto criminals" : "rebuilding communities"}`,
@@ -66,8 +68,7 @@ const Index = () => {
   
   const handleQuestionnaireComplete = (role: "bounty-hunter" | "survivor") => {
     console.log("Questionnaire complete, setting role:", role);
-    setUserRole(role);
-    setTerminalStage("completed");
+    handleRoleSelect(role);
   };
   
   const terminalIntroText = `SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY. RESILIENT COMMUNITIES HAVE ESTABLISHED NEW ECONOMIES FROM THE ASHES. OUR TRADERS REPORT THAT TOKEN EXCHANGE NETWORKS ARE FUNCTIONING AGAIN. WE ARE REBUILDING THE FINANCIAL SYSTEM. JOIN US.`;
@@ -129,6 +130,7 @@ const Index = () => {
                   />
                 </div>
                 
+                {/* If userRole exists, show the user interface */}
                 {userRole && (
                   <div className="mt-6 border-t border-toxic-neen/20 pt-6">
                     <div className="flex justify-between items-center mb-4">

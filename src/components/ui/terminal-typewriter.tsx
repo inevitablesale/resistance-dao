@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { Radiation, Target, Shield, Terminal, Zap, AlertTriangle, RotateCw, Check } from "lucide-react";
@@ -195,22 +194,31 @@ export function TerminalTypewriter({
   const [questionnaireStarted, setQuestionnaireStarted] = useState(false);
   const [typingStarted, setTypingStarted] = useState(false);
   const [typingComplete, setTypingComplete] = useState(false);
+  const [forcedShow, setForcedShow] = useState(false);
   
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  // Debug logging for component state
   useEffect(() => {
     console.log("Terminal state:", { 
       bootStage, 
       isComplete, 
       typingStarted, 
       typingComplete, 
+      showQuestionnaire,
       displayTextLength: displayText.length,
-      showQuestionnaire
+      questionnaireStarted,
+      forcedShow
     });
-  }, [bootStage, isComplete, typingStarted, typingComplete, displayText, showQuestionnaire]);
+  }, [bootStage, isComplete, typingStarted, typingComplete, showQuestionnaire, displayText, questionnaireStarted, forcedShow]);
+
+  useEffect(() => {
+    console.log("showQuestionnaire prop changed to:", showQuestionnaire);
+    if (showQuestionnaire && !questionnaireStarted && !selectedRole) {
+      console.log("Should show questionnaire now");
+      setForcedShow(true);
+    }
+  }, [showQuestionnaire, questionnaireStarted, selectedRole]);
   
-  // Boot sequence handling
   useEffect(() => {
     if (!showBootSequence) {
       setBootStage("complete");
@@ -221,7 +229,6 @@ export function TerminalTypewriter({
     setBootMessages(BOOT_MESSAGES[bootStage]);
     setCurrentBootMessage(0);
     
-    // Only reset boot progress when changing stages
     if (bootStage !== "complete") {
       setBootProgress(0);
     }
@@ -266,7 +273,6 @@ export function TerminalTypewriter({
     };
   }, [bootStage, showBootSequence]);
   
-  // Cursor blinking
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setCursorVisible(prev => !prev);
@@ -275,14 +281,11 @@ export function TerminalTypewriter({
     return () => clearInterval(cursorInterval);
   }, []);
   
-  // Text typing effect - improved version with forced completion
   useEffect(() => {
-    // Only start typing when boot is complete
     if (!isComplete || bootStage !== "complete" || typingStarted) {
       return;
     }
     
-    // Set typing started to prevent repeated execution
     setTypingStarted(true);
     console.log("Starting typing animation with text:", textToType);
     
@@ -302,7 +305,6 @@ export function TerminalTypewriter({
       }
     }, typeDelay);
     
-    // Force completion after a timeout in case the animation gets stuck
     const forceCompletionTimeout = setTimeout(() => {
       if (!typingComplete) {
         console.log("Forcing typing completion");
@@ -314,7 +316,7 @@ export function TerminalTypewriter({
           onTypingComplete();
         }
       }
-    }, textToType.length * typeDelay + 5000); // Add extra buffer time
+    }, textToType.length * typeDelay + 5000);
     
     return () => {
       clearInterval(typingInterval);
@@ -322,20 +324,19 @@ export function TerminalTypewriter({
     };
   }, [textToType, typeDelay, bootStage, isComplete, onTypingComplete, typingStarted, typingComplete]);
   
-  // Separate useEffect to force questionnaire display if not showing after a delay
   useEffect(() => {
-    if (isComplete && showQuestionnaire && !questionnaireStarted && !typingComplete) {
-      const forceQuestionnaireTimeout = setTimeout(() => {
-        console.log("Forcing questionnaire display");
-        setTypingComplete(true);
-        if (onTypingComplete) {
+    if (isComplete && !questionnaireStarted && !selectedRole) {
+      const forceQuestionnaireSafetyTimeout = setTimeout(() => {
+        console.log("Safety timeout: forcing questionnaire display");
+        setForcedShow(true);
+        if (onTypingComplete && !typingComplete) {
           onTypingComplete();
         }
-      }, 10000); // Force after 10 seconds
+      }, 10000);
       
-      return () => clearTimeout(forceQuestionnaireTimeout);
+      return () => clearTimeout(forceQuestionnaireSafetyTimeout);
     }
-  }, [isComplete, showQuestionnaire, questionnaireStarted, typingComplete, onTypingComplete]);
+  }, [isComplete, questionnaireStarted, selectedRole, onTypingComplete, typingComplete]);
   
   const handleStartAssessment = () => {
     console.log("Starting assessment questionnaire");
@@ -375,6 +376,8 @@ export function TerminalTypewriter({
       }, 3000);
     }
   };
+
+  const shouldShowQuestionnaire = (showQuestionnaire || forcedShow) && !selectedRole;
 
   return (
     <div className={cn("terminal-container relative", className)}>
@@ -496,7 +499,7 @@ export function TerminalTypewriter({
           </>
         )}
         
-        {showQuestionnaire && !questionnaireStarted && typingComplete && (
+        {isComplete && (shouldShowQuestionnaire || (showQuestionnaire && isComplete)) && !questionnaireStarted && (typingComplete || forcedShow) && (
           <div className="terminal-line mt-6">
             <div className="text-white/70 mb-4">BEFORE JOINING THE RESISTANCE, WE MUST DETERMINE YOUR ROLE IN THE NEW ECONOMY:</div>
             
@@ -511,26 +514,7 @@ export function TerminalTypewriter({
           </div>
         )}
         
-        {/* Force display questionnaire button if showQuestionnaire is true but not started yet */}
-        {showQuestionnaire && !questionnaireStarted && !typingComplete && bootStage === "complete" && isComplete && displayText.length > 0 && (
-          <div className="terminal-line mt-6">
-            <div className="text-white/70 mb-4">BEFORE JOINING THE RESISTANCE, WE MUST DETERMINE YOUR ROLE IN THE NEW ECONOMY:</div>
-            
-            <ToxicButton
-              onClick={() => {
-                setTypingComplete(true);
-                handleStartAssessment();
-              }}
-              className="w-full mt-2 bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
-              size="lg"
-            >
-              <Terminal className="w-5 h-5 mr-2 text-toxic-neon" />
-              <span className="flash-beacon">BEGIN WASTELAND ROLE ASSESSMENT</span>
-            </ToxicButton>
-          </div>
-        )}
-        
-        {showQuestionnaire && questionnaireStarted && !selectedRole && (
+        {isComplete && shouldShowQuestionnaire && questionnaireStarted && !selectedRole && (
           <div className="assessment-container">
             {calculatingResult ? (
               <div className="text-center py-8">
