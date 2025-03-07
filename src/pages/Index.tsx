@@ -109,18 +109,7 @@ const Index = () => {
   );
 
   // Render pre-authentication content
-  const renderPreAuthContent = () => (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
-      <EmergencyTicker />
-      <HistoricalRecords />
-      <NetworkStats />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <SurvivorNotifications />
-        <BountyBoard />
-      </div>
-      <SettlementMap />
-    </div>
-  );
+  const renderPreAuthContent = () => null; // Hide all pre-auth content
 
   // Main content with NFT showcase
   const renderNFTContent = () => (
@@ -136,21 +125,12 @@ const Index = () => {
       // If authenticated, show the NFT selection in the main content
       return renderNFTContent();
     } else if (authStage === "pre-boot" || authStage === "authenticating" || authStage === "system-breach") {
-      // Pre-authentication shows informational components
+      // Pre-authentication shows nothing
       return renderPreAuthContent();
     }
     
     // Default fallback (should not reach here)
-    return (
-      <TerminalMonitor
-        showQuestionnaire={terminalStage === "questionnaire"}
-        onTypingComplete={handleTerminalComplete}
-        onRoleSelect={handleRoleSelect}
-        selectedRole={userRole}
-        className="w-full" 
-        skipBootSequence={true}
-      />
-    );
+    return null;
   };
 
   return (
@@ -159,11 +139,13 @@ const Index = () => {
       <div className="dust-particles"></div>
       <div className="fog-overlay"></div>
 
-      {/* Emergency Transmission Popup */}
-      <EmergencyTransmission 
-        isOpen={showEmergencyTransmission} 
-        onClose={handleCloseEmergencyTransmission} 
-      />
+      {/* Emergency Transmission Popup - only show when authenticated */}
+      {authStage === "authenticated" && (
+        <EmergencyTransmission 
+          isOpen={showEmergencyTransmission} 
+          onClose={handleCloseEmergencyTransmission} 
+        />
+      )}
 
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0">
@@ -184,27 +166,27 @@ const Index = () => {
             transition={{ duration: 1 }}
             className="w-full"
           >
-            <div className={`text-center mb-4 flex ${authStage === "authenticated" ? "justify-between" : "justify-center"} items-center`}>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm font-mono broken-glass">
-                <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
-                <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Network Status: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
-              </div>
-              
-              {/* Always show emergency transmission button */}
-              <div className="flex space-x-2">
-                <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission}>
-                  <Radiation className="w-4 h-4 mr-2" />
-                  Emergency Transmission
-                </ToxicButton>
+            {/* Only show header elements if authenticated */}
+            {authStage === "authenticated" && (
+              <div className="text-center mb-4 flex justify-between items-center">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm font-mono broken-glass">
+                  <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
+                  <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Network Status: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
+                </div>
                 
-                {authStage === "authenticated" && (
+                <div className="flex space-x-2">
+                  <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission}>
+                    <Radiation className="w-4 h-4 mr-2" />
+                    Emergency Transmission
+                  </ToxicButton>
+                  
                   <ToxicButton variant="outline" size="sm">
                     <Shield className="w-4 h-4 mr-2" />
                     System Status
                   </ToxicButton>
-                )}
+                </div>
               </div>
-            </div>
+            )}
 
             <Card className={`w-full bg-black/80 border-toxic-neon/30 p-0 relative overflow-hidden transition-all duration-500 ${authStage === "authenticated" ? "min-h-[80vh]" : "min-h-[50vh]"}`}>
               <div className="absolute inset-0 z-0 rust-overlay broken-glass">
@@ -212,17 +194,20 @@ const Index = () => {
               </div>
               
               <div className="relative z-10 p-6 md:p-8">
-                <div className="flex items-center justify-between mb-4 border-b border-toxic-neon/20 pb-2">
-                  <div className="flex items-center">
-                    <Radiation className="h-5 w-5 mr-2 text-toxic-neon" />
-                    <span className="text-toxic-neon font-mono text-lg">RESISTANCE_NETWORK</span>
+                {/* Only show this header if authenticated */}
+                {authStage === "authenticated" && (
+                  <div className="flex items-center justify-between mb-4 border-b border-toxic-neon/20 pb-2">
+                    <div className="flex items-center">
+                      <Radiation className="h-5 w-5 mr-2 text-toxic-neon" />
+                      <span className="text-toxic-neon font-mono text-lg">RESISTANCE_NETWORK</span>
+                    </div>
+                    
+                    <div className="flex gap-1">
+                      <div className="h-3 w-3 rounded-full bg-apocalypse-red animate-pulse"></div>
+                      <div className="h-3 w-3 rounded-full bg-toxic-neon/70"></div>
+                    </div>
                   </div>
-                  
-                  <div className="flex gap-1">
-                    <div className="h-3 w-3 rounded-full bg-apocalypse-red animate-pulse"></div>
-                    <div className="h-3 w-3 rounded-full bg-toxic-neon/70"></div>
-                  </div>
-                </div>
+                )}
                 
                 <div className="mb-6">
                   {/* Conditional rendering based on authentication state */}

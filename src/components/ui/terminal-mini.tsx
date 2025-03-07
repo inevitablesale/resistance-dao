@@ -26,7 +26,7 @@ export function TerminalMini({ minimized = false, onToggleMinimize }: TerminalMi
   const handleCommand = (cmd: string) => {
     const lowerCmd = cmd.toLowerCase().trim();
     
-    addLine(`${'>'}' ${cmd}`);
+    addLine(`${'>'}${cmd}`);
     
     // Basic command responses
     switch(lowerCmd) {
