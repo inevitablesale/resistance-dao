@@ -57,7 +57,7 @@ const Index = () => {
           <div className="absolute w-[500px] h-[500px] bg-toxic-neon/5 rounded-full blur-3xl -bottom-48 -right-24" />
         </div>
         
-        <div className="container px-4 relative w-full max-w-5xl mx-auto">
+        <div className="container px-4 relative w-full max-w-5xl mx-auto h-full py-10">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -96,6 +96,7 @@ const Index = () => {
                     onRoleSelect={handleRoleSelect}
                     selectedRole={userRole}
                     className="w-full" 
+                    skipBootSequence={true}
                   />
                 </div>
                 

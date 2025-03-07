@@ -115,6 +115,7 @@ interface TerminalMonitorProps {
   onRoleSelect?: (role: "bounty-hunter" | "survivor") => void;
   selectedRole?: "bounty-hunter" | "survivor" | null;
   className?: string;
+  skipBootSequence?: boolean;
 }
 
 export function TerminalMonitor({
@@ -123,15 +124,26 @@ export function TerminalMonitor({
   onTypingComplete,
   onRoleSelect,
   selectedRole,
-  className
+  className,
+  skipBootSequence = false
 }: TerminalMonitorProps) {
   const [openApps, setOpenApps] = useState<string[]>([]);
   const [maximizedApp, setMaximizedApp] = useState<string | null>(null);
   const [activeApp, setActiveApp] = useState<string | null>(null);
   const [appZIndex, setAppZIndex] = useState<Record<string, number>>({});
   const [nextZIndex, setNextZIndex] = useState(10);
-  const [showDesktopIcons, setShowDesktopIcons] = useState(false);
-  const [bootComplete, setBootComplete] = useState(false);
+  const [showDesktopIcons, setShowDesktopIcons] = useState(skipBootSequence);
+  const [bootComplete, setBootComplete] = useState(skipBootSequence);
+
+  // Auto-open the first app on desktop load after a short delay
+  useEffect(() => {
+    if (showDesktopIcons && openApps.length === 0) {
+      const timer = setTimeout(() => {
+        handleOpenApp('network-status');
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [showDesktopIcons, openApps.length]);
 
   // Show desktop icons after boot sequence or role selection
   useEffect(() => {
@@ -556,7 +568,7 @@ export function TerminalMonitor({
       {/* Monitor frame */}
       <div className="monitor-frame bg-black/90 border-2 border-toxic-neon/40 rounded-lg overflow-hidden shadow-[0_0_15px_rgba(80,250,123,0.2)] relative">
         {/* Monitor screen */}
-        <div className="monitor-screen bg-black p-1 md:p-2 relative min-h-[500px] max-h-[600px] overflow-hidden">
+        <div className="monitor-screen bg-black p-1 md:p-2 relative overflow-hidden" style={{ minHeight: "400px", height: "60vh", maxHeight: "600px" }}>
           <div className="monitor-scanlines absolute inset-0 pointer-events-none"></div>
           <div className="monitor-glow absolute inset-0 pointer-events-none"></div>
           
@@ -572,7 +584,7 @@ export function TerminalMonitor({
           
           {/* Terminal content */}
           <div className="relative p-2 h-full">
-            {!bootComplete && !selectedRole ? (
+            {!bootComplete && !selectedRole && !skipBootSequence ? (
               <div className="w-full h-full">
                 <TerminalTypewriter
                   showBootSequence={true}
@@ -583,7 +595,7 @@ export function TerminalMonitor({
               <div className="desktop-environment h-full relative">
                 {/* Desktop Icons */}
                 {showDesktopIcons && (
-                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-1 p-2 absolute top-0 left-0 z-10">
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 p-2 absolute top-0 left-0 z-10">
                     <DesktopIcon 
                       icon={<AlertTriangle size={20} />} 
                       label="Network Status"

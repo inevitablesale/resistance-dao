@@ -73,9 +73,28 @@
 .terminal-monitor .monitor-screen {
   position: relative;
   width: 100%;
-  min-height: 600px;
+  min-height: 400px;
+  height: 60vh;
+  max-height: 600px;
   background-color: #000;
   overflow: hidden;
+}
+
+/* Desktop environment styling */
+.desktop-environment {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+/* Desktop icons row */
+.desktop-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 8px;
+  padding: 8px;
+  z-index: 10;
 }
 
 /* Scanlines effect */
