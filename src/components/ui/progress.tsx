@@ -11,7 +11,7 @@ const Progress = React.forwardRef<
   const getProgressColor = (percentage: number) => {
     if (percentage <= 25) return 'from-red-500 to-red-600';
     if (percentage <= 50) return 'from-yellow-500 to-yellow-600';
-    if (percentage <= 75) return 'from-blue-500 to-blue-600';
+    if (percentage <= 75) return 'from-toxic-muted to-toxic-neon';
     return 'from-green-500 to-green-600';
   };
 
