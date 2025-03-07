@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './button';
 import { Input } from './input';
@@ -17,6 +18,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   const [terminalReady, setTerminalReady] = useState(false);
   const [authStatus, setAuthStatus] = useState<'idle' | 'checking' | 'success' | 'error'>('idle');
   const [forgotHovered, setForgotHovered] = useState(false);
+  const [terminalEffect, setTerminalEffect] = useState<'flicker' | 'glitch' | 'normal'>('normal');
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
 
@@ -55,11 +57,23 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         if (isPunctuation) delay += 30;
         if (isSpace) delay += 10;
         
+        // Occasionally add glitch effect during typing
+        if (Math.random() < 0.03) {
+          setTerminalEffect('glitch');
+          setTimeout(() => setTerminalEffect('normal'), 120);
+        }
+        
         timeout = setTimeout(() => {
           typeMessage(messageIndex, charIndex + 1);
         }, delay);
       } else {
         const pauseTime = currentMessage.includes('WARNING') ? 150 : 50; 
+        
+        if (currentMessage.includes('WARNING')) {
+          setTerminalEffect('flicker');
+          setTimeout(() => setTerminalEffect('normal'), 400);
+        }
+        
         timeout = setTimeout(() => {
           setCommandLine(prev => prev + '\n');
           typeMessage(messageIndex + 1, 0);
@@ -75,7 +89,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         setCommandLine(bootMessages.join('\n'));
         setTerminalReady(true);
       }
-    }, 2000);
+    }, 3000);
 
     return () => {
       clearTimeout(timeout);
@@ -92,19 +106,16 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   useEffect(() => {
     if (!terminalReady) return;
     
+    // More frequent and dramatic flicker effects
     const flickerInterval = setInterval(() => {
       const terminalEl = terminalRef.current;
       if (!terminalEl) return;
       
-      terminalEl.style.opacity = (0.85 + Math.random() * 0.15).toString();
-      terminalEl.style.filter = `brightness(${0.9 + Math.random() * 0.2})`;
+      if (Math.random() < 0.4) {
+        setTerminalEffect('flicker');
+        setTimeout(() => setTerminalEffect('normal'), 150);
+      }
       
-      setTimeout(() => {
-        if (terminalEl) {
-          terminalEl.style.opacity = '1';
-          terminalEl.style.filter = 'brightness(1)';
-        }
-      }, 100);
     }, 5000 + Math.random() * 10000);
 
     return () => clearInterval(flickerInterval);
@@ -120,6 +131,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
     setTimeout(() => {
       if (password === CORRECT_PASSWORD) {
         setAuthStatus('success');
+        setTerminalEffect('flicker');
         
         setCommandLine(prev => 
           prev + 
@@ -131,11 +143,15 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         );
         
         setTimeout(() => {
-          onAuthenticated();
+          setTerminalEffect('glitch');
+          setTimeout(() => {
+            onAuthenticated();
+          }, 800);
         }, 1000);
       } else {
         setAuthStatus('error');
         setShowError(true);
+        setTerminalEffect('glitch');
         
         setCommandLine(prev => 
           prev + 
@@ -154,6 +170,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         setTimeout(() => {
           setShowError(false);
           setAuthStatus('idle');
+          setTerminalEffect('normal');
         }, 1000);
       }
     }, 600);
@@ -174,18 +191,33 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
     >
       <div className="absolute inset-0 overflow-hidden crt-overlay">
         <div className="crt-scanline"></div>
-        <div className="crt-flicker"></div>
+        <div className={cn("crt-flicker", terminalEffect === 'flicker' && "active-flicker")}></div>
         <div className="crt-vignette"></div>
+        
+        {/* Add subtle animated background patterns */}
+        <div className="terminal-matrix-bg absolute inset-0 opacity-10 z-0 pointer-events-none"></div>
+        
+        {/* Scanline effect that continuously scrolls */}
+        <div className="scanner-active-line absolute left-0 right-0 h-[2px] bg-toxic-neon/20 z-10 pointer-events-none"></div>
       </div>
       
-      <div className="relative monitor-screen p-4 font-mono text-sm sm:text-base overflow-hidden transition-all duration-300">
+      <div className={cn(
+        "relative monitor-screen p-4 sm:p-6 font-mono text-sm sm:text-base overflow-hidden transition-all duration-300",
+        terminalEffect === 'glitch' && "terminal-glitch-effect"
+      )}>
         <div className="monitor-scanlines absolute inset-0"></div>
         <div className="monitor-glow absolute inset-0"></div>
         
         <div className="terminal-content flex flex-col h-full">
           <div className="flex items-center gap-2 mb-3 border-b border-toxic-neon/20 pb-2">
-            <Terminal className="h-4 w-4 text-toxic-neon animate-pulse" />
-            <span className="text-toxic-neon/90 text-xs">RESISTANCE_SECURE_SHELL</span>
+            <motion.div 
+              animate={{ rotate: [0, 360] }} 
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }} 
+              className="text-toxic-neon"
+            >
+              <Terminal className="h-4 w-4 text-toxic-neon" />
+            </motion.div>
+            <span className="text-toxic-neon/90 text-xs tracking-wider">RESISTANCE_SECURE_SHELL</span>
             <div className="ml-auto flex gap-1.5">
               <div className="h-2 w-2 rounded-full bg-apocalypse-red/80 animate-pulse"></div>
               <div className="h-2 w-2 rounded-full bg-toxic-neon/50"></div>
@@ -197,7 +229,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
             className="flex-1 text-toxic-neon mb-4 whitespace-pre-line overflow-y-auto terminal-scrollbar max-h-[300px] transition-all duration-300"
           >
             {commandLine}
-            {terminalReady && <span className="terminal-prompt block mt-2">resistance@secure:~$</span>}
+            {terminalReady && <span className="terminal-prompt block mt-2 text-toxic-neon/90">resistance@secure:~$</span>}
           </div>
           
           {terminalReady && (
@@ -206,7 +238,13 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <div className="relative flex-1 group">
                     <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                      <Key className="h-4 w-4 text-toxic-neon group-focus-within:animate-pulse" />
+                      <Lock className={cn(
+                        "h-4 w-4 transition-colors duration-300",
+                        authStatus === 'checking' ? "text-toxic-neon animate-pulse" : 
+                        authStatus === 'success' ? "text-toxic-neon" : 
+                        authStatus === 'error' ? "text-apocalypse-red" : 
+                        "text-toxic-neon/60 group-focus-within:text-toxic-neon"
+                      )} />
                     </div>
                     <Input
                       ref={inputRef}
@@ -216,6 +254,8 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                       placeholder="Enter access code"
                       className={cn(
                         "bg-black/60 text-toxic-neon border-toxic-neon/40 pl-8 focus-visible:ring-toxic-neon/30 font-mono",
+                        "transition-all duration-300",
+                        "focus:placeholder-toxic-neon/40 placeholder-toxic-neon/20", 
                         showError && "border-apocalypse-red animate-shake",
                         authStatus === 'checking' && "bg-toxic-neon/5",
                         authStatus === 'success' && "bg-toxic-neon/10 border-toxic-neon"
@@ -261,17 +301,21 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                     type="submit" 
                     className={cn(
                       "bg-black/80 border border-toxic-neon text-toxic-neon hover:bg-toxic-neon/20 transition-all duration-300",
+                      "flex items-center justify-center relative overflow-hidden",
                       authStatus === 'checking' && "opacity-70 cursor-not-allowed",
                       authStatus === 'success' && "bg-toxic-neon/20"
                     )}
                     disabled={authStatus === 'checking' || authStatus === 'success'}
                   >
-                    <Terminal className="w-4 h-4 mr-2" />
-                    {authStatus === 'checking' ? 'Verifying...' : 'Submit'}
+                    <span className="z-10 flex items-center">
+                      <Terminal className="w-4 h-4 mr-2" />
+                      {authStatus === 'checking' ? 'Verifying...' : 'Submit'}
+                    </span>
+                    <span className="absolute inset-0 bg-toxic-neon/0 hover:bg-toxic-neon/20 transition-colors duration-300"></span>
                   </Button>
                 </div>
                 
-                <div className="mt-3 relative">
+                <div className="mt-5 relative">
                   <div 
                     className="relative"
                     onMouseEnter={() => setForgotHovered(true)}
@@ -284,8 +328,8 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                       className="pointer-events-none absolute inset-x-0 top-0 h-0"
                     />
                     
-                    <div className="relative py-3 px-4 bg-black/70 backdrop-blur-sm rounded border border-toxic-neon/10 inline-block">
-                      <div className="access-code-message text-center mb-2">Need access code:</div>
+                    <div className="relative py-3 px-4 bg-black/70 backdrop-blur-sm rounded border border-toxic-neon/10 inline-block group">
+                      <div className="access-code-message text-toxic-neon/60 font-mono text-sm mb-2">// Access code is "resistance"</div>
                       <a 
                         href="https://www.linkedin.com/groups/12657922/" 
                         target="_blank" 
@@ -297,10 +341,10 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                           forgotHovered && "opacity-100"
                         )}></span>
                         <ExternalLink className={cn(
-                          "h-5 w-5 mr-2",
+                          "h-5 w-5 mr-2 transition-all duration-300",
                           forgotHovered ? "animate-pulse text-toxic-neon" : "text-toxic-neon/90"
                         )} />
-                        <span className="relative font-bold">
+                        <span className="relative font-bold group-hover:underline">
                           Join Resistance LinkedIn Group
                         </span>
                       </a>
@@ -313,8 +357,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         </div>
       </div>
       
-      <style>
-        {`
+      <style jsx>{`
         .crt-scanline::before {
           content: '';
           position: absolute;
@@ -345,15 +388,78 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           animation: flicker 5s infinite;
         }
         
+        .active-flicker {
+          opacity: 0.1;
+          animation: intense-flicker 0.2s infinite;
+        }
+        
         .crt-vignette {
           position: absolute;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
-          box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.7);
+          box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.9);
           pointer-events: none;
           z-index: 10;
+        }
+        
+        .terminal-glitch-effect {
+          animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+        
+        .terminal-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        .terminal-scrollbar::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.4);
+        }
+        
+        .terminal-scrollbar::-webkit-scrollbar-thumb {
+          background-color: rgba(80, 250, 123, 0.3);
+          border-radius: 20px;
+        }
+        
+        .typing-text {
+          border-right: 2px solid rgba(80, 250, 123, 0.7);
+          animation: blink-caret 1s step-end infinite;
+        }
+        
+        .scanner-active-line {
+          animation: scanner-move 3s infinite linear;
+          box-shadow: 0 0 5px rgba(80, 250, 123, 0.5);
+        }
+        
+        .terminal-matrix-bg {
+          background-image: linear-gradient(
+            rgba(0, 10, 2, 0.8) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            90deg,
+            rgba(0, 10, 2, 0.8) 1px,
+            transparent 1px
+          );
+          background-size: 20px 20px;
+          background-position: center center;
+        }
+        
+        @keyframes scanner-move {
+          0% {
+            top: -2px;
+          }
+          100% {
+            top: 100%;
+          }
+        }
+        
+        @keyframes intense-flicker {
+          0% { opacity: 0.05; }
+          25% { opacity: 0.2; }
+          50% { opacity: 0.05; }
+          75% { opacity: 0.15; }
+          100% { opacity: 0.05; }
         }
         
         @keyframes flicker {
@@ -364,8 +470,33 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           95% { opacity: 0.3; }
           100% { opacity: 0; }
         }
-        `}
-      </style>
+        
+        @keyframes blink-caret {
+          from, to { border-color: transparent }
+          50% { border-color: rgba(80, 250, 123, 0.7) }
+        }
+        
+        @keyframes glitch {
+          0% {
+            transform: translate(0);
+          }
+          20% {
+            transform: translate(-2px, 2px);
+          }
+          40% {
+            transform: translate(-2px, -2px);
+          }
+          60% {
+            transform: translate(2px, 2px);
+          }
+          80% {
+            transform: translate(2px, -2px);
+          }
+          100% {
+            transform: translate(0);
+          }
+        }
+      `}</style>
     </motion.div>
   );
 }
