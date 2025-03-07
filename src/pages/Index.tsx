@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Shield, Target, Radiation, FileText, Map } from "lucide-react";
+import { Shield, Target, Radiation, FileText, Map, BookOpen } from "lucide-react";
 import { TerminalMonitor } from "@/components/ui/terminal-monitor";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { DrippingSlime } from "@/components/ui/dripping-slime";
@@ -22,6 +21,8 @@ import { SettlementMap } from "@/components/ui/settlement-map";
 import { PostAuthLayout } from "@/components/ui/post-auth-layout";
 import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
 import { ProgressIndicator } from "@/components/ui/progress-indicator";
+import { WalletConnectButton } from "@/components/ui/wallet-connect-button";
+import { JournalDialog } from "@/components/ui/journal-dialog";
 
 type AuthStage = "pre-boot" | "authenticating" | "breach-transition" | "post-breach" | "authenticated";
 
@@ -37,7 +38,8 @@ const Index = () => {
   const [terminalMinimized, setTerminalMinimized] = useState(false);
   const [showDesktopEnvironment, setShowDesktopEnvironment] = useState(false);
   const [initialAppOpened, setInitialAppOpened] = useState(false);
-  
+  const [showJournalDialog, setShowJournalDialog] = useState(false);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCommunityActivity(Math.floor(Math.random() * 100));
@@ -196,14 +198,24 @@ const Index = () => {
       <div className="fog-overlay"></div>
 
       {(authStage === "authenticated" || authStage === "post-breach") && (
-        <EmergencyTransmission 
-          isOpen={showEmergencyTransmission} 
-          onClose={handleCloseEmergencyTransmission} 
-        />
+        <>
+          <EmergencyTransmission 
+            isOpen={showEmergencyTransmission} 
+            onClose={handleCloseEmergencyTransmission} 
+          />
+          <JournalDialog 
+            open={showJournalDialog}
+            onOpenChange={setShowJournalDialog}
+          />
+        </>
       )}
 
       <div className="fixed top-4 right-4 z-50">
         <ProgressIndicator stages={journalStages} />
+      </div>
+
+      <div className="fixed top-4 left-4 z-50">
+        <WalletConnectButton variant="outline" size="sm" />
       </div>
 
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -243,8 +255,12 @@ const Index = () => {
                     Emergency Transmission
                   </ToxicButton>
                   
-                  <ToxicButton variant="outline" size="sm">
-                    <FileText className="w-4 h-4 mr-2" />
+                  <ToxicButton 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowJournalDialog(true)}
+                  >
+                    <BookOpen className="w-4 h-4 mr-2" />
                     Journal Entries
                   </ToxicButton>
                 </div>
