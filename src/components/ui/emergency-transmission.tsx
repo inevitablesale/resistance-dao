@@ -1,6 +1,6 @@
 
 import React from "react";
-import { AlertTriangle, Radio, X } from "lucide-react";
+import { Radio, X } from "lucide-react";
 import { Button } from "./button";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -36,26 +36,10 @@ export function EmergencyTransmission({ isOpen, onClose }: EmergencyTransmission
               </button>
               
               <div className="mb-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <AlertTriangle className="text-apocalypse-red w-6 h-6" />
-                  <h2 className="text-apocalypse-red text-xl font-mono">NETWORK STATUS: CRITICAL</h2>
-                </div>
-                
-                <div className="border-t border-apocalypse-red/30 pt-4 mb-4">
-                  <h3 className="text-white font-mono mb-2">EMERGENCY TRANSMISSION:</h3>
-                  <div className="flex items-center gap-2 text-white/70 mb-2 text-sm">
-                    <div className="w-3 h-3 bg-apocalypse-red/70 rounded-full animate-pulse"></div>
-                    <span>[SIGNAL WEAK]</span>
-                  </div>
-                  <p className="font-mono text-white/80 mb-4 border-l-2 border-apocalypse-red/40 pl-3">
-                    SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE...
-                  </p>
-                </div>
-                
                 <div className="flex justify-center">
                   <Button variant="destructive" className="w-full" onClick={onClose}>
                     <Radio className="w-4 h-4 mr-2" />
-                    CONNECT TO NETWORK
+                    CONNECT TO RESISTANCE NETWORK
                   </Button>
                 </div>
               </div>

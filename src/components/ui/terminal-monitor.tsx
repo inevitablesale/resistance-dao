@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Minimize2, Maximize2, X, Monitor, Shield, Target, Radio, Users, Clock, AlertTriangle, BookOpen, Radiation, AppWindow, FileQuestion } from 'lucide-react';
@@ -135,15 +134,7 @@ export function TerminalMonitor({
   const [showDesktopIcons, setShowDesktopIcons] = useState(skipBootSequence);
   const [bootComplete, setBootComplete] = useState(skipBootSequence);
 
-  // Auto-open the first app on desktop load after a short delay
-  useEffect(() => {
-    if (showDesktopIcons && openApps.length === 0) {
-      const timer = setTimeout(() => {
-        handleOpenApp('network-status');
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [showDesktopIcons, openApps.length]);
+  // Removed auto-open app on desktop load
 
   // Show desktop icons after boot sequence or role selection
   useEffect(() => {
@@ -210,26 +201,10 @@ export function TerminalMonitor({
       content: (
         <div className="p-2">
           <div className="mb-6 border border-apocalypse-red/40 rounded-md p-4 bg-black/70">
-            <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="text-apocalypse-red w-6 h-6" />
-              <h2 className="text-apocalypse-red text-xl font-mono">NETWORK STATUS: CRITICAL</h2>
-            </div>
-            
-            <div className="border-t border-apocalypse-red/30 pt-4 mb-4">
-              <h3 className="text-white font-mono mb-2">EMERGENCY TRANSMISSION:</h3>
-              <div className="flex items-center gap-2 text-white/70 mb-2 text-sm">
-                <div className="w-3 h-3 bg-apocalypse-red/70 rounded-full animate-pulse"></div>
-                <span>[SIGNAL WEAK]</span>
-              </div>
-              <p className="font-mono text-white/80 mb-4 border-l-2 border-apocalypse-red/40 pl-3">
-                SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE...
-              </p>
-            </div>
-            
             <div className="flex justify-center">
               <Button variant="destructive" className="w-full">
                 <Radio className="w-4 h-4 mr-2" />
-                ACTIVATE SURVIVAL BEACON
+                ACTIVATE RESISTANCE BEACON
               </Button>
             </div>
           </div>

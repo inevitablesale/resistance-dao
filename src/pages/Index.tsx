@@ -53,7 +53,7 @@ const Index = () => {
     setShowEmergencyTransmission(false);
   };
 
-  // Added function to manually show the emergency transmission
+  // Function to manually show the emergency transmission
   const handleShowEmergencyTransmission = () => {
     setShowEmergencyTransmission(true);
   };
@@ -88,7 +88,7 @@ const Index = () => {
                 <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
                 <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Network Status: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
               </div>
-              {/* Added button to manually show emergency transmission */}
+              {/* Button to manually show emergency transmission */}
               <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission} className="ml-2">
                 <Radiation className="w-4 h-4 mr-2" />
                 View Emergency Transmission
