@@ -135,7 +135,7 @@ const Index = () => {
                     onTypingComplete={handleTerminalComplete}
                     onRoleSelect={handleRoleSelect}
                     selectedRole={userRole}
-                    className="w-full" 
+                    className="w-full"
                     skipBootSequence={false}
                   />
                 </div>
