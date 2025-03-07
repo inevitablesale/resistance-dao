@@ -217,11 +217,43 @@ export function TerminalTypewriter({
     
     // Smoother progress bar with occasional flickers
     let lastProgress = 0;
+    let progressIncrement = 1;
+    const maxProgress = 100;
     const bootInterval = setInterval(() => {
       setBootProgress(prev => {
-        // Smoother, more natural progress increments
-        const increment = Math.sin(prev / 25) * 3 + Math.random() * 2 + 1;
-        const newProgress = prev + increment;
+        // Ensure we reach exactly 100% by the end
+        if (prev >= maxProgress) {
+          clearInterval(bootInterval);
+          
+          setTimeout(() => {
+            if (bootStage === "initializing") setBootStage("diagnosing");
+            else if (bootStage === "diagnosing") setBootStage("connecting");
+            else if (bootStage === "connecting") {
+              setBootStage("complete");
+              setIsComplete(true);
+            }
+          }, 500);
+          
+          return maxProgress;
+        }
+        
+        // Smoother, more natural progress increments with gradual acceleration
+        const remainingProgress = maxProgress - prev;
+        const timeLeft = bootMessages.length - currentBootMessage;
+        
+        // Adjust increment based on remaining progress and time
+        if (remainingProgress > 50 && timeLeft > 3) {
+          progressIncrement = Math.sin(prev / 25) * 2 + Math.random() * 1.5 + 1;
+        } else if (remainingProgress > 20 && timeLeft > 1) {
+          progressIncrement = Math.sin(prev / 25) * 2.5 + Math.random() * 2 + 2;
+        } else {
+          // Final sprint to ensure we reach 100%
+          progressIncrement = remainingProgress / (timeLeft + 1);
+          if (progressIncrement < 3) progressIncrement = 3;
+        }
+        
+        // Ensure we don't go over 100%
+        const newProgress = Math.min(prev + progressIncrement, maxProgress);
         
         // Occasional progress bar glitch
         if (Math.random() < 0.1 && newProgress - lastProgress > 5) {
@@ -236,20 +268,7 @@ export function TerminalTypewriter({
           setTimeout(() => setBootGlitch(false), 150);
         }
         
-        if (newProgress >= 100) {
-          clearInterval(bootInterval);
-          
-          setTimeout(() => {
-            if (bootStage === "initializing") setBootStage("diagnosing");
-            else if (bootStage === "diagnosing") setBootStage("connecting");
-            else if (bootStage === "connecting") {
-              setBootStage("complete");
-              setIsComplete(true);
-            }
-          }, 500);
-        }
-        
-        return newProgress > 100 ? 100 : newProgress;
+        return newProgress;
       });
     }, 70);
     
@@ -259,6 +278,9 @@ export function TerminalTypewriter({
         setCurrentBootMessage(prev => prev + 1);
       } else {
         clearInterval(messageInterval);
+        
+        // Ensure we reach 100% if we're at the last message
+        setBootProgress(maxProgress);
       }
     }, 600);
     
