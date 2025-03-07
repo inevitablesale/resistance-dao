@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Lock, Unlock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -21,14 +20,13 @@ export const TerminalTypewriter = ({
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cursorVisible, setCursorVisible] = useState(true);
-  const [isTyping, setIsTyping] = useState(true); // Start typing immediately
+  const [isTyping, setIsTyping] = useState(true);
   const [showFullMessage, setShowFullMessage] = useState(false);
   
   const firstPartOfMessage = "SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY. WE'VE BUILT SHELTERS FROM THE FALLOUT, PRESERVING WHAT'S LEFT OF DECENTRALIZED TECHNOLOGY. OUR COMMUNITY HAS GROWN STRONGER THROUGH ADVERSITY. ";
   const pressEnterMessage = "PRESS [ENTER] TO CONTINUE...";
   const remainingMessage = "THE RESISTANCE NEEDS YOUR HELP. THE OLD WORLD IS GONE. WE ARE BUILDING FROM THE ASHES. SHALL WE PLAY A GAME?";
 
-  // Handle cursor blinking
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setCursorVisible(prev => !prev);
@@ -37,11 +35,9 @@ export const TerminalTypewriter = ({
     return () => clearInterval(cursorInterval);
   }, []);
 
-  // Handle text typing effect
   useEffect(() => {
     if (!isTyping) return;
     
-    // Determine what text to show based on current state
     const textToShow = showFullMessage ? 
       (firstPartOfMessage + remainingMessage) : 
       (currentIndex >= firstPartOfMessage.length ? 
@@ -53,7 +49,6 @@ export const TerminalTypewriter = ({
         setDisplayedText(textToShow.substring(0, currentIndex + 1));
         setCurrentIndex(prevIndex => prevIndex + 1);
       } else if (!showFullMessage && currentIndex >= firstPartOfMessage.length) {
-        // We've reached the point to show PRESS ENTER
         setDisplayedText(firstPartOfMessage + pressEnterMessage);
         setIsTyping(false);
       } else {
@@ -69,8 +64,8 @@ export const TerminalTypewriter = ({
   const handleEnterClick = () => {
     if (!isTyping && !showFullMessage && currentIndex >= firstPartOfMessage.length) {
       setShowFullMessage(true);
-      setCurrentIndex(0); // Reset to start typing the full message
-      setIsTyping(true); // Allow the typing effect to restart
+      setCurrentIndex(0);
+      setIsTyping(true);
     }
   };
 
@@ -85,11 +80,11 @@ export const TerminalTypewriter = ({
                 <Lock className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
                 <div>
                   <div className="flex items-center font-bold mb-1">
-                    <span className="mr-2 tracking-wider text-lg">EMERGENCY TRANSMISSION:</span>
+                    <span className="mr-2 tracking-wider text-xl">EMERGENCY TRANSMISSION:</span>
                     <span className="text-xs text-apocalypse-red/70 animate-pulse">[SIGNAL WEAK]</span>
                   </div>
                   <div className="flex flex-col">
-                    <div className="text-base">
+                    <div className="text-lg">
                       <span>{displayedText}</span>
                       {!isTyping && !showFullMessage && (
                         <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
@@ -119,11 +114,11 @@ export const TerminalTypewriter = ({
               <Unlock className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
               <div>
                 <div className="flex items-center font-bold mb-1">
-                  <span className="mr-2 tracking-wider text-lg">EMERGENCY TRANSMISSION:</span>
+                  <span className="mr-2 tracking-wider text-xl">EMERGENCY TRANSMISSION:</span>
                   <span className="text-xs text-apocalypse-red/70">[SIGNAL SECURE]</span>
                 </div>
                 <div className="flex">
-                  <span className="text-base">{displayedText}</span>
+                  <span className="text-lg">{displayedText}</span>
                   <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
                 </div>
               </div>

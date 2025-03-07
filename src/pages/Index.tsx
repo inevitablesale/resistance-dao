@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -21,7 +20,12 @@ import {
   Zap,
   Shield,
   Image,
-  Biohazard
+  Biohazard,
+  ShieldX,
+  UserX,
+  Bug,
+  Bomb,
+  Crosshair
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToxicButton } from "@/components/ui/toxic-button";
@@ -66,35 +70,38 @@ const Index = () => {
   const nftCollection = [
     {
       id: 1,
-      name: "Radiation Survivor #001",
-      rarity: "Rare",
+      name: "Mutant Zero X-35",
+      crime: "Protocol Sabotage",
       tokenId: 1,
+      bounty: "15,000 RD",
       attributes: [
         { trait: "Radiation Level", value: "High" },
-        { trait: "Mutation", value: "Enhanced Vision" },
-        { trait: "Wasteland Skills", value: "Resource Scavenging" }
+        { trait: "Mutation", value: "Neural Hacking" },
+        { trait: "Threat Level", value: "Extreme" }
       ]
     },
     {
       id: 2,
-      name: "Resistance Fighter #042",
-      rarity: "Epic",
+      name: "Toxic Liquidator K-42",
+      crime: "DAO Treasury Theft",
       tokenId: 42,
+      bounty: "32,000 RD",
       attributes: [
         { trait: "Radiation Level", value: "Medium" },
         { trait: "Mutation", value: "Toxic Immunity" },
-        { trait: "Wasteland Skills", value: "Combat Tactics" }
+        { trait: "Threat Level", value: "High" }
       ]
     },
     {
       id: 3,
-      name: "Wasteland Prophet #007",
-      rarity: "Legendary",
+      name: "Mind Raider B-007",
+      crime: "Consensus Attack",
       tokenId: 7,
+      bounty: "50,000 RD",
       attributes: [
         { trait: "Radiation Level", value: "Critical" },
         { trait: "Mutation", value: "Telepathy" },
-        { trait: "Wasteland Skills", value: "Leadership" }
+        { trait: "Threat Level", value: "Catastrophic" }
       ]
     }
   ];
@@ -161,7 +168,7 @@ const Index = () => {
                 <div className="scanline"></div>
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
-                    <Radiation className="h-5 w-5 mr-2" /> Wasteland NFT Collection
+                    <Crosshair className="h-5 w-5 mr-2" /> WASTELAND BOUNTY LIST
                   </h3>
                   <ToxicButton 
                     variant="outline" 
@@ -179,23 +186,26 @@ const Index = () => {
                       <ToxicCardContent className="p-0">
                         <div className="relative h-48 bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-t-lg overflow-hidden">
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <Image className="w-20 h-20 text-toxic-neon/50" />
+                            <Skull className="w-20 h-20 text-toxic-neon/50" />
                           </div>
                           <DrippingSlime position="top" dripsCount={5} toxicGreen={true} showIcons={false} />
                           <div className="absolute top-2 right-2">
-                            <div className="px-2 py-1 rounded-full bg-toxic-neon/20 text-xs text-toxic-neon font-mono">
+                            <div className="px-2 py-1 rounded-full bg-apocalypse-red/20 text-xs text-apocalypse-red font-mono">
                               #{nft.tokenId}
+                            </div>
+                          </div>
+                          <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60">
+                            <div className="flex items-center justify-between">
+                              <span className="text-apocalypse-red text-xs font-mono">WANTED</span>
+                              <span className="text-toxic-neon text-xs font-mono">BOUNTY: {nft.bounty}</span>
                             </div>
                           </div>
                         </div>
                         <div className="p-4">
-                          <h4 className="text-xl font-mono text-toxic-neon mb-2">{nft.name}</h4>
-                          <div className="flex justify-between items-center mb-3">
-                            <span className="text-white/70 text-sm">Rarity</span>
-                            <span className={`text-sm font-semibold ${
-                              nft.rarity === "Legendary" ? "text-purple-300" : 
-                              nft.rarity === "Epic" ? "text-toxic-neon" : "text-blue-300"
-                            }`}>{nft.rarity}</span>
+                          <h4 className="text-xl font-mono text-toxic-neon mb-1">{nft.name}</h4>
+                          <div className="flex items-center mb-3">
+                            <ShieldX className="h-4 w-4 text-apocalypse-red mr-2" />
+                            <span className="text-apocalypse-red text-sm">{nft.crime}</span>
                           </div>
                           <div className="space-y-2 mb-4">
                             {nft.attributes.map((attr, idx) => (
@@ -209,7 +219,7 @@ const Index = () => {
                             className="w-full mt-2 bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80 text-sm"
                             size="sm"
                           >
-                            <Wallet className="h-4 w-4 mr-1" /> Claim NFT
+                            <Target className="h-4 w-4 mr-1" /> Claim Bounty
                           </ToxicButton>
                         </div>
                       </ToxicCardContent>
@@ -221,10 +231,10 @@ const Index = () => {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
                       <Shield className="h-5 w-5 text-toxic-neon" />
-                      <span className="text-lg font-mono text-toxic-neon">Your NFT Collection</span>
+                      <span className="text-lg font-mono text-toxic-neon">Your Captured Bounties</span>
                     </div>
                     <div className="bg-toxic-neon/10 px-3 py-1 rounded-full text-toxic-neon text-sm font-mono">
-                      {isLoadingNFT ? "Loading..." : `${nftBalance} NFTs`}
+                      {isLoadingNFT ? "Loading..." : `${nftBalance} Captures`}
                     </div>
                   </div>
                   
@@ -233,14 +243,14 @@ const Index = () => {
                     
                     {nftBalance === 0 && (
                       <div className="text-center py-6 bg-toxic-neon/5 rounded-lg mt-4">
-                        <p className="text-white/70 mb-4">You don't own any Wasteland NFTs yet</p>
+                        <p className="text-white/70 mb-4">You haven't captured any mutant criminals yet</p>
                         <ToxicButton 
                           variant="default"
                           onClick={() => navigate('/buy-membership-nft')}
                           className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
                         >
                           <Radiation className="h-4 w-4 mr-2" />
-                          Get Your First NFT
+                          Hunt Your First Target
                         </ToxicButton>
                       </div>
                     )}
