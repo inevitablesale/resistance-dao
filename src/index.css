@@ -97,37 +97,67 @@
   z-index: 10;
 }
 
-/* Scanlines effect */
-.terminal-monitor .monitor-scanlines:before {
+/* Scanlines effect - enhanced */
+.terminal-monitor .monitor-scanlines:before,
+.scanline:before {
   content: "";
   position: absolute;
   width: 100%;
   height: 100%;
   top: 0;
   left: 0;
-  background: linear-gradient(
+  background: repeating-linear-gradient(
     to bottom,
-    transparent 50%,
-    rgba(0, 0, 0, 0.05) 51%
+    transparent 0%,
+    rgba(80, 250, 123, 0.03) 0.5%,
+    transparent 1%
   );
   background-size: 100% 4px;
   pointer-events: none;
   z-index: 10;
+  animation: scanline-movement 8s linear infinite;
 }
 
-/* CRT glow effect */
-.terminal-monitor .monitor-glow {
+/* CRT glow effect - enhanced */
+.terminal-monitor .monitor-glow,
+.crt-screen-effect {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  box-shadow: inset 0 0 60px rgba(80, 250, 123, 0.1);
+  box-shadow: 
+    inset 0 0 30px rgba(80, 250, 123, 0.1),
+    inset 0 0 5px rgba(80, 250, 123, 0.05);
   pointer-events: none;
   z-index: 5;
+  border-radius: 2px;
 }
 
-/* Post-apocalyptic background styling */
+.crt-screen-effect::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(
+      circle at center,
+      transparent 50%,
+      rgba(0, 0, 0, 0.15) 100%
+    );
+  pointer-events: none;
+}
+
+/* Noise texture */
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  opacity: 0.05;
+}
+
+/* Post-apocalyptic background styling - enhanced */
 .post-apocalyptic-bg {
   background-color: #000;
   background-image: 
@@ -146,20 +176,24 @@
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='rgba(255, 255, 255, 0.3)' /%3E%3Ccircle cx='30' cy='40' r='0.5' fill='rgba(255, 255, 255, 0.3)' /%3E%3Ccircle cx='60' cy='20' r='0.75' fill='rgba(255, 255, 255, 0.3)' /%3E%3Ccircle cx='80' cy='70' r='0.5' fill='rgba(255, 255, 255, 0.3)' /%3E%3Ccircle cx='22' cy='73' r='0.75' fill='rgba(255, 255, 255, 0.3)' /%3E%3Ccircle cx='45' cy='90' r='0.5' fill='rgba(255, 255, 255, 0.3)' /%3E%3C/svg%3E");
   opacity: 0.4;
+  animation: dust-float 60s linear infinite;
 }
 
-/* Fog overlay */
+/* Fog overlay - enhanced */
 .fog-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
+  background: 
+    radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
   pointer-events: none;
+  z-index: 1;
 }
 
-/* Broken glass effect */
+/* Broken glass effect - enhanced */
 .broken-glass {
   position: relative;
   overflow: hidden;
@@ -177,16 +211,16 @@
   opacity: 0.3;
 }
 
-/* Rust overlay */
+/* Rust overlay - enhanced */
 .rust-overlay {
   position: absolute;
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
-  opacity: 0.1;
+  opacity: 0.15;
   pointer-events: none;
 }
 
-/* Scanline effect */
+/* Scanline effect - enhanced */
 .scanline {
   pointer-events: none;
   position: absolute;
@@ -194,22 +228,28 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
+  background: repeating-linear-gradient(
     to bottom,
     transparent,
     transparent 50%,
-    rgba(80, 250, 123, 0.02) 50%,
-    rgba(80, 250, 123, 0.02)
+    rgba(80, 250, 123, 0.02) 50.5%,
+    rgba(80, 250, 123, 0.02) 51%
   );
-  background-size: 100% 4px;
+  background-size: 100% 6px;
   z-index: 2;
 }
 
-/* Critical status flash */
+/* Glitch effect */
+.glitch-effect {
+  animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both;
+}
+
+/* Critical status flash - enhanced */
 .flash-critical {
   animation: flash-red 2s infinite;
 }
 
+/* Animations */
 @keyframes flash-red {
   0%, 49% {
     background-color: rgba(234, 56, 76, 0.6);
@@ -219,12 +259,51 @@
   }
 }
 
-/* Toxic glow for elements */
+@keyframes scanline-movement {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 1200px;
+  }
+}
+
+@keyframes dust-float {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+/* Toxic glow for elements - enhanced */
 .toxic-glow {
   filter: drop-shadow(0 0 2px rgba(80, 250, 123, 0.6));
 }
 
-/* Typing animation */
+/* Enhanced typing animation */
 .typing-text {
   overflow: hidden;
   white-space: nowrap;
@@ -236,22 +315,7 @@
   to { width: 100% }
 }
 
-/* Beacon flash for important buttons */
-.flash-beacon {
-  position: relative;
-  animation: flash-glow 3s infinite;
-}
-
-@keyframes flash-glow {
-  0%, 100% {
-    text-shadow: 0 0 0px rgba(80, 250, 123, 0.5);
-  }
-  50% {
-    text-shadow: 0 0 10px rgba(80, 250, 123, 1);
-  }
-}
-
-/* Status indicators */
+/* Status indicators - enhanced */
 .status-critical {
   position: relative;
   animation: status-critical 1s infinite;
@@ -266,36 +330,7 @@
   }
 }
 
-/* Add Apocalypse theme colors */
-.text-apocalypse-red {
-  color: hsl(350, 82%, 57%);
-}
-
-.bg-apocalypse-red {
-  background-color: hsl(350, 82%, 57%);
-}
-
-.text-toxic-neon {
-  color: hsl(142, 84%, 65%);
-}
-
-.bg-toxic-neon {
-  background-color: hsl(142, 84%, 65%);
-}
-
-.bg-toxic-dark {
-  background-color: rgba(10, 15, 20, 0.8);
-}
-
-.border-toxic-neon {
-  border-color: hsl(142, 84%, 65%);
-}
-
-.border-apocalypse-red {
-  border-color: hsl(350, 82%, 57%);
-}
-
-/* Terminal scrollbar styling */
+/* Terminal scrollbar styling - enhanced */
 .terminal-scrollbar::-webkit-scrollbar {
   width: 6px;
   height: 6px;
