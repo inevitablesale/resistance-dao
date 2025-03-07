@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle } from 'lucide-react';
@@ -13,7 +14,6 @@ interface PreBootTerminalProps {
 export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   const [password, setPassword] = useState('');
   const [showError, setShowError] = useState(false);
-  const [cursorVisible, setCursorVisible] = useState(true);
   const [commandLine, setCommandLine] = useState('');
   const [terminalReady, setTerminalReady] = useState(false);
   const [authStatus, setAuthStatus] = useState<'idle' | 'checking' | 'success' | 'error'>('idle');
@@ -155,7 +155,8 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           '\n\n> CREDENTIAL VERIFIED' +
           '\n> ACCESS LEVEL: RESISTANCE MEMBER' + 
           '\n> INITIALIZING SECURE BOOT SEQUENCE...' +
-          '\n> ESTABLISHING ENCRYPTED CHANNEL...'
+          '\n> ESTABLISHING ENCRYPTED CHANNEL...' +
+          '\n> SYSTEM BREACH IMMINENT...'
         );
         
         setTimeout(() => {

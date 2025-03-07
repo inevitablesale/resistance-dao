@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Shield, Target, Radiation } from "lucide-react";
 import { TerminalMonitor } from "@/components/ui/terminal-monitor";
@@ -9,9 +10,10 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { EmergencyTransmission } from "@/components/ui/emergency-transmission";
 import { PreBootTerminal } from "@/components/ui/pre-boot-terminal";
+import { SystemBreachTransition } from "@/components/ui/system-breach-transition";
 
 // Define the authentication states
-type AuthStage = "pre-boot" | "authenticated";
+type AuthStage = "pre-boot" | "authenticating" | "authenticated" | "system-breach";
 
 // Define the application stages
 type AppStage = "typing" | "questionnaire" | "completed";
@@ -53,18 +55,25 @@ const Index = () => {
     setShowEmergencyTransmission(false);
   };
 
-  // Function to manually show the emergency transmission
   const handleShowEmergencyTransmission = () => {
     setShowEmergencyTransmission(true);
   };
 
   // Function to handle authentication completion
   const handleAuthenticated = () => {
-    setAuthStage("authenticated");
-    toast.success("Access granted", {
-      description: "Welcome to the Resistance Network terminal",
-      duration: 3000,
-    });
+    setAuthStage("authenticating");
+    
+    setTimeout(() => {
+      setAuthStage("system-breach");
+      
+      setTimeout(() => {
+        setAuthStage("authenticated");
+        toast.success("Access granted", {
+          description: "Welcome to the Resistance Network terminal",
+          duration: 3000,
+        });
+      }, 2500);
+    }, 500);
   };
 
   return (
@@ -85,29 +94,42 @@ const Index = () => {
           <div className="absolute w-[500px] h-[500px] bg-toxic-neon/5 rounded-full blur-3xl -bottom-48 -right-24" />
         </div>
         
-        <div className="container px-4 relative w-full max-w-5xl mx-auto h-full py-10">
+        <AnimatePresence mode="wait">
+          {authStage === "system-breach" && (
+            <SystemBreachTransition />
+          )}
+        </AnimatePresence>
+        
+        <div className={`container px-4 relative w-full mx-auto h-full py-10 transition-all duration-500 ${authStage === "authenticated" ? "max-w-[95%]" : "max-w-5xl"}`}>
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
             className="w-full"
           >
-            <div className="text-center mb-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
+            <div className={`text-center mb-4 flex ${authStage === "authenticated" ? "justify-between" : "justify-center"} items-center`}>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm font-mono broken-glass">
                 <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
                 <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Network Status: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
               </div>
               
               {/* Only show emergency transmission button when authenticated */}
               {authStage === "authenticated" && (
-                <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission} className="ml-2">
-                  <Radiation className="w-4 h-4 mr-2" />
-                  View Emergency Transmission
-                </ToxicButton>
+                <div className="flex space-x-2">
+                  <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission}>
+                    <Radiation className="w-4 h-4 mr-2" />
+                    Emergency Transmission
+                  </ToxicButton>
+                  
+                  <ToxicButton variant="outline" size="sm">
+                    <Shield className="w-4 h-4 mr-2" />
+                    System Status
+                  </ToxicButton>
+                </div>
               )}
             </div>
 
-            <Card className="w-full bg-black/80 border-toxic-neon/30 p-0 relative overflow-hidden">
+            <Card className={`w-full bg-black/80 border-toxic-neon/30 p-0 relative overflow-hidden transition-all duration-500 ${authStage === "authenticated" ? "min-h-[80vh]" : ""}`}>
               <div className="absolute inset-0 z-0 rust-overlay broken-glass">
                 <div className="scanline absolute inset-0"></div>
               </div>
@@ -127,7 +149,7 @@ const Index = () => {
                 
                 <div className="mb-6">
                   {/* Conditional rendering based on authentication state */}
-                  {authStage === "pre-boot" ? (
+                  {authStage === "pre-boot" || authStage === "authenticating" ? (
                     <PreBootTerminal onAuthenticated={handleAuthenticated} />
                   ) : (
                     <TerminalMonitor
