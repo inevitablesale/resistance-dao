@@ -454,36 +454,36 @@ export function TerminalTypewriter({
         {bootStage === "complete" && (
           <>
             {isComplete && (
-              <div className="mb-4">
-                <div className="flex items-center text-toxic-neon mb-2">
+              <div className="mb-6">
+                <div className="flex items-center text-toxic-neon mb-4">
                   <Check className="h-4 w-4 mr-2" />
                   <span className="font-bold">SYSTEM RECOVERY COMPLETE</span>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3 mt-3 text-sm">
-                  <div className="bg-black/50 border border-toxic-neon/20 rounded p-2">
-                    <div className="text-white/70 mb-1">Network Status</div>
+                <div className="grid grid-cols-1 gap-4 mt-3">
+                  <div className="bg-black/70 border border-toxic-neon/30 rounded p-3">
+                    <div className="text-white/90 text-lg mb-1">Network Status</div>
                     <div className="text-toxic-neon flex items-center">
-                      <div className="h-2 w-2 rounded-full bg-toxic-neon mr-2 animate-pulse"></div>
-                      Connected
+                      <div className="h-3 w-3 rounded-full bg-toxic-neon mr-2 animate-pulse"></div>
+                      <span className="text-lg">Connected</span>
                     </div>
                   </div>
                   
-                  <div className="bg-black/50 border border-toxic-neon/20 rounded p-2">
-                    <div className="text-white/70 mb-1">Protocol Integrity</div>
-                    <div className="text-toxic-neon">78% Restored</div>
+                  <div className="bg-black/70 border border-toxic-neon/30 rounded p-3">
+                    <div className="text-white/90 text-lg mb-1">Protocol Integrity</div>
+                    <div className="text-toxic-neon text-lg">78% Restored</div>
                   </div>
                   
-                  <div className="bg-black/50 border border-toxic-neon/20 rounded p-2">
-                    <div className="text-white/70 mb-1">Security Level</div>
-                    <div className="text-toxic-neon">Maximum</div>
+                  <div className="bg-black/70 border border-toxic-neon/30 rounded p-3">
+                    <div className="text-white/90 text-lg mb-1">Security Level</div>
+                    <div className="text-toxic-neon text-lg">Maximum</div>
                   </div>
                   
-                  <div className="bg-black/50 border border-toxic-neon/20 rounded p-2">
-                    <div className="text-white/70 mb-1">Wasteland Radiation</div>
+                  <div className="bg-black/70 border border-toxic-neon/30 rounded p-3">
+                    <div className="text-white/90 text-lg mb-1">Wasteland Radiation</div>
                     <div className="text-apocalypse-red flex items-center">
-                      <div className="h-2 w-2 rounded-full bg-apocalypse-red mr-2 animate-pulse"></div>
-                      High Risk
+                      <div className="h-3 w-3 rounded-full bg-apocalypse-red mr-2 animate-pulse"></div>
+                      <span className="text-lg">High Risk</span>
                     </div>
                   </div>
                 </div>
@@ -633,3 +633,4 @@ export function TerminalTypewriter({
     </div>
   );
 }
+
