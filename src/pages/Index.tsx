@@ -1,4 +1,4 @@
-<lov-code>
+
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -687,4 +687,383 @@ const Index = () => {
                     </div>
                     
                     <h4 className="text-toxic-neon font-mono mb-2">The Resistance DAO</h4>
-                    <p className="text-
+                    <p className="text-white/80 mb-4 text-sm">
+                      From the remnants of the old world, we built something new. The Resistance DAO became a beacon in the 
+                      wasteland - a community united by shared principles: decentralization, transparency, and user sovereignty.
+                    </p>
+                    <p className="text-white/80 mb-4 text-sm">
+                      Our Resistance Survivor Launchpad isn't just a place to build - it's a manifesto. We validate projects 
+                      through community consensus, require transparent governance, and ensure value flows back to the ecosystem 
+                      that nurtures them.
+                    </p>
+                  </div>
+                </div>
+              </ToxicCardContent>
+              
+              <ToxicCardFooter className="flex justify-center gap-4">
+                <ToxicButton variant="outline" className="text-toxic-neon">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Resistance Manifesto
+                </ToxicButton>
+                
+                <ToxicButton variant="glowing">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Join The Resistance
+                </ToxicButton>
+              </ToxicCardFooter>
+            </ToxicCard>
+          </div>
+        )}
+      </div>
+      
+      {/* Sidebar */}
+      <div className="col-span-12 md:col-span-4 space-y-4">
+        {/* Survivor Stats */}
+        <ToxicCard>
+          <ToxicCardHeader>
+            <div className="flex items-center justify-between">
+              <ToxicCardTitle className="text-base">RESISTANCE METRICS</ToxicCardTitle>
+              <Clock className="w-4 h-4 text-toxic-neon/70" />
+            </div>
+          </ToxicCardHeader>
+          
+          <ToxicCardContent>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/50">
+                <div className="flex items-center gap-2 mb-1">
+                  <Users className="text-toxic-neon w-4 h-4" />
+                  <h3 className="text-toxic-neon font-mono text-sm">Survivors</h3>
+                </div>
+                <p className="text-2xl text-white font-mono">821</p>
+              </div>
+              
+              <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/50">
+                <div className="flex items-center gap-2 mb-1">
+                  <Users className="text-toxic-neon w-4 h-4" />
+                  <h3 className="text-toxic-neon font-mono text-sm">Population</h3>
+                </div>
+                <p className="text-2xl text-white font-mono">2.5K</p>
+              </div>
+              
+              <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/50">
+                <div className="flex items-center gap-2 mb-1">
+                  <Radio className="text-toxic-neon w-4 h-4" />
+                  <h3 className="text-toxic-neon font-mono text-sm">Radio Subs</h3>
+                </div>
+                <p className="text-2xl text-white font-mono">2.7K</p>
+              </div>
+              
+              <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/50">
+                <div className="flex items-center gap-2 mb-1">
+                  <Target className="text-toxic-neon w-4 h-4" />
+                  <h3 className="text-toxic-neon font-mono text-sm">Bounty Hunters</h3>
+                </div>
+                <p className="text-2xl text-white font-mono">782</p>
+              </div>
+            </div>
+          </ToxicCardContent>
+        </ToxicCard>
+        
+        {/* Emergency Updates */}
+        <ToxicCard>
+          <ToxicCardHeader>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="text-apocalypse-red w-5 h-5" />
+              <ToxicCardTitle className="text-base">EMERGENCY BROADCASTS</ToxicCardTitle>
+            </div>
+          </ToxicCardHeader>
+          
+          <ToxicCardContent>
+            <div className="space-y-3">
+              <div className="rounded-md p-2 bg-toxic-neon/5 border border-toxic-neon/20 flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-toxic-neon animate-pulse"></div>
+                <div>
+                  <div className="text-toxic-neon text-sm">New Survivor Pledge</div>
+                  <div className="text-white font-mono text-xs">$500</div>
+                </div>
+              </div>
+              
+              <div className="rounded-md p-2 bg-toxic-neon/5 border border-toxic-neon/20 flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-toxic-neon animate-pulse"></div>
+                <div>
+                  <div className="text-toxic-neon text-sm">New Survivor Pledge</div>
+                  <div className="text-white font-mono text-xs">$23,500</div>
+                </div>
+              </div>
+              
+              <div className="rounded-md p-2 bg-toxic-neon/5 border border-toxic-neon/20 flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-toxic-neon animate-pulse"></div>
+                <div>
+                  <div className="text-toxic-neon text-sm">New Survivor Pledge</div>
+                  <div className="text-white font-mono text-xs">$150</div>
+                </div>
+              </div>
+            </div>
+          </ToxicCardContent>
+        </ToxicCard>
+        
+        {/* Community Support */}
+        <ToxicCard>
+          <ToxicCardHeader>
+            <ToxicCardTitle className="text-base">COMMUNITY SUPPORT</ToxicCardTitle>
+          </ToxicCardHeader>
+          
+          <ToxicCardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div className="text-white/70 text-sm">Total Support</div>
+                <div className="text-toxic-neon font-mono text-lg">$37,660</div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/50 text-center">
+                  <div className="text-toxic-neon font-mono">2</div>
+                  <div className="text-white/60 text-xs">Resistance Fighters</div>
+                </div>
+                
+                <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/50 text-center">
+                  <div className="text-toxic-neon font-mono">7</div>
+                  <div className="text-white/60 text-xs">Established Colonies</div>
+                </div>
+              </div>
+              
+              <div className="pt-2">
+                <div className="h-1 bg-black/60 rounded-full overflow-hidden">
+                  <div className="h-full bg-toxic-neon w-3/5 rounded-full"></div>
+                </div>
+                <div className="flex justify-between text-xs text-white/60 mt-1">
+                  <div>Phase 1: 60%</div>
+                  <div>Goal: $50,000</div>
+                </div>
+              </div>
+            </div>
+          </ToxicCardContent>
+        </ToxicCard>
+      </div>
+    </div>
+  );
+
+  // Determine what content to show based on the stages
+  const renderMainContent = () => {
+    if (authStage === "post-breach" || authStage === "authenticated") {
+      // If post-breach or authenticated, show different content based on terminal stage
+      if (terminalStage === "nft-selection") {
+        console.log("Showing NFT selection content");
+        return renderNFTContent();
+      } else if (terminalStage === "desktop-environment") {
+        console.log("Showing desktop environment");
+        return renderDesktopEnvironment();
+      } else if (terminalStage === "typing") {
+        // Show terminal typewriter in the authenticated state
+        return renderTypewriterContent();
+      } else if (terminalStage === "completed") {
+        // Show enhanced dashboard in the completed state
+        return renderEnhancedDashboard();
+      }
+    } else {
+      // Pre-authentication shows nothing
+      return renderPreAuthContent();
+    }
+    
+    // Default fallback (should not reach here)
+    return null;
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
+      <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} />
+      <div className="dust-particles"></div>
+      <div className="fog-overlay"></div>
+
+      {/* Journal Dialog - shown after wallet connection */}
+      <JournalDialog 
+        isOpen={showJournalDialog}
+        onClose={() => setShowJournalDialog(false)}
+      />
+
+      {/* Emergency Transmission Popup - only show when authenticated */}
+      {(authStage === "post-breach" || authStage === "authenticated") && (
+        <EmergencyTransmission 
+          isOpen={showEmergencyTransmission} 
+          onClose={handleCloseEmergencyTransmission} 
+        />
+      )}
+
+      <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute w-[500px] h-[500px] bg-toxic-neon/5 rounded-full blur-3xl -top-48 -left-24" />
+          <div className="absolute w-[500px] h-[500px] bg-toxic-neon/5 rounded-full blur-3xl -bottom-48 -right-24" />
+        </div>
+        
+        <AnimatePresence mode="wait">
+          {authStage === "breach-transition" && (
+            <SystemBreachTransition />
+          )}
+        </AnimatePresence>
+        
+        <div className={`container px-4 relative w-full mx-auto h-full py-10 transition-all duration-500 ${(authStage === "authenticated" || authStage === "post-breach") ? "max-w-[95%]" : "max-w-5xl"}`}>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+            className="w-full"
+          >
+            {/* Only show header elements if post-breach or authenticated */}
+            {(authStage === "post-breach" || authStage === "authenticated") && (
+              <div className="text-center mb-4 flex justify-between items-center">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm font-mono broken-glass">
+                  <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
+                  <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Network Status: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <ToxicButton 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setShowJournalDialog(true)}
+                    className="animate-pulse-subtle hover:animate-none"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Survivor Messages
+                  </ToxicButton>
+                  
+                  <ToxicButton 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleShowEmergencyTransmission}
+                    className="animate-pulse-subtle hover:animate-none"
+                  >
+                    <Radiation className="w-4 w-4 mr-2" />
+                    Emergency Transmission
+                  </ToxicButton>
+                  
+                  <ToxicButton variant="outline" size="sm">
+                    <Shield className="w-4 h-4 mr-2" />
+                    System Status
+                  </ToxicButton>
+                </div>
+              </div>
+            )}
+
+            <Card className={`w-full bg-black/80 border-toxic-neon/30 p-0 relative overflow-hidden transition-all duration-500 ${(authStage === "authenticated" || authStage === "post-breach") ? "min-h-[80vh]" : "min-h-[50vh]"}`}>
+              <div className="absolute inset-0 z-0 rust-overlay broken-glass">
+                <div className="scanline absolute inset-0"></div>
+              </div>
+              
+              <div className="relative z-10 p-6 md:p-8">
+                {/* Only show this header if post-breach or authenticated */}
+                {(authStage === "post-breach" || authStage === "authenticated") && (
+                  <div className="flex items-center justify-between mb-4 border-b border-toxic-neon/20 pb-2">
+                    <div className="flex items-center">
+                      <Radiation className="h-5 w-5 mr-2 text-toxic-neon" />
+                      <span className="text-toxic-neon font-mono text-lg">RESISTANCE_NETWORK</span>
+                    </div>
+                    
+                    <div className="flex gap-1">
+                      <div className="h-3 w-3 rounded-full bg-apocalypse-red animate-pulse"></div>
+                      <div className="h-3 w-3 rounded-full bg-toxic-neon/70"></div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="mb-6">
+                  {/* Conditional rendering based on authentication state */}
+                  {authStage === "pre-boot" && (
+                    <>
+                      <PreBootTerminal onAuthenticated={handleAuthenticated} />
+                      {/* Progress Indicator only shown during pre-boot stage */}
+                      {showProgressIndicator && (
+                        <div className="mt-6">
+                          <ProgressIndicator 
+                            stages={[
+                              { id: "boot", label: "Boot", completed: authStage !== "pre-boot" },
+                              { id: "breach", label: "System Breach", completed: authStage === "post-breach" || authStage === "authenticated" },
+                              { id: "desktop", label: "Interface", completed: terminalStage !== "typing" },
+                              { id: "role", label: "Role Selection", completed: userRole !== null }
+                            ]}
+                          />
+                        </div>
+                      )}
+                    </>
+                  )}
+                  
+                  {(authStage === "post-breach" || authStage === "authenticated") && (
+                    <>
+                      <PostAuthLayout
+                        leftSidebar={renderLeftSidebar()}
+                        mainContent={renderMainContent()}
+                        rightSidebar={renderRightSidebar()}
+                      />
+                      {/* Progress Indicator only shown during typing stage after breach */}
+                      {showProgressIndicator && terminalStage === "typing" && (
+                        <div className="mt-6">
+                          <ProgressIndicator 
+                            stages={[
+                              { id: "boot", label: "Boot", completed: true },
+                              { id: "breach", label: "System Breach", completed: true },
+                              { id: "desktop", label: "Interface", completed: terminalStage !== "typing" },
+                              { id: "role", label: "Role Selection", completed: userRole !== null }
+                            ]}
+                          />
+                        </div>
+                      )}
+                    </>
+                  )}
+                  
+                  {authStage !== "pre-boot" && authStage !== "post-breach" && authStage !== "authenticated" && (
+                    renderMainContent()
+                  )}
+                </div>
+                
+                {/* Show skip button for typing terminal stage only */}
+                {(authStage === "post-breach" || authStage === "authenticated") && terminalStage === "typing" && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 2 }}
+                    className="mt-4 text-center"
+                  >
+                    <p className="text-white/70 text-sm mb-3">
+                      Complete the terminal sequence to access the Resistance Network
+                    </p>
+                    <ToxicButton 
+                      onClick={handleTerminalComplete}
+                      variant="ghost"
+                      size="sm"
+                      className="hover:bg-toxic-neon/20 transition-all duration-300"
+                    >
+                      <Radiation className="w-4 h-4 mr-2" />
+                      Skip Intro Sequence
+                    </ToxicButton>
+                  </motion.div>
+                )}
+                
+                {/* Show continue button for desktop environment */}
+                {(authStage === "post-breach" || authStage === "authenticated") && terminalStage === "desktop-environment" && initialAppOpened && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 8 }}
+                    className="mt-4 text-center"
+                  >
+                    <ToxicButton 
+                      onClick={handleDesktopExplored}
+                      variant="default"
+                      size="lg"
+                      className="animate-pulse-subtle"
+                    >
+                      <Target className="w-5 h-5 mr-2" />
+                      Continue to Resistance Role Selection
+                    </ToxicButton>
+                  </motion.div>
+                )}
+              </div>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Index;
