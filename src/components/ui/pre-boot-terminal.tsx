@@ -51,16 +51,16 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         
         const isSpace = currentMessage[charIndex] === ' ';
         const isPunctuation = ['.', ',', ':', ';', '!', '?'].includes(currentMessage[charIndex] || '');
-        let delay = 30 + Math.random() * 20;
+        let delay = 15 + Math.random() * 10;
         
-        if (isPunctuation) delay += 200;
-        if (isSpace) delay += 50;
+        if (isPunctuation) delay += 100;
+        if (isSpace) delay += 25;
         
         timeout = setTimeout(() => {
           typeMessage(messageIndex, charIndex + 1);
         }, delay);
       } else {
-        const pauseTime = currentMessage.includes('WARNING') ? 1000 : 500; 
+        const pauseTime = currentMessage.includes('WARNING') ? 500 : 250; 
         timeout = setTimeout(() => {
           setCommandLine(prev => prev + '\n');
           typeMessage(messageIndex + 1, 0);
@@ -94,7 +94,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                   }
                   return prev;
                 });
-              }, 150);
+              }, 75);
               
               return lines.join('\n');
             }
@@ -102,12 +102,12 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           return prev;
         });
         
-        setTimeout(addNoise, 2000 + Math.random() * 3000);
+        setTimeout(addNoise, 1000 + Math.random() * 1500);
       }
     };
 
     typeMessage();
-    setTimeout(addNoise, 1000);
+    setTimeout(addNoise, 500);
 
     return () => clearTimeout(timeout);
   }, []);
@@ -160,7 +160,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         
         setTimeout(() => {
           onAuthenticated();
-        }, 2000);
+        }, 1000);
       } else {
         setAuthStatus('error');
         setShowError(true);
@@ -182,9 +182,9 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         setTimeout(() => {
           setShowError(false);
           setAuthStatus('idle');
-        }, 2000);
+        }, 1000);
       }
-    }, 1200);
+    }, 600);
   };
 
   const focusInput = () => {
@@ -328,7 +328,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                           forgotHovered ? "animate-pulse text-toxic-neon" : "text-toxic-neon/90"
                         )} />
                         <span className="relative font-bold">
-                          Need password?
+                          Join Resistance LinkedIn Group
                           <span className={cn(
                             "ml-2 text-apocalypse-red transition-all duration-300",
                             forgotHovered && "text-apocalypse-red flash-critical"
