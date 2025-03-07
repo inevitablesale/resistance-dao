@@ -36,8 +36,9 @@ export function JournalDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (
     
     try {
       setIsLoading(true);
+      // Use type assertion to work around TypeScript limitations
       const { data, error } = await supabase
-        .from('journal_entries')
+        .from('journal_entries' as any)
         .select('*')
         .order('created_at', { ascending: false });
         
@@ -61,13 +62,13 @@ export function JournalDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (
       
       // Use type assertion when inserting data
       const { error } = await supabase
-        .from('journal_entries')
+        .from('journal_entries' as any)
         .insert([
           {
             wallet_address: address,
             content: journalEntry.trim()
           }
-        ] as any);
+        ]);
         
       if (error) throw error;
       

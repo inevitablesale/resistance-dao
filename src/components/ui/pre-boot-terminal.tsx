@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle, Lock, Zap, Code } from 'lucide-react';
@@ -22,7 +23,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   const [isHackMode, setIsHackMode] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
-  const { handleConnect } = useDynamicContext();
+  const dynamicContext = useDynamicContext();
 
   const CORRECT_PASSWORD = 'resistance';
 
@@ -189,10 +190,10 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
 
   const handleWalletHack = async () => {
     setIsHackMode(true);
-    // Trigger wallet connection
-    if (handleConnect) {
+    // Trigger wallet connection using the correct Dynamic SDK method
+    if (dynamicContext && dynamicContext.openWalletConnectModal) {
       try {
-        await handleConnect();
+        await dynamicContext.openWalletConnectModal();
         // Handle successful wallet connection
         handlePasswordSubmit(new Event('submit') as any);
       } catch (error) {
