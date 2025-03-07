@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle } from 'lucide-react';
@@ -34,7 +33,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
       'Authentication required:',
     ];
 
-    // Reduced typing speed and delay between messages for faster boot
     const typeMessage = (messageIndex: number = 0, charIndex: number = 0) => {
       if (messageIndex >= bootMessages.length) {
         setTerminalReady(true);
@@ -52,7 +50,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         
         const isSpace = currentMessage[charIndex] === ' ';
         const isPunctuation = ['.', ',', ':', ';', '!', '?'].includes(currentMessage[charIndex] || '');
-        // Reduced delay between characters
         let delay = 5 + Math.random() * 5;
         
         if (isPunctuation) delay += 30;
@@ -62,7 +59,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           typeMessage(messageIndex, charIndex + 1);
         }, delay);
       } else {
-        // Reduced pause time between messages
         const pauseTime = currentMessage.includes('WARNING') ? 150 : 50; 
         timeout = setTimeout(() => {
           setCommandLine(prev => prev + '\n');
@@ -71,10 +67,8 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
       }
     };
 
-    // Start typing faster
     typeMessage();
     
-    // Force complete boot in 2 seconds
     const forceCompleteTimeout = setTimeout(() => {
       if (!terminalReady) {
         clearTimeout(timeout);
@@ -291,7 +285,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                     />
                     
                     <div className="relative py-3 px-4 bg-black/70 backdrop-blur-sm rounded border border-toxic-neon/10 inline-block">
-                      <div className="access-code-message text-center mb-2">Need access code: join LinkedIn group</div>
+                      <div className="access-code-message text-center mb-2">Need access code:</div>
                       <a 
                         href="https://www.linkedin.com/groups/12657922/" 
                         target="_blank" 
@@ -308,29 +302,8 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                         )} />
                         <span className="relative font-bold">
                           Join Resistance LinkedIn Group
-                          <span className={cn(
-                            "ml-2 text-apocalypse-red transition-all duration-300",
-                            forgotHovered && "text-apocalypse-red flash-critical"
-                          )}>[RESISTANCE GROUP]</span>
                         </span>
                       </a>
-                      
-                      {forgotHovered && (
-                        <motion.div 
-                          initial={{ opacity: 0, y: 5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="absolute -bottom-16 left-0 w-56 bg-black/90 backdrop-blur-md border border-toxic-neon/30 rounded p-2 font-mono text-[10px] leading-tight z-10"
-                        >
-                          <div className="flex items-start gap-1.5">
-                            <Radiation className="h-3 w-3 text-toxic-neon mt-0.5 animate-pulse" />
-                            <div>
-                              <span className="text-toxic-neon/90">EXTERNAL CONNECTION</span>
-                              <p className="text-white/70 mt-1">Access the resistance network's public recovery channel on LinkedIn.</p>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
                     </div>
                   </div>
                 </div>
