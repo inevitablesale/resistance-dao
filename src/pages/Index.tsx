@@ -1,5 +1,6 @@
+
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Shield, Target, Radiation, Zap, Biohazard, Users, Activity, Clock, MessageSquare } from "lucide-react";
 import { ToxicButton } from "@/components/ui/toxic-button";
