@@ -81,7 +81,7 @@ export const BuyRDTokens = () => {
             className="bg-gradient-to-r from-apocalypse-red to-apocalypse-rust hover:from-apocalypse-red/90 hover:to-apocalypse-rust/90"
           >
             <Shield className="w-4 h-4 mr-2" />
-            Connect Survival Beacon
+            Activate Survival Beacon
           </Button>
         )}
       </div>
