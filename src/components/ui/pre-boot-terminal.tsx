@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle } from 'lucide-react';
@@ -22,10 +21,8 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  // Correct password - in a real app, this would come from a secure source
   const CORRECT_PASSWORD = 'resistance';
 
-  // Cursor blinking effect
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setCursorVisible(prev => !prev);
@@ -34,7 +31,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
     return () => clearInterval(cursorInterval);
   }, []);
 
-  // Initial boot sequence typing effect with more atmospheric messages
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     const bootMessages = [
@@ -61,19 +57,17 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           currentMessage.substring(0, charIndex)
         );
         
-        // Variable typing speed for more natural feel
         const isSpace = currentMessage[charIndex] === ' ';
         const isPunctuation = ['.', ',', ':', ';', '!', '?'].includes(currentMessage[charIndex] || '');
         let delay = 30 + Math.random() * 20;
         
-        if (isPunctuation) delay += 200; // Pause longer at punctuation
-        if (isSpace) delay += 50; // Slight pause at spaces
+        if (isPunctuation) delay += 200;
+        if (isSpace) delay += 50;
         
         timeout = setTimeout(() => {
           typeMessage(messageIndex, charIndex + 1);
         }, delay);
       } else {
-        // Longer pause between messages
         const pauseTime = currentMessage.includes('WARNING') ? 1000 : 500; 
         timeout = setTimeout(() => {
           setCommandLine(prev => prev + '\n');
@@ -82,11 +76,9 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
       }
     };
 
-    // Add random "noise" glitches during startup
     const addNoise = () => {
       if (!terminalReady) {
         setCommandLine(prev => {
-          // Only add noise if we're still in boot sequence
           if (prev.split('\n').length < bootMessages.length) {
             const lines = prev.split('\n');
             const randomIndex = Math.floor(Math.random() * lines.length);
@@ -95,14 +87,12 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
               const randomChar = chars[Math.floor(Math.random() * chars.length)];
               const position = Math.floor(Math.random() * lines[randomIndex].length);
               
-              // Insert glitch character
               const newLine = lines[randomIndex].substring(0, position) + 
                               randomChar + 
                               lines[randomIndex].substring(position + 1);
               
               lines[randomIndex] = newLine;
               
-              // Immediately fix the glitch
               setTimeout(() => {
                 setCommandLine(prev => {
                   const currentLines = prev.split('\n');
@@ -120,7 +110,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           return prev;
         });
         
-        // Schedule next noise
         setTimeout(addNoise, 2000 + Math.random() * 3000);
       }
     };
@@ -131,14 +120,12 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
     return () => clearTimeout(timeout);
   }, []);
 
-  // Auto-scroll terminal
   useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [commandLine]);
 
-  // Add subtle CRT flicker effect
   useEffect(() => {
     if (!terminalReady) return;
     
@@ -146,18 +133,16 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
       const terminalEl = terminalRef.current;
       if (!terminalEl) return;
       
-      // Apply brief flicker effect
       terminalEl.style.opacity = (0.85 + Math.random() * 0.15).toString();
       terminalEl.style.filter = `brightness(${0.9 + Math.random() * 0.2})`;
       
-      // Reset after short duration
       setTimeout(() => {
         if (terminalEl) {
           terminalEl.style.opacity = '1';
           terminalEl.style.filter = 'brightness(1)';
         }
       }, 100);
-    }, 5000 + Math.random() * 10000); // Random long intervals
+    }, 5000 + Math.random() * 10000);
 
     return () => clearInterval(flickerInterval);
   }, [terminalReady]);
@@ -167,16 +152,12 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
     
     if (password.trim() === '') return;
     
-    // Set checking state with loading indicator
     setAuthStatus('checking');
     
-    // Simulate network delay for authenticity
     setTimeout(() => {
       if (password === CORRECT_PASSWORD) {
-        // Authentication success
         setAuthStatus('success');
         
-        // Add access granted message with more detail
         setCommandLine(prev => 
           prev + 
           '\n\n> CREDENTIAL VERIFIED' +
@@ -185,16 +166,11 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           '\n> ESTABLISHING ENCRYPTED CHANNEL...'
         );
         
-        // Simulate loading before granting access
         setTimeout(() => {
-          // Store authentication in localStorage
           localStorage.setItem('resistance_authenticated', 'true');
-          
-          // Call the callback to move to the next stage
           onAuthenticated();
         }, 2000);
       } else {
-        // Authentication failure
         setAuthStatus('error');
         setShowError(true);
         
@@ -206,15 +182,12 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           '\n> ATTEMPTS LOGGED'
         );
         
-        // Clear password field
         setPassword('');
         
-        // Return focus to input
         if (inputRef.current) {
           inputRef.current.focus();
         }
         
-        // Clear error state after delay
         setTimeout(() => {
           setShowError(false);
           setAuthStatus('idle');
@@ -247,7 +220,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         <div className="monitor-glow absolute inset-0"></div>
         
         <div className="terminal-content flex flex-col h-full">
-          {/* Terminal header */}
           <div className="flex items-center gap-2 mb-3 border-b border-toxic-neon/20 pb-2">
             <Terminal className="h-4 w-4 text-toxic-neon animate-pulse" />
             <span className="text-toxic-neon/90 text-xs">RESISTANCE_SECURE_SHELL</span>
@@ -257,7 +229,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
             </div>
           </div>
           
-          {/* Terminal output with scrollable area */}
           <div 
             ref={terminalRef}
             className="flex-1 text-toxic-neon mb-4 whitespace-pre-line overflow-y-auto terminal-scrollbar max-h-[300px] transition-all duration-300"
@@ -267,7 +238,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
             {cursorVisible && <span className="cursor">▌</span>}
           </div>
           
-          {/* Password input section - only show when ready */}
           {terminalReady && (
             <form onSubmit={handlePasswordSubmit} className="mt-2">
               <div>
@@ -292,7 +262,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                       autoFocus
                     />
                     
-                    {/* Status indicators */}
                     <AnimatePresence>
                       {authStatus === 'checking' && (
                         <motion.div 
@@ -340,7 +309,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                   </Button>
                 </div>
                 
-                {/* Forgot password link with enhanced dripping effect */}
                 <div className="mt-3 relative">
                   <div 
                     className="relative"
@@ -378,7 +346,6 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                         </span>
                       </a>
                       
-                      {/* Tooltip that appears on hover */}
                       {forgotHovered && (
                         <motion.div 
                           initial={{ opacity: 0, y: 5 }}
@@ -404,8 +371,8 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         </div>
       </div>
       
-      {/* Add extra CRT effects with CSS */}
-      <style jsx>{`
+      <style>
+        {`
         .crt-scanline::before {
           content: '';
           position: absolute;
@@ -455,7 +422,8 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           95% { opacity: 0.3; }
           100% { opacity: 0; }
         }
-      `}</style>
+        `}
+      </style>
     </motion.div>
   );
 }
