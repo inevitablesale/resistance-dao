@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -29,6 +30,14 @@ export default {
           dark: "#0D1F0F",
           muted: "#00BB13",
           faint: "rgba(57, 255, 20, 0.25)",
+        },
+        apocalypse: {
+          red: "#ea384c",
+          dark: "#1A1F2C",
+          ash: "#403E43",
+          charcoal: "#221F26",
+          rust: "#8B4D2D",
+          metal: "#6E7A89",
         },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

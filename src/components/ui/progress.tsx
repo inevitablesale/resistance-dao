@@ -22,7 +22,7 @@ const Progress = React.forwardRef<
     <ProgressPrimitive.Root
       ref={ref}
       className={cn(
-        "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
+        "relative h-4 w-full overflow-hidden rounded-full bg-gray-800/50 border border-gray-700",
         className
       )}
       {...props}
@@ -30,10 +30,13 @@ const Progress = React.forwardRef<
       <ProgressPrimitive.Indicator
         className={cn(
           "h-full w-full flex-1 transition-all bg-gradient-to-r",
-          gradientClass
+          gradientClass,
+          "relative overflow-hidden"
         )}
         style={{ transform: `translateX(-${100 - percentage}%)` }}
-      />
+      >
+        <div className="absolute inset-0 opacity-20 bg-gradient-to-r from-transparent via-white to-transparent -translate-x-full animate-[shine_2s_ease-in-out_infinite]"></div>
+      </ProgressPrimitive.Indicator>
     </ProgressPrimitive.Root>
   );
 })

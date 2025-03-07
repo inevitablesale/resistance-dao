@@ -63,8 +63,8 @@ export function DrippingSlime({
     }
   };
   
-  const iconColor = toxicGreen ? "text-toxic-green" : (postApocalyptic ? "text-yellow-300" : "text-toxic-neon");
-  const iconGlowClass = toxicGreen ? "toxic-green-glow" : (postApocalyptic ? "yellow-glow" : "toxic-glow");
+  const iconColor = toxicGreen ? "text-toxic-green" : (postApocalyptic ? "text-red-400" : "text-toxic-neon");
+  const iconGlowClass = toxicGreen ? "toxic-green-glow" : (postApocalyptic ? "red-glow" : "toxic-glow");
   
   return (
     <div className={cn("dripping-container", className)}>
