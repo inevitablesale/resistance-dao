@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -376,60 +375,161 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-24 relative radiation-bg">
-        <DrippingSlime position="both" dripsCount={6} showIcons={true} className="absolute inset-x-0 h-full" toxicGreen={true} />
-        <div className="container px-4">
+      {/* NEW SECTION: The Resistance Story */}
+      <section className="py-24 relative overflow-hidden radiation-bg">
+        <div className="scanline"></div>
+        <div className="container px-4 relative z-10">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-yellow-500/20 bg-black/40 text-yellow-300 mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-apocalypse-red/30 bg-black/60 text-apocalypse-red mb-4">
               <Radiation className="w-5 h-5" />
-              <span className="text-sm font-mono">3-Step Survival Protocol</span>
+              <span className="text-sm font-mono">HISTORICAL ARCHIVES</span>
             </div>
-            <h2 className="text-3xl font-bold font-mono mb-4 text-yellow-300 toxic-glow">
-              Wasteland Protocol
+            <h2 className="text-4xl font-bold font-mono mb-6 text-toxic-neon toxic-glow">
+              The Resistance Story
             </h2>
+            <p className="text-xl text-white/70 max-w-3xl mx-auto mb-12">
+              How we survived the crypto nuclear winter and built a new world from the ashes
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <ToxicCard className="relative group bg-black/70 border-yellow-500/30">
-              <ToxicCardContent>
-                <Target className="w-8 h-8 text-yellow-300 mb-4" />
-                <h3 className="text-lg font-mono text-yellow-300 mb-2">1. Resource Testing</h3>
-                <p className="text-white/70 relative z-10">
-                  Submit settlement proposal and collect resource pledges with minimal risk. Smart contracts ensure transparent allocation and resource tracking.
-                </p>
-                <div className="absolute bottom-6 right-6 text-yellow-300/20 group-hover:text-yellow-300/40 transition-colors">
-                  <ArrowIcon className="w-6 h-6" />
+          <div className="grid md:grid-cols-2 gap-16 items-center mb-16">
+            <div className="relative">
+              <div className="absolute inset-0 bg-toxic-neon/5 rounded-2xl blur-xl"></div>
+              <div className="relative bg-black/60 rounded-xl overflow-hidden border border-apocalypse-ash p-1">
+                <div className="aspect-video bg-apocalypse-dark rounded-lg overflow-hidden relative">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Image className="w-32 h-32 text-apocalypse-ash/30" />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 p-4">
+                    <div className="text-xs text-apocalypse-ash/70 font-mono mb-1">DAY 0</div>
+                    <div className="text-lg text-toxic-neon font-mono">The Fall</div>
+                  </div>
                 </div>
-              </ToxicCardContent>
-            </ToxicCard>
+              </div>
+            </div>
 
-            <ToxicCard className="relative group bg-black/70 border-yellow-500/30">
-              <ToxicCardContent>
-                <Share2 className="w-8 h-8 text-yellow-300 mb-4" />
-                <h3 className="text-lg font-mono text-yellow-300 mb-2">2. Survivor Network</h3>
-                <p className="text-white/70 relative z-10">
-                  Connect with fellow survivors and track engagement metrics. Build proof of settlement interest through on-chain analytics.
-                </p>
-                <div className="absolute bottom-6 right-6 text-yellow-300/20 group-hover:text-yellow-300/40 transition-colors">
-                  <ArrowIcon className="w-6 h-6" />
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-apocalypse-red/20">
+                  <Skull className="h-4 w-4 text-apocalypse-red" />
                 </div>
-              </ToxicCardContent>
-            </ToxicCard>
+                <h3 className="text-xl font-bold text-toxic-neon font-mono">The Crypto Nuclear Winter</h3>
+              </div>
+              <p className="text-white/70 mb-4">
+                It began with the great crashes of 2022-2023. Major protocols imploded one by one, like a chain of nuclear detonations across the digital landscape. FTX, Terra Luna, 3AC - each collapse sent toxic fallout across the ecosystem.
+              </p>
+              <p className="text-white/70 mb-6">
+                User trust was obliterated. Capital fled in panic. Development froze as the crypto nuclear winter descended. Weakened by greed and centralization, the old world wasn't sustainable - it had to burn for something new to emerge.
+              </p>
+              <ToxicButton 
+                variant="outline" 
+                size="sm" 
+                className="border-apocalypse-red/30 text-toxic-neon hover:bg-apocalypse-red/10"
+                onClick={() => navigate('/crypto-history')}
+              >
+                Historical Records <ArrowIcon className="ml-2 h-4 w-4" />
+              </ToxicButton>
+            </div>
+          </div>
 
-            <ToxicCard className="relative group bg-black/70 border-yellow-500/30">
-              <ToxicCardContent>
-                <Wallet className="w-8 h-8 text-yellow-300 mb-4" />
-                <h3 className="text-lg font-mono text-yellow-300 mb-2">3. Settlement Launch</h3>
-                <p className="text-white/70 relative z-10">
-                  Convert resource pledges to investment when targets are met. Automated distribution through radiation-proof smart contract execution.
-                </p>
-                <div className="absolute bottom-6 right-6 text-yellow-300/20 group-hover:text-yellow-300/40 transition-colors">
-                  <ArrowIcon className="w-6 h-6" />
+          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 md:mt-24">
+            <div className="order-2 md:order-1">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-toxic-neon/20">
+                  <Radiation className="h-4 w-4 text-toxic-neon" />
                 </div>
-              </ToxicCardContent>
-            </ToxicCard>
+                <h3 className="text-xl font-bold text-toxic-neon font-mono">The First Survivors</h3>
+              </div>
+              <p className="text-white/70 mb-4">
+                As institutional players abandoned the wasteland, a resilient community began to form. We were the builders who stayed - developing during the depths of winter, convinced of the technology's potential despite the destruction.
+              </p>
+              <p className="text-white/70 mb-6">
+                Operating with minimal resources, we formed underground networks for mutual support. Skills were shared, protocols were hardened against radiation, and new models of trust were forged in the crucible of catastrophe.
+              </p>
+              <ToxicButton 
+                variant="outline" 
+                size="sm" 
+                className="border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10"
+                onClick={() => navigate('/resistance-origins')}
+              >
+                Survivor Stories <ArrowIcon className="ml-2 h-4 w-4" />
+              </ToxicButton>
+            </div>
+
+            <div className="order-1 md:order-2 relative">
+              <div className="absolute inset-0 bg-toxic-neon/5 rounded-2xl blur-xl"></div>
+              <div className="relative bg-black/60 rounded-xl overflow-hidden border border-apocalypse-ash p-1">
+                <div className="aspect-video bg-apocalypse-dark rounded-lg overflow-hidden relative">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Image className="w-32 h-32 text-apocalypse-ash/30" />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 p-4">
+                    <div className="text-xs text-apocalypse-ash/70 font-mono mb-1">DAY 248</div>
+                    <div className="text-lg text-toxic-neon font-mono">First Resistance</div>
+                  </div>
+                  <DrippingSlime position="bottom" dripsCount={3} showIcons={false} toxicGreen={true} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="relative">
+              <div className="absolute inset-0 bg-toxic-neon/5 rounded-2xl blur-xl"></div>
+              <div className="relative bg-black/60 rounded-xl overflow-hidden border border-apocalypse-ash p-1">
+                <div className="aspect-video bg-apocalypse-dark rounded-lg overflow-hidden relative">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Image className="w-32 h-32 text-apocalypse-ash/30" />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 p-4">
+                    <div className="text-xs text-apocalypse-ash/70 font-mono mb-1">DAY 621</div>
+                    <div className="text-lg text-toxic-neon font-mono">The New Dawn</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-toxic-neon/20">
+                  <Shield className="h-4 w-4 text-toxic-neon" />
+                </div>
+                <h3 className="text-xl font-bold text-toxic-neon font-mono">The Resistance DAO</h3>
+              </div>
+              <p className="text-white/70 mb-4">
+                From the remnants of the old world, we built something new. The Resistance DAO became a beacon in the wasteland - a community united by shared principles: decentralization, transparency, and user sovereignty.
+              </p>
+              <p className="text-white/70 mb-6">
+                Our Post-Apocalyptic Launch Platform isn't just a place to build - it's a manifesto. We validate projects through community consensus, require transparent governance, and ensure value flows back to the ecosystem that nurtures them.
+              </p>
+              <ToxicButton 
+                variant="outline" 
+                size="sm" 
+                className="border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10"
+                onClick={() => navigate('/manifesto')}
+              >
+                Resistance Manifesto <ArrowIcon className="ml-2 h-4 w-4" />
+              </ToxicButton>
+            </div>
+          </div>
+
+          <div className="flex justify-center mt-16">
+            <ToxicButton 
+              size="lg"
+              onClick={() => navigate('/join-resistance')}
+              variant="glowing"
+              className="bg-apocalypse-dark border-toxic-neon/50 hover:bg-apocalypse-charcoal"
+            >
+              <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
+              Join The Resistance
+            </ToxicButton>
           </div>
         </div>
+        <ToxicPuddle className="absolute bottom-32 left-1/4" toxicGreen={true} />
+        <ToxicPuddle className="absolute top-40 right-1/3" toxicGreen={true} />
       </section>
 
       <section className="py-24 relative radiation-bg">
@@ -556,269 +656,4 @@ const Index = () => {
             <div className="inline-block mb-4">
               <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-yellow-500/20 bg-black/40 backdrop-blur">
                 <FileText className="w-5 h-5 text-yellow-300" />
-                <span className="text-sm font-medium text-yellow-300">Smart Contract NFT</span>
-              </div>
-            </div>
-            <h2 className="text-4xl font-bold mb-6 text-yellow-300 toxic-glow">
-              NFT-Backed Agreement
-            </h2>
-            <p className="text-xl text-white/70 max-w-2xl mx-auto">
-              Your proposal is minted as an NFT, representing a binding smart contract with the community
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div className="space-y-6">
-              <ToxicCard className="relative">
-                <ToxicCardContent>
-                  <h3 className="text-2xl font-bold text-yellow-300 mb-4">Community Agreement NFT</h3>
-                  <p className="text-white/70 mb-4">
-                    When you submit your proposal, a unique NFT is minted representing your commitment to allocate 2.5% of your project's tokens to the DAO community.
-                  </p>
-                  <ul className="space-y-3">
-                    {[
-                      "Immutable smart contract agreement",
-                      "Automated token distribution mechanism",
-                      "Transparent on-chain verification",
-                      "Permanent proof of commitment"
-                    ].map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2 text-white/70">
-                        <Check className="w-5 h-5 text-yellow-300 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </ToxicCardContent>
-              </ToxicCard>
-              <div className="bg-black/40 rounded-xl p-6 border border-yellow-500/20">
-                <h4 className="text-xl font-bold text-yellow-300 mb-2">Token Distribution</h4>
-                <p className="text-white/70">
-                  The 2.5% token allocation is automatically distributed to DAO members through the smart contract when your project launches, ensuring fairness and transparency.
-                </p>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-0 bg-yellow-500/20 rounded-2xl blur-2xl opacity-50" />
-              <ToxicCard className="relative">
-                <ToxicCardContent>
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between border-b border-yellow-500/20 pb-4">
-                      <span className="text-white/70">Token Allocation</span>
-                      <span className="text-yellow-300 font-bold">2.5%</span>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-yellow-500/20 pb-4">
-                      <span className="text-white/70">Distribution Method</span>
-                      <span className="text-yellow-300 font-bold">Automatic</span>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-yellow-500/20 pb-4">
-                      <span className="text-white/70">Contract Type</span>
-                      <span className="text-yellow-300 font-bold">ERC-721</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-white/70">Verification</span>
-                      <span className="text-yellow-300 font-bold">On-chain</span>
-                    </div>
-                  </div>
-                </ToxicCardContent>
-              </ToxicCard>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 relative radiation-bg">
-        <div className="container px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-yellow-300 toxic-glow">
-              Amplify Your Reach
-            </h2>
-            <p className="text-xl text-white/70 mb-12">
-              Get your project in front of thousands of potential supporters through our established channels.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <ToxicCard>
-              <ToxicCardContent>
-                <div className="mb-4">
-                  <CircleDollarSign className="w-8 h-8 text-yellow-300" />
-                </div>
-                <p className="text-white/70">
-                  Reach 1,500+ engaged subscribers through our curated newsletter. Each proposal gets dedicated coverage to maximize visibility.
-                </p>
-              </ToxicCardContent>
-            </ToxicCard>
-
-            <ToxicCard>
-              <ToxicCardContent>
-                <div className="mb-4">
-                  <Building2 className="w-8 h-8 text-yellow-300" />
-                </div>
-                <p className="text-white/70">
-                  Get exposure to our network of 2,500+ LinkedIn professionals. Your proposal will be shared with detailed insights.
-                </p>
-              </ToxicCardContent>
-            </ToxicCard>
-
-            <ToxicCard>
-              <ToxicCardContent>
-                <div className="mb-4">
-                  <Users className="w-8 h-8 text-yellow-300" />
-                </div>
-                <p className="text-white/70">
-                  Present your project in our community calls and AMAs. Connect directly with potential supporters and get valuable feedback.
-                </p>
-              </ToxicCardContent>
-            </ToxicCard>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 relative radiation-bg">
-        <div className="container px-4">
-          <div className="grid md:grid-cols-2 gap-12">
-            <div>
-              <h3 className="text-2xl font-bold text-yellow-300 mb-6">Feeling Sidelined?</h3>
-              <ul className="space-y-4">
-                {[
-                  "Watching others launch tokens, NFTs, and DeFi platforms while your idea stays locked in your head",
-                  "Launchpads demand steep fees and force commitments before proving interest",
-                  "Social platforms drown out fresh voices, and traditional routes demand insider networks"
-                ].map((item, index) => (
-                  <li key={index} className="flex items-start gap-3 text-white/70">
-                    <ChevronRight className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-bold text-yellow-300 mb-6">Our Pre-Launch Solution</h3>
-              <ul className="space-y-4">
-                {[
-                  "Create a proposal NFT that tests your token, NFT, DeFi, or AI project",
-                  "Tap our network of 1,500+ newsletter subscribers and 2,500+ LinkedIn members",
-                  "Gather soft commitments with $1 votes before investing in smart contracts"
-                ].map((item, index) => (
-                  <li key={index} className="flex items-start gap-3 text-white/70">
-                    <Check className="w-5 h-5 text-yellow-300 mt-1 flex-shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 relative radiation-bg">
-        <div className="container px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-yellow-300 toxic-glow">
-              Alternative to Equity
-            </h2>
-            <p className="text-xl text-white/70">
-              Support early-stage Web3 innovation without the traditional equity model
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "No Dilution",
-                description: "Keep full ownership of your project while accessing capital and community support"
-              },
-              {
-                title: "Token Economics",
-                description: "Align incentives through token distributions and innovative reward mechanisms"
-              },
-              {
-                title: "Community Power",
-                description: "Leverage the power of decentralized communities for growth and adoption"
-              }
-            ].map((item, index) => (
-              <ToxicCard key={index} className="relative">
-                <ToxicCardContent>
-                  <h3 className="text-xl font-bold text-yellow-300 mb-3">{item.title}</h3>
-                  <p className="text-white/70">{item.description}</p>
-                </ToxicCardContent>
-              </ToxicCard>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 relative radiation-bg">
-        <div className="container px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-yellow-300 toxic-glow">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-xl text-white/70">
-              Everything you need to know about the Resistance DAO
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              {
-                question: "What is Resistance DAO?",
-                answer: "Resistance DAO is a community-driven platform connecting Web3 innovators with early-stage capital and support."
-              },
-              {
-                question: "How does it work?",
-                answer: "Our platform allows you to submit a proposal, collect soft commitments, and launch your project with confidence."
-              },
-              {
-                question: "What are the fees?",
-                answer: "The platform has three fee components: 25 RD tokens to list a project, 1 RD token to vote on proposals, and 2.5% of project tokens distributed to DAO holders upon launch."
-              },
-              {
-                question: "Is it secure?",
-                answer: (
-                  <span>
-                    Yes, our platform uses verified smart contracts and secure protocols to ensure the safety of your project. View our contracts on Polyscan: {' '}
-                    <a 
-                      href={`https://polygonscan.com/address/${FACTORY_ADDRESS}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 underline"
-                    >
-                      Proposal Factory
-                    </a>
-                    {' '} and {' '}
-                    <a 
-                      href={`https://polygonscan.com/address/${RD_TOKEN_ADDRESS}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 underline"
-                    >
-                      RD Token
-                    </a>
-                  </span>
-                )
-              },
-              {
-                question: "Benefits?",
-                answer: "Join our community and access capital, support, and visibility to grow your project."
-              }
-            ].map((item, index) => (
-              <ToxicCard key={index} className="relative">
-                <ToxicCardContent>
-                  <h3 className="text-xl font-bold text-yellow-300 mb-3">{item.question}</h3>
-                  <p className="text-white/70">
-                    {typeof item.answer === 'string' ? item.answer : item.answer}
-                  </p>
-                </ToxicCardContent>
-              </ToxicCard>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <DrippingSlime position="bottom" dripsCount={12} showIcons={true} className="absolute inset-x-0 bottom-0" toxicGreen={true} />
-    </div>
-  );
-};
-
-export default Index;
+                <span className="text-sm
