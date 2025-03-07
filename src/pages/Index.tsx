@@ -217,7 +217,7 @@ const Index = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
                     <Crosshair className="h-5 w-5 mr-2" /> 
-                    Are you here to fund the Resistance or create a Settlement?
+                    {userRole === "survivor" ? "Resistance SURVIVOR NETWORK" : "Resistance BOUNTY LIST"}
                   </h3>
                   <div className="flex items-center gap-4">
                     <div className="flex bg-black/60 border border-toxic-neon/20 rounded-lg overflow-hidden">
@@ -226,14 +226,14 @@ const Index = () => {
                         onClick={() => handleRoleSelect('bounty-hunter')}
                       >
                         <Target className="w-4 h-4" />
-                        <span>Fund Resistance</span>
+                        <span>Bounty Hunter</span>
                       </button>
                       <button 
                         className={`px-4 py-2 flex items-center gap-2 transition-all ${userRole === 'survivor' ? 'bg-toxic-neon/20 text-toxic-neon' : 'text-white/60 hover:text-white/80'}`}
                         onClick={() => handleRoleSelect('survivor')}
                       >
                         <Shield className="w-4 h-4" />
-                        <span>Create Settlement</span>
+                        <span>Survivor</span>
                       </button>
                     </div>
                     <ToxicButton 
@@ -262,22 +262,20 @@ const Index = () => {
                     <div>
                       {userRole === "survivor" ? (
                         <>
-                          <h4 className="text-lg font-mono text-apocalypse-red mb-2">Resource Allocation Protocol</h4>
+                          <h4 className="text-lg font-mono text-apocalypse-red mb-2">Survivor Network Protocol</h4>
                           <p className="text-white/80 mb-3 text-sm">
-                            <span className="text-apocalypse-red font-semibold">Request Mission Sponsorship</span> - In the wasteland, 
-                            lone survivors rarely last. Your mission might be vital to our collective survival, but resources are scarce. 
-                            Present your plans to the Council and fellow survivors will vote with their Resistance Dollars to back missions 
-                            that strengthen our foothold in this hostile world.
+                            The wasteland is unforgiving to those who journey alone. As a <span className="text-toxic-neon font-semibold">Survivor</span>, 
+                            your skills and resources are vital to building a new future from the ashes of the old world.
                           </p>
                           <p className="text-white/80 mb-3 text-sm">
-                            <span className="text-toxic-neon font-semibold">Scout Settlements</span> - Our network of outposts and safe zones grows 
-                            with each passing day. Browse the mission board to discover initiatives from fellow survivors - from radiation-resistant 
-                            crop research to mutant defense systems. Contribute your expertise and RD tokens to missions that align with your survival strategy.
+                            Each survivor contributes according to their abilities - medical experts, engineers, scouts, and 
+                            farmers all play crucial roles in our fragile network of settlements. Your survivor NFT represents 
+                            your standing within the Resistance.
                           </p>
                           <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
-                            <span className="text-toxic-neon font-semibold block mb-1">» SURVIVAL DIRECTIVE «</span>
-                            The old world fell because resources flowed to the greedy, not the worthy. The Resistance vets all projects through 
-                            decentralized consensus - your voice matters in determining what gets built and who receives support. Choose wisely, survivor.
+                            <span className="text-toxic-neon font-semibold block mb-1">» CRITICAL DIRECTIVE «</span>
+                            Survivors must maintain a positive contribution ratio to access Resistance resources. Regular 
+                            participation in community projects strengthens your position and unlocks greater benefits for all.
                           </div>
                         </>
                       ) : (
