@@ -201,6 +201,7 @@ export function TerminalTypewriter({
   const [survivorScore, setSurvivorScore] = useState(0);
   const [calculatingResult, setCalculatingResult] = useState(false);
   const [questionnaireStarted, setQuestionnaireStarted] = useState(false);
+  const [typingStarted, setTypingStarted] = useState(false);
   
   const terminalRef = useRef<HTMLDivElement>(null);
   
@@ -212,11 +213,13 @@ export function TerminalTypewriter({
       return;
     }
     
-    if (bootStage !== "initializing" && bootStage !== "diagnosing" && bootStage !== "recovering" && bootStage !== "connecting" && bootStage !== "complete") return;
-    
     setBootMessages(BOOT_MESSAGES[bootStage]);
     setCurrentBootMessage(0);
-    setBootProgress(0);
+    
+    // Only reset boot progress when changing stages
+    if (bootStage !== "complete") {
+      setBootProgress(0);
+    }
     
     const bootInterval = setInterval(() => {
       setBootProgress(prev => {
@@ -227,28 +230,23 @@ export function TerminalTypewriter({
           setTimeout(() => setBootGlitch(false), 150);
         }
         
+        if (newProgress >= 100) {
+          clearInterval(bootInterval);
+          
+          setTimeout(() => {
+            if (bootStage === "initializing") setBootStage("diagnosing");
+            else if (bootStage === "diagnosing") setBootStage("recovering");
+            else if (bootStage === "recovering") setBootStage("connecting");
+            else if (bootStage === "connecting") {
+              setBootStage("complete");
+              setIsComplete(true);
+            }
+          }, 1000);
+        }
+        
         return newProgress > 100 ? 100 : newProgress;
       });
     }, 100);
-    
-    if (bootProgress >= 100) {
-      clearInterval(bootInterval);
-      
-      setTimeout(() => {
-        if (bootStage === "initializing") setBootStage("diagnosing");
-        else if (bootStage === "diagnosing") setBootStage("recovering");
-        else if (bootStage === "recovering") setBootStage("connecting");
-        else if (bootStage === "connecting") {
-          setBootStage("complete");
-          
-          setTimeout(() => {
-            setIsComplete(true);
-          }, 1000);
-        }
-      }, 1000);
-      
-      return () => clearInterval(bootInterval);
-    }
     
     const messageInterval = setInterval(() => {
       if (currentBootMessage < bootMessages.length - 1) {
@@ -262,7 +260,7 @@ export function TerminalTypewriter({
       clearInterval(bootInterval);
       clearInterval(messageInterval);
     };
-  }, [bootStage, bootProgress, currentBootMessage, showBootSequence]);
+  }, [bootStage, showBootSequence]);
   
   // Cursor blinking
   useEffect(() => {
@@ -273,17 +271,24 @@ export function TerminalTypewriter({
     return () => clearInterval(cursorInterval);
   }, []);
   
-  // Text typing effect
+  // Text typing effect - fixed version
   useEffect(() => {
-    if (bootStage !== "complete" || !isComplete) return;
+    // Only start typing when boot is complete
+    if (!isComplete || bootStage !== "complete" || typingStarted) {
+      return;
+    }
+    
+    // Set typing started to prevent repeated execution
+    setTypingStarted(true);
+    console.log("Starting typing animation with text:", textToType);
     
     let i = 0;
-    const interval = setInterval(() => {
+    const typingInterval = setInterval(() => {
       if (i <= textToType.length) {
         setDisplayText(textToType.substring(0, i));
         i++;
       } else {
-        clearInterval(interval);
+        clearInterval(typingInterval);
         if (onTypingComplete) {
           setTimeout(() => {
             onTypingComplete();
@@ -292,8 +297,8 @@ export function TerminalTypewriter({
       }
     }, typeDelay);
     
-    return () => clearInterval(interval);
-  }, [textToType, typeDelay, bootStage, isComplete, onTypingComplete]);
+    return () => clearInterval(typingInterval);
+  }, [textToType, typeDelay, bootStage, isComplete, onTypingComplete, typingStarted]);
   
   const handleStartAssessment = () => {
     setQuestionnaireStarted(true);
@@ -444,16 +449,16 @@ export function TerminalTypewriter({
               </div>
             )}
             
-            <div className="terminal-line flex items-center h-6 min-h-6 mb-4">
-              <span className="block">
+            <div className="terminal-line flex items-center h-6 min-h-6">
+              <span className="block text-toxic-neon">
                 {displayText}
-                {cursorVisible && <span className="cursor">_</span>}
+                {cursorVisible && <span className="cursor text-toxic-neon">_</span>}
               </span>
             </div>
           </>
         )}
         
-        {showQuestionnaire && !questionnaireStarted && (
+        {showQuestionnaire && !questionnaireStarted && displayText.length > 0 && (
           <div className="terminal-line mt-6">
             <div className="text-white/70 mb-4">BEFORE JOINING THE RESISTANCE, WE MUST DETERMINE YOUR ROLE IN THE NEW ECONOMY:</div>
             
