@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Coins, Target, Shield } from "lucide-react";
+import { Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -55,7 +55,7 @@ export const BuyRDTokens = () => {
           Convert Old World Paper Money
         </h3>
         <p className="text-white/70 text-sm mb-4">
-          Support the war effort and acquire tokens to fund bounty hunters tracking mutant protocol criminals
+          Support the war effort and acquire tokens to participate in the new order
         </p>
         {isConnected ? (
           <div className="flex gap-3">
@@ -69,21 +69,16 @@ export const BuyRDTokens = () => {
             <Button
               onClick={handlePurchase}
               disabled={!amount || isLoading}
-              className="bg-gradient-to-r from-apocalypse-red to-apocalypse-rust hover:from-apocalypse-red/90 hover:to-apocalypse-rust/90 min-w-[120px] flex items-center gap-2"
+              className="bg-gradient-to-r from-apocalypse-red to-apocalypse-rust hover:from-apocalypse-red/90 hover:to-apocalypse-rust/90 min-w-[120px]"
             >
-              {isLoading ? "Processing..." : 
-                <>
-                  <Target className="h-4 w-4" /> Convert
-                </>
-              }
+              {isLoading ? "Processing..." : "Convert"}
             </Button>
           </div>
         ) : (
           <Button
             onClick={connect}
-            className="bg-gradient-to-r from-apocalypse-red to-apocalypse-rust hover:from-apocalypse-red/90 hover:to-apocalypse-rust/90 flex items-center gap-2"
+            className="bg-gradient-to-r from-apocalypse-red to-apocalypse-rust hover:from-apocalypse-red/90 hover:to-apocalypse-rust/90"
           >
-            <Shield className="h-4 w-4" />
             Connect Survival Beacon
           </Button>
         )}

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, Lock, Unlock, Shield } from 'lucide-react';
+import { AlertTriangle, Lock, Unlock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface TerminalTypewriterProps {
@@ -25,8 +25,7 @@ export const TerminalTypewriter = ({
   const [showFullMessage, setShowFullMessage] = useState(false);
   
   const firstPartOfMessage = "SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY. WE'VE BUILT SHELTERS FROM THE FALLOUT, PRESERVING WHAT'S LEFT OF DECENTRALIZED TECHNOLOGY. OUR COMMUNITY HAS GOOD NEWS TO REPORT. WE ARE WINNING THE WAR. ";
-  const pressEnterMessage = "CONNECT SURVIVAL BEACON TO PROCEED...";
-  const identityConfirmedMessage = "IDENTITY CONFIRMED. PROCEEDING WITH TRANSMISSION... ";
+  const pressEnterMessage = "PRESS [ENTER] TO CONTINUE...";
   const remainingMessage = "THE RESISTANCE NEEDS YOUR HELP. THE OLD WORLD IS GONE. WE ARE BUILDING FROM THE ASHES. SHALL WE PLAY A GAME?";
 
   useEffect(() => {
@@ -40,19 +39,17 @@ export const TerminalTypewriter = ({
   useEffect(() => {
     if (!isTyping) return;
     
-    const textToShow = isConnected ? 
-      (identityConfirmedMessage + remainingMessage) : 
-      (showFullMessage ? 
-        firstPartOfMessage + remainingMessage : 
-        (currentIndex >= firstPartOfMessage.length ? 
-          firstPartOfMessage + pressEnterMessage :
-          firstPartOfMessage.substring(0, currentIndex)));
+    const textToShow = showFullMessage ? 
+      (firstPartOfMessage + remainingMessage) : 
+      (currentIndex >= firstPartOfMessage.length ? 
+        firstPartOfMessage + pressEnterMessage :
+        firstPartOfMessage.substring(0, currentIndex));
     
     const typeNextChar = () => {
-      if (currentIndex < textToShow.length) {
+      if (currentIndex < (showFullMessage ? (firstPartOfMessage + remainingMessage).length : firstPartOfMessage.length)) {
         setDisplayedText(textToShow.substring(0, currentIndex + 1));
         setCurrentIndex(prevIndex => prevIndex + 1);
-      } else if (!isConnected && !showFullMessage && currentIndex >= firstPartOfMessage.length) {
+      } else if (!showFullMessage && currentIndex >= firstPartOfMessage.length) {
         setDisplayedText(firstPartOfMessage + pressEnterMessage);
         setIsTyping(false);
       } else {
@@ -63,22 +60,18 @@ export const TerminalTypewriter = ({
     const typingInterval = setInterval(typeNextChar, typingSpeed);
     
     return () => clearInterval(typingInterval);
-  }, [currentIndex, typingSpeed, isTyping, showFullMessage, firstPartOfMessage, pressEnterMessage, remainingMessage, isConnected, identityConfirmedMessage]);
-
-  // When wallet gets connected, start typing the identity confirmed message
-  useEffect(() => {
-    if (isConnected && !showFullMessage) {
-      setDisplayedText(identityConfirmedMessage.substring(0, 0));
-      setCurrentIndex(0);
-      setShowFullMessage(true);
-      setIsTyping(true);
-    }
-  }, [isConnected, showFullMessage, identityConfirmedMessage]);
+  }, [currentIndex, typingSpeed, isTyping, showFullMessage, firstPartOfMessage, remainingMessage, pressEnterMessage]);
 
   const handleEnterClick = () => {
-    if (!isTyping && !isConnected && currentIndex >= firstPartOfMessage.length) {
-      // Connect wallet when ENTER is clicked
-      onConnect();
+    if (!isTyping && !showFullMessage && currentIndex >= firstPartOfMessage.length) {
+      setShowFullMessage(true);
+      setCurrentIndex(0);
+      setIsTyping(true);
+      
+      // After showing the full message, connect the wallet
+      setTimeout(() => {
+        onConnect();
+      }, (remainingMessage.length * typingSpeed) + 500); // Wait for the message to finish typing
     }
   };
 
@@ -99,23 +92,22 @@ export const TerminalTypewriter = ({
                   <div className="flex flex-col">
                     <div className="text-xl">
                       <span>{displayedText}</span>
-                      {!isTyping && !isConnected && (
+                      {!isTyping && !showFullMessage && (
                         <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
                       )}
-                      {(isTyping || isConnected) && (
+                      {(isTyping || showFullMessage) && (
                         <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
                       )}
                     </div>
-                    {!isTyping && !isConnected && (
+                    {!isTyping && !showFullMessage && (
                       <div className="mt-4">
                         <Button 
                           variant="ghost" 
                           size="sm" 
                           onClick={handleEnterClick}
-                          className="text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-4 py-2 h-auto text-xs font-mono border border-apocalypse-red/50 animate-pulse flex items-center gap-2"
+                          className="text-apocalypse-red hover:text-white hover:bg-apocalypse-red/20 px-4 py-2 h-auto text-xs font-mono border border-apocalypse-red/50 animate-pulse"
                         >
-                          <Shield className="h-4 w-4" />
-                          CONNECT SURVIVAL BEACON
+                          ENTER
                         </Button>
                       </div>
                     )}
