@@ -91,10 +91,10 @@ export const TerminalTypewriter = ({
                   <div className="flex flex-col">
                     <div>
                       <span>{displayedText}</span>
-                      {!isTyping && !showFullMessage && currentIndex >= firstPartOfMessage.length && (
+                      {!isTyping && !showFullMessage && (
                         <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
                       )}
-                      {(isTyping || showFullMessage || currentIndex < firstPartOfMessage.length) && (
+                      {(isTyping || showFullMessage) && (
                         <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
                       )}
                     </div>
