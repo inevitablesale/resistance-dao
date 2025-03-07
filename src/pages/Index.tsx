@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -19,7 +20,8 @@ import {
   Skull,
   Zap,
   Shield,
-  Image
+  Image,
+  Biohazard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToxicButton } from "@/components/ui/toxic-button";
@@ -98,8 +100,8 @@ const Index = () => {
 
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute w-[500px] h-[500px] bg-yellow-500/5 rounded-full blur-3xl -top-48 -left-24" />
-          <div className="absolute w-[500px] h-[500px] bg-yellow-500/5 rounded-full blur-3xl -bottom-48 -right-24" />
+          <div className="absolute w-[500px] h-[500px] bg-toxic-neon/5 rounded-full blur-3xl -top-48 -left-24" />
+          <div className="absolute w-[500px] h-[500px] bg-toxic-neon/5 rounded-full blur-3xl -bottom-48 -right-24" />
         </div>
         
         <div className="container px-4 relative">
@@ -111,33 +113,33 @@ const Index = () => {
           >
             {/* Network Status and Title */}
             <div className="text-left mb-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-300 text-sm mb-4 font-mono broken-glass">
-                <span className="w-2 h-2 bg-yellow-300 rounded-full animate-pulse" />
-                <Radiation className="h-4 w-4 mr-1 yellow-glow" /> Network Status: Critical
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
+                <span className="w-2 h-2 bg-toxic-neon rounded-full animate-pulse" />
+                <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Network Status: Critical
               </div>
-              <h1 className="text-5xl md:text-6xl font-bold font-mono mb-6 text-yellow-300 toxic-glow">
+              <h1 className="text-5xl md:text-6xl font-bold font-mono mb-6 text-toxic-neon toxic-glow">
                 Post-Apocalyptic Launch Platform
               </h1>
 
               {/* Metrics Cards */}
               <div className="flex gap-4 mb-8">
-                <div className="bg-black/70 border border-yellow-500/20 rounded-lg p-4 flex-1 relative overflow-hidden rust-overlay">
+                <div className="bg-black/70 border border-toxic-neon/20 rounded-lg p-4 flex-1 relative overflow-hidden rust-overlay">
                   <div className="scanline"></div>
-                  <div className="text-yellow-300 text-sm mb-1 flex items-center">
+                  <div className="text-toxic-neon text-sm mb-1 flex items-center">
                     <Shield className="h-4 w-4 mr-2" /> Survivors
                   </div>
                   <div className="font-mono text-2xl text-white">821</div>
                 </div>
-                <div className="bg-black/70 border border-yellow-500/20 rounded-lg p-4 flex-1 relative overflow-hidden rust-overlay">
+                <div className="bg-black/70 border border-toxic-neon/20 rounded-lg p-4 flex-1 relative overflow-hidden rust-overlay">
                   <div className="scanline"></div>
-                  <div className="text-yellow-300 text-sm mb-1 flex items-center">
+                  <div className="text-toxic-neon text-sm mb-1 flex items-center">
                     <Users className="h-4 w-4 mr-2" /> Wasteland Community
                   </div>
                   <div className="font-mono text-2xl text-white">2.5K</div>
                 </div>
-                <div className="bg-black/70 border border-yellow-500/20 rounded-lg p-4 flex-1 relative overflow-hidden rust-overlay">
+                <div className="bg-black/70 border border-toxic-neon/20 rounded-lg p-4 flex-1 relative overflow-hidden rust-overlay">
                   <div className="scanline"></div>
-                  <div className="text-yellow-300 text-sm mb-1 flex items-center">
+                  <div className="text-toxic-neon text-sm mb-1 flex items-center">
                     <Zap className="h-4 w-4 mr-2" /> Radio Subscribers
                   </div>
                   <div className="font-mono text-2xl text-white">2.7K</div>
@@ -156,16 +158,16 @@ const Index = () => {
                   size="lg"
                   onClick={() => navigate('/thesis')}
                   variant="glowing"
-                  className="bg-yellow-900/60 border-yellow-500/50 hover:bg-yellow-900/80"
+                  className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
                 >
-                  <Radiation className="w-5 h-5 mr-2 text-yellow-300" />
+                  <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
                   Start Project
                 </ToxicButton>
                 <ToxicButton 
                   size="lg"
                   variant="outline"
                   onClick={() => navigate('/proposals')}
-                  className="border-yellow-500/50 text-yellow-300 hover:bg-yellow-900/30"
+                  className="border-toxic-neon/50 text-toxic-neon hover:bg-toxic-dark/30"
                 >
                   <Share2 className="w-5 h-5 mr-2" />
                   View Projects
@@ -174,17 +176,17 @@ const Index = () => {
             </div>
 
             {/* NFT Collection Showcase - NEW SECTION */}
-            <div className="mt-12 mb-12 bg-black/40 border border-yellow-500/20 rounded-xl p-6 relative broken-glass">
+            <div className="mt-12 mb-12 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
               <div className="scanline"></div>
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-mono text-yellow-300 flex items-center toxic-glow">
+                <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
                   <Radiation className="h-5 w-5 mr-2" /> Wasteland NFT Collection
                 </h3>
                 <ToxicButton 
                   variant="outline" 
                   size="sm" 
                   onClick={() => navigate('/marketplace')}
-                  className="text-yellow-300 hover:bg-yellow-900/20 border-yellow-500/50"
+                  className="text-toxic-neon hover:bg-toxic-dark/20 border-toxic-neon/50"
                 >
                   View All <ArrowIcon className="h-4 w-4 ml-1" />
                 </ToxicButton>
@@ -192,38 +194,38 @@ const Index = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {nftCollection.map((nft) => (
-                  <ToxicCard key={nft.id} className="bg-black/70 border-yellow-500/30 hover:border-yellow-500/60 transition-all">
+                  <ToxicCard key={nft.id} className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all">
                     <ToxicCardContent className="p-0">
-                      <div className="relative h-48 bg-gradient-to-b from-yellow-500/20 to-black/60 rounded-t-lg overflow-hidden">
+                      <div className="relative h-48 bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-t-lg overflow-hidden">
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <Image className="w-20 h-20 text-yellow-500/50" />
+                          <Image className="w-20 h-20 text-toxic-neon/50" />
                         </div>
                         <DrippingSlime position="top" dripsCount={5} toxicGreen={true} />
                         <div className="absolute top-2 right-2">
-                          <div className="px-2 py-1 rounded-full bg-yellow-500/20 text-xs text-yellow-300 font-mono">
+                          <div className="px-2 py-1 rounded-full bg-toxic-neon/20 text-xs text-toxic-neon font-mono">
                             #{nft.tokenId}
                           </div>
                         </div>
                       </div>
                       <div className="p-4">
-                        <h4 className="text-xl font-mono text-yellow-300 mb-2">{nft.name}</h4>
+                        <h4 className="text-xl font-mono text-toxic-neon mb-2">{nft.name}</h4>
                         <div className="flex justify-between items-center mb-3">
                           <span className="text-white/70 text-sm">Rarity</span>
                           <span className={`text-sm font-semibold ${
                             nft.rarity === "Legendary" ? "text-purple-300" : 
-                            nft.rarity === "Epic" ? "text-yellow-300" : "text-blue-300"
+                            nft.rarity === "Epic" ? "text-toxic-neon" : "text-blue-300"
                           }`}>{nft.rarity}</span>
                         </div>
                         <div className="space-y-2 mb-4">
                           {nft.attributes.map((attr, idx) => (
                             <div key={idx} className="flex justify-between text-xs">
                               <span className="text-white/60">{attr.trait}</span>
-                              <span className="text-yellow-500/90">{attr.value}</span>
+                              <span className="text-toxic-neon/90">{attr.value}</span>
                             </div>
                           ))}
                         </div>
                         <ToxicButton 
-                          className="w-full mt-2 bg-yellow-900/60 border-yellow-500/50 hover:bg-yellow-900/80 text-sm"
+                          className="w-full mt-2 bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80 text-sm"
                           size="sm"
                         >
                           <Wallet className="h-4 w-4 mr-1" /> Claim NFT
@@ -234,13 +236,13 @@ const Index = () => {
                 ))}
               </div>
               
-              <div className="mt-6 pt-6 border-t border-yellow-500/20">
+              <div className="mt-6 pt-6 border-t border-toxic-neon/20">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-toxic-green" />
-                    <span className="text-lg font-mono text-yellow-300">Your NFT Collection</span>
+                    <Shield className="h-5 w-5 text-toxic-neon" />
+                    <span className="text-lg font-mono text-toxic-neon">Your NFT Collection</span>
                   </div>
-                  <div className="bg-yellow-500/10 px-3 py-1 rounded-full text-yellow-300 text-sm font-mono">
+                  <div className="bg-toxic-neon/10 px-3 py-1 rounded-full text-toxic-neon text-sm font-mono">
                     {isLoadingNFT ? "Loading..." : `${nftBalance} NFTs`}
                   </div>
                 </div>
@@ -249,12 +251,12 @@ const Index = () => {
                   <NFTDisplay balance={nftBalance} className="bg-black/30 p-4 rounded-lg" />
                   
                   {nftBalance === 0 && (
-                    <div className="text-center py-6 bg-yellow-500/5 rounded-lg mt-4">
+                    <div className="text-center py-6 bg-toxic-neon/5 rounded-lg mt-4">
                       <p className="text-white/70 mb-4">You don't own any Wasteland NFTs yet</p>
                       <ToxicButton 
                         variant="default"
                         onClick={() => navigate('/buy-membership-nft')}
-                        className="bg-yellow-900/60 border-yellow-500/50 hover:bg-yellow-900/80"
+                        className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
                       >
                         <Radiation className="h-4 w-4 mr-2" />
                         Get Your First NFT
@@ -265,22 +267,22 @@ const Index = () => {
               </div>
             </div>
 
-            <div className="mt-12 bg-black/40 border border-yellow-500/20 rounded-xl p-6 relative broken-glass">
+            <div className="mt-12 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
               <div className="scanline"></div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-mono text-yellow-300 flex items-center">
+                <h3 className="text-lg font-mono text-toxic-neon flex items-center">
                   <Radiation className="h-5 w-5 mr-2" /> Wasteland Activity
                 </h3>
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 text-sm text-yellow-500/70">
-                    <div className="w-2 h-2 bg-yellow-300 rounded-full animate-pulse" />
+                  <div className="flex items-center gap-2 text-sm text-toxic-neon/70">
+                    <div className="w-2 h-2 bg-toxic-neon rounded-full animate-pulse" />
                     Emergency Updates
                   </div>
                   <ToxicButton 
                     variant="ghost" 
                     size="sm" 
                     onClick={() => window.location.reload()}
-                    className="text-yellow-300 hover:bg-yellow-900/20"
+                    className="text-toxic-neon hover:bg-toxic-dark/20"
                   >
                     <RefreshCw className="h-4 w-4" />
                   </ToxicButton>
@@ -291,11 +293,11 @@ const Index = () => {
                   <div className="animate-pulse">Scanning wasteland...</div>
                 ) : (
                   stats?.recentActivities.map((activity, i) => (
-                    <div key={i} className="flex items-center justify-between py-2 border-b border-yellow-500/10 last:border-0">
+                    <div key={i} className="flex items-center justify-between py-2 border-b border-toxic-neon/10 last:border-0">
                       <div className="flex items-center gap-3">
                         <div className={`w-2 h-2 rounded-full ${
-                          activity.type === 'vote' ? 'bg-yellow-300' :
-                          activity.type === 'create' ? 'bg-yellow-500/70' : 'bg-yellow-600'
+                          activity.type === 'vote' ? 'bg-toxic-neon' :
+                          activity.type === 'create' ? 'bg-toxic-neon/70' : 'bg-toxic-muted'
                         }`} />
                         <span className="text-white/70">
                           {activity.type === 'vote' ? 'New Survivor Pledge' :
@@ -304,7 +306,7 @@ const Index = () => {
                         </span>
                       </div>
                       <div className="flex items-center gap-4">
-                        <span className="font-mono text-yellow-300">
+                        <span className="font-mono text-toxic-neon">
                           {activity.type === 'vote' || activity.type === 'complete' 
                             ? formatCurrency(Number(activity.amount))
                             : `#${activity.proposalId}`}
@@ -317,13 +319,13 @@ const Index = () => {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 mt-8">
-              <ToxicCard className="relative bg-black/70 border-yellow-500/30">
+              <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-full bg-yellow-500/10">
-                    <CircleDollarSign className="w-6 h-6 text-yellow-300" />
+                  <div className="p-3 rounded-full bg-toxic-neon/10">
+                    <CircleDollarSign className="w-6 h-6 text-toxic-neon" />
                   </div>
                   <div>
-                    <div className="text-yellow-500/70 text-sm">Total Resource Pledges</div>
+                    <div className="text-toxic-neon/70 text-sm">Total Resource Pledges</div>
                     <div className="text-2xl font-semibold text-white">
                       {isLoadingStats ? (
                         <span className="animate-pulse">Calculating...</span>
@@ -335,13 +337,13 @@ const Index = () => {
                 </div>
               </ToxicCard>
 
-              <ToxicCard className="relative bg-black/70 border-yellow-500/30">
+              <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-full bg-yellow-500/10">
-                    <Users className="w-6 h-6 text-yellow-300" />
+                  <div className="p-3 rounded-full bg-toxic-neon/10">
+                    <Users className="w-6 h-6 text-toxic-neon" />
                   </div>
                   <div>
-                    <div className="text-yellow-500/70 text-sm">Surviving Members</div>
+                    <div className="text-toxic-neon/70 text-sm">Surviving Members</div>
                     <div className="text-2xl font-semibold text-white">
                       {isLoadingStats ? (
                         <span className="animate-pulse">Counting...</span>
@@ -353,13 +355,13 @@ const Index = () => {
                 </div>
               </ToxicCard>
 
-              <ToxicCard className="relative bg-black/70 border-yellow-500/30">
+              <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-full bg-yellow-500/10">
-                    <Scale className="w-6 h-6 text-yellow-300" />
+                  <div className="p-3 rounded-full bg-toxic-neon/10">
+                    <Scale className="w-6 h-6 text-toxic-neon" />
                   </div>
                   <div>
-                    <div className="text-yellow-500/70 text-sm">Active Settlements</div>
+                    <div className="text-toxic-neon/70 text-sm">Active Settlements</div>
                     <div className="text-2xl font-semibold text-white">
                       {isLoadingStats ? (
                         <span className="animate-pulse">Searching...</span>
@@ -521,7 +523,7 @@ const Index = () => {
               size="lg"
               onClick={() => navigate('/join-resistance')}
               variant="glowing"
-              className="bg-apocalypse-dark border-toxic-neon/50 hover:bg-apocalypse-charcoal"
+              className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
             >
               <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
               Join The Resistance
@@ -535,7 +537,7 @@ const Index = () => {
       <section className="py-24 relative radiation-bg">
         <div className="container px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-yellow-300 toxic-glow">
+            <h2 className="text-4xl font-bold mb-4 text-toxic-neon toxic-glow">
               Test Market Interest, Then Launch With Confidence
             </h2>
             <p className="text-xl text-white/70 mb-12">
@@ -547,7 +549,7 @@ const Index = () => {
             <ToxicCard>
               <ToxicCardContent>
                 <div className="mb-4">
-                  <CircleDollarSign className="w-8 h-8 text-yellow-300" />
+                  <CircleDollarSign className="w-8 h-8 text-toxic-neon" />
                 </div>
                 <p className="text-white/70">
                   Supporters indicate their potential investment amount through soft pledges with a voting fee to RD. Test your project's market interest verified without requiring immediate investment.
@@ -558,7 +560,7 @@ const Index = () => {
             <ToxicCard>
               <ToxicCardContent>
                 <div className="mb-4">
-                  <Share2 className="w-8 h-8 text-yellow-300" />
+                  <Share2 className="w-8 h-8 text-toxic-neon" />
                 </div>
                 <p className="text-white/70">
                   Connect directly with interested supporters and track their soft commitment amounts. Build reports that provide concrete proof of market interest.
@@ -569,7 +571,7 @@ const Index = () => {
             <ToxicCard>
               <ToxicCardContent>
                 <div className="mb-4">
-                  <CircleDollarSign className="w-8 h-8 text-yellow-300" />
+                  <CircleDollarSign className="w-8 h-8 text-toxic-neon" />
                 </div>
                 <p className="text-white/70">
                   Once you hit your soft commitment target, re-engage supporters for their pledged investments. Launch with confidence knowing you have verified interest and committed capital.
@@ -585,7 +587,7 @@ const Index = () => {
         <ToxicPuddle className="absolute bottom-40 right-1/4" toxicGreen={true} />
         <div className="container px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-yellow-300 toxic-glow">
+            <h2 className="text-4xl font-bold mb-4 text-toxic-neon toxic-glow">
               How Soft Commitments & Voting Work
             </h2>
             <p className="text-xl text-white/70 mb-12">
@@ -597,10 +599,10 @@ const Index = () => {
             <ToxicCard>
               <ToxicCardContent>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                    <Coins className="w-6 h-6 text-yellow-300" />
+                  <div className="w-10 h-10 rounded-full bg-toxic-neon/10 flex items-center justify-center">
+                    <Coins className="w-6 h-6 text-toxic-neon" />
                   </div>
-                  <h3 className="text-xl font-bold text-yellow-300">Initial Voting</h3>
+                  <h3 className="text-xl font-bold text-toxic-neon">Initial Voting</h3>
                 </div>
                 <ul className="space-y-4">
                   {[
@@ -609,7 +611,7 @@ const Index = () => {
                     "No Lock-in: Soft commitments are non-binding to encourage honest feedback"
                   ].map((item, index) => (
                     <li key={index} className="flex items-start gap-3 text-white/70">
-                      <Check className="w-5 h-5 text-yellow-300 mt-1 flex-shrink-0" />
+                      <Check className="w-5 h-5 text-toxic-neon mt-1 flex-shrink-0" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -620,10 +622,10 @@ const Index = () => {
             <ToxicCard>
               <ToxicCardContent>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                    <Rocket className="w-6 h-6 text-yellow-300" />
+                  <div className="w-10 h-10 rounded-full bg-toxic-neon/10 flex items-center justify-center">
+                    <Rocket className="w-6 h-6 text-toxic-neon" />
                   </div>
-                  <h3 className="text-xl font-bold text-yellow-300">Launch Process</h3>
+                  <h3 className="text-xl font-bold text-toxic-neon">Launch Process</h3>
                 </div>
                 <ul className="space-y-4">
                   {[
@@ -632,7 +634,7 @@ const Index = () => {
                     "Convert Interest: Turn soft commitments into actual investments"
                   ].map((item, index) => (
                     <li key={index} className="flex items-start gap-3 text-white/70">
-                      <Check className="w-5 h-5 text-yellow-300 mt-1 flex-shrink-0" />
+                      <Check className="w-5 h-5 text-toxic-neon mt-1 flex-shrink-0" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -645,7 +647,7 @@ const Index = () => {
 
       <section className="py-24 relative overflow-hidden radiation-bg">
         <div className="absolute inset-0">
-          <div className="absolute w-[600px] h-[600px] bg-yellow-500/10 rounded-full blur-[100px] -top-1/4 -right-1/4" />
+          <div className="absolute w-[600px] h-[600px] bg-toxic-neon/10 rounded-full blur-[100px] -top-1/4 -right-1/4" />
         </div>
         <div className="container px-4 relative">
           <motion.div 
@@ -654,6 +656,75 @@ const Index = () => {
             className="text-center mb-16"
           >
             <div className="inline-block mb-4">
-              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-yellow-500/20 bg-black/40 backdrop-blur">
-                <FileText className="w-5 h-5 text-yellow-300" />
-                <span className="text-sm
+              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-toxic-neon/20 bg-black/40 backdrop-blur">
+                <FileText className="w-5 h-5 text-toxic-neon" />
+                <span className="text-sm font-mono text-toxic-neon">ALLIANCE PROTOCOL</span>
+              </div>
+            </div>
+            <h2 className="text-4xl font-bold mb-6 text-toxic-neon toxic-glow">
+              Join the Resistance Today
+            </h2>
+            <p className="text-xl text-white/70 max-w-3xl mx-auto">
+              The old world is gone. Help us build something better from the ashes.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <Card className="bg-black/50 border-toxic-neon/30 p-6 text-white relative group hover:border-toxic-neon/60 transition-all">
+              <div className="absolute -inset-px opacity-0 group-hover:opacity-100 bg-toxic-neon/5 rounded-xl blur-sm transition-opacity"></div>
+              <div className="mb-4">
+                <Radiation className="h-8 w-8 text-toxic-neon" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-toxic-neon">Survivor Membership</h3>
+              <p className="text-white/70 mb-4">Join our community of post-nuclear builders and gain access to exclusive launches and governance rights.</p>
+              <Button variant="outline" className="border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10 w-full mt-auto">
+                Connect Wallet
+              </Button>
+            </Card>
+
+            <Card className="bg-black/50 border-toxic-neon/30 p-6 text-white relative group hover:border-toxic-neon/60 transition-all">
+              <div className="absolute -inset-px opacity-0 group-hover:opacity-100 bg-toxic-neon/5 rounded-xl blur-sm transition-opacity"></div>
+              <div className="mb-4">
+                <Coins className="h-8 w-8 text-toxic-neon" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-toxic-neon">Stake RD Tokens</h3>
+              <p className="text-white/70 mb-4">Secure the network and earn rewards by staking your RD tokens in our radiation-resistant vaults.</p>
+              <Button variant="outline" className="border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10 w-full mt-auto">
+                Stake Now
+              </Button>
+            </Card>
+
+            <Card className="bg-black/50 border-toxic-neon/30 p-6 text-white relative group hover:border-toxic-neon/60 transition-all">
+              <div className="absolute -inset-px opacity-0 group-hover:opacity-100 bg-toxic-neon/5 rounded-xl blur-sm transition-opacity"></div>
+              <div className="mb-4">
+                <Building2 className="h-8 w-8 text-toxic-neon" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-toxic-neon">Launch a Project</h3>
+              <p className="text-white/70 mb-4">Submit your vision to the community and gather support for your post-apocalyptic innovation.</p>
+              <Button variant="outline" className="border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10 w-full mt-auto">
+                Submit Thesis
+              </Button>
+            </Card>
+          </div>
+
+          <div className="flex flex-col items-center">
+            <ToxicButton 
+              size="lg"
+              variant="glowing"
+              onClick={() => navigate('/thesis')}
+              className="px-8 mb-4"
+            >
+              <Radiation className="w-5 h-5 mr-2" />
+              Start Building
+            </ToxicButton>
+            <p className="text-white/60 text-sm max-w-lg text-center">
+              By joining the Resistance, you agree to uphold our community principles and contribute to the rebirth of our digital ecosystem.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Index;

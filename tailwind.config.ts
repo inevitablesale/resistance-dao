@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -30,6 +29,8 @@ export default {
           dark: "#0D1F0F",
           muted: "#00BB13",
           faint: "rgba(57, 255, 20, 0.25)",
+          army: "#4B5320",
+          olive: "#556B2F",
         },
         apocalypse: {
           red: "#ea384c",

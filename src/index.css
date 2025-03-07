@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -176,7 +177,7 @@
     @apply relative overflow-hidden;
     background-color: #0D0D0D;
     background-image: 
-      radial-gradient(circle at 20% 35%, rgba(234, 56, 76, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 20% 35%, rgba(57, 255, 20, 0.15) 0%, transparent 50%),
       radial-gradient(circle at 75% 44%, rgba(57, 255, 20, 0.1) 0%, transparent 50%),
       linear-gradient(180deg, #000000 0%, #1A1A1A 100%);
   }
@@ -200,7 +201,7 @@
 
   .fog-overlay {
     @apply absolute inset-0 pointer-events-none;
-    background-image: linear-gradient(0deg, rgba(0,0,0,0) 60%, rgba(91, 13, 13, 0.1) 100%);
+    background-image: linear-gradient(0deg, rgba(0,0,0,0) 60%, rgba(57, 255, 20, 0.05) 100%);
     opacity: 0.7;
   }
 
@@ -225,9 +226,18 @@
     text-shadow: 0 0 5px rgba(234, 56, 76, 0.7), 0 0 10px rgba(234, 56, 76, 0.5);
   }
 
+  .drip.toxic-green {
+    background: rgba(57, 255, 20, 0.7);
+    filter: drop-shadow(0 0 5px rgba(57, 255, 20, 0.4));
+  }
+
   .drip.post-apocalyptic {
     background: rgba(234, 56, 76, 0.7);
     filter: drop-shadow(0 0 5px rgba(234, 56, 76, 0.4));
+  }
+
+  .toxic-puddle.toxic-green {
+    background: rgba(57, 255, 20, 0.4);
   }
 
   .toxic-puddle.post-apocalyptic {
@@ -334,8 +344,8 @@
   position: absolute;
   inset: 0;
   background-image: 
-    linear-gradient(to right, rgba(20, 184, 166, 0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(20, 184, 166, 0.1) 1px, transparent 1px);
+    linear-gradient(to right, rgba(57, 255, 20, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(57, 255, 20, 0.1) 1px, transparent 1px);
   background-size: 50px 50px;
   transform: perspective(1000px) rotateX(60deg);
   transform-origin: center center;
@@ -350,9 +360,9 @@
   animation: node-pulse 2s infinite;
 }
 
-.circuit-node.yellow {
-  --node-color: #eab308;
-  background: #eab308;
+.circuit-node.green {
+  --node-color: #39FF14;
+  background: #39FF14;
 }
 
 .circuit-node.teal {
@@ -368,9 +378,9 @@
   animation: data-flow 3s infinite linear;
 }
 
-.data-point.yellow {
-  background: #eab308;
-  box-shadow: 0 0 10px #eab308;
+.data-point.green {
+  background: #39FF14;
+  box-shadow: 0 0 10px #39FF14;
 }
 
 .data-point.teal {
@@ -407,8 +417,8 @@
   animation: energy-flow 2s infinite;
 }
 
-.cosmic-box.yellow-energy::before {
-  --energy-color: rgba(234, 179, 8, 0.6);
+.cosmic-box.green-energy::before {
+  --energy-color: rgba(57, 255, 20, 0.6);
   background: linear-gradient(var(--angle, 90deg), var(--energy-color), transparent);
 }
 
@@ -442,11 +452,11 @@
   animation: particle-flow 1.5s infinite;
 }
 
-.cosmic-box.yellow-energy::after {
-  background: rgba(234, 179, 8, 0.8);
+.cosmic-box.green-energy::after {
+  background: rgba(57, 255, 20, 0.8);
   box-shadow: 
-    0 0 4px rgba(234, 179, 8, 0.4),
-    0 0 8px rgba(234, 179, 8, 0.2);
+    0 0 4px rgba(57, 255, 20, 0.4),
+    0 0 8px rgba(57, 255, 20, 0.2);
 }
 
 .cosmic-box.teal-energy::after {
@@ -616,5 +626,33 @@
   50% {
     transform: scaleX(1.2);
     opacity: 0.8;
+  }
+}
+
+.toxic-symbols {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.toxic-symbol {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  animation: toxic-symbol-float 8s ease-in-out infinite;
+}
+
+@keyframes toxic-symbol-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(5deg);
   }
 }

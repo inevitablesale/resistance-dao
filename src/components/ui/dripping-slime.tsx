@@ -18,7 +18,7 @@ export function DrippingSlime({
   className,
   showIcons = false,
   postApocalyptic = false,
-  toxicGreen = false
+  toxicGreen = true // Default to true for toxic green
 }: DrippingSlimeProps) {
   const topDripsRef = useRef<HTMLDivElement>(null);
   const bottomDripsRef = useRef<HTMLDivElement>(null);
@@ -43,6 +43,8 @@ export function DrippingSlime({
       
       if (toxicGreen) {
         drip.className = 'drip toxic-green';
+        drip.style.background = 'rgba(57, 255, 20, 0.7)';
+        drip.style.filter = 'drop-shadow(0 0 5px rgba(57, 255, 20, 0.4))';
       } else if (postApocalyptic) {
         drip.className = 'drip post-apocalyptic';
       } else {
@@ -63,8 +65,8 @@ export function DrippingSlime({
     }
   };
   
-  const iconColor = toxicGreen ? "text-toxic-green" : (postApocalyptic ? "text-red-400" : "text-toxic-neon");
-  const iconGlowClass = toxicGreen ? "toxic-green-glow" : (postApocalyptic ? "red-glow" : "toxic-glow");
+  const iconColor = toxicGreen ? "text-toxic-neon" : (postApocalyptic ? "text-red-400" : "text-toxic-neon");
+  const iconGlowClass = toxicGreen ? "toxic-glow" : (postApocalyptic ? "red-glow" : "toxic-glow");
   
   return (
     <div className={cn("dripping-container", className)}>
@@ -139,7 +141,7 @@ export function DrippingSlime({
 export function ToxicPuddle({ 
   className, 
   postApocalyptic = false,
-  toxicGreen = false 
+  toxicGreen = true 
 }: { 
   className?: string, 
   postApocalyptic?: boolean,
@@ -153,6 +155,10 @@ export function ToxicPuddle({
       puddleRef.current.style.width = `${width}px`;
       puddleRef.current.style.left = `${Math.random() * 80}%`;
       puddleRef.current.style.animationDelay = `${Math.random() * 2}s`;
+      
+      if (toxicGreen) {
+        puddleRef.current.style.background = 'rgba(57, 255, 20, 0.4)';
+      }
     }
   }, []);
   

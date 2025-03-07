@@ -9,10 +9,10 @@ const Progress = React.forwardRef<
 >(({ className, value, ...props }, ref) => {
   // Calculate the gradient color based on progress percentage
   const getProgressColor = (percentage: number) => {
-    if (percentage <= 25) return 'from-red-500 to-apocalypse-red';
-    if (percentage <= 50) return 'from-apocalypse-red to-apocalypse-rust';
-    if (percentage <= 75) return 'from-toxic-muted to-toxic-neon';
-    return 'from-toxic-neon to-toxic-glow';
+    if (percentage <= 25) return 'from-apocalypse-red to-toxic-dark';
+    if (percentage <= 50) return 'from-toxic-dark to-toxic-army';
+    if (percentage <= 75) return 'from-toxic-army to-toxic-muted';
+    return 'from-toxic-muted to-toxic-neon';
   };
 
   const percentage = value || 0;
@@ -22,7 +22,7 @@ const Progress = React.forwardRef<
     <ProgressPrimitive.Root
       ref={ref}
       className={cn(
-        "relative h-4 w-full overflow-hidden rounded-full bg-apocalypse-dark border border-apocalypse-ash",
+        "relative h-4 w-full overflow-hidden rounded-full bg-black border border-toxic-muted/30",
         className
       )}
       {...props}
@@ -35,7 +35,7 @@ const Progress = React.forwardRef<
         )}
         style={{ transform: `translateX(-${100 - percentage}%)` }}
       >
-        <div className="absolute inset-0 opacity-20 bg-gradient-to-r from-transparent via-white to-transparent -translate-x-full animate-[shine_2s_ease-in-out_infinite]"></div>
+        <div className="absolute inset-0 opacity-30 bg-gradient-to-r from-transparent via-toxic-neon to-transparent -translate-x-full animate-[shine_2s_ease-in-out_infinite]"></div>
       </ProgressPrimitive.Indicator>
     </ProgressPrimitive.Root>
   );
