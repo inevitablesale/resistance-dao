@@ -180,7 +180,6 @@ const Index = () => {
               
               <div className="mb-6">
                 <TerminalTypewriter 
-                  textToType=""
                   isConnected={isConnected}
                   onConnect={handleConnectWallet}
                   onRoleSelect={handleRoleSelect}
