@@ -1,3 +1,4 @@
+<lov-code>
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -654,4 +655,3 @@ const Index = () => {
                   <div className="p-3 rounded-full bg-toxic-neon/10">
                     <CircleDollarSign className="w-6 h-6 text-toxic-neon" />
                   </div>
-                  <div>
