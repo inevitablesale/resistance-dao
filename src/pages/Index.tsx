@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -18,12 +19,13 @@ import {
   Radiation,
   Skull,
   Zap,
-  Shield
+  Shield,
+  Image
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ToxicCard, ToxicCardContent, ToxicCardHeader, ToxicCardTitle, ToxicCardDescription, ToxicCardFooter } from "@/components/ui/toxic-card";
 import { Progress } from "@/components/ui/progress";
 import { ToxicProgress } from "@/components/ui/toxic-progress";
@@ -33,10 +35,13 @@ import { BuyRDTokens } from "@/components/BuyRDTokens";
 import { FACTORY_ADDRESS, RD_TOKEN_ADDRESS } from "@/lib/constants";
 import { DrippingSlime, ToxicPuddle } from "@/components/ui/dripping-slime";
 import { ToxicBadge } from "@/components/ui/toxic-badge";
+import { useNFTBalance } from "@/hooks/useNFTBalance";
+import { NFTDisplay } from "@/components/wallet/ResistanceWalletWidget/NFTDisplay";
 
 const Index = () => {
   const navigate = useNavigate();
   const { data: stats, isLoading: isLoadingStats } = useProposalStats();
+  const { data: nftBalance = 0, isLoading: isLoadingNFT } = useNFTBalance("0x1234..."); // Demo address
   
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(Math.round(num));
@@ -49,6 +54,42 @@ const Index = () => {
       maximumFractionDigits: 0
     }).format(amount);
   };
+
+  const nftCollection = [
+    {
+      id: 1,
+      name: "Radiation Survivor #001",
+      rarity: "Rare",
+      tokenId: 1,
+      attributes: [
+        { trait: "Radiation Level", value: "High" },
+        { trait: "Mutation", value: "Enhanced Vision" },
+        { trait: "Wasteland Skills", value: "Resource Scavenging" }
+      ]
+    },
+    {
+      id: 2,
+      name: "Resistance Fighter #042",
+      rarity: "Epic",
+      tokenId: 42,
+      attributes: [
+        { trait: "Radiation Level", value: "Medium" },
+        { trait: "Mutation", value: "Toxic Immunity" },
+        { trait: "Wasteland Skills", value: "Combat Tactics" }
+      ]
+    },
+    {
+      id: 3,
+      name: "Wasteland Prophet #007",
+      rarity: "Legendary",
+      tokenId: 7,
+      attributes: [
+        { trait: "Radiation Level", value: "Critical" },
+        { trait: "Mutation", value: "Telepathy" },
+        { trait: "Wasteland Skills", value: "Leadership" }
+      ]
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
@@ -130,6 +171,98 @@ const Index = () => {
                   <Share2 className="w-5 h-5 mr-2" />
                   View Projects
                 </ToxicButton>
+              </div>
+            </div>
+
+            {/* NFT Collection Showcase - NEW SECTION */}
+            <div className="mt-12 mb-12 bg-black/40 border border-yellow-500/20 rounded-xl p-6 relative broken-glass">
+              <div className="scanline"></div>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-mono text-yellow-300 flex items-center toxic-glow">
+                  <Radiation className="h-5 w-5 mr-2" /> Wasteland NFT Collection
+                </h3>
+                <ToxicButton 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => navigate('/marketplace')}
+                  className="text-yellow-300 hover:bg-yellow-900/20 border-yellow-500/50"
+                >
+                  View All <ArrowIcon className="h-4 w-4 ml-1" />
+                </ToxicButton>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {nftCollection.map((nft) => (
+                  <ToxicCard key={nft.id} className="bg-black/70 border-yellow-500/30 hover:border-yellow-500/60 transition-all">
+                    <ToxicCardContent className="p-0">
+                      <div className="relative h-48 bg-gradient-to-b from-yellow-500/20 to-black/60 rounded-t-lg overflow-hidden">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Image className="w-20 h-20 text-yellow-500/50" />
+                        </div>
+                        <DrippingSlime position="top" dripsCount={5} toxicGreen={true} />
+                        <div className="absolute top-2 right-2">
+                          <div className="px-2 py-1 rounded-full bg-yellow-500/20 text-xs text-yellow-300 font-mono">
+                            #{nft.tokenId}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <h4 className="text-xl font-mono text-yellow-300 mb-2">{nft.name}</h4>
+                        <div className="flex justify-between items-center mb-3">
+                          <span className="text-white/70 text-sm">Rarity</span>
+                          <span className={`text-sm font-semibold ${
+                            nft.rarity === "Legendary" ? "text-purple-300" : 
+                            nft.rarity === "Epic" ? "text-yellow-300" : "text-blue-300"
+                          }`}>{nft.rarity}</span>
+                        </div>
+                        <div className="space-y-2 mb-4">
+                          {nft.attributes.map((attr, idx) => (
+                            <div key={idx} className="flex justify-between text-xs">
+                              <span className="text-white/60">{attr.trait}</span>
+                              <span className="text-yellow-500/90">{attr.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <ToxicButton 
+                          className="w-full mt-2 bg-yellow-900/60 border-yellow-500/50 hover:bg-yellow-900/80 text-sm"
+                          size="sm"
+                        >
+                          <Wallet className="h-4 w-4 mr-1" /> Claim NFT
+                        </ToxicButton>
+                      </div>
+                    </ToxicCardContent>
+                  </ToxicCard>
+                ))}
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-yellow-500/20">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-toxic-green" />
+                    <span className="text-lg font-mono text-yellow-300">Your NFT Collection</span>
+                  </div>
+                  <div className="bg-yellow-500/10 px-3 py-1 rounded-full text-yellow-300 text-sm font-mono">
+                    {isLoadingNFT ? "Loading..." : `${nftBalance} NFTs`}
+                  </div>
+                </div>
+                
+                <div className="mt-4">
+                  <NFTDisplay balance={nftBalance} className="bg-black/30 p-4 rounded-lg" />
+                  
+                  {nftBalance === 0 && (
+                    <div className="text-center py-6 bg-yellow-500/5 rounded-lg mt-4">
+                      <p className="text-white/70 mb-4">You don't own any Wasteland NFTs yet</p>
+                      <ToxicButton 
+                        variant="default"
+                        onClick={() => navigate('/buy-membership-nft')}
+                        className="bg-yellow-900/60 border-yellow-500/50 hover:bg-yellow-900/80"
+                      >
+                        <Radiation className="h-4 w-4 mr-2" />
+                        Get Your First NFT
+                      </ToxicButton>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
