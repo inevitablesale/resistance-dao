@@ -213,17 +213,7 @@ const Index = () => {
         />
       )}
 
-      {/* Progress Indicator */}
-      <div className="fixed top-4 right-4 z-50">
-        <ProgressIndicator 
-          stages={[
-            { id: "boot", label: "Boot", completed: authStage !== "pre-boot" },
-            { id: "breach", label: "System Breach", completed: authStage === "post-breach" || authStage === "authenticated" },
-            { id: "desktop", label: "Interface", completed: terminalStage !== "typing" && (authStage === "post-breach" || authStage === "authenticated") },
-            { id: "role", label: "Role Selection", completed: userRole !== null }
-          ]}
-        />
-      </div>
+      {/* Progress Indicator has been removed from here */}
 
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0">
@@ -305,15 +295,41 @@ const Index = () => {
                 <div className="mb-6">
                   {/* Conditional rendering based on authentication state */}
                   {authStage === "pre-boot" && (
-                    <PreBootTerminal onAuthenticated={handleAuthenticated} />
+                    <>
+                      <PreBootTerminal onAuthenticated={handleAuthenticated} />
+                      {/* Progress Indicator moved here, below the terminal */}
+                      <div className="mt-6">
+                        <ProgressIndicator 
+                          stages={[
+                            { id: "boot", label: "Boot", completed: authStage !== "pre-boot" },
+                            { id: "breach", label: "System Breach", completed: authStage === "post-breach" || authStage === "authenticated" },
+                            { id: "desktop", label: "Interface", completed: terminalStage !== "typing" && (authStage === "post-breach" || authStage === "authenticated") },
+                            { id: "role", label: "Role Selection", completed: userRole !== null }
+                          ]}
+                        />
+                      </div>
+                    </>
                   )}
                   
                   {(authStage === "authenticated" || authStage === "post-breach") ? (
-                    <PostAuthLayout
-                      leftSidebar={renderLeftSidebar()}
-                      mainContent={renderMainContent()}
-                      rightSidebar={renderRightSidebar()}
-                    />
+                    <>
+                      <PostAuthLayout
+                        leftSidebar={renderLeftSidebar()}
+                        mainContent={renderMainContent()}
+                        rightSidebar={renderRightSidebar()}
+                      />
+                      {/* Progress Indicator shown below the PostAuthLayout too */}
+                      <div className="mt-6">
+                        <ProgressIndicator 
+                          stages={[
+                            { id: "boot", label: "Boot", completed: authStage !== "pre-boot" },
+                            { id: "breach", label: "System Breach", completed: authStage === "post-breach" || authStage === "authenticated" },
+                            { id: "desktop", label: "Interface", completed: terminalStage !== "typing" && (authStage === "post-breach" || authStage === "authenticated") },
+                            { id: "role", label: "Role Selection", completed: userRole !== null }
+                          ]}
+                        />
+                      </div>
+                    </>
                   ) : (
                     renderMainContent()
                   )}

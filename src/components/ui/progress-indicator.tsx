@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { CheckCircle, Circle, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Check } from 'lucide-react';
 
 interface ProgressStage {
   id: string;
@@ -17,51 +16,50 @@ interface ProgressIndicatorProps {
 
 export function ProgressIndicator({ stages, className }: ProgressIndicatorProps) {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5 }}
-      className={cn(
-        "flex items-center bg-black/60 backdrop-blur-sm border border-toxic-neon/30 rounded-lg p-2",
-        className
-      )}
-    >
-      {stages.map((stage, index) => (
-        <React.Fragment key={stage.id}>
-          <div className="flex items-center">
-            <motion.div 
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: index * 0.2 + 0.5 }}
-              className={cn(
-                "flex items-center justify-center w-6 h-6 rounded-full border",
-                stage.completed 
-                  ? "bg-toxic-neon/20 border-toxic-neon text-toxic-neon" 
-                  : "bg-black/40 border-white/20 text-white/40"
-              )}
-            >
-              {stage.completed ? (
-                <CheckCircle className="w-4 h-4" />
-              ) : (
-                <Circle className="w-4 h-4" />
-              )}
-            </motion.div>
-            <span className={cn(
-              "ml-1 text-xs font-mono hidden sm:inline",
-              stage.completed ? "text-toxic-neon" : "text-white/40"
-            )}>
-              {stage.label}
-            </span>
-          </div>
-          
-          {index < stages.length - 1 && (
-            <div className={cn(
-              "h-[2px] w-4 mx-1",
-              stage.completed ? "bg-toxic-neon" : "bg-white/20"
-            )}/>
-          )}
-        </React.Fragment>
-      ))}
-    </motion.div>
+    <div className={cn("w-full overflow-hidden", className)}>
+      <div className="flex items-center justify-between">
+        {stages.map((stage, index) => (
+          <React.Fragment key={stage.id}>
+            <div className="flex flex-col items-center justify-center">
+              <div 
+                className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300",
+                  stage.completed 
+                    ? "bg-toxic-neon border-toxic-neon text-black" 
+                    : "bg-black border-toxic-neon/40 text-toxic-neon/40"
+                )}
+              >
+                {stage.completed ? (
+                  <Check className="h-5 w-5" />
+                ) : (
+                  <span className="text-xs font-bold">{index + 1}</span>
+                )}
+              </div>
+              <span 
+                className={cn(
+                  "text-xs mt-1 font-mono transition-colors duration-300",
+                  stage.completed ? "text-toxic-neon" : "text-toxic-neon/40"
+                )}
+              >
+                {stage.label}
+              </span>
+            </div>
+            
+            {index < stages.length - 1 && (
+              <div 
+                className={cn(
+                  "h-0.5 flex-1 mx-2 transition-all duration-500",
+                  stages[index + 1].completed 
+                    ? "bg-toxic-neon" 
+                    : stage.completed 
+                      ? "bg-gradient-to-r from-toxic-neon to-toxic-neon/10" 
+                      : "bg-toxic-neon/20"
+                )}
+              />
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
   );
 }
