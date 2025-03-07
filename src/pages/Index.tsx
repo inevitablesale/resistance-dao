@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -153,6 +154,119 @@ const Index = () => {
 
   const displayCollection = userRole === "survivor" ? survivorCollection : bountyHunterCollection;
 
+  // Resistance updates section - moved to a standalone component structure to avoid duplication
+  const ResistanceUpdates = () => (
+    <div className="bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
+      <div className="scanline"></div>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-mono text-toxic-neon flex items-center">
+          <Radiation className="h-5 w-5 mr-2" /> Resistance Updates
+        </h3>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 text-sm text-toxic-neon/70">
+            <div className="w-2 h-2 bg-toxic-neon rounded-full animate-pulse" />
+            Emergency Broadcasts
+          </div>
+          <ToxicButton 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => window.location.reload()}
+            className="text-toxic-neon hover:bg-toxic-dark/20"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </ToxicButton>
+        </div>
+      </div>
+      <div className="space-y-4">
+        {isLoadingStats ? (
+          <div className="animate-pulse">Scanning wasteland...</div>
+        ) : (
+          stats?.recentActivities.map((activity, i) => (
+            <div key={i} className="flex items-center justify-between py-2 border-b border-toxic-neon/10 last:border-0">
+              <div className="flex items-center gap-3">
+                <div className={`w-2 h-2 rounded-full ${
+                  activity.type === 'vote' ? 'bg-toxic-neon' :
+                  activity.type === 'create' ? 'bg-toxic-neon/70' : 'bg-toxic-muted'
+                }`} />
+                <span className="text-white/70">
+                  {activity.type === 'vote' ? 'New Survivor Pledge' :
+                  activity.type === 'create' ? 'Settlement Initiative' :
+                  'Resource Goal Reached'}
+                </span>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="font-mono text-toxic-neon">
+                  {activity.type === 'vote' || activity.type === 'complete' 
+                    ? formatCurrency(Number(activity.amount))
+                    : `#${activity.proposalId}`}
+                </span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+
+  // Stats cards - moved to a standalone component to avoid duplication
+  const ResistanceStats = () => (
+    <div className="grid md:grid-cols-3 gap-8 mt-8">
+      <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-full bg-toxic-neon/10">
+            <CircleDollarSign className="w-6 h-6 text-toxic-neon" />
+          </div>
+          <div>
+            <div className="text-toxic-neon/70 text-sm">Community Support</div>
+            <div className="text-2xl font-semibold text-white">
+              {isLoadingStats ? (
+                <span className="animate-pulse">Calculating...</span>
+              ) : (
+                formatCurrency(stats?.totalLockedValue || 0)
+              )}
+            </div>
+          </div>
+        </div>
+      </ToxicCard>
+
+      <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-full bg-toxic-neon/10">
+            <Users className="w-6 h-6 text-toxic-neon" />
+          </div>
+          <div>
+            <div className="text-toxic-neon/70 text-sm">Resistance Fighters</div>
+            <div className="text-2xl font-semibold text-white">
+              {isLoadingStats ? (
+                <span className="animate-pulse">Counting...</span>
+              ) : (
+                formatNumber(stats?.totalHolders || 0)
+              )}
+            </div>
+          </div>
+        </div>
+      </ToxicCard>
+
+      <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-full bg-toxic-neon/10">
+            <Scale className="w-6 h-6 text-toxic-neon" />
+          </div>
+          <div>
+            <div className="text-toxic-neon/70 text-sm">Established Colonies</div>
+            <div className="text-2xl font-semibold text-white">
+              {isLoadingStats ? (
+                <span className="animate-pulse">Searching...</span>
+              ) : (
+                formatNumber(stats?.activeProposals || 0)
+              )}
+            </div>
+          </div>
+        </div>
+      </ToxicCard>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
       <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} />
@@ -212,6 +326,7 @@ const Index = () => {
                 </div>
               </div>
               
+              {/* Main content with role-based view */}
               <div className="mb-12 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
                 <div className="scanline"></div>
                 <div className="flex items-center justify-between mb-4">
@@ -453,141 +568,12 @@ const Index = () => {
                   </ToxicButton>
                 </div>
 
-                <div className="mb-6 p-4 bg-black/50 border border-apocalypse-red/30 rounded-lg relative">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-apocalypse-red/20 flex items-center justify-center">
-                      <Radiation className="w-6 h-6 text-apocalypse-red" />
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-mono text-apocalypse-red mb-2">Resource Allocation Protocol</h4>
-                      <p className="text-white/80 mb-3 text-sm">
-                        <span className="text-apocalypse-red font-semibold">Request Mission Sponsorship</span> - In the wasteland, 
-                        lone survivors rarely last. Your mission might be vital to our collective survival, but resources are scarce. 
-                        Present your plans to the Council and fellow survivors will vote with their Resistance Dollars to back missions 
-                        that strengthen our foothold in this hostile world.
-                      </p>
-                      <p className="text-white/80 mb-3 text-sm">
-                        <span className="text-toxic-neon font-semibold">Scout Settlements</span> - Our network of outposts and safe zones grows 
-                        with each passing day. Browse the mission board to discover initiatives from fellow survivors - from radiation-resistant 
-                        crop research to mutant defense systems. Contribute your expertise and RD tokens to missions that align with your survival strategy.
-                      </p>
-                      <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
-                        <span className="text-toxic-neon font-semibold block mb-1">» SURVIVAL DIRECTIVE «</span>
-                        The old world fell because resources flowed to the greedy, not the worthy. The Resistance vets all projects through 
-                        decentralized consensus - your voice matters in determining what gets built and who receives support. Choose wisely, survivor.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
-                  <div className="scanline"></div>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-mono text-toxic-neon flex items-center">
-                      <Radiation className="h-5 w-5 mr-2" /> Resistance Updates
-                    </h3>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2 text-sm text-toxic-neon/70">
-                        <div className="w-2 h-2 bg-toxic-neon rounded-full animate-pulse" />
-                        Emergency Broadcasts
-                      </div>
-                      <ToxicButton 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => window.location.reload()}
-                        className="text-toxic-neon hover:bg-toxic-dark/20"
-                      >
-                        <RefreshCw className="h-4 w-4" />
-                      </ToxicButton>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    {isLoadingStats ? (
-                      <div className="animate-pulse">Scanning wasteland...</div>
-                    ) : (
-                      stats?.recentActivities.map((activity, i) => (
-                        <div key={i} className="flex items-center justify-between py-2 border-b border-toxic-neon/10 last:border-0">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-2 h-2 rounded-full ${
-                              activity.type === 'vote' ? 'bg-toxic-neon' :
-                              activity.type === 'create' ? 'bg-toxic-neon/70' : 'bg-toxic-muted'
-                            }`} />
-                            <span className="text-white/70">
-                              {activity.type === 'vote' ? 'New Survivor Pledge' :
-                              activity.type === 'create' ? 'Settlement Initiative' :
-                              'Resource Goal Reached'}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <span className="font-mono text-toxic-neon">
-                              {activity.type === 'vote' || activity.type === 'complete' 
-                                ? formatCurrency(Number(activity.amount))
-                                : `#${activity.proposalId}`}
-                            </span>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-8 mt-8">
-                  <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-full bg-toxic-neon/10">
-                        <CircleDollarSign className="w-6 h-6 text-toxic-neon" />
-                      </div>
-                      <div>
-                        <div className="text-toxic-neon/70 text-sm">Community Support</div>
-                        <div className="text-2xl font-semibold text-white">
-                          {isLoadingStats ? (
-                            <span className="animate-pulse">Calculating...</span>
-                          ) : (
-                            formatCurrency(stats?.totalLockedValue || 0)
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </ToxicCard>
-
-                  <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-full bg-toxic-neon/10">
-                        <Users className="w-6 h-6 text-toxic-neon" />
-                      </div>
-                      <div>
-                        <div className="text-toxic-neon/70 text-sm">Resistance Fighters</div>
-                        <div className="text-2xl font-semibold text-white">
-                          {isLoadingStats ? (
-                            <span className="animate-pulse">Counting...</span>
-                          ) : (
-                            formatNumber(stats?.totalHolders || 0)
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </ToxicCard>
-
-                  <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-full bg-toxic-neon/10">
-                        <Scale className="w-6 h-6 text-toxic-neon" />
-                      </div>
-                      <div>
-                        <div className="text-toxic-neon/70 text-sm">Established Colonies</div>
-                        <div className="text-2xl font-semibold text-white">
-                          {isLoadingStats ? (
-                            <span className="animate-pulse">Searching...</span>
-                          ) : (
-                            formatNumber(stats?.activeProposals || 0)
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </ToxicCard>
-                </div>
+                {/* Updates section */}
+                <ResistanceUpdates />
+                <ResistanceStats />
               </div>
 
+              {/* Resistance Story section */}
               <div className="mb-12 relative">
                 <div className="text-center mb-16">
                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-apocalypse-red/30 bg-black/60 text-apocalypse-red mb-4">
@@ -738,113 +724,6 @@ const Index = () => {
                   </ToxicButton>
                 </div>
               </div>
-            </div>
-
-            <div className="mt-12 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
-              <div className="scanline"></div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-mono text-toxic-neon flex items-center">
-                  <Radiation className="h-5 w-5 mr-2" /> Resistance Updates
-                </h3>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 text-sm text-toxic-neon/70">
-                    <div className="w-2 h-2 bg-toxic-neon rounded-full animate-pulse" />
-                    Emergency Broadcasts
-                  </div>
-                  <ToxicButton 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => window.location.reload()}
-                    className="text-toxic-neon hover:bg-toxic-dark/20"
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                  </ToxicButton>
-                </div>
-              </div>
-              <div className="space-y-4">
-                {isLoadingStats ? (
-                  <div className="animate-pulse">Scanning wasteland...</div>
-                ) : (
-                  stats?.recentActivities.map((activity, i) => (
-                    <div key={i} className="flex items-center justify-between py-2 border-b border-toxic-neon/10 last:border-0">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-2 h-2 rounded-full ${
-                          activity.type === 'vote' ? 'bg-toxic-neon' :
-                          activity.type === 'create' ? 'bg-toxic-neon/70' : 'bg-toxic-muted'
-                        }`} />
-                        <span className="text-white/70">
-                          {activity.type === 'vote' ? 'New Survivor Pledge' :
-                           activity.type === 'create' ? 'Settlement Initiative' :
-                           'Resource Goal Reached'}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <span className="font-mono text-toxic-neon">
-                          {activity.type === 'vote' || activity.type === 'complete' 
-                            ? formatCurrency(Number(activity.amount))
-                            : `#${activity.proposalId}`}
-                        </span>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8 mt-8">
-              <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-full bg-toxic-neon/10">
-                    <CircleDollarSign className="w-6 h-6 text-toxic-neon" />
-                  </div>
-                  <div>
-                    <div className="text-toxic-neon/70 text-sm">Community Support</div>
-                    <div className="text-2xl font-semibold text-white">
-                      {isLoadingStats ? (
-                        <span className="animate-pulse">Calculating...</span>
-                      ) : (
-                        formatCurrency(stats?.totalLockedValue || 0)
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </ToxicCard>
-
-              <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-full bg-toxic-neon/10">
-                    <Users className="w-6 h-6 text-toxic-neon" />
-                  </div>
-                  <div>
-                    <div className="text-toxic-neon/70 text-sm">Resistance Fighters</div>
-                    <div className="text-2xl font-semibold text-white">
-                      {isLoadingStats ? (
-                        <span className="animate-pulse">Counting...</span>
-                      ) : (
-                        formatNumber(stats?.totalHolders || 0)
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </ToxicCard>
-
-              <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-full bg-toxic-neon/10">
-                    <Scale className="w-6 h-6 text-toxic-neon" />
-                  </div>
-                  <div>
-                    <div className="text-toxic-neon/70 text-sm">Established Colonies</div>
-                    <div className="text-2xl font-semibold text-white">
-                      {isLoadingStats ? (
-                        <span className="animate-pulse">Searching...</span>
-                      ) : (
-                        formatNumber(stats?.activeProposals || 0)
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </ToxicCard>
             </div>
           </motion.div>
         </div>
