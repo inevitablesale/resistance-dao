@@ -1,4 +1,4 @@
-<lov-code>
+
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -248,6 +248,7 @@ const Index = () => {
                           <ToxicButton 
                             className="w-full mt-2 bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80 text-sm"
                             size="sm"
+                            onClick={handleConnectWallet}
                           >
                             <Target className="h-4 w-4 mr-1" /> Claim Bounty
                           </ToxicButton>
@@ -276,7 +277,7 @@ const Index = () => {
                         <p className="text-white/70 mb-4">You haven't captured any mutant criminals yet</p>
                         <ToxicButton 
                           variant="default"
-                          onClick={() => navigate('/buy-membership-nft')}
+                          onClick={handleConnectWallet}
                           className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
                         >
                           <Radiation className="h-4 w-4 mr-2" />
@@ -289,7 +290,7 @@ const Index = () => {
               </div>
               
               <div className="relative mb-8">
-                <BuyRDTokens />
+                <BuyRDTokens onConnectWallet={handleConnectWallet} />
                 <ToxicPuddle className="absolute -bottom-2 -right-10" toxicGreen={true} />
               </div>
               
@@ -587,7 +588,7 @@ const Index = () => {
                 <div className="flex justify-center mt-16">
                   <ToxicButton 
                     size="lg"
-                    onClick={() => navigate('/join-resistance')}
+                    onClick={handleConnectWallet}
                     variant="glowing"
                     className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
                   >
@@ -655,3 +656,60 @@ const Index = () => {
                   <div className="p-3 rounded-full bg-toxic-neon/10">
                     <CircleDollarSign className="w-6 h-6 text-toxic-neon" />
                   </div>
+                  <div>
+                    <div className="text-toxic-neon/70 text-sm">Community Support</div>
+                    <div className="text-2xl font-semibold text-white">
+                      {isLoadingStats ? (
+                        <span className="animate-pulse">Calculating...</span>
+                      ) : (
+                        formatCurrency(stats?.totalLockedValue || 0)
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </ToxicCard>
+
+              <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-toxic-neon/10">
+                    <Users className="w-6 h-6 text-toxic-neon" />
+                  </div>
+                  <div>
+                    <div className="text-toxic-neon/70 text-sm">Resistance Fighters</div>
+                    <div className="text-2xl font-semibold text-white">
+                      {isLoadingStats ? (
+                        <span className="animate-pulse">Counting...</span>
+                      ) : (
+                        formatNumber(stats?.totalHolders || 0)
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </ToxicCard>
+
+              <ToxicCard className="relative bg-black/70 border-toxic-neon/30">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-toxic-neon/10">
+                    <Scale className="w-6 h-6 text-toxic-neon" />
+                  </div>
+                  <div>
+                    <div className="text-toxic-neon/70 text-sm">Established Colonies</div>
+                    <div className="text-2xl font-semibold text-white">
+                      {isLoadingStats ? (
+                        <span className="animate-pulse">Searching...</span>
+                      ) : (
+                        formatNumber(stats?.activeProposals || 0)
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </ToxicCard>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Index;

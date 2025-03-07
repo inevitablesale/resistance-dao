@@ -1,90 +1,129 @@
 
-import React, { useState } from "react";
-import { Coins, Target, Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { purchaseTokens } from "@/services/presaleContractService";
-import { ethers } from "ethers";
+import { useState } from 'react';
+import { ToxicButton } from "@/components/ui/toxic-button";
+import { Wallet, Radiation, ArrowRightLeft, CornerRightDown } from 'lucide-react';
+import { ToxicCard } from '@/components/ui/toxic-card';
 
-export const BuyRDTokens = () => {
-  const [amount, setAmount] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-  const { isConnected, connect, wallet } = useWalletConnection();
+interface BuyRDTokensProps {
+  onConnectWallet?: () => void;
+}
 
-  const handlePurchase = async () => {
-    if (!amount || !wallet?.address) return;
-
-    setIsLoading(true);
-    try {
-      // Use ethereum from window object and create provider
-      if (!window.ethereum) {
-        throw new Error("No ethereum provider found");
-      }
-      
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      
-      const tx = await purchaseTokens(signer, amount);
-      
-      toast({
-        title: "Conversion Complete",
-        description: `Successfully converted ${tx.amount} USDC to RD tokens to fuel the resistance.`,
-      });
-      
-      setAmount("");
-    } catch (error: any) {
-      console.error("Purchase error:", error);
-      toast({
-        title: "Conversion Failed",
-        description: error.message || "Failed to convert to resistance dollars. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+export const BuyRDTokens = ({ onConnectWallet }: BuyRDTokensProps) => {
+  const [amount, setAmount] = useState<number>(100);
+  
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value)) {
+      setAmount(value);
     }
   };
-
+  
   return (
-    <div className="flex flex-col md:flex-row items-center gap-4 my-8 p-4 bg-apocalypse-charcoal/80 rounded-xl border border-apocalypse-red/30">
-      <div className="flex-1 min-w-0">
-        <h3 className="text-xl font-mono text-apocalypse-red flex items-center gap-2 mb-2">
-          <Coins className="w-5 h-5" />
-          Convert to Resistance Dollars
-        </h3>
-        <p className="text-white/70 text-sm mb-4">
-          Transform your Old World currency (USDC) into Resistance Dollars (RD) - the only currency survivors trust in the wasteland
-        </p>
-        {isConnected ? (
-          <div className="flex gap-3">
-            <Input
-              type="number"
-              placeholder="Amount in USDC"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="bg-black/20 border-apocalypse-red/20 text-white placeholder:text-white/40"
-            />
-            <Button
-              onClick={handlePurchase}
-              disabled={!amount || isLoading}
-              className="bg-gradient-to-r from-apocalypse-red to-apocalypse-rust hover:from-apocalypse-red/90 hover:to-apocalypse-rust/90 min-w-[120px]"
-            >
-              <Shield className="w-4 h-4 mr-2" />
-              {isLoading ? "Converting..." : "Convert Currency"}
-            </Button>
+    <ToxicCard className="relative bg-black/40 border border-toxic-neon/20 p-0 overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+        <div className="p-6">
+          <h3 className="text-2xl font-mono text-toxic-neon mb-4 toxic-glow flex items-center">
+            <Radiation className="w-6 h-6 mr-2" /> Fund Bounty Hunters
+          </h3>
+          <p className="text-white/70 mb-4">
+            Convert your <span className="text-apocalypse-red font-semibold">Old World currency (USDC)</span> into <span className="text-toxic-neon font-semibold">Resistance Dollars (RD)</span> to support bounty hunters tracking mutant protocol criminals across the wasteland.
+          </p>
+          
+          <div className="mb-4">
+            <div className="bg-black/70 border border-toxic-neon/20 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-toxic-neon font-mono">Exchange Rate</span>
+                <span className="text-white font-mono">1 USDC = 1 RD</span>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-toxic-neon font-mono">Minimum Transfer</span>
+                <span className="text-white font-mono">10 USDC</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-toxic-neon font-mono">Protocol Fee</span>
+                <span className="text-white font-mono">0.5%</span>
+              </div>
+            </div>
           </div>
-        ) : (
-          <Button
-            onClick={connect}
-            className="bg-gradient-to-r from-apocalypse-red to-apocalypse-rust hover:from-apocalypse-red/90 hover:to-apocalypse-rust/90"
+          
+          <div className="bg-black/60 border border-toxic-neon/20 p-4 rounded-lg mb-6">
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-white/70 text-sm">Amount to Convert</span>
+                <span className="text-toxic-neon text-sm">Balance: 0 USDC</span>
+              </div>
+              <div className="flex items-center gap-2 mb-4">
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={handleAmountChange}
+                  className="w-full bg-black/70 border border-toxic-neon/30 text-white p-2 rounded-lg focus:outline-none focus:border-toxic-neon font-mono"
+                />
+                <span className="text-white font-mono bg-toxic-neon/20 py-2 px-3 rounded-lg">USDC</span>
+              </div>
+              
+              <div className="flex items-center justify-center my-3">
+                <div className="bg-toxic-neon/20 p-2 rounded-full">
+                  <ArrowRightLeft className="h-5 w-5 text-toxic-neon" />
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-white/70 text-sm">You'll Receive</span>
+                <span className="text-toxic-neon text-sm">Est. Value</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-full bg-black/70 border border-toxic-neon/30 text-white p-2 rounded-lg font-mono">
+                  {amount} RD
+                </div>
+                <span className="text-white font-mono bg-toxic-neon/20 py-2 px-3 rounded-lg">RD</span>
+              </div>
+            </div>
+          </div>
+          
+          <ToxicButton
+            className="w-full bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+            size="lg"
+            onClick={onConnectWallet}
           >
-            <Shield className="w-4 h-4 mr-2" />
-            Activate Survival Beacon
-          </Button>
-        )}
+            <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
+            <span className="text-lg font-mono flash-beacon">ACTIVATE SURVIVAL BEACON</span>
+          </ToxicButton>
+        </div>
+        
+        <div className="bg-toxic-neon/5 p-6 border-l border-toxic-neon/20">
+          <h3 className="text-xl font-mono text-toxic-neon mb-4">Why Join The Resistance?</h3>
+          <ul className="space-y-4">
+            <li className="flex gap-3">
+              <div className="flex-shrink-0 bg-toxic-neon/10 w-8 h-8 rounded-full flex items-center justify-center">
+                <Wallet className="w-4 h-4 text-toxic-neon" />
+              </div>
+              <div>
+                <h4 className="text-white font-mono mb-1">Secure Asset Storage</h4>
+                <p className="text-white/70 text-sm">Your RD tokens are stored in radiation-hardened vaults secured by battle-tested smart contracts.</p>
+              </div>
+            </li>
+            <li className="flex gap-3">
+              <div className="flex-shrink-0 bg-toxic-neon/10 w-8 h-8 rounded-full flex items-center justify-center">
+                <Radiation className="w-4 h-4 text-toxic-neon" />
+              </div>
+              <div>
+                <h4 className="text-white font-mono mb-1">Governance Rights</h4>
+                <p className="text-white/70 text-sm">RD token holders vote on Resistance initiatives and resource allocation throughout the wasteland.</p>
+              </div>
+            </li>
+            <li className="flex gap-3">
+              <div className="flex-shrink-0 bg-toxic-neon/10 w-8 h-8 rounded-full flex items-center justify-center">
+                <CornerRightDown className="w-4 h-4 text-toxic-neon" />
+              </div>
+              <div>
+                <h4 className="text-white font-mono mb-1">Priority Access</h4>
+                <p className="text-white/70 text-sm">Early access to new Resistance technology and survival protocols before they're released to the wasteland.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
+    </ToxicCard>
   );
 };
