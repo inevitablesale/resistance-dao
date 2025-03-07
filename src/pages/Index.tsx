@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -114,8 +113,8 @@ const Index = () => {
             {/* Network Status and Title */}
             <div className="text-left mb-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
-                <span className="w-2 h-2 bg-toxic-neon rounded-full animate-pulse" />
-                <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Network Status: Critical
+                <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
+                <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Network Status: <span className="text-apocalypse-red font-bold animate-pulse">Critical</span>
               </div>
               <h1 className="text-5xl md:text-6xl font-bold font-mono mb-6 text-toxic-neon toxic-glow">
                 Post-Apocalyptic Launch Platform
@@ -150,6 +149,32 @@ const Index = () => {
               <div className="relative mb-8">
                 <BuyRDTokens />
                 <ToxicPuddle className="absolute -bottom-2 -right-10" toxicGreen={true} />
+              </div>
+              
+              {/* THE RESISTANCE STORY - MOVED HERE */}
+              <div className="mb-12 bg-black/50 border border-apocalypse-red/30 rounded-xl p-6 relative">
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-apocalypse-red/30 bg-black/60 text-apocalypse-red mb-4">
+                    <Radiation className="w-5 h-5" />
+                    <span className="text-sm font-mono">HISTORICAL ARCHIVES</span>
+                  </div>
+                  <h2 className="text-4xl font-bold font-mono mb-6 text-toxic-neon toxic-glow">
+                    The Resistance Story
+                  </h2>
+                  <p className="text-xl text-white/70 max-w-3xl mx-auto">
+                    How we survived the crypto nuclear winter and built a new world from the ashes
+                  </p>
+                  <div className="mt-8">
+                    <ToxicButton 
+                      variant="outline" 
+                      size="lg" 
+                      className="border-apocalypse-red/30 text-toxic-neon hover:bg-apocalypse-red/10"
+                      onClick={() => navigate('/resistance-origins')}
+                    >
+                      Read Our Story <ArrowIcon className="ml-2 h-5 w-5" />
+                    </ToxicButton>
+                  </div>
+                </div>
               </div>
               
               {/* Action Buttons */}
@@ -647,84 +672,4 @@ const Index = () => {
 
       <section className="py-24 relative overflow-hidden radiation-bg">
         <div className="absolute inset-0">
-          <div className="absolute w-[600px] h-[600px] bg-toxic-neon/10 rounded-full blur-[100px] -top-1/4 -right-1/4" />
-        </div>
-        <div className="container px-4 relative">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
-          >
-            <div className="inline-block mb-4">
-              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-toxic-neon/20 bg-black/40 backdrop-blur">
-                <FileText className="w-5 h-5 text-toxic-neon" />
-                <span className="text-sm font-mono text-toxic-neon">ALLIANCE PROTOCOL</span>
-              </div>
-            </div>
-            <h2 className="text-4xl font-bold mb-6 text-toxic-neon toxic-glow">
-              Join the Resistance Today
-            </h2>
-            <p className="text-xl text-white/70 max-w-3xl mx-auto">
-              The old world is gone. Help us build something better from the ashes.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <Card className="bg-black/50 border-toxic-neon/30 p-6 text-white relative group hover:border-toxic-neon/60 transition-all">
-              <div className="absolute -inset-px opacity-0 group-hover:opacity-100 bg-toxic-neon/5 rounded-xl blur-sm transition-opacity"></div>
-              <div className="mb-4">
-                <Radiation className="h-8 w-8 text-toxic-neon" />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-toxic-neon">Survivor Membership</h3>
-              <p className="text-white/70 mb-4">Join our community of post-nuclear builders and gain access to exclusive launches and governance rights.</p>
-              <Button variant="outline" className="border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10 w-full mt-auto">
-                Connect Wallet
-              </Button>
-            </Card>
-
-            <Card className="bg-black/50 border-toxic-neon/30 p-6 text-white relative group hover:border-toxic-neon/60 transition-all">
-              <div className="absolute -inset-px opacity-0 group-hover:opacity-100 bg-toxic-neon/5 rounded-xl blur-sm transition-opacity"></div>
-              <div className="mb-4">
-                <Coins className="h-8 w-8 text-toxic-neon" />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-toxic-neon">Stake RD Tokens</h3>
-              <p className="text-white/70 mb-4">Secure the network and earn rewards by staking your RD tokens in our radiation-resistant vaults.</p>
-              <Button variant="outline" className="border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10 w-full mt-auto">
-                Stake Now
-              </Button>
-            </Card>
-
-            <Card className="bg-black/50 border-toxic-neon/30 p-6 text-white relative group hover:border-toxic-neon/60 transition-all">
-              <div className="absolute -inset-px opacity-0 group-hover:opacity-100 bg-toxic-neon/5 rounded-xl blur-sm transition-opacity"></div>
-              <div className="mb-4">
-                <Building2 className="h-8 w-8 text-toxic-neon" />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-toxic-neon">Launch a Project</h3>
-              <p className="text-white/70 mb-4">Submit your vision to the community and gather support for your post-apocalyptic innovation.</p>
-              <Button variant="outline" className="border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10 w-full mt-auto">
-                Submit Thesis
-              </Button>
-            </Card>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <ToxicButton 
-              size="lg"
-              variant="glowing"
-              onClick={() => navigate('/thesis')}
-              className="px-8 mb-4"
-            >
-              <Radiation className="w-5 h-5 mr-2" />
-              Start Building
-            </ToxicButton>
-            <p className="text-white/60 text-sm max-w-lg text-center">
-              By joining the Resistance, you agree to uphold our community principles and contribute to the rebirth of our digital ecosystem.
-            </p>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-};
-
-export default Index;
+          <div className="absolute w-[600px] h

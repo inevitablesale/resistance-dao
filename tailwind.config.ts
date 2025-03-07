@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -106,6 +107,7 @@ export default {
         "scanline": "scanline 8s linear infinite",
         "radiation": "radiation 4s ease-in-out infinite",
         "glitch": "glitch 3s ease-in-out infinite",
+        "flash-critical": "flash-critical 1s ease-in-out infinite",
       },
       keyframes: {
         "accordion-down": {
@@ -200,6 +202,10 @@ export default {
           "70%": { transform: "translate(-2px, -2px)" },
           "80%": { transform: "translate(2px, 2px)" },
           "90%": { transform: "translate(-2px, 2px)" },
+        },
+        "flash-critical": {
+          "0%, 100%": { opacity: "1", boxShadow: "0 0 10px rgba(234, 56, 76, 0.8), 0 0 20px rgba(234, 56, 76, 0.6)" },
+          "50%": { opacity: "0.5", boxShadow: "0 0 5px rgba(234, 56, 76, 0.3), 0 0 10px rgba(234, 56, 76, 0.2)" },
         },
       }
     },
