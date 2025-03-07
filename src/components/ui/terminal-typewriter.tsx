@@ -37,7 +37,7 @@ export const TerminalTypewriter = ({
     return () => clearInterval(cursorInterval);
   }, []);
 
-  // Handle text typing effect - works regardless of connection state
+  // Handle text typing effect - ensure it starts immediately on component mount
   useEffect(() => {
     if (isTyping) return;
     
@@ -119,6 +119,10 @@ export const TerminalTypewriter = ({
                     <span className="mr-2 tracking-wider">EMERGENCY TRANSMISSION:</span>
                     <span className="text-xs text-apocalypse-red/70 animate-pulse">[SIGNAL WEAK]</span>
                   </div>
+                  <div className="flex items-center mb-1">
+                    <span className="mr-2">Network Status:</span> 
+                    <span className="text-apocalypse-red font-bold animate-flicker">Critical</span>
+                  </div>
                   <div className="flex">
                     {renderDisplayedText()}
                     <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
@@ -143,6 +147,10 @@ export const TerminalTypewriter = ({
                 <div className="flex items-center font-bold mb-1">
                   <span className="mr-2 tracking-wider">EMERGENCY TRANSMISSION:</span>
                   <span className="text-xs text-apocalypse-red/70">[SIGNAL SECURE]</span>
+                </div>
+                <div className="flex items-center mb-1">
+                  <span className="mr-2">Network Status:</span> 
+                  <span className="text-apocalypse-red font-bold animate-flicker">Critical</span>
                 </div>
                 <div className="flex">
                   {renderDisplayedText()}
