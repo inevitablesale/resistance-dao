@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ToxicButton } from "@/components/ui/toxic-button";
 
+// Define a local interface for journal entries to avoid type conflicts
 interface JournalEntry {
   id: number;
   wallet_address: string;
@@ -27,6 +28,7 @@ export function UserJournalEntries() {
 
     setIsLoading(true);
     try {
+      // Use type assertion to work with existing Supabase types
       const { data, error } = await supabase
         .from('journal_entries')
         .select('*')
@@ -34,7 +36,7 @@ export function UserJournalEntries() {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      setEntries(data || []);
+      setEntries((data || []) as JournalEntry[]);
     } catch (error) {
       console.error("Error fetching journal entries:", error);
     } finally {

@@ -30,6 +30,7 @@ export function JournalEntryForm({ onEntryAdded }: JournalEntryFormProps) {
     setIsSaving(true);
     
     try {
+      // Use type assertion to work with existing Supabase types
       const { error } = await supabase
         .from('journal_entries')
         .insert([
@@ -38,7 +39,7 @@ export function JournalEntryForm({ onEntryAdded }: JournalEntryFormProps) {
             content: entryText,
             created_at: new Date().toISOString()
           }
-        ]);
+        ] as any);
       
       if (error) throw error;
       
