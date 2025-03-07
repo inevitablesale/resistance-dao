@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -151,7 +152,7 @@ const Index = () => {
                 <div className="bg-black/70 border border-toxic-neon/20 rounded-lg p-4 flex-1 relative overflow-hidden rust-overlay">
                   <div className="scanline"></div>
                   <div className="text-toxic-neon text-sm mb-1 flex items-center">
-                    <Users className="h-4 w-4 mr-2" /> Wasteland Community
+                    <Users className="h-4 w-4 mr-2" /> Total Population
                   </div>
                   <div className="font-mono text-2xl text-white">2.5K</div>
                 </div>
@@ -168,7 +169,7 @@ const Index = () => {
                 <div className="scanline"></div>
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
-                    <Crosshair className="h-5 w-5 mr-2" /> WASTELAND BOUNTY LIST
+                    <Crosshair className="h-5 w-5 mr-2" /> Resistance BOUNTY LIST
                   </h3>
                   <ToxicButton 
                     variant="outline" 

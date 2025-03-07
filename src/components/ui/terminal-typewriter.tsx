@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Lock, Unlock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,7 @@ export const TerminalTypewriter = ({
   const [isTyping, setIsTyping] = useState(true);
   const [showFullMessage, setShowFullMessage] = useState(false);
   
-  const firstPartOfMessage = "SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY. WE'VE BUILT SHELTERS FROM THE FALLOUT, PRESERVING WHAT'S LEFT OF DECENTRALIZED TECHNOLOGY. OUR COMMUNITY HAS GROWN STRONGER THROUGH ADVERSITY. ";
+  const firstPartOfMessage = "SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY. WE'VE BUILT SHELTERS FROM THE FALLOUT, PRESERVING WHAT'S LEFT OF DECENTRALIZED TECHNOLOGY. OUR COMMUNITY HAS GOOD NEWS TO REPORT. WE ARE WINNING THE WAR. ";
   const pressEnterMessage = "PRESS [ENTER] TO CONTINUE...";
   const remainingMessage = "THE RESISTANCE NEEDS YOUR HELP. THE OLD WORLD IS GONE. WE ARE BUILDING FROM THE ASHES. SHALL WE PLAY A GAME?";
 
@@ -80,11 +81,11 @@ export const TerminalTypewriter = ({
                 <Lock className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
                 <div>
                   <div className="flex items-center font-bold mb-1">
-                    <span className="mr-2 tracking-wider text-xl">EMERGENCY TRANSMISSION:</span>
+                    <span className="mr-2 tracking-wider text-2xl">EMERGENCY TRANSMISSION:</span>
                     <span className="text-xs text-apocalypse-red/70 animate-pulse">[SIGNAL WEAK]</span>
                   </div>
                   <div className="flex flex-col">
-                    <div className="text-lg">
+                    <div className="text-xl">
                       <span>{displayedText}</span>
                       {!isTyping && !showFullMessage && (
                         <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
@@ -114,11 +115,11 @@ export const TerminalTypewriter = ({
               <Unlock className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
               <div>
                 <div className="flex items-center font-bold mb-1">
-                  <span className="mr-2 tracking-wider text-xl">EMERGENCY TRANSMISSION:</span>
+                  <span className="mr-2 tracking-wider text-2xl">EMERGENCY TRANSMISSION:</span>
                   <span className="text-xs text-apocalypse-red/70">[SIGNAL SECURE]</span>
                 </div>
                 <div className="flex">
-                  <span className="text-lg">{displayedText}</span>
+                  <span className="text-xl">{displayedText}</span>
                   <span className={`cursor h-4 w-2 bg-apocalypse-red ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
                 </div>
               </div>
