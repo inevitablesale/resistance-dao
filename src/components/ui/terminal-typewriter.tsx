@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { Radiation, Target, Shield, Terminal, Zap, AlertTriangle, RotateCw, Check, X, Skull } from "lucide-react";
@@ -211,7 +210,6 @@ export function TerminalTypewriter({
   const glitchRef = useRef<HTMLAudioElement>(null);
   const successRef = useRef<HTMLAudioElement>(null);
   
-  // Boot sequence effect
   useEffect(() => {
     if (bootStage !== "initializing" && bootStage !== "diagnosing" && bootStage !== "recovering" && bootStage !== "connecting" && bootStage !== "complete") return;
     
@@ -223,12 +221,10 @@ export function TerminalTypewriter({
       setBootProgress(prev => {
         const newProgress = prev + (Math.random() * 3 + 1);
         
-        // Occasionally add glitch effect
         if (Math.random() < 0.15) {
           setBootGlitch(true);
           setTimeout(() => setBootGlitch(false), 150);
           
-          // Play glitch sound if audio is enabled
           if (audioEnabled && glitchRef.current) {
             glitchRef.current.currentTime = 0;
             glitchRef.current.play().catch(() => {});
@@ -239,7 +235,6 @@ export function TerminalTypewriter({
       });
     }, 100);
     
-    // Move to next boot stage when progress reaches 100%
     if (bootProgress >= 100) {
       clearInterval(bootInterval);
       
@@ -250,7 +245,6 @@ export function TerminalTypewriter({
         else if (bootStage === "connecting") {
           setBootStage("complete");
           
-          // Play success sound when boot is complete
           if (audioEnabled && successRef.current) {
             successRef.current.currentTime = 0;
             successRef.current.play().catch(() => {});
@@ -265,12 +259,10 @@ export function TerminalTypewriter({
       return () => clearInterval(bootInterval);
     }
     
-    // Progress through boot messages
     const messageInterval = setInterval(() => {
       if (currentBootMessage < bootMessages.length - 1) {
         setCurrentBootMessage(prev => prev + 1);
         
-        // Play beep sound when message changes
         if (audioEnabled && beepRef.current) {
           beepRef.current.currentTime = 0;
           beepRef.current.play().catch(() => {});
@@ -286,7 +278,6 @@ export function TerminalTypewriter({
     };
   }, [bootStage, bootProgress, currentBootMessage, audioEnabled]);
   
-  // Cursor blink effect
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setCursorVisible(prev => !prev);
@@ -295,7 +286,6 @@ export function TerminalTypewriter({
     return () => clearInterval(cursorInterval);
   }, []);
   
-  // Typewriter effect for main text
   useEffect(() => {
     if (bootStage !== "complete" || !isComplete) return;
     
@@ -305,7 +295,6 @@ export function TerminalTypewriter({
         setDisplayText(textToType.substring(0, i));
         i++;
         
-        // Play typing sound every few characters
         if (audioEnabled && i % 3 === 0 && beepRef.current) {
           beepRef.current.volume = 0.2;
           beepRef.current.currentTime = 0;
@@ -319,41 +308,33 @@ export function TerminalTypewriter({
     return () => clearInterval(interval);
   }, [textToType, typeDelay, bootStage, isComplete, audioEnabled]);
   
-  // Initialize AudioContext when enabling audio
   const handleEnableAudio = () => {
-    // Create AudioContext
     const context = new (window.AudioContext || (window as any).webkitAudioContext)();
     setAudioContext(context);
     setAudioEnabled(true);
     
-    // Play ambient sound
     if (audioRef.current) {
       audioRef.current.volume = 0.3;
       audioRef.current.play().catch(() => {});
     }
   };
   
-  // Handle selecting a personality assessment answer
   const handleSelectAnswer = (questionIndex: number, answerIndex: number) => {
     const question = ASSESSMENT_QUESTIONS[questionIndex];
     const answer = question.options[answerIndex];
     
-    // Update scores
     setBountyHunterScore(prev => prev + answer.bountyHunterScore);
     setSurvivorScore(prev => prev + answer.survivorScore);
     
-    // Store answer
     const newAnswers = [...answers];
     newAnswers[questionIndex] = answerIndex;
     setAnswers(newAnswers);
     
-    // Play select sound
     if (audioEnabled && beepRef.current) {
       beepRef.current.currentTime = 0;
       beepRef.current.play().catch(() => {});
     }
     
-    // Move to next question or show results
     if (questionIndex < ASSESSMENT_QUESTIONS.length - 1) {
       setTimeout(() => {
         setCurrentQuestion(questionIndex + 1);
@@ -361,28 +342,23 @@ export function TerminalTypewriter({
     } else {
       setCalculatingResult(true);
       
-      // Play processing sound
       if (audioEnabled && glitchRef.current) {
         glitchRef.current.currentTime = 0;
         glitchRef.current.play().catch(() => {});
       }
       
-      // Show results after delay
       setTimeout(() => {
         setBootStage("results");
         setCalculatingResult(false);
         
-        // Play success sound
         if (audioEnabled && successRef.current) {
           successRef.current.currentTime = 0;
           successRef.current.play().catch(() => {});
         }
         
-        // Determine role
         const role = bountyHunterScore > survivorScore ? "bounty-hunter" : "survivor";
         onRoleSelect?.(role);
         
-        // Notify parent component
         if (onAssessmentComplete) {
           onAssessmentComplete(role);
         }
@@ -390,7 +366,6 @@ export function TerminalTypewriter({
     }
   };
   
-  // Start the personality assessment
   const handleStartAssessment = () => {
     setBootStage("assessment");
     setCurrentQuestion(0);
@@ -398,7 +373,6 @@ export function TerminalTypewriter({
     setBountyHunterScore(0);
     setSurvivorScore(0);
     
-    // Play select sound
     if (audioEnabled && beepRef.current) {
       beepRef.current.currentTime = 0;
       beepRef.current.play().catch(() => {});
@@ -407,7 +381,6 @@ export function TerminalTypewriter({
   
   return (
     <div className={cn("terminal-container relative", className)}>
-      {/* Audio elements */}
       <audio ref={audioRef} src="/sounds/ambient-terminal.mp3" loop />
       <audio ref={beepRef} src="/sounds/terminal-beep.mp3" />
       <audio ref={glitchRef} src="/sounds/glitch.mp3" />
@@ -421,10 +394,8 @@ export function TerminalTypewriter({
           bootStage === "assessment" && "assessment-terminal"
         )}
       >
-        {/* CRT scanline effect */}
         <div className="scanline absolute inset-0 pointer-events-none"></div>
         
-        {/* Terminal header */}
         <div className="flex items-center justify-between mb-4 border-b border-toxic-neon/20 pb-2">
           <div className="flex items-center">
             <Terminal className="h-5 w-5 mr-2 text-toxic-neon" />
@@ -448,7 +419,6 @@ export function TerminalTypewriter({
           </div>
         </div>
         
-        {/* Boot sequence visualization */}
         {(bootStage === "initializing" || bootStage === "diagnosing" || bootStage === "recovering" || bootStage === "connecting") && (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
@@ -499,7 +469,6 @@ export function TerminalTypewriter({
           </div>
         )}
         
-        {/* Complete boot stage */}
         {bootStage === "complete" && (
           <>
             <div className="mb-4">
@@ -546,7 +515,6 @@ export function TerminalTypewriter({
           </>
         )}
         
-        {/* Personality Assessment */}
         {bootStage === "assessment" && (
           <div className="assessment-container">
             <div className="text-center mb-6">
@@ -556,7 +524,6 @@ export function TerminalTypewriter({
               </p>
             </div>
             
-            {/* Progress indicator */}
             <div className="mb-6">
               <div className="flex justify-between text-xs mb-1">
                 <span className="text-white/60">Question {currentQuestion + 1} of {ASSESSMENT_QUESTIONS.length}</span>
@@ -572,7 +539,6 @@ export function TerminalTypewriter({
               </div>
             </div>
             
-            {/* Current question */}
             <div className="mb-6 pb-4 border-b border-toxic-neon/20">
               <h4 className="text-white font-bold mb-3">{ASSESSMENT_QUESTIONS[currentQuestion].question}</h4>
               
@@ -606,7 +572,6 @@ export function TerminalTypewriter({
           </div>
         )}
         
-        {/* Results screen */}
         {bootStage === "results" && (
           <div className="results-container">
             {calculatingResult ? (
@@ -675,7 +640,6 @@ export function TerminalTypewriter({
           </div>
         )}
         
-        {/* Initial connection buttons */}
         {bootStage === "complete" && isComplete && !isConnected && selectedRole === null && (
           <div className="terminal-line mt-6">
             <div className="text-white/70 mb-4">BEFORE JOINING THE RESISTANCE, WE MUST DETERMINE YOUR ROLE IN THE NEW ECONOMY:</div>
@@ -691,7 +655,6 @@ export function TerminalTypewriter({
           </div>
         )}
         
-        {/* Show connected state */}
         {isConnected && (
           <div className="terminal-line mt-4 text-toxic-neon">
             <span>[CONNECTED]</span> <span className="text-white/70">ECONOMY ACCESS GRANTED - WELCOME TO THE NEW FINANCIAL SYSTEM</span>

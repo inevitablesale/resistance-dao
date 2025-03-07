@@ -1,13 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
-import { ToxicCard } from '@/components/ui/toxic-card';
-import { Shield, Target, ArrowRight, Check, Radiation, AlertTriangle } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Shield, Target, AlertTriangle, Check, X, ChevronRight, Terminal, Radiation } from 'lucide-react';
 import { ToxicButton } from '@/components/ui/toxic-button';
-
-interface WastelandQuestionnaireProps {
-  onComplete: (role: "bounty-hunter" | "survivor") => void;
-  className?: string;
-}
+import { cn } from '@/lib/utils';
 
 type Question = {
   id: number;
@@ -15,414 +11,337 @@ type Question = {
   options: {
     id: string;
     text: string;
-    bountyHunterScore: number;
-    survivorScore: number;
+    bountyHunterPoints: number;
+    survivorPoints: number;
   }[];
 };
 
+type UserRole = 'bounty-hunter' | 'survivor' | null;
+
+interface WastelandQuestionnaireProps {
+  onComplete: (role: 'bounty-hunter' | 'survivor') => void;
+  className?: string;
+}
+
+const QUESTIONS: Question[] = [
+  {
+    id: 1,
+    text: "When exploring abandoned ruins, what's your primary focus?",
+    options: [
+      { id: '1a', text: "Finding weapons and tactical gear", bountyHunterPoints: 3, survivorPoints: 0 },
+      { id: '1b', text: "Gathering resources for the community", bountyHunterPoints: 0, survivorPoints: 3 },
+      { id: '1c', text: "Securing the area from hostiles", bountyHunterPoints: 2, survivorPoints: 1 }
+    ]
+  },
+  {
+    id: 2,
+    text: "How do you prefer to deal with threats in the wasteland?",
+    options: [
+      { id: '2a', text: "Eliminating them before they become problems", bountyHunterPoints: 3, survivorPoints: 0 },
+      { id: '2b', text: "Negotiating when possible, fighting when necessary", bountyHunterPoints: 1, survivorPoints: 2 },
+      { id: '2c', text: "Building defenses and avoiding confrontation", bountyHunterPoints: 0, survivorPoints: 3 }
+    ]
+  },
+  {
+    id: 3,
+    text: "Which skill set do you most value in the post-apocalyptic world?",
+    options: [
+      { id: '3a', text: "Combat training and weapon proficiency", bountyHunterPoints: 3, survivorPoints: 0 },
+      { id: '3b', text: "Medical knowledge and healing abilities", bountyHunterPoints: 0, survivorPoints: 3 },
+      { id: '3c', text: "Tactical planning and leadership", bountyHunterPoints: 2, survivorPoints: 1 }
+    ]
+  },
+  {
+    id: 4,
+    text: "When you find a stash of resources, what's your first thought?",
+    options: [
+      { id: '4a', text: "How can I use this to improve my gear?", bountyHunterPoints: 3, survivorPoints: 0 },
+      { id: '4b', text: "How should we distribute this to the group?", bountyHunterPoints: 0, survivorPoints: 3 },
+      { id: '4c', text: "Is this a trap? Let me check for ambushes.", bountyHunterPoints: 2, survivorPoints: 1 }
+    ]
+  },
+  {
+    id: 5,
+    text: "What's your ideal role in a survivor community?",
+    options: [
+      { id: '5a', text: "Scout/Hunter - protecting the perimeter", bountyHunterPoints: 3, survivorPoints: 0 },
+      { id: '5b', text: "Builder/Farmer - creating sustainable systems", bountyHunterPoints: 0, survivorPoints: 3 },
+      { id: '5c', text: "Trader/Diplomat - managing external relations", bountyHunterPoints: 1, survivorPoints: 2 }
+    ]
+  }
+];
+
 export function WastelandQuestionnaire({ onComplete, className }: WastelandQuestionnaireProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<{ [key: number]: string }>({});
+  const [answers, setAnswers] = useState<Record<number, string>>({});
   const [bountyHunterScore, setBountyHunterScore] = useState(0);
   const [survivorScore, setSurvivorScore] = useState(0);
   const [showResults, setShowResults] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<"bounty-hunter" | "survivor" | null>(null);
-  const [audioEnabled, setAudioEnabled] = useState(false);
-  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [role, setRole] = useState<UserRole>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
   
-  const beepRef = useRef<HTMLAudioElement>(null);
-  const successRef = useRef<HTMLAudioElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   
-  const questions: Question[] = [
-    {
-      id: 1,
-      text: "How do you approach resource scarcity in the wasteland?",
-      options: [
-        {
-          id: "1a",
-          text: "Track down those hoarding resources and liberate them for the people",
-          bountyHunterScore: 8,
-          survivorScore: 3
-        },
-        {
-          id: "1b",
-          text: "Develop sustainable systems to create more for everyone",
-          bountyHunterScore: 2,
-          survivorScore: 9
-        },
-        {
-          id: "1c",
-          text: "Protect what you have at all costs - survival is personal",
-          bountyHunterScore: 6,
-          survivorScore: 4
-        }
-      ]
-    },
-    {
-      id: 2,
-      text: "What was your role in the old world before the collapse?",
-      options: [
-        {
-          id: "2a",
-          text: "Security or law enforcement - protecting order",
-          bountyHunterScore: 9,
-          survivorScore: 3
-        },
-        {
-          id: "2b",
-          text: "Builder, engineer, or scientist - creating value",
-          bountyHunterScore: 2,
-          survivorScore: 8
-        },
-        {
-          id: "2c",
-          text: "Trader or negotiator - facilitating exchange",
-          bountyHunterScore: 5,
-          survivorScore: 6
-        }
-      ]
-    },
-    {
-      id: 3,
-      text: "When faced with a corrupt settlement leader stealing community funds, you would:",
-      options: [
-        {
-          id: "3a",
-          text: "Gather evidence and bring them to justice publicly as an example",
-          bountyHunterScore: 9,
-          survivorScore: 3
-        },
-        {
-          id: "3b",
-          text: "Work with community members to build a new governance system",
-          bountyHunterScore: 2,
-          survivorScore: 9
-        },
-        {
-          id: "3c",
-          text: "Avoid the conflict altogether and find a safer settlement",
-          bountyHunterScore: 4,
-          survivorScore: 3
-        }
-      ]
-    },
-    {
-      id: 4,
-      text: "You discover technology that could help many people. Do you:",
-      options: [
-        {
-          id: "4a",
-          text: "Use it to enhance your own capabilities as a hunter",
-          bountyHunterScore: 8,
-          survivorScore: 2
-        },
-        {
-          id: "4b",
-          text: "Share it with your settlement to strengthen collective survival",
-          bountyHunterScore: 2,
-          survivorScore: 9
-        },
-        {
-          id: "4c",
-          text: "Study it carefully to understand all potential applications",
-          bountyHunterScore: 5,
-          survivorScore: 5
-        }
-      ]
-    },
-    {
-      id: 5,
-      text: "The wasteland is full of dangers. Which statement best describes you?",
-      options: [
-        {
-          id: "5a",
-          text: "I am the danger. Those who threaten others should fear me.",
-          bountyHunterScore: 10,
-          survivorScore: 1
-        },
-        {
-          id: "5b",
-          text: "Safety comes through community. Together we're stronger.",
-          bountyHunterScore: 1,
-          survivorScore: 10
-        },
-        {
-          id: "5c",
-          text: "Adaptation and intelligence are key to navigating threats.",
-          bountyHunterScore: 5,
-          survivorScore: 7
-        }
-      ]
-    }
-  ];
-  
-  const currentQuestion = questions[currentQuestionIndex];
+  const currentQuestion = QUESTIONS[currentQuestionIndex];
   
   useEffect(() => {
-    // Calculate scores whenever answers change
-    let bScore = 0;
-    let sScore = 0;
-    
-    Object.entries(answers).forEach(([questionId, answerId]) => {
-      const question = questions.find(q => q.id === parseInt(questionId));
-      if (!question) return;
-      
-      const option = question.options.find(o => o.id === answerId);
-      if (!option) return;
-      
-      bScore += option.bountyHunterScore;
-      sScore += option.survivorScore;
-    });
-    
-    setBountyHunterScore(bScore);
-    setSurvivorScore(sScore);
-    
-    // Determine role once all questions are answered
-    if (Object.keys(answers).length === questions.length) {
-      setSelectedRole(bScore > sScore ? "bounty-hunter" : "survivor");
+    const container = containerRef.current;
+    if (container) {
+      container.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [answers]);
+  }, [currentQuestionIndex, showResults]);
   
-  const handleSelectOption = (optionId: string) => {
-    // Play select sound
-    if (audioEnabled && beepRef.current) {
-      beepRef.current.currentTime = 0;
-      beepRef.current.play().catch(() => {});
-    }
+  const handleSelectOption = (questionId: number, optionId: string, bountyPoints: number, survivorPoints: number) => {
+    const newAnswers = { ...answers, [questionId]: optionId };
+    setAnswers(newAnswers);
     
-    // Save answer
-    setAnswers(prev => ({
-      ...prev,
-      [currentQuestion.id]: optionId
-    }));
+    setBountyHunterScore(prev => prev + bountyPoints);
+    setSurvivorScore(prev => prev + survivorPoints);
+    
+    // Play sound effect
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
+    }
     
     // Move to next question or show results
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < QUESTIONS.length - 1) {
       setTimeout(() => {
         setCurrentQuestionIndex(prev => prev + 1);
       }, 500);
     } else {
+      setIsCalculating(true);
       setTimeout(() => {
+        const determinedRole = bountyHunterScore + bountyPoints > survivorScore + survivorPoints 
+          ? 'bounty-hunter' 
+          : 'survivor';
+        setRole(determinedRole);
         setShowResults(true);
-        
-        // Play success sound
-        if (audioEnabled && successRef.current) {
-          successRef.current.currentTime = 0;
-          successRef.current.play().catch(() => {});
-        }
-      }, 800);
+        setIsCalculating(false);
+      }, 2000);
     }
   };
   
   const handleComplete = () => {
-    if (selectedRole) {
-      onComplete(selectedRole);
+    if (role) {
+      onComplete(role);
     }
   };
   
-  // Initialize AudioContext when enabling audio
-  const handleEnableAudio = () => {
-    // Create AudioContext
-    const context = new (window.AudioContext || (window as any).webkitAudioContext)();
-    setAudioContext(context);
-    setAudioEnabled(true);
-  };
-  
   return (
-    <div className={`wasteland-questionnaire ${className || ''}`}>
-      {/* Audio elements */}
-      <audio ref={beepRef} src="/sounds/terminal-beep.mp3" />
-      <audio ref={successRef} src="/sounds/success.mp3" />
+    <div 
+      ref={containerRef}
+      className={cn(
+        "questionnaire-container bg-black/90 border border-toxic-neon/30 rounded-lg p-6 relative",
+        className
+      )}
+    >
+      {/* Sound effect */}
+      <audio ref={audioRef} src="/sounds/terminal-beep.mp3" />
       
-      <ToxicCard className="bg-black/80 border-toxic-neon/30">
-        <div className="p-6">
-          {!showResults ? (
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-toxic-neon text-lg flex items-center">
-                  <Radiation className="h-5 w-5 mr-2" />
-                  Wasteland Role Assessment
-                </h3>
-                
-                {!audioEnabled && (
-                  <button 
-                    onClick={handleEnableAudio} 
-                    className="text-toxic-neon/60 hover:text-toxic-neon text-xs flex items-center"
-                  >
-                    <AlertTriangle className="h-3 w-3 mr-1" />
-                    Enable Audio
-                  </button>
-                )}
+      {/* Terminal header */}
+      <div className="flex items-center justify-between mb-6 border-b border-toxic-neon/20 pb-2">
+        <div className="flex items-center">
+          <Terminal className="h-5 w-5 mr-2 text-toxic-neon" />
+          <span className="text-toxic-neon/90 font-bold">WASTELAND ADAPTATION ASSESSMENT</span>
+        </div>
+        <div className="text-white/70 text-xs font-mono">
+          SUBJECT_ID: #WL-{Math.floor(Math.random() * 10000).toString().padStart(4, '0')}
+        </div>
+      </div>
+      
+      {!showResults ? (
+        <>
+          {/* Progress indicator */}
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <div className="text-toxic-neon/80 text-sm font-mono">
+                ASSESSMENT PROGRESS
               </div>
-              
-              <div className="mb-6">
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-white/60">Question {currentQuestionIndex + 1} of {questions.length}</span>
-                  <span className="text-toxic-neon">
-                    {Math.floor(((currentQuestionIndex) / questions.length) * 100)}% Complete
-                  </span>
-                </div>
-                <div className="w-full h-1 bg-black/60 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-toxic-neon rounded-full transition-all"
-                    style={{ width: `${((currentQuestionIndex) / questions.length) * 100}%` }}
-                  ></div>
-                </div>
+              <div className="text-white/70 text-sm">
+                {currentQuestionIndex + 1} / {QUESTIONS.length}
               </div>
-              
-              <div className="mb-6">
-                <h4 className="text-white text-xl mb-4">{currentQuestion.text}</h4>
-                
-                <div className="space-y-4">
-                  {currentQuestion.options.map(option => (
-                    <button
-                      key={option.id}
-                      className={`w-full text-left p-4 rounded border transition-all ${
-                        answers[currentQuestion.id] === option.id 
-                          ? 'bg-toxic-neon/20 border-toxic-neon text-toxic-neon' 
-                          : 'bg-black/40 border-toxic-neon/30 text-white/80 hover:bg-black/60 hover:border-toxic-neon/60'
-                      }`}
-                      onClick={() => handleSelectOption(option.id)}
-                      disabled={!!answers[currentQuestion.id]}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className={`flex-shrink-0 w-6 h-6 rounded-full border flex items-center justify-center mt-0.5 ${
-                          answers[currentQuestion.id] === option.id 
-                            ? 'border-toxic-neon bg-toxic-neon/20' 
-                            : 'border-toxic-neon/30'
-                        }`}>
-                          {answers[currentQuestion.id] === option.id && (
-                            <Check className="w-3 h-3 text-toxic-neon" />
-                          )}
-                        </div>
-                        <span>{option.text}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-6 mt-8">
-                <div className={`p-3 rounded border ${
-                  answers[currentQuestion.id] && bountyHunterScore > survivorScore
-                    ? 'border-apocalypse-red/60 bg-apocalypse-red/10'
-                    : 'border-apocalypse-red/20 bg-black/30'
-                }`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className={`h-5 w-5 ${
-                      answers[currentQuestion.id] && bountyHunterScore > survivorScore
-                        ? 'text-apocalypse-red'
-                        : 'text-apocalypse-red/50'
-                    }`} />
-                    <span className={`${
-                      answers[currentQuestion.id] && bountyHunterScore > survivorScore
-                        ? 'text-apocalypse-red'
-                        : 'text-white/50'
-                    }`}>
-                      Bounty Hunter
-                    </span>
-                  </div>
-                  
-                  <div className="w-full bg-black/60 h-2 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-apocalypse-red/70 rounded-full transition-all duration-700"
-                      style={{ 
-                        width: `${Math.min(100, (bountyHunterScore / (questions.length * 10)) * 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-                
-                <div className={`p-3 rounded border ${
-                  answers[currentQuestion.id] && survivorScore >= bountyHunterScore
-                    ? 'border-toxic-neon/60 bg-toxic-neon/10'
-                    : 'border-toxic-neon/20 bg-black/30'
-                }`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Shield className={`h-5 w-5 ${
-                      answers[currentQuestion.id] && survivorScore >= bountyHunterScore
-                        ? 'text-toxic-neon'
-                        : 'text-toxic-neon/50'
-                    }`} />
-                    <span className={`${
-                      answers[currentQuestion.id] && survivorScore >= bountyHunterScore
-                        ? 'text-toxic-neon'
-                        : 'text-white/50'
-                    }`}>
-                      Survivor
-                    </span>
-                  </div>
-                  
-                  <div className="w-full bg-black/60 h-2 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-toxic-neon/70 rounded-full transition-all duration-700"
-                      style={{ 
-                        width: `${Math.min(100, (survivorScore / (questions.length * 10)) * 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
+            </div>
+            <div className="w-full h-2 bg-black/60 rounded-full overflow-hidden border border-toxic-neon/30">
+              <div 
+                className="h-full bg-toxic-neon transition-all duration-300"
+                style={{ width: `${((currentQuestionIndex + 1) / QUESTIONS.length) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+          
+          {isCalculating ? (
+            <div className="text-center py-12">
+              <div className="inline-block mb-4 h-12 w-12 animate-spin rounded-full border-4 border-solid border-toxic-neon border-r-transparent"></div>
+              <h3 className="text-toxic-neon text-xl mb-2">Analyzing Psychological Profile</h3>
+              <p className="text-white/70">Processing your responses to determine optimal wasteland role...</p>
             </div>
           ) : (
-            <div className="text-center">
-              <h3 className="text-2xl text-toxic-neon mb-6">Assessment Complete</h3>
+            <div className="question-container">
+              <h3 className="text-xl text-white mb-6">{currentQuestion.text}</h3>
               
-              <div className="flex items-center justify-center gap-8 mb-8">
-                <div className={`p-6 rounded-lg border ${selectedRole === 'bounty-hunter' ? 'border-apocalypse-red bg-apocalypse-red/10' : 'border-white/10 bg-black/30'}`}>
-                  <Target className={`h-16 w-16 mx-auto mb-3 ${selectedRole === 'bounty-hunter' ? 'text-apocalypse-red' : 'text-white/30'}`} />
-                  <div className={`text-center ${selectedRole === 'bounty-hunter' ? 'text-apocalypse-red' : 'text-white/50'}`}>
-                    <div className="text-lg font-bold mb-1">Bounty Hunter</div>
-                    <div className="text-sm">{Math.round((bountyHunterScore / (bountyHunterScore + survivorScore)) * 100)}%</div>
-                  </div>
-                </div>
-                
-                <div className={`p-6 rounded-lg border ${selectedRole === 'survivor' ? 'border-toxic-neon bg-toxic-neon/10' : 'border-white/10 bg-black/30'}`}>
-                  <Shield className={`h-16 w-16 mx-auto mb-3 ${selectedRole === 'survivor' ? 'text-toxic-neon' : 'text-white/30'}`} />
-                  <div className={`text-center ${selectedRole === 'survivor' ? 'text-toxic-neon' : 'text-white/50'}`}>
-                    <div className="text-lg font-bold mb-1">Survivor</div>
-                    <div className="text-sm">{Math.round((survivorScore / (bountyHunterScore + survivorScore)) * 100)}%</div>
-                  </div>
-                </div>
+              <div className="options-container space-y-4">
+                {currentQuestion.options.map(option => (
+                  <motion.button
+                    key={option.id}
+                    className={cn(
+                      "w-full text-left rounded-lg border p-4 transition-all",
+                      answers[currentQuestion.id] === option.id
+                        ? "bg-toxic-neon/20 border-toxic-neon text-toxic-neon"
+                        : "bg-black/50 border-toxic-neon/20 text-white/80 hover:bg-black/70 hover:border-toxic-neon/40"
+                    )}
+                    onClick={() => handleSelectOption(
+                      currentQuestion.id, 
+                      option.id, 
+                      option.bountyHunterPoints, 
+                      option.survivorPoints
+                    )}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div 
+                        className={cn(
+                          "flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5 border",
+                          answers[currentQuestion.id] === option.id 
+                            ? "border-toxic-neon" 
+                            : "border-toxic-neon/30"
+                        )}
+                      >
+                        {answers[currentQuestion.id] === option.id && (
+                          <div className="w-3 h-3 rounded-full bg-toxic-neon"></div>
+                        )}
+                      </div>
+                      <span>{option.text}</span>
+                    </div>
+                  </motion.button>
+                ))}
               </div>
-              
-              <div className="mb-6 p-4 rounded-lg border border-toxic-neon/30 bg-black/40 text-left">
-                <h4 className="font-bold text-toxic-neon mb-3">
-                  {selectedRole === 'bounty-hunter' ? 'You are a BOUNTY HUNTER' : 'You are a SURVIVOR'}
-                </h4>
-                
-                <p className="text-white/80 mb-4">
-                  {selectedRole === 'bounty-hunter' 
-                    ? 'Your answers reveal a strong sense of justice and exceptional tracking instincts. The wasteland needs hunters like you to bring order to chaos by tracking down those who continue to exploit the system.'
-                    : 'Your responses indicate a natural talent for community building and resource management. The wasteland needs visionaries like you to rebuild society from the ashes of the old world.'}
-                </p>
-                
-                <div className="text-white/70 text-sm">
-                  <div className="mb-2">
-                    <span className="text-toxic-neon">Key Attributes:</span> {selectedRole === 'bounty-hunter' 
-                      ? 'Strategic thinking, independence, decisive action' 
-                      : 'Cooperation, long-term planning, innovation'}
-                  </div>
-                  <div>
-                    <span className="text-toxic-neon">Role in Economy:</span> {selectedRole === 'bounty-hunter' 
-                      ? 'Asset recovery, security enforcement, threat elimination' 
-                      : 'Resource management, community governance, infrastructure development'}
-                  </div>
-                </div>
-              </div>
-              
-              <ToxicButton
-                onClick={handleComplete}
-                className="w-full bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
-                size="lg"
-              >
-                <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
-                <span className="flash-beacon">JOIN THE RESISTANCE AS A {selectedRole?.toUpperCase()}</span>
-              </ToxicButton>
             </div>
           )}
+        </>
+      ) : (
+        <div className="results-container">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl text-toxic-neon mb-4">Assessment Complete</h2>
+            <p className="text-white/70 max-w-md mx-auto">
+              Based on your responses to the wasteland adaptation assessment, we've determined your optimal role in the Resistance.
+            </p>
+          </div>
+          
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-8">
+            <div 
+              className={cn(
+                "p-6 rounded-lg border w-full md:w-auto text-center",
+                role === 'bounty-hunter' 
+                  ? "border-apocalypse-red bg-apocalypse-red/10" 
+                  : "border-white/10 bg-black/50 opacity-50"
+              )}
+            >
+              <Target 
+                className={cn(
+                  "h-16 w-16 mx-auto mb-4",
+                  role === 'bounty-hunter' ? "text-apocalypse-red" : "text-white/30"
+                )} 
+              />
+              <h3 className={cn(
+                "text-xl font-bold mb-1",
+                role === 'bounty-hunter' ? "text-apocalypse-red" : "text-white/40"
+              )}>
+                Bounty Hunter
+              </h3>
+              <div className="text-sm text-white/70 mb-3">
+                {Math.round((bountyHunterScore / (bountyHunterScore + survivorScore)) * 100)}% Match
+              </div>
+              {role === 'bounty-hunter' && (
+                <div className="mt-2 text-white/80 text-sm">
+                  You are naturally drawn to tracking targets, administering justice, and operating independently in hostile territory.
+                </div>
+              )}
+            </div>
+            
+            <div 
+              className={cn(
+                "p-6 rounded-lg border w-full md:w-auto text-center",
+                role === 'survivor' 
+                  ? "border-toxic-neon bg-toxic-neon/10" 
+                  : "border-white/10 bg-black/50 opacity-50"
+              )}
+            >
+              <Shield 
+                className={cn(
+                  "h-16 w-16 mx-auto mb-4",
+                  role === 'survivor' ? "text-toxic-neon" : "text-white/30"
+                )} 
+              />
+              <h3 className={cn(
+                "text-xl font-bold mb-1",
+                role === 'survivor' ? "text-toxic-neon" : "text-white/40"
+              )}>
+                Survivor
+              </h3>
+              <div className="text-sm text-white/70 mb-3">
+                {Math.round((survivorScore / (bountyHunterScore + survivorScore)) * 100)}% Match
+              </div>
+              {role === 'survivor' && (
+                <div className="mt-2 text-white/80 text-sm">
+                  You excel at building communities, sharing resources, and creating sustainable systems that benefit the collective.
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-2 mb-2">
+              <Radiation className="h-5 w-5 text-toxic-neon" />
+              <h3 className="text-lg text-toxic-neon">Role Analysis</h3>
+            </div>
+            
+            <p className="text-white/80 text-sm mb-3">
+              {role === 'bounty-hunter' 
+                ? "Your psychological profile indicates a strong aptitude for justice-seeking and independent operations. The Resistance needs skilled hunters to track down those who corrupted the old system."
+                : "Your psychological profile shows a natural inclination toward community-building and collaborative efforts. The settlements need visionaries like you to rebuild our civilization from the ashes."
+              }
+            </p>
+            
+            <div className="text-sm text-white/70">
+              <div className="flex items-start gap-2 mb-1">
+                <Check className="h-4 w-4 text-toxic-neon flex-shrink-0 mt-0.5" />
+                <span>
+                  {role === 'bounty-hunter'
+                    ? "You will excel at tracking down crypto criminals and securing stolen assets."
+                    : "You will thrive establishing sustainable economic systems in wasteland settlements."
+                  }
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="h-4 w-4 text-toxic-neon flex-shrink-0 mt-0.5" />
+                <span>
+                  {role === 'bounty-hunter'
+                    ? "Key strengths: tactical planning, target acquisition, independent action."
+                    : "Key strengths: resource management, community building, long-term planning."
+                  }
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <ToxicButton
+            onClick={handleComplete}
+            className="w-full bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+            size="lg"
+          >
+            <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
+            <span className="flash-beacon">
+              {role === 'bounty-hunter' 
+                ? "INITIALIZE BOUNTY HUNTER PROTOCOL" 
+                : "INITIALIZE SURVIVOR PROTOCOL"
+              }
+            </span>
+          </ToxicButton>
         </div>
-      </ToxicCard>
+      )}
     </div>
   );
 }
