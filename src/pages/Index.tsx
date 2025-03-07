@@ -8,17 +8,36 @@ import { ToxicButton } from "@/components/ui/toxic-button";
 import { DrippingSlime } from "@/components/ui/dripping-slime";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+import { EmergencyTransmission } from "@/components/ui/emergency-transmission";
 
 const Index = () => {
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState<"bounty-hunter" | "survivor" | null>(null);
   const [communityActivity, setCommunityActivity] = useState(0);
   const [terminalStage, setTerminalStage] = useState<"typing" | "questionnaire" | "completed">("typing");
+  const [showEmergencyTransmission, setShowEmergencyTransmission] = useState(false);
   
   // Debug terminalStage changes
   useEffect(() => {
     console.log("Terminal stage changed to:", terminalStage);
   }, [terminalStage]);
+  
+  // Show emergency transmission once on initial load
+  useEffect(() => {
+    // Check if we've already shown the transmission in this session
+    const hasSeenTransmission = sessionStorage.getItem("hasSeenEmergencyTransmission");
+    
+    if (!hasSeenTransmission) {
+      // Add a small delay for dramatic effect
+      const timer = setTimeout(() => {
+        setShowEmergencyTransmission(true);
+        // Set session storage to prevent showing again
+        sessionStorage.setItem("hasSeenEmergencyTransmission", "true");
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, []);
   
   // Community activity simulation
   useEffect(() => {
@@ -45,11 +64,21 @@ const Index = () => {
     setTerminalStage("questionnaire");
   };
 
+  const handleCloseEmergencyTransmission = () => {
+    setShowEmergencyTransmission(false);
+  };
+
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
       <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} />
       <div className="dust-particles"></div>
       <div className="fog-overlay"></div>
+
+      {/* Emergency Transmission Popup */}
+      <EmergencyTransmission 
+        isOpen={showEmergencyTransmission} 
+        onClose={handleCloseEmergencyTransmission} 
+      />
 
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0">
