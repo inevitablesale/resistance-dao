@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { Radiation, Target, Shield, Terminal, Zap, AlertTriangle, RotateCw, Check } from "lucide-react";
@@ -194,31 +195,10 @@ export function TerminalTypewriter({
   const [questionnaireStarted, setQuestionnaireStarted] = useState(false);
   const [typingStarted, setTypingStarted] = useState(false);
   const [typingComplete, setTypingComplete] = useState(false);
-  const [forcedShow, setForcedShow] = useState(false);
   
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    console.log("Terminal state:", { 
-      bootStage, 
-      isComplete, 
-      typingStarted, 
-      typingComplete, 
-      showQuestionnaire,
-      displayTextLength: displayText.length,
-      questionnaireStarted,
-      forcedShow
-    });
-  }, [bootStage, isComplete, typingStarted, typingComplete, showQuestionnaire, displayText, questionnaireStarted, forcedShow]);
-
-  useEffect(() => {
-    console.log("showQuestionnaire prop changed to:", showQuestionnaire);
-    if (showQuestionnaire && !questionnaireStarted && !selectedRole) {
-      console.log("Should show questionnaire now");
-      setForcedShow(true);
-    }
-  }, [showQuestionnaire, questionnaireStarted, selectedRole]);
-  
+  // Setup boot sequence
   useEffect(() => {
     if (!showBootSequence) {
       setBootStage("complete");
@@ -273,6 +253,7 @@ export function TerminalTypewriter({
     };
   }, [bootStage, showBootSequence]);
   
+  // Setup cursor blinking
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setCursorVisible(prev => !prev);
@@ -281,13 +262,13 @@ export function TerminalTypewriter({
     return () => clearInterval(cursorInterval);
   }, []);
   
+  // Setup typing animation
   useEffect(() => {
     if (!isComplete || bootStage !== "complete" || typingStarted) {
       return;
     }
     
     setTypingStarted(true);
-    console.log("Starting typing animation with text:", textToType);
     
     let i = 0;
     const typingInterval = setInterval(() => {
@@ -297,7 +278,6 @@ export function TerminalTypewriter({
       } else {
         clearInterval(typingInterval);
         setTypingComplete(true);
-        console.log("Typing complete, calling onTypingComplete callback");
         
         if (onTypingComplete) {
           onTypingComplete();
@@ -307,7 +287,6 @@ export function TerminalTypewriter({
     
     const forceCompletionTimeout = setTimeout(() => {
       if (!typingComplete) {
-        console.log("Forcing typing completion");
         clearInterval(typingInterval);
         setDisplayText(textToType);
         setTypingComplete(true);
@@ -324,22 +303,14 @@ export function TerminalTypewriter({
     };
   }, [textToType, typeDelay, bootStage, isComplete, onTypingComplete, typingStarted, typingComplete]);
   
+  // Auto-start questionnaire if showQuestionnaire is true
   useEffect(() => {
-    if (isComplete && !questionnaireStarted && !selectedRole) {
-      const forceQuestionnaireSafetyTimeout = setTimeout(() => {
-        console.log("Safety timeout: forcing questionnaire display");
-        setForcedShow(true);
-        if (onTypingComplete && !typingComplete) {
-          onTypingComplete();
-        }
-      }, 10000);
-      
-      return () => clearTimeout(forceQuestionnaireSafetyTimeout);
+    if (showQuestionnaire && !questionnaireStarted && !selectedRole) {
+      setQuestionnaireStarted(true);
     }
-  }, [isComplete, questionnaireStarted, selectedRole, onTypingComplete, typingComplete]);
+  }, [showQuestionnaire, questionnaireStarted, selectedRole]);
   
   const handleStartAssessment = () => {
-    console.log("Starting assessment questionnaire");
     setQuestionnaireStarted(true);
     setCurrentQuestion(0);
     setAnswers([]);
@@ -368,7 +339,6 @@ export function TerminalTypewriter({
       setTimeout(() => {
         setCalculatingResult(false);
         const role = bountyHunterScore > survivorScore ? "bounty-hunter" : "survivor";
-        console.log(`Assessment complete, determined role: ${role}`);
         
         if (onRoleSelect) {
           onRoleSelect(role);
@@ -376,8 +346,6 @@ export function TerminalTypewriter({
       }, 3000);
     }
   };
-
-  const shouldShowQuestionnaire = (showQuestionnaire || forcedShow) && !selectedRole;
 
   return (
     <div className={cn("terminal-container relative", className)}>
@@ -389,18 +357,6 @@ export function TerminalTypewriter({
         )}
       >
         <div className="scanline absolute inset-0 pointer-events-none"></div>
-        
-        <div className="flex items-center justify-between mb-4 border-b border-toxic-neon/20 pb-2">
-          <div className="flex items-center">
-            <Terminal className="h-5 w-5 mr-2 text-toxic-neon" />
-            <span className="text-toxic-neon/90 font-bold">RESISTANCE_OS v3.2.1</span>
-          </div>
-          
-          <div className="flex gap-1">
-            <div className="h-3 w-3 rounded-full bg-apocalypse-red animate-pulse"></div>
-            <div className="h-3 w-3 rounded-full bg-toxic-neon/70"></div>
-          </div>
-        </div>
         
         {showBootSequence && (bootStage === "initializing" || bootStage === "diagnosing" || bootStage === "connecting") && (
           <div className="mb-4">
@@ -453,43 +409,6 @@ export function TerminalTypewriter({
         
         {bootStage === "complete" && (
           <>
-            {isComplete && (
-              <div className="mb-6">
-                <div className="flex items-center text-toxic-neon mb-4">
-                  <Check className="h-4 w-4 mr-2" />
-                  <span className="font-bold">SYSTEM RECOVERY COMPLETE</span>
-                </div>
-                
-                <div className="grid grid-cols-1 gap-4 mt-3">
-                  <div className="bg-black/70 border border-toxic-neon/30 rounded p-3">
-                    <div className="text-white/90 text-lg mb-1">Network Status</div>
-                    <div className="text-toxic-neon flex items-center">
-                      <div className="h-3 w-3 rounded-full bg-toxic-neon mr-2 animate-pulse"></div>
-                      <span className="text-lg">Connected</span>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-black/70 border border-toxic-neon/30 rounded p-3">
-                    <div className="text-white/90 text-lg mb-1">Protocol Integrity</div>
-                    <div className="text-toxic-neon text-lg">78% Restored</div>
-                  </div>
-                  
-                  <div className="bg-black/70 border border-toxic-neon/30 rounded p-3">
-                    <div className="text-white/90 text-lg mb-1">Security Level</div>
-                    <div className="text-toxic-neon text-lg">Maximum</div>
-                  </div>
-                  
-                  <div className="bg-black/70 border border-toxic-neon/30 rounded p-3">
-                    <div className="text-white/90 text-lg mb-1">Wasteland Radiation</div>
-                    <div className="text-apocalypse-red flex items-center">
-                      <div className="h-3 w-3 rounded-full bg-apocalypse-red mr-2 animate-pulse"></div>
-                      <span className="text-lg">High Risk</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
             <div className="terminal-line flex items-center h-6 min-h-6">
               <span className="block text-toxic-neon">
                 {displayText}
@@ -499,23 +418,8 @@ export function TerminalTypewriter({
           </>
         )}
         
-        {isComplete && (shouldShowQuestionnaire || (showQuestionnaire && isComplete)) && !questionnaireStarted && (typingComplete || forcedShow) && (
-          <div className="terminal-line mt-6">
-            <div className="text-white/70 mb-4">BEFORE JOINING THE RESISTANCE, WE MUST DETERMINE YOUR ROLE IN THE NEW ECONOMY:</div>
-            
-            <ToxicButton
-              onClick={handleStartAssessment}
-              className="w-full mt-2 bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
-              size="lg"
-            >
-              <Terminal className="w-5 h-5 mr-2 text-toxic-neon" />
-              <span className="flash-beacon">BEGIN WASTELAND ROLE ASSESSMENT</span>
-            </ToxicButton>
-          </div>
-        )}
-        
-        {isComplete && shouldShowQuestionnaire && questionnaireStarted && !selectedRole && (
-          <div className="assessment-container">
+        {showQuestionnaire && !selectedRole && (
+          <div className="assessment-container mt-4">
             {calculatingResult ? (
               <div className="text-center py-8">
                 <div className="inline-block rounded-full h-16 w-16 border-4 border-toxic-neon/30 border-t-toxic-neon animate-spin mb-4"></div>
@@ -633,4 +537,3 @@ export function TerminalTypewriter({
     </div>
   );
 }
-

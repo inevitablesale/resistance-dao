@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Minimize2, Maximize2, X, Monitor, Shield, Target, Radio, Users, Clock, AlertTriangle, BookOpen, Radiation, AppWindow } from 'lucide-react';
+import { Minimize2, Maximize2, X, Monitor, Shield, Target, Radio, Users, Clock, AlertTriangle, BookOpen, Radiation, AppWindow, FileQuestion } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TerminalTypewriter } from './terminal-typewriter';
 import { Button } from './button';
@@ -131,13 +131,14 @@ export function TerminalMonitor({
   const [appZIndex, setAppZIndex] = useState<Record<string, number>>({});
   const [nextZIndex, setNextZIndex] = useState(10);
   const [showDesktopIcons, setShowDesktopIcons] = useState(false);
+  const [bootComplete, setBootComplete] = useState(false);
 
-  // Show desktop icons after a role is selected or when explicitly enabled
+  // Show desktop icons after boot sequence or role selection
   useEffect(() => {
-    if (selectedRole) {
+    if (selectedRole || bootComplete) {
       setShowDesktopIcons(true);
     }
-  }, [selectedRole]);
+  }, [selectedRole, bootComplete]);
   
   const handleOpenApp = (appId: string) => {
     if (!openApps.includes(appId)) {
@@ -180,6 +181,13 @@ export function TerminalMonitor({
       });
       setNextZIndex(nextZIndex + 1);
     }
+  };
+
+  const handleCompleteBootSequence = () => {
+    if (onTypingComplete) {
+      onTypingComplete();
+    }
+    setBootComplete(true);
   };
 
   // Apps content based on user's suggestions
@@ -239,6 +247,26 @@ export function TerminalMonitor({
             </div>
             <p className="text-2xl text-white font-mono">2.7K</p>
           </div>
+        </div>
+      )
+    },
+    'survey': {
+      title: 'WASTELAND ROLE ASSESSMENT',
+      icon: <FileQuestion size={16} />,
+      content: (
+        <div className="p-2">
+          <div className="mb-4">
+            <h2 className="text-xl text-toxic-neon font-mono mb-3">WASTELAND ROLE ASSESSMENT</h2>
+            <p className="text-white/80 mb-4">
+              The wasteland requires different skills to survive. Complete this assessment to determine your optimal role.
+            </p>
+          </div>
+          
+          <TerminalTypewriter
+            showQuestionnaire={true}
+            onRoleSelect={onRoleSelect}
+            selectedRole={selectedRole}
+          />
         </div>
       )
     },
@@ -544,44 +572,50 @@ export function TerminalMonitor({
           
           {/* Terminal content */}
           <div className="relative p-2 h-full">
-            {!selectedRole ? (
+            {!bootComplete && !selectedRole ? (
               <div className="w-full h-full">
                 <TerminalTypewriter
-                  showQuestionnaire={showQuestionnaire}
-                  onTypingComplete={onTypingComplete}
-                  onRoleSelect={onRoleSelect}
-                  selectedRole={selectedRole}
+                  showBootSequence={true}
+                  onTypingComplete={handleCompleteBootSequence}
                 />
               </div>
             ) : (
               <div className="desktop-environment h-full relative">
                 {/* Desktop Icons */}
-                <div className="grid grid-cols-4 sm:grid-cols-5 gap-1 p-2 absolute top-0 left-0 z-10">
-                  <DesktopIcon 
-                    icon={<AlertTriangle size={20} />} 
-                    label="Network Status"
-                    onClick={() => handleOpenApp('network-status')}
-                    isActive={activeApp === 'network-status'}
-                  />
-                  <DesktopIcon 
-                    icon={<Target size={20} />} 
-                    label="Bounty List"
-                    onClick={() => handleOpenApp('bounty-hunter')}
-                    isActive={activeApp === 'bounty-hunter'}
-                  />
-                  <DesktopIcon 
-                    icon={<BookOpen size={20} />} 
-                    label="Archives"
-                    onClick={() => handleOpenApp('archives')}
-                    isActive={activeApp === 'archives'}
-                  />
-                  <DesktopIcon 
-                    icon={<AppWindow size={20} />} 
-                    label="Thesis Test"
-                    onClick={() => handleOpenApp('thesis-test')}
-                    isActive={activeApp === 'thesis-test'}
-                  />
-                </div>
+                {showDesktopIcons && (
+                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-1 p-2 absolute top-0 left-0 z-10">
+                    <DesktopIcon 
+                      icon={<AlertTriangle size={20} />} 
+                      label="Network Status"
+                      onClick={() => handleOpenApp('network-status')}
+                      isActive={activeApp === 'network-status'}
+                    />
+                    <DesktopIcon 
+                      icon={<FileQuestion size={20} />} 
+                      label="Assessment"
+                      onClick={() => handleOpenApp('survey')}
+                      isActive={activeApp === 'survey'}
+                    />
+                    <DesktopIcon 
+                      icon={<Target size={20} />} 
+                      label="Bounty List"
+                      onClick={() => handleOpenApp('bounty-hunter')}
+                      isActive={activeApp === 'bounty-hunter'}
+                    />
+                    <DesktopIcon 
+                      icon={<BookOpen size={20} />} 
+                      label="Archives"
+                      onClick={() => handleOpenApp('archives')}
+                      isActive={activeApp === 'archives'}
+                    />
+                    <DesktopIcon 
+                      icon={<AppWindow size={20} />} 
+                      label="Thesis Test"
+                      onClick={() => handleOpenApp('thesis-test')}
+                      isActive={activeApp === 'thesis-test'}
+                    />
+                  </div>
+                )}
                 
                 {/* Desktop Apps */}
                 {Object.entries(appContent).map(([appId, app]) => (
@@ -600,43 +634,45 @@ export function TerminalMonitor({
                 ))}
                 
                 {/* Task Bar */}
-                <div className="absolute bottom-0 left-0 right-0 bg-black/80 border-t border-toxic-neon/30 h-10 flex items-center px-2 z-20">
-                  <div className="flex items-center gap-2 overflow-x-auto terminal-scrollbar flex-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 text-xs text-toxic-neon flex-shrink-0"
-                      onClick={() => {}}
-                    >
-                      <Radiation className="w-4 h-4 mr-1" />
-                      Start
-                    </Button>
-                    
-                    {openApps.length > 0 && (
-                      <div className="h-6 border-r border-toxic-neon/20 flex-shrink-0"></div>
-                    )}
-                    
-                    {openApps.map(appId => (
+                {showDesktopIcons && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/80 border-t border-toxic-neon/30 h-10 flex items-center px-2 z-20">
+                    <div className="flex items-center gap-2 overflow-x-auto terminal-scrollbar flex-1">
                       <Button
-                        key={appId}
-                        variant={activeApp === appId ? "secondary" : "ghost"}
+                        variant="ghost"
                         size="sm"
                         className="h-8 text-xs text-toxic-neon flex-shrink-0"
-                        onClick={() => handleAppFocus(appId)}
+                        onClick={() => {}}
                       >
-                        {appContent[appId].icon}
-                        <span className="ml-1 max-w-20 truncate">{appContent[appId].title}</span>
+                        <Radiation className="w-4 h-4 mr-1" />
+                        Start
                       </Button>
-                    ))}
+                      
+                      {openApps.length > 0 && (
+                        <div className="h-6 border-r border-toxic-neon/20 flex-shrink-0"></div>
+                      )}
+                      
+                      {openApps.map(appId => (
+                        <Button
+                          key={appId}
+                          variant={activeApp === appId ? "secondary" : "ghost"}
+                          size="sm"
+                          className="h-8 text-xs text-toxic-neon flex-shrink-0"
+                          onClick={() => handleAppFocus(appId)}
+                        >
+                          {appContent[appId].icon}
+                          <span className="ml-1 max-w-20 truncate">{appContent[appId].title}</span>
+                        </Button>
+                      ))}
+                    </div>
+                    
+                    <div className="ml-auto flex items-center text-toxic-neon flex-shrink-0">
+                      <Clock size={14} className="mr-2" />
+                      <span className="text-xs font-mono">
+                        {new Date().toLocaleTimeString()}
+                      </span>
+                    </div>
                   </div>
-                  
-                  <div className="ml-auto flex items-center text-toxic-neon flex-shrink-0">
-                    <Clock size={14} className="mr-2" />
-                    <span className="text-xs font-mono">
-                      {new Date().toLocaleTimeString()}
-                    </span>
-                  </div>
-                </div>
+                )}
               </div>
             )}
           </div>

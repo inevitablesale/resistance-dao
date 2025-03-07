@@ -29,18 +29,6 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
   
-  // Force questionnaire display after a delay
-  useEffect(() => {
-    if (terminalStage === "typing") {
-      const forceQuestionnaireTimeout = setTimeout(() => {
-        console.log("Force timeout: Switching to questionnaire stage");
-        setTerminalStage("questionnaire");
-      }, 10000); // Force after 10 seconds for demo purposes
-      
-      return () => clearTimeout(forceQuestionnaireTimeout);
-    }
-  }, [terminalStage]);
-  
   const handleRoleSelect = (role: "bounty-hunter" | "survivor") => {
     console.log("Role selected in Index component:", role);
     setUserRole(role);
@@ -112,7 +100,7 @@ const Index = () => {
                 </div>
                 
                 {/* Only show this if the user doesn't have access to the desktop yet */}
-                {!userRole && (
+                {!userRole && terminalStage !== "completed" && (
                   <div className="mt-4 text-center">
                     <p className="text-white/70 text-sm mb-3">
                       Complete the terminal sequence to access the Resistance Network
@@ -125,14 +113,6 @@ const Index = () => {
                       <Radiation className="w-4 h-4 mr-2" />
                       Skip Intro Sequence
                     </ToxicButton>
-                  </div>
-                )}
-                
-                {userRole && (
-                  <div className="mt-4 text-center">
-                    <p className="text-toxic-neon text-sm mb-3">
-                      Click on desktop icons to explore the Resistance Network
-                    </p>
                   </div>
                 )}
               </div>
