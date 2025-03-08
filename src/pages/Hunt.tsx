@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Target, Biohazard, Radiation, Shield, Users, 
-  Flask, Skull, Building2, Crosshair, HeartPulse, 
+  FlaskConical, Skull, Building2, Crosshair, HeartPulse, 
   BriefcaseBusiness, ChevronRight
 } from 'lucide-react';
 import { DrippingSlime, ToxicPuddle } from '@/components/ui/dripping-slime';
@@ -23,7 +22,6 @@ const Hunt = () => {
   const { isConnected, connect } = useWalletConnection();
   const [activeTab, setActiveTab] = useState('settlements');
   
-  // Mock data for settlements
   const mockSettlements: ProposalEvent[] = [
     {
       tokenId: "1",
@@ -87,12 +85,10 @@ const Hunt = () => {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Background Elements */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJub25lIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9zdmc+')] opacity-10 z-0"></div>
       <div className="fog-overlay"></div>
       <div className="dust-particles"></div>
       
-      {/* Hero Section */}
       <section className="relative pt-28 pb-16 overflow-hidden">
         <div className="container mx-auto px-4 relative z-10 max-w-6xl">
           <motion.div 
@@ -111,7 +107,6 @@ const Hunt = () => {
               Track settlements, find medics, and secure jobs in the post-apocalyptic wasteland
             </p>
             
-            {/* Navigation Tabs */}
             <div className="flex justify-center mt-8 mb-2 gap-2 flex-wrap">
               <ToxicButton 
                 variant={activeTab === 'settlements' ? 'glowing' : 'outline'} 
@@ -140,7 +135,6 @@ const Hunt = () => {
             </div>
           </motion.div>
           
-          {/* Dripping effect at the bottom of hero section */}
           <div className="relative">
             <DrippingSlime 
               position="bottom" 
@@ -151,9 +145,7 @@ const Hunt = () => {
         </div>
       </section>
       
-      {/* Content Sections */}
       <div className="container mx-auto px-4 pb-20 relative z-10 max-w-6xl">
-        {/* Settlements Section */}
         {activeTab === 'settlements' && (
           <motion.section
             initial={{ opacity: 0 }}
@@ -182,7 +174,6 @@ const Hunt = () => {
           </motion.section>
         )}
         
-        {/* Medics & Healers Section */}
         {activeTab === 'medics' && (
           <motion.section
             initial={{ opacity: 0 }}
@@ -206,7 +197,6 @@ const Hunt = () => {
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-4 max-w-4xl mx-auto mt-8">
-                {/* Tier 1 - Field Medic */}
                 <div className="bg-black/60 border border-toxic-neon/20 rounded-lg p-4 relative">
                   <ToxicBadge variant="status" className="absolute top-2 right-2">
                     Tier 1
@@ -217,7 +207,6 @@ const Hunt = () => {
                   <ToxicProgress variant="radiation" value={25} className="h-1 mt-4" />
                 </div>
                 
-                {/* Tier 2 - Radiation Specialist */}
                 <div className="bg-black/60 border border-toxic-neon/20 rounded-lg p-4 relative">
                   <ToxicBadge variant="status" className="absolute top-2 right-2">
                     Tier 2
@@ -228,18 +217,16 @@ const Hunt = () => {
                   <ToxicProgress variant="radiation" value={50} className="h-1 mt-4" />
                 </div>
                 
-                {/* Tier 3 - Wasteland Surgeon */}
                 <div className="bg-black/60 border border-toxic-neon/20 rounded-lg p-4 relative">
                   <ToxicBadge variant="status" className="absolute top-2 right-2">
                     Tier 3
                   </ToxicBadge>
-                  <Flask className="h-8 w-8 mx-auto mb-2 text-toxic-neon/50" />
+                  <FlaskConical className="h-8 w-8 mx-auto mb-2 text-toxic-neon/50" />
                   <h4 className="text-toxic-neon mb-1">Wasteland Surgeon</h4>
                   <p className="text-white/60 text-sm">Advanced medical procedures and treatments</p>
                   <ToxicProgress variant="radiation" value={75} className="h-1 mt-4" />
                 </div>
                 
-                {/* Tier 4 - Genetic Healer */}
                 <div className="bg-black/60 border border-toxic-neon/20 rounded-lg p-4 relative">
                   <ToxicBadge variant="status" className="absolute top-2 right-2">
                     Tier 4
@@ -260,7 +247,6 @@ const Hunt = () => {
           </motion.section>
         )}
         
-        {/* Job Opportunities Section */}
         {activeTab === 'jobs' && (
           <motion.section
             initial={{ opacity: 0 }}
@@ -284,7 +270,6 @@ const Hunt = () => {
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 max-w-4xl mx-auto mt-8">
-                {/* Scout Position */}
                 <div className="bg-black/60 border border-toxic-neon/20 rounded-lg p-4 relative">
                   <ToxicBadge variant="danger" className="absolute top-2 right-2">
                     <Radiation className="h-3 w-3 mr-1" /> High Risk
@@ -302,7 +287,6 @@ const Hunt = () => {
                   </div>
                 </div>
                 
-                {/* Security Position */}
                 <div className="bg-black/60 border border-toxic-neon/20 rounded-lg p-4 relative">
                   <ToxicBadge variant="secondary" className="absolute top-2 right-2">
                     <Radiation className="h-3 w-3 mr-1" /> Medium Risk
@@ -320,12 +304,11 @@ const Hunt = () => {
                   </div>
                 </div>
                 
-                {/* Engineer Position */}
                 <div className="bg-black/60 border border-toxic-neon/20 rounded-lg p-4 relative">
                   <ToxicBadge variant="default" className="absolute top-2 right-2">
                     <Radiation className="h-3 w-3 mr-1" /> Low Risk
                   </ToxicBadge>
-                  <Flask className="h-10 w-10 mx-auto mb-2 text-toxic-neon/30" />
+                  <FlaskConical className="h-10 w-10 mx-auto mb-2 text-toxic-neon/30" />
                   <h4 className="text-toxic-neon mb-1">Water Engineer</h4>
                   <p className="text-white/60 text-sm mb-3">Build and maintain water purification systems</p>
                   <div className="flex justify-between text-xs mb-1">
