@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Shield, LockKeyhole, AlertTriangle, Terminal, ExternalLink, Info } from "lucide-react";
+import { Shield, LockKeyhole, AlertTriangle, Terminal, ExternalLink } from "lucide-react";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 
@@ -170,28 +169,6 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
           </div>
         </form>
 
-        <div className="bg-black/80 border border-toxic-neon/20 p-4 rounded mb-6">
-          <div className="flex items-start gap-3">
-            <Info className="h-5 w-5 text-toxic-neon flex-shrink-0 mt-0.5" />
-            <div className="flex flex-col sm:flex-row gap-3">
-              <a 
-                href="https://www.linkedin.com/groups/12657922/" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="w-full"
-              >
-                <ToxicButton
-                  variant="glowing"
-                  className="w-full uppercase font-mono flex items-center justify-center py-3 text-base"
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  <span>Gain Access Code</span>
-                </ToxicButton>
-              </a>
-            </div>
-          </div>
-        </div>
-
         <div className="flex justify-center items-center gap-2 text-white/60 mb-6">
           <span className="border-t border-white/20 flex-grow"></span>
           <span className="text-sm">OR</span>
@@ -201,12 +178,27 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
         <ToxicButton 
           onClick={handleWalletConnect} 
           disabled={isAuthenticating}
-          variant="outline"
-          className="w-full uppercase font-mono flex items-center justify-center py-3 text-base"
+          variant="glowing"
+          className="w-full uppercase font-mono flex items-center justify-center py-3 text-base mb-6"
         >
           <Shield className="h-4 w-4 mr-2" />
           Connect Crypto Wallet
         </ToxicButton>
+
+        <a 
+          href="https://www.linkedin.com/groups/12657922/" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="block w-full"
+        >
+          <ToxicButton
+            variant="outline"
+            className="w-full uppercase font-mono flex items-center justify-center py-3 text-base"
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            <span>Gain Access Code</span>
+          </ToxicButton>
+        </a>
 
         <div className="mt-6 text-center">
           <div className="text-white/40 text-xs flex items-center justify-center gap-2">
