@@ -1,14 +1,15 @@
 
 import { useState } from 'react';
 import { ToxicButton } from "@/components/ui/toxic-button";
-import { Wallet, Radiation, ArrowRightLeft, CornerRightDown } from 'lucide-react';
+import { Wallet, Radiation, ArrowRightLeft, CornerRightDown, Wifi, Shield } from 'lucide-react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 
 interface BuyRDTokensProps {
   onConnectWallet?: () => void;
+  isConnected?: boolean;
 }
 
-export const BuyRDTokens = ({ onConnectWallet }: BuyRDTokensProps) => {
+export const BuyRDTokens = ({ onConnectWallet, isConnected = false }: BuyRDTokensProps) => {
   const [amount, setAmount] = useState<number>(100);
   
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,8 +87,17 @@ export const BuyRDTokens = ({ onConnectWallet }: BuyRDTokensProps) => {
             size="lg"
             onClick={onConnectWallet}
           >
-            <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
-            <span className="text-lg font-mono flash-beacon">ACTIVATE SURVIVAL BEACON</span>
+            {isConnected ? (
+              <>
+                <Wifi className="w-5 h-5 mr-2 text-toxic-neon" />
+                <span className="text-lg font-mono">ACCESS FUNDING TERMINAL</span>
+              </>
+            ) : (
+              <>
+                <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
+                <span className="text-lg font-mono flash-beacon">ACTIVATE SURVIVAL BEACON</span>
+              </>
+            )}
           </ToxicButton>
         </div>
         

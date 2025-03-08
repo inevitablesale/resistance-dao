@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ToxicCard, ToxicCardContent } from "@/components/ui/toxic-card";
 import { ToxicBadge } from "@/components/ui/toxic-badge";
@@ -244,8 +245,17 @@ export function MarketplaceListingGrid({
             variant="marketplace"
             onClick={() => setShowAuthFlow(true)}
           >
-            <Radiation className="h-4 w-4 mr-2" />
-            Create First Listing
+            {isConnected ? (
+              <>
+                <Target className="h-4 w-4 mr-2" />
+                Create Listing
+              </>
+            ) : (
+              <>
+                <Radiation className="h-4 w-4 mr-2" />
+                Create First Listing
+              </>
+            )}
           </ToxicButton>
         </div>
       )}

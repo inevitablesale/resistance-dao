@@ -278,6 +278,107 @@ const Index = () => {
     navigate('/marketplace');
   };
 
+  // Survival Guide Component that will be moved to the top
+  const WastelandSurvivalGuide = () => (
+    <div className="mb-8 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
+      <div className="scanline"></div>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
+          <Radiation className="h-6 w-6 mr-2" /> WASTELAND SURVIVAL GUIDE
+        </h3>
+      </div>
+      
+      <div className="mb-6 p-4 bg-black/50 border border-apocalypse-red/30 rounded-lg relative">
+        <div className="flex gap-3">
+          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-apocalypse-red/20 flex items-center justify-center">
+            <Biohazard className="w-6 h-6 text-apocalypse-red" />
+          </div>
+          <div>
+            <h4 className="text-lg font-mono text-apocalypse-red mb-2">Resistance Protocol</h4>
+            <p className="text-white/80 mb-3 text-sm">
+              The <span className="text-apocalypse-red font-semibold">Resistance</span> connects survivors and bounty hunters to rebuild from the ashes of the old financial world.
+            </p>
+            <p className="text-white/80 mb-3 text-sm">
+              Whether you're a <span className="text-toxic-neon font-semibold">Hunter tracking criminal protocols</span> or a <span className="text-toxic-neon font-semibold">Survivor contributing rebuild skills</span>, our network facilitates wasteland justice and rebuilding efforts.
+            </p>
+            <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
+              <span className="text-toxic-neon font-semibold block mb-1">» COMING SOON «</span>
+              Settler Jobs | Wasteland Expeditions | Settlement Building - Expanding the Resistance with more ways to survive and rebuild.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 rounded-full bg-toxic-neon/10">
+              <Target className="w-5 h-5 text-toxic-neon" />
+            </div>
+            <h4 className="text-lg font-mono text-toxic-neon">Hunt Bounties</h4>
+          </div>
+          <p className="text-white/70 text-sm mb-3">
+            Track down the criminals who crashed the old world. Submit capture evidence and earn rewards for bringing justice to the wasteland.
+          </p>
+          <div className="flex justify-end">
+            <ToxicButton 
+              variant="outline" 
+              size="sm" 
+              className="text-toxic-neon border-toxic-neon/30"
+              onClick={() => navigate('/marketplace/bounty-hunters')}
+            >
+              Hunt <ChevronRight className="ml-1 h-4 w-4" />
+            </ToxicButton>
+          </div>
+        </div>
+        
+        <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 rounded-full bg-toxic-neon/10">
+              <Shield className="w-5 h-5 text-toxic-neon" />
+            </div>
+            <h4 className="text-lg font-mono text-toxic-neon">Join Survivors</h4>
+          </div>
+          <p className="text-white/70 text-sm mb-3">
+            Contribute your skills to rebuilding civilization. Each survivor plays a vital role in our settlement network, from medics to engineers.
+          </p>
+          <div className="flex justify-end">
+            <ToxicButton 
+              variant="outline" 
+              size="sm" 
+              className="text-toxic-neon border-toxic-neon/30"
+              onClick={() => navigate('/marketplace/survivors')}
+            >
+              Settle <ChevronRight className="ml-1 h-4 w-4" />
+            </ToxicButton>
+          </div>
+        </div>
+        
+        <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 rounded-full bg-toxic-neon/10">
+              <Coins className="w-5 h-5 text-toxic-neon" />
+            </div>
+            <h4 className="text-lg font-mono text-toxic-neon">Fund Economy</h4>
+          </div>
+          <p className="text-white/70 text-sm mb-3">
+            Convert your Old World assets to Resistance Dollars (RD). Power the new wasteland economy and gain governance rights in settlement decisions.
+          </p>
+          <div className="flex justify-end">
+            <ToxicButton 
+              variant="outline" 
+              size="sm" 
+              className="text-toxic-neon border-toxic-neon/30"
+              onClick={() => navigate('/buy-rd')}
+            >
+              Convert <ChevronRight className="ml-1 h-4 w-4" />
+            </ToxicButton>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderStoryIntro = () => (
     <div className="max-w-4xl mx-auto mb-16">
       <motion.div 
@@ -360,6 +461,9 @@ const Index = () => {
           <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Rebuilding From The Ashes</span>
         </div>
         
+        {/* Wasteland Survival Guide moved to the top */}
+        <WastelandSurvivalGuide />
+        
         <div className="mb-6">
           <TerminalTypewriter 
             textToType="WELCOME TO THE RESISTANCE SURVIVAL TERMINAL - JOIN THE NETWORK TO REBUILD CIVILIZATION"
@@ -410,7 +514,7 @@ const Index = () => {
                     className="w-full border-toxic-neon/40"
                     onClick={() => navigate('/marketplace/bounty-hunters')}
                   >
-                    Select Bounty Hunter
+                    {isConnected ? "Browse Bounty Hunters" : "Select Bounty Hunter"}
                   </ToxicButton>
                 </ToxicCard>
                 
@@ -438,7 +542,7 @@ const Index = () => {
                     className="w-full border-toxic-neon/40"
                     onClick={() => navigate('/marketplace/survivors')}
                   >
-                    Select Survivor
+                    {isConnected ? "Browse Survivors" : "Select Survivor"}
                   </ToxicButton>
                 </ToxicCard>
               </div>
@@ -539,7 +643,7 @@ const Index = () => {
                 className="w-full"
                 onClick={() => navigate('/buy-rd')}
               >
-                JOIN THE RESISTANCE ECONOMY
+                {isConnected ? "ACCESS FUNDING TERMINAL" : "JOIN THE RESISTANCE ECONOMY"}
               </ToxicButton>
             </ToxicCard>
             
@@ -595,104 +699,6 @@ const Index = () => {
                 </div>
               </ToxicCard>
             )}
-          </div>
-        </div>
-        
-        <div className="mb-12 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
-          <div className="scanline"></div>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
-              <Radiation className="h-6 w-6 mr-2" /> WASTELAND SURVIVAL GUIDE
-            </h3>
-          </div>
-          
-          <div className="mb-6 p-4 bg-black/50 border border-apocalypse-red/30 rounded-lg relative">
-            <div className="flex gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-apocalypse-red/20 flex items-center justify-center">
-                <Biohazard className="w-6 h-6 text-apocalypse-red" />
-              </div>
-              <div>
-                <h4 className="text-lg font-mono text-apocalypse-red mb-2">Resistance Protocol</h4>
-                <p className="text-white/80 mb-3 text-sm">
-                  The <span className="text-apocalypse-red font-semibold">Resistance</span> connects survivors and bounty hunters to rebuild from the ashes of the old financial world.
-                </p>
-                <p className="text-white/80 mb-3 text-sm">
-                  Whether you're a <span className="text-toxic-neon font-semibold">Hunter tracking criminal protocols</span> or a <span className="text-toxic-neon font-semibold">Survivor contributing rebuild skills</span>, our network facilitates wasteland justice and rebuilding efforts.
-                </p>
-                <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
-                  <span className="text-toxic-neon font-semibold block mb-1">» COMING SOON «</span>
-                  Settler Jobs | Wasteland Expeditions | Settlement Building - Expanding the Resistance with more ways to survive and rebuild.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-full bg-toxic-neon/10">
-                  <Target className="w-5 h-5 text-toxic-neon" />
-                </div>
-                <h4 className="text-lg font-mono text-toxic-neon">Hunt Bounties</h4>
-              </div>
-              <p className="text-white/70 text-sm mb-3">
-                Track down the criminals who crashed the old world. Submit capture evidence and earn rewards for bringing justice to the wasteland.
-              </p>
-              <div className="flex justify-end">
-                <ToxicButton 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-toxic-neon border-toxic-neon/30"
-                  onClick={() => navigate('/marketplace/bounty-hunters')}
-                >
-                  Hunt <ChevronRight className="ml-1 h-4 w-4" />
-                </ToxicButton>
-              </div>
-            </div>
-            
-            <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-full bg-toxic-neon/10">
-                  <Shield className="w-5 h-5 text-toxic-neon" />
-                </div>
-                <h4 className="text-lg font-mono text-toxic-neon">Join Survivors</h4>
-              </div>
-              <p className="text-white/70 text-sm mb-3">
-                Contribute your skills to rebuilding civilization. Each survivor plays a vital role in our settlement network, from medics to engineers.
-              </p>
-              <div className="flex justify-end">
-                <ToxicButton 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-toxic-neon border-toxic-neon/30"
-                  onClick={() => navigate('/marketplace/survivors')}
-                >
-                  Settle <ChevronRight className="ml-1 h-4 w-4" />
-                </ToxicButton>
-              </div>
-            </div>
-            
-            <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-full bg-toxic-neon/10">
-                  <Coins className="w-5 h-5 text-toxic-neon" />
-                </div>
-                <h4 className="text-lg font-mono text-toxic-neon">Fund Economy</h4>
-              </div>
-              <p className="text-white/70 text-sm mb-3">
-                Convert your Old World assets to Resistance Dollars (RD). Power the new wasteland economy and gain governance rights in settlement decisions.
-              </p>
-              <div className="flex justify-end">
-                <ToxicButton 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-toxic-neon border-toxic-neon/30"
-                  onClick={() => navigate('/buy-rd')}
-                >
-                  Convert <ChevronRight className="ml-1 h-4 w-4" />
-                </ToxicButton>
-              </div>
-            </div>
           </div>
         </div>
       </div>
