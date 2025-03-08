@@ -52,7 +52,6 @@ import { MarketplaceListingGrid, MarketplaceListing } from "@/components/marketp
 import { MarketplaceStatusPanel } from "@/components/marketplace/MarketplaceStatusPanel";
 import { MarketplaceActivityFeed, MarketplaceActivity } from "@/components/marketplace/MarketplaceActivityFeed";
 import { MarketplaceQuickActions } from "@/components/marketplace/MarketplaceQuickActions";
-import { ModelShowcase } from "@/components/ModelShowcase";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -293,65 +292,50 @@ const Index = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.8 }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <div>
-            <TerminalTypewriter 
-              textToType="THE OLD SYSTEMS COLLAPSED. THE RESISTANCE WAS BORN. WILL YOU JOIN US?"
-              storyMode={true}
-              isConnected={isConnected}
-              onConnect={advanceStory}
-              className="mb-8"
-            />
+        <TerminalTypewriter 
+          textToType="THE OLD SYSTEMS COLLAPSED. THE RESISTANCE WAS BORN. WILL YOU JOIN US?"
+          storyMode={true}
+          isConnected={isConnected}
+          onConnect={advanceStory}
+          className="mb-8"
+        />
 
-            <div className="grid grid-cols-1 gap-6 mb-8">
-              <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 rounded-full bg-toxic-neon/10">
-                    <Skull className="w-5 h-5 text-toxic-neon" />
-                  </div>
-                  <h3 className="text-xl font-mono text-toxic-neon">The Collapse</h3>
-                </div>
-                <p className="text-white/70 mb-4">
-                  Traditional venture capital dried up. Banks consolidated power. Independent innovators were shut out of the system.
-                </p>
-              </ToxicCard>
-              
-              <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 rounded-full bg-toxic-neon/10">
-                    <Zap className="w-5 h-5 text-toxic-neon" />
-                  </div>
-                  <h3 className="text-xl font-mono text-toxic-neon">The Awakening</h3>
-                </div>
-                <p className="text-white/70 mb-4">
-                  A group of renegade builders created a new system. Project funding through community commitment. Decentralized control.
-                </p>
-              </ToxicCard>
-              
-              <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 rounded-full bg-toxic-neon/10">
-                    <Shield className="w-5 h-5 text-toxic-neon" />
-                  </div>
-                  <h3 className="text-xl font-mono text-toxic-neon">The Resistance</h3>
-                </div>
-                <p className="text-white/70 mb-4">
-                  Now we're building the future. Supporting innovation through soft capital commitments. No gatekeepers. Direct access.
-                </p>
-              </ToxicCard>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-full bg-toxic-neon/10">
+                <Skull className="w-5 h-5 text-toxic-neon" />
+              </div>
+              <h3 className="text-xl font-mono text-toxic-neon">The Collapse</h3>
             </div>
-          </div>
+            <p className="text-white/70 mb-4">
+              Traditional venture capital dried up. Banks consolidated power. Independent innovators were shut out of the system.
+            </p>
+          </ToxicCard>
           
-          <div>
-            <ToxicCard className="bg-black/60 border-toxic-neon/30 p-4 mb-4">
-              <h3 className="text-xl font-mono text-toxic-neon mb-4">Resistance Operatives</h3>
-              <ModelShowcase className="mb-4" />
-              <p className="text-white/70 text-sm">
-                <span className="text-toxic-neon font-bold">MODEL PREVIEW:</span> Interact with the 3D model by clicking and dragging to rotate. 
-                Zoom with mouse wheel. Click the info button for operative details.
-              </p>
-            </ToxicCard>
-          </div>
+          <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-full bg-toxic-neon/10">
+                <Zap className="w-5 h-5 text-toxic-neon" />
+              </div>
+              <h3 className="text-xl font-mono text-toxic-neon">The Awakening</h3>
+            </div>
+            <p className="text-white/70 mb-4">
+              A group of renegade builders created a new system. Project funding through community commitment. Decentralized control.
+            </p>
+          </ToxicCard>
+          
+          <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-full bg-toxic-neon/10">
+                <Shield className="w-5 h-5 text-toxic-neon" />
+              </div>
+              <h3 className="text-xl font-mono text-toxic-neon">The Resistance</h3>
+            </div>
+            <p className="text-white/70 mb-4">
+              Now we're building the future. Supporting innovation through soft capital commitments. No gatekeepers. Direct access.
+            </p>
+          </ToxicCard>
         </div>
       </motion.div>
     </div>
