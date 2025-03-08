@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -516,5 +517,81 @@ export default function MarketplaceItemDetails() {
                   <ToxicCard className="bg-black/70 border-toxic-neon/30">
                     <ToxicCardContent>
                       <div className="space-y-3">
-                        {item?.attributes
-
+                        {item?.attributes && item.attributes.map((attr, index) => (
+                          <div key={index} className="flex justify-between p-2 border-b border-toxic-neon/10 last:border-0">
+                            <span className="text-white/70">{attr.trait}</span>
+                            <span className="text-toxic-neon font-mono">{attr.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </ToxicCardContent>
+                  </ToxicCard>
+                </TabsContent>
+                
+                <TabsContent value="activity" className="pt-4">
+                  <ToxicCard className="bg-black/70 border-toxic-neon/30">
+                    <ToxicCardContent>
+                      <div className="space-y-3">
+                        {MOCKUP_ACTIVITY.map((activity) => (
+                          <div 
+                            key={activity.id} 
+                            className="flex items-center p-2 border-b border-toxic-neon/10 last:border-0"
+                          >
+                            <div className="h-8 w-8 rounded-full bg-black flex items-center justify-center mr-3">
+                              {getActivityIcon(activity.type)}
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex justify-between">
+                                <span className="text-white/80">
+                                  {activity.type.charAt(0).toUpperCase() + activity.type.slice(1)}
+                                </span>
+                                <span className="text-toxic-muted text-xs">{activity.timestamp}</span>
+                              </div>
+                              
+                              <div className="flex justify-between mt-1">
+                                <span className="text-xs text-white/60">
+                                  {activity.type === 'mint' ? 'Minted by' : 
+                                   activity.type === 'transfer' ? 'Transferred from' : 'From'}: {activity.from}
+                                </span>
+                                {activity.price && (
+                                  <span className="text-toxic-neon text-xs font-mono">{activity.price}</span>
+                                )}
+                              </div>
+                              
+                              {activity.to && (
+                                <div className="mt-1 text-xs text-white/60">
+                                  To: {activity.to}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </ToxicCardContent>
+                  </ToxicCard>
+                </TabsContent>
+              </Tabs>
+              
+              <div className="flex gap-4">
+                <ToxicButton 
+                  variant="outline" 
+                  className="flex-1 border-toxic-neon/40"
+                  onClick={() => {}}
+                >
+                  <Heart className="h-4 w-4 mr-2" /> Favorite
+                </ToxicButton>
+                <ToxicButton 
+                  variant="outline" 
+                  className="flex-1 border-toxic-neon/40"
+                  onClick={() => {}}
+                >
+                  <Share2 className="h-4 w-4 mr-2" /> Share
+                </ToxicButton>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
