@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RadiationOverlay } from '@/components/radiation/RadiationOverlay';
+import { getModelFromIPFS } from '@/services/ipfsService';
 
 interface ModelPreviewProps {
   modelUrl: string;
@@ -27,7 +28,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   radiationLevel = 0,
   animateRadiation = true,
   useRadiationCloud = false,
-  radiationCloudUrl = "https://gateway.pinata.cloud/ipfs/bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
+  radiationCloudUrl = "bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
@@ -38,17 +39,48 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   const [scene, setScene] = useState<THREE.Scene | null>(null);
   const [mixer, setMixer] = useState<THREE.AnimationMixer | null>(null);
   const [clock] = useState(new THREE.Clock());
+  const [processedModelUrl, setProcessedModelUrl] = useState<string | null>(null);
+  const [processedCloudUrl, setProcessedCloudUrl] = useState<string | null>(null);
   
-  // Process modelUrl - if it starts with 'ipfs://' convert to HTTPS gateway URL
-  const processUrl = (url: string) => {
-    return url.startsWith('ipfs://') 
-      ? `https://gateway.pinata.cloud/ipfs/${url.replace('ipfs://', '')}`
-      : url;
-  };
+  // Process the model URLs using the IPFS service
+  useEffect(() => {
+    const fetchUrls = async () => {
+      try {
+        if (modelUrl) {
+          // Check if modelUrl is already a full URL or just a hash
+          if (modelUrl.startsWith('http')) {
+            setProcessedModelUrl(modelUrl);
+          } else {
+            // Remove ipfs:// prefix if it exists
+            const modelHash = modelUrl.replace('ipfs://', '');
+            const url = await getModelFromIPFS(modelHash);
+            setProcessedModelUrl(url);
+          }
+        }
+        
+        if (useRadiationCloud && radiationCloudUrl) {
+          // Check if radiationCloudUrl is already a full URL or just a hash
+          if (radiationCloudUrl.startsWith('http')) {
+            setProcessedCloudUrl(radiationCloudUrl);
+          } else {
+            // Remove ipfs:// prefix if it exists
+            const cloudHash = radiationCloudUrl.replace('ipfs://', '');
+            const url = await getModelFromIPFS(cloudHash);
+            setProcessedCloudUrl(url);
+          }
+        }
+      } catch (error) {
+        console.error('Error processing IPFS URLs:', error);
+        setError('Failed to process model URLs');
+      }
+    };
+    
+    fetchUrls();
+  }, [modelUrl, radiationCloudUrl, useRadiationCloud]);
   
   // Setup the scene, camera, and renderer
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !processedModelUrl) return;
     
     setLoading(true);
     setError(null);
@@ -105,13 +137,14 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     controls.minDistance = 3;
     controls.maxDistance = 10;
     
-    // Load the models - Main model and radiation cloud if needed
-    const loader = new GLTFLoader();
-    const processedModelUrl = processUrl(modelUrl);
-    
     // Animation mixer
     const newMixer = new THREE.AnimationMixer(newScene);
     setMixer(newMixer);
+    
+    // Load the main model
+    const loader = new GLTFLoader();
+    
+    console.log('Loading main model from:', processedModelUrl);
     
     // Load the main model
     loader.load(
@@ -173,14 +206,14 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       },
       (error) => {
         console.error('Error loading main model:', error);
-        setError('Failed to load 3D model');
+        setError('Failed to load 3D model. Please check the format and try again.');
         setLoading(false);
       }
     );
     
     // Load radiation cloud model if needed
-    if (useRadiationCloud) {
-      const processedCloudUrl = processUrl(radiationCloudUrl);
+    if (useRadiationCloud && processedCloudUrl) {
+      console.log('Loading radiation cloud from:', processedCloudUrl);
       
       loader.load(
         processedCloudUrl,
@@ -196,22 +229,26 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
           gltf.scene.scale.set(scale, scale, scale);
           gltf.scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
           
-          // Create glowing shader material for radiation effect
+          // Apply transparent material without emissive effects
           gltf.scene.traverse((child) => {
             if (child instanceof THREE.Mesh) {
-              // Apply glowing effect to the cloud model
+              // Apply simple transparent material without glow
               if (Array.isArray(child.material)) {
                 child.material.forEach(mat => {
                   mat.transparent = true;
                   mat.opacity = radiationLevel / 100;
-                  mat.emissive = new THREE.Color(0x39ff14); // Toxic green glow
-                  mat.emissiveIntensity = 0.5;
+                  
+                  // Remove emissive properties to avoid sunburst effect
+                  mat.emissive = new THREE.Color(0x000000);
+                  mat.emissiveIntensity = 0;
                 });
               } else {
                 child.material.transparent = true;
                 child.material.opacity = radiationLevel / 100;
-                child.material.emissive = new THREE.Color(0x39ff14);
-                child.material.emissiveIntensity = 0.5;
+                
+                // Remove emissive properties to avoid sunburst effect
+                child.material.emissive = new THREE.Color(0x000000);
+                child.material.emissiveIntensity = 0;
               }
             }
           });
@@ -303,7 +340,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     return () => {
       cancelAnimationFrame(animationId);
       
-      if (containerRef.current) {
+      if (containerRef.current && containerRef.current.contains(renderer.domElement)) {
         containerRef.current.removeChild(renderer.domElement);
       }
       window.removeEventListener('resize', handleResize);
@@ -327,42 +364,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       controls.dispose();
       if (newMixer) newMixer.stopAllAction();
     };
-  }, [modelUrl, autoRotate, radiationCloudUrl, useRadiationCloud]);
-  
-  // Update opacity when radiation level changes
-  useEffect(() => {
-    if (scene && mainModel && radiationModel && useRadiationCloud) {
-      // Update main model opacity
-      mainModel.traverse((child) => {
-        if (child instanceof THREE.Mesh && child.material) {
-          if (Array.isArray(child.material)) {
-            child.material.forEach(mat => {
-              if (mat.opacity !== undefined) {
-                mat.opacity = 1 - (radiationLevel / 100);
-              }
-            });
-          } else if (child.material.opacity !== undefined) {
-            child.material.opacity = 1 - (radiationLevel / 100);
-          }
-        }
-      });
-      
-      // Update radiation cloud opacity
-      radiationModel.traverse((child) => {
-        if (child instanceof THREE.Mesh && child.material) {
-          if (Array.isArray(child.material)) {
-            child.material.forEach(mat => {
-              if (mat.opacity !== undefined) {
-                mat.opacity = radiationLevel / 100;
-              }
-            });
-          } else if (child.material.opacity !== undefined) {
-            child.material.opacity = radiationLevel / 100;
-          }
-        }
-      });
-    }
-  }, [radiationLevel, scene, mainModel, radiationModel, useRadiationCloud]);
+  }, [processedModelUrl, processedCloudUrl, autoRotate, radiationLevel, useRadiationCloud]);
   
   return (
     <RadiationOverlay 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -47,7 +46,6 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { MarketplaceListing, MarketplaceListingType } from "@/components/marketplace/MarketplaceListingGrid";
 
-// Mockup data for testing
 const MOCKUP_LISTINGS: Record<string, MarketplaceListing> = {
   "1": {
     id: 1,
@@ -147,7 +145,6 @@ const MOCKUP_LISTINGS: Record<string, MarketplaceListing> = {
   }
 };
 
-// Activity history mockup for item
 type ActivityType = 'listing' | 'offer' | 'sale' | 'transfer' | 'mint';
 
 interface ItemActivity {
@@ -242,10 +239,8 @@ export default function MarketplaceItemDetails() {
   const [offerAmount, setOfferAmount] = useState('');
   
   useEffect(() => {
-    // In a real app, you would fetch the item data from your API or blockchain
     setLoading(true);
     
-    // Simulate API call with timeout
     const timer = setTimeout(() => {
       if (id && MOCKUP_LISTINGS[id]) {
         setItem(MOCKUP_LISTINGS[id]);
@@ -263,7 +258,6 @@ export default function MarketplaceItemDetails() {
     }
     
     setPurchaseStep(1);
-    // In a real app, you would integrate with your marketplace contract here
   };
   
   const handleMakeOffer = () => {
@@ -272,12 +266,11 @@ export default function MarketplaceItemDetails() {
       return;
     }
     
-    // In a real app, you would show an offer modal and handle the offer submission
     alert('Make offer functionality would be implemented here');
   };
   
   const handleBackToMarketplace = () => {
-    navigate(-1); // Go back to previous page
+    navigate(-1);
   };
   
   if (loading) {
@@ -339,7 +332,6 @@ export default function MarketplaceItemDetails() {
           </Button>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left column - 3D Model */}
             <div className="lg:col-span-1">
               <ToxicCard className="bg-black/70 border-toxic-neon/30 mb-6">
                 <ToxicCardContent className="p-0">
@@ -353,7 +345,7 @@ export default function MarketplaceItemDetails() {
                         radiationLevel={item.radiation.value}
                         animateRadiation={true}
                         useRadiationCloud={true}
-                        radiationCloudUrl="https://gateway.pinata.cloud/ipfs/bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
+                        radiationCloudUrl="bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full bg-gradient-to-b from-toxic-neon/20 to-black/60">
@@ -405,7 +397,6 @@ export default function MarketplaceItemDetails() {
               </ToxicCard>
             </div>
             
-            {/* Middle column - Item Details & Purchase */}
             <div className="lg:col-span-1">
               <ToxicCard className="bg-black/70 border-toxic-neon/30 mb-6">
                 <ToxicCardHeader>
@@ -494,7 +485,6 @@ export default function MarketplaceItemDetails() {
               </ToxicCard>
             </div>
             
-            {/* Right column - Item Properties & Activity */}
             <div className="lg:col-span-1">
               <Tabs defaultValue="properties" className="w-full mb-6">
                 <TabsList className="w-full bg-black/80 border-b border-toxic-neon/30">
@@ -660,6 +650,7 @@ export default function MarketplaceItemDetails() {
                             autoRotate={true}
                             radiationLevel={relatedItem.radiation.value}
                             useRadiationCloud={true}
+                            radiationCloudUrl="bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full">
