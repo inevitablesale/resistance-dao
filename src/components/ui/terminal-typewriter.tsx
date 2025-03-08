@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
-import { Lock, Terminal } from "lucide-react";
+import { Lock, ExternalLink, Terminal } from "lucide-react";
 import { ToxicButton } from "./toxic-button";
+import { Input } from "./input";
 
 interface TerminalTypewriterProps {
   textToType?: string;
@@ -26,6 +27,7 @@ export function TerminalTypewriter({
   const [isComplete, setIsComplete] = useState(false);
   const [initializationComplete, setInitializationComplete] = useState(false);
   const [currentLine, setCurrentLine] = useState(0);
+  const [accessCode, setAccessCode] = useState("");
   const terminalRef = useRef<HTMLDivElement>(null);
   
   const initLines = [
@@ -62,24 +64,7 @@ export function TerminalTypewriter({
     }
   }, [currentLine, typeDelay]);
   
-  // Handle main text typing after initialization
-  useEffect(() => {
-    if (initializationComplete && !isComplete) {
-      let i = 0;
-      const interval = setInterval(() => {
-        if (i <= textToType.length) {
-          setDisplayText(textToType.substring(0, i));
-          i++;
-        } else {
-          clearInterval(interval);
-          setIsComplete(true);
-        }
-      }, typeDelay);
-      
-      return () => clearInterval(interval);
-    }
-  }, [textToType, typeDelay, initializationComplete]);
-  
+  // Handle cursor blinking
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setCursorVisible(prev => !prev);
@@ -95,104 +80,119 @@ export function TerminalTypewriter({
     }
   }, [displayText, isConnected, isComplete, currentLine]);
   
-  const getTerminalContent = () => {
-    if (!initializationComplete) {
-      return (
-        <div className="terminal-line flex items-start">
-          <span className="block text-toxic-neon">
-            {currentLine === 0 && <span className="text-toxic-neon">_&gt; </span>}
-            {displayText}
-            {cursorVisible && <span className="cursor">_</span>}
-          </span>
-        </div>
-      );
+  const handleSubmit = () => {
+    if (onConnect) {
+      onConnect();
     }
-    
-    return (
-      <>
-        <div className="terminal-line">
-          <span className="text-toxic-neon">_&gt; RESISTANCE_SECURE_SHELL</span>
-        </div>
-        <div className="terminal-line">
-          <span className="text-toxic-neon">Initializing secure terminal...</span>
-        </div>
-        <div className="terminal-line">
-          <span className="text-toxic-neon">Establishing encrypted connection...</span>
-        </div>
-        <div className="terminal-line">
-          <span className="text-toxic-neon">[WARNING]: Connection masking enabled</span>
-        </div>
-        <div className="terminal-line">
-          <span className="text-toxic-neon">Routing through decentralized nodes...</span>
-        </div>
-        <div className="terminal-line">
-          <span className="text-toxic-neon">RESISTANCE NETWORK TERMINAL v3.27</span>
-        </div>
-        <div className="terminal-line">
-          <span className="text-toxic-neon">Authentication required:</span>
-        </div>
-        <div className="terminal-line flex items-center h-6 min-h-6">
-          <span className="block text-toxic-neon">
-            resistance@secure:~$ {displayText}
-            {cursorVisible && <span className="cursor">_</span>}
-          </span>
-        </div>
-        <div className="terminal-line mt-2 text-toxic-neon/70 text-sm">
-          <span>// Access code is "resistance"</span>
-        </div>
-      </>
-    );
+  };
+  
+  const handleAccessCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAccessCode(e.target.value);
   };
   
   return (
-    <div className={cn("terminal-container relative", className)}>
-      <div 
-        ref={terminalRef} 
-        className="terminal-output bg-black text-toxic-neon p-4 font-mono border border-toxic-neon/30 rounded-md relative overflow-hidden"
-      >
-        <div className="terminal-header flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <Terminal className="w-4 h-4 mr-2 text-toxic-neon" />
-            <span className="text-toxic-neon text-xs">RESISTANCE_SECURE_SHELL</span>
+    <div className={cn("terminal-outer-container", className)}>
+      <div className="terminal-middle-container">
+        <div 
+          ref={terminalRef} 
+          className="terminal-container"
+        >
+          <div className="terminal-header">
+            <div className="flex items-center">
+              <span className="text-toxic-neon text-sm">_&gt; RESISTANCE_SECURE_SHELL</span>
+            </div>
+            <div className="flex gap-2">
+              <div className="w-3 h-3 rounded-full bg-apocalypse-red"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+            </div>
           </div>
-          <div className="flex gap-1">
-            <div className="w-2 h-2 rounded-full bg-apocalypse-red"></div>
-            <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+          
+          <div className="terminal-content">
+            {!initializationComplete ? (
+              <div className="terminal-line">
+                <span className="text-toxic-neon">
+                  {currentLine === 0 && <span className="text-toxic-neon">_&gt; </span>}
+                  {displayText}
+                  {cursorVisible && <span className="cursor">_</span>}
+                </span>
+              </div>
+            ) : (
+              <>
+                <div className="terminal-line">
+                  <span className="text-toxic-neon">_&gt; RESISTANCE_SECURE_SHELL</span>
+                </div>
+                <div className="terminal-line">
+                  <span className="text-toxic-neon">Initializing secure terminal...</span>
+                </div>
+                <div className="terminal-line">
+                  <span className="text-toxic-neon">Establishing encrypted connection...</span>
+                </div>
+                <div className="terminal-line">
+                  <span className="text-toxic-neon">[WARNING]: Connection masking enabled</span>
+                </div>
+                <div className="terminal-line">
+                  <span className="text-toxic-neon">Routing through decentralized nodes...</span>
+                </div>
+                <div className="terminal-line">
+                  <span className="text-toxic-neon">RESISTANCE NETWORK TERMINAL v3.27</span>
+                </div>
+                <div className="terminal-line">
+                  <span className="text-toxic-neon">Authentication required:</span>
+                </div>
+                <div className="terminal-line">
+                  <span className="text-toxic-neon">resistance@secure:~$</span>
+                </div>
+                
+                {isConnected ? (
+                  <div className="terminal-line mt-4">
+                    <div className="animate-pulse text-toxic-neon">
+                      Access granted. Welcome to the Resistance.
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="terminal-input-container mt-5">
+                      <div className="access-code-container">
+                        <div className="flex items-center w-full">
+                          <Input
+                            type="password"
+                            placeholder="Enter access code"
+                            className="access-code-input"
+                            value={accessCode}
+                            onChange={handleAccessCodeChange}
+                            icon={<Lock className="access-code-icon" />}
+                          />
+                          <button 
+                            onClick={handleSubmit}
+                            className="submit-button"
+                          >
+                            <span className="mr-2">Submit</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="terminal-hint mt-4">
+                      <span className="text-toxic-neon/70 text-sm">// Access code is "resistance"</span>
+                    </div>
+                    
+                    <div className="terminal-footer mt-4">
+                      <a 
+                        href="https://www.linkedin.com/groups/14310213/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="linkedin-link"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        <span>Join Resistance LinkedIn Group</span>
+                      </a>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
           </div>
         </div>
-        
-        {getTerminalContent()}
-        
-        {isComplete && !isConnected && (
-          <div className="terminal-line mt-4">
-            <ToxicButton
-              onClick={onConnect}
-              variant="outline"
-              className="bg-transparent border-toxic-neon/50 hover:bg-toxic-neon/10"
-            >
-              <Lock className="w-4 h-4 mr-2 text-toxic-neon" />
-              <span>SUBMIT ACCESS CODE</span>
-            </ToxicButton>
-            <div className="mt-2">
-              <a 
-                href="https://www.linkedin.com/groups/14310213/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-toxic-neon text-sm flex items-center hover:underline"
-              >
-                <span className="mr-2">📎</span> Join Resistance LinkedIn Group
-              </a>
-            </div>
-          </div>
-        )}
-        
-        {isConnected && (
-          <div className="terminal-line mt-4 text-toxic-neon">
-            <div className="animate-pulse text-toxic-neon">
-              Access granted. Welcome to the Resistance.
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
