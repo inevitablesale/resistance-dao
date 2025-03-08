@@ -85,12 +85,12 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     directionalLight.position.set(1, 1, 1);
     newScene.add(directionalLight);
     
-    // Add point lights for dramatic effect
-    const pointLight1 = new THREE.PointLight(0x39ff14, 0.5); // Toxic green
+    // Add neutral point lights instead of colored ones
+    const pointLight1 = new THREE.PointLight(0xffffff, 0.5); // Changed to white
     pointLight1.position.set(2, 1, 3);
     newScene.add(pointLight1);
     
-    const pointLight2 = new THREE.PointLight(0xff3333, 0.3); // Reddish for contrast
+    const pointLight2 = new THREE.PointLight(0xffffff, 0.3); // Changed to white
     pointLight2.position.set(-2, 2, -1);
     newScene.add(pointLight2);
     
@@ -145,16 +145,17 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         gltf.scene.scale.set(scale, scale, scale);
         gltf.scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
         
-        // Apply transparent material without emissive effects
+        // Apply transparent material with neutral color
         gltf.scene.traverse((child) => {
           if (child instanceof THREE.Mesh) {
-            // Apply simple transparent material without glow
+            // Apply neutral transparent material without color tint
             if (Array.isArray(child.material)) {
               child.material.forEach(mat => {
                 mat.transparent = true;
                 mat.opacity = radiationLevel / 100;
                 
-                // Remove emissive properties to avoid sunburst effect
+                // Use neutral gray color instead of green/yellow
+                mat.color = new THREE.Color(0xffffff);
                 mat.emissive = new THREE.Color(0x000000);
                 mat.emissiveIntensity = 0;
               });
@@ -162,7 +163,8 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
               child.material.transparent = true;
               child.material.opacity = radiationLevel / 100;
               
-              // Remove emissive properties to avoid sunburst effect
+              // Use neutral gray color instead of green/yellow
+              child.material.color = new THREE.Color(0xffffff);
               child.material.emissive = new THREE.Color(0x000000);
               child.material.emissiveIntensity = 0;
             }
@@ -260,13 +262,13 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       >
         {loading && !error && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-            <Loader2 className="h-8 w-8 text-toxic-neon animate-spin" />
+            <Loader2 className="h-8 w-8 text-white animate-spin" />
           </div>
         )}
         
         {error && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/70">
-            <div className="text-apocalypse-red text-center p-4">
+            <div className="text-red-500 text-center p-4">
               <p>{error}</p>
               <p className="text-xs mt-2">Try a different model or check the URL</p>
             </div>
