@@ -31,7 +31,7 @@ export const ModelShowcase: React.FC<ModelShowcaseProps> = ({
     {
       name: "Mutant Zero X-35",
       description: "Elite bounty hunter with neural hacking mutations. Specializes in tracking digital signatures across the wasteland.",
-      ipfsHash: "bafybeic2yffnslotf33yojsihiyv73rmxenstfwcxnyws5ktxp2mptkb3q", // Your provided CID
+      ipfsHash: "bafybeic2yffnslotf33yojsihiyv73rmxenstfwcxnyws5ktxp2mptkb3q",
       type: 'bounty-hunter',
       stats: {
         "Radiation Level": "High (78%)",
@@ -39,8 +39,19 @@ export const ModelShowcase: React.FC<ModelShowcaseProps> = ({
         "Threat Rating": "Extreme",
         "Bounties Claimed": 24
       }
+    },
+    {
+      name: "Wasteland Enforcer",
+      description: "Heavily armored bounty hunter with enhanced strength mutations. Specializes in close combat and territorial control.",
+      ipfsHash: "bafybeievz6nebdf347o55mr7igdfv57qmjt6othr77wqxh3wpx6s7yhdcu",
+      type: 'bounty-hunter',
+      stats: {
+        "Radiation Level": "Medium (62%)",
+        "Mutation Type": "Enhanced Strength",
+        "Threat Rating": "High",
+        "Bounties Claimed": 17
+      }
     }
-    // You can add more models here later
   ];
 
   const currentModel = models[currentModelIndex];
