@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Zap } from 'lucide-react';
+import { Shield, Zap, Lock, LockKeyhole, Terminal, ArrowRight, Check, AlertTriangle } from 'lucide-react';
 
 interface BreachSequenceProps {
   onComplete: () => void;
@@ -10,22 +10,47 @@ interface BreachSequenceProps {
 export const BreachSequence: React.FC<BreachSequenceProps> = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
   const [showGlitch, setShowGlitch] = useState(false);
+  const [currentPhase, setCurrentPhase] = useState(0);
+  
+  // Breach sequence phases
+  const phases = [
+    { icon: LockKeyhole, text: "BYPASSING SECURITY", delay: 400 },
+    { icon: Terminal, text: "ACCESSING NETWORK", delay: 400 },
+    { icon: Zap, text: "INJECTING PROTOCOLS", delay: 400 },
+    { icon: Shield, text: "SECURING CONNECTION", delay: 400 },
+    { icon: Check, text: "ACCESS GRANTED", delay: 400 }
+  ];
 
   useEffect(() => {
-    // Show initial glitch effect
+    // Initial glitch effect
     setShowGlitch(true);
     setTimeout(() => setShowGlitch(false), 300);
     
-    // Quick progress animation
+    // Progress animation - faster at 70ms intervals
     const progressInterval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(progressInterval);
           return 100;
         }
-        return prev + 10;
+        return prev + 8; // Faster increment to complete in ~875ms
       });
-    }, 100); // Update every 100ms to reach 100% in ~1 second
+    }, 70);
+    
+    // Phase transitions
+    let phaseTimeout: NodeJS.Timeout;
+    const advancePhase = (index: number) => {
+      if (index < phases.length) {
+        setCurrentPhase(index);
+        
+        if (index < phases.length - 1) {
+          phaseTimeout = setTimeout(() => advancePhase(index + 1), phases[index].delay);
+        }
+      }
+    };
+    
+    // Start phase transitions
+    advancePhase(0);
     
     // Complete after 2 seconds total
     setTimeout(() => {
@@ -34,11 +59,37 @@ export const BreachSequence: React.FC<BreachSequenceProps> = ({ onComplete }) =>
       onComplete();
     }, 2000);
     
-    return () => clearInterval(progressInterval);
+    return () => {
+      clearInterval(progressInterval);
+      if (phaseTimeout) clearTimeout(phaseTimeout);
+    };
   }, [onComplete]);
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex items-center justify-center overflow-hidden">
+      {/* Matrix-like data streams in background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="data-stream-container">
+          {[...Array(15)].map((_, i) => (
+            <div 
+              key={i} 
+              className="data-stream" 
+              style={{ 
+                left: `${Math.random() * 100}%`, 
+                animationDuration: `${Math.random() * 2 + 1}s`,
+                opacity: Math.random() * 0.3 + 0.1
+              }}
+            >
+              {[...Array(10)].map((_, j) => (
+                <div key={j} className="text-toxic-neon/30 font-mono text-sm">
+                  {Math.random() > 0.5 ? '1' : '0'}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+      
       {/* Glitch overlay */}
       <AnimatePresence>
         {showGlitch && (
@@ -73,19 +124,28 @@ export const BreachSequence: React.FC<BreachSequenceProps> = ({ onComplete }) =>
             />
           </div>
           
-          <div className="flex items-center justify-center mb-2">
-            <div className="w-10 h-10 rounded-full bg-toxic-neon/20 flex items-center justify-center">
-              <Shield className="h-6 w-6 text-toxic-neon animate-pulse" />
-            </div>
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={currentPhase}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col items-center justify-center"
+            >
+              <div className="w-10 h-10 rounded-full bg-toxic-neon/20 flex items-center justify-center mb-2">
+                {React.createElement(phases[currentPhase].icon, { className: "h-6 w-6 text-toxic-neon animate-pulse" })}
+              </div>
+              
+              <h2 className="text-xl text-center font-mono text-toxic-neon mb-1">
+                {phases[currentPhase].text}
+              </h2>
+            </motion.div>
+          </AnimatePresence>
           
-          <h2 className="text-xl text-center font-mono text-toxic-neon mb-1">
-            ACCESSING RESISTANCE NETWORK
-          </h2>
-          
-          <div className="text-center font-mono text-sm text-toxic-neon/70">
+          <div className="text-center font-mono text-sm text-toxic-neon/70 mt-2">
             <span className="inline-block mr-1 text-apocalypse-red">&gt;</span> 
-            AUTHENTICATION SUCCESSFUL
+            BREACH PROTOCOL {Math.floor(progress)}% COMPLETE
           </div>
         </motion.div>
       </div>
