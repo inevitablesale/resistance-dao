@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -59,9 +60,14 @@ const Index = () => {
   const { setShowAuthFlow, isConnected } = useWalletConnection();
   
   const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
+  const [storyStage, setStoryStage] = useState<number>(0);
   
   const handleConnectWallet = () => {
     setShowAuthFlow(true);
+  };
+
+  const advanceStory = () => {
+    setStoryStage(prev => prev + 1);
   };
   
   const handleRefreshActivity = () => {
@@ -258,6 +264,334 @@ const Index = () => {
     navigate('/marketplace');
   };
 
+  const renderStoryIntro = () => (
+    <div className="max-w-4xl mx-auto mb-16">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        className="text-center mb-8"
+      >
+        <h1 className="text-4xl md:text-6xl font-mono text-toxic-neon mb-6 toxic-glow">THE RESISTANCE</h1>
+        <p className="text-xl text-white/80 mb-8 leading-relaxed">
+          After the financial collapse of 2031, centralized powers seized control of global funding.
+          Innovation stalled. Independent projects disappeared. The future darkened.
+        </p>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.8 }}
+      >
+        <TerminalTypewriter 
+          textToType="THE OLD SYSTEMS COLLAPSED. THE RESISTANCE WAS BORN. WILL YOU JOIN US?"
+          storyMode={true}
+          onConnect={advanceStory}
+          className="mb-8"
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-full bg-toxic-neon/10">
+                <Skull className="w-5 h-5 text-toxic-neon" />
+              </div>
+              <h3 className="text-xl font-mono text-toxic-neon">The Collapse</h3>
+            </div>
+            <p className="text-white/70 mb-4">
+              Traditional venture capital dried up. Banks consolidated power. Independent innovators were shut out of the system.
+            </p>
+          </ToxicCard>
+          
+          <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-full bg-toxic-neon/10">
+                <Zap className="w-5 h-5 text-toxic-neon" />
+              </div>
+              <h3 className="text-xl font-mono text-toxic-neon">The Awakening</h3>
+            </div>
+            <p className="text-white/70 mb-4">
+              A group of renegade builders created a new system. Project funding through community commitment. Decentralized control.
+            </p>
+          </ToxicCard>
+          
+          <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-full bg-toxic-neon/10">
+                <Shield className="w-5 h-5 text-toxic-neon" />
+              </div>
+              <h3 className="text-xl font-mono text-toxic-neon">The Resistance</h3>
+            </div>
+            <p className="text-white/70 mb-4">
+              Now we're building the future. Supporting innovation through soft capital commitments. No gatekeepers. Direct access.
+            </p>
+          </ToxicCard>
+        </div>
+      </motion.div>
+    </div>
+  );
+  
+  const renderMarketplace = () => (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-5xl mx-auto"
+    >
+      <div className="text-left mb-8">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
+          <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
+          <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Project Status: <span className="text-apocalypse-red font-bold status-critical">Seeking Capital Commitments</span>
+        </div>
+        
+        <div className="mb-6">
+          <TerminalTypewriter 
+            textToType="WELCOME TO THE RESISTANCE PROJECT FUNDING PORTAL - SOFT CAPITAL COMMITMENTS ACTIVE"
+            isConnected={isConnected}
+            onConnect={handleConnectWallet}
+            className="mb-4"
+            marketplaceMode={true}
+          />
+        </div>
+
+        <MarketplaceQuickActions 
+          className="mb-8"
+          onCreateListing={handleCreateListing}
+          onBrowseListings={handleBrowseListings}
+        />
+
+        <MarketplaceStatusPanel 
+          stats={marketplaceStats} 
+          isLoading={isLoadingStats}
+          className="mb-8"
+        />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2">
+            <MarketplaceListingGrid 
+              listings={bountyHunterListings} 
+              title="Featured Projects - Bounty Hunter Series" 
+              onListingClick={handleListingClick}
+              className="mb-8"
+            />
+            
+            <MarketplaceListingGrid 
+              listings={survivorListings} 
+              title="Community-Voted Projects - Survivor Series" 
+              onListingClick={handleListingClick}
+            />
+          </div>
+          
+          <div className="lg:col-span-1">
+            <MarketplaceActivityFeed 
+              activities={recentActivities} 
+              isLoading={isRefreshingActivity}
+              onRefresh={handleRefreshActivity}
+              className="mb-6"
+            />
+            
+            <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 rounded-full bg-toxic-neon/10">
+                  <Shield className="w-5 h-5 text-toxic-neon" />
+                </div>
+                <h3 className="text-lg font-mono text-toxic-neon">My Funding Status</h3>
+              </div>
+              
+              {isConnected ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/70">Active Commitments</span>
+                    <span className="text-toxic-neon font-mono">0</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/70">Funding Reputation</span>
+                    <div className="flex items-center">
+                      <ToxicBadge variant="rating" className="text-toxic-neon">★ 0.0</ToxicBadge>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/70">Radiation Level</span>
+                    <span className="text-toxic-neon font-mono">
+                      <span className="text-toxic-neon">LOW (5%)</span>
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-6 bg-toxic-neon/5 rounded-lg">
+                  <p className="text-white/70 mb-4">Connect to view your funding status</p>
+                  <ToxicButton 
+                    variant="marketplace"
+                    onClick={handleConnectWallet}
+                  >
+                    <Radiation className="h-4 w-4 mr-2" />
+                    ACTIVATE SURVIVAL BEACON
+                  </ToxicButton>
+                </div>
+              )}
+            </ToxicCard>
+            
+            {isConnected && (
+              <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4 mt-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-2 rounded-full bg-toxic-neon/10">
+                    <CircleDollarSign className="w-5 h-5 text-toxic-neon" />
+                  </div>
+                  <h3 className="text-lg font-mono text-toxic-neon">Quick Actions</h3>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <ToxicButton 
+                    variant="outline" 
+                    size="sm"
+                    className="border-toxic-neon/30"
+                    onClick={handleCreateListing}
+                  >
+                    <PlusCircle className="h-4 w-4 mr-1" />
+                    Submit Project
+                  </ToxicButton>
+                  
+                  <ToxicButton 
+                    variant="outline" 
+                    size="sm"
+                    className="border-toxic-neon/30"
+                    onClick={handleBrowseListings}
+                  >
+                    <Search className="h-4 w-4 mr-1" />
+                    Browse
+                  </ToxicButton>
+                  
+                  <ToxicButton 
+                    variant="outline" 
+                    size="sm"
+                    className="border-toxic-neon/30"
+                    onClick={() => navigate('/marketplace/inventory')}
+                  >
+                    <ShoppingBag className="h-4 w-4 mr-1" />
+                    My Projects
+                  </ToxicButton>
+                  
+                  <ToxicButton 
+                    variant="outline" 
+                    size="sm"
+                    className="border-toxic-neon/30"
+                    onClick={() => navigate('/marketplace/offers')}
+                  >
+                    <Target className="h-4 w-4 mr-1" />
+                    Commitments
+                  </ToxicButton>
+                </div>
+              </ToxicCard>
+            )}
+          </div>
+        </div>
+        
+        <div className="relative mb-8">
+          <BuyRDTokens onConnectWallet={handleConnectWallet} />
+          <ToxicPuddle className="absolute -bottom-2 -right-10" toxicGreen={true} />
+        </div>
+        
+        <div className="mb-12 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
+          <div className="scanline"></div>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
+              <Radiation className="h-6 w-6 mr-2" /> PROJECT FUNDING GUIDE
+            </h3>
+          </div>
+          
+          <div className="mb-6 p-4 bg-black/50 border border-apocalypse-red/30 rounded-lg relative">
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-apocalypse-red/20 flex items-center justify-center">
+                <Biohazard className="w-6 h-6 text-apocalypse-red" />
+              </div>
+              <div>
+                <h4 className="text-lg font-mono text-apocalypse-red mb-2">Soft Capital Commitments</h4>
+                <p className="text-white/80 mb-3 text-sm">
+                  The <span className="text-apocalypse-red font-semibold">Resistance Project Funding Portal</span> connects project owners with potential backers through soft capital commitments - no upfront capital required.
+                </p>
+                <p className="text-white/80 mb-3 text-sm">
+                  Whether you're <span className="text-toxic-neon font-semibold">seeking funding</span> for your innovative protocol or looking to <span className="text-toxic-neon font-semibold">support promising projects</span>, our platform facilitates secure commitments and project validation.
+                </p>
+                <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
+                  <span className="text-toxic-neon font-semibold block mb-1">» COMING SOON «</span>
+                  Job Listings | Partner Matching | Role Seeking - Expanding the Resistance network with more ways to connect and collaborate.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-full bg-toxic-neon/10">
+                  <Target className="w-5 h-5 text-toxic-neon" />
+                </div>
+                <h4 className="text-lg font-mono text-toxic-neon">Project Submission</h4>
+              </div>
+              <p className="text-white/70 text-sm mb-3">
+                Submit your project for community validation and funding. Projects with sufficient soft commitments move into development with Resistance support.
+              </p>
+              <div className="flex justify-end">
+                <ToxicButton 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-toxic-neon border-toxic-neon/30"
+                  onClick={() => navigate('/thesis')}
+                >
+                  Submit <ChevronRight className="ml-1 h-4 w-4" />
+                </ToxicButton>
+              </div>
+            </div>
+            
+            <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-full bg-toxic-neon/10">
+                  <Shield className="w-5 h-5 text-toxic-neon" />
+                </div>
+                <h4 className="text-lg font-mono text-toxic-neon">Fund Projects</h4>
+              </div>
+              <p className="text-white/70 text-sm mb-3">
+                Browse promising projects and show support through soft commitments. Validate quality protocols before they launch with no upfront capital required.
+              </p>
+              <div className="flex justify-end">
+                <ToxicButton 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-toxic-neon border-toxic-neon/30"
+                  onClick={() => navigate('/proposals')}
+                >
+                  Explore <ChevronRight className="ml-1 h-4 w-4" />
+                </ToxicButton>
+              </div>
+            </div>
+            
+            <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-full bg-toxic-neon/10">
+                  <ShoppingBag className="w-5 h-5 text-toxic-neon" />
+                </div>
+                <h4 className="text-lg font-mono text-toxic-neon">Coming Soon</h4>
+              </div>
+              <p className="text-white/70 text-sm mb-3">
+                Job Listings | Partner Matching | Role Seeking - New ways to connect talent, projects, and resources within the Resistance ecosystem.
+              </p>
+              <div className="flex justify-end">
+                <ToxicButton 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-toxic-neon border-toxic-neon/30 opacity-60 cursor-not-allowed"
+                >
+                  Soon <ChevronRight className="ml-1 h-4 w-4" />
+                </ToxicButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
       <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} />
@@ -271,263 +605,7 @@ const Index = () => {
         </div>
         
         <div className="container px-4 relative">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-5xl mx-auto"
-          >
-            <div className="text-left mb-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
-                <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
-                <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Project Status: <span className="text-apocalypse-red font-bold status-critical">Seeking Capital Commitments</span>
-              </div>
-              
-              <div className="mb-6">
-                <TerminalTypewriter 
-                  textToType="WELCOME TO THE RESISTANCE PROJECT FUNDING PORTAL - SOFT CAPITAL COMMITMENTS ACTIVE"
-                  isConnected={isConnected}
-                  onConnect={handleConnectWallet}
-                  className="mb-4"
-                  marketplaceMode={true}
-                />
-              </div>
-
-              <MarketplaceQuickActions 
-                className="mb-8"
-                onCreateListing={handleCreateListing}
-                onBrowseListings={handleBrowseListings}
-              />
-
-              <MarketplaceStatusPanel 
-                stats={marketplaceStats} 
-                isLoading={isLoadingStats}
-                className="mb-8"
-              />
-              
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <div className="lg:col-span-2">
-                  <MarketplaceListingGrid 
-                    listings={bountyHunterListings} 
-                    title="Featured Projects - Bounty Hunter Series" 
-                    onListingClick={handleListingClick}
-                    className="mb-8"
-                  />
-                  
-                  <MarketplaceListingGrid 
-                    listings={survivorListings} 
-                    title="Community-Voted Projects - Survivor Series" 
-                    onListingClick={handleListingClick}
-                  />
-                </div>
-                
-                <div className="lg:col-span-1">
-                  <MarketplaceActivityFeed 
-                    activities={recentActivities} 
-                    isLoading={isRefreshingActivity}
-                    onRefresh={handleRefreshActivity}
-                    className="mb-6"
-                  />
-                  
-                  <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="p-2 rounded-full bg-toxic-neon/10">
-                        <Shield className="w-5 h-5 text-toxic-neon" />
-                      </div>
-                      <h3 className="text-lg font-mono text-toxic-neon">My Funding Status</h3>
-                    </div>
-                    
-                    {isConnected ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-white/70">Active Commitments</span>
-                          <span className="text-toxic-neon font-mono">0</span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-white/70">Funding Reputation</span>
-                          <div className="flex items-center">
-                            <ToxicBadge variant="rating" className="text-toxic-neon">★ 0.0</ToxicBadge>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-white/70">Radiation Level</span>
-                          <span className="text-toxic-neon font-mono">
-                            <span className="text-toxic-neon">LOW (5%)</span>
-                          </span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-center py-6 bg-toxic-neon/5 rounded-lg">
-                        <p className="text-white/70 mb-4">Connect to view your funding status</p>
-                        <ToxicButton 
-                          variant="marketplace"
-                          onClick={handleConnectWallet}
-                        >
-                          <Radiation className="h-4 w-4 mr-2" />
-                          ACTIVATE SURVIVAL BEACON
-                        </ToxicButton>
-                      </div>
-                    )}
-                  </ToxicCard>
-                  
-                  {isConnected && (
-                    <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4 mt-6">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="p-2 rounded-full bg-toxic-neon/10">
-                          <CircleDollarSign className="w-5 h-5 text-toxic-neon" />
-                        </div>
-                        <h3 className="text-lg font-mono text-toxic-neon">Quick Actions</h3>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-2">
-                        <ToxicButton 
-                          variant="outline" 
-                          size="sm"
-                          className="border-toxic-neon/30"
-                          onClick={handleCreateListing}
-                        >
-                          <PlusCircle className="h-4 w-4 mr-1" />
-                          Submit Project
-                        </ToxicButton>
-                        
-                        <ToxicButton 
-                          variant="outline" 
-                          size="sm"
-                          className="border-toxic-neon/30"
-                          onClick={handleBrowseListings}
-                        >
-                          <Search className="h-4 w-4 mr-1" />
-                          Browse
-                        </ToxicButton>
-                        
-                        <ToxicButton 
-                          variant="outline" 
-                          size="sm"
-                          className="border-toxic-neon/30"
-                          onClick={() => navigate('/marketplace/inventory')}
-                        >
-                          <ShoppingBag className="h-4 w-4 mr-1" />
-                          My Projects
-                        </ToxicButton>
-                        
-                        <ToxicButton 
-                          variant="outline" 
-                          size="sm"
-                          className="border-toxic-neon/30"
-                          onClick={() => navigate('/marketplace/offers')}
-                        >
-                          <Target className="h-4 w-4 mr-1" />
-                          Commitments
-                        </ToxicButton>
-                      </div>
-                    </ToxicCard>
-                  )}
-                </div>
-              </div>
-              
-              <div className="relative mb-8">
-                <BuyRDTokens onConnectWallet={handleConnectWallet} />
-                <ToxicPuddle className="absolute -bottom-2 -right-10" toxicGreen={true} />
-              </div>
-              
-              <div className="mb-12 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
-                <div className="scanline"></div>
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
-                    <Radiation className="h-6 w-6 mr-2" /> PROJECT FUNDING GUIDE
-                  </h3>
-                </div>
-                
-                <div className="mb-6 p-4 bg-black/50 border border-apocalypse-red/30 rounded-lg relative">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-apocalypse-red/20 flex items-center justify-center">
-                      <Biohazard className="w-6 h-6 text-apocalypse-red" />
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-mono text-apocalypse-red mb-2">Soft Capital Commitments</h4>
-                      <p className="text-white/80 mb-3 text-sm">
-                        The <span className="text-apocalypse-red font-semibold">Resistance Project Funding Portal</span> connects project owners with potential backers through soft capital commitments - no upfront capital required.
-                      </p>
-                      <p className="text-white/80 mb-3 text-sm">
-                        Whether you're <span className="text-toxic-neon font-semibold">seeking funding</span> for your innovative protocol or looking to <span className="text-toxic-neon font-semibold">support promising projects</span>, our platform facilitates secure commitments and project validation.
-                      </p>
-                      <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
-                        <span className="text-toxic-neon font-semibold block mb-1">» COMING SOON «</span>
-                        Job Listings | Partner Matching | Role Seeking - Expanding the Resistance network with more ways to connect and collaborate.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-6">
-                  <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 rounded-full bg-toxic-neon/10">
-                        <Target className="w-5 h-5 text-toxic-neon" />
-                      </div>
-                      <h4 className="text-lg font-mono text-toxic-neon">Project Submission</h4>
-                    </div>
-                    <p className="text-white/70 text-sm mb-3">
-                      Submit your project for community validation and funding. Projects with sufficient soft commitments move into development with Resistance support.
-                    </p>
-                    <div className="flex justify-end">
-                      <ToxicButton 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-toxic-neon border-toxic-neon/30"
-                        onClick={() => navigate('/thesis')}
-                      >
-                        Submit <ChevronRight className="ml-1 h-4 w-4" />
-                      </ToxicButton>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 rounded-full bg-toxic-neon/10">
-                        <Shield className="w-5 h-5 text-toxic-neon" />
-                      </div>
-                      <h4 className="text-lg font-mono text-toxic-neon">Fund Projects</h4>
-                    </div>
-                    <p className="text-white/70 text-sm mb-3">
-                      Browse promising projects and show support through soft commitments. Validate quality protocols before they launch with no upfront capital required.
-                    </p>
-                    <div className="flex justify-end">
-                      <ToxicButton 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-toxic-neon border-toxic-neon/30"
-                        onClick={() => navigate('/proposals')}
-                      >
-                        Explore <ChevronRight className="ml-1 h-4 w-4" />
-                      </ToxicButton>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 rounded-full bg-toxic-neon/10">
-                        <ShoppingBag className="w-5 h-5 text-toxic-neon" />
-                      </div>
-                      <h4 className="text-lg font-mono text-toxic-neon">Coming Soon</h4>
-                    </div>
-                    <p className="text-white/70 text-sm mb-3">
-                      Job Listings | Partner Matching | Role Seeking - New ways to connect talent, projects, and resources within the Resistance ecosystem.
-                    </p>
-                    <div className="flex justify-end">
-                      <ToxicButton 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-toxic-neon border-toxic-neon/30 opacity-60 cursor-not-allowed"
-                      >
-                        Soon <ChevronRight className="ml-1 h-4 w-4" />
-                      </ToxicButton>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+          {storyStage === 0 ? renderStoryIntro() : renderMarketplace()}
         </div>
       </section>
     </div>

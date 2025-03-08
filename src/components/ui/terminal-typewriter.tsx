@@ -11,6 +11,7 @@ interface TerminalTypewriterProps {
   isConnected?: boolean;
   onConnect?: () => void;
   marketplaceMode?: boolean;
+  storyMode?: boolean;
 }
 
 export function TerminalTypewriter({
@@ -19,7 +20,8 @@ export function TerminalTypewriter({
   className,
   isConnected = false,
   onConnect,
-  marketplaceMode = false
+  marketplaceMode = false,
+  storyMode = false
 }: TerminalTypewriterProps) {
   const [displayText, setDisplayText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
@@ -49,6 +51,31 @@ export function TerminalTypewriter({
     return () => clearInterval(cursorInterval);
   }, []);
 
+  const getStoryContent = () => (
+    <>
+      <div className="terminal-line">
+        <span className="text-toxic-neon/80">[RESISTANCE_OS v3.2.1]</span>
+        <span className="text-white/70"> TRANSMISSION INITIALIZED...</span>
+      </div>
+      <div className="terminal-line">
+        <span className="text-toxic-neon/80">[WORLD_STATUS]</span>
+        <span className="text-white/70"> The old financial systems collapsed. Power centralized. Innovation stifled.</span>
+      </div>
+      <div className="terminal-line">
+        <span className="text-toxic-neon/80">[RESISTANCE_MISSION]</span>
+        <span className="text-white/70"> Building a new paradigm for project funding. Community-driven. Decentralized.</span>
+      </div>
+      <div className="terminal-line">
+        <span className="text-toxic-neon/80">[CURRENT_OPERATIONS]</span>
+        <span className="text-white/70"> Soft capital commitments. Project validation. Resource allocation.</span>
+      </div>
+      <div className="terminal-line h-6">
+        <span className="text-apocalypse-red/90">[COMING_SOON]</span>
+        <span className="text-white/70"> JOB LISTINGS | PARTNER MATCHING | ROLE SEEKING</span>
+      </div>
+    </>
+  );
+  
   const getMarketplaceContent = () => (
     <>
       <div className="terminal-line">
@@ -91,7 +118,9 @@ export function TerminalTypewriter({
       >
         <div className="scanline absolute inset-0 pointer-events-none"></div>
         
-        {marketplaceMode ? getMarketplaceContent() : getStandardContent()}
+        {storyMode ? getStoryContent() : 
+         marketplaceMode ? getMarketplaceContent() : 
+         getStandardContent()}
         
         <div className="terminal-line flex items-center h-6 min-h-6">
           <span className="block">
@@ -107,7 +136,7 @@ export function TerminalTypewriter({
               variant="marketplace"
               className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
             >
-              {marketplaceMode ? (
+              {marketplaceMode || storyMode ? (
                 <>
                   <ShieldAlert className="w-4 h-4 mr-2 text-toxic-neon" />
                   <span className="flash-beacon">ACTIVATE SURVIVAL BEACON</span>
