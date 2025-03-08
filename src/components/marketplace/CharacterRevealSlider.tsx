@@ -36,23 +36,23 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
     onChange(newValue[0]);
   };
   
-  // Get the description text based on reveal value
-  // Reversed logic: Low value = more radiation, high value = less radiation
-  const getRevealDescription = (revealValue: number) => {
-    if (revealValue < 10) {
-      return "Character fully visible, minimal radiation";
-    } else if (revealValue < 25) {
-      return "Character mostly revealed, slight radiation haze";
-    } else if (revealValue < 40) {
-      return "Character features clearly visible through radiation";
-    } else if (revealValue < 60) {
-      return "Character features becoming obscured by radiation";
-    } else if (revealValue < 75) {
-      return "Radiation increasing, character partially obscured";
-    } else if (revealValue < 90) {
-      return "Character silhouette barely visible through dense radiation";
-    } else {
+  // Get the description text based on radiation value
+  // Higher value = more radiation, character more obscured
+  const getRevealDescription = (radiationValue: number) => {
+    if (radiationValue > 90) {
       return "Fully obscured by toxic radiation cloud";
+    } else if (radiationValue > 75) {
+      return "Character silhouette barely visible through dense radiation";
+    } else if (radiationValue > 60) {
+      return "Radiation strong, character partially obscured";
+    } else if (radiationValue > 40) {
+      return "Character features becoming visible through radiation";
+    } else if (radiationValue > 25) {
+      return "Character mostly revealed, moderate radiation haze";
+    } else if (radiationValue > 10) {
+      return "Character clearly visible, slight radiation";
+    } else {
+      return "Character fully visible, minimal radiation";
     }
   };
   
@@ -60,10 +60,10 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
     <div className={`flex flex-col ${className}`}>
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {value > 50 ? (
-            <EyeOff className="h-4 w-4 text-toxic-neon" />
-          ) : (
+          {value < 50 ? (
             <Eye className="h-4 w-4 text-toxic-neon" />
+          ) : (
+            <EyeOff className="h-4 w-4 text-toxic-neon" />
           )}
           <span className="text-sm text-toxic-neon font-mono">RADIATION LEVEL</span>
         </div>
@@ -80,7 +80,7 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
       <div className="flex items-center gap-3">
         <Eye className={cn(
           "h-5 w-5 transition-opacity duration-300",
-          value < 30 ? "text-white" : "text-white/50"
+          value > 70 ? "text-white/50" : "text-white"
         )} />
         <Slider
           value={[value]}
@@ -96,7 +96,7 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
         />
         <EyeOff className={cn(
           "h-5 w-5 transition-opacity duration-300",
-          value > 70 ? "text-white" : "text-white/50"
+          value < 30 ? "text-white/50" : "text-white"
         )} />
       </div>
       
