@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Target, Biohazard, Zap, Shield, Activity, Hammer } from 'lucide-react';
 import { ToxicCard } from '@/components/ui/toxic-card';
@@ -18,9 +17,11 @@ export interface RadiationLevel {
   value: number;
 }
 
+export type MarketplaceListingType = 'bounty-hunter' | 'survivor' | 'sentinel' | 'equipment' | 'settlement';
+
 export interface MarketplaceListing {
   id: number;
-  type?: 'bounty-hunter' | 'survivor' | 'sentinel';
+  type?: MarketplaceListingType;
   name: string;
   tokenId: number;
   price: string;
@@ -31,6 +32,7 @@ export interface MarketplaceListing {
   modelUrl?: string;
   role?: string;
   rank?: string;
+  description?: string;
 }
 
 interface MarketplaceListingGridProps {
