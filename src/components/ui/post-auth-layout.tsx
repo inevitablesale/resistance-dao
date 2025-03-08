@@ -6,9 +6,17 @@ interface PostAuthLayoutProps {
   leftSidebar?: React.ReactNode;
   mainContent: React.ReactNode;
   rightSidebar?: React.ReactNode;
+  onAppOpened?: () => void;
 }
 
-export function PostAuthLayout({ leftSidebar, mainContent, rightSidebar }: PostAuthLayoutProps) {
+export function PostAuthLayout({ leftSidebar, mainContent, rightSidebar, onAppOpened }: PostAuthLayoutProps) {
+  // Call onAppOpened on component mount if provided
+  React.useEffect(() => {
+    if (onAppOpened) {
+      onAppOpened();
+    }
+  }, [onAppOpened]);
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
