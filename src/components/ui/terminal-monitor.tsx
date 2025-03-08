@@ -1,16 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Minimize2, Maximize2, X, Monitor, Shield, Target, Radio, Users, Clock, AlertTriangle, BookOpen, Radiation, AppWindow, FileQuestion } from 'lucide-react';
+import { Minimize2, Maximize2, X, Monitor, Shield, Target, AlertTriangle, BookOpen, AppWindow } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TerminalTypewriter } from './terminal-typewriter';
-import { Button } from './button';
 
 interface TerminalAppProps {
   title: string;
   icon: React.ReactNode;
   isOpen: boolean;
   onClose: () => void;
-  onMinimize: () => void;
   onMaximize: () => void;
   isMaximized: boolean;
   zIndex: number;
@@ -22,7 +21,6 @@ const TerminalApp: React.FC<TerminalAppProps> = ({
   icon,
   isOpen,
   onClose,
-  onMinimize,
   onMaximize,
   isMaximized,
   zIndex,
@@ -32,9 +30,9 @@ const TerminalApp: React.FC<TerminalAppProps> = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           className={cn(
             "absolute border border-toxic-neon/40 bg-black/90 rounded-md overflow-hidden",
@@ -51,16 +49,10 @@ const TerminalApp: React.FC<TerminalAppProps> = ({
             </div>
             <div className="flex items-center gap-1">
               <button 
-                onClick={onMinimize}
-                className="p-1 hover:bg-toxic-neon/20 rounded-sm text-toxic-neon"
-              >
-                <Minimize2 size={14} />
-              </button>
-              <button 
                 onClick={onMaximize}
                 className="p-1 hover:bg-toxic-neon/20 rounded-sm text-toxic-neon"
               >
-                <Maximize2 size={14} />
+                {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
               </button>
               <button 
                 onClick={onClose}
@@ -70,7 +62,7 @@ const TerminalApp: React.FC<TerminalAppProps> = ({
               </button>
             </div>
           </div>
-          <div className="p-4 h-[calc(100%-40px)] overflow-auto terminal-scrollbar">
+          <div className="p-4 h-[calc(100%-40px)] overflow-auto">
             {children}
           </div>
         </motion.div>
@@ -141,18 +133,7 @@ export function TerminalMonitor({
   // Auto-open Network Status app when initialAppOpened prop changes
   useEffect(() => {
     if (initialAppOpened && showDesktopIcons && !openApps.includes('network-status')) {
-      console.log("Auto-opening Network Status app");
       handleOpenApp('network-status');
-      
-      // Auto-open Archives app after a delay
-      setTimeout(() => {
-        handleOpenApp('archives');
-        
-        // Auto-open Bounty Hunter app after another delay
-        setTimeout(() => {
-          handleOpenApp('bounty-hunter');
-        }, 5000);
-      }, 4000);
     }
   }, [initialAppOpened, showDesktopIcons, openApps]);
 
@@ -186,11 +167,6 @@ export function TerminalMonitor({
     }
   };
 
-  const handleMinimizeApp = (appId: string) => {
-    // Just close for now as we don't have a taskbar minimized state
-    handleCloseApp(appId);
-  };
-
   const handleMaximizeApp = (appId: string) => {
     setMaximizedApp(maximizedApp === appId ? null : appId);
   };
@@ -213,62 +189,40 @@ export function TerminalMonitor({
     setBootComplete(true);
   };
 
-  // Apps content based on user's suggestions
+  // Simplified app content
   const appContent: Record<string, { title: string, icon: React.ReactNode, content: React.ReactNode }> = {
     'network-status': {
       title: 'NETWORK STATUS',
       icon: <AlertTriangle size={16} />,
       content: (
         <div className="p-2">
-          <div className="mb-6 border border-apocalypse-red/40 rounded-md p-4 bg-black/70">
-            <div className="flex justify-center">
-              <Button variant="destructive" className="w-full">
-                <Radio className="w-4 h-4 mr-2" />
-                ACTIVATE RESISTANCE BEACON
-              </Button>
-            </div>
+          <h3 className="text-toxic-neon text-lg mb-3">Resistance Network Status</h3>
+          <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/70 mb-4">
+            <p className="text-white/80">
+              Network connection established. Security protocols active.
+            </p>
           </div>
           
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="border border-toxic-neon/30 rounded-md p-4 bg-black/70">
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="text-toxic-neon w-5 h-5" />
-                <h3 className="text-toxic-neon font-mono">Survivors</h3>
-              </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/70">
+              <h4 className="text-toxic-neon font-mono mb-1">Survivors</h4>
               <p className="text-2xl text-white font-mono">821</p>
             </div>
             
-            <div className="border border-toxic-neon/30 rounded-md p-4 bg-black/70">
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="text-toxic-neon w-5 h-5" />
-                <h3 className="text-toxic-neon font-mono">Total Population</h3>
-              </div>
-              <p className="text-2xl text-white font-mono">2.5K</p>
+            <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/70">
+              <h4 className="text-toxic-neon font-mono mb-1">Settlements</h4>
+              <p className="text-2xl text-white font-mono">23</p>
             </div>
-          </div>
-          
-          <div className="border border-toxic-neon/30 rounded-md p-4 bg-black/70 mb-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Radio className="text-toxic-neon w-5 h-5" />
-              <h3 className="text-toxic-neon font-mono">Radio Subscribers</h3>
-            </div>
-            <p className="text-2xl text-white font-mono">2.7K</p>
           </div>
         </div>
       )
     },
     'survey': {
       title: 'WASTELAND ROLE ASSESSMENT',
-      icon: <FileQuestion size={16} />,
+      icon: <Shield size={16} />,
       content: (
         <div className="p-2">
-          <div className="mb-4">
-            <h2 className="text-xl text-toxic-neon font-mono mb-3">WASTELAND ROLE ASSESSMENT</h2>
-            <p className="text-white/80 mb-4">
-              The wasteland requires different skills to survive. Complete this assessment to determine your optimal role.
-            </p>
-          </div>
-          
+          <h3 className="text-toxic-neon text-lg mb-3">Wasteland Role Assessment</h3>
           <TerminalTypewriter
             showQuestionnaire={true}
             onRoleSelect={onRoleSelect}
@@ -278,280 +232,38 @@ export function TerminalMonitor({
       )
     },
     'bounty-hunter': {
-      title: 'RESISTANCE BOUNTY LIST',
+      title: 'BOUNTY LIST',
       icon: <Target size={16} />,
       content: (
         <div className="p-2">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl text-toxic-neon font-mono">Resistance BOUNTY LIST</h2>
-            <Button variant="outline" size="sm" className="text-toxic-neon text-xs">
-              View All
-            </Button>
-          </div>
-          
-          <div className="border border-apocalypse-red/30 rounded-md p-4 bg-black/70 mb-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Target className="text-apocalypse-red w-5 h-5" />
-              <h3 className="text-apocalypse-red font-mono">TOP SECRET</h3>
-            </div>
-            
-            <h3 className="text-xl text-toxic-neon font-mono mb-3">Bounty Hunter Protocol</h3>
-            
-            <p className="text-white/80 mb-4 text-sm">
-              After the collapse, a dangerous new breed emerged from the toxic wastelands - Mutant Protocol Criminals. 
-              Former CEOs, lead developers, and treasury managers who survived by mutating their code to drain 
-              liquidity from the survivors' remaining assets.
+          <h3 className="text-toxic-neon text-lg mb-3">Active Bounties</h3>
+          <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/70 mb-4">
+            <p className="text-white/80">
+              Displaying active bounties for execution. Authorized hunters only.
             </p>
-            
-            <p className="text-white/80 mb-4 text-sm">
-              The Resistance fights back through our elite Bounty Hunter Program. Each captured criminal's digital 
-              signature is minted as an NFT trophy, with their stolen funds redirected to fuel the Resistance's operations.
-            </p>
-            
-            <div className="border border-apocalypse-red/30 rounded-md p-3 bg-black/50 mb-4">
-              <h4 className="text-center text-apocalypse-red font-mono mb-2">» CRITICAL DIRECTIVE «</h4>
-              <p className="text-white/90 text-sm">
-                To join the Resistance, each survivor must capture at least one criminal. Your first successful 
-                capture proves your commitment and grants you full Resistance membership privileges.
-              </p>
-            </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="border border-toxic-neon/30 rounded-md bg-black/70 overflow-hidden">
-              <div className="bg-apocalypse-red/20 p-2 border-b border-apocalypse-red/30">
-                <div className="flex items-center justify-between">
-                  <span className="text-apocalypse-red font-mono">#1</span>
-                  <span className="text-white/80 font-mono text-xs">WANTED</span>
-                </div>
-                <div className="text-white font-mono mt-1">BOUNTY: 15,000 RD</div>
-              </div>
-              
-              <div className="p-3">
-                <h4 className="text-toxic-neon font-mono mb-1">Mutant Zero X-35</h4>
-                <p className="text-white/70 text-xs mb-3">Protocol Sabotage</p>
-                
-                <div className="space-y-2 mb-3">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/60">Radiation Level</span>
-                    <span className="text-apocalypse-red">High</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/60">Mutation</span>
-                    <span className="text-toxic-neon">Neural Hacking</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/60">Threat Level</span>
-                    <span className="text-apocalypse-red">Extreme</span>
-                  </div>
-                </div>
-                
-                <Button variant="outline" size="sm" className="w-full text-toxic-neon text-xs">
-                  Claim Bounty
-                </Button>
-              </div>
-            </div>
-            
-            <div className="border border-toxic-neon/30 rounded-md bg-black/70 overflow-hidden">
-              <div className="bg-apocalypse-red/20 p-2 border-b border-apocalypse-red/30">
-                <div className="flex items-center justify-between">
-                  <span className="text-apocalypse-red font-mono">#42</span>
-                  <span className="text-white/80 font-mono text-xs">WANTED</span>
-                </div>
-                <div className="text-white font-mono mt-1">BOUNTY: 32,000 RD</div>
-              </div>
-              
-              <div className="p-3">
-                <h4 className="text-toxic-neon font-mono mb-1">Toxic Liquidator K-42</h4>
-                <p className="text-white/70 text-xs mb-3">DAO Treasury Theft</p>
-                
-                <div className="space-y-2 mb-3">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/60">Radiation Level</span>
-                    <span className="text-toxic-neon">Medium</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/60">Mutation</span>
-                    <span className="text-toxic-neon">Toxic Immunity</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/60">Threat Level</span>
-                    <span className="text-apocalypse-red">High</span>
-                  </div>
-                </div>
-                
-                <Button variant="outline" size="sm" className="w-full text-toxic-neon text-xs">
-                  Claim Bounty
-                </Button>
-              </div>
-            </div>
-            
-            <div className="border border-toxic-neon/30 rounded-md bg-black/70 overflow-hidden">
-              <div className="bg-apocalypse-red/20 p-2 border-b border-apocalypse-red/30">
-                <div className="flex items-center justify-between">
-                  <span className="text-apocalypse-red font-mono">#7</span>
-                  <span className="text-white/80 font-mono text-xs">WANTED</span>
-                </div>
-                <div className="text-white font-mono mt-1">BOUNTY: 50,000 RD</div>
-              </div>
-              
-              <div className="p-3">
-                <h4 className="text-toxic-neon font-mono mb-1">Mind Raider B-007</h4>
-                <p className="text-white/70 text-xs mb-3">Consensus Attack</p>
-                
-                <div className="space-y-2 mb-3">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/60">Radiation Level</span>
-                    <span className="text-apocalypse-red">Critical</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/60">Mutation</span>
-                    <span className="text-toxic-neon">Telepathy</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/60">Threat Level</span>
-                    <span className="text-apocalypse-red">Catastrophic</span>
-                  </div>
-                </div>
-                
-                <Button variant="outline" size="sm" className="w-full text-toxic-neon text-xs">
-                  Claim Bounty
-                </Button>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border border-toxic-neon/30 rounded-md p-4 bg-black/70 mb-6">
-            <h3 className="text-toxic-neon font-mono mb-3">Your Captured Bounties</h3>
-            <p className="text-white/70 text-center py-4">You haven't captured any mutant criminals yet</p>
-            
-            <Button variant="default" className="w-full">
-              <Target className="w-4 h-4 mr-2" />
-              Hunt Your First Target
-            </Button>
+          <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/70 mb-4">
+            <h4 className="text-toxic-neon font-mono mb-1">Target #42</h4>
+            <p className="text-white/80 mb-2">Toxic Liquidator K-42</p>
+            <p className="text-white/70 text-sm">Last seen: Settlement #7</p>
+            <p className="text-white/70 text-sm">Bounty: 32,000 RD</p>
           </div>
         </div>
       )
     },
     'archives': {
-      title: 'HISTORICAL ARCHIVES',
+      title: 'ARCHIVES',
       icon: <BookOpen size={16} />,
       content: (
         <div className="p-2">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl text-toxic-neon font-mono">HISTORICAL ARCHIVES</h2>
-          </div>
-          
-          <div className="border border-toxic-neon/30 rounded-md p-4 bg-black/70 mb-6">
-            <h3 className="text-toxic-neon font-mono mb-3 text-lg">The Resistance Story</h3>
-            <p className="text-white/80 mb-4 text-sm">
-              How we survived the crypto nuclear winter and built a new world from the ashes
+          <h3 className="text-toxic-neon text-lg mb-3">Historical Archives</h3>
+          <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/70 mb-4">
+            <h4 className="text-toxic-neon font-mono mb-1">The Fall</h4>
+            <p className="text-white/80 text-sm">
+              It began with the great crashes of 2022-2023. Major protocols imploded one by one, like a chain of 
+              nuclear detonations across the digital landscape.
             </p>
-            
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="bg-toxic-neon/20 rounded-full px-3 py-1 text-xs text-toxic-neon font-mono">DAY 0</span>
-                <h4 className="text-white font-mono">The Fall</h4>
-              </div>
-              
-              <h4 className="text-toxic-neon font-mono mb-2">The Crypto Nuclear Winter</h4>
-              <p className="text-white/80 mb-4 text-sm">
-                It began with the great crashes of 2022-2023. Major protocols imploded one by one, like a chain of 
-                nuclear detonations across the digital landscape. FTX, Terra Luna, 3AC - each collapse sent toxic 
-                fallout across the ecosystem.
-              </p>
-              <p className="text-white/80 mb-4 text-sm">
-                User trust was obliterated. Capital fled in panic. Development froze as the crypto nuclear winter 
-                descended. Weakened by greed and centralization, the old world wasn't sustainable - it had to burn 
-                for something new to emerge.
-              </p>
-            </div>
-            
-            <div className="mb-6">
-              <h4 className="text-toxic-neon font-mono mb-2">Historical Records</h4>
-              <h5 className="text-white font-mono mb-2">The First Survivors</h5>
-              <p className="text-white/80 mb-4 text-sm">
-                As institutional players abandoned the wasteland, a resilient community began to form. We were the 
-                builders who stayed - developing during the depths of winter, convinced of the technology's potential 
-                despite the destruction.
-              </p>
-              <p className="text-white/80 mb-4 text-sm">
-                Operating with minimal resources, we formed underground networks for mutual support. Skills were shared, 
-                protocols were hardened against radiation, and new models of trust were forged in the crucible of catastrophe.
-              </p>
-            </div>
-            
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="bg-toxic-neon/20 rounded-full px-3 py-1 text-xs text-toxic-neon font-mono">DAY 248</span>
-                <h4 className="text-white font-mono">First Resistance</h4>
-              </div>
-              
-              <div className="flex items-center gap-2 mb-2">
-                <span className="bg-toxic-neon/20 rounded-full px-3 py-1 text-xs text-toxic-neon font-mono">DAY 621</span>
-                <h4 className="text-white font-mono">The New Dawn</h4>
-              </div>
-              
-              <h4 className="text-toxic-neon font-mono mb-2">The Resistance DAO</h4>
-              <p className="text-white/80 mb-4 text-sm">
-                From the remnants of the old world, we built something new. The Resistance DAO became a beacon in the 
-                wasteland - a community united by shared principles: decentralization, transparency, and user sovereignty.
-              </p>
-              <p className="text-white/80 mb-4 text-sm">
-                Our Resistance Survivor Launchpad isn't just a place to build - it's a manifesto. We validate projects 
-                through community consensus, require transparent governance, and ensure value flows back to the ecosystem 
-                that nurtures them.
-              </p>
-            </div>
-            
-            <div className="flex justify-center gap-4">
-              <Button variant="outline" className="text-toxic-neon">
-                <BookOpen className="w-4 h-4 mr-2" />
-                Resistance Manifesto
-              </Button>
-              
-              <Button variant="default">
-                <Shield className="w-4 h-4 mr-2" />
-                Join The Resistance
-              </Button>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    'thesis-test': {
-      title: 'THESIS TESTING',
-      icon: <AppWindow size={16} />,
-      content: (
-        <div className="p-2">
-          <div className="border border-toxic-neon/30 rounded-md p-4 bg-black/70 mb-6">
-            <h3 className="text-toxic-neon font-mono mb-3 text-lg">Test Market Interest, Then Launch With Confidence</h3>
-            <p className="text-white/80 mb-4 text-sm">
-              Collect soft commitments from interested supporters and build your launch community before investing in development.
-            </p>
-            
-            <p className="text-white/80 mb-4 text-sm">
-              Supporters indicate their potential investment amount through soft pledges with a voting fee to RD. Test your project's market interest verified without requiring immediate investment.
-            </p>
-            
-            <p className="text-white/80 mb-4 text-sm">
-              Connect directly with interested supporters and track their soft commitment amounts. Build reports that provide concrete proof of market interest.
-            </p>
-            
-            <p className="text-white/80 mb-4 text-sm">
-              Once interest is proven, launch with confidence knowing there's a committed community ready to support your project from day one.
-            </p>
-            
-            <Button variant="default" className="w-full mt-4">
-              <Target className="w-4 h-4 mr-2" />
-              Submit Your Thesis
-            </Button>
           </div>
         </div>
       )
@@ -560,22 +272,12 @@ export function TerminalMonitor({
 
   return (
     <div className={cn("terminal-monitor relative", className)}>
-      {/* Monitor frame */}
-      <div className="monitor-frame bg-black/90 border-2 border-toxic-neon/40 rounded-lg overflow-hidden shadow-[0_0_15px_rgba(80,250,123,0.2)] relative">
-        {/* Monitor screen */}
-        <div className="monitor-screen bg-black p-1 md:p-2 relative overflow-hidden" style={{ minHeight: "400px", height: "60vh", maxHeight: "600px" }}>
-          <div className="monitor-scanlines absolute inset-0 pointer-events-none"></div>
-          <div className="monitor-glow absolute inset-0 pointer-events-none"></div>
-          
-          {/* Monitor bezel elements */}
-          <div className="absolute top-2 left-2 flex items-center gap-1 z-30">
-            <div className="w-2 h-2 rounded-full bg-apocalypse-red animate-pulse"></div>
-            <div className="w-2 h-2 rounded-full bg-toxic-neon/70"></div>
-          </div>
-          
-          <div className="absolute top-2 right-2 text-toxic-neon/50 text-xs font-mono z-30">
-            RSTNC_OS v3.2.1
-          </div>
+      {/* Simplified monitor frame */}
+      <div className="monitor-frame bg-black/90 border border-toxic-neon/40 rounded-lg overflow-hidden shadow-[0_0_10px_rgba(80,250,123,0.2)] relative">
+        {/* Monitor screen - reduced visual effects */}
+        <div className="monitor-screen bg-black p-2 relative overflow-hidden" style={{ minHeight: "400px", height: "60vh", maxHeight: "600px" }}>
+          {/* Simplified scanline effect */}
+          <div className="monitor-scanlines absolute inset-0 pointer-events-none opacity-30"></div>
           
           {/* Terminal content */}
           <div className="relative p-2 h-full">
@@ -588,24 +290,24 @@ export function TerminalMonitor({
               </div>
             ) : (
               <div className="desktop-environment h-full relative">
-                {/* Desktop Icons */}
+                {/* Desktop Icons - simplified grid */}
                 {showDesktopIcons && (
-                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 p-2 absolute top-0 left-0 z-10">
+                  <div className="grid grid-cols-4 gap-2 p-2 absolute top-0 left-0 z-10">
                     <DesktopIcon 
                       icon={<AlertTriangle size={20} />} 
-                      label="Network Status"
+                      label="Network"
                       onClick={() => handleOpenApp('network-status')}
                       isActive={activeApp === 'network-status'}
                     />
                     <DesktopIcon 
-                      icon={<FileQuestion size={20} />} 
-                      label="Assessment"
+                      icon={<Shield size={20} />} 
+                      label="Survey"
                       onClick={() => handleOpenApp('survey')}
                       isActive={activeApp === 'survey'}
                     />
                     <DesktopIcon 
                       icon={<Target size={20} />} 
-                      label="Bounty List"
+                      label="Bounties"
                       onClick={() => handleOpenApp('bounty-hunter')}
                       isActive={activeApp === 'bounty-hunter'}
                     />
@@ -614,12 +316,6 @@ export function TerminalMonitor({
                       label="Archives"
                       onClick={() => handleOpenApp('archives')}
                       isActive={activeApp === 'archives'}
-                    />
-                    <DesktopIcon 
-                      icon={<AppWindow size={20} />} 
-                      label="Thesis Test"
-                      onClick={() => handleOpenApp('thesis-test')}
-                      isActive={activeApp === 'thesis-test'}
                     />
                   </div>
                 )}
@@ -632,62 +328,36 @@ export function TerminalMonitor({
                     icon={app.icon}
                     isOpen={openApps.includes(appId)}
                     onClose={() => handleCloseApp(appId)}
-                    onMinimize={() => handleMinimizeApp(appId)}
                     onMaximize={() => handleMaximizeApp(appId)}
                     isMaximized={maximizedApp === appId}
                     zIndex={appZIndex[appId] || 10}
                     children={app.content}
                   />
                 ))}
-                
-                {/* Task Bar with pulsing effect on app buttons */}
-                {showDesktopIcons && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/80 border-t border-toxic-neon/30 h-10 flex items-center px-2 z-20">
-                    <div className="flex items-center gap-2 overflow-x-auto terminal-scrollbar flex-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 text-xs text-toxic-neon flex-shrink-0"
-                        onClick={() => {}}
-                      >
-                        <Radiation className="w-4 h-4 mr-1" />
-                        Start
-                      </Button>
-                      
-                      {openApps.length > 0 && (
-                        <div className="h-6 border-r border-toxic-neon/20 flex-shrink-0"></div>
-                      )}
-                      
-                      {openApps.map(appId => (
-                        <Button
-                          key={appId}
-                          variant={activeApp === appId ? "secondary" : "ghost"}
-                          size="sm"
-                          className={cn(
-                            "h-8 text-xs text-toxic-neon flex-shrink-0",
-                            activeApp !== appId && "animate-pulse-subtle"
-                          )}
-                          onClick={() => handleAppFocus(appId)}
-                        >
-                          {appContent[appId].icon}
-                          <span className="ml-1 max-w-20 truncate">{appContent[appId].title}</span>
-                        </Button>
-                      ))}
-                    </div>
-                    
-                    <div className="ml-auto flex items-center text-toxic-neon flex-shrink-0">
-                      <Clock size={14} className="mr-2" />
-                      <span className="text-xs font-mono">
-                        {new Date().toLocaleTimeString()}
-                      </span>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
         </div>
       </div>
+      
+      <style jsx>{`
+        .monitor-scanlines::before {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          background: linear-gradient(
+            to bottom,
+            transparent 50%,
+            rgba(0, 0, 0, 0.05) 51%
+          );
+          background-size: 100% 4px;
+          pointer-events: none;
+          z-index: 1;
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
-import { Radiation, Target, Shield, Terminal, Zap, AlertTriangle, RotateCw, Check } from "lucide-react";
+import { Radiation, Target, Shield, Terminal, Check } from "lucide-react";
 import { ToxicButton } from "./toxic-button";
 
 interface TerminalTypewriterProps {
@@ -17,51 +17,29 @@ interface TerminalTypewriterProps {
 
 type BootStage = 
   | "initializing" 
-  | "diagnosing" 
   | "connecting" 
   | "complete";
 
-type AssessmentQuestion = {
-  id: number;
-  question: string;
-  options: {
-    text: string;
-    bountyHunterScore: number;
-    survivorScore: number;
-  }[];
-};
-
+// Simplified boot messages with fewer stages
 const BOOT_MESSAGES = {
   initializing: [
     "SYSTEM INITIALIZING...",
-    "CHECKING MEMORY INTEGRITY...",
-    "DETECTING HARDWARE COMPONENTS...",
     "RADIATION LEVELS: HIGH BUT TOLERABLE",
     "LOADING CORE MODULES..."
-  ],
-  diagnosing: [
-    "DIAGNOSTIC CHECK INITIATED...",
-    "NEURAL NETWORK STATUS: DEGRADED",
-    "CHECKING QUANTUM ENCRYPTION CELLS...",
-    "DATA STORAGE: 62% CORRUPTED",
-    "ATTEMPTING AUTO-REPAIR SEQUENCES..."
   ],
   connecting: [
     "ESTABLISHING SECURE CONNECTION...",
     "SCANNING FOR SURVIVOR OUTPOSTS...",
-    "BOUNTY HUNTER DATABASE DETECTED...",
-    "TRADING NETWORKS LOCATED...",
     "SYNCHRONIZING WITH WASTELAND ECONOMY..."
   ],
   complete: [
     "SYSTEM RECOVERY COMPLETE",
-    "WELCOME TO THE RESISTANCE NETWORK",
-    "THE OLD WORLD DIED. WE LIVE AMONG ITS RUINS.",
-    "JOIN US TO REBUILD FROM THE ASHES."
+    "WELCOME TO THE RESISTANCE NETWORK"
   ]
 };
 
-const ASSESSMENT_QUESTIONS: AssessmentQuestion[] = [
+// Simplified assessment questions with fewer options
+const ASSESSMENT_QUESTIONS = [
   {
     id: 1,
     question: "You discover an abandoned bunker with valuable supplies. What's your first action?",
@@ -75,11 +53,6 @@ const ASSESSMENT_QUESTIONS: AssessmentQuestion[] = [
         text: "Assess what resources could benefit your community and retrieve them", 
         bountyHunterScore: 2, 
         survivorScore: 9 
-      },
-      { 
-        text: "Secure the perimeter first to ensure no hostile entities are nearby", 
-        bountyHunterScore: 9, 
-        survivorScore: 3 
       }
     ]
   },
@@ -96,11 +69,6 @@ const ASSESSMENT_QUESTIONS: AssessmentQuestion[] = [
         text: "Find the safest approach for everyone involved, prioritizing group survival", 
         bountyHunterScore: 2, 
         survivorScore: 8 
-      },
-      { 
-        text: "Analyze patterns to predict outcomes before choosing my path", 
-        bountyHunterScore: 6, 
-        survivorScore: 6 
       }
     ]
   },
@@ -117,60 +85,13 @@ const ASSESSMENT_QUESTIONS: AssessmentQuestion[] = [
         text: "Tracking down those responsible for the collapse and bringing justice", 
         bountyHunterScore: 10, 
         survivorScore: 1 
-      },
-      { 
-        text: "Exploring forgotten technology and salvaging valuable artifacts", 
-        bountyHunterScore: 6, 
-        survivorScore: 6 
-      }
-    ]
-  },
-  {
-    id: 4,
-    question: "What's your approach to encountering strangers in the wasteland?",
-    options: [
-      { 
-        text: "Observe from distance, assess threat level, approach with caution", 
-        bountyHunterScore: 8, 
-        survivorScore: 4 
-      },
-      { 
-        text: "Evaluate what skills they might bring to strengthen our settlement", 
-        bountyHunterScore: 1, 
-        survivorScore: 10 
-      },
-      { 
-        text: "Keep my distance unless they have information I need", 
-        bountyHunterScore: 7, 
-        survivorScore: 2 
-      }
-    ]
-  },
-  {
-    id: 5,
-    question: "When making difficult decisions, what factors most influence your choice?",
-    options: [
-      { 
-        text: "Maximum benefit for the collective group over time", 
-        bountyHunterScore: 3, 
-        survivorScore: 9 
-      },
-      { 
-        text: "Tactical advantage and strategic positioning", 
-        bountyHunterScore: 9, 
-        survivorScore: 3 
-      },
-      { 
-        text: "Risk vs. reward calculation with emphasis on survival", 
-        bountyHunterScore: 5, 
-        survivorScore: 7 
       }
     ]
   }
 ];
 
 export function TerminalTypewriter({
-  textToType = "SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY. RESILIENT COMMUNITIES HAVE ESTABLISHED NEW ECONOMIES FROM THE ASHES. OUR TRADERS REPORT THAT TOKEN EXCHANGE NETWORKS ARE FUNCTIONING AGAIN. WE ARE REBUILDING THE FINANCIAL SYSTEM. JOIN US.",
+  textToType = "SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY.",
   typeDelay = 30,
   className,
   showBootSequence = true,
@@ -215,29 +136,29 @@ export function TerminalTypewriter({
     
     const bootInterval = setInterval(() => {
       setBootProgress(prev => {
-        const newProgress = prev + (Math.random() * 3 + 1);
+        const newProgress = prev + (Math.random() * 5 + 1);
         
-        if (Math.random() < 0.15) {
+        // Reduced glitch frequency
+        if (Math.random() < 0.05) {
           setBootGlitch(true);
-          setTimeout(() => setBootGlitch(false), 150);
+          setTimeout(() => setBootGlitch(false), 100);
         }
         
         if (newProgress >= 100) {
           clearInterval(bootInterval);
           
           setTimeout(() => {
-            if (bootStage === "initializing") setBootStage("diagnosing");
-            else if (bootStage === "diagnosing") setBootStage("connecting");
+            if (bootStage === "initializing") setBootStage("connecting");
             else if (bootStage === "connecting") {
               setBootStage("complete");
               setIsComplete(true);
             }
-          }, 1000);
+          }, 800);
         }
         
         return newProgress > 100 ? 100 : newProgress;
       });
-    }, 100);
+    }, 120);
     
     const messageInterval = setInterval(() => {
       if (currentBootMessage < bootMessages.length - 1) {
@@ -245,7 +166,7 @@ export function TerminalTypewriter({
       } else {
         clearInterval(messageInterval);
       }
-    }, 1200);
+    }, 1000);
     
     return () => {
       clearInterval(bootInterval);
@@ -310,14 +231,6 @@ export function TerminalTypewriter({
     }
   }, [showQuestionnaire, questionnaireStarted, selectedRole]);
   
-  const handleStartAssessment = () => {
-    setQuestionnaireStarted(true);
-    setCurrentQuestion(0);
-    setAnswers([]);
-    setBountyHunterScore(0);
-    setSurvivorScore(0);
-  };
-  
   const handleSelectAnswer = (questionIndex: number, answerIndex: number) => {
     const question = ASSESSMENT_QUESTIONS[questionIndex];
     const answer = question.options[answerIndex];
@@ -343,7 +256,7 @@ export function TerminalTypewriter({
         if (onRoleSelect) {
           onRoleSelect(role);
         }
-      }, 3000);
+      }, 2000);
     }
   };
 
@@ -352,20 +265,20 @@ export function TerminalTypewriter({
       <div 
         ref={terminalRef} 
         className={cn(
-          "terminal-output bg-black/90 text-toxic-neon p-6 font-mono border border-toxic-neon/30 rounded-md relative overflow-hidden",
+          "terminal-output bg-black/90 text-toxic-neon p-4 font-mono border border-toxic-neon/30 rounded-md relative overflow-hidden",
           bootGlitch && "glitch-effect"
         )}
       >
-        <div className="scanline absolute inset-0 pointer-events-none"></div>
+        {/* Simplified scanline - reduced opacity */}
+        <div className="scanline absolute inset-0 pointer-events-none opacity-30"></div>
         
-        {showBootSequence && (bootStage === "initializing" || bootStage === "diagnosing" || bootStage === "connecting") && (
+        {showBootSequence && (bootStage === "initializing" || bootStage === "connecting") && (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <div className="text-white/70 flex items-center">
-                <RotateCw className={`h-4 w-4 mr-2 ${bootProgress < 100 ? 'animate-spin' : ''}`} />
+                <Terminal className={`h-4 w-4 mr-2 ${bootProgress < 100 ? 'animate-spin' : ''}`} />
                 <span>
                   {bootStage === "initializing" && "SYSTEM INITIALIZATION"}
-                  {bootStage === "diagnosing" && "SYSTEM DIAGNOSTICS"}
                   {bootStage === "connecting" && "NETWORK CONNECTION"}
                 </span>
               </div>
@@ -374,6 +287,7 @@ export function TerminalTypewriter({
               </div>
             </div>
             
+            {/* Simplified progress bar */}
             <div className="w-full bg-black/60 h-2 rounded-full overflow-hidden border border-toxic-neon/30">
               <div 
                 className="h-full bg-toxic-neon/70 rounded-full transition-all duration-100"
@@ -381,6 +295,7 @@ export function TerminalTypewriter({
               ></div>
             </div>
             
+            {/* Simplified boot messages */}
             <div className="mt-4 space-y-1">
               {bootMessages.slice(0, currentBootMessage + 1).map((message, index) => (
                 <div key={index} className="text-white/80 flex">
@@ -391,19 +306,6 @@ export function TerminalTypewriter({
                 </div>
               ))}
             </div>
-            
-            {bootStage === "initializing" && bootProgress > 50 && (
-              <div className="mt-4 p-2 border border-apocalypse-red/40 bg-apocalypse-red/10 rounded">
-                <div className="flex items-center text-apocalypse-red mb-1">
-                  <AlertTriangle className="h-4 w-4 mr-1" />
-                  <span className="text-sm font-bold">WARNING: SYSTEM DEGRADED</span>
-                </div>
-                <p className="text-white/70 text-xs">
-                  Multiple critical systems compromised. Running in emergency mode.
-                  Protocol corruption detected. Full system recovery required.
-                </p>
-              </div>
-            )}
           </div>
         )}
         
@@ -421,26 +323,19 @@ export function TerminalTypewriter({
         {showQuestionnaire && !selectedRole && (
           <div className="assessment-container mt-4">
             {calculatingResult ? (
-              <div className="text-center py-8">
-                <div className="inline-block rounded-full h-16 w-16 border-4 border-toxic-neon/30 border-t-toxic-neon animate-spin mb-4"></div>
-                <h3 className="text-toxic-neon text-xl mb-2">Analyzing Survival Profile</h3>
-                <p className="text-white/70">Calculating optimal wasteland role based on your responses...</p>
+              <div className="text-center py-6">
+                <div className="inline-block rounded-full h-12 w-12 border-2 border-toxic-neon/30 border-t-toxic-neon animate-spin mb-4"></div>
+                <h3 className="text-toxic-neon text-lg mb-2">Processing...</h3>
               </div>
             ) : (
               <div className="assessment-content">
-                <div className="text-center mb-6">
-                  <h3 className="text-xl text-toxic-neon mb-2">Wasteland Adaptation Protocol</h3>
-                  <p className="text-white/70">
-                    To determine your optimal role in the Resistance, complete this wasteland survival assessment.
-                  </p>
+                <div className="text-center mb-4">
+                  <h3 className="text-lg text-toxic-neon mb-2">Wasteland Role Assessment</h3>
                 </div>
                 
-                <div className="mb-6">
+                <div className="mb-4">
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-white/60">Question {currentQuestion + 1} of {ASSESSMENT_QUESTIONS.length}</span>
-                    <span className="text-toxic-neon">
-                      {Math.floor((currentQuestion / ASSESSMENT_QUESTIONS.length) * 100)}% Complete
-                    </span>
                   </div>
                   <div className="w-full h-1 bg-black/60 rounded-full overflow-hidden">
                     <div 
@@ -450,7 +345,7 @@ export function TerminalTypewriter({
                   </div>
                 </div>
                 
-                <div className="mb-6 pb-4 border-b border-toxic-neon/20">
+                <div className="mb-4 pb-3 border-b border-toxic-neon/20">
                   <h4 className="text-white font-bold mb-3">{ASSESSMENT_QUESTIONS[currentQuestion].question}</h4>
                   
                   <div className="space-y-3">
@@ -465,13 +360,13 @@ export function TerminalTypewriter({
                         onClick={() => handleSelectAnswer(currentQuestion, index)}
                       >
                         <div className="flex items-start gap-3">
-                          <div className={`flex-shrink-0 w-6 h-6 rounded-full border flex items-center justify-center mt-0.5 ${
+                          <div className={`flex-shrink-0 w-5 h-5 rounded-full border flex items-center justify-center mt-0.5 ${
                             answers[currentQuestion] === index 
                               ? 'border-toxic-neon bg-toxic-neon/20' 
                               : 'border-toxic-neon/30'
                           }`}>
                             {answers[currentQuestion] === index && (
-                              <div className="w-3 h-3 rounded-full bg-toxic-neon"></div>
+                              <div className="w-2 h-2 rounded-full bg-toxic-neon"></div>
                             )}
                           </div>
                           <span>{option.text}</span>
@@ -487,53 +382,68 @@ export function TerminalTypewriter({
         
         {selectedRole && (
           <div className="results-container text-center">
-            <h3 className="text-2xl text-toxic-neon mb-4">Wasteland Role Assessment Complete</h3>
+            <h3 className="text-xl text-toxic-neon mb-4">Assessment Complete</h3>
             
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <div className={`p-4 rounded-lg border ${selectedRole === 'bounty-hunter' ? 'border-apocalypse-red bg-apocalypse-red/10' : 'border-white/10 bg-black/30'}`}>
-                <Target className={`h-12 w-12 mx-auto mb-2 ${selectedRole === 'bounty-hunter' ? 'text-apocalypse-red' : 'text-white/30'}`} />
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className={`p-3 rounded-lg border ${selectedRole === 'bounty-hunter' ? 'border-apocalypse-red bg-apocalypse-red/10' : 'border-white/10 bg-black/30'}`}>
+                <Target className={`h-10 w-10 mx-auto mb-2 ${selectedRole === 'bounty-hunter' ? 'text-apocalypse-red' : 'text-white/30'}`} />
                 <div className={`text-center ${selectedRole === 'bounty-hunter' ? 'text-apocalypse-red' : 'text-white/50'}`}>
                   <div className="font-bold">Bounty Hunter</div>
-                  <div className="text-sm">{selectedRole === 'bounty-hunter' ? '76%' : '24%'}</div>
                 </div>
               </div>
               
-              <div className={`p-4 rounded-lg border ${selectedRole === 'survivor' ? 'border-toxic-neon bg-toxic-neon/10' : 'border-white/10 bg-black/30'}`}>
-                <Shield className={`h-12 w-12 mx-auto mb-2 ${selectedRole === 'survivor' ? 'text-toxic-neon' : 'text-white/30'}`} />
+              <div className={`p-3 rounded-lg border ${selectedRole === 'survivor' ? 'border-toxic-neon bg-toxic-neon/10' : 'border-white/10 bg-black/30'}`}>
+                <Shield className={`h-10 w-10 mx-auto mb-2 ${selectedRole === 'survivor' ? 'text-toxic-neon' : 'text-white/30'}`} />
                 <div className={`text-center ${selectedRole === 'survivor' ? 'text-toxic-neon' : 'text-white/50'}`}>
                   <div className="font-bold">Survivor</div>
-                  <div className="text-sm">{selectedRole === 'survivor' ? '82%' : '18%'}</div>
                 </div>
               </div>
             </div>
             
-            <div className="mb-6 p-4 rounded-lg border border-toxic-neon/30 bg-black/40 text-left">
-              <h4 className="font-bold text-toxic-neon mb-2">
-                {selectedRole === 'bounty-hunter' ? 'Your Bounty Hunter Profile' : 'Your Survivor Profile'}
-              </h4>
-              
-              <p className="text-white/80 mb-3">
+            <div className="p-3 rounded-lg border border-toxic-neon/30 bg-black/40 text-left mb-4">
+              <p className="text-white/80 mb-2">
                 {selectedRole === 'bounty-hunter' 
-                  ? 'You are naturally skilled at tracking, strategic thinking, and independent operations. The wasteland needs justice-bringers like you to hunt down those who corrupted the old system.'
-                  : 'You possess the cooperative mindset and community-building skills vital for rebuilding civilization. The settlements need visionaries like you to rebuild from the ashes.'}
+                  ? 'You are naturally skilled at tracking, strategic thinking, and independent operations.'
+                  : 'You possess the cooperative mindset and community-building skills vital for rebuilding.'}
               </p>
-              
-              <div className="text-white/70 text-sm">
-                <div className="mb-1">
-                  <span className="text-toxic-neon">Key Strengths:</span> {selectedRole === 'bounty-hunter' 
-                    ? 'Tactical acumen, target acquisition, risk assessment' 
-                    : 'Resource management, community building, long-term planning'}
-                </div>
-                <div>
-                  <span className="text-toxic-neon">Recommended Focus:</span> {selectedRole === 'bounty-hunter' 
-                    ? 'Hunting down crypto criminals and securing stolen assets' 
-                    : 'Establishing sustainable economic systems in wasteland settlements'}
-                </div>
-              </div>
             </div>
+            
+            <ToxicButton variant="default">
+              <Check className="w-4 h-4 mr-2" />
+              Continue
+            </ToxicButton>
           </div>
         )}
       </div>
+      
+      <style jsx>{`
+        .scanline::before {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          background: linear-gradient(
+            to bottom,
+            transparent 50%,
+            rgba(0, 0, 0, 0.05) 51%
+          );
+          background-size: 100% 4px;
+          pointer-events: none;
+          z-index: 1;
+        }
+        
+        .typing-text {
+          border-right: 2px solid rgba(80, 250, 123, 0.7);
+          animation: blink-caret 1s step-end infinite;
+        }
+        
+        @keyframes blink-caret {
+          from, to { border-color: transparent }
+          50% { border-color: rgba(80, 250, 123, 0.7) }
+        }
+      `}</style>
     </div>
   );
 }
