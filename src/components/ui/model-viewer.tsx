@@ -123,13 +123,13 @@ const Model = ({
 };
 
 // The camera controls component
-const CameraController = () => {
+const CameraController = ({ initialZoom = 5 }: { initialZoom?: number }) => {
   const { camera, gl } = useThree();
   
   useEffect(() => {
-    camera.position.set(0, 0, 5);
+    camera.position.set(0, 0, initialZoom);
     camera.lookAt(0, 0, 0);
-  }, [camera]);
+  }, [camera, initialZoom]);
   
   return null;
 };
@@ -166,6 +166,7 @@ export interface ModelViewerProps {
   radiationEffect?: boolean;
   rotationSpeed?: number;
   showControls?: boolean;
+  initialZoom?: number;
   onError?: (error: Error) => void;
   className?: string;
 }
@@ -179,6 +180,7 @@ export const ModelViewer = ({
   radiationEffect = false,
   rotationSpeed = 0.005,
   showControls = true,
+  initialZoom = 5,
   onError,
   className = "",
 }: ModelViewerProps) => {
@@ -218,7 +220,7 @@ export const ModelViewer = ({
         <ModelErrorBoundary fallback={<ErrorFallback />}>
           <Canvas key={`model-canvas-${retryCount}`} shadows dpr={[1, 2]}>
             <Suspense fallback={<ModelLoader />}>
-              <CameraController />
+              <CameraController initialZoom={initialZoom} />
               <Model 
                 url={pinataUrl} 
                 autoRotate={autoRotate} 
@@ -245,4 +247,3 @@ export const ModelViewer = ({
 
 // Preload the model to avoid jank when it's first displayed
 useGLTF.preload('https://gateway.pinata.cloud/ipfs/bafybeic2yffnslotf33yojsihiyv73rmxenstfwcxnyws5ktxp2mptkb3q');
-

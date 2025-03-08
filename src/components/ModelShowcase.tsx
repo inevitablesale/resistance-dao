@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ModelViewer } from './ui/model-viewer';
 import { ToxicCard } from './ui/toxic-card';
 import { ToxicButton } from './ui/toxic-button';
-import { ChevronLeft, ChevronRight, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Info, ZoomIn, ZoomOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ModelInfo {
@@ -25,6 +25,7 @@ export const ModelShowcase: React.FC<ModelShowcaseProps> = ({
 }) => {
   const [currentModelIndex, setCurrentModelIndex] = useState(0);
   const [showInfo, setShowInfo] = useState(false);
+  const [zoom, setZoom] = useState(5); // Default zoom level
   
   // Sample models (you would replace these with your actual models)
   const models: ModelInfo[] = [
@@ -68,6 +69,14 @@ export const ModelShowcase: React.FC<ModelShowcaseProps> = ({
     setShowInfo(!showInfo);
   };
   
+  const zoomIn = () => {
+    setZoom(prev => Math.max(prev - 1, 2)); // Lower values = more zoomed in
+  };
+  
+  const zoomOut = () => {
+    setZoom(prev => Math.min(prev + 1, 10)); // Higher values = more zoomed out
+  };
+  
   // Randomly change models every 20 seconds if there's more than one
   useEffect(() => {
     if (models.length > 1) {
@@ -90,6 +99,7 @@ export const ModelShowcase: React.FC<ModelShowcaseProps> = ({
             radiationEffect={false}
             rotationSpeed={0.003}
             showControls={true}
+            initialZoom={zoom}
             className="w-full"
           />
           
@@ -110,6 +120,24 @@ export const ModelShowcase: React.FC<ModelShowcaseProps> = ({
               </button>
             </>
           )}
+          
+          {/* Zoom controls */}
+          <div className="absolute left-2 bottom-2 flex flex-col gap-2 z-10">
+            <button 
+              onClick={zoomIn}
+              className="bg-black/40 p-2 rounded-full border border-toxic-neon/30 text-toxic-neon hover:bg-black/60 transition-all"
+              aria-label="Zoom in"
+            >
+              <ZoomIn className="h-5 w-5" />
+            </button>
+            <button 
+              onClick={zoomOut}
+              className="bg-black/40 p-2 rounded-full border border-toxic-neon/30 text-toxic-neon hover:bg-black/60 transition-all"
+              aria-label="Zoom out"
+            >
+              <ZoomOut className="h-5 w-5" />
+            </button>
+          </div>
           
           {/* Info toggle button */}
           <button 
