@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Shield, Target, Radiation } from "lucide-react";
+import { Shield, Target, Radiation, Lock, Terminal as TerminalIcon, Users, Radio, Database, Map, ExternalLink } from "lucide-react";
 import { TerminalMonitor } from "@/components/ui/terminal-monitor";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { DrippingSlime } from "@/components/ui/dripping-slime";
@@ -21,6 +21,7 @@ import { TerminalMini } from "@/components/ui/terminal-mini";
 import { SettlementMap } from "@/components/ui/settlement-map";
 import { PostAuthLayout } from "@/components/ui/post-auth-layout";
 import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
+import { cn } from "@/lib/utils";
 
 // Define the authentication states
 type AuthStage = "pre-boot" | "authenticating" | "breach-transition" | "post-breach" | "authenticated";
@@ -80,13 +81,48 @@ const Index = () => {
       
       setTimeout(() => {
         setAuthStage("post-breach");
-        
-        // Typing animation will now happen in the post-breach stage
       }, 2500);
     }, 500);
   };
 
-  // Prepare sidebar content for authenticated state
+  // Header section with proper buttons
+  const renderHeader = () => (
+    <div className="flex justify-between items-center mb-4">
+      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/80 border border-toxic-neon/40 text-toxic-neon text-sm font-mono">
+        <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
+        <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Radiation Levels: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
+      </div>
+      
+      <div className="flex space-x-3">
+        <ToxicButton variant="ghost" size="sm" className="border border-toxic-neon/30" onClick={handleShowEmergencyTransmission}>
+          <Radiation className="w-4 h-4 mr-2" />
+          Emergency Broadcast
+        </ToxicButton>
+        
+        <ToxicButton variant="ghost" size="sm" className="border border-toxic-neon/30">
+          <Shield className="w-4 h-4 mr-2" />
+          Wasteland Status
+        </ToxicButton>
+      </div>
+    </div>
+  );
+
+  // Main header with RESISTANCE_NETWORK label
+  const renderNetworkHeader = () => (
+    <div className="flex items-center justify-between mb-4 border-b border-toxic-neon/20 pb-2">
+      <div className="flex items-center">
+        <Radiation className="h-5 w-5 mr-2 text-toxic-neon" />
+        <span className="text-toxic-neon font-mono text-lg">RESISTANCE_NETWORK</span>
+      </div>
+      
+      <div className="flex gap-1">
+        <div className="h-3 w-3 rounded-full bg-apocalypse-red animate-pulse"></div>
+        <div className="h-3 w-3 rounded-full bg-toxic-neon/70"></div>
+      </div>
+    </div>
+  );
+
+  // Prepare sidebar content for authenticated state - Terminal and Network Stats
   const renderLeftSidebar = () => (
     <>
       <TerminalMini 
@@ -94,10 +130,31 @@ const Index = () => {
         onToggleMinimize={() => setTerminalMinimized(!terminalMinimized)}
       />
       <NetworkStats />
-      <SettlementMap />
+      <div className="mb-6">
+        <Card className="bg-black/80 border-toxic-neon/30 overflow-hidden">
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Map className="h-5 w-5 text-toxic-neon" />
+                <h3 className="text-toxic-neon font-mono text-lg">SETTLEMENT MAP</h3>
+              </div>
+              <button 
+                className="text-toxic-neon hover:bg-toxic-neon/20 p-1 rounded"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="bg-black h-[200px] flex items-center justify-center border border-toxic-neon/30 rounded relative">
+              <div className="absolute inset-0 opacity-20 bg-[url('/lovable-uploads/e689178f-ffc2-4231-9e80-dae7dc39d25b.png')] bg-center bg-cover"></div>
+              <p className="text-toxic-neon text-sm font-mono z-10">EXPAND</p>
+            </div>
+          </div>
+        </Card>
+      </div>
     </>
   );
   
+  // Right sidebar with Survivor and Bounty components
   const renderRightSidebar = () => (
     <>
       <SurvivorNotifications />
@@ -144,6 +201,17 @@ const Index = () => {
     return null;
   };
 
+  // Header button for hack mainframe
+  const renderHackMainframeButton = () => (
+    <div className="absolute top-4 right-4 z-20">
+      <ToxicButton variant="glowing" size="sm" className="font-mono">
+        <Lock className="w-4 h-4 mr-2" />
+        HACK MAINFRAME
+        <span className="ml-2 text-xs px-2 py-0.5 bg-toxic-neon/20 rounded">ACCESS</span>
+      </ToxicButton>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
       <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} />
@@ -157,6 +225,9 @@ const Index = () => {
           onClose={handleCloseEmergencyTransmission} 
         />
       )}
+
+      {/* Hack Mainframe Button */}
+      {renderHackMainframeButton()}
 
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0">
@@ -178,47 +249,19 @@ const Index = () => {
             className="w-full"
           >
             {/* Only show header elements if post-breach or authenticated */}
-            {(authStage === "authenticated" || authStage === "post-breach") && (
-              <div className="text-center mb-4 flex justify-between items-center">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm font-mono broken-glass">
-                  <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
-                  <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Radiation Levels: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
-                </div>
-                
-                <div className="flex space-x-2">
-                  <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission}>
-                    <Radiation className="w-4 h-4 mr-2" />
-                    Emergency Broadcast
-                  </ToxicButton>
-                  
-                  <ToxicButton variant="outline" size="sm">
-                    <Shield className="w-4 h-4 mr-2" />
-                    Wasteland Status
-                  </ToxicButton>
-                </div>
-              </div>
-            )}
+            {(authStage === "authenticated" || authStage === "post-breach") && renderHeader()}
 
-            <Card className={`w-full bg-black/80 border-toxic-neon/30 p-0 relative overflow-hidden transition-all duration-500 ${(authStage === "authenticated" || authStage === "post-breach") ? "min-h-[80vh]" : "min-h-[50vh]"}`}>
+            <Card className={cn(
+              "w-full bg-black/90 border-toxic-neon/30 p-0 relative overflow-hidden transition-all duration-500 min-h-[80vh]",
+              "border-[1px]"
+            )}>
               <div className="absolute inset-0 z-0 rust-overlay broken-glass">
                 <div className="scanline absolute inset-0"></div>
               </div>
               
               <div className="relative z-10 p-6 md:p-8">
                 {/* Only show this header if post-breach or authenticated */}
-                {(authStage === "authenticated" || authStage === "post-breach") && (
-                  <div className="flex items-center justify-between mb-4 border-b border-toxic-neon/20 pb-2">
-                    <div className="flex items-center">
-                      <Radiation className="h-5 w-5 mr-2 text-toxic-neon" />
-                      <span className="text-toxic-neon font-mono text-lg">RESISTANCE_NETWORK</span>
-                    </div>
-                    
-                    <div className="flex gap-1">
-                      <div className="h-3 w-3 rounded-full bg-apocalypse-red animate-pulse"></div>
-                      <div className="h-3 w-3 rounded-full bg-toxic-neon/70"></div>
-                    </div>
-                  </div>
-                )}
+                {(authStage === "authenticated" || authStage === "post-breach") && renderNetworkHeader()}
                 
                 <div className="mb-6">
                   {/* Conditional rendering based on authentication state */}

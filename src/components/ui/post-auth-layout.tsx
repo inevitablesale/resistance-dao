@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 interface PostAuthLayoutProps {
   leftSidebar?: React.ReactNode;
@@ -13,7 +14,10 @@ export function PostAuthLayout({ leftSidebar, mainContent, rightSidebar }: PostA
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="grid grid-cols-1 md:grid-cols-12 gap-6 w-full"
+      className={cn(
+        "grid grid-cols-1 md:grid-cols-12 gap-6 w-full",
+        "min-h-[70vh]"
+      )}
     >
       {/* Left sidebar section */}
       {leftSidebar && (

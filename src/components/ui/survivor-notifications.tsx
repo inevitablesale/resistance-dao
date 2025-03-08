@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserCheck, Clock, Shield } from 'lucide-react';
+import { UserCheck, Clock, Shield, ExternalLink } from 'lucide-react';
 import { Card } from './card';
+import { cn } from '@/lib/utils';
 
 // Mock data for survivor notifications
 const mockNotifications = [
@@ -62,25 +64,38 @@ export function SurvivorNotifications() {
       transition={{ delay: 0.8 }}
       className="mb-6"
     >
-      <Card className="bg-black/80 border-toxic-neon/30 overflow-hidden">
+      <Card className={cn(
+        "bg-black/90 border-toxic-neon/30 overflow-hidden",
+        "border-[1px]"
+      )}>
         <div className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <UserCheck className="h-5 w-5 text-toxic-neon" />
-            <h3 className="text-toxic-neon font-mono text-lg">SURVIVOR ACTIVITY</h3>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <UserCheck className="h-5 w-5 text-toxic-neon" />
+              <h3 className="text-toxic-neon font-mono text-lg">SURVIVOR ACTIVITY</h3>
+            </div>
+            <button 
+              className="text-toxic-neon hover:bg-toxic-neon/20 p-1 rounded"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </button>
           </div>
           
           <div className="space-y-2">
             <AnimatePresence mode="popLayout">
               {notifications
                 .filter(n => visibleNotifications.includes(n.id))
-                .map(notification => (
+                .map((notification, index) => (
                   <motion.div
                     key={notification.id}
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3 }}
-                    className="p-2 bg-black/60 border border-toxic-neon/20 rounded flex items-center justify-between cursor-pointer hover:bg-toxic-neon/10"
+                    className={cn(
+                      "p-2 bg-black border border-toxic-neon/20 rounded flex items-center justify-between cursor-pointer hover:bg-toxic-neon/10",
+                      index === 0 && "bg-toxic-neon/5" // Highlight the newest notification
+                    )}
                   >
                     <div className="flex items-center gap-2">
                       <Shield className="h-4 w-4 text-toxic-neon flex-shrink-0" />

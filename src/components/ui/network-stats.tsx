@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Radio, Shield, Target, Radiation, Database } from 'lucide-react';
 import { Card } from './card';
+import { cn } from '@/lib/utils';
 
 export function NetworkStats() {
   // Simulate changing network stats
@@ -52,7 +53,10 @@ export function NetworkStats() {
       transition={{ delay: 0.7 }}
       className="mb-6"
     >
-      <Card className="bg-black/80 border-toxic-neon/30">
+      <Card className={cn(
+        "bg-black/90 border-toxic-neon/30",
+        "border-[1px]"
+      )}>
         <div className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <Database className="h-5 w-5 text-toxic-neon" />
@@ -60,7 +64,7 @@ export function NetworkStats() {
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
-            <div className="p-2 bg-black/60 border border-toxic-neon/20 rounded flex items-center gap-2">
+            <div className="p-2 bg-black border border-toxic-neon/20 rounded flex items-center gap-2">
               <Users className="h-4 w-4 text-toxic-neon flex-shrink-0" />
               <div className="flex flex-col">
                 <span className="text-white/70">Survivors</span>
@@ -68,7 +72,7 @@ export function NetworkStats() {
               </div>
             </div>
             
-            <div className="p-2 bg-black/60 border border-toxic-neon/20 rounded flex items-center gap-2">
+            <div className="p-2 bg-black border border-toxic-neon/20 rounded flex items-center gap-2">
               <Radio className="h-4 w-4 text-toxic-neon flex-shrink-0" />
               <div className="flex flex-col">
                 <span className="text-white/70">Radio Subs</span>
@@ -76,7 +80,7 @@ export function NetworkStats() {
               </div>
             </div>
             
-            <div className="p-2 bg-black/60 border border-toxic-neon/20 rounded flex items-center gap-2">
+            <div className="p-2 bg-black border border-toxic-neon/20 rounded flex items-center gap-2">
               <Shield className="h-4 w-4 text-toxic-neon flex-shrink-0" />
               <div className="flex flex-col">
                 <span className="text-white/70">Settlements</span>
@@ -84,7 +88,7 @@ export function NetworkStats() {
               </div>
             </div>
             
-            <div className="p-2 bg-black/60 border border-toxic-neon/20 rounded flex items-center gap-2">
+            <div className="p-2 bg-black border border-toxic-neon/20 rounded flex items-center gap-2">
               <Target className="h-4 w-4 text-apocalypse-red flex-shrink-0" />
               <div className="flex flex-col">
                 <span className="text-white/70">Bounties</span>
@@ -92,7 +96,7 @@ export function NetworkStats() {
               </div>
             </div>
             
-            <div className="p-2 bg-black/60 border border-toxic-neon/20 rounded flex items-center gap-2 col-span-1 sm:col-span-2">
+            <div className="p-2 bg-black border border-toxic-neon/20 rounded flex items-center gap-2 col-span-1 sm:col-span-2">
               <Radiation className="h-4 w-4 text-toxic-neon flex-shrink-0" />
               <div className="flex flex-col">
                 <span className="text-white/70">Resources Recovered</span>

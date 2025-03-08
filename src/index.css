@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -378,4 +379,65 @@
   font-family: monospace;
   color: hsl(142, 84%, 65%);
   text-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
+}
+
+/* Scanner line effects */
+.scanner-line-red {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: rgba(234, 56, 76, 0.7);
+  box-shadow: 0 0 8px 2px rgba(234, 56, 76, 0.5);
+  animation: scan-line 2s linear infinite;
+  z-index: 3;
+}
+
+.scanner-line-green {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: rgba(80, 250, 123, 0.7);
+  box-shadow: 0 0 8px 2px rgba(80, 250, 123, 0.5);
+  animation: scan-line 2s linear infinite;
+  z-index: 3;
+}
+
+@keyframes scan-line {
+  0% {
+    top: 0;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+/* Animation for the shine effect on buttons */
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Radial pulse animation for NFT cards */
+.radial-pulse-slow {
+  background: radial-gradient(circle at center, rgba(80, 250, 123, 0.2) 0%, transparent 50%);
+  animation: radial-pulse 10s ease-in-out infinite;
+}
+
+@keyframes radial-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.4;
+  }
 }

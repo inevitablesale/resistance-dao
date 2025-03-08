@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Terminal, ChevronDown, ChevronUp, Minimize, Maximize } from 'lucide-react';
+import { Terminal, ChevronDown, ChevronUp, Minimize, Maximize, ExternalLink } from 'lucide-react';
 import { Card } from './card';
+import { cn } from '@/lib/utils';
 
 interface TerminalMiniProps {
   minimized?: boolean;
@@ -80,26 +81,36 @@ export function TerminalMini({ minimized = false, onToggleMinimize }: TerminalMi
       transition={{ delay: 0.4 }}
       className="mb-6"
     >
-      <Card className="bg-black/80 border-toxic-neon/30 overflow-hidden">
+      <Card className={cn(
+        "bg-black/90 border-toxic-neon/30 overflow-hidden",
+        "border-[1px]"
+      )}>
         <div className="p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Terminal className="h-5 w-5 text-toxic-neon" />
               <h3 className="text-toxic-neon font-mono text-lg">TERMINAL</h3>
             </div>
-            <button 
-              className="text-toxic-neon hover:bg-toxic-neon/20 p-1 rounded"
-              onClick={onToggleMinimize}
-            >
-              {minimized ? <Maximize className="h-4 w-4" /> : <Minimize className="h-4 w-4" />}
-            </button>
+            <div className="flex items-center">
+              <button 
+                className="text-toxic-neon hover:bg-toxic-neon/20 p-1 rounded mr-1"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </button>
+              <button 
+                className="text-toxic-neon hover:bg-toxic-neon/20 p-1 rounded"
+                onClick={onToggleMinimize}
+              >
+                {minimized ? <Maximize className="h-4 w-4" /> : <Minimize className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
           
           {!minimized && (
             <>
               <div 
                 id="terminal-output"
-                className="bg-black border border-toxic-neon/30 rounded p-2 h-40 overflow-y-auto mb-2 font-mono text-sm"
+                className="bg-black border border-toxic-neon/30 rounded p-2 h-40 overflow-y-auto mb-2 font-mono text-sm terminal-scrollbar"
               >
                 {terminalLines.map((line, i) => (
                   <div key={i} className={line.startsWith('>') ? 'text-white' : (line.startsWith('>>') ? 'text-toxic-neon' : 'text-white/70')}>
