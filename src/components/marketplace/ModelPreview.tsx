@@ -249,12 +249,9 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     };
   }, [processedCloudUrl, autoRotate, radiationLevel]);
   
+  // Instead of using the RadiationOverlay with effects, we'll directly render the container for the 3D model
   return (
-    <RadiationOverlay 
-      radiationLevel={0} // No gradient overlay when using 3D cloud
-      animate={animateRadiation && modelLoaded}
-      className={`${className}`}
-    >
+    <div className={`${className}`}>
       <div 
         ref={containerRef} 
         className="w-full h-full rounded-lg overflow-hidden" 
@@ -275,6 +272,6 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
           </div>
         )}
       </div>
-    </RadiationOverlay>
+    </div>
   );
 };

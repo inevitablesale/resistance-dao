@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
@@ -10,6 +9,7 @@ interface RadiationOverlayProps {
   animate?: boolean;
   children: React.ReactNode;
   useCloudModel?: boolean; // Whether to use the 3D radiation cloud model
+  skipVisualEffects?: boolean; // NEW: Skip the visual overlay effects
 }
 
 export function RadiationOverlay({ 
@@ -18,7 +18,8 @@ export function RadiationOverlay({
   onComplete, 
   animate = true,
   children,
-  useCloudModel = false
+  useCloudModel = false,
+  skipVisualEffects = false
 }: RadiationOverlayProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [currentRadiation, setCurrentRadiation] = useState(radiationLevel);
@@ -75,6 +76,23 @@ export function RadiationOverlay({
     }
   }, [radiationLevel, animate, isLoading, onComplete]);
   
+  // If we're skipping visual effects, just render the children directly
+  if (skipVisualEffects) {
+    return (
+      <div className={`relative overflow-hidden ${className}`}>
+        {children}
+        
+        {/* Loading overlay only */}
+        {isLoading && (
+          <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-20">
+            <Loader2 className="h-8 w-8 text-white animate-spin" />
+          </div>
+        )}
+      </div>
+    );
+  }
+  
+  // Otherwise, render with all the radiation visual effects
   return (
     <div className={`relative overflow-hidden ${className}`}>
       {/* Content (NFT or 3D model) */}
