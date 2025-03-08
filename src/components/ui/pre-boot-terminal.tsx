@@ -329,7 +329,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                     />
                     
                     <div className="relative py-3 px-4 bg-black/70 backdrop-blur-sm rounded border border-toxic-neon/10 inline-block group">
-                      <div className="access-code-message text-toxic-neon/60 font-mono text-sm mb-2">// Access code is "resistance"</div>
+                      <div className="access-code-message text-toxic-neon/60 font-mono text-sm mb-2">// Get access code by joining our LinkedIn group</div>
                       <a 
                         href="https://www.linkedin.com/groups/12657922/" 
                         target="_blank" 
