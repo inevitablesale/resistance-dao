@@ -26,12 +26,12 @@ export function RadiationOverlay({
   // Calculate opacity based on radiation level (inverse relationship)
   const overlayOpacity = currentRadiation / 100;
   
-  // Define radiation colors based on level - ensuring it's always green-based
+  // Define radiation colors based on level
   const getRadiationColor = (level: number) => {
-    if (level > 90) return 'from-toxic-neon/90 to-toxic-neon/70';
-    if (level > 70) return 'from-toxic-neon/80 to-toxic-neon/60';
-    if (level > 40) return 'from-toxic-neon/70 to-toxic-neon/50';
-    if (level > 10) return 'from-toxic-neon/50 to-toxic-neon/30';
+    if (level > 90) return 'from-apocalypse-red/90 to-apocalypse-red/70';
+    if (level > 70) return 'from-orange-500/90 to-orange-500/70';
+    if (level > 40) return 'from-amber-400/80 to-amber-400/60';
+    if (level > 10) return 'from-toxic-neon/70 to-toxic-neon/50';
     return 'from-toxic-neon/30 to-toxic-neon/10';
   };
   

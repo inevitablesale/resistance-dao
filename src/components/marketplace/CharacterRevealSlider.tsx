@@ -32,28 +32,23 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
     }
   }, [value, prevValue]);
   
-  // Calculate the character reveal value (inverse of radiation level)
-  // Higher radiation = lower reveal, Lower radiation = higher reveal
-  const revealValue = 100 - value;
-  
   const handleChange = (newValue: number[]) => {
-    // Convert slider value (reveal) to radiation level (inverse)
-    onChange(100 - newValue[0]);
+    onChange(newValue[0]);
   };
   
-  // Get the description text based on radiation value
-  const getRevealDescription = (radiationValue: number) => {
-    if (radiationValue > 90) {
+  // Get the description text based on reveal value
+  const getRevealDescription = (revealValue: number) => {
+    if (revealValue < 10) {
       return "Fully obscured by toxic radiation cloud";
-    } else if (radiationValue > 75) {
+    } else if (revealValue < 25) {
       return "Character silhouette barely visible through radiation";
-    } else if (radiationValue > 60) {
+    } else if (revealValue < 40) {
       return "Radiation cloud thinning, basic outlines visible";
-    } else if (radiationValue > 40) {
+    } else if (revealValue < 60) {
       return "Character features becoming distinguishable";
-    } else if (radiationValue > 25) {
+    } else if (revealValue < 75) {
       return "Radiation dissipating, most features visible";
-    } else if (radiationValue > 10) {
+    } else if (revealValue < 90) {
       return "Character nearly fully revealed, slight radiation haze";
     } else {
       return "Full character reveal, minimal radiation effects";
@@ -64,7 +59,7 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
     <div className={`flex flex-col ${className}`}>
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {value > 50 ? (
+          {value < 50 ? (
             <EyeOff className="h-4 w-4 text-toxic-neon" />
           ) : (
             <Eye className="h-4 w-4 text-toxic-neon" />
@@ -73,8 +68,8 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
         </div>
         <span className={cn(
           "text-sm font-mono transition-colors duration-300",
-          value > 70 ? "text-apocalypse-red" : 
-          value > 30 ? "text-yellow-400" : 
+          value < 30 ? "text-apocalypse-red" : 
+          value < 70 ? "text-yellow-400" : 
           "text-toxic-neon"
         )}>
           {value}%
@@ -82,12 +77,12 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
       </div>
       
       <div className="flex items-center gap-3">
-        <Eye className={cn(
+        <EyeOff className={cn(
           "h-5 w-5 transition-opacity duration-300",
           value < 30 ? "text-white" : "text-white/50"
         )} />
         <Slider
-          value={[revealValue]} // Display the reveal value (inverse of radiation)
+          value={[value]}
           min={0}
           max={100}
           step={1}
@@ -98,7 +93,7 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
             isIncreasing === false ? "animate-pulse" : ""
           )}
         />
-        <EyeOff className={cn(
+        <Eye className={cn(
           "h-5 w-5 transition-opacity duration-300",
           value > 70 ? "text-white" : "text-white/50"
         )} />
@@ -107,8 +102,8 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
       <div className={cn(
         "mt-2 text-xs text-center transition-all duration-300",
         animateLabel ? "scale-105" : "scale-100",
-        value > 70 ? "text-apocalypse-red/80" : 
-        value > 30 ? "text-yellow-400/80" : 
+        value < 30 ? "text-apocalypse-red/80" : 
+        value < 70 ? "text-yellow-400/80" : 
         "text-toxic-neon/80"
       )}>
         {getRevealDescription(value)}
