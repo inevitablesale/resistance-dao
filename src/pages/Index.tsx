@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -396,19 +395,6 @@ const Index = () => {
         </div>
         
         <WastelandSurvivalGuide />
-        
-        {/* Remove TerminalTypewriter when authenticated */}
-        {!isConnected && (
-          <div className="mb-6">
-            <TerminalTypewriter 
-              textToType="WELCOME TO THE RESISTANCE SURVIVAL TERMINAL - JOIN THE NETWORK TO REBUILD CIVILIZATION"
-              isConnected={isConnected}
-              onConnect={connect}
-              className="mb-4"
-              marketplaceMode={true}
-            />
-          </div>
-        )}
 
         <MarketplaceQuickActions 
           className="mb-8"

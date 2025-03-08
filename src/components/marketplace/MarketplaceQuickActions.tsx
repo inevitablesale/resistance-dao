@@ -5,6 +5,7 @@ import { ToxicCard } from '@/components/ui/toxic-card';
 import { ShoppingBag, Target, Shield, ListFilter, Search, PlusCircle, UserPlus, Settings } from 'lucide-react';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { useNavigate } from 'react-router-dom';
+import { useCustomWallet } from '@/hooks/useCustomWallet';
 
 interface MarketplaceQuickActionsProps {
   className?: string;
@@ -17,7 +18,8 @@ export function MarketplaceQuickActions({
   onCreateListing,
   onBrowseListings
 }: MarketplaceQuickActionsProps) {
-  const { isConnected, setShowAuthFlow } = useWalletConnection();
+  const { setShowAuthFlow } = useWalletConnection();
+  const { isConnected } = useCustomWallet();
   const navigate = useNavigate();
   
   const handleAction = (callback?: () => void) => {
@@ -30,7 +32,9 @@ export function MarketplaceQuickActions({
   
   return (
     <ToxicCard className={`relative bg-black/70 border-toxic-neon/30 p-6 ${className}`}>
-      <div className="scanline"></div>
+      {/* Only show scanline effect when not connected */}
+      {!isConnected && <div className="scanline"></div>}
+      
       <div className="flex flex-col space-y-6">
         <div>
           <h3 className="text-xl font-mono text-toxic-neon mb-2">Wasteland Marketplace</h3>
@@ -101,6 +105,7 @@ export function MarketplaceQuickActions({
           </div>
         </div>
         
+        {/* Only show the connect prompt when not connected */}
         {!isConnected && (
           <div className="bg-toxic-neon/5 rounded-lg p-4 border border-toxic-neon/20">
             <div className="flex items-center gap-3">
