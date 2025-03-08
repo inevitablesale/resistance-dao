@@ -393,3 +393,36 @@
 .beacon-flash {
   animation: beacon-flash 1s ease-in-out infinite;
 }
+
+/* 3D Model Viewer Styles */
+.model-viewer-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+.model-viewer-container canvas {
+  display: block;
+}
+
+.radiation-pulse {
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+
+/* Make sure the 3D rendering doesn't look pixelated */
+canvas {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
