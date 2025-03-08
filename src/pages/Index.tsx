@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +9,9 @@ import { DrippingSlime } from "@/components/ui/dripping-slime";
 import { TerminalLogin } from '@/components/terminal/TerminalLogin';
 import { BreachSequence } from '@/components/terminal/BreachSequence';
 import { StoryTerminal } from '@/components/terminal/StoryTerminal';
+import { RadiationSystem } from '@/components/radiation/RadiationSystem';
+import { NFTDistributionStatus } from '@/components/radiation/NFTDistributionStatus';
+import { ReferralSystem } from '@/components/radiation/ReferralSystem';
 
 import { 
   Rocket, 
@@ -87,6 +91,12 @@ const Index = () => {
   const [activeRole, setActiveRole] = useState<'sentinel' | 'pioneer'>('sentinel');
   const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
   
+  // New states for radiation system
+  const [currentRadiation, setCurrentRadiation] = useState(94); // Start at 94% radiation
+  const [totalNFTsClaimed, setTotalNFTsClaimed] = useState(925); // Mock data - total claimed NFTs
+  const [referralEarnings, setReferralEarnings] = useState(375); // Mock data - earnings in MATIC
+  const [totalReferrals, setTotalReferrals] = useState(15); // Mock data - total referrals
+  
   useEffect(() => {
     if (isConnected && authState === "unauthenticated") {
       setAuthState("authenticated");
@@ -130,121 +140,197 @@ const Index = () => {
     bountyHunterRatio: 35
   };
   
+  // Updated NFT listings with proper roles
   const sentinelListings: MarketplaceListing[] = [
     {
       id: 1,
-      type: 'bounty-hunter',
-      name: "Territory Watcher X-35",
+      type: 'sentinel',
+      name: "Strategic Commander X-35",
       tokenId: 1,
       price: "15,000 RD",
       seller: "0x1234...5678",
       radiation: {
-        level: "High",
-        value: 78
+        level: "Immune",
+        value: 100
       },
       attributes: [
-        { trait: "Network Influence", value: "High" },
-        { trait: "Resource Allocation", value: "Territory Control" },
-        { trait: "Strategic Rating", value: "Exceptional" }
+        { trait: "Governance Rank", value: "Settlement Architect" },
+        { trait: "Voting Power", value: "High" },
+        { trait: "Investment Ability", value: "Strategic" }
       ],
       status: 'active',
+      role: "Strategic Commander",
+      rank: "Veteran",
       modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiheog5wgtnl7ldazmsj3n7xmkgkzpjnix5e4tuxndzw7j3bgkp2n4"
     },
     {
       id: 2,
-      type: 'bounty-hunter',
-      name: "Resource Director K-42",
+      type: 'sentinel',
+      name: "Financial Overseer K-42",
       tokenId: 42,
       price: "32,000 RD",
       seller: "0x8765...4321",
       radiation: {
-        level: "Medium",
-        value: 54
+        level: "Immune",
+        value: 100
       },
       attributes: [
-        { trait: "Network Influence", value: "Medium" },
-        { trait: "Resource Allocation", value: "Supply Chain" },
-        { trait: "Strategic Rating", value: "Advanced" }
+        { trait: "Governance Rank", value: "Financial Overseer" },
+        { trait: "Voting Power", value: "Critical" },
+        { trait: "Investment Ability", value: "Economic" }
       ],
       status: 'active',
+      role: "Financial Overseer",
+      rank: "Elite",
       modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiavqxeov62wgj6upfpvq6g4vpvot4mnwl3ggunxp27sbfjgs4hlfq"
     },
     {
       id: 3,
-      type: 'bounty-hunter',
-      name: "Network Commander B-007",
+      type: 'sentinel',
+      name: "Trade Commissioner B-007",
       tokenId: 7,
       price: "50,000 RD",
       seller: "0x9876...5432",
       radiation: {
-        level: "Critical",
-        value: 92
+        level: "Immune",
+        value: 100
       },
       attributes: [
-        { trait: "Network Influence", value: "Critical" },
-        { trait: "Resource Allocation", value: "Full Network" },
-        { trait: "Strategic Rating", value: "Elite" }
+        { trait: "Governance Rank", value: "Trade Commissioner" },
+        { trait: "Voting Power", value: "High" },
+        { trait: "Investment Ability", value: "Diplomatic" }
       ],
       status: 'active',
+      role: "Trade Commissioner",
+      rank: "Legend",
       modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeig47okn4sqqbajhje57htkxw6py3tdms7boyc3hkvvr4qlj7zsabu"
     }
   ];
   
-  const pioneerListings: MarketplaceListing[] = [
+  const bountyHunterListings: MarketplaceListing[] = [
     {
       id: 4,
-      type: 'survivor',
-      name: "Settlement Architect R-12",
-      tokenId: 12,
+      type: 'bounty-hunter',
+      name: "Protocol Tracker S-17",
+      tokenId: 17,
       price: "18,500 RD",
       seller: "0x2468...1357",
+      radiation: {
+        level: "Medium",
+        value: 58
+      },
+      attributes: [
+        { trait: "Hunter Class", value: "Scout" },
+        { trait: "Specialization", value: "Protocol Security" },
+        { trait: "Operating Territory", value: "Wastelands" }
+      ],
+      status: 'active',
+      role: "Protocol Tracker",
+      rank: "Feared",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeifzvpyj5znhgjq22cbjyzav5zsvese3m3klbkc4lcdm3fdbbxiooa"
+    },
+    {
+      id: 5,
+      type: 'bounty-hunter',
+      name: "Asset Recovery A-67",
+      tokenId: 67,
+      price: "24,000 RD",
+      seller: "0x1357...2468",
+      radiation: {
+        level: "High",
+        value: 72
+      },
+      attributes: [
+        { trait: "Hunter Class", value: "Apex" },
+        { trait: "Specialization", value: "Asset Recovery" },
+        { trait: "Operating Territory", value: "Cyber Core" }
+      ],
+      status: 'active',
+      role: "Asset Recovery",
+      rank: "Respected"
+    },
+    {
+      id: 6,
+      type: 'bounty-hunter',
+      name: "Network Infiltrator L-89",
+      tokenId: 89,
+      price: "36,500 RD",
+      seller: "0x6543...7890",
+      radiation: {
+        level: "Critical",
+        value: 85
+      },
+      attributes: [
+        { trait: "Hunter Class", value: "Legend" },
+        { trait: "Specialization", value: "Network Infiltration" },
+        { trait: "Operating Territory", value: "Deep Zone" }
+      ],
+      status: 'active',
+      role: "Network Infiltrator",
+      rank: "Infamous"
+    }
+  ];
+  
+  const survivorListings: MarketplaceListing[] = [
+    {
+      id: 7,
+      type: 'survivor',
+      name: "Engineer Pioneer R-12",
+      tokenId: 12,
+      price: "12,500 RD",
+      seller: "0x5555...6666",
       radiation: {
         level: "Low",
         value: 28
       },
       attributes: [
-        { trait: "Innovation", value: "Medical Systems" },
-        { trait: "Build Rating", value: "Enhanced" },
-        { trait: "Project", value: "New Haven" }
+        { trait: "Survivor Role", value: "Engineer" },
+        { trait: "Specialty", value: "Construction" },
+        { trait: "Settlement", value: "New Haven" }
       ],
       status: 'active',
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeifzvpyj5znhgjq22cbjyzav5zsvese3m3klbkc4lcdm3fdbbxiooa"
+      role: "Engineer",
+      rank: "Veteran"
     },
     {
-      id: 5,
+      id: 8,
       type: 'survivor',
-      name: "Innovation Builder E-67",
-      tokenId: 67,
-      price: "24,000 RD",
-      seller: "0x1357...2468",
+      name: "Medic Support M-23",
+      tokenId: 23,
+      price: "9,800 RD",
+      seller: "0x7777...8888",
       radiation: {
         level: "Medium",
         value: 45
       },
       attributes: [
-        { trait: "Innovation", value: "Reconnaissance Tech" },
-        { trait: "Build Rating", value: "Standard" },
-        { trait: "Project", value: "Outpost Alpha" }
+        { trait: "Survivor Role", value: "Medic" },
+        { trait: "Specialty", value: "Medicine" },
+        { trait: "Settlement", value: "Outpost Alpha" }
       ],
-      status: 'active'
+      status: 'active',
+      role: "Medic",
+      rank: "Skilled"
     },
     {
-      id: 6,
+      id: 9,
       type: 'survivor',
-      name: "Project Founder T-89",
-      tokenId: 89,
-      price: "36,500 RD",
-      seller: "0x6543...7890",
+      name: "Settlement Leader T-01",
+      tokenId: 1,
+      price: "42,000 RD",
+      seller: "0x9999...0000",
       radiation: {
         level: "High",
         value: 65
       },
       attributes: [
-        { trait: "Innovation", value: "Power Systems" },
-        { trait: "Build Rating", value: "High" },
-        { trait: "Project", value: "Reactor City" }
+        { trait: "Survivor Role", value: "Settlement Leader" },
+        { trait: "Specialty", value: "Resource Management" },
+        { trait: "Settlement", value: "Reactor City" }
       ],
-      status: 'active'
+      status: 'active',
+      role: "Settlement Leader",
+      rank: "Master"
     }
   ];
 
@@ -308,7 +394,8 @@ const Index = () => {
       <div className="text-left mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
           <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
-          <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Rebuilding From The Ashes</span>
+          <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> 
+          Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Radiation Level: {currentRadiation}%</span>
         </div>
         
         <StoryTerminal 
@@ -318,14 +405,23 @@ const Index = () => {
         />
         
         <WastelandSurvivalGuideEnhanced className="mb-8" />
-
+        
+        {/* New Radiation System Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="md:col-span-2">
-            <ChroniclePanel className="mb-6" />
-          </div>
           <div className="md:col-span-1">
-            <CharacterProgress className="mb-6" role={activeRole} />
-            <TerritoryStatus />
+            <RadiationSystem 
+              currentRadiation={currentRadiation} 
+              totalNFTsClaimed={totalNFTsClaimed} 
+              className="mb-6"
+            />
+            <ReferralSystem
+              earnings={referralEarnings}
+              totalReferrals={totalReferrals}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <NFTDistributionStatus className="mb-6" />
+            <ChroniclePanel className="mb-6" />
           </div>
         </div>
 
@@ -351,20 +447,20 @@ const Index = () => {
                 >
                   <h3 className="text-2xl font-mono text-toxic-neon mb-3">SENTINEL</h3>
                   <p className="text-white/80 mb-4 leading-relaxed">
-                    Monitor territories, direct network resources, and track strategic objectives across the wasteland. Guide the resistance by connecting outposts and controlling the flow of critical supplies.
+                    Governance & Economic Oversight. Hold voting rights on key economic decisions, invest in settlements, and earn a share of marketplace transactions.
                   </p>
                   <div className="grid grid-cols-3 gap-2 mb-4">
                     <div className="text-center">
-                      <div className="text-sm text-white/60">Network Size:</div>
-                      <div className="text-toxic-neon font-mono">142 TERRITORIES</div>
+                      <div className="text-sm text-white/60">Free Claims</div>
+                      <div className="text-toxic-neon font-mono">495 LEFT</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-sm text-white/60">Resource Pool:</div>
-                      <div className="text-toxic-neon font-mono">325,000 RD</div>
+                      <div className="text-sm text-white/60">Total Supply</div>
+                      <div className="text-toxic-neon font-mono">1,500</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-sm text-white/60">Active Sentinels:</div>
-                      <div className="text-toxic-neon font-mono">68</div>
+                      <div className="text-sm text-white/60">Radiation Immunity</div>
+                      <div className="text-toxic-neon font-mono">100%</div>
                     </div>
                   </div>
                   <ToxicButton 
@@ -380,44 +476,51 @@ const Index = () => {
                   className={`bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all ${activeRole === 'pioneer' ? 'border-2 border-amber-500/70' : ''}`}
                   onClick={() => setActiveRole('pioneer')}
                 >
-                  <h3 className="text-2xl font-mono text-toxic-neon mb-3">PIONEER</h3>
+                  <h3 className="text-2xl font-mono text-toxic-neon mb-3">BOUNTY HUNTER</h3>
                   <p className="text-white/80 mb-4 leading-relaxed">
-                    Build settlements, develop innovations, and create the foundation for a new civilization. Pioneers lead projects from medical facilities to power networks, shaping our collective future.
+                    Enforcers & Funders of the Wasteland. Earn from referrals, post jobs, track criminals, and drive the economy through investments and missions.
                   </p>
                   <div className="grid grid-cols-3 gap-2 mb-4">
                     <div className="text-center">
-                      <div className="text-sm text-white/60">Active Projects:</div>
-                      <div className="text-toxic-neon font-mono">84 INITIATIVES</div>
+                      <div className="text-sm text-white/60">Free Claims</div>
+                      <div className="text-toxic-neon font-mono">313 LEFT</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-sm text-white/60">Settlement Outposts:</div>
-                      <div className="text-toxic-neon font-mono">37</div>
+                      <div className="text-sm text-white/60">Total Supply</div>
+                      <div className="text-toxic-neon font-mono">500</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-sm text-white/60">Innovation Rate:</div>
-                      <div className="text-toxic-neon font-mono">78%</div>
+                      <div className="text-sm text-white/60">Referral Reward</div>
+                      <div className="text-toxic-neon font-mono">50%</div>
                     </div>
                   </div>
                   <ToxicButton 
                     variant="outline" 
                     className="w-full border-toxic-neon/40"
-                    onClick={() => navigate('/marketplace/pioneers')}
+                    onClick={() => navigate('/marketplace/bounty-hunters')}
                   >
-                    {isConnected ? "Access Build Center" : "Become a Pioneer"}
+                    {isConnected ? "Access Bounty Center" : "Become a Bounty Hunter"}
                   </ToxicButton>
                 </ToxicCard>
               </div>
               
               <MarketplaceListingGrid 
                 listings={sentinelListings} 
-                title="SENTINEL: Territory Network Leaders" 
+                title="FOUNDER SENTINELS: Governance & Oversight" 
                 onListingClick={handleListingClick}
                 className="mb-8"
               />
               
               <MarketplaceListingGrid 
-                listings={pioneerListings} 
-                title="PIONEER: Settlement Innovators" 
+                listings={bountyHunterListings} 
+                title="BOUNTY HUNTERS: Enforcers & Funders" 
+                onListingClick={handleListingClick}
+                className="mb-8"
+              />
+              
+              <MarketplaceListingGrid 
+                listings={survivorListings} 
+                title="SURVIVORS: Builders & Innovators" 
                 onListingClick={handleListingClick}
               />
             </div>
@@ -458,8 +561,8 @@ const Index = () => {
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">Chronicle Entries</span>
-                    <span className="text-toxic-neon font-mono">8</span>
+                    <span className="text-white/70">Referral Earnings</span>
+                    <span className="text-toxic-neon font-mono">{referralEarnings} MATIC</span>
                   </div>
                 </div>
               ) : (
@@ -536,10 +639,10 @@ const Index = () => {
                     variant="outline" 
                     size="sm"
                     className="border-toxic-neon/30"
-                    onClick={() => navigate('/marketplace/pioneers')}
+                    onClick={() => navigate('/marketplace/bounty-hunters')}
                   >
-                    <Hammer className="h-4 w-4 mr-1" />
-                    Pioneer Hub
+                    <Target className="h-4 w-4 mr-1" />
+                    Bounty Hub
                   </ToxicButton>
                   
                   <ToxicButton 

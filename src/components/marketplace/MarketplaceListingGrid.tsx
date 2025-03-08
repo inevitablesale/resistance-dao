@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Target, Biohazard, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Target, Biohazard, Zap, Shield, Activity, Hammer } from 'lucide-react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
 import { ToxicProgress } from '@/components/ui/toxic-progress';
@@ -20,7 +20,7 @@ export interface RadiationLevel {
 
 export interface MarketplaceListing {
   id: number;
-  type?: 'bounty-hunter' | 'survivor' | 'equipment';
+  type?: 'bounty-hunter' | 'survivor' | 'sentinel';
   name: string;
   tokenId: number;
   price: string;
@@ -29,6 +29,8 @@ export interface MarketplaceListing {
   attributes?: MarketplaceAttribute[];
   status: 'active' | 'sold' | 'auction';
   modelUrl?: string;
+  role?: string;
+  rank?: string;
 }
 
 interface MarketplaceListingGridProps {
@@ -75,8 +77,36 @@ export function MarketplaceListingGrid({
         return 'bg-orange-500/30 text-orange-400 border-orange-500/40';
       case 'critical':
         return 'bg-apocalypse-red/30 text-apocalypse-red border-apocalypse-red/40';
+      case 'immune':
+        return 'bg-purple-600/30 text-purple-400 border-purple-600/40';
       default:
         return 'bg-toxic-neon/20 text-toxic-neon border-toxic-neon/40';
+    }
+  };
+
+  const getRoleIcon = (type?: string) => {
+    switch (type?.toLowerCase()) {
+      case 'bounty-hunter':
+        return <Target className="w-3 h-3 mr-1 text-apocalypse-red" />;
+      case 'survivor':
+        return <Hammer className="w-3 h-3 mr-1 text-amber-400" />;
+      case 'sentinel':
+        return <Shield className="w-3 h-3 mr-1 text-purple-400" />;
+      default:
+        return <Activity className="w-3 h-3 mr-1 text-toxic-neon" />;
+    }
+  };
+  
+  const getRoleLabel = (type?: string) => {
+    switch (type?.toLowerCase()) {
+      case 'bounty-hunter':
+        return 'BOUNTY HUNTER';
+      case 'survivor':
+        return 'SURVIVOR';
+      case 'sentinel':
+        return 'FOUNDER SENTINEL';
+      default:
+        return 'WASTELAND NFT';
     }
   };
   
@@ -126,10 +156,19 @@ export function MarketplaceListingGrid({
                 {/* Type Badge */}
                 <div className="absolute top-3 left-3 z-10">
                   <ToxicBadge variant="marketplace" className="bg-black/60 border-toxic-neon/50">
-                    <Target className="w-3 h-3 mr-1 text-apocalypse-red" /> 
-                    BOUNTY HUNTER
+                    {getRoleIcon(listing.type)} 
+                    {getRoleLabel(listing.type)}
                   </ToxicBadge>
                 </div>
+                
+                {/* Role/Rank Badge - New */}
+                {listing.role && (
+                  <div className="absolute top-3 right-3 z-10">
+                    <ToxicBadge variant="marketplace" className="bg-black/60 border-toxic-neon/50">
+                      {listing.role}
+                    </ToxicBadge>
+                  </div>
+                )}
                 
                 {/* Model Preview with fixed height */}
                 <div className="relative w-full h-64 bg-gradient-to-b from-black/40 to-black/90">
@@ -169,6 +208,21 @@ export function MarketplaceListingGrid({
                         <Biohazard className="w-3.5 h-3.5 mr-1.5" /> RAD LEVEL: {listing.radiation.level}
                       </span>
                       <span>({listing.radiation.value}%)</span>
+                    </ToxicBadge>
+                  </div>
+                )}
+                
+                {/* Rank Badge - New */}
+                {listing.rank && (
+                  <div className="px-4 py-1">
+                    <ToxicBadge 
+                      variant="outline" 
+                      className="w-full flex justify-between items-center py-1 bg-black/40"
+                    >
+                      <span className="flex items-center">
+                        RANK
+                      </span>
+                      <span className="text-toxic-neon">{listing.rank}</span>
                     </ToxicBadge>
                   </div>
                 )}
