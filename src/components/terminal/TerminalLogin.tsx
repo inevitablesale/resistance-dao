@@ -44,16 +44,22 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
     setIsAuthenticating(true);
     setLoginErrors([]);
     
+    // Demo authentication - in a real app, you'd validate against a server
     addTerminalMessage(`> VALIDATING ACCESS CODE: ${accessCode.replace(/./g, '*')}`);
     
-    if (accessCode === "resistance" || accessCode === "admin") {
-      addTerminalMessage("> ACCESS CODE VALIDATED");
-      handleLoginSuccess();
-    } else {
-      setIsAuthenticating(false);
-      setLoginErrors(["ERROR: INVALID ACCESS CODE"]);
-      addTerminalMessage("> AUTHENTICATION FAILED");
-    }
+    // Reduced authentication time from 2000ms to 500ms
+    setTimeout(() => {
+      if (accessCode === "resistance" || accessCode === "admin") {
+        addTerminalMessage("> ACCESS CODE VALIDATED");
+        addTerminalMessage("> INITIATING SECURE PROTOCOL...");
+        // Reduced success delay from 1500ms to 300ms
+        setTimeout(handleLoginSuccess, 300);
+      } else {
+        setIsAuthenticating(false);
+        setLoginErrors(["ERROR: INVALID ACCESS CODE"]);
+        addTerminalMessage("> AUTHENTICATION FAILED");
+      }
+    }, 500);
   };
 
   const handleWalletConnect = () => {
@@ -61,11 +67,19 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
     setLoginErrors([]);
     addTerminalMessage("> INITIALIZING WALLET CONNECTION...");
     
-    connect();
+    // Reduced wallet connection delay from 1000ms to 300ms
+    setTimeout(() => {
+      connect();
+    }, 300);
   };
 
   const handleLoginSuccess = () => {
-    onLoginSuccess();
+    addTerminalMessage("> AUTHENTICATION SUCCESSFUL");
+    addTerminalMessage("> INITIATING BREACH PROTOCOL...");
+    
+    setTimeout(() => {
+      onLoginSuccess();
+    }, 2000);
   };
 
   const terminalVariants = {
