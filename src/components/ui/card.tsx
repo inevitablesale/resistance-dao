@@ -77,4 +77,50 @@ const CardFooter = React.forwardRef<
 ))
 CardFooter.displayName = "CardFooter"
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+// Added Settlement-specific card components that match our narrative
+const SettlementCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "settlement-card rounded-lg border border-toxic-neon/30 bg-black/90 shadow-[0_0_15px_rgba(57,255,20,0.15)] hover:border-toxic-neon/60 transition-all duration-300",
+      className
+    )}
+    {...props}
+  />
+))
+SettlementCard.displayName = "SettlementCard"
+
+const SettlementCardHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5 p-6 border-b border-toxic-neon/20", className)}
+    {...props}
+  />
+))
+SettlementCardHeader.displayName = "SettlementCardHeader"
+
+const SettlementCardContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6", className)} {...props} />
+))
+SettlementCardContent.displayName = "SettlementCardContent"
+
+export { 
+  Card, 
+  CardHeader, 
+  CardFooter, 
+  CardTitle, 
+  CardDescription, 
+  CardContent,
+  SettlementCard,
+  SettlementCardHeader,
+  SettlementCardContent
+}
