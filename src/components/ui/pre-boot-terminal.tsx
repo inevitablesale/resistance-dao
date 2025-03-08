@@ -357,7 +357,8 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         </div>
       </div>
       
-      <style jsx>{`
+      <style>
+        {`
         .crt-scanline::before {
           content: '';
           position: absolute;
@@ -496,7 +497,8 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
             transform: translate(0);
           }
         }
-      `}</style>
+        `}
+      </style>
     </motion.div>
   );
 }
