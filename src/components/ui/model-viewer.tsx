@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { 
@@ -15,7 +14,6 @@ import { Group, MeshStandardMaterial, Color } from 'three';
 import { ToxicButton } from './toxic-button';
 import { Loader2 } from 'lucide-react';
 
-// Loading component displayed while the GLB model is loading
 const ModelLoader = () => {
   const { progress } = useProgress();
   return (
@@ -30,7 +28,6 @@ const ModelLoader = () => {
   );
 };
 
-// The actual 3D model with auto-rotation and glow effect
 const Model = ({ 
   url, 
   autoRotate = true, 
@@ -46,28 +43,23 @@ const Model = ({
   const { scene, animations } = useGLTF(url);
   const [hovered, setHovered] = useState(false);
   
-  // Apply glowing effect to all materials if radiation effect is enabled
   useEffect(() => {
     if (radiationEffect) {
       scene.traverse((child: any) => {
         if (child.isMesh && child.material) {
-          // Store original material properties
           const originalEmissive = child.material.emissive 
             ? child.material.emissive.clone() 
             : new Color(0x000000);
           const originalEmissiveIntensity = child.material.emissiveIntensity || 0;
           
-          // Create a new material with glow effect
           const newMaterial = new MeshStandardMaterial({
             ...child.material,
-            emissive: new Color(0x00ff66), // Toxic green glow
+            emissive: new Color(0x00ff66),
             emissiveIntensity: 0.3,
           });
           
-          // Apply the new material
           child.material = newMaterial;
           
-          // Store original values for hover states
           child.userData.originalEmissive = originalEmissive;
           child.userData.originalEmissiveIntensity = originalEmissiveIntensity;
         }
@@ -75,7 +67,6 @@ const Model = ({
     }
     
     return () => {
-      // Cleanup function
       scene.traverse((child: any) => {
         if (child.isMesh && child.material && child.userData.originalEmissive) {
           child.material.emissive = child.userData.originalEmissive;
@@ -85,22 +76,20 @@ const Model = ({
     };
   }, [scene, radiationEffect]);
 
-  // Handle hover effects
   useEffect(() => {
     if (radiationEffect) {
       scene.traverse((child: any) => {
         if (child.isMesh && child.material) {
           if (hovered) {
-            child.material.emissiveIntensity = 0.6; // Increase intensity on hover
+            child.material.emissiveIntensity = 0.6;
           } else {
-            child.material.emissiveIntensity = 0.3; // Reset to normal when not hovering
+            child.material.emissiveIntensity = 0.3;
           }
         }
       });
     }
   }, [hovered, scene, radiationEffect]);
 
-  // Auto-rotation animation
   useFrame(() => {
     if (group.current && autoRotate) {
       group.current.rotation.y += rotationSpeed;
@@ -122,7 +111,6 @@ const Model = ({
   );
 };
 
-// The camera controls component
 const CameraController = ({ initialZoom = 2 }: { initialZoom?: number }) => {
   const { camera, gl } = useThree();
   
@@ -134,7 +122,6 @@ const CameraController = ({ initialZoom = 2 }: { initialZoom?: number }) => {
   return null;
 };
 
-// Error boundary for handling loading failures
 class ModelErrorBoundary extends React.Component<
   { children: React.ReactNode, fallback: React.ReactNode },
   { hasError: boolean }
@@ -156,7 +143,6 @@ class ModelErrorBoundary extends React.Component<
   }
 }
 
-// Main component for the model viewer
 export interface ModelViewerProps {
   ipfsHash: string;
   width?: string | number;
@@ -180,23 +166,20 @@ export const ModelViewer = ({
   radiationEffect = false,
   rotationSpeed = 0.005,
   showControls = true,
-  initialZoom = 2, // Changed default from 5 to 2
+  initialZoom = 2,
   onError,
   className = "",
 }: ModelViewerProps) => {
   const [hasError, setHasError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   
-  // Construct the Pinata gateway URL
   const pinataUrl = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
   
-  // Handler for retry button
   const handleRetry = () => {
     setHasError(false);
     setRetryCount(prev => prev + 1);
   };
   
-  // Error fallback UI
   const ErrorFallback = () => (
     <div className="flex flex-col items-center justify-center h-full w-full bg-black/40 p-4 rounded-md border border-toxic-neon/30">
       <div className="text-toxic-neon font-mono mb-4 text-center">
@@ -234,7 +217,6 @@ export const ModelViewer = ({
         </ModelErrorBoundary>
       )}
       
-      {/* Overlay radiation effect */}
       {radiationEffect && (
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute inset-0 bg-toxic-neon/5 mix-blend-overlay radiation-pulse"></div>
@@ -245,5 +227,5 @@ export const ModelViewer = ({
   );
 };
 
-// Preload the model to avoid jank when it's first displayed
 useGLTF.preload('https://gateway.pinata.cloud/ipfs/bafybeic2yffnslotf33yojsihiyv73rmxenstfwcxnyws5ktxp2mptkb3q');
+useGLTF.preload('https://gateway.pinata.cloud/ipfs/bafybeifzvpyj5znhgjq22cbjyzav5zsvese3m3klbkc4lcdm3fdbbxiooa');
