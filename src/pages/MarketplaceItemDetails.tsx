@@ -350,6 +350,10 @@ export default function MarketplaceItemDetails() {
                         height="400px"
                         width="100%"
                         autoRotate={true}
+                        radiationLevel={item.radiation.value}
+                        animateRadiation={true}
+                        useRadiationCloud={true}
+                        radiationCloudUrl="https://gateway.pinata.cloud/ipfs/bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full bg-gradient-to-b from-toxic-neon/20 to-black/60">
@@ -654,6 +658,8 @@ export default function MarketplaceItemDetails() {
                             height="100%"
                             width="100%"
                             autoRotate={true}
+                            radiationLevel={relatedItem.radiation.value}
+                            useRadiationCloud={true}
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full">

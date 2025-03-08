@@ -9,6 +9,7 @@ interface RadiationOverlayProps {
   onComplete?: () => void;
   animate?: boolean;
   children: React.ReactNode;
+  useCloudModel?: boolean; // Whether to use the 3D radiation cloud model
 }
 
 export function RadiationOverlay({ 
@@ -16,7 +17,8 @@ export function RadiationOverlay({
   className = "", 
   onComplete, 
   animate = true,
-  children 
+  children,
+  useCloudModel = false
 }: RadiationOverlayProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [currentRadiation, setCurrentRadiation] = useState(radiationLevel);
