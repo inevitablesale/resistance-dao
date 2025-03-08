@@ -43,13 +43,15 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
       
       <div className="mt-2 text-xs text-toxic-muted text-center">
         {value < 20 ? (
-          "Heavy radiation obscuring view"
-        ) : value < 50 ? (
-          "Partially visible through radiation"
+          "Character fully obscured by radiation cloud"
+        ) : value < 40 ? (
+          "Radiation cloud dissipating, faint outlines visible"
+        ) : value < 60 ? (
+          "Character becoming more visible through radiation"
         ) : value < 80 ? (
-          "Character features becoming clear"
+          "Radiation cloud thinning, character features clear"
         ) : (
-          "Full character reveal"
+          "Full character reveal, minimal radiation effects"
         )}
       </div>
     </div>

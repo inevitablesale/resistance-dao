@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import * as THREE from 'three';
@@ -17,7 +16,7 @@ interface ModelPreviewProps {
   animateRadiation?: boolean;
   useRadiationCloud?: boolean;
   radiationCloudUrl?: string;
-  revealValue?: number; // New prop for controlling reveal amount (0-100)
+  revealValue?: number; // Controls the transition between radiation cloud and character model (0-100)
   showControls?: boolean; // Whether to show fullscreen controls
 }
 
@@ -31,23 +30,25 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   animateRadiation = true,
   useRadiationCloud = false,
   radiationCloudUrl = "bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4",
-  revealValue = 100, // Default to 100 (fully obscured)
+  revealValue = 20, // Default to 20 (mostly obscured)
   showControls = true
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [modelLoaded, setModelLoaded] = useState(false);
+  const [characterModel, setCharacterModel] = useState<THREE.Group | null>(null);
   const [radiationModel, setRadiationModel] = useState<THREE.Group | null>(null);
   const [scene, setScene] = useState<THREE.Scene | null>(null);
   const [mixer, setMixer] = useState<THREE.AnimationMixer | null>(null);
   const [clock] = useState(new THREE.Clock());
   const [processedCloudUrl, setProcessedCloudUrl] = useState<string | null>(null);
+  const [processedModelUrl, setProcessedModelUrl] = useState<string | null>(null);
   
-  // Process the radiation cloud URL using the IPFS service
+  // Process the IPFS URLs
   useEffect(() => {
     const fetchUrls = async () => {
       try {
+        // Process radiation cloud URL
         if (radiationCloudUrl) {
           // Check if radiationCloudUrl is already a full URL or just a hash
           if (radiationCloudUrl.startsWith('http')) {
@@ -59,6 +60,19 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
             setProcessedCloudUrl(url);
           }
         }
+        
+        // Process character model URL
+        if (modelUrl) {
+          // Check if modelUrl is already a full URL or just a hash
+          if (modelUrl.startsWith('http')) {
+            setProcessedModelUrl(modelUrl);
+          } else {
+            // Remove ipfs:// prefix if it exists
+            const modelHash = modelUrl.replace('ipfs://', '');
+            const url = await getModelFromIPFS(modelHash);
+            setProcessedModelUrl(url);
+          }
+        }
       } catch (error) {
         console.error('Error processing IPFS URLs:', error);
         setError('Failed to process model URLs');
@@ -66,11 +80,11 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     };
     
     fetchUrls();
-  }, [radiationCloudUrl]);
+  }, [radiationCloudUrl, modelUrl]);
   
-  // Setup the scene, camera, and renderer
+  // Setup the scene, camera, and renderer when URLs are processed
   useEffect(() => {
-    if (!containerRef.current || !processedCloudUrl) return;
+    if (!containerRef.current || !processedCloudUrl || !processedModelUrl) return;
     
     setLoading(true);
     setError(null);
@@ -131,10 +145,12 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     const newMixer = new THREE.AnimationMixer(newScene);
     setMixer(newMixer);
     
-    console.log('Loading radiation cloud from:', processedCloudUrl);
+    // Loader for both models
+    const loader = new GLTFLoader();
+    let loadedCount = 0;
     
     // Load radiation cloud model
-    const loader = new GLTFLoader();
+    console.log('Loading radiation cloud from:', processedCloudUrl);
     loader.load(
       processedCloudUrl,
       (gltf) => {
@@ -149,31 +165,31 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         gltf.scene.scale.set(scale, scale, scale);
         gltf.scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
         
-        // Apply transparent material with neutral color
+        // Apply transparent material for the radiation cloud
         gltf.scene.traverse((child) => {
           if (child instanceof THREE.Mesh) {
-            // Use the reveal value to set opacity - invert the value (100 = fully obscured, 0 = fully revealed)
+            // Calculate opacity based on revealValue (100 - revealValue because 100 means fully revealed)
             const opacity = Math.max(0, Math.min(100, 100 - revealValue)) / 100;
             
-            // Apply neutral transparent material without color tint
+            // Apply neutral transparent material
             if (Array.isArray(child.material)) {
               child.material.forEach(mat => {
                 mat.transparent = true;
                 mat.opacity = opacity;
                 
-                // Use neutral gray color instead of green/yellow
-                mat.color = new THREE.Color(0xffffff);
-                mat.emissive = new THREE.Color(0x000000);
-                mat.emissiveIntensity = 0;
+                // Use a slightly toxic green tint for radiation cloud
+                mat.color = new THREE.Color(0xaaff88);
+                mat.emissive = new THREE.Color(0x113311);
+                mat.emissiveIntensity = 0.2;
               });
             } else {
               child.material.transparent = true;
               child.material.opacity = opacity;
               
-              // Use neutral gray color instead of green/yellow
-              child.material.color = new THREE.Color(0xffffff);
-              child.material.emissive = new THREE.Color(0x000000);
-              child.material.emissiveIntensity = 0;
+              // Use a slightly toxic green tint for radiation cloud
+              child.material.color = new THREE.Color(0xaaff88);
+              child.material.emissive = new THREE.Color(0x113311);
+              child.material.emissiveIntensity = 0.2;
             }
           }
         });
@@ -183,16 +199,83 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         
         // Add to scene
         newScene.add(gltf.scene);
-        setLoading(false);
-        setModelLoaded(true);
+        
+        // Increment loaded count
+        loadedCount++;
+        if (loadedCount === 2) {
+          setLoading(false);
+        }
       },
       (xhr) => {
-        // Progress callback
+        // Progress callback for radiation cloud
         console.log(`${(xhr.loaded / xhr.total) * 100}% loaded - Radiation cloud`);
       },
       (error) => {
         console.error('Error loading radiation cloud model:', error);
         setError('Failed to load radiation cloud. Please check the URL and try again.');
+        setLoading(false);
+      }
+    );
+    
+    // Load character model
+    console.log('Loading character model from:', processedModelUrl);
+    loader.load(
+      processedModelUrl,
+      (gltf) => {
+        // Center the model
+        const box = new THREE.Box3().setFromObject(gltf.scene);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        
+        // Normalize and center
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 2.8 / maxDim; // Set appropriate scale
+        gltf.scene.scale.set(scale, scale, scale);
+        gltf.scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+        
+        // Apply material to character model with opacity based on reveal value
+        gltf.scene.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            // Calculate opacity based on revealValue (more reveal = more visible character)
+            const opacity = Math.max(0, Math.min(100, revealValue)) / 100;
+            
+            if (Array.isArray(child.material)) {
+              child.material.forEach(mat => {
+                mat.transparent = true;
+                mat.opacity = opacity;
+                
+                // Keep original colors but adjust emissive for a slight glow
+                mat.emissiveIntensity = 0.1;
+              });
+            } else {
+              child.material.transparent = true;
+              child.material.opacity = opacity;
+              
+              // Keep original colors but adjust emissive for a slight glow
+              child.material.emissiveIntensity = 0.1;
+            }
+          }
+        });
+        
+        // Store the character model reference
+        setCharacterModel(gltf.scene);
+        
+        // Add to scene
+        newScene.add(gltf.scene);
+        
+        // Increment loaded count
+        loadedCount++;
+        if (loadedCount === 2) {
+          setLoading(false);
+        }
+      },
+      (xhr) => {
+        // Progress callback for character model
+        console.log(`${(xhr.loaded / xhr.total) * 100}% loaded - Character model`);
+      },
+      (error) => {
+        console.error('Error loading character model:', error);
+        setError('Failed to load character model. Please check the URL and try again.');
         setLoading(false);
       }
     );
@@ -205,6 +288,37 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       if (newMixer) {
         const delta = clock.getDelta();
         newMixer.update(delta);
+      }
+      
+      // Update models' opacity based on reveal value whenever it changes
+      if (radiationModel) {
+        radiationModel.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            const opacity = Math.max(0, Math.min(100, 100 - revealValue)) / 100;
+            if (Array.isArray(child.material)) {
+              child.material.forEach(mat => {
+                mat.opacity = opacity;
+              });
+            } else {
+              child.material.opacity = opacity;
+            }
+          }
+        });
+      }
+      
+      if (characterModel) {
+        characterModel.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            const opacity = Math.max(0, Math.min(100, revealValue)) / 100;
+            if (Array.isArray(child.material)) {
+              child.material.forEach(mat => {
+                mat.opacity = opacity;
+              });
+            } else {
+              child.material.opacity = opacity;
+            }
+          }
+        });
       }
       
       controls.update();
@@ -254,7 +368,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       controls.dispose();
       if (newMixer) newMixer.stopAllAction();
     };
-  }, [processedCloudUrl, autoRotate, revealValue]); // Added revealValue to the dependency array
+  }, [processedCloudUrl, processedModelUrl, autoRotate, revealValue]); // Added revealValue to the dependency array
   
   // Directly render the container for the 3D model
   return (
