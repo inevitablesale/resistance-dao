@@ -171,7 +171,7 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
               className="uppercase font-mono flex items-center justify-center text-base md:w-auto w-full"
             >
               <LockKeyhole className="h-5 w-5 mr-2" />
-              Authenticate
+              <span>Authenticate</span>
             </ToxicButton>
           </div>
         </form>
@@ -190,7 +190,7 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
           className="w-full uppercase font-mono flex items-center justify-center py-3 text-base mb-8"
         >
           <Shield className="h-5 w-5 mr-2" />
-          Connect Crypto Wallet
+          <span>Connect Crypto Wallet</span>
         </ToxicButton>
 
         <div className="flex justify-center items-center gap-2 text-white/60 mb-6">
