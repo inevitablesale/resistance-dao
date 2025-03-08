@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -19,9 +18,6 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        // New cyber-themed variants
-        cyber: "bg-black border border-toxic-neon text-toxic-neon hover:bg-toxic-neon/20 shadow-[0_0_10px_rgba(80,250,123,0.3)]",
-        cyberDestructive: "bg-black border border-apocalypse-red text-apocalypse-red hover:bg-apocalypse-red/20 shadow-[0_0_10px_rgba(234,56,76,0.3)]",
       },
       size: {
         default: "h-10 px-4 py-2",

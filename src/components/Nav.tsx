@@ -2,9 +2,10 @@ import { Link, useLocation } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import Twitter from "./icons/Twitter";
+import Linked from "./icons/Linked";
 import { Button } from "@/components/ui/button";
-import { Terminal, Radiation, Shield, Lock } from "lucide-react";
-import { ToxicBadge } from "@/components/ui/toxic-badge";
+import { Rocket } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -115,6 +116,22 @@ const Nav = () => {
           </div>
 
           <div className="flex items-center gap-4">
+            <a 
+              href="https://x.com/LedgerFundDAO" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-white/60 hover:text-white transition-colors transform hover:scale-105 duration-200"
+            >
+              <Twitter className="w-5 h-5" />
+            </a>
+            <a 
+              href="https://www.linkedin.com/groups/12657922/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-white/60 hover:text-white transition-colors transform hover:scale-105 duration-200"
+            >
+              <Linked className="w-5 h-5" />
+            </a>
             <div className="relative z-[101] flex items-center pointer-events-auto">
               {isPendingInitialization ? (
                 <Button disabled className="opacity-50">
@@ -123,15 +140,7 @@ const Nav = () => {
               ) : isConnected ? (
                 <DynamicWidget />
               ) : (
-                <Button 
-                  onClick={handleLaunchClick}
-                  className="bg-toxic-dark border border-toxic-neon text-toxic-neon hover:bg-toxic-neon/20 relative group overflow-hidden"
-                >
-                  <span className="absolute inset-0 bg-toxic-neon/10 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
-                  <Lock className="w-4 h-4 mr-2 group-hover:animate-pulse" />
-                  <span className="mr-2">HACK MAINFRAME</span>
-                  <ToxicBadge variant="secondary" className="text-[0.65rem] py-0 px-1.5">ACCESS</ToxicBadge>
-                </Button>
+                null
               )}
             </div>
           </div>
