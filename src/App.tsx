@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -160,6 +159,7 @@ function Layout() {
         <Route path="/toxic-theme" element={<ToxicTheme />} />
         <Route path="/marketplace/:id" element={<MarketplaceItemDetails />} />
         <Route path="/hunt" element={<Hunt />} />
+        <Route path="/command" element={<Hunt />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

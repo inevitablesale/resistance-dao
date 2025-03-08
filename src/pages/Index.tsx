@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -38,7 +39,15 @@ import {
   PlusCircle,
   Search,
   ShoppingBag,
-  Box
+  Box,
+  Eye, 
+  Map,
+  Globe,
+  Network,
+  Wrench,
+  Hammer,
+  Lightbulb,
+  Flag
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToxicButton } from "@/components/ui/toxic-button";
@@ -113,11 +122,12 @@ const Index = () => {
     bountyHunterRatio: 35
   };
   
-  const bountyHunterListings: MarketplaceListing[] = [
+  // Updated to Sentinel listings (previously bountyHunterListings)
+  const sentinelListings: MarketplaceListing[] = [
     {
       id: 1,
-      type: 'bounty-hunter',
-      name: "Mutant Zero X-35",
+      type: 'sentinel',
+      name: "Territory Watcher X-35",
       tokenId: 1,
       price: "15,000 RD",
       seller: "0x1234...5678",
@@ -126,17 +136,17 @@ const Index = () => {
         value: 78
       },
       attributes: [
-        { trait: "Radiation Level", value: "High" },
-        { trait: "Mutation", value: "Neural Hacking" },
-        { trait: "Threat Level", value: "Extreme" }
+        { trait: "Network Influence", value: "High" },
+        { trait: "Resource Allocation", value: "Territory Control" },
+        { trait: "Strategic Rating", value: "Exceptional" }
       ],
       status: 'active',
       modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiheog5wgtnl7ldazmsj3n7xmkgkzpjnix5e4tuxndzw7j3bgkp2n4"
     },
     {
       id: 2,
-      type: 'bounty-hunter',
-      name: "Toxic Liquidator K-42",
+      type: 'sentinel',
+      name: "Resource Director K-42",
       tokenId: 42,
       price: "32,000 RD",
       seller: "0x8765...4321",
@@ -145,17 +155,17 @@ const Index = () => {
         value: 54
       },
       attributes: [
-        { trait: "Radiation Level", value: "Medium" },
-        { trait: "Mutation", value: "Toxic Immunity" },
-        { trait: "Threat Level", value: "High" }
+        { trait: "Network Influence", value: "Medium" },
+        { trait: "Resource Allocation", value: "Supply Chain" },
+        { trait: "Strategic Rating", value: "Advanced" }
       ],
       status: 'active',
       modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiavqxeov62wgj6upfpvq6g4vpvot4mnwl3ggunxp27sbfjgs4hlfq"
     },
     {
       id: 3,
-      type: 'bounty-hunter',
-      name: "Mind Raider B-007",
+      type: 'sentinel',
+      name: "Network Commander B-007",
       tokenId: 7,
       price: "50,000 RD",
       seller: "0x9876...5432",
@@ -164,20 +174,21 @@ const Index = () => {
         value: 92
       },
       attributes: [
-        { trait: "Radiation Level", value: "Critical" },
-        { trait: "Mutation", value: "Telepathy" },
-        { trait: "Threat Level", value: "Catastrophic" }
+        { trait: "Network Influence", value: "Critical" },
+        { trait: "Resource Allocation", value: "Full Network" },
+        { trait: "Strategic Rating", value: "Elite" }
       ],
       status: 'active',
       modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeig47okn4sqqbajhje57htkxw6py3tdms7boyc3hkvvr4qlj7zsabu"
     }
   ];
   
-  const survivorListings: MarketplaceListing[] = [
+  // Updated to Pioneer listings (previously survivorListings)
+  const pioneerListings: MarketplaceListing[] = [
     {
       id: 4,
-      type: 'survivor',
-      name: "Wasteland Medic R-12",
+      type: 'pioneer',
+      name: "Settlement Architect R-12",
       tokenId: 12,
       price: "18,500 RD",
       seller: "0x2468...1357",
@@ -186,17 +197,17 @@ const Index = () => {
         value: 28
       },
       attributes: [
-        { trait: "Specialty", value: "Medicine" },
-        { trait: "Radiation Resistance", value: "Enhanced" },
-        { trait: "Settlement", value: "New Haven" }
+        { trait: "Innovation", value: "Medical Systems" },
+        { trait: "Build Rating", value: "Enhanced" },
+        { trait: "Project", value: "New Haven" }
       ],
       status: 'active',
       modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeifzvpyj5znhgjq22cbjyzav5zsvese3m3klbkc4lcdm3fdbbxiooa"
     },
     {
       id: 5,
-      type: 'survivor',
-      name: "Scout Unit E-67",
+      type: 'pioneer',
+      name: "Innovation Builder E-67",
       tokenId: 67,
       price: "24,000 RD",
       seller: "0x1357...2468",
@@ -205,16 +216,16 @@ const Index = () => {
         value: 45
       },
       attributes: [
-        { trait: "Specialty", value: "Recon" },
-        { trait: "Radiation Resistance", value: "Standard" },
-        { trait: "Settlement", value: "Outpost Alpha" }
+        { trait: "Innovation", value: "Reconnaissance Tech" },
+        { trait: "Build Rating", value: "Standard" },
+        { trait: "Project", value: "Outpost Alpha" }
       ],
       status: 'active'
     },
     {
       id: 6,
-      type: 'survivor',
-      name: "Engineer T-89",
+      type: 'pioneer',
+      name: "Project Founder T-89",
       tokenId: 89,
       price: "36,500 RD",
       seller: "0x6543...7890",
@@ -223,9 +234,9 @@ const Index = () => {
         value: 65
       },
       attributes: [
-        { trait: "Specialty", value: "Engineering" },
-        { trait: "Radiation Resistance", value: "High" },
-        { trait: "Settlement", value: "Reactor City" }
+        { trait: "Innovation", value: "Power Systems" },
+        { trait: "Build Rating", value: "High" },
+        { trait: "Project", value: "Reactor City" }
       ],
       status: 'active'
     }
@@ -298,14 +309,14 @@ const Index = () => {
           <div>
             <h4 className="text-lg font-mono text-apocalypse-red mb-2">Resistance Protocol</h4>
             <p className="text-white/80 mb-3 text-sm">
-              The <span className="text-apocalypse-red font-semibold">Resistance</span> connects survivors and bounty hunters to rebuild from the ashes of the old financial world.
+              The <span className="text-apocalypse-red font-semibold">Resistance</span> connects sentinels and pioneers to rebuild from the ashes of the old financial world.
             </p>
             <p className="text-white/80 mb-3 text-sm">
-              Whether you're a <span className="text-toxic-neon font-semibold">Hunter tracking criminal protocols</span> or a <span className="text-toxic-neon font-semibold">Survivor contributing rebuild skills</span>, our network facilitates wasteland justice and rebuilding efforts.
+              Whether you're a <span className="text-toxic-neon font-semibold">Sentinel tracking resources and territories</span> or a <span className="text-toxic-neon font-semibold">Pioneer building settlements and innovations</span>, our network facilitates wasteland justice and rebuilding efforts.
             </p>
             <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
               <span className="text-toxic-neon font-semibold block mb-1">» COMING SOON «</span>
-              Settler Jobs | Wasteland Expeditions | Settlement Building - Expanding the Resistance with more ways to survive and rebuild.
+              Settlement Control | Territory Expansion | Network Influence - Expanding the Resistance with more ways to survive and rebuild.
             </div>
           </div>
         </div>
@@ -315,21 +326,21 @@ const Index = () => {
         <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 rounded-full bg-toxic-neon/10">
-              <Target className="w-5 h-5 text-toxic-neon" />
+              <Eye className="w-5 h-5 text-toxic-neon" />
             </div>
-            <h4 className="text-lg font-mono text-toxic-neon">Hunt Bounties</h4>
+            <h4 className="text-lg font-mono text-toxic-neon">Become a Sentinel</h4>
           </div>
           <p className="text-white/70 text-sm mb-3">
-            Track down the criminals who crashed the old world. Submit capture evidence and earn rewards for bringing justice to the wasteland.
+            Direct network resources, monitor territories, and establish strategic outposts. Shape the wasteland's future through resource allocation.
           </p>
           <div className="flex justify-end">
             <ToxicButton 
               variant="outline" 
               size="sm" 
               className="text-toxic-neon border-toxic-neon/30"
-              onClick={() => navigate('/marketplace/bounty-hunters')}
+              onClick={() => navigate('/hunt')}
             >
-              Hunt <ChevronRight className="ml-1 h-4 w-4" />
+              Direct <ChevronRight className="ml-1 h-4 w-4" />
             </ToxicButton>
           </div>
         </div>
@@ -337,21 +348,21 @@ const Index = () => {
         <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 rounded-full bg-toxic-neon/10">
-              <Shield className="w-5 h-5 text-toxic-neon" />
+              <Hammer className="w-5 h-5 text-toxic-neon" />
             </div>
-            <h4 className="text-lg font-mono text-toxic-neon">Join Survivors</h4>
+            <h4 className="text-lg font-mono text-toxic-neon">Become a Pioneer</h4>
           </div>
           <p className="text-white/70 text-sm mb-3">
-            Contribute your skills to rebuilding civilization. Each survivor plays a vital role in our settlement network, from medics to engineers.
+            Build settlement projects, lead innovations, and develop technologies. Each pioneer shapes our community from outpost builders to tech innovators.
           </p>
           <div className="flex justify-end">
             <ToxicButton 
               variant="outline" 
               size="sm" 
               className="text-toxic-neon border-toxic-neon/30"
-              onClick={() => navigate('/marketplace/survivors')}
+              onClick={() => navigate('/marketplace/pioneers')}
             >
-              Settle <ChevronRight className="ml-1 h-4 w-4" />
+              Build <ChevronRight className="ml-1 h-4 w-4" />
             </ToxicButton>
           </div>
         </div>
@@ -412,73 +423,77 @@ const Index = () => {
           <div className="lg:col-span-2">
             <div className="mb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {/* Sentinel Card - Updated from Bounty Hunter */}
                 <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
-                  <h3 className="text-2xl font-mono text-toxic-neon mb-3">BOUNTY HUNTER</h3>
+                  <h3 className="text-2xl font-mono text-toxic-neon mb-3">SENTINEL</h3>
                   <p className="text-white/80 mb-4 leading-relaxed">
-                    Stalk the wasteland hunting the criminals who crashed the old world. Track digital signatures, capture mutated protocols, and earn rewards for bringing justice to the Resistance.
+                    Monitor territories, direct network resources, and track strategic objectives across the wasteland. Guide the resistance by connecting outposts and controlling the flow of critical supplies.
                   </p>
                   <div className="grid grid-cols-3 gap-2 mb-4">
                     <div className="text-center">
-                      <div className="text-sm text-white/60">Collection Size:</div>
-                      <div className="text-toxic-neon font-mono">142 CRIMINALS</div>
+                      <div className="text-sm text-white/60">Network Size:</div>
+                      <div className="text-toxic-neon font-mono">142 TERRITORIES</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-sm text-white/60">Avg. Bounty Value:</div>
-                      <div className="text-toxic-neon font-mono">22,500 RD</div>
+                      <div className="text-sm text-white/60">Resource Pool:</div>
+                      <div className="text-toxic-neon font-mono">325,000 RD</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-sm text-white/60">Active Hunters:</div>
+                      <div className="text-sm text-white/60">Active Sentinels:</div>
                       <div className="text-toxic-neon font-mono">68</div>
                     </div>
                   </div>
                   <ToxicButton 
                     variant="outline" 
                     className="w-full border-toxic-neon/40"
-                    onClick={() => navigate('/marketplace/bounty-hunters')}
+                    onClick={() => navigate('/hunt')}
                   >
-                    {isConnected ? "Browse Bounty Hunters" : "Select Bounty Hunter"}
+                    {isConnected ? "Enter Command Center" : "Become a Sentinel"}
                   </ToxicButton>
                 </ToxicCard>
                 
+                {/* Pioneer Card - Updated from Survivor */}
                 <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
-                  <h3 className="text-2xl font-mono text-toxic-neon mb-3">SURVIVOR</h3>
+                  <h3 className="text-2xl font-mono text-toxic-neon mb-3">PIONEER</h3>
                   <p className="text-white/80 mb-4 leading-relaxed">
-                    Join a network of settlements rebuilding civilization from the ashes. Contribute your skills to community projects, develop new technologies, and shape our collective future.
+                    Build settlements, develop innovations, and create the foundation for a new civilization. Pioneers lead projects from medical facilities to power networks, shaping our collective future.
                   </p>
                   <div className="grid grid-cols-3 gap-2 mb-4">
                     <div className="text-center">
-                      <div className="text-sm text-white/60">Collection Size:</div>
-                      <div className="text-toxic-neon font-mono">821 SURVIVORS</div>
+                      <div className="text-sm text-white/60">Active Projects:</div>
+                      <div className="text-toxic-neon font-mono">84 INITIATIVES</div>
                     </div>
                     <div className="text-center">
                       <div className="text-sm text-white/60">Settlement Outposts:</div>
                       <div className="text-toxic-neon font-mono">37</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-sm text-white/60">Active Projects:</div>
-                      <div className="text-toxic-neon font-mono">84</div>
+                      <div className="text-sm text-white/60">Innovation Rate:</div>
+                      <div className="text-toxic-neon font-mono">78%</div>
                     </div>
                   </div>
                   <ToxicButton 
                     variant="outline" 
                     className="w-full border-toxic-neon/40"
-                    onClick={() => navigate('/marketplace/survivors')}
+                    onClick={() => navigate('/marketplace/pioneers')}
                   >
-                    {isConnected ? "Browse Survivors" : "Select Survivor"}
+                    {isConnected ? "Access Build Center" : "Become a Pioneer"}
                   </ToxicButton>
                 </ToxicCard>
               </div>
               
+              {/* Updated Sentinel listings display */}
               <MarketplaceListingGrid 
-                listings={bountyHunterListings} 
-                title="WANTED: Top Bounty Targets" 
+                listings={sentinelListings} 
+                title="SENTINEL: Territory Network Leaders" 
                 onListingClick={handleListingClick}
                 className="mb-8"
               />
               
+              {/* Updated Pioneer listings display */}
               <MarketplaceListingGrid 
-                listings={survivorListings} 
-                title="RECRUTING: Needed Survivor Skills" 
+                listings={pioneerListings} 
+                title="PIONEER: Settlement Innovators" 
                 onListingClick={handleListingClick}
               />
             </div>
@@ -497,13 +512,13 @@ const Index = () => {
                 <div className="p-2 rounded-full bg-toxic-neon/10">
                   <Shield className="w-5 h-5 text-toxic-neon" />
                 </div>
-                <h3 className="text-lg font-mono text-toxic-neon">Survivor Status</h3>
+                <h3 className="text-lg font-mono text-toxic-neon">Resistance Status</h3>
               </div>
               
               {isConnected ? (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">Bounties Claimed</span>
+                    <span className="text-white/70">Network Influence</span>
                     <span className="text-toxic-neon font-mono">0</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
@@ -521,7 +536,7 @@ const Index = () => {
                 </div>
               ) : (
                 <div className="text-center py-6 bg-toxic-neon/5 rounded-lg">
-                  <p className="text-white/70 mb-4">Connect to view your wasteland status</p>
+                  <p className="text-white/70 mb-4">Connect to view your resistance status</p>
                   <ToxicButton 
                     variant="marketplace"
                     onClick={connect}
@@ -573,9 +588,9 @@ const Index = () => {
               <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="p-2 rounded-full bg-toxic-neon/10">
-                    <Target className="w-5 h-5 text-toxic-neon" />
+                    <Network className="w-5 h-5 text-toxic-neon" />
                   </div>
-                  <h3 className="text-lg font-mono text-toxic-neon">Wasteland Missions</h3>
+                  <h3 className="text-lg font-mono text-toxic-neon">Wasteland Operations</h3>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2">
@@ -583,20 +598,20 @@ const Index = () => {
                     variant="outline" 
                     size="sm"
                     className="border-toxic-neon/30"
-                    onClick={handleCreateListing}
+                    onClick={() => navigate('/hunt')}
                   >
-                    <PlusCircle className="h-4 w-4 mr-1" />
-                    Submit Mission
+                    <Eye className="h-4 w-4 mr-1" />
+                    Sentinel Center
                   </ToxicButton>
                   
                   <ToxicButton 
                     variant="outline" 
                     size="sm"
                     className="border-toxic-neon/30"
-                    onClick={handleBrowseListings}
+                    onClick={() => navigate('/marketplace/pioneers')}
                   >
-                    <Search className="h-4 w-4 mr-1" />
-                    Hunt Bounties
+                    <Hammer className="h-4 w-4 mr-1" />
+                    Pioneer Hub
                   </ToxicButton>
                   
                   <ToxicButton 
@@ -605,8 +620,8 @@ const Index = () => {
                     className="border-toxic-neon/30"
                     onClick={() => navigate('/marketplace/inventory')}
                   >
-                    <ShoppingBag className="h-4 w-4 mr-1" />
-                    My Captures
+                    <Globe className="h-4 w-4 mr-1" />
+                    My Territory
                   </ToxicButton>
                   
                   <ToxicButton 

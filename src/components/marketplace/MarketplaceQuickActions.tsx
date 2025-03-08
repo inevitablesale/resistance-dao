@@ -2,7 +2,7 @@
 import React from 'react';
 import { ToxicButton } from '@/components/ui/toxic-button';
 import { ToxicCard } from '@/components/ui/toxic-card';
-import { ShoppingBag, Target, Shield, ListFilter, Search, PlusCircle, UserPlus, Settings, Award, Radiation, Star, Coins } from 'lucide-react';
+import { ShoppingBag, Target, Shield, ListFilter, Search, PlusCircle, UserPlus, Settings, Award, Radiation, Star, Coins, Eye, Hammer, Network, Globe } from 'lucide-react';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { useNavigate } from 'react-router-dom';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
@@ -40,7 +40,7 @@ export function MarketplaceQuickActions({
         <div>
           <h3 className="text-xl font-mono text-toxic-neon mb-2">Wasteland Marketplace</h3>
           <p className="text-white/70 text-sm mb-4">
-            Trade rare assets, hire protection, and form alliances to survive the nuclear fallout
+            Trade rare assets, establish territories, and build settlements to rebuild from the nuclear fallout
           </p>
         </div>
         
@@ -77,17 +77,17 @@ export function MarketplaceQuickActions({
           
           <div className="flex flex-col items-center bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4 hover:bg-toxic-dark/40 hover:border-toxic-neon/30 transition-all group">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-toxic-dark border border-toxic-neon/50 mb-3 group-hover:border-toxic-neon group-hover:scale-110 transition-all">
-              <Target className="h-5 w-5 text-toxic-neon group-hover:animate-pulse" />
+              <Eye className="h-5 w-5 text-toxic-neon group-hover:animate-pulse" />
             </div>
-            <span className="text-toxic-neon text-sm font-medium mb-2">Bounty Hunters</span>
+            <span className="text-toxic-neon text-sm font-medium mb-2">Sentinels</span>
             <div className="mb-2 flex justify-center">
-              <Badge className="bg-purple-900/60 text-purple-300 text-xs">NEW TIERS</Badge>
+              <Badge className="bg-purple-900/60 text-purple-300 text-xs">NETWORK OPS</Badge>
             </div>
             <ToxicButton 
               variant="outline" 
               size="sm" 
               className="w-full"
-              onClick={() => handleAction(() => navigate('/marketplace?type=bounty-hunter'))}
+              onClick={() => handleAction(() => navigate('/hunt'))}
             >
               Explore
             </ToxicButton>
@@ -95,17 +95,17 @@ export function MarketplaceQuickActions({
           
           <div className="flex flex-col items-center bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4 hover:bg-toxic-dark/40 hover:border-toxic-neon/30 transition-all group">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-toxic-dark border border-toxic-neon/50 mb-3 group-hover:border-toxic-neon group-hover:scale-110 transition-all">
-              <Shield className="h-5 w-5 text-toxic-neon group-hover:animate-pulse" />
+              <Hammer className="h-5 w-5 text-toxic-neon group-hover:animate-pulse" />
             </div>
-            <span className="text-toxic-neon text-sm font-medium mb-2">Survivors</span>
+            <span className="text-toxic-neon text-sm font-medium mb-2">Pioneers</span>
             <div className="mb-2 flex justify-center">
-              <Badge className="bg-amber-900/60 text-amber-300 text-xs">STAKING</Badge>
+              <Badge className="bg-amber-900/60 text-amber-300 text-xs">BUILDERS</Badge>
             </div>
             <ToxicButton 
               variant="outline" 
               size="sm" 
               className="w-full"
-              onClick={() => handleAction(() => navigate('/marketplace?type=survivor'))}
+              onClick={() => handleAction(() => navigate('/marketplace/pioneers'))}
             >
               Explore
             </ToxicButton>
@@ -116,31 +116,31 @@ export function MarketplaceQuickActions({
         {isConnected && (
           <div className="bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4">
             <h4 className="text-toxic-neon font-mono text-sm mb-3 flex items-center">
-              <Radiation className="h-4 w-4 mr-2" /> NFT PRICING & DISTRIBUTION
+              <Radiation className="h-4 w-4 mr-2" /> WASTELAND ROLE DISTRIBUTION
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
               <div className="bg-black/40 p-3 rounded border border-purple-500/30 flex flex-col">
                 <div className="flex items-center text-purple-300 mb-1">
-                  <Award className="h-4 w-4 mr-1" /> Legacy Founders
+                  <Network className="h-4 w-4 mr-1" /> Sentinel Network
                 </div>
-                <span className="text-white/70">800 Airdropped</span>
-                <span className="text-toxic-neon mt-1">Status: Active</span>
+                <span className="text-white/70">142 Territory Directors</span>
+                <span className="text-toxic-neon mt-1">Status: Recruiting</span>
               </div>
               
               <div className="bg-black/40 p-3 rounded border border-green-500/30 flex flex-col">
                 <div className="flex items-center text-green-300 mb-1">
-                  <Star className="h-4 w-4 mr-1" /> Early Adopters
+                  <Hammer className="h-4 w-4 mr-1" /> Pioneer Collective
                 </div>
                 <span className="text-white/70">250 @ 50 RD</span>
-                <span className="text-toxic-neon mt-1">Status: Selling</span>
+                <span className="text-toxic-neon mt-1">Status: Building</span>
               </div>
               
               <div className="bg-black/40 p-3 rounded border border-amber-500/30 flex flex-col">
                 <div className="flex items-center text-amber-300 mb-1">
-                  <Coins className="h-4 w-4 mr-1" /> Staking Rewards
+                  <Coins className="h-4 w-4 mr-1" /> Resource Allocation
                 </div>
                 <span className="text-white/70">Earn RD over time</span>
-                <span className="text-toxic-neon mt-1">Hunters & Survivors</span>
+                <span className="text-toxic-neon mt-1">Both Roles Eligible</span>
               </div>
             </div>
           </div>
@@ -155,7 +155,7 @@ export function MarketplaceQuickActions({
               </div>
               <div>
                 <h4 className="text-sm font-mono text-toxic-neon">Connect Your Survival Pack</h4>
-                <p className="text-xs text-white/70 mt-1">Authenticate your identity to access the secure trading network</p>
+                <p className="text-xs text-white/70 mt-1">Authenticate your identity to access the secure network</p>
               </div>
             </div>
             <div className="mt-3 flex justify-end">

@@ -6,7 +6,8 @@ import {
   Target, Biohazard, Radiation, Shield, Users, 
   FlaskConical, Skull, Building2, Crosshair, HeartPulse, 
   BriefcaseBusiness, ChevronRight, Map, Flame, 
-  BarChart3, TrendingUp, Eye, Flag, Compass
+  BarChart3, TrendingUp, Eye, Flag, Compass, 
+  Network, Globe
 } from 'lucide-react';
 import { DrippingSlime, ToxicPuddle } from '@/components/ui/dripping-slime';
 import { ToxicCard, ToxicCardHeader, ToxicCardTitle, ToxicCardContent } from '@/components/ui/toxic-card';
@@ -85,13 +86,13 @@ const Hunt = () => {
     return `${amount} RD`;
   };
 
-  // Command center metrics
+  // Command center metrics - updated to reflect Sentinel terminology
   const commandMetrics = [
     { 
       label: "Network Strength", 
       value: "68%", 
       icon: <TrendingUp className="h-5 w-5 text-toxic-neon" />,
-      description: "Combined influence of all settlements",
+      description: "Combined influence of all territories",
       progress: 68
     },
     { 
@@ -117,8 +118,8 @@ const Hunt = () => {
     }
   ];
 
-  // Bounty hunter ranks for network tab
-  const hunterRanks = [
+  // Updated to Sentinel ranks from hunterRanks
+  const sentinelRanks = [
     {
       rank: "Scout",
       abilities: ["Territory Mapping", "Resource Location"],
@@ -128,24 +129,24 @@ const Hunt = () => {
       icon: <Eye className="h-10 w-10 text-toxic-neon/30" />
     },
     {
-      rank: "Stalker",
-      abilities: ["Advanced Recon", "Threat Assessment"],
+      rank: "Surveyor",
+      abilities: ["Advanced Recon", "Resource Planning"],
       riskLevel: "Medium",
       rewardPotential: "High",
       requiredExperience: "5 missions",
       icon: <Compass className="h-10 w-10 text-toxic-neon/40" />
     },
     {
-      rank: "Apex",
-      abilities: ["Territory Control", "Resource Defense"],
+      rank: "Watcher",
+      abilities: ["Territory Control", "Resource Direction"],
       riskLevel: "High",
       rewardPotential: "Very High",
       requiredExperience: "15 missions",
       icon: <Shield className="h-10 w-10 text-toxic-neon/50" />
     },
     {
-      rank: "Legend",
-      abilities: ["Settlement Foundation", "Network Leadership"],
+      rank: "Overseer",
+      abilities: ["Network Command", "Strategic Direction"],
       riskLevel: "Extreme",
       rewardPotential: "Maximum",
       requiredExperience: "30 missions",
@@ -174,8 +175,8 @@ const Hunt = () => {
       icon: <Map className="h-10 w-10 text-toxic-neon/40" />
     },
     {
-      name: "Raider Suppression",
-      description: "Eliminate hostile threats to settlement security",
+      name: "Network Defense",
+      description: "Protect critical network nodes from hostile forces",
       duration: "12 hours",
       risk: "Extreme",
       reward: "Enhanced Security",
@@ -205,13 +206,13 @@ const Hunt = () => {
           >
             <div className="mb-4 relative">
               <div className="absolute inset-0 bg-gradient-to-r from-toxic-neon/20 to-toxic-neon/20 blur-xl"></div>
-              <Target className="w-16 h-16 mx-auto text-toxic-neon relative" />
+              <Network className="w-16 h-16 mx-auto text-toxic-neon relative" />
             </div>
             <h1 className="text-4xl md:text-6xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-toxic-neon via-toxic-neon/80 to-toxic-neon">
-              Bounty Hunter Command
+              Sentinel Command Center
             </h1>
             <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-6">
-              Deploy scouts, control territory, and establish settlement networks in the wasteland
+              Monitor territories, direct resources, and establish strategic networks throughout the wasteland
             </p>
             
             {/* Command Center Metrics */}
@@ -247,15 +248,15 @@ const Hunt = () => {
                 className="group"
               >
                 <Building2 className="h-4 w-4 mr-1 group-hover:animate-pulse" />
-                Settlement Opportunities
+                Settlement Network
               </ToxicButton>
               <ToxicButton 
                 variant={activeTab === 'network' ? 'glowing' : 'outline'} 
                 onClick={() => setActiveTab('network')}
                 className="group"
               >
-                <Users className="h-4 w-4 mr-1 group-hover:animate-pulse" />
-                Network Expansion
+                <Network className="h-4 w-4 mr-1 group-hover:animate-pulse" />
+                Sentinel Ranks
               </ToxicButton>
               <ToxicButton 
                 variant={activeTab === 'operations' ? 'glowing' : 'outline'} 
@@ -292,7 +293,7 @@ const Hunt = () => {
               settlements={mockSettlements}
               isLoading={false}
               formatUSDAmount={formatUSDAmount}
-              title="Active Settlement Outposts"
+              title="Active Settlement Network"
               className="mb-12"
             />
             
@@ -302,14 +303,14 @@ const Hunt = () => {
                 onClick={() => navigate('/thesis')}
                 className="group"
               >
-                <Building2 className="h-4 w-4 mr-2 group-hover:animate-pulse" />
+                <Globe className="h-4 w-4 mr-2 group-hover:animate-pulse" />
                 Establish New Settlement
               </ToxicButton>
             </div>
           </motion.section>
         )}
         
-        {/* Network Tab - Bounty Hunter Ranks */}
+        {/* Network Tab - Sentinel Ranks (renamed from Bounty Hunter Ranks) */}
         {activeTab === 'network' && (
           <motion.section
             initial={{ opacity: 0 }}
@@ -319,7 +320,7 @@ const Hunt = () => {
           >
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
-                <Users className="h-5 w-5 mr-2" /> Bounty Hunter Network
+                <Network className="h-5 w-5 mr-2" /> Sentinel Network
               </h2>
             </div>
             
@@ -327,15 +328,15 @@ const Hunt = () => {
               <DrippingSlime position="top" dripsCount={4} toxicGreen={true} />
               
               <div className="text-center mb-8">
-                <Users className="h-12 w-12 mx-auto mb-4 text-toxic-neon/40" />
-                <h3 className="text-xl text-toxic-neon mb-2">Hunter Rank Progression</h3>
+                <Network className="h-12 w-12 mx-auto mb-4 text-toxic-neon/40" />
+                <h3 className="text-xl text-toxic-neon mb-2">Sentinel Rank Progression</h3>
                 <p className="text-white/70 mb-6 max-w-2xl mx-auto">
-                  Join the wasteland's elite scouts and hunters. Each rank unlocks new abilities and mission opportunities.
+                  Direct resources and monitor territories. Each rank unlocks new network abilities and resource control.
                 </p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {hunterRanks.map((rank, index) => (
+                {sentinelRanks.map((rank, index) => (
                   <motion.div 
                     key={rank.rank}
                     initial={{ opacity: 0, y: 20 }}
@@ -354,7 +355,7 @@ const Hunt = () => {
                     
                     <div className="text-center">
                       {rank.icon}
-                      <h4 className="text-toxic-neon mb-2 mt-2">{rank.rank} Hunter</h4>
+                      <h4 className="text-toxic-neon mb-2 mt-2">{rank.rank} Sentinel</h4>
                     </div>
                     
                     <div className="space-y-2 mt-3">
@@ -387,8 +388,8 @@ const Hunt = () => {
               
               <div className="flex justify-center mt-10">
                 <ToxicButton variant="glowing" className="group">
-                  <Target className="h-4 w-4 mr-2" />
-                  Join Hunter Network
+                  <Network className="h-4 w-4 mr-2" />
+                  Join Sentinel Network
                 </ToxicButton>
               </div>
             </div>
