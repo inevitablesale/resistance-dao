@@ -28,7 +28,10 @@ export function TerminalTypewriter({
   const [isComplete, setIsComplete] = useState(false);
   const terminalRef = useRef<HTMLDivElement>(null);
   
+  // Reset and restart typing when text changes
   useEffect(() => {
+    setDisplayText("");
+    setIsComplete(false);
     let i = 0;
     const interval = setInterval(() => {
       if (i <= textToType.length) {
@@ -50,6 +53,13 @@ export function TerminalTypewriter({
     
     return () => clearInterval(cursorInterval);
   }, []);
+
+  // Scroll to bottom when content changes
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [displayText, isConnected, isComplete]);
 
   const getStoryContent = () => (
     <>

@@ -13,6 +13,7 @@ export const useWalletConnection = () => {
   const { primaryWallet, setShowAuthFlow, setShowOnRamp, user } = useDynamicContext();
   const { getProvider, validateNetwork, getWalletType } = useWalletProvider();
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isConnectionInitialized, setIsConnectionInitialized] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -89,6 +90,10 @@ export const useWalletConnection = () => {
   };
 
   useEffect(() => {
+    if (!isConnectionInitialized && primaryWallet?.address) {
+      setIsConnectionInitialized(true);
+    }
+    
     if (primaryWallet?.address) {
       if (user) {
         setShowAuthFlow?.(false);
@@ -126,12 +131,13 @@ export const useWalletConnection = () => {
         nameServiceSubdomain: user?.['name-service-subdomain-handle']
       });
     }
-  }, [primaryWallet, setShowAuthFlow, user, navigate, isSdkInitialized]);
+  }, [primaryWallet, setShowAuthFlow, user, navigate, isSdkInitialized, isConnectionInitialized]);
 
   return {
     isConnected: !!primaryWallet?.address && !!user && isSdkInitialized,
     isConnecting,
     isPendingInitialization: !!primaryWallet?.address && !user,
+    isConnectionInitialized,
     connect,
     disconnect,
     address: primaryWallet?.address,
