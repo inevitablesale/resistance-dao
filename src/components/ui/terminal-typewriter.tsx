@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
-import { Radiation, ShieldAlert, Shield, Wifi, Terminal, Lock } from "lucide-react";
+import { Lock, Terminal } from "lucide-react";
 import { ToxicButton } from "./toxic-button";
 
 interface TerminalTypewriterProps {
@@ -10,18 +10,14 @@ interface TerminalTypewriterProps {
   className?: string;
   isConnected?: boolean;
   onConnect?: () => void;
-  marketplaceMode?: boolean;
-  storyMode?: boolean;
 }
 
 export function TerminalTypewriter({
-  textToType = "PASSWORD: LEDGERFUND or CONNECT WALLET",
+  textToType = "Enter access code",
   typeDelay = 70,
   className,
   isConnected = false,
-  onConnect,
-  marketplaceMode = false,
-  storyMode = false
+  onConnect
 }: TerminalTypewriterProps) {
   const [displayText, setDisplayText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
@@ -40,11 +36,6 @@ export function TerminalTypewriter({
     "Authentication required:",
     "resistance@secure:~$"
   ];
-  
-  // Console log the connection state for debugging
-  useEffect(() => {
-    console.log("[TerminalTypewriter] Connection state:", { isConnected });
-  }, [isConnected]);
   
   // Handle initialization sequence typing
   useEffect(() => {
@@ -101,50 +92,8 @@ export function TerminalTypewriter({
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [displayText, isConnected, isComplete, currentLine]);
-
-  const getStoryContent = () => (
-    <>
-      <div className="terminal-line">
-        <span className="text-toxic-neon/80">[RESISTANCE_OS v3.2.1]</span>
-        <span className="text-white/70"> TRANSMISSION INITIALIZED...</span>
-      </div>
-      <div className="terminal-line">
-        <span className="text-toxic-neon/80">[WORLD_STATUS]</span>
-        <span className="text-white/70"> The old financial systems collapsed. Power centralized. Innovation stifled.</span>
-      </div>
-      <div className="terminal-line">
-        <span className="text-toxic-neon/80">[RESISTANCE_MISSION]</span>
-        <span className="text-white/70"> Building a new paradigm for project funding. Community-driven. Decentralized.</span>
-      </div>
-      <div className="terminal-line">
-        <span className="text-toxic-neon/80">[CURRENT_OPERATIONS]</span>
-        <span className="text-white/70"> Soft capital commitments. Project validation. Resource allocation.</span>
-      </div>
-      <div className="terminal-line h-6">
-        <span className="text-apocalypse-red/90">[COMING_SOON]</span>
-        <span className="text-white/70"> JOB LISTINGS | PARTNER MATCHING | ROLE SEEKING</span>
-      </div>
-    </>
-  );
   
-  const getMarketplaceContent = () => (
-    <>
-      <div className="terminal-line">
-        <span className="text-toxic-neon/80">[RESISTANCE_OS v3.2.1]</span>
-        <span className="text-white/70"> SCANNING FOR PROJECT OPPORTUNITIES...</span>
-      </div>
-      <div className="terminal-line">
-        <span className="text-toxic-neon/80">[CAPITAL_PROTOCOL]</span>
-        <span className="text-white/70"> ESTABLISHING SECURE COMMITMENT CHANNELS...</span>
-      </div>
-      <div className="terminal-line h-6">
-        <span className="text-apocalypse-red/90">[COMING_SOON]</span>
-        <span className="text-white/70"> JOB LISTINGS | PARTNER MATCHING | ROLE SEEKING</span>
-      </div>
-    </>
-  );
-  
-  const getTerminalInitContent = () => {
+  const getTerminalContent = () => {
     if (!initializationComplete) {
       return (
         <div className="terminal-line flex items-start">
@@ -197,9 +146,8 @@ export function TerminalTypewriter({
     <div className={cn("terminal-container relative", className)}>
       <div 
         ref={terminalRef} 
-        className="terminal-output bg-black/80 text-toxic-neon p-4 font-mono border border-toxic-neon/30 rounded-md relative overflow-hidden"
+        className="terminal-output bg-black text-toxic-neon p-4 font-mono border border-toxic-neon/30 rounded-md relative overflow-hidden"
       >
-        <div className="scanline absolute inset-0 pointer-events-none"></div>
         <div className="terminal-header flex items-center justify-between mb-4">
           <div className="flex items-center">
             <Terminal className="w-4 h-4 mr-2 text-toxic-neon" />
@@ -208,32 +156,20 @@ export function TerminalTypewriter({
           <div className="flex gap-1">
             <div className="w-2 h-2 rounded-full bg-apocalypse-red"></div>
             <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-            <div className="w-2 h-2 rounded-full bg-toxic-neon"></div>
           </div>
         </div>
         
-        {marketplaceMode ? getMarketplaceContent() : 
-         storyMode ? getStoryContent() : 
-         getTerminalInitContent()}
+        {getTerminalContent()}
         
         {isComplete && !isConnected && (
           <div className="terminal-line mt-4">
             <ToxicButton
               onClick={onConnect}
-              variant="marketplace"
-              className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+              variant="outline"
+              className="bg-transparent border-toxic-neon/50 hover:bg-toxic-neon/10"
             >
-              {marketplaceMode || storyMode ? (
-                <>
-                  <ShieldAlert className="w-4 h-4 mr-2 text-toxic-neon" />
-                  <span className="flash-beacon">CONNECT WALLET</span>
-                </>
-              ) : (
-                <>
-                  <Lock className="w-4 h-4 mr-2 text-toxic-neon" />
-                  <span className="flash-beacon">SUBMIT ACCESS CODE</span>
-                </>
-              )}
+              <Lock className="w-4 h-4 mr-2 text-toxic-neon" />
+              <span>SUBMIT ACCESS CODE</span>
             </ToxicButton>
             <div className="mt-2">
               <a 
@@ -249,23 +185,9 @@ export function TerminalTypewriter({
         )}
         
         {isConnected && (
-          <div className="terminal-line mt-4">
-            <ToxicButton
-              variant="outline"
-              className="border-toxic-neon/30 bg-toxic-neon/10 hover:bg-toxic-neon/20"
-            >
-              <Wifi className="w-4 h-4 mr-2 text-toxic-neon" />
-              <span className="text-toxic-neon">
-                {marketplaceMode ? "ACCESS FUNDING TERMINAL" : "ACCESS COMMAND TERMINAL"}
-              </span>
-            </ToxicButton>
-            <div className="mt-2 text-toxic-neon flex items-center gap-2">
-              <Shield className="w-4 h-4 text-toxic-neon" />
-              <span className="text-white/70">
-                {marketplaceMode ? 
-                  "CAPITAL COMMITMENT PROTOCOLS ACTIVE" : 
-                  "SURVIVAL BEACON ACTIVE - WELCOME TO THE RESISTANCE"}
-              </span>
+          <div className="terminal-line mt-4 text-toxic-neon">
+            <div className="animate-pulse text-toxic-neon">
+              Access granted. Welcome to the Resistance.
             </div>
           </div>
         )}

@@ -398,37 +398,12 @@ const Index = () => {
         transition={{ delay: 0.5, duration: 0.8 }}
         className="max-w-3xl mx-auto"
       >
-        <div className="bg-black/50 border border-toxic-neon/30 rounded-md p-3 mb-10">
-          <div className="flex items-center mb-1">
-            <span className="text-toxic-neon text-sm font-mono">_&gt; RESISTANCE_SECURE_SHELL</span>
-            <div className="ml-auto flex gap-1">
-              <div className="w-2 h-2 rounded-full bg-apocalypse-red"></div>
-              <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-              <div className="w-2 h-2 rounded-full bg-toxic-neon"></div>
-            </div>
-          </div>
-          <div className="p-3 bg-black/80 font-mono text-sm">
-            <div className="terminal-line">
-              <span className="text-toxic-neon/80">[RESISTANCE_OS v3.2.1]</span>
-              <span className="text-white/70"> TRANSMISSION INITIALIZED...</span>
-            </div>
-            <div className="terminal-line">
-              <span className="text-toxic-neon/80">[WORLD_STATUS]</span>
-              <span className="text-white/70"> The old financial systems collapsed. Power centralized. Innovation stifled.</span>
-            </div>
-            <div className="terminal-line">
-              <span className="text-toxic-neon/80">[RESISTANCE_MISSION]</span>
-              <span className="text-white/70"> Building a new paradigm for project funding. Community-driven. Decentralized.</span>
-            </div>
-            <div className="terminal-line">
-              <span className="text-toxic-neon/80">[CURRENT_OPERATIONS]</span>
-              <span className="text-white/70"> Soft capital commitments. Project validation. Resource allocation.</span>
-            </div>
-            <div className="terminal-line">
-              <span className="text-apocalypse-red/90">[COMING_SOON]</span>
-              <span className="text-white/70"> JOB LISTINGS | PARTNER MATCHING | ROLE SEEKING</span>
-            </div>
-          </div>
+        <div className="mb-8">
+          <TerminalTypewriter 
+            textToType="Enter access code"
+            isConnected={isConnected}
+            onConnect={handleConnectWallet}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -467,17 +442,6 @@ const Index = () => {
               Now we're building the future. Supporting innovation through soft capital commitments. No gatekeepers. Direct access.
             </p>
           </ToxicCard>
-        </div>
-        
-        <div className="text-center mt-10">
-          <ToxicButton 
-            variant="marketplace"
-            onClick={advanceStory}
-            className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
-          >
-            <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
-            <span className="flash-beacon">JOIN THE RESISTANCE</span>
-          </ToxicButton>
         </div>
       </motion.div>
     </div>
