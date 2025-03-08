@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModelPreview } from "@/components/marketplace/ModelPreview";
+import { CharacterRevealSlider } from "@/components/marketplace/CharacterRevealSlider";
 import { 
   Card, 
   CardContent, 
@@ -237,6 +238,7 @@ export default function MarketplaceItemDetails() {
   const [loading, setLoading] = useState(true);
   const [purchaseStep, setPurchaseStep] = useState(0);
   const [offerAmount, setOfferAmount] = useState('');
+  const [revealValue, setRevealValue] = useState(20);
   
   useEffect(() => {
     setLoading(true);
@@ -346,6 +348,7 @@ export default function MarketplaceItemDetails() {
                         animateRadiation={true}
                         useRadiationCloud={true}
                         radiationCloudUrl="bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
+                        revealValue={revealValue}
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full bg-gradient-to-b from-toxic-neon/20 to-black/60">
@@ -363,6 +366,13 @@ export default function MarketplaceItemDetails() {
                     </div>
                   </div>
                 </ToxicCardContent>
+                <ToxicCardFooter className="p-3">
+                  <CharacterRevealSlider
+                    value={revealValue}
+                    onChange={setRevealValue}
+                    className="w-full"
+                  />
+                </ToxicCardFooter>
               </ToxicCard>
               
               <ToxicCard className="bg-black/70 border-toxic-neon/30">
