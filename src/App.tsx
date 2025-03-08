@@ -17,6 +17,7 @@ import Settings from "./pages/Settings";
 import BuyMembershipNFT from "./pages/BuyMembershipNFT";
 import ReferralRedirect from "./pages/ReferralRedirect";
 import ToxicTheme from "./pages/ToxicTheme";
+import MarketplaceItemDetails from "./pages/MarketplaceItemDetails";
 import { Toaster } from "./components/ui/toaster";
 
 const zeroDevConfig = {
@@ -156,6 +157,7 @@ function Layout() {
         <Route path="/buy-membership-nft" element={<BuyMembershipNFT />} />
         <Route path="/r/:referrerAddress" element={<ReferralRedirect />} />
         <Route path="/toxic-theme" element={<ToxicTheme />} />
+        <Route path="/marketplace/:id" element={<MarketplaceItemDetails />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

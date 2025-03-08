@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ToxicCard, ToxicCardContent } from "@/components/ui/toxic-card";
 import { ToxicBadge } from "@/components/ui/toxic-badge";
@@ -7,6 +6,7 @@ import { DrippingSlime } from "@/components/ui/dripping-slime";
 import { ModelPreview } from "@/components/marketplace/ModelPreview";
 import { Skull, Biohazard, ChevronRight, Filter, SearchCode, Users, Target, Shield, Radiation, ShieldX, Image, Box } from "lucide-react";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useNavigate } from "react-router-dom";
 
 export type MarketplaceListingType = 'survivor' | 'bounty-hunter' | 'equipment' | 'settlement';
 
@@ -48,6 +48,7 @@ export function MarketplaceListingGrid({
 }: MarketplaceListingGridProps) {
   const { setShowAuthFlow, isConnected } = useWalletConnection();
   const [modelViewEnabled, setModelViewEnabled] = useState(true);
+  const navigate = useNavigate();
 
   const getListingTypeIcon = (type: MarketplaceListingType) => {
     switch(type) {
@@ -72,6 +73,14 @@ export function MarketplaceListingGrid({
 
   const toggleModelView = () => {
     setModelViewEnabled(!modelViewEnabled);
+  };
+
+  const handleItemClick = (listing: MarketplaceListing) => {
+    if (onListingClick) {
+      onListingClick(listing);
+    } else {
+      navigate(`/marketplace/${listing.id}`);
+    }
   };
 
   return (
@@ -125,7 +134,7 @@ export function MarketplaceListingGrid({
             <ToxicCard 
               key={listing.id} 
               className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all cursor-pointer"
-              onClick={() => onListingClick?.(listing)}
+              onClick={() => handleItemClick(listing)}
             >
               <ToxicCardContent className="p-0">
                 <div className="relative h-48 bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-t-lg overflow-hidden">
@@ -205,7 +214,11 @@ export function MarketplaceListingGrid({
                     variant="marketplace"
                     onClick={(e) => {
                       e.stopPropagation();
-                      isConnected ? onListingClick?.(listing) : setShowAuthFlow(true);
+                      if (isConnected) {
+                        handleItemClick(listing);
+                      } else {
+                        setShowAuthFlow(true);
+                      }
                     }}
                   >
                     {isConnected ? (
