@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { Lock, ExternalLink, Terminal } from "lucide-react";
-import { ToxicButton } from "./toxic-button";
 import { Input } from "./input";
 
 interface TerminalTypewriterProps {
@@ -89,9 +88,16 @@ export function TerminalTypewriter({
   const handleAccessCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAccessCode(e.target.value);
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSubmit();
+    }
+  };
   
   return (
-    <div className={cn("terminal-outer-container", className)}>
+    <div className={cn("terminal-outer-container relative", className)}>
+      <div className="scanline"></div>
       <div className="terminal-middle-container">
         <div 
           ref={terminalRef} 
@@ -99,18 +105,20 @@ export function TerminalTypewriter({
         >
           <div className="terminal-header">
             <div className="flex items-center">
-              <span className="text-toxic-neon text-sm">_&gt; RESISTANCE_SECURE_SHELL</span>
+              <Terminal className="w-4 h-4 mr-2 text-toxic-neon" />
+              <span className="text-toxic-neon text-sm font-mono">RESISTANCE_SECURE_SHELL</span>
             </div>
             <div className="flex gap-2">
               <div className="w-3 h-3 rounded-full bg-apocalypse-red"></div>
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-toxic-neon/70"></div>
             </div>
           </div>
           
           <div className="terminal-content">
             {!initializationComplete ? (
               <div className="terminal-line">
-                <span className="text-toxic-neon">
+                <span className="text-toxic-neon font-mono">
                   {currentLine === 0 && <span className="text-toxic-neon">_&gt; </span>}
                   {displayText}
                   {cursorVisible && <span className="cursor">_</span>}
@@ -119,33 +127,33 @@ export function TerminalTypewriter({
             ) : (
               <>
                 <div className="terminal-line">
-                  <span className="text-toxic-neon">_&gt; RESISTANCE_SECURE_SHELL</span>
+                  <span className="text-toxic-neon font-mono">_&gt; RESISTANCE_SECURE_SHELL</span>
                 </div>
                 <div className="terminal-line">
-                  <span className="text-toxic-neon">Initializing secure terminal...</span>
+                  <span className="text-toxic-neon font-mono">Initializing secure terminal...</span>
                 </div>
                 <div className="terminal-line">
-                  <span className="text-toxic-neon">Establishing encrypted connection...</span>
+                  <span className="text-toxic-neon font-mono">Establishing encrypted connection...</span>
                 </div>
                 <div className="terminal-line">
-                  <span className="text-toxic-neon">[WARNING]: Connection masking enabled</span>
+                  <span className="text-toxic-neon font-mono">[WARNING]: Connection masking enabled</span>
                 </div>
                 <div className="terminal-line">
-                  <span className="text-toxic-neon">Routing through decentralized nodes...</span>
+                  <span className="text-toxic-neon font-mono">Routing through decentralized nodes...</span>
                 </div>
                 <div className="terminal-line">
-                  <span className="text-toxic-neon">RESISTANCE NETWORK TERMINAL v3.27</span>
+                  <span className="text-toxic-neon font-mono">RESISTANCE NETWORK TERMINAL v3.27</span>
                 </div>
                 <div className="terminal-line">
-                  <span className="text-toxic-neon">Authentication required:</span>
+                  <span className="text-toxic-neon font-mono">Authentication required:</span>
                 </div>
                 <div className="terminal-line">
-                  <span className="text-toxic-neon">resistance@secure:~$</span>
+                  <span className="text-toxic-neon font-mono">resistance@secure:~$</span>
                 </div>
                 
                 {isConnected ? (
                   <div className="terminal-line mt-4">
-                    <div className="animate-pulse text-toxic-neon">
+                    <div className="animate-pulse text-toxic-neon font-mono">
                       Access granted. Welcome to the Resistance.
                     </div>
                   </div>
@@ -161,6 +169,7 @@ export function TerminalTypewriter({
                             className="access-code-input pl-10"
                             value={accessCode}
                             onChange={handleAccessCodeChange}
+                            onKeyDown={handleKeyDown}
                           />
                           <button 
                             onClick={handleSubmit}
@@ -173,7 +182,7 @@ export function TerminalTypewriter({
                     </div>
                     
                     <div className="terminal-hint mt-4">
-                      <span className="text-toxic-neon/70 text-sm">// Access code is "resistance"</span>
+                      <span className="text-toxic-neon/70 text-sm font-mono">// Access code is "resistance"</span>
                     </div>
                     
                     <div className="terminal-footer mt-4">
