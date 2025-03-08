@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
-import { Radiation, ShieldAlert, Shield, Wifi } from "lucide-react";
+import { Radiation, ShieldAlert, Shield, Wifi, Terminal, Lock } from "lucide-react";
 import { ToxicButton } from "./toxic-button";
 
 interface TerminalTypewriterProps {
@@ -26,30 +26,66 @@ export function TerminalTypewriter({
   const [displayText, setDisplayText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
   const [isComplete, setIsComplete] = useState(false);
+  const [initializationComplete, setInitializationComplete] = useState(false);
+  const [currentLine, setCurrentLine] = useState(0);
   const terminalRef = useRef<HTMLDivElement>(null);
+  
+  const initLines = [
+    "RESISTANCE_SECURE_SHELL",
+    "Initializing secure terminal...",
+    "Establishing encrypted connection...",
+    "[WARNING]: Connection masking enabled",
+    "Routing through decentralized nodes...",
+    "RESISTANCE NETWORK TERMINAL v3.27",
+    "Authentication required:",
+    "resistance@secure:~$"
+  ];
   
   // Console log the connection state for debugging
   useEffect(() => {
     console.log("[TerminalTypewriter] Connection state:", { isConnected });
   }, [isConnected]);
   
-  // Reset and restart typing when text changes
+  // Handle initialization sequence typing
   useEffect(() => {
-    setDisplayText("");
-    setIsComplete(false);
-    let i = 0;
-    const interval = setInterval(() => {
-      if (i <= textToType.length) {
-        setDisplayText(textToType.substring(0, i));
-        i++;
-      } else {
-        clearInterval(interval);
-        setIsComplete(true);
-      }
-    }, typeDelay);
-    
-    return () => clearInterval(interval);
-  }, [textToType, typeDelay]);
+    if (currentLine < initLines.length) {
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i <= initLines[currentLine].length) {
+          setDisplayText(prev => initLines[currentLine].substring(0, i));
+          i++;
+        } else {
+          clearInterval(interval);
+          setTimeout(() => {
+            setCurrentLine(prev => prev + 1);
+          }, 300); // Wait before moving to next line
+        }
+      }, typeDelay);
+      
+      return () => clearInterval(interval);
+    } else if (currentLine === initLines.length) {
+      setInitializationComplete(true);
+      setCurrentLine(prev => prev + 1);
+    }
+  }, [currentLine, typeDelay]);
+  
+  // Handle main text typing after initialization
+  useEffect(() => {
+    if (initializationComplete && !isComplete) {
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i <= textToType.length) {
+          setDisplayText(textToType.substring(0, i));
+          i++;
+        } else {
+          clearInterval(interval);
+          setIsComplete(true);
+        }
+      }, typeDelay);
+      
+      return () => clearInterval(interval);
+    }
+  }, [textToType, typeDelay, initializationComplete]);
   
   useEffect(() => {
     const cursorInterval = setInterval(() => {
@@ -64,7 +100,7 @@ export function TerminalTypewriter({
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
-  }, [displayText, isConnected, isComplete]);
+  }, [displayText, isConnected, isComplete, currentLine]);
 
   const getStoryContent = () => (
     <>
@@ -108,22 +144,54 @@ export function TerminalTypewriter({
     </>
   );
   
-  const getStandardContent = () => (
-    <>
-      <div className="terminal-line">
-        <span className="text-toxic-neon/80">[RESISTANCE_OS v3.2.1]</span>
-        <span className="text-white/70"> LOADING INTERFACE...</span>
-      </div>
-      <div className="terminal-line">
-        <span className="text-toxic-neon/80">[SURVIVAL_PROTOCOL]</span>
-        <span className="text-white/70"> ESTABLISHING SECURE TRANSMISSION...</span>
-      </div>
-      <div className="terminal-line h-6">
-        <span className="text-apocalypse-red/90">[COMING_SOON]</span>
-        <span className="text-white/70"> JOB LISTINGS | PARTNER MATCHING | ROLE SEEKING</span>
-      </div>
-    </>
-  );
+  const getTerminalInitContent = () => {
+    if (!initializationComplete) {
+      return (
+        <div className="terminal-line flex items-start">
+          <span className="block text-toxic-neon">
+            {currentLine === 0 && <span className="text-toxic-neon">_> </span>}
+            {displayText}
+            {cursorVisible && <span className="cursor">_</span>}
+          </span>
+        </div>
+      );
+    }
+    
+    return (
+      <>
+        <div className="terminal-line">
+          <span className="text-toxic-neon">_> RESISTANCE_SECURE_SHELL</span>
+        </div>
+        <div className="terminal-line">
+          <span className="text-toxic-neon">Initializing secure terminal...</span>
+        </div>
+        <div className="terminal-line">
+          <span className="text-toxic-neon">Establishing encrypted connection...</span>
+        </div>
+        <div className="terminal-line">
+          <span className="text-toxic-neon">[WARNING]: Connection masking enabled</span>
+        </div>
+        <div className="terminal-line">
+          <span className="text-toxic-neon">Routing through decentralized nodes...</span>
+        </div>
+        <div className="terminal-line">
+          <span className="text-toxic-neon">RESISTANCE NETWORK TERMINAL v3.27</span>
+        </div>
+        <div className="terminal-line">
+          <span className="text-toxic-neon">Authentication required:</span>
+        </div>
+        <div className="terminal-line flex items-center h-6 min-h-6">
+          <span className="block text-toxic-neon">
+            resistance@secure:~$ {displayText}
+            {cursorVisible && <span className="cursor">_</span>}
+          </span>
+        </div>
+        <div className="terminal-line mt-2 text-toxic-neon/70 text-sm">
+          <span>// Access code is "resistance"</span>
+        </div>
+      </>
+    );
+  };
   
   return (
     <div className={cn("terminal-container relative", className)}>
@@ -132,17 +200,21 @@ export function TerminalTypewriter({
         className="terminal-output bg-black/80 text-toxic-neon p-4 font-mono border border-toxic-neon/30 rounded-md relative overflow-hidden"
       >
         <div className="scanline absolute inset-0 pointer-events-none"></div>
-        
-        {storyMode ? getStoryContent() : 
-         marketplaceMode ? getMarketplaceContent() : 
-         getStandardContent()}
-        
-        <div className="terminal-line flex items-center h-6 min-h-6">
-          <span className="block">
-            {displayText}
-            {cursorVisible && <span className="cursor">_</span>}
-          </span>
+        <div className="terminal-header flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <Terminal className="w-4 h-4 mr-2 text-toxic-neon" />
+            <span className="text-toxic-neon text-xs">RESISTANCE_SECURE_SHELL</span>
+          </div>
+          <div className="flex gap-1">
+            <div className="w-2 h-2 rounded-full bg-apocalypse-red"></div>
+            <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+            <div className="w-2 h-2 rounded-full bg-toxic-neon"></div>
+          </div>
         </div>
+        
+        {marketplaceMode ? getMarketplaceContent() : 
+         storyMode ? getStoryContent() : 
+         getTerminalInitContent()}
         
         {isComplete && !isConnected && (
           <div className="terminal-line mt-4">
@@ -158,11 +230,21 @@ export function TerminalTypewriter({
                 </>
               ) : (
                 <>
-                  <Radiation className="w-4 h-4 mr-2 text-toxic-neon" />
-                  <span className="flash-beacon">CONNECT WALLET</span>
+                  <Lock className="w-4 h-4 mr-2 text-toxic-neon" />
+                  <span className="flash-beacon">SUBMIT ACCESS CODE</span>
                 </>
               )}
             </ToxicButton>
+            <div className="mt-2">
+              <a 
+                href="https://www.linkedin.com/groups/14310213/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-toxic-neon text-sm flex items-center hover:underline"
+              >
+                <span className="mr-2">📎</span> Join Resistance LinkedIn Group
+              </a>
+            </div>
           </div>
         )}
         
