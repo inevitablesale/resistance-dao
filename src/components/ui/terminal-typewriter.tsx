@@ -159,45 +159,59 @@ export function TerminalTypewriter({
                   </div>
                 ) : (
                   <>
-                    <div className="terminal-input-container mt-4">
-                      <div className="access-code-container">
-                        <div className="flex items-center w-full relative">
-                          <Lock className="access-code-icon absolute left-3 z-10 text-toxic-neon" size={16} />
-                          <Input
-                            type="password"
-                            placeholder="Enter access code"
-                            className="access-code-input pl-10"
-                            value={accessCode}
-                            onChange={handleAccessCodeChange}
-                            onKeyDown={handleKeyDown}
-                          />
+                    {!marketplaceMode ? (
+                      <>
+                        <div className="terminal-input-container mt-4">
+                          <div className="access-code-container">
+                            <div className="flex items-center w-full relative">
+                              <Lock className="access-code-icon absolute left-3 z-10 text-toxic-neon" size={16} />
+                              <Input
+                                type="password"
+                                placeholder="Enter access code"
+                                className="access-code-input pl-10"
+                                value={accessCode}
+                                onChange={handleAccessCodeChange}
+                                onKeyDown={handleKeyDown}
+                              />
+                              <button 
+                                onClick={handleSubmit}
+                                className="submit-button ml-3 active:transform active:translate-y-0.5 transition-transform"
+                              >
+                                <span className="mr-2">Submit</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="terminal-hint mt-3">
+                          <span className="text-toxic-neon/70 text-xs font-mono">// Access code is "resistance"</span>
+                        </div>
+                        
+                        <div className="terminal-footer mt-4">
+                          <a 
+                            href="https://www.linkedin.com/groups/14310213/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="linkedin-link"
+                          >
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            <span>Join Resistance LinkedIn Group</span>
+                          </a>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="terminal-line mt-2">
+                        <div className="text-toxic-neon font-mono">
+                          {textToType} {cursorVisible && <span className="cursor">_</span>}
+                        </div>
+                        <div className="mt-3">
                           <button 
                             onClick={handleSubmit}
-                            className="submit-button ml-3 active:transform active:translate-y-0.5 transition-transform"
+                            className="submit-button active:transform active:translate-y-0.5 transition-transform"
                           >
-                            <span className="mr-2">Submit</span>
+                            <span className="mr-2">Connect</span>
                           </button>
                         </div>
-                      </div>
-                    </div>
-                    
-                    {!marketplaceMode && (
-                      <div className="terminal-hint mt-3">
-                        <span className="text-toxic-neon/70 text-xs font-mono">// Access code is "resistance"</span>
-                      </div>
-                    )}
-                    
-                    {!marketplaceMode && (
-                      <div className="terminal-footer mt-4">
-                        <a 
-                          href="https://www.linkedin.com/groups/14310213/" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="linkedin-link"
-                        >
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          <span>Join Resistance LinkedIn Group</span>
-                        </a>
                       </div>
                     )}
                   </>
