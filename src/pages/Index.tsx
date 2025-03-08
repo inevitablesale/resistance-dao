@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -164,7 +165,8 @@ const Index = () => {
         { trait: "Mutation", value: "Telepathy" },
         { trait: "Threat Level", value: "Catastrophic" }
       ],
-      status: 'active'
+      status: 'active',
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeig47okn4sqqbajhje57htkxw6py3tdms7boyc3hkvvr4qlj7zsabu"
     }
   ];
   
@@ -718,4 +720,3 @@ const Index = () => {
 };
 
 export default Index;
-
