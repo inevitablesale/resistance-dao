@@ -15,7 +15,7 @@ interface TerminalTypewriterProps {
 }
 
 export function TerminalTypewriter({
-  textToType = "PRESS [ACTIVATE SURVIVAL BEACON] TO CONTINUE...",
+  textToType = "PASSWORD: LEDGERFUND or CONNECT WALLET",
   typeDelay = 70,
   className,
   isConnected = false,
@@ -154,12 +154,12 @@ export function TerminalTypewriter({
               {marketplaceMode || storyMode ? (
                 <>
                   <ShieldAlert className="w-4 h-4 mr-2 text-toxic-neon" />
-                  <span className="flash-beacon">ACTIVATE SURVIVAL BEACON</span>
+                  <span className="flash-beacon">CONNECT WALLET</span>
                 </>
               ) : (
                 <>
                   <Radiation className="w-4 h-4 mr-2 text-toxic-neon" />
-                  <span className="flash-beacon">ACTIVATE SURVIVAL BEACON</span>
+                  <span className="flash-beacon">CONNECT WALLET</span>
                 </>
               )}
             </ToxicButton>
