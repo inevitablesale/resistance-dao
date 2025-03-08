@@ -1,10 +1,7 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import Twitter from "./icons/Twitter";
-import Linked from "./icons/Linked";
 import { Button } from "@/components/ui/button";
 import { Terminal, Radiation, Shield, Lock } from "lucide-react";
 import { ToxicBadge } from "@/components/ui/toxic-badge";
@@ -118,23 +115,6 @@ const Nav = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <a 
-              href="https://x.com/LedgerFundDAO" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-white/60 hover:text-white transition-colors transform hover:scale-105 duration-200"
-            >
-              <Twitter className="w-5 h-5" />
-            </a>
-            <a 
-              href="https://www.linkedin.com/groups/12657922/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-white/60 hover:text-white transition-colors transform hover:scale-105 duration-200"
-            >
-              <Linked className="w-5 h-5" />
-            </a>
-            
             <div className="relative z-[101] flex items-center pointer-events-auto">
               {isPendingInitialization ? (
                 <Button disabled className="opacity-50">
