@@ -126,30 +126,14 @@ export function TerminalTypewriter({
               </div>
             ) : (
               <>
-                <div className="terminal-line">
-                  <span className="text-toxic-neon font-mono">_&gt; RESISTANCE_SECURE_SHELL</span>
-                </div>
-                <div className="terminal-line">
-                  <span className="text-toxic-neon font-mono">Initializing secure terminal...</span>
-                </div>
-                <div className="terminal-line">
-                  <span className="text-toxic-neon font-mono">Establishing encrypted connection...</span>
-                </div>
-                <div className="terminal-line">
-                  <span className="text-toxic-neon font-mono">[WARNING]: Connection masking enabled</span>
-                </div>
-                <div className="terminal-line">
-                  <span className="text-toxic-neon font-mono">Routing through decentralized nodes...</span>
-                </div>
-                <div className="terminal-line">
-                  <span className="text-toxic-neon font-mono">RESISTANCE NETWORK TERMINAL v3.27</span>
-                </div>
-                <div className="terminal-line">
-                  <span className="text-toxic-neon font-mono">Authentication required:</span>
-                </div>
-                <div className="terminal-line">
-                  <span className="text-toxic-neon font-mono">resistance@secure:~$</span>
-                </div>
+                {initLines.map((line, index) => (
+                  <div key={index} className="terminal-line">
+                    <span className="text-toxic-neon font-mono">
+                      {index === 0 && <span className="text-toxic-neon">_&gt; </span>}
+                      {line}
+                    </span>
+                  </div>
+                ))}
                 
                 {isConnected ? (
                   <div className="terminal-line mt-4">
