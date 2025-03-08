@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -83,7 +84,7 @@
 
 /* Custom Styles */
 .toxic-neon-text {
-  text-shadow: 0 0 5px theme('colors.toxic-neon');
+  text-shadow: 0 0 5px theme('colors.toxic.neon');
 }
 
 .post-apocalyptic-bg {
@@ -128,7 +129,7 @@
 }
 
 .terminal-input {
-  color: theme('colors.toxic-neon');
+  color: theme('colors.toxic.neon');
 }
 
 .terminal-output {
@@ -138,13 +139,13 @@
 /* Animation Keyframes */
 @keyframes toxic-pulse {
   0% {
-    box-shadow: 0 0 5px theme('colors.toxic-neon');
+    box-shadow: 0 0 5px theme('colors.toxic.neon');
   }
   50% {
-    box-shadow: 0 0 15px theme('colors.toxic-neon');
+    box-shadow: 0 0 15px theme('colors.toxic.neon');
   }
   100% {
-    box-shadow: 0 0 5px theme('colors.toxic-neon');
+    box-shadow: 0 0 5px theme('colors.toxic.neon');
   }
 }
 
