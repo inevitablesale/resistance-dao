@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Shield, LockKeyhole, AlertTriangle, Terminal, ExternalLink, Info } from "lucide-react";
@@ -173,30 +172,21 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
         <div className="bg-black/80 border border-toxic-neon/20 p-4 rounded mb-6">
           <div className="flex items-start gap-3">
             <Info className="h-5 w-5 text-toxic-neon flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="text-toxic-neon font-mono text-sm mb-2">NEED AN ACCESS CODE?</h3>
-              <p className="text-white/80 text-sm mb-2">
-                Join the Resistance LinkedIn group to receive your access code and connect with fellow survivors.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 mt-3">
-                <a 
-                  href="https://www.linkedin.com/groups/14310213/" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-full"
+            <div className="flex flex-col sm:flex-row gap-3">
+              <a 
+                href="https://www.linkedin.com/groups/14310213/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-full"
+              >
+                <ToxicButton
+                  variant="glowing"
+                  className="w-full uppercase font-mono flex items-center justify-center"
                 >
-                  <ToxicButton
-                    variant="glowing"
-                    className="w-full uppercase font-mono flex items-center justify-center"
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    <span>Gain Access Code</span>
-                  </ToxicButton>
-                </a>
-              </div>
-              <p className="text-white/60 text-xs mt-3">
-                <span className="text-apocalypse-red">*</span> Default access code: "resistance"
-              </p>
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  <span>Gain Access Code</span>
+                </ToxicButton>
+              </a>
             </div>
           </div>
         </div>
