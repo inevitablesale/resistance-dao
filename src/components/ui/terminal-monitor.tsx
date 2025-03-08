@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Minimize2, Maximize2, X, Monitor, Shield, Target, AlertTriangle } from 'lucide-react';
@@ -130,14 +129,12 @@ export function TerminalMonitor({
   const [showDesktopIcons, setShowDesktopIcons] = useState(skipBootSequence);
   const [bootComplete, setBootComplete] = useState(skipBootSequence);
   
-  // Auto-open Network Status app when initialAppOpened prop changes
   useEffect(() => {
     if (initialAppOpened && showDesktopIcons && !openApps.includes('network-status')) {
       handleOpenApp('network-status');
     }
   }, [initialAppOpened, showDesktopIcons, openApps]);
 
-  // Show desktop icons after boot sequence or role selection
   useEffect(() => {
     if (selectedRole || bootComplete) {
       setShowDesktopIcons(true);
@@ -178,7 +175,6 @@ export function TerminalMonitor({
     setBootComplete(true);
   };
 
-  // Simplified app content
   const appContent: Record<string, { title: string, icon: React.ReactNode, content: React.ReactNode }> = {
     'network-status': {
       title: 'NETWORK',
@@ -244,11 +240,8 @@ export function TerminalMonitor({
 
   return (
     <div className={cn("terminal-monitor relative", className)}>
-      {/* Simplified monitor frame */}
       <div className="monitor-frame bg-black/90 border border-toxic-neon/40 rounded-lg overflow-hidden shadow-[0_0_10px_rgba(80,250,123,0.2)] relative">
-        {/* Monitor screen - reduced visual effects */}
         <div className="monitor-screen bg-black p-2 relative overflow-hidden" style={{ minHeight: "400px", height: "60vh", maxHeight: "600px" }}>
-          {/* Terminal content */}
           <div className="relative p-2 h-full">
             {!bootComplete && !selectedRole && !skipBootSequence ? (
               <div className="w-full h-full">
@@ -259,7 +252,6 @@ export function TerminalMonitor({
               </div>
             ) : (
               <div className="desktop-environment h-full relative">
-                {/* Desktop Icons - simplified grid */}
                 {showDesktopIcons && (
                   <div className="grid grid-cols-3 gap-2 p-2 absolute top-0 left-0 z-10">
                     <DesktopIcon 
@@ -283,7 +275,6 @@ export function TerminalMonitor({
                   </div>
                 )}
                 
-                {/* Desktop Apps */}
                 {Object.entries(appContent).map(([appId, app]) => (
                   <TerminalApp
                     key={appId}
