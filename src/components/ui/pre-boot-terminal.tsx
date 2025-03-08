@@ -1,12 +1,16 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, CheckCircle, Lock, Zap, Code } from 'lucide-react';
+import { 
+  Terminal, Key, Shield, ExternalLink, Radiation, AlertTriangle, 
+  CheckCircle, Lock, Zap, Code, Signal, Wifi, Radar, 
+  RadioTower, Fingerprint, Users, Database
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './button';
 import { Input } from './input';
 import { DrippingSlime } from './dripping-slime';
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { ToxicBadge } from './toxic-badge';
 
 interface PreBootTerminalProps {
   onAuthenticated: () => void;
@@ -21,13 +25,42 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   const [forgotHovered, setForgotHovered] = useState(false);
   const [terminalEffect, setTerminalEffect] = useState<'flicker' | 'glitch' | 'normal'>('normal');
   const [isHackMode, setIsHackMode] = useState(false);
+  const [securityLevel, setSecurityLevel] = useState<'low' | 'medium' | 'high' | 'critical'>('medium');
+  const [encryptionStatus, setEncryptionStatus] = useState<number>(0);
+  const [nodeConnections, setNodeConnections] = useState<number>(0);
+  const [threatStatus, setThreatStatus] = useState<'none' | 'detected' | 'imminent'>('none');
+  const [squadStatus, setSquadStatus] = useState<'standby' | 'deployed' | 'engaged'>('standby');
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
   const dynamicContext = useDynamicContext();
 
   const CORRECT_PASSWORD = 'resistance';
 
-  // Check if wallet is already connected when component mounts
+  useEffect(() => {
+    if (!terminalReady) return;
+
+    const securityInterval = setInterval(() => {
+      const securityLevels: Array<'low' | 'medium' | 'high' | 'critical'> = ['medium', 'high', 'high', 'critical'];
+      setSecurityLevel(securityLevels[Math.floor(Math.random() * securityLevels.length)]);
+      
+      setNodeConnections(Math.floor(Math.random() * 17) + 42);
+      
+      if (Math.random() < 0.3) {
+        const threats: Array<'none' | 'detected' | 'imminent'> = ['none', 'detected', 'imminent'];
+        setThreatStatus(threats[Math.floor(Math.random() * threats.length)]);
+      }
+      
+      if (Math.random() < 0.2) {
+        const squads: Array<'standby' | 'deployed' | 'engaged'> = ['standby', 'deployed', 'engaged'];
+        setSquadStatus(squads[Math.floor(Math.random() * squads.length)]);
+      }
+      
+      setEncryptionStatus(Math.floor(Math.random() * 21) + 80);
+    }, 5000);
+
+    return () => clearInterval(securityInterval);
+  }, [terminalReady]);
+
   useEffect(() => {
     if (dynamicContext.primaryWallet && dynamicContext.user) {
       console.log("Wallet already connected, bypassing authentication");
@@ -43,11 +76,15 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     const bootMessages = [
-      'Initializing secure terminal...',
-      'Establishing encrypted connection...',
-      '[WARNING]: Connection masking enabled',
-      'Routing through decentralized nodes...',
-      'RESISTANCE NETWORK TERMINAL v3.27',
+      'Initializing military-grade secure terminal...',
+      'Establishing quantum-encrypted connection...',
+      '[WARNING]: Hostile network detected',
+      'Activating counter-surveillance protocols...',
+      'Routing through decentralized resistance nodes...',
+      'Node security verification: COMPLETE',
+      'Firmware integrity check: PASSED',
+      'RESISTANCE COMBAT NETWORK TERMINAL v5.14',
+      'Clearance level required: OPERATIVE',
       'Authentication required:',
     ];
 
@@ -73,7 +110,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         if (isPunctuation) delay += 30;
         if (isSpace) delay += 10;
         
-        if (Math.random() < 0.03) {
+        if (Math.random() < 0.05) {
           setTerminalEffect('glitch');
           setTimeout(() => setTerminalEffect('normal'), 120);
         }
@@ -82,7 +119,10 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           typeMessage(messageIndex, charIndex + 1);
         }, delay);
       } else {
-        const pauseTime = currentMessage.includes('WARNING') ? 150 : 50; 
+        const pauseTime = 
+          currentMessage.includes('WARNING') ? 300 : 
+          currentMessage.includes('RESISTANCE COMBAT') ? 250 : 
+          currentMessage.includes('Clearance') ? 200 : 80;
         
         if (currentMessage.includes('WARNING')) {
           setTerminalEffect('flicker');
@@ -104,7 +144,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         setCommandLine(bootMessages.join('\n'));
         setTerminalReady(true);
       }
-    }, 3000);
+    }, 5000);
 
     return () => {
       clearTimeout(timeout);
@@ -152,17 +192,20 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
             prev + 
             '\n\n> UNAUTHORIZED ACCESS DETECTED' +
             '\n> EXTERNAL ENCRYPTION KEY RECOGNIZED' +
-            '\n> HACK TOOL ACTIVATED' + 
-            '\n> BYPASSING SECURITY PROTOCOLS...' +
+            '\n> ADVANCED INFILTRATION PROTOCOL ACTIVATED' + 
+            '\n> BYPASSING SECURITY CHECKPOINTS...' +
+            '\n> DISABLING PERIMETER DEFENSES...' +
+            '\n> OVERRIDING COMMAND PROTOCOLS...' +
             '\n> SYSTEM BREACH IMMINENT...'
           );
         } else {
           setCommandLine(prev => 
             prev + 
-            '\n\n> CREDENTIAL VERIFIED' +
-            '\n> ACCESS LEVEL: RESISTANCE MEMBER' + 
-            '\n> INITIALIZING SECURE BOOT SEQUENCE...' +
-            '\n> ESTABLISHING ENCRYPTED CHANNEL...' +
+            '\n\n> OPERATIVE CREDENTIALS VERIFIED' +
+            '\n> ACCESS LEVEL: RESISTANCE COMMAND' + 
+            '\n> INITIALIZING TACTICAL OVERLAY...' +
+            '\n> ESTABLISHING SECURE BATTLEFIELD CHANNEL...' +
+            '\n> DEPLOYING COMMAND INTERFACE...' +
             '\n> SYSTEM BREACH IMMINENT...'
           );
         }
@@ -172,7 +215,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           setTimeout(() => {
             onAuthenticated();
           }, 800);
-        }, 1000);
+        }, 1500);
       } else {
         setAuthStatus('error');
         setShowError(true);
@@ -183,7 +226,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           '\n\n> ERROR: INVALID CREDENTIALS' + 
           '\n> ACCESS DENIED' +
           '\n> SECURITY PROTOCOLS ENGAGED' +
-          '\n> ATTEMPTS LOGGED'
+          '\n> HOSTILE ATTEMPT LOGGED'
         );
         
         setPassword('');
@@ -198,16 +241,14 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           setTerminalEffect('normal');
         }, 1000);
       }
-    }, 600);
+    }, 1200);
   };
 
   const handleWalletHack = async () => {
     setIsHackMode(true);
-    // Trigger wallet connection using the correct Dynamic SDK method
     if (dynamicContext && dynamicContext.setShowAuthFlow) {
       try {
         dynamicContext.setShowAuthFlow(true);
-        // Handle successful wallet connection
         handlePasswordSubmit(new Event('submit') as any);
       } catch (error) {
         console.error("Wallet connection failed:", error);
@@ -222,6 +263,38 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
     if (inputRef.current) {
       inputRef.current.focus();
     }
+  };
+
+  const getStatusDisplay = (status: string, type: 'security' | 'threat' | 'squad' | 'nodes') => {
+    if (type === 'security') {
+      const colors = {
+        low: 'text-green-400',
+        medium: 'text-yellow-400',
+        high: 'text-orange-400',
+        critical: 'text-apocalypse-red animate-pulse'
+      };
+      return <span className={colors[status as keyof typeof colors]}>{status.toUpperCase()}</span>;
+    }
+    
+    if (type === 'threat') {
+      const colors = {
+        none: 'text-green-400',
+        detected: 'text-yellow-400',
+        imminent: 'text-apocalypse-red animate-pulse'
+      };
+      return <span className={colors[status as keyof typeof colors]}>{status.toUpperCase()}</span>;
+    }
+    
+    if (type === 'squad') {
+      const colors = {
+        standby: 'text-blue-400',
+        deployed: 'text-yellow-400',
+        engaged: 'text-apocalypse-red'
+      };
+      return <span className={colors[status as keyof typeof colors]}>{status.toUpperCase()}</span>;
+    }
+    
+    return <span>{status}</span>;
   };
 
   return (
@@ -249,19 +322,50 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         <div className="monitor-glow absolute inset-0"></div>
         
         <div className="terminal-content flex flex-col h-full">
-          <div className="flex items-center gap-2 mb-3 border-b border-toxic-neon/20 pb-2">
-            <motion.div 
-              animate={{ rotate: [0, 360] }} 
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }} 
-              className="text-toxic-neon"
-            >
-              <Terminal className="h-4 w-4 text-toxic-neon" />
-            </motion.div>
-            <span className="text-toxic-neon/90 text-xs tracking-wider">RESISTANCE_SECURE_SHELL</span>
-            <div className="ml-auto flex gap-1.5">
-              <div className="h-2 w-2 rounded-full bg-apocalypse-red/80 animate-pulse"></div>
-              <div className="h-2 w-2 rounded-full bg-toxic-neon/50"></div>
+          <div className="flex flex-col gap-2 mb-3 border-b border-toxic-neon/20 pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <motion.div 
+                  animate={{ rotate: [0, 360] }} 
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }} 
+                  className="text-toxic-neon"
+                >
+                  <Terminal className="h-4 w-4 text-toxic-neon" />
+                </motion.div>
+                <span className="text-toxic-neon/90 text-xs tracking-wider">RESISTANCE_COMBAT_TERMINAL</span>
+              </div>
+              <div className="flex gap-1.5">
+                <div className="h-2 w-2 rounded-full bg-apocalypse-red/80 animate-pulse"></div>
+                <div className="h-2 w-2 rounded-full bg-toxic-neon/50"></div>
+              </div>
             </div>
+            
+            {terminalReady && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-3 gap-y-1 text-[10px] sm:text-xs">
+                <div className="flex items-center gap-1">
+                  <Shield className="h-3 w-3 text-toxic-neon/70" />
+                  <span className="text-white/70">SECURITY:</span>
+                  {getStatusDisplay(securityLevel, 'security')}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Radiation className="h-3 w-3 text-toxic-neon/70" />
+                  <span className="text-white/70">THREAT:</span>
+                  {getStatusDisplay(threatStatus, 'threat')}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Users className="h-3 w-3 text-toxic-neon/70" />
+                  <span className="text-white/70">SQUAD:</span>
+                  {getStatusDisplay(squadStatus, 'squad')}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Lock className="h-3 w-3 text-toxic-neon/70" />
+                  <span className="text-white/70">ENCRYPT:</span>
+                  <span className={encryptionStatus > 90 ? "text-green-400" : "text-yellow-400"}>
+                    {encryptionStatus}%
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
           
           <div 
@@ -291,7 +395,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter access code"
+                      placeholder="Enter Clearance Code"
                       className={cn(
                         "bg-black/60 text-toxic-neon border-toxic-neon/40 pl-8 focus-visible:ring-toxic-neon/30 font-mono",
                         "transition-all duration-300",
@@ -309,42 +413,70 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                         }
                       }}
                     />
-                    
-                    <AnimatePresence>
-                      {authStatus === 'checking' && (
-                        <motion.div 
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="absolute inset-y-0 right-2 flex items-center"
-                        >
-                          <div className="h-4 w-4 border-2 border-toxic-neon border-t-transparent rounded-full animate-spin"></div>
-                        </motion.div>
-                      )}
-                      {authStatus === 'success' && (
-                        <motion.div 
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className="absolute inset-y-0 right-2 flex items-center"
-                        >
-                          <CheckCircle className="h-4 w-4 text-toxic-neon" />
-                        </motion.div>
-                      )}
-                      {authStatus === 'error' && (
-                        <motion.div 
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="absolute inset-y-0 right-2 flex items-center"
-                        >
-                          <AlertTriangle className="h-4 w-4 text-apocalypse-red" />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+
+                    <div className="absolute inset-y-0 right-2 flex items-center">
+                      <AnimatePresence>
+                        {authStatus === 'checking' && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                          >
+                            <div className="h-4 w-4 border-2 border-toxic-neon border-t-transparent rounded-full animate-spin"></div>
+                          </motion.div>
+                        )}
+                        {authStatus === 'success' && (
+                          <motion.div 
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                          >
+                            <CheckCircle className="h-4 w-4 text-toxic-neon" />
+                          </motion.div>
+                        )}
+                        {authStatus === 'error' && (
+                          <motion.div 
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                          >
+                            <AlertTriangle className="h-4 w-4 text-apocalypse-red" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    <motion.div
+                      initial={false}
+                      animate={{ 
+                        height: authStatus === 'idle' && terminalReady ? "auto" : 0,
+                        opacity: authStatus === 'idle' && terminalReady ? 1 : 0,
+                        marginTop: authStatus === 'idle' && terminalReady ? 4 : 0
+                      }}
+                      className="overflow-hidden text-xs text-white/60"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <Fingerprint className="h-3 w-3 text-toxic-neon/70" />
+                          <span>Biometric</span>
+                        </div>
+                        <div className="h-1 w-1 rounded-full bg-white/30"></div>
+                        <div className="flex items-center gap-1">
+                          <RadioTower className="h-3 w-3 text-toxic-neon/70" />
+                          <span>Squad verification</span>
+                        </div>
+                        <div className="h-1 w-1 rounded-full bg-white/30"></div>
+                        <div className="flex items-center gap-1">
+                          <Signal className="h-3 w-3 text-toxic-neon/70" />
+                          <span>Command protocol</span>
+                        </div>
+                      </div>
+                    </motion.div>
                   </div>
                   
                   <div className="flex items-center justify-center">
-                    <div className="text-toxic-neon/60 font-mono text-sm px-4">OR</div>
+                    <ToxicBadge variant="outline" className="font-mono">
+                      <Radiation className="h-3 w-3 mr-1" /> OR
+                    </ToxicBadge>
                   </div>
                   
                   <div className="flex">
@@ -363,7 +495,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                       <span className="z-10 flex items-center">
                         <Zap className="w-4 h-4 mr-2" />
                         <Code className="w-4 h-4 mr-2" />
-                        Hack Mainframe
+                        Breach Mainframe
                       </span>
                       <span className="absolute inset-0 bg-apocalypse-red/0 hover:bg-apocalypse-red/20 transition-colors duration-300"></span>
                       <span className="absolute -inset-[1px] border border-apocalypse-red/30 opacity-0 group-hover:opacity-100 rounded-md"></span>
@@ -401,12 +533,30 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                           forgotHovered ? "animate-pulse text-toxic-neon" : "text-toxic-neon/90"
                         )} />
                         <span className="relative font-bold group-hover:underline">
-                          Join Resistance LinkedIn Group to get access code
+                          Join Resistance Command Group for Strategic Access
                         </span>
                       </a>
                     </div>
                   </div>
                 </div>
+
+                {terminalReady && (
+                  <div className="mt-4 border-t border-toxic-neon/10 pt-3">
+                    <div className="flex justify-between items-center text-xs mb-1">
+                      <div className="flex items-center gap-1">
+                        <Wifi className="h-3 w-3 text-toxic-neon/70" />
+                        <span className="text-white/70">RESISTANCE NODE CONNECTIONS:</span>
+                      </div>
+                      <span className="text-toxic-neon/80">{nodeConnections}/60</span>
+                    </div>
+                    <div className="w-full h-1 bg-black/60 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-toxic-neon/70 rounded-full transition-all"
+                        style={{ width: `${(nodeConnections / 60) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
               </div>
             </form>
           )}
@@ -561,6 +711,16 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
           100% {
             transform: translateX(100%);
           }
+        }
+        
+        .animate-shake {
+          animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+        
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+          20%, 40%, 60%, 80% { transform: translateX(2px); }
         }
         `}
       </style>
