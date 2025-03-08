@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Shield, LockKeyhole, AlertTriangle, Terminal, ExternalLink, Info } from "lucide-react";
@@ -161,7 +162,7 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
               type="submit" 
               disabled={isAuthenticating}
               variant="marketplace"
-              className="uppercase font-mono flex items-center"
+              className="uppercase font-mono flex items-center justify-center py-3 text-base"
             >
               <LockKeyhole className="h-4 w-4 mr-2" />
               Authenticate
@@ -174,14 +175,14 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
             <Info className="h-5 w-5 text-toxic-neon flex-shrink-0 mt-0.5" />
             <div className="flex flex-col sm:flex-row gap-3">
               <a 
-                href="https://www.linkedin.com/groups/14310213/" 
+                href="https://www.linkedin.com/groups/12657922/" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="w-full"
               >
                 <ToxicButton
                   variant="glowing"
-                  className="w-full uppercase font-mono flex items-center justify-center"
+                  className="w-full uppercase font-mono flex items-center justify-center py-3 text-base"
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
                   <span>Gain Access Code</span>
@@ -201,7 +202,7 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
           onClick={handleWalletConnect} 
           disabled={isAuthenticating}
           variant="outline"
-          className="w-full uppercase font-mono flex items-center justify-center"
+          className="w-full uppercase font-mono flex items-center justify-center py-3 text-base"
         >
           <Shield className="h-4 w-4 mr-2" />
           Connect Crypto Wallet
