@@ -2,8 +2,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 interface ModelPreviewProps {
   modelUrl: string;
@@ -33,8 +33,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
-    scene.background.set(0x000000);
-    scene.background.opacity = 0.3;
+    // Remove the opacity setting as it's not supported on Color
     
     // Add ambient light
     const ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);

@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { ToxicCard, ToxicCardContent } from "@/components/ui/toxic-card";
 import { ToxicBadge } from "@/components/ui/toxic-badge";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { DrippingSlime } from "@/components/ui/dripping-slime";
 import { ModelPreview } from "@/components/marketplace/ModelPreview";
-import { Skull, Biohazard, ChevronRight, Filter, SearchCode, Users, Target, Shield, Radiation, ShieldX, Image, Cube } from "lucide-react";
+import { Skull, Biohazard, ChevronRight, Filter, SearchCode, Users, Target, Shield, Radiation, ShieldX, Image, Box3D } from "lucide-react";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 export type MarketplaceListingType = 'survivor' | 'bounty-hunter' | 'equipment' | 'settlement';
@@ -28,7 +27,7 @@ export interface MarketplaceListing {
   }[];
   status: 'active' | 'pending' | 'sold';
   imageUrl?: string;
-  modelUrl?: string; // Added field for 3D model URL
+  modelUrl?: string;
 }
 
 interface MarketplaceListingGridProps {
@@ -49,7 +48,6 @@ export function MarketplaceListingGrid({
   const { setShowAuthFlow, isConnected } = useWalletConnection();
   const [modelViewEnabled, setModelViewEnabled] = useState(true);
 
-  // Get icon based on listing type
   const getListingTypeIcon = (type: MarketplaceListingType) => {
     switch(type) {
       case 'survivor':
@@ -65,7 +63,6 @@ export function MarketplaceListingGrid({
     }
   };
 
-  // Get radiation level color based on value
   const getRadiationColor = (value: number) => {
     if (value >= 80) return "text-apocalypse-red border-apocalypse-red/70 shadow-[0_0_8px_rgba(255,0,0,0.3)]";
     if (value >= 50) return "text-yellow-400 border-yellow-400/70 shadow-[0_0_8px_rgba(255,255,0,0.3)]";
@@ -97,7 +94,7 @@ export function MarketplaceListingGrid({
               </>
             ) : (
               <>
-                <Cube className="h-4 w-4 mr-1" />
+                <Box3D className="h-4 w-4 mr-1" />
                 3D View
               </>
             )}
@@ -131,7 +128,6 @@ export function MarketplaceListingGrid({
             >
               <ToxicCardContent className="p-0">
                 <div className="relative h-48 bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-t-lg overflow-hidden">
-                  {/* Show 3D model if available and 3D view is enabled */}
                   {listing.modelUrl && modelViewEnabled ? (
                     <ModelPreview 
                       modelUrl={listing.modelUrl} 
@@ -170,7 +166,7 @@ export function MarketplaceListingGrid({
                   {listing.modelUrl && (
                     <div className="absolute top-2 right-12">
                       <ToxicBadge variant="secondary" className="bg-toxic-neon/20 text-toxic-neon">
-                        <Cube className="h-3 w-3 mr-1" /> 3D
+                        <Box3D className="h-3 w-3 mr-1" /> 3D
                       </ToxicBadge>
                     </div>
                   )}
