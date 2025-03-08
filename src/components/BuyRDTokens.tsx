@@ -23,10 +23,10 @@ export const BuyRDTokens = ({ onConnectWallet }: BuyRDTokensProps) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
         <div className="p-6">
           <h3 className="text-2xl font-mono text-toxic-neon mb-4 toxic-glow flex items-center">
-            <Radiation className="w-6 h-6 mr-2" /> Fund Bounty Hunters
+            <Radiation className="w-6 h-6 mr-2" /> Fund Projects
           </h3>
           <p className="text-white/70 mb-4">
-            Convert your <span className="text-apocalypse-red font-semibold">Old World currency (USDC)</span> into <span className="text-toxic-neon font-semibold">Resistance Dollars (RD)</span> to support bounty hunters tracking mutant protocol criminals across the wasteland.
+            Convert your <span className="text-apocalypse-red font-semibold">Old World currency (USDC)</span> into <span className="text-toxic-neon font-semibold">Resistance Dollars (RD)</span> to support innovative projects and make soft capital commitments.
           </p>
           
           <div className="mb-4">
@@ -109,7 +109,7 @@ export const BuyRDTokens = ({ onConnectWallet }: BuyRDTokensProps) => {
               </div>
               <div>
                 <h4 className="text-white font-mono mb-1">Governance Rights</h4>
-                <p className="text-white/70 text-sm">RD token holders vote on Resistance initiatives and resource allocation throughout the wasteland.</p>
+                <p className="text-white/70 text-sm">RD token holders vote on Resistance initiatives and resource allocation for promising projects.</p>
               </div>
             </li>
             <li className="flex gap-3">
@@ -118,7 +118,7 @@ export const BuyRDTokens = ({ onConnectWallet }: BuyRDTokensProps) => {
               </div>
               <div>
                 <h4 className="text-white font-mono mb-1">Priority Access</h4>
-                <p className="text-white/70 text-sm">Early access to new Resistance technology and survival protocols before they're released to the wasteland.</p>
+                <p className="text-white/70 text-sm">Early access to new projects, protocols, and opportunities before they're publicly available.</p>
               </div>
             </li>
           </ul>

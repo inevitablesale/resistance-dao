@@ -52,16 +52,16 @@ export function TerminalTypewriter({
   const getMarketplaceContent = () => (
     <>
       <div className="terminal-line">
-        <span className="text-toxic-neon/80">[WASTELAND_EXCHANGE v4.1.2]</span>
-        <span className="text-white/70"> INITIALIZING MARKETPLACE PROTOCOLS...</span>
+        <span className="text-toxic-neon/80">[RESISTANCE_OS v3.2.1]</span>
+        <span className="text-white/70"> SCANNING FOR PROJECT OPPORTUNITIES...</span>
       </div>
       <div className="terminal-line">
-        <span className="text-toxic-neon/80">[TRADE_SYSTEM]</span>
-        <span className="text-white/70"> ESTABLISHING SECURE TRANSACTION CHANNELS...</span>
+        <span className="text-toxic-neon/80">[CAPITAL_PROTOCOL]</span>
+        <span className="text-white/70"> ESTABLISHING SECURE COMMITMENT CHANNELS...</span>
       </div>
       <div className="terminal-line h-6">
-        <span className="text-apocalypse-red/90">[MARKET_ALERT]</span>
-        <span className="text-white/70"> RADIATION LEVELS AFFECTING ASSET VALUES - USE CAUTION</span>
+        <span className="text-apocalypse-red/90">[COMING_SOON]</span>
+        <span className="text-white/70"> JOB LISTINGS | PARTNER MATCHING | ROLE SEEKING</span>
       </div>
     </>
   );
@@ -77,8 +77,8 @@ export function TerminalTypewriter({
         <span className="text-white/70"> ESTABLISHING SECURE TRANSMISSION...</span>
       </div>
       <div className="terminal-line h-6">
-        <span className="text-apocalypse-red/90">[WARNING]</span>
-        <span className="text-white/70"> WASTELAND RADIATION LEVELS CRITICAL - ENCRYPTION REQUIRED</span>
+        <span className="text-apocalypse-red/90">[COMING_SOON]</span>
+        <span className="text-white/70"> JOB LISTINGS | PARTNER MATCHING | ROLE SEEKING</span>
       </div>
     </>
   );
@@ -110,7 +110,7 @@ export function TerminalTypewriter({
               {marketplaceMode ? (
                 <>
                   <ShieldAlert className="w-4 h-4 mr-2 text-toxic-neon" />
-                  <span className="flash-beacon">AUTHENTICATE FOR MARKETPLACE ACCESS</span>
+                  <span className="flash-beacon">ACTIVATE SURVIVAL BEACON</span>
                 </>
               ) : (
                 <>
@@ -127,7 +127,7 @@ export function TerminalTypewriter({
             <span>[CONNECTED]</span> 
             <span className="text-white/70">
               {marketplaceMode ? 
-                " MARKETPLACE ACCESS GRANTED - TRADE PROTOCOLS ACTIVE" : 
+                " CAPITAL COMMITMENT PROTOCOLS ACTIVE - PROJECT FUNDING ENABLED" : 
                 " SURVIVAL BEACON ACTIVE - WELCOME TO THE RESISTANCE"}
             </span>
           </div>

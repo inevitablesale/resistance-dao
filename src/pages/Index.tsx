@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -281,12 +280,12 @@ const Index = () => {
             <div className="text-left mb-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
                 <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
-                <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Market Status: <span className="text-apocalypse-red font-bold status-critical">High Radiation Zone</span>
+                <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Project Status: <span className="text-apocalypse-red font-bold status-critical">Seeking Capital Commitments</span>
               </div>
               
               <div className="mb-6">
                 <TerminalTypewriter 
-                  textToType="WELCOME TO THE WASTELAND MARKETPLACE - TRADE AT YOUR OWN RISK"
+                  textToType="WELCOME TO THE RESISTANCE PROJECT FUNDING PORTAL - SOFT CAPITAL COMMITMENTS ACTIVE"
                   isConnected={isConnected}
                   onConnect={handleConnectWallet}
                   className="mb-4"
@@ -310,14 +309,14 @@ const Index = () => {
                 <div className="lg:col-span-2">
                   <MarketplaceListingGrid 
                     listings={bountyHunterListings} 
-                    title="Bounty Hunter Collection" 
+                    title="Featured Projects - Bounty Hunter Series" 
                     onListingClick={handleListingClick}
                     className="mb-8"
                   />
                   
                   <MarketplaceListingGrid 
                     listings={survivorListings} 
-                    title="Survivor Collection" 
+                    title="Community-Voted Projects - Survivor Series" 
                     onListingClick={handleListingClick}
                   />
                 </div>
@@ -335,17 +334,17 @@ const Index = () => {
                       <div className="p-2 rounded-full bg-toxic-neon/10">
                         <Shield className="w-5 h-5 text-toxic-neon" />
                       </div>
-                      <h3 className="text-lg font-mono text-toxic-neon">My Marketplace Status</h3>
+                      <h3 className="text-lg font-mono text-toxic-neon">My Funding Status</h3>
                     </div>
                     
                     {isConnected ? (
                       <div className="space-y-4">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-white/70">Active Listings</span>
+                          <span className="text-white/70">Active Commitments</span>
                           <span className="text-toxic-neon font-mono">0</span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-white/70">Trade Reputation</span>
+                          <span className="text-white/70">Funding Reputation</span>
                           <div className="flex items-center">
                             <ToxicBadge variant="rating" className="text-toxic-neon">★ 0.0</ToxicBadge>
                           </div>
@@ -359,13 +358,13 @@ const Index = () => {
                       </div>
                     ) : (
                       <div className="text-center py-6 bg-toxic-neon/5 rounded-lg">
-                        <p className="text-white/70 mb-4">Connect to view your marketplace status</p>
+                        <p className="text-white/70 mb-4">Connect to view your funding status</p>
                         <ToxicButton 
                           variant="marketplace"
                           onClick={handleConnectWallet}
                         >
                           <Radiation className="h-4 w-4 mr-2" />
-                          Connect Wallet
+                          ACTIVATE SURVIVAL BEACON
                         </ToxicButton>
                       </div>
                     )}
@@ -388,7 +387,7 @@ const Index = () => {
                           onClick={handleCreateListing}
                         >
                           <PlusCircle className="h-4 w-4 mr-1" />
-                          Create
+                          Submit Project
                         </ToxicButton>
                         
                         <ToxicButton 
@@ -408,7 +407,7 @@ const Index = () => {
                           onClick={() => navigate('/marketplace/inventory')}
                         >
                           <ShoppingBag className="h-4 w-4 mr-1" />
-                          Inventory
+                          My Projects
                         </ToxicButton>
                         
                         <ToxicButton 
@@ -418,7 +417,7 @@ const Index = () => {
                           onClick={() => navigate('/marketplace/offers')}
                         >
                           <Target className="h-4 w-4 mr-1" />
-                          Offers
+                          Commitments
                         </ToxicButton>
                       </div>
                     </ToxicCard>
@@ -435,7 +434,7 @@ const Index = () => {
                 <div className="scanline"></div>
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
-                    <Radiation className="h-6 w-6 mr-2" /> WASTELAND MARKETPLACE GUIDE
+                    <Radiation className="h-6 w-6 mr-2" /> PROJECT FUNDING GUIDE
                   </h3>
                 </div>
                 
@@ -445,16 +444,16 @@ const Index = () => {
                       <Biohazard className="w-6 h-6 text-apocalypse-red" />
                     </div>
                     <div>
-                      <h4 className="text-lg font-mono text-apocalypse-red mb-2">Trading in the Wasteland</h4>
+                      <h4 className="text-lg font-mono text-apocalypse-red mb-2">Soft Capital Commitments</h4>
                       <p className="text-white/80 mb-3 text-sm">
-                        After the collapse, resources became scarce and specialized skills became invaluable. The <span className="text-apocalypse-red font-semibold">Wasteland Marketplace</span> connects survivors with the assets and allies they need.
+                        The <span className="text-apocalypse-red font-semibold">Resistance Project Funding Portal</span> connects project owners with potential backers through soft capital commitments - no upfront capital required.
                       </p>
                       <p className="text-white/80 mb-3 text-sm">
-                        Whether you're seeking a <span className="text-toxic-neon font-semibold">Bounty Hunter</span> to protect your settlement, a <span className="text-toxic-neon font-semibold">Survivor</span> with specialized skills, or rare <span className="text-toxic-neon font-semibold">Equipment</span> to survive the radiation zones, our secure trading protocols ensure fair exchanges in this hostile environment.
+                        Whether you're <span className="text-toxic-neon font-semibold">seeking funding</span> for your innovative protocol or looking to <span className="text-toxic-neon font-semibold">support promising projects</span>, our platform facilitates secure commitments and project validation.
                       </p>
                       <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
-                        <span className="text-toxic-neon font-semibold block mb-1">» RADIATION WARNING «</span>
-                        All assets are affected by radiation levels. Higher radiation can grant unique abilities but may reduce lifespan. Choose wisely, survivor.
+                        <span className="text-toxic-neon font-semibold block mb-1">» COMING SOON «</span>
+                        Job Listings | Partner Matching | Role Seeking - Expanding the Resistance network with more ways to connect and collaborate.
                       </div>
                     </div>
                   </div>
@@ -466,19 +465,19 @@ const Index = () => {
                       <div className="p-2 rounded-full bg-toxic-neon/10">
                         <Target className="w-5 h-5 text-toxic-neon" />
                       </div>
-                      <h4 className="text-lg font-mono text-toxic-neon">Bounty Hunters</h4>
+                      <h4 className="text-lg font-mono text-toxic-neon">Project Submission</h4>
                     </div>
                     <p className="text-white/70 text-sm mb-3">
-                      Elite warriors immune to most radiation effects. Hire them to protect settlements, hunt mutants, or retrieve valuable resources from high-rad zones.
+                      Submit your project for community validation and funding. Projects with sufficient soft commitments move into development with Resistance support.
                     </p>
                     <div className="flex justify-end">
                       <ToxicButton 
                         variant="outline" 
                         size="sm" 
                         className="text-toxic-neon border-toxic-neon/30"
-                        onClick={() => navigate('/marketplace?type=bounty-hunter')}
+                        onClick={() => navigate('/thesis')}
                       >
-                        Explore <ChevronRight className="ml-1 h-4 w-4" />
+                        Submit <ChevronRight className="ml-1 h-4 w-4" />
                       </ToxicButton>
                     </div>
                   </div>
@@ -488,17 +487,17 @@ const Index = () => {
                       <div className="p-2 rounded-full bg-toxic-neon/10">
                         <Shield className="w-5 h-5 text-toxic-neon" />
                       </div>
-                      <h4 className="text-lg font-mono text-toxic-neon">Survivors</h4>
+                      <h4 className="text-lg font-mono text-toxic-neon">Fund Projects</h4>
                     </div>
                     <p className="text-white/70 text-sm mb-3">
-                      Specialists with unique skills critical for rebuilding. Medics, engineers, scouts, and farmers with varying radiation resistance and adaptations.
+                      Browse promising projects and show support through soft commitments. Validate quality protocols before they launch with no upfront capital required.
                     </p>
                     <div className="flex justify-end">
                       <ToxicButton 
                         variant="outline" 
                         size="sm" 
                         className="text-toxic-neon border-toxic-neon/30"
-                        onClick={() => navigate('/marketplace?type=survivor')}
+                        onClick={() => navigate('/proposals')}
                       >
                         Explore <ChevronRight className="ml-1 h-4 w-4" />
                       </ToxicButton>
@@ -510,19 +509,18 @@ const Index = () => {
                       <div className="p-2 rounded-full bg-toxic-neon/10">
                         <ShoppingBag className="w-5 h-5 text-toxic-neon" />
                       </div>
-                      <h4 className="text-lg font-mono text-toxic-neon">Equipment</h4>
+                      <h4 className="text-lg font-mono text-toxic-neon">Coming Soon</h4>
                     </div>
                     <p className="text-white/70 text-sm mb-3">
-                      Radiation-resistant gear and survival tools. From hazmat suits to specialized weapons that function in high-radiation environments.
+                      Job Listings | Partner Matching | Role Seeking - New ways to connect talent, projects, and resources within the Resistance ecosystem.
                     </p>
                     <div className="flex justify-end">
                       <ToxicButton 
                         variant="outline" 
                         size="sm" 
-                        className="text-toxic-neon border-toxic-neon/30"
-                        onClick={() => navigate('/marketplace?type=equipment')}
+                        className="text-toxic-neon border-toxic-neon/30 opacity-60 cursor-not-allowed"
                       >
-                        Explore <ChevronRight className="ml-1 h-4 w-4" />
+                        Soon <ChevronRight className="ml-1 h-4 w-4" />
                       </ToxicButton>
                     </div>
                   </div>
