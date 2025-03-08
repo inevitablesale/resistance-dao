@@ -574,16 +574,24 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       }
       window.removeEventListener('resize', handleResize);
       
-      // Dispose resources
+      // Dispose resources - FIX HERE
       if (scene) {
         scene.traverse((object) => {
           if (object instanceof THREE.Mesh) {
             object.geometry.dispose();
             
-            if (object.material instanceof THREE.Material) {
-              object.material.dispose();
-            } else if (Array.isArray(object.material)) {
-              object.material.forEach(material => material.dispose());
+            if (Array.isArray(object.material)) {
+              // Handle array of materials
+              object.material.forEach(material => {
+                if (material && typeof material.dispose === 'function') {
+                  material.dispose();
+                }
+              });
+            } else if (object.material) {
+              // Handle single material
+              if (typeof object.material.dispose === 'function') {
+                object.material.dispose();
+              }
             }
           }
         });
@@ -591,12 +599,32 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       
       if (particleSystem) {
         if (particleSystem.geometry) particleSystem.geometry.dispose();
-        if (particleSystem.material) particleSystem.material.dispose();
+        if (particleSystem.material) {
+          if (Array.isArray(particleSystem.material)) {
+            particleSystem.material.forEach(material => {
+              if (material && typeof material.dispose === 'function') {
+                material.dispose();
+              }
+            });
+          } else if (particleSystem.material && typeof particleSystem.material.dispose === 'function') {
+            particleSystem.material.dispose();
+          }
+        }
       }
       
       if (transitionMesh) {
         if (transitionMesh.geometry) transitionMesh.geometry.dispose();
-        if (transitionMesh.material) transitionMesh.material.dispose();
+        if (transitionMesh.material) {
+          if (Array.isArray(transitionMesh.material)) {
+            transitionMesh.material.forEach(material => {
+              if (material && typeof material.dispose === 'function') {
+                material.dispose();
+              }
+            });
+          } else if (transitionMesh.material && typeof transitionMesh.material.dispose === 'function') {
+            transitionMesh.material.dispose();
+          }
+        }
       }
       
       renderer.dispose();
