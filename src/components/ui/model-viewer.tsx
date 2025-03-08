@@ -123,7 +123,7 @@ const Model = ({
 };
 
 // The camera controls component
-const CameraController = ({ initialZoom = 5 }: { initialZoom?: number }) => {
+const CameraController = ({ initialZoom = 2 }: { initialZoom?: number }) => {
   const { camera, gl } = useThree();
   
   useEffect(() => {
@@ -180,7 +180,7 @@ export const ModelViewer = ({
   radiationEffect = false,
   rotationSpeed = 0.005,
   showControls = true,
-  initialZoom = 5,
+  initialZoom = 2, // Changed default from 5 to 2
   onError,
   className = "",
 }: ModelViewerProps) => {

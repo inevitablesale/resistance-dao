@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ModelViewer } from './ui/model-viewer';
 import { ToxicCard } from './ui/toxic-card';
@@ -25,7 +24,7 @@ export const ModelShowcase: React.FC<ModelShowcaseProps> = ({
 }) => {
   const [currentModelIndex, setCurrentModelIndex] = useState(0);
   const [showInfo, setShowInfo] = useState(false);
-  const [zoom, setZoom] = useState(5); // Default zoom level
+  const [zoom, setZoom] = useState(2); // Changed from 5 to 2 (more zoomed in)
   
   // Sample models (you would replace these with your actual models)
   const models: ModelInfo[] = [
@@ -70,7 +69,7 @@ export const ModelShowcase: React.FC<ModelShowcaseProps> = ({
   };
   
   const zoomIn = () => {
-    setZoom(prev => Math.max(prev - 1, 2)); // Lower values = more zoomed in
+    setZoom(prev => Math.max(prev - 1, 1)); // Changed minimum zoom value from 2 to 1
   };
   
   const zoomOut = () => {
