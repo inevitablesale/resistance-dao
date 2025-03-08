@@ -46,7 +46,8 @@ import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { NFTDisplay } from "@/components/wallet/ResistanceWalletWidget/NFTDisplay";
 import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
-import { useState } from "react";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useState, useEffect } from "react";
 import { MarketplaceListingGrid, MarketplaceListing } from "@/components/marketplace/MarketplaceListingGrid";
 import { MarketplaceStatusPanel } from "@/components/marketplace/MarketplaceStatusPanel";
 import { MarketplaceActivityFeed, MarketplaceActivity } from "@/components/marketplace/MarketplaceActivityFeed";
@@ -57,12 +58,21 @@ const Index = () => {
   const { data: stats, isLoading: isLoadingStats } = useProposalStats();
   const { data: nftBalance = 0, isLoading: isLoadingNFT } = useNFTBalance("0x1234..."); // Demo address
   const { isConnected, address } = useCustomWallet();
+  const { connect } = useWalletConnection();
   
   const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
-  const [storyStage, setStoryStage] = useState<number>(0);
+  const [storyStage, setStoryStage] = useState<number>(isConnected ? 1 : 0);
+  
+  useEffect(() => {
+    if (isConnected) {
+      setStoryStage(1); // Skip to marketplace view when connected
+      console.log("[Index] Wallet connected, showing marketplace view");
+    }
+  }, [isConnected]);
   
   const handleConnectWallet = () => {
     console.log("[Index] Triggering wallet connection from Index page");
+    connect();
   };
 
   const advanceStory = () => {

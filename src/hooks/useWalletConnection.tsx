@@ -1,3 +1,4 @@
+
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -22,6 +23,7 @@ export const useWalletConnection = () => {
   const connect = async () => {
     try {
       setIsConnecting(true);
+      console.log("[useWalletConnection] Showing auth flow");
       setShowAuthFlow?.(true);
     } catch (error) {
       console.error("Connection error:", error);
