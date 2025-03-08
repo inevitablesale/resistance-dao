@@ -168,10 +168,10 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
               disabled={isAuthenticating}
               variant="primary"
               size="xl"
-              className="uppercase font-mono flex items-center justify-center text-base md:w-auto w-full"
+              className="uppercase font-mono inline-flex items-center justify-center text-base md:w-auto w-full"
             >
               <LockKeyhole className="h-5 w-5 mr-2" />
-              <span>Authenticate</span>
+              AUTHENTICATE
             </ToxicButton>
           </div>
         </form>
@@ -187,10 +187,10 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
           disabled={isAuthenticating}
           variant="secondary"
           size="lg"
-          className="w-full uppercase font-mono flex items-center justify-center py-3 text-base mb-8"
+          className="w-full uppercase font-mono inline-flex items-center justify-center py-3 text-base mb-8"
         >
           <Shield className="h-5 w-5 mr-2" />
-          <span>Connect Crypto Wallet</span>
+          CONNECT CRYPTO WALLET
         </ToxicButton>
 
         <div className="flex justify-center items-center gap-2 text-white/60 mb-6">
@@ -208,10 +208,10 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
           <ToxicButton
             variant="tertiary"
             size="default"
-            className="w-full uppercase font-mono flex items-center justify-center py-2.5 text-sm"
+            className="w-full uppercase font-mono inline-flex items-center justify-center py-2.5 text-sm"
           >
             <ExternalLink className="h-4 w-4 mr-2" />
-            <span>Gain Access Code</span>
+            GAIN ACCESS CODE
           </ToxicButton>
         </a>
 

@@ -48,7 +48,7 @@ const ToxicButton = React.forwardRef<HTMLButtonElement, ToxicButtonProps>(
         ref={ref}
         {...props}
       >
-        <span className="relative z-10">{props.children}</span>
+        {props.children}
         <span className="absolute inset-0 opacity-20 bg-gradient-to-r from-transparent via-toxic-neon/30 to-transparent -translate-x-full group-hover:animate-[shine_1.5s_ease-in-out_forwards]"></span>
         <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-toxic-neon/10 transition-opacity duration-300"></span>
         {(variant === 'glowing' || variant === 'secondary') && (
