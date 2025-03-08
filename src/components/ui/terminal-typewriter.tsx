@@ -153,14 +153,14 @@ export function TerminalTypewriter({
                   <>
                     <div className="terminal-input-container mt-5">
                       <div className="access-code-container">
-                        <div className="flex items-center w-full">
+                        <div className="flex items-center w-full relative">
+                          <Lock className="access-code-icon absolute left-3 z-10 text-toxic-neon" size={16} />
                           <Input
                             type="password"
                             placeholder="Enter access code"
-                            className="access-code-input"
+                            className="access-code-input pl-10"
                             value={accessCode}
                             onChange={handleAccessCodeChange}
-                            icon={<Lock className="access-code-icon" />}
                           />
                           <button 
                             onClick={handleSubmit}
