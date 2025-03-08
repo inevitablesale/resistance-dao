@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -341,7 +340,7 @@ export default function MarketplaceItemDetails() {
                   <div className="h-[400px] relative">
                     {item?.modelUrl ? (
                       <ModelPreview 
-                        modelUrl="bafybeig47okn4sqqbajhje57htkxw6py3tdms7boyc3hkvvr4qlj7zsabu" 
+                        modelUrl={item.modelUrl} 
                         height="400px"
                         width="100%"
                         autoRotate={true}
@@ -595,3 +594,4 @@ export default function MarketplaceItemDetails() {
     </div>
   );
 }
+

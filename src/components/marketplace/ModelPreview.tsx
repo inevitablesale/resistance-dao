@@ -1,11 +1,9 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RadiationOverlay } from '@/components/radiation/RadiationOverlay';
-import { getModelFromIPFS } from '@/services/ipfsService';
 
 interface ModelPreviewProps {
   modelUrl: string;
@@ -61,7 +59,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   
   // Process the IPFS URLs
   useEffect(() => {
-    const fetchUrls = async () => {
+    const processUrls = () => {
       try {
         // Process radiation cloud URL
         if (radiationCloudUrl) {
@@ -69,10 +67,9 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
           if (radiationCloudUrl.startsWith('http')) {
             setProcessedCloudUrl(radiationCloudUrl);
           } else {
-            // Remove ipfs:// prefix if it exists
+            // Use a direct gateway URL (avoid dynamic fetch)
             const cloudHash = radiationCloudUrl.replace('ipfs://', '');
-            const url = await getModelFromIPFS(cloudHash);
-            setProcessedCloudUrl(url);
+            setProcessedCloudUrl(`https://gateway.pinata.cloud/ipfs/${cloudHash}`);
           }
         }
         
@@ -82,19 +79,18 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
           if (modelUrl.startsWith('http')) {
             setProcessedModelUrl(modelUrl);
           } else {
-            // Remove ipfs:// prefix if it exists
+            // Use a direct gateway URL (avoid dynamic fetch)
             const modelHash = modelUrl.replace('ipfs://', '');
-            const url = await getModelFromIPFS(modelHash);
-            setProcessedModelUrl(url);
+            setProcessedModelUrl(`https://gateway.pinata.cloud/ipfs/${modelHash}`);
           }
         }
       } catch (error) {
-        console.error('Error processing IPFS URLs:', error);
+        console.error('Error processing URLs:', error);
         setError('Failed to process model URLs');
       }
     };
     
-    fetchUrls();
+    processUrls();
   }, [radiationCloudUrl, modelUrl]);
   
   // Check for transition direction
@@ -108,6 +104,9 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   // Setup the scene, camera, and renderer when URLs are processed
   useEffect(() => {
     if (!containerRef.current || !processedCloudUrl || !processedModelUrl) return;
+    
+    console.log('Loading radiation cloud from:', processedCloudUrl);
+    console.log('Loading character model from:', processedModelUrl);
     
     setLoading(true);
     setError(null);
@@ -658,7 +657,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
           <div className="absolute inset-0 flex items-center justify-center bg-black/70">
             <div className="text-red-500 text-center p-4">
               <p>{error}</p>
-              <p className="text-xs mt-2">Try a different model or check the URL</p>
+              <p className="text-xs mt-2">Try refreshing or check the model URLs</p>
             </div>
           </div>
         )}
