@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Minimize2, Maximize2, X, Monitor, Shield, Target, AlertTriangle, BookOpen, AppWindow } from 'lucide-react';
+import { Minimize2, Maximize2, X, Monitor, Shield, Target, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TerminalTypewriter } from './terminal-typewriter';
 
@@ -83,16 +83,16 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({ icon, label, onClick, isActiv
     <div 
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center p-1 rounded-md cursor-pointer group",
+        "flex flex-col items-center p-1 rounded-md cursor-pointer",
         isActive ? "bg-toxic-neon/20" : "hover:bg-toxic-neon/10"
       )}
     >
-      <div className="w-10 h-10 rounded-md bg-black/80 border border-toxic-neon/30 flex items-center justify-center mb-1 group-hover:border-toxic-neon/60">
+      <div className="w-10 h-10 rounded-md bg-black/80 border border-toxic-neon/30 flex items-center justify-center mb-1">
         <div className="text-toxic-neon">
           {icon}
         </div>
       </div>
-      <span className="text-toxic-neon/80 text-xs font-mono text-center group-hover:text-toxic-neon max-w-[60px] truncate">
+      <span className="text-toxic-neon/80 text-xs font-mono text-center max-w-[60px] truncate">
         {label}
       </span>
     </div>
@@ -171,17 +171,6 @@ export function TerminalMonitor({
     setMaximizedApp(maximizedApp === appId ? null : appId);
   };
 
-  const handleAppFocus = (appId: string) => {
-    if (openApps.includes(appId)) {
-      setActiveApp(appId);
-      setAppZIndex({
-        ...appZIndex,
-        [appId]: nextZIndex
-      });
-      setNextZIndex(nextZIndex + 1);
-    }
-  };
-
   const handleCompleteBootSequence = () => {
     if (onTypingComplete) {
       onTypingComplete();
@@ -192,14 +181,14 @@ export function TerminalMonitor({
   // Simplified app content
   const appContent: Record<string, { title: string, icon: React.ReactNode, content: React.ReactNode }> = {
     'network-status': {
-      title: 'NETWORK STATUS',
+      title: 'NETWORK',
       icon: <AlertTriangle size={16} />,
       content: (
         <div className="p-2">
-          <h3 className="text-toxic-neon text-lg mb-3">Resistance Network Status</h3>
+          <h3 className="text-toxic-neon text-lg mb-3">Network Status</h3>
           <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/70 mb-4">
             <p className="text-white/80">
-              Network connection established. Security protocols active.
+              Network connection established.
             </p>
           </div>
           
@@ -218,11 +207,11 @@ export function TerminalMonitor({
       )
     },
     'survey': {
-      title: 'WASTELAND ROLE ASSESSMENT',
+      title: 'ROLE SELECT',
       icon: <Shield size={16} />,
       content: (
         <div className="p-2">
-          <h3 className="text-toxic-neon text-lg mb-3">Wasteland Role Assessment</h3>
+          <h3 className="text-toxic-neon text-lg mb-3">Role Assessment</h3>
           <TerminalTypewriter
             showQuestionnaire={true}
             onRoleSelect={onRoleSelect}
@@ -232,38 +221,21 @@ export function TerminalMonitor({
       )
     },
     'bounty-hunter': {
-      title: 'BOUNTY LIST',
+      title: 'BOUNTIES',
       icon: <Target size={16} />,
       content: (
         <div className="p-2">
           <h3 className="text-toxic-neon text-lg mb-3">Active Bounties</h3>
           <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/70 mb-4">
             <p className="text-white/80">
-              Displaying active bounties for execution. Authorized hunters only.
+              Displaying active bounties.
             </p>
           </div>
           
           <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/70 mb-4">
             <h4 className="text-toxic-neon font-mono mb-1">Target #42</h4>
             <p className="text-white/80 mb-2">Toxic Liquidator K-42</p>
-            <p className="text-white/70 text-sm">Last seen: Settlement #7</p>
             <p className="text-white/70 text-sm">Bounty: 32,000 RD</p>
-          </div>
-        </div>
-      )
-    },
-    'archives': {
-      title: 'ARCHIVES',
-      icon: <BookOpen size={16} />,
-      content: (
-        <div className="p-2">
-          <h3 className="text-toxic-neon text-lg mb-3">Historical Archives</h3>
-          <div className="border border-toxic-neon/30 rounded-md p-3 bg-black/70 mb-4">
-            <h4 className="text-toxic-neon font-mono mb-1">The Fall</h4>
-            <p className="text-white/80 text-sm">
-              It began with the great crashes of 2022-2023. Major protocols imploded one by one, like a chain of 
-              nuclear detonations across the digital landscape.
-            </p>
           </div>
         </div>
       )
@@ -276,9 +248,6 @@ export function TerminalMonitor({
       <div className="monitor-frame bg-black/90 border border-toxic-neon/40 rounded-lg overflow-hidden shadow-[0_0_10px_rgba(80,250,123,0.2)] relative">
         {/* Monitor screen - reduced visual effects */}
         <div className="monitor-screen bg-black p-2 relative overflow-hidden" style={{ minHeight: "400px", height: "60vh", maxHeight: "600px" }}>
-          {/* Simplified scanline effect */}
-          <div className="monitor-scanlines absolute inset-0 pointer-events-none opacity-30"></div>
-          
           {/* Terminal content */}
           <div className="relative p-2 h-full">
             {!bootComplete && !selectedRole && !skipBootSequence ? (
@@ -292,7 +261,7 @@ export function TerminalMonitor({
               <div className="desktop-environment h-full relative">
                 {/* Desktop Icons - simplified grid */}
                 {showDesktopIcons && (
-                  <div className="grid grid-cols-4 gap-2 p-2 absolute top-0 left-0 z-10">
+                  <div className="grid grid-cols-3 gap-2 p-2 absolute top-0 left-0 z-10">
                     <DesktopIcon 
                       icon={<AlertTriangle size={20} />} 
                       label="Network"
@@ -310,12 +279,6 @@ export function TerminalMonitor({
                       label="Bounties"
                       onClick={() => handleOpenApp('bounty-hunter')}
                       isActive={activeApp === 'bounty-hunter'}
-                    />
-                    <DesktopIcon 
-                      icon={<BookOpen size={20} />} 
-                      label="Archives"
-                      onClick={() => handleOpenApp('archives')}
-                      isActive={activeApp === 'archives'}
                     />
                   </div>
                 )}
@@ -340,7 +303,8 @@ export function TerminalMonitor({
         </div>
       </div>
       
-      <style jsx>{`
+      <style>
+        {`
         .monitor-scanlines::before {
           content: '';
           position: absolute;
@@ -357,7 +321,8 @@ export function TerminalMonitor({
           pointer-events: none;
           z-index: 1;
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 }

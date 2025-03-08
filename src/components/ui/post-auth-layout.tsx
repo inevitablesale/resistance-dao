@@ -23,41 +23,28 @@ export function PostAuthLayout({ leftSidebar, mainContent, rightSidebar, onAppOp
       animate={{ opacity: 1 }}
       className="grid grid-cols-1 md:grid-cols-12 gap-4 w-full"
     >
-      {/* Left sidebar section - simplified with less motion */}
+      {/* Left sidebar section - simplified */}
       {leftSidebar && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="md:col-span-3 space-y-4"
-        >
+        <div className="md:col-span-3 space-y-4">
           {leftSidebar}
-        </motion.div>
+        </div>
       )}
       
-      {/* Main content section - reduced animation */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
+      {/* Main content section - simplified */}
+      <div 
         className={`
           ${leftSidebar && rightSidebar ? 'md:col-span-6' : 
            (leftSidebar || rightSidebar ? 'md:col-span-9' : 'md:col-span-12')}
         `}
       >
         {mainContent}
-      </motion.div>
+      </div>
       
-      {/* Right sidebar section - simplified with less motion */}
+      {/* Right sidebar section - simplified */}
       {rightSidebar && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="md:col-span-3 space-y-4"
-        >
+        <div className="md:col-span-3 space-y-4">
           {rightSidebar}
-        </motion.div>
+        </div>
       )}
     </motion.div>
   );
