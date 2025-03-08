@@ -342,12 +342,12 @@ const Index = () => {
       <div className="text-left mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
           <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
-          <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Project Status: <span className="text-apocalypse-red font-bold status-critical">Seeking Capital Commitments</span>
+          <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Rebuilding From The Ashes</span>
         </div>
         
         <div className="mb-6">
           <TerminalTypewriter 
-            textToType="WELCOME TO THE RESISTANCE PROJECT FUNDING PORTAL - SOFT CAPITAL COMMITMENTS ACTIVE"
+            textToType="WELCOME TO THE RESISTANCE SURVIVAL TERMINAL - JOIN THE NETWORK TO REBUILD CIVILIZATION"
             isConnected={isConnected}
             onConnect={handleConnectWallet}
             className="mb-4"
@@ -369,18 +369,78 @@ const Index = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
-            <MarketplaceListingGrid 
-              listings={bountyHunterListings} 
-              title="Featured Projects - Bounty Hunter Series" 
-              onListingClick={handleListingClick}
-              className="mb-8"
-            />
-            
-            <MarketplaceListingGrid 
-              listings={survivorListings} 
-              title="Community-Voted Projects - Survivor Series" 
-              onListingClick={handleListingClick}
-            />
+            <div className="mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
+                  <h3 className="text-2xl font-mono text-toxic-neon mb-3">BOUNTY HUNTER</h3>
+                  <p className="text-white/80 mb-4 leading-relaxed">
+                    Stalk the wasteland hunting the criminals who crashed the old world. Track digital signatures, capture mutated protocols, and earn rewards for bringing justice to the Resistance.
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <div className="text-center">
+                      <div className="text-sm text-white/60">Collection Size:</div>
+                      <div className="text-toxic-neon font-mono">142 CRIMINALS</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-white/60">Avg. Bounty Value:</div>
+                      <div className="text-toxic-neon font-mono">22,500 RD</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-white/60">Active Hunters:</div>
+                      <div className="text-toxic-neon font-mono">68</div>
+                    </div>
+                  </div>
+                  <ToxicButton 
+                    variant="outline" 
+                    className="w-full border-toxic-neon/40"
+                    onClick={() => navigate('/marketplace/bounty-hunters')}
+                  >
+                    Select Bounty Hunter
+                  </ToxicButton>
+                </ToxicCard>
+                
+                <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
+                  <h3 className="text-2xl font-mono text-toxic-neon mb-3">SURVIVOR</h3>
+                  <p className="text-white/80 mb-4 leading-relaxed">
+                    Join a network of settlements rebuilding civilization from the ashes. Contribute your skills to community projects, develop new technologies, and shape our collective future.
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <div className="text-center">
+                      <div className="text-sm text-white/60">Collection Size:</div>
+                      <div className="text-toxic-neon font-mono">821 SURVIVORS</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-white/60">Settlement Outposts:</div>
+                      <div className="text-toxic-neon font-mono">37</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-white/60">Active Projects:</div>
+                      <div className="text-toxic-neon font-mono">84</div>
+                    </div>
+                  </div>
+                  <ToxicButton 
+                    variant="outline" 
+                    className="w-full border-toxic-neon/40"
+                    onClick={() => navigate('/marketplace/survivors')}
+                  >
+                    Select Survivor
+                  </ToxicButton>
+                </ToxicCard>
+              </div>
+              
+              <MarketplaceListingGrid 
+                listings={bountyHunterListings} 
+                title="WANTED: Top Bounty Targets" 
+                onListingClick={handleListingClick}
+                className="mb-8"
+              />
+              
+              <MarketplaceListingGrid 
+                listings={survivorListings} 
+                title="RECRUTING: Needed Survivor Skills" 
+                onListingClick={handleListingClick}
+              />
+            </div>
           </div>
           
           <div className="lg:col-span-1">
@@ -391,22 +451,22 @@ const Index = () => {
               className="mb-6"
             />
             
-            <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4">
+            <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4 mb-6">
               <div className="flex items-center gap-2 mb-4">
                 <div className="p-2 rounded-full bg-toxic-neon/10">
                   <Shield className="w-5 h-5 text-toxic-neon" />
                 </div>
-                <h3 className="text-lg font-mono text-toxic-neon">My Funding Status</h3>
+                <h3 className="text-lg font-mono text-toxic-neon">Survivor Status</h3>
               </div>
               
               {isConnected ? (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">Active Commitments</span>
+                    <span className="text-white/70">Bounties Claimed</span>
                     <span className="text-toxic-neon font-mono">0</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">Funding Reputation</span>
+                    <span className="text-white/70">Wasteland Reputation</span>
                     <div className="flex items-center">
                       <ToxicBadge variant="rating" className="text-toxic-neon">★ 0.0</ToxicBadge>
                     </div>
@@ -420,7 +480,7 @@ const Index = () => {
                 </div>
               ) : (
                 <div className="text-center py-6 bg-toxic-neon/5 rounded-lg">
-                  <p className="text-white/70 mb-4">Connect to view your funding status</p>
+                  <p className="text-white/70 mb-4">Connect to view your wasteland status</p>
                   <ToxicButton 
                     variant="marketplace"
                     onClick={handleConnectWallet}
@@ -432,13 +492,49 @@ const Index = () => {
               )}
             </ToxicCard>
             
+            <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4 mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 rounded-full bg-toxic-neon/10">
+                  <CircleDollarSign className="w-5 h-5 text-toxic-neon" />
+                </div>
+                <h3 className="text-lg font-mono text-toxic-neon">Fuel The New Economy</h3>
+              </div>
+              <p className="text-white/70 text-sm mb-4">
+                PRESALE NOW ACTIVE - Join the first wave of wasteland rebuilders.
+              </p>
+              <p className="text-white/70 text-sm mb-4">
+                Convert your Old World currency (USDC) into Resistance Dollars (RD) to establish trade networks and power the post-apocalyptic economy.
+              </p>
+              <div className="bg-black/50 border border-toxic-neon/20 p-3 rounded-md mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-white/70">Exchange Rate</span>
+                  <span className="text-sm text-toxic-neon font-mono">1 USDC = 1 RD</span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-white/70">Minimum Contribution</span>
+                  <span className="text-sm text-toxic-neon font-mono">10 USDC</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-white/70">Protocol Fee</span>
+                  <span className="text-sm text-toxic-neon font-mono">0.5%</span>
+                </div>
+              </div>
+              <ToxicButton
+                variant="marketplace"
+                className="w-full"
+                onClick={() => navigate('/buy-rd')}
+              >
+                JOIN THE RESISTANCE ECONOMY
+              </ToxicButton>
+            </ToxicCard>
+            
             {isConnected && (
-              <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4 mt-6">
+              <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="p-2 rounded-full bg-toxic-neon/10">
-                    <CircleDollarSign className="w-5 h-5 text-toxic-neon" />
+                    <Target className="w-5 h-5 text-toxic-neon" />
                   </div>
-                  <h3 className="text-lg font-mono text-toxic-neon">Quick Actions</h3>
+                  <h3 className="text-lg font-mono text-toxic-neon">Wasteland Missions</h3>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2">
@@ -449,7 +545,7 @@ const Index = () => {
                     onClick={handleCreateListing}
                   >
                     <PlusCircle className="h-4 w-4 mr-1" />
-                    Submit Project
+                    Submit Mission
                   </ToxicButton>
                   
                   <ToxicButton 
@@ -459,7 +555,7 @@ const Index = () => {
                     onClick={handleBrowseListings}
                   >
                     <Search className="h-4 w-4 mr-1" />
-                    Browse
+                    Hunt Bounties
                   </ToxicButton>
                   
                   <ToxicButton 
@@ -469,7 +565,7 @@ const Index = () => {
                     onClick={() => navigate('/marketplace/inventory')}
                   >
                     <ShoppingBag className="h-4 w-4 mr-1" />
-                    My Projects
+                    My Captures
                   </ToxicButton>
                   
                   <ToxicButton 
@@ -479,7 +575,7 @@ const Index = () => {
                     onClick={() => navigate('/marketplace/offers')}
                   >
                     <Target className="h-4 w-4 mr-1" />
-                    Commitments
+                    Active Missions
                   </ToxicButton>
                 </div>
               </ToxicCard>
@@ -487,16 +583,11 @@ const Index = () => {
           </div>
         </div>
         
-        <div className="relative mb-8">
-          <BuyRDTokens onConnectWallet={handleConnectWallet} />
-          <ToxicPuddle className="absolute -bottom-2 -right-10" toxicGreen={true} />
-        </div>
-        
         <div className="mb-12 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
           <div className="scanline"></div>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
-              <Radiation className="h-6 w-6 mr-2" /> PROJECT FUNDING GUIDE
+              <Radiation className="h-6 w-6 mr-2" /> WASTELAND SURVIVAL GUIDE
             </h3>
           </div>
           
@@ -506,16 +597,16 @@ const Index = () => {
                 <Biohazard className="w-6 h-6 text-apocalypse-red" />
               </div>
               <div>
-                <h4 className="text-lg font-mono text-apocalypse-red mb-2">Soft Capital Commitments</h4>
+                <h4 className="text-lg font-mono text-apocalypse-red mb-2">Resistance Protocol</h4>
                 <p className="text-white/80 mb-3 text-sm">
-                  The <span className="text-apocalypse-red font-semibold">Resistance Project Funding Portal</span> connects project owners with potential backers through soft capital commitments - no upfront capital required.
+                  The <span className="text-apocalypse-red font-semibold">Resistance</span> connects survivors and bounty hunters to rebuild from the ashes of the old financial world.
                 </p>
                 <p className="text-white/80 mb-3 text-sm">
-                  Whether you're <span className="text-toxic-neon font-semibold">seeking funding</span> for your innovative protocol or looking to <span className="text-toxic-neon font-semibold">support promising projects</span>, our platform facilitates secure commitments and project validation.
+                  Whether you're a <span className="text-toxic-neon font-semibold">Hunter tracking criminal protocols</span> or a <span className="text-toxic-neon font-semibold">Survivor contributing rebuild skills</span>, our network facilitates wasteland justice and rebuilding efforts.
                 </p>
                 <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
                   <span className="text-toxic-neon font-semibold block mb-1">» COMING SOON «</span>
-                  Job Listings | Partner Matching | Role Seeking - Expanding the Resistance network with more ways to connect and collaborate.
+                  Settler Jobs | Wasteland Expeditions | Settlement Building - Expanding the Resistance with more ways to survive and rebuild.
                 </div>
               </div>
             </div>
@@ -527,19 +618,19 @@ const Index = () => {
                 <div className="p-2 rounded-full bg-toxic-neon/10">
                   <Target className="w-5 h-5 text-toxic-neon" />
                 </div>
-                <h4 className="text-lg font-mono text-toxic-neon">Project Submission</h4>
+                <h4 className="text-lg font-mono text-toxic-neon">Hunt Bounties</h4>
               </div>
               <p className="text-white/70 text-sm mb-3">
-                Submit your project for community validation and funding. Projects with sufficient soft commitments move into development with Resistance support.
+                Track down the criminals who crashed the old world. Submit capture evidence and earn rewards for bringing justice to the wasteland.
               </p>
               <div className="flex justify-end">
                 <ToxicButton 
                   variant="outline" 
                   size="sm" 
                   className="text-toxic-neon border-toxic-neon/30"
-                  onClick={() => navigate('/thesis')}
+                  onClick={() => navigate('/marketplace/bounty-hunters')}
                 >
-                  Submit <ChevronRight className="ml-1 h-4 w-4" />
+                  Hunt <ChevronRight className="ml-1 h-4 w-4" />
                 </ToxicButton>
               </div>
             </div>
@@ -549,19 +640,19 @@ const Index = () => {
                 <div className="p-2 rounded-full bg-toxic-neon/10">
                   <Shield className="w-5 h-5 text-toxic-neon" />
                 </div>
-                <h4 className="text-lg font-mono text-toxic-neon">Fund Projects</h4>
+                <h4 className="text-lg font-mono text-toxic-neon">Join Survivors</h4>
               </div>
               <p className="text-white/70 text-sm mb-3">
-                Browse promising projects and show support through soft commitments. Validate quality protocols before they launch with no upfront capital required.
+                Contribute your skills to rebuilding civilization. Each survivor plays a vital role in our settlement network, from medics to engineers.
               </p>
               <div className="flex justify-end">
                 <ToxicButton 
                   variant="outline" 
                   size="sm" 
                   className="text-toxic-neon border-toxic-neon/30"
-                  onClick={() => navigate('/proposals')}
+                  onClick={() => navigate('/marketplace/survivors')}
                 >
-                  Explore <ChevronRight className="ml-1 h-4 w-4" />
+                  Settle <ChevronRight className="ml-1 h-4 w-4" />
                 </ToxicButton>
               </div>
             </div>
@@ -569,20 +660,21 @@ const Index = () => {
             <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 rounded-full bg-toxic-neon/10">
-                  <ShoppingBag className="w-5 h-5 text-toxic-neon" />
+                  <Coins className="w-5 h-5 text-toxic-neon" />
                 </div>
-                <h4 className="text-lg font-mono text-toxic-neon">Coming Soon</h4>
+                <h4 className="text-lg font-mono text-toxic-neon">Fund Economy</h4>
               </div>
               <p className="text-white/70 text-sm mb-3">
-                Job Listings | Partner Matching | Role Seeking - New ways to connect talent, projects, and resources within the Resistance ecosystem.
+                Convert your Old World assets to Resistance Dollars (RD). Power the new wasteland economy and gain governance rights in settlement decisions.
               </p>
               <div className="flex justify-end">
                 <ToxicButton 
                   variant="outline" 
                   size="sm" 
-                  className="text-toxic-neon border-toxic-neon/30 opacity-60 cursor-not-allowed"
+                  className="text-toxic-neon border-toxic-neon/30"
+                  onClick={() => navigate('/buy-rd')}
                 >
-                  Soon <ChevronRight className="ml-1 h-4 w-4" />
+                  Convert <ChevronRight className="ml-1 h-4 w-4" />
                 </ToxicButton>
               </div>
             </div>
