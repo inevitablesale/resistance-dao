@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Shield, LockKeyhole, AlertTriangle, Terminal } from "lucide-react";
+import { Shield, LockKeyhole, AlertTriangle, Terminal, ExternalLink, Info } from "lucide-react";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 
@@ -168,6 +169,30 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
             </ToxicButton>
           </div>
         </form>
+
+        <div className="bg-black/80 border border-toxic-neon/20 p-4 rounded mb-6">
+          <div className="flex items-start gap-3">
+            <Info className="h-5 w-5 text-toxic-neon flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-toxic-neon font-mono text-sm mb-2">HOW TO GET ACCESS CODE</h3>
+              <p className="text-white/80 text-sm mb-2">
+                Join the Resistance LinkedIn group to receive your access code and connect with fellow survivors.
+              </p>
+              <a 
+                href="https://www.linkedin.com/groups/14310213/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-center gap-2 text-toxic-neon text-sm hover:underline hover:text-toxic-neon/80 transition-colors mt-1"
+              >
+                <ExternalLink className="h-4 w-4" />
+                <span>Join Resistance LinkedIn Group</span>
+              </a>
+              <p className="text-white/60 text-xs mt-2">
+                <span className="text-apocalypse-red">*</span> Default access code: "resistance"
+              </p>
+            </div>
+          </div>
+        </div>
 
         <div className="flex justify-center items-center gap-2 text-white/60 mb-6">
           <span className="border-t border-white/20 flex-grow"></span>
