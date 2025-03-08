@@ -10,6 +10,7 @@ interface TerminalTypewriterProps {
   className?: string;
   isConnected?: boolean;
   onConnect?: () => void;
+  marketplaceMode?: boolean;
 }
 
 export function TerminalTypewriter({
@@ -17,7 +18,8 @@ export function TerminalTypewriter({
   typeDelay = 70,
   className,
   isConnected = false,
-  onConnect
+  onConnect,
+  marketplaceMode = false
 }: TerminalTypewriterProps) {
   const [displayText, setDisplayText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
