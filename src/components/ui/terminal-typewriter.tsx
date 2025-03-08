@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
-import { Radiation, ShieldAlert } from "lucide-react";
+import { Radiation, ShieldAlert, Shield, Wifi } from "lucide-react";
 import { ToxicButton } from "./toxic-button";
 
 interface TerminalTypewriterProps {
@@ -152,13 +152,25 @@ export function TerminalTypewriter({
         )}
         
         {isConnected && (
-          <div className="terminal-line mt-4 text-toxic-neon">
-            <span>[CONNECTED]</span> 
-            <span className="text-white/70">
-              {marketplaceMode ? 
-                " CAPITAL COMMITMENT PROTOCOLS ACTIVE - PROJECT FUNDING ENABLED" : 
-                " SURVIVAL BEACON ACTIVE - WELCOME TO THE RESISTANCE"}
-            </span>
+          <div className="terminal-line mt-4">
+            <ToxicButton
+              onClick={onConnect}
+              variant="outline"
+              className="border-toxic-neon/30 bg-toxic-neon/10 hover:bg-toxic-neon/20"
+            >
+              <Wifi className="w-4 h-4 mr-2 text-toxic-neon" />
+              <span className="text-toxic-neon">
+                {marketplaceMode ? "ACCESS FUNDING TERMINAL" : "ACCESS COMMAND TERMINAL"}
+              </span>
+            </ToxicButton>
+            <div className="mt-2 text-toxic-neon flex items-center gap-2">
+              <Shield className="w-4 h-4 text-toxic-neon" />
+              <span className="text-white/70">
+                {marketplaceMode ? 
+                  "CAPITAL COMMITMENT PROTOCOLS ACTIVE" : 
+                  "SURVIVAL BEACON ACTIVE - WELCOME TO THE RESISTANCE"}
+              </span>
+            </div>
           </div>
         )}
       </div>
