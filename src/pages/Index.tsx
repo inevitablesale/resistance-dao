@@ -1,4 +1,4 @@
-
+<lov-code>
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -560,6 +560,33 @@ const Index = () => {
     </div>
   );
 
+  // Add missing functions for render content based on terminal stages
+  const renderTypewriterContent = () => (
+    <div className="h-full">
+      <TerminalTypewriter
+        showBootSequence={false}
+        onTypingComplete={handleTerminalComplete}
+      />
+    </div>
+  );
+
+  const renderNFTContent = () => (
+    <div className="h-full">
+      <TerminalTypewriter
+        showBootSequence={false}
+        showQuestionnaire={true}
+        onRoleSelect={handleRoleSelect}
+        selectedRole={userRole}
+      />
+    </div>
+  );
+
+  const renderDesktopEnvironment = () => (
+    <PostAuthLayout
+      onAppOpened={() => setInitialAppOpened(true)}
+    />
+  );
+
   // Function to render different content based on the authentication and terminal stages
   const renderMainContent = () => {
     if (authStage === "post-breach" || authStage === "authenticated") {
@@ -584,6 +611,14 @@ const Index = () => {
     
     // Default fallback (should not reach here)
     return null;
+  };
+
+  // Fix the comparison logic in the conditional rendering
+  const shouldShowProgressIndicator = () => {
+    if (authStage === "pre-boot" && showProgressIndicator) {
+      return true;
+    }
+    return false;
   };
 
   return (
@@ -669,98 +704,4 @@ const Index = () => {
                 {/* Terminal header */}
                 <div className="flex items-center justify-between mb-4 border-b border-toxic-neon/20 pb-2">
                   <div className="flex items-center">
-                    <Radiation className="h-5 w-5 mr-2 text-toxic-neon" />
-                    <span className="text-toxic-neon font-mono text-lg">RESISTANCE_NETWORK</span>
-                  </div>
-                  
-                  <div className="flex gap-1">
-                    <div className="h-3 w-3 rounded-full bg-apocalypse-red animate-pulse"></div>
-                    <div className="h-3 w-3 rounded-full bg-toxic-neon/70"></div>
-                  </div>
-                </div>
-                
-                {/* Main content area */}
-                <div className="h-full">
-                  {renderMainContent()}
-                  
-                  {/* Progress Indicator only shown during typing stage after breach */}
-                  {showProgressIndicator && terminalStage === "typing" && (
-                    <div className="mt-6">
-                      <ProgressIndicator 
-                        stages={[
-                          { id: "boot", label: "Boot", completed: true },
-                          { id: "breach", label: "System Breach", completed: true },
-                          { id: "desktop", label: "Interface", completed: terminalStage !== "typing" },
-                          { id: "role", label: "Role Selection", completed: userRole !== null }
-                        ]}
-                      />
-                    </div>
-                  )}
-                </div>
-                
-                {/* Conditional buttons */}
-                {authStage === "pre-boot" && showProgressIndicator && (
-                  <div className="mt-6">
-                    <ProgressIndicator 
-                      stages={[
-                        { id: "boot", label: "Boot", completed: authStage !== "pre-boot" },
-                        { id: "breach", label: "System Breach", completed: authStage === "post-breach" || authStage === "authenticated" },
-                        { id: "desktop", label: "Interface", completed: terminalStage !== "typing" },
-                        { id: "role", label: "Role Selection", completed: userRole !== null }
-                      ]}
-                    />
-                  </div>
-                )}
-                
-                {/* Show skip button for typing terminal stage only */}
-                {(authStage === "post-breach" || authStage === "authenticated") && terminalStage === "typing" && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 2 }}
-                    className="mt-4 text-center"
-                  >
-                    <p className="text-white/70 text-sm mb-3">
-                      Complete the terminal sequence to access the Resistance Network
-                    </p>
-                    <ToxicButton 
-                      onClick={handleTerminalComplete}
-                      variant="ghost"
-                      size="sm"
-                      className="hover:bg-toxic-neon/20 transition-all duration-300"
-                    >
-                      <Radiation className="w-4 h-4 mr-2" />
-                      Skip Intro Sequence
-                    </ToxicButton>
-                  </motion.div>
-                )}
-                
-                {/* Show continue button for desktop environment */}
-                {(authStage === "post-breach" || authStage === "authenticated") && terminalStage === "desktop-environment" && initialAppOpened && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 8 }}
-                    className="mt-4 text-center"
-                  >
-                    <ToxicButton 
-                      onClick={handleDesktopExplored}
-                      variant="default"
-                      size="lg"
-                      className="animate-pulse-subtle"
-                    >
-                      <Target className="w-5 h-5 mr-2" />
-                      Continue to Resistance Role Selection
-                    </ToxicButton>
-                  </motion.div>
-                )}
-              </div>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
-    </div>
-  );
-};
-
-export default Index;
+                    <Radiation className

@@ -17,6 +17,7 @@ const badgeVariants = cva(
         outline: "border border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/10",
         alert: "border border-apocalypse-red/30 text-apocalypse-red animate-pulse",
         warning: "border border-yellow-400/30 text-yellow-400",
+        danger: "border-transparent bg-red-600 text-white shadow hover:bg-red-700",
       },
     },
     defaultVariants: {
