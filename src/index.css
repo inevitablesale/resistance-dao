@@ -150,6 +150,67 @@ body {
   text-shadow: 0 0 5px var(--toxic-neon), 0 0 10px var(--toxic-neon), 0 0 20px var(--toxic-neon);
 }
 
+/* Enhanced terminal styles */
+.terminal-content {
+  font-family: monospace;
+  line-height: 1.6;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(57, 255, 20, 0.3) rgba(0, 0, 0, 0.5);
+}
+
+.terminal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.terminal-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.terminal-content::-webkit-scrollbar-thumb {
+  background-color: rgba(57, 255, 20, 0.3);
+  border-radius: 20px;
+}
+
+.terminal-content p {
+  margin-bottom: 1rem;
+}
+
+/* Matrix-like rain effect for special terminal sections */
+.matrix-rain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  opacity: 0.2;
+  overflow: hidden;
+}
+
+.matrix-rain::before {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 200%;
+  background: linear-gradient(0deg, 
+    rgba(57, 255, 20, 0) 0%, 
+    rgba(57, 255, 20, 0.1) 75%, 
+    rgba(57, 255, 20, 0.3) 100%
+  );
+  animation: matrix-flow 10s linear infinite;
+}
+
+@keyframes matrix-flow {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(50%);
+  }
+}
+
 /* Critical status flash */
 .flash-critical {
   animation: flash-red 2s infinite;
@@ -388,4 +449,119 @@ button:focus {
   100% {
     transform: scale(1);
   }
+}
+
+.terminal-header {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.terminal-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 6px;
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.1);
+}
+
+.terminal-input-container {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.terminal-middle-container {
+  position: relative;
+  z-index: 10;
+}
+
+.terminal-outer-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.access-code-container {
+  width: 100%;
+  position: relative;
+}
+
+.access-code-input {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  color: var(--toxic-neon);
+  padding: 8px 10px 8px 36px;
+  font-family: monospace;
+  transition: all 0.3s ease;
+}
+
+.access-code-input:focus {
+  border-color: rgba(57, 255, 20, 0.6);
+  box-shadow: 0 0 8px rgba(57, 255, 20, 0.2);
+  outline: none;
+}
+
+.access-code-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--toxic-neon);
+  opacity: 0.7;
+}
+
+.submit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(57, 255, 20, 0.15);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  color: var(--toxic-neon);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-family: monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-button:hover {
+  background-color: rgba(57, 255, 20, 0.25);
+  border-color: rgba(57, 255, 20, 0.5);
+}
+
+.submit-button:active {
+  transform: translateY(1px);
+}
+
+.terminal-footer {
+  padding: 10px;
+  border-top: 1px solid rgba(57, 255, 20, 0.1);
+  display: flex;
+  justify-content: center;
+}
+
+.linkedin-link {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(57, 255, 20, 0.7);
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: color 0.2s;
+}
+
+.linkedin-link:hover {
+  color: var(--toxic-neon);
+}
+
+.terminal-hint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(57, 255, 20, 0.5);
 }

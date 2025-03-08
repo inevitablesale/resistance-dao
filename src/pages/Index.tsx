@@ -7,6 +7,7 @@ import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { DrippingSlime } from "@/components/ui/dripping-slime";
 import { TerminalLogin } from '@/components/terminal/TerminalLogin';
 import { BreachSequence } from '@/components/terminal/BreachSequence';
+import { StoryTerminal } from '@/components/terminal/StoryTerminal';
 
 import { 
   Rocket, 
@@ -70,6 +71,7 @@ import { ChroniclePanel } from "@/components/chronicle/ChroniclePanel";
 import { CharacterProgress } from "@/components/chronicle/CharacterProgress";
 import { TerritoryStatus } from "@/components/chronicle/TerritoryStatus";
 import { WastelandSurvivalGuideEnhanced } from "@/components/chronicle/WastelandSurvivalGuideEnhanced";
+import { ModelPreview } from '@/components/marketplace/ModelPreview';
 
 type AuthState = "unauthenticated" | "authenticating" | "breaching" | "authenticated";
 
@@ -83,6 +85,7 @@ const Index = () => {
   const [authState, setAuthState] = useState<AuthState>("unauthenticated");
   const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
   const [activeRole, setActiveRole] = useState<'sentinel' | 'pioneer'>('sentinel');
+  const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
   
   useEffect(() => {
     if (isConnected && authState === "unauthenticated") {
@@ -105,7 +108,7 @@ const Index = () => {
       setIsRefreshingActivity(false);
     }, 1000);
   };
-  
+
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(Math.round(num));
   };
@@ -307,6 +310,12 @@ const Index = () => {
           <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
           <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Rebuilding From The Ashes</span>
         </div>
+        
+        <StoryTerminal 
+          initiallyOpen={storyTerminalOpen} 
+          onClose={() => setStoryTerminalOpen(false)} 
+          className="mb-8" 
+        />
         
         <WastelandSurvivalGuideEnhanced className="mb-8" />
 
