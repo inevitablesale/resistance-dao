@@ -134,10 +134,10 @@ export function MarketplaceListingGrid({
           {listings.map((listing) => (
             <ToxicCard 
               key={listing.id} 
-              className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all cursor-pointer flex flex-col"
+              className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all cursor-pointer"
               onClick={() => handleItemClick(listing)}
             >
-              <ToxicCardContent className="p-0 flex-grow flex flex-col">
+              <ToxicCardContent className="p-0">
                 <div className="relative h-48 bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-t-lg overflow-hidden">
                   {listing.modelUrl && modelViewEnabled ? (
                     <ModelPreview 
@@ -188,32 +188,29 @@ export function MarketplaceListingGrid({
                     </div>
                   </div>
                 </div>
-                <div className="p-4 flex-grow flex flex-col">
-                  <h4 className="text-xl font-mono text-toxic-neon mb-2 truncate">{listing.name}</h4>
-                  
-                  {/* RAD Level Badge in a dedicated row with fixed height */}
-                  <div className="flex items-center h-8 mb-3">
+                <div className="p-4">
+                  <h4 className="text-xl font-mono text-toxic-neon mb-1">{listing.name}</h4>
+                  <div className="flex items-center mb-3">
                     <ToxicBadge 
                       variant="secondary" 
-                      className={`flex items-center gap-1 whitespace-nowrap ${getRadiationColor(listing.radiation.value)}`}
+                      className={`flex items-center gap-1 ${getRadiationColor(listing.radiation.value)}`}
                     >
-                      <Radiation className="h-3 w-3 mr-1 flex-shrink-0" />
+                      <Radiation className="h-3 w-3 mr-1" />
                       RAD LEVEL: {listing.radiation.level} ({listing.radiation.value}%)
                     </ToxicBadge>
                   </div>
                   
-                  {/* Fixed height attributes container */}
-                  <div className="space-y-2 mb-4 flex-grow min-h-[76px]">
-                    {listing.attributes.slice(0, 3).map((attr, idx) => (
-                      <div key={idx} className="flex justify-between text-xs h-6 items-center">
-                        <span className="text-white/60 truncate max-w-[45%]">{attr.trait}</span>
-                        <span className="text-toxic-neon/90 truncate max-w-[50%] text-right">{attr.value}</span>
+                  <div className="space-y-2 mb-4">
+                    {listing.attributes.map((attr, idx) => (
+                      <div key={idx} className="flex justify-between text-xs">
+                        <span className="text-white/60">{attr.trait}</span>
+                        <span className="text-toxic-neon/90">{attr.value}</span>
                       </div>
                     ))}
                   </div>
                   
                   <ToxicButton 
-                    className="w-full mt-auto bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80 text-sm"
+                    className="w-full mt-2 bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80 text-sm"
                     size="sm"
                     variant="marketplace"
                     onClick={(e) => {
