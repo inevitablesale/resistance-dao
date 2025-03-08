@@ -17,6 +17,8 @@ interface ModelPreviewProps {
   animateRadiation?: boolean;
   useRadiationCloud?: boolean;
   radiationCloudUrl?: string;
+  revealValue?: number; // New prop for controlling reveal amount (0-100)
+  showControls?: boolean; // Whether to show fullscreen controls
 }
 
 export const ModelPreview: React.FC<ModelPreviewProps> = ({ 
@@ -28,7 +30,9 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   radiationLevel = 0,
   animateRadiation = true,
   useRadiationCloud = false,
-  radiationCloudUrl = "bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
+  radiationCloudUrl = "bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4",
+  revealValue = 100, // Default to 100 (fully obscured)
+  showControls = true
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
@@ -73,24 +77,24 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     
     // Scene setup
     const newScene = new THREE.Scene();
-    newScene.background = new THREE.Color(0x000000);
+    newScene.background = new THREE.Color(0x111111); // Lighter background (dark gray instead of black)
     setScene(newScene);
     
-    // Add ambient light
-    const ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+    // Add ambient light - increase intensity
+    const ambientLight = new THREE.AmbientLight(0xcccccc, 0.6); // Increased from 0.4
     newScene.add(ambientLight);
     
-    // Add directional light
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    // Add directional light - increase intensity
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2); // Increased from 0.8
     directionalLight.position.set(1, 1, 1);
     newScene.add(directionalLight);
     
-    // Add neutral point lights instead of colored ones
-    const pointLight1 = new THREE.PointLight(0xffffff, 0.5); // Changed to white
+    // Add neutral point lights with increased intensity
+    const pointLight1 = new THREE.PointLight(0xffffff, 0.8); // Increased from 0.5
     pointLight1.position.set(2, 1, 3);
     newScene.add(pointLight1);
     
-    const pointLight2 = new THREE.PointLight(0xffffff, 0.3); // Changed to white
+    const pointLight2 = new THREE.PointLight(0xffffff, 0.5); // Increased from 0.3
     pointLight2.position.set(-2, 2, -1);
     newScene.add(pointLight2);
     
@@ -109,7 +113,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.25;
+    renderer.toneMappingExposure = 1.5; // Increased from 1.25 for more brightness
     containerRef.current.appendChild(renderer.domElement);
     
     // Controls
@@ -148,11 +152,14 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         // Apply transparent material with neutral color
         gltf.scene.traverse((child) => {
           if (child instanceof THREE.Mesh) {
+            // Use the reveal value to set opacity - invert the value (100 = fully obscured, 0 = fully revealed)
+            const opacity = Math.max(0, Math.min(100, 100 - revealValue)) / 100;
+            
             // Apply neutral transparent material without color tint
             if (Array.isArray(child.material)) {
               child.material.forEach(mat => {
                 mat.transparent = true;
-                mat.opacity = radiationLevel / 100;
+                mat.opacity = opacity;
                 
                 // Use neutral gray color instead of green/yellow
                 mat.color = new THREE.Color(0xffffff);
@@ -161,7 +168,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
               });
             } else {
               child.material.transparent = true;
-              child.material.opacity = radiationLevel / 100;
+              child.material.opacity = opacity;
               
               // Use neutral gray color instead of green/yellow
               child.material.color = new THREE.Color(0xffffff);
@@ -247,14 +254,11 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       controls.dispose();
       if (newMixer) newMixer.stopAllAction();
     };
-  }, [processedCloudUrl, autoRotate, radiationLevel]);
+  }, [processedCloudUrl, autoRotate, revealValue]); // Added revealValue to the dependency array
   
+  // Directly render the container for the 3D model
   return (
-    <RadiationOverlay 
-      radiationLevel={0} // No gradient overlay when using 3D cloud
-      animate={animateRadiation && modelLoaded}
-      className={`${className}`}
-    >
+    <div className={`${className}`}>
       <div 
         ref={containerRef} 
         className="w-full h-full rounded-lg overflow-hidden" 
@@ -275,6 +279,6 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
           </div>
         )}
       </div>
-    </RadiationOverlay>
+    </div>
   );
 };

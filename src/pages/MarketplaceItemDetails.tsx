@@ -651,6 +651,7 @@ export default function MarketplaceItemDetails() {
                             radiationLevel={relatedItem.radiation.value}
                             useRadiationCloud={true}
                             radiationCloudUrl="bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
+                            revealValue={20}
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full">
