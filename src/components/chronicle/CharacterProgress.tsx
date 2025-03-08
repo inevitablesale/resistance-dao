@@ -3,7 +3,7 @@ import React from 'react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicProgress } from '@/components/ui/toxic-progress';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
-import { User, Shield, Zap, Target, Award, Flag, Network, BookOpen, Radiation } from 'lucide-react';
+import { User, Shield, Zap, Target, Award, Flag, Network, BookOpen, Radiation, Eye, Hammer } from 'lucide-react';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
 
 interface CharacterProgressProps {

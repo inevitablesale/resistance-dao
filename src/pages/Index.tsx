@@ -46,7 +46,8 @@ import {
   Wrench,
   Hammer,
   Lightbulb,
-  Flag
+  Flag,
+  Scroll
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToxicButton } from "@/components/ui/toxic-button";
@@ -126,11 +127,10 @@ const Index = () => {
     bountyHunterRatio: 35
   };
   
-  // Updated to Sentinel listings (previously bountyHunterListings)
   const sentinelListings: MarketplaceListing[] = [
     {
       id: 1,
-      type: 'sentinel',
+      type: 'bounty-hunter',
       name: "Territory Watcher X-35",
       tokenId: 1,
       price: "15,000 RD",
@@ -149,7 +149,7 @@ const Index = () => {
     },
     {
       id: 2,
-      type: 'sentinel',
+      type: 'bounty-hunter',
       name: "Resource Director K-42",
       tokenId: 42,
       price: "32,000 RD",
@@ -168,7 +168,7 @@ const Index = () => {
     },
     {
       id: 3,
-      type: 'sentinel',
+      type: 'bounty-hunter',
       name: "Network Commander B-007",
       tokenId: 7,
       price: "50,000 RD",
@@ -187,11 +187,10 @@ const Index = () => {
     }
   ];
   
-  // Updated to Pioneer listings (previously survivorListings)
   const pioneerListings: MarketplaceListing[] = [
     {
       id: 4,
-      type: 'pioneer',
+      type: 'survivor',
       name: "Settlement Architect R-12",
       tokenId: 12,
       price: "18,500 RD",
@@ -210,7 +209,7 @@ const Index = () => {
     },
     {
       id: 5,
-      type: 'pioneer',
+      type: 'survivor',
       name: "Innovation Builder E-67",
       tokenId: 67,
       price: "24,000 RD",
@@ -228,7 +227,7 @@ const Index = () => {
     },
     {
       id: 6,
-      type: 'pioneer',
+      type: 'survivor',
       name: "Project Founder T-89",
       tokenId: 89,
       price: "36,500 RD",
@@ -337,7 +336,6 @@ const Index = () => {
           <div className="lg:col-span-2">
             <div className="mb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                {/* Sentinel Card */}
                 <ToxicCard 
                   className={`bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all ${activeRole === 'sentinel' ? 'border-2 border-purple-500/70' : ''}`}
                   onClick={() => setActiveRole('sentinel')}
@@ -369,7 +367,6 @@ const Index = () => {
                   </ToxicButton>
                 </ToxicCard>
                 
-                {/* Pioneer Card */}
                 <ToxicCard 
                   className={`bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all ${activeRole === 'pioneer' ? 'border-2 border-amber-500/70' : ''}`}
                   onClick={() => setActiveRole('pioneer')}
@@ -402,7 +399,6 @@ const Index = () => {
                 </ToxicCard>
               </div>
               
-              {/* Updated Sentinel listings display */}
               <MarketplaceListingGrid 
                 listings={sentinelListings} 
                 title="SENTINEL: Territory Network Leaders" 
@@ -410,7 +406,6 @@ const Index = () => {
                 className="mb-8"
               />
               
-              {/* Updated Pioneer listings display */}
               <MarketplaceListingGrid 
                 listings={pioneerListings} 
                 title="PIONEER: Settlement Innovators" 
