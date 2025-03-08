@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ModelViewer } from './ui/model-viewer';
 import { ToxicCard } from './ui/toxic-card';
@@ -44,7 +43,7 @@ export const ModelShowcase: React.FC<ModelShowcaseProps> = ({
     {
       name: "Wasteland Enforcer",
       description: "Heavily armored bounty hunter with enhanced strength mutations. Specializes in close combat and territorial control.",
-      ipfsHash: "bafybeifzvpyj5znhgjq22cbjyzav5zsvese3m3klbkc4lcdm3fdbbxiooa",
+      ipfsHash: "bafybeievz6nebdf347o55mr7igdfv57qmjt6othr77wqxh3wpx6s7yhdcu",
       type: 'bounty-hunter',
       stats: {
         "Radiation Level": "Medium (62%)",
