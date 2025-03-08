@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -278,7 +277,6 @@ const Index = () => {
     navigate('/marketplace');
   };
 
-  // Survival Guide Component that will be moved to the top
   const WastelandSurvivalGuide = () => (
     <div className="mb-8 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
       <div className="scanline"></div>
@@ -387,8 +385,8 @@ const Index = () => {
         transition={{ duration: 1 }}
         className="text-center mb-8"
       >
-        <h1 className="text-4xl md:text-6xl font-mono text-toxic-neon mb-6 toxic-glow">THE RESISTANCE</h1>
-        <p className="text-xl text-white/80 mb-8 leading-relaxed">
+        <h1 className="text-6xl md:text-7xl font-mono text-toxic-neon mb-8 toxic-glow">THE RESISTANCE</h1>
+        <p className="text-xl text-white/80 mb-12 leading-relaxed max-w-3xl mx-auto">
           After the financial collapse of 2031, centralized powers seized control of global funding.
           Innovation stalled. Independent projects disappeared. The future darkened.
         </p>
@@ -398,14 +396,40 @@ const Index = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.8 }}
+        className="max-w-3xl mx-auto"
       >
-        <TerminalTypewriter 
-          textToType="THE OLD SYSTEMS COLLAPSED. THE RESISTANCE WAS BORN. WILL YOU JOIN US?"
-          storyMode={true}
-          isConnected={isConnected}
-          onConnect={advanceStory}
-          className="mb-8"
-        />
+        <div className="bg-black/50 border border-toxic-neon/30 rounded-md p-3 mb-10">
+          <div className="flex items-center mb-1">
+            <span className="text-toxic-neon text-sm font-mono">_&gt; RESISTANCE_SECURE_SHELL</span>
+            <div className="ml-auto flex gap-1">
+              <div className="w-2 h-2 rounded-full bg-apocalypse-red"></div>
+              <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+              <div className="w-2 h-2 rounded-full bg-toxic-neon"></div>
+            </div>
+          </div>
+          <div className="p-3 bg-black/80 font-mono text-sm">
+            <div className="terminal-line">
+              <span className="text-toxic-neon/80">[RESISTANCE_OS v3.2.1]</span>
+              <span className="text-white/70"> TRANSMISSION INITIALIZED...</span>
+            </div>
+            <div className="terminal-line">
+              <span className="text-toxic-neon/80">[WORLD_STATUS]</span>
+              <span className="text-white/70"> The old financial systems collapsed. Power centralized. Innovation stifled.</span>
+            </div>
+            <div className="terminal-line">
+              <span className="text-toxic-neon/80">[RESISTANCE_MISSION]</span>
+              <span className="text-white/70"> Building a new paradigm for project funding. Community-driven. Decentralized.</span>
+            </div>
+            <div className="terminal-line">
+              <span className="text-toxic-neon/80">[CURRENT_OPERATIONS]</span>
+              <span className="text-white/70"> Soft capital commitments. Project validation. Resource allocation.</span>
+            </div>
+            <div className="terminal-line">
+              <span className="text-apocalypse-red/90">[COMING_SOON]</span>
+              <span className="text-white/70"> JOB LISTINGS | PARTNER MATCHING | ROLE SEEKING</span>
+            </div>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
@@ -444,6 +468,17 @@ const Index = () => {
             </p>
           </ToxicCard>
         </div>
+        
+        <div className="text-center mt-10">
+          <ToxicButton 
+            variant="marketplace"
+            onClick={advanceStory}
+            className="bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80"
+          >
+            <Radiation className="w-5 h-5 mr-2 text-toxic-neon" />
+            <span className="flash-beacon">JOIN THE RESISTANCE</span>
+          </ToxicButton>
+        </div>
       </motion.div>
     </div>
   );
@@ -461,7 +496,6 @@ const Index = () => {
           <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Rebuilding From The Ashes</span>
         </div>
         
-        {/* Wasteland Survival Guide moved to the top */}
         <WastelandSurvivalGuide />
         
         <div className="mb-6">

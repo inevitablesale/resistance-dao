@@ -149,7 +149,7 @@ export function TerminalTypewriter({
       return (
         <div className="terminal-line flex items-start">
           <span className="block text-toxic-neon">
-            {currentLine === 0 && <span className="text-toxic-neon">_> </span>}
+            {currentLine === 0 && <span className="text-toxic-neon">_&gt; </span>}
             {displayText}
             {cursorVisible && <span className="cursor">_</span>}
           </span>
@@ -160,7 +160,7 @@ export function TerminalTypewriter({
     return (
       <>
         <div className="terminal-line">
-          <span className="text-toxic-neon">_> RESISTANCE_SECURE_SHELL</span>
+          <span className="text-toxic-neon">_&gt; RESISTANCE_SECURE_SHELL</span>
         </div>
         <div className="terminal-line">
           <span className="text-toxic-neon">Initializing secure terminal...</span>
