@@ -1,12 +1,16 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { 
   Rocket, 
   Coins, 
   Users, 
+  Share2, 
+  Check, 
   ChevronRight, 
   Building2, 
   CircleDollarSign,
   Scale,
+  FileText,
+  ChevronRight as ArrowIcon,
   Clock,
   Target,
   Wallet,
@@ -15,20 +19,33 @@ import {
   Skull,
   Zap,
   Shield,
+  Image,
   Biohazard,
+  ShieldX,
+  UserX,
+  Bug,
+  Bomb,
+  Crosshair,
   PlusCircle,
   Search,
   ShoppingBag,
-  Server
+  Box
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { useNavigate } from "react-router-dom";
-import { ToxicCard } from "@/components/ui/toxic-card";
+import { Card, CardContent } from "@/components/ui/card";
+import { ToxicCard, ToxicCardContent, ToxicCardHeader, ToxicCardTitle, ToxicCardDescription, ToxicCardFooter } from "@/components/ui/toxic-card";
+import { ToxicProgress } from "@/components/ui/toxic-progress";
+import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
+import { useProposalStats } from "@/hooks/useProposalStats";
+import { BuyRDTokens } from "@/components/BuyRDTokens";
+import { FACTORY_ADDRESS, RD_TOKEN_ADDRESS } from "@/lib/constants";
+import { DrippingSlime, ToxicPuddle } from "@/components/ui/dripping-slime";
 import { ToxicBadge } from "@/components/ui/toxic-badge";
-import { DrippingSlime } from "@/components/ui/dripping-slime";
-import { EnhancedTerminal } from "@/components/ui/enhanced-terminal";
-import { BreachSequence } from "@/components/ui/breach-sequence";
-import { useTerminalState } from "@/hooks/useTerminalState";
+import { useNFTBalance } from "@/hooks/useNFTBalance";
+import { NFTDisplay } from "@/components/wallet/ResistanceWalletWidget/NFTDisplay";
+import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useState, useEffect } from "react";
@@ -36,37 +53,36 @@ import { MarketplaceListingGrid, MarketplaceListing } from "@/components/marketp
 import { MarketplaceStatusPanel } from "@/components/marketplace/MarketplaceStatusPanel";
 import { MarketplaceActivityFeed, MarketplaceActivity } from "@/components/marketplace/MarketplaceActivityFeed";
 import { MarketplaceQuickActions } from "@/components/marketplace/MarketplaceQuickActions";
-import "./breach-animation.css";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { data: stats, isLoading: isLoadingStats } = useProposalStats();
+  const { data: nftBalance = 0, isLoading: isLoadingNFT } = useNFTBalance("0x1234..."); // Demo address
   const { isConnected, address } = useCustomWallet();
   const { connect } = useWalletConnection();
-  const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
   
-  const { 
-    terminalState, 
-    setTerminalState,
-    handlePasswordSuccess,
-    handleBreachComplete
-  } = useTerminalState({ 
-    skipToMarketplace: isConnected,
-    isConnected 
-  });
+  const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
+  const [storyStage, setStoryStage] = useState<number>(isConnected ? 1 : 0);
   
   useEffect(() => {
-    if (isConnected && terminalState === 'locked') {
-      setTerminalState('authorized');
+    if (isConnected) {
+      setStoryStage(1); // Skip to marketplace view when connected
+      console.log("[Index] Wallet connected, showing marketplace view");
     }
-  }, [isConnected, terminalState, setTerminalState]);
+  }, [isConnected]);
   
   const handleConnectWallet = () => {
     console.log("[Index] Triggering wallet connection from Index page");
     connect();
   };
+
+  const advanceStory = () => {
+    setStoryStage(prev => prev + 1);
+  };
   
   const handleRefreshActivity = () => {
     setIsRefreshingActivity(true);
+    // Simulate refresh delay
     setTimeout(() => {
       setIsRefreshingActivity(false);
     }, 1000);
@@ -362,12 +378,7 @@ const Index = () => {
   );
 
   const renderStoryIntro = () => (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      className="max-w-4xl mx-auto mb-16"
-    >
+    <div className="max-w-4xl mx-auto mb-16">
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -388,11 +399,10 @@ const Index = () => {
         className="max-w-3xl mx-auto"
       >
         <div className="mb-8">
-          <EnhancedTerminal 
-            terminalState={terminalState}
-            onPasswordSuccess={handlePasswordSuccess}
-            onConnect={handleConnectWallet}
+          <TerminalTypewriter 
+            textToType="Enter access code"
             isConnected={isConnected}
+            onConnect={handleConnectWallet}
           />
         </div>
 
@@ -434,7 +444,7 @@ const Index = () => {
           </ToxicCard>
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
   
   const renderMarketplace = () => (
@@ -453,11 +463,12 @@ const Index = () => {
         <WastelandSurvivalGuide />
         
         <div className="mb-6">
-          <EnhancedTerminal 
-            terminalState={terminalState}
-            onPasswordSuccess={handlePasswordSuccess}
-            onConnect={handleConnectWallet}
+          <TerminalTypewriter 
+            textToType="WELCOME TO THE RESISTANCE SURVIVAL TERMINAL - JOIN THE NETWORK TO REBUILD CIVILIZATION"
             isConnected={isConnected}
+            onConnect={handleConnectWallet}
+            className="mb-4"
+            marketplaceMode={true}
           />
         </div>
 
@@ -469,7 +480,7 @@ const Index = () => {
 
         <MarketplaceStatusPanel 
           stats={marketplaceStats} 
-          isLoading={false}
+          isLoading={isLoadingStats}
           className="mb-8"
         />
         
@@ -698,20 +709,6 @@ const Index = () => {
       <div className="dust-particles"></div>
       <div className="fog-overlay"></div>
 
-      <AnimatePresence mode="wait">
-        {terminalState === 'breach-sequence' && (
-          <motion.div
-            key="breach-sequence"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50"
-          >
-            <BreachSequence onComplete={handleBreachComplete} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute w-[500px] h-[500px] bg-toxic-neon/5 rounded-full blur-3xl -top-48 -left-24" />
@@ -719,27 +716,7 @@ const Index = () => {
         </div>
         
         <div className="container px-4 relative">
-          <AnimatePresence mode="wait">
-            {terminalState !== 'authorized' ? (
-              <motion.div
-                key="intro"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {renderStoryIntro()}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="marketplace"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {renderMarketplace()}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {storyStage === 0 ? renderStoryIntro() : renderMarketplace()}
         </div>
       </section>
     </div>
@@ -747,4 +724,3 @@ const Index = () => {
 };
 
 export default Index;
-
