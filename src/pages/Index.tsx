@@ -127,7 +127,7 @@ const Index = () => {
         { trait: "Threat Level", value: "Extreme" }
       ],
       status: 'active',
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeifzvpyj5znhgjq22cbjyzav5zsvese3m3klbkc4lcdm3fdbbxiooa"
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiheog5wgtnl7ldazmsj3n7xmkgkzpjnix5e4tuxndzw7j3bgkp2n4"
     },
     {
       id: 2,
@@ -718,3 +718,4 @@ const Index = () => {
 };
 
 export default Index;
+
