@@ -28,6 +28,11 @@ export function TerminalTypewriter({
   const [isComplete, setIsComplete] = useState(false);
   const terminalRef = useRef<HTMLDivElement>(null);
   
+  // Console log the connection state for debugging
+  useEffect(() => {
+    console.log("[TerminalTypewriter] Connection state:", { isConnected });
+  }, [isConnected]);
+  
   // Reset and restart typing when text changes
   useEffect(() => {
     setDisplayText("");
@@ -164,7 +169,6 @@ export function TerminalTypewriter({
         {isConnected && (
           <div className="terminal-line mt-4">
             <ToxicButton
-              onClick={onConnect}
               variant="outline"
               className="border-toxic-neon/30 bg-toxic-neon/10 hover:bg-toxic-neon/20"
             >

@@ -20,15 +20,15 @@ export const useCustomWallet = () => {
       return () => clearTimeout(timer);
     }
     
-    if (user) {
-      // Basic debug logging of user object
-      console.log("[useCustomWallet] User connected:", {
-        hasWallet: !!primaryWallet?.address,
-        hasUser: !!user,
-        walletAddress: primaryWallet?.address
-      });
-    }
-  }, [user, primaryWallet, isInitializing]);
+    // Enhanced debug logging
+    console.log("[useCustomWallet] Wallet state:", {
+      hasWallet: !!primaryWallet?.address,
+      hasUser: !!user,
+      isFullyConnected,
+      walletAddress: primaryWallet?.address
+    });
+    
+  }, [user, primaryWallet, isInitializing, isFullyConnected]);
 
   // Get stored referrer from localStorage if available
   const getReferrer = () => {

@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { 
   Rocket, 
@@ -46,7 +45,7 @@ import { ToxicBadge } from "@/components/ui/toxic-badge";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { NFTDisplay } from "@/components/wallet/ResistanceWalletWidget/NFTDisplay";
 import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useState } from "react";
 import { MarketplaceListingGrid, MarketplaceListing } from "@/components/marketplace/MarketplaceListingGrid";
 import { MarketplaceStatusPanel } from "@/components/marketplace/MarketplaceStatusPanel";
@@ -57,13 +56,13 @@ const Index = () => {
   const navigate = useNavigate();
   const { data: stats, isLoading: isLoadingStats } = useProposalStats();
   const { data: nftBalance = 0, isLoading: isLoadingNFT } = useNFTBalance("0x1234..."); // Demo address
-  const { setShowAuthFlow, isConnected } = useWalletConnection();
+  const { isConnected, address } = useCustomWallet();
   
   const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
   const [storyStage, setStoryStage] = useState<number>(0);
   
   const handleConnectWallet = () => {
-    setShowAuthFlow(true);
+    console.log("[Index] Triggering wallet connection from Index page");
   };
 
   const advanceStory = () => {
@@ -90,7 +89,6 @@ const Index = () => {
     }).format(amount);
   };
   
-  // Mock marketplace data
   const marketplaceStats = {
     tradingVolume: 2450000,
     activeListings: 472,
@@ -287,6 +285,7 @@ const Index = () => {
         <TerminalTypewriter 
           textToType="THE OLD SYSTEMS COLLAPSED. THE RESISTANCE WAS BORN. WILL YOU JOIN US?"
           storyMode={true}
+          isConnected={isConnected}
           onConnect={advanceStory}
           className="mb-8"
         />
