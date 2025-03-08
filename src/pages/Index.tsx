@@ -28,7 +28,8 @@ import {
   Crosshair,
   PlusCircle,
   Search,
-  ShoppingBag
+  ShoppingBag,
+  Cube
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToxicButton } from "@/components/ui/toxic-button";
@@ -125,7 +126,8 @@ const Index = () => {
         { trait: "Mutation", value: "Neural Hacking" },
         { trait: "Threat Level", value: "Extreme" }
       ],
-      status: 'active'
+      status: 'active',
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeifzvpyj5znhgjq22cbjyzav5zsvese3m3klbkc4lcdm3fdbbxiooa"
     },
     {
       id: 2,
@@ -143,7 +145,8 @@ const Index = () => {
         { trait: "Mutation", value: "Toxic Immunity" },
         { trait: "Threat Level", value: "High" }
       ],
-      status: 'active'
+      status: 'active',
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiavqxeov62wgj6upfpvq6g4vpvot4mnwl3ggunxp27sbfjgs4hlfq"
     },
     {
       id: 3,
@@ -182,7 +185,8 @@ const Index = () => {
         { trait: "Radiation Resistance", value: "Enhanced" },
         { trait: "Settlement", value: "New Haven" }
       ],
-      status: 'active'
+      status: 'active',
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeifzvpyj5znhgjq22cbjyzav5zsvese3m3klbkc4lcdm3fdbbxiooa"
     },
     {
       id: 5,

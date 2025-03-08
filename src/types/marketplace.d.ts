@@ -4,6 +4,7 @@ export interface MarketplaceMetadata {
   description: string;
   image: string;
   imageUrl?: string; // Add optional imageUrl for HTTP version of IPFS image
+  modelUrl?: string; // 3D model URL (GLB file)
   contentType: string;
   category: string;
   experiences: Array<{
@@ -28,4 +29,27 @@ export interface Publication {
   publisher: string;
   publishedAt: number;
   metadata?: MarketplaceMetadata;
+}
+
+export type MarketplaceListingType = 'survivor' | 'bounty-hunter' | 'equipment' | 'settlement';
+
+export interface MarketplaceListing {
+  id: number;
+  type: MarketplaceListingType;
+  name: string;
+  description?: string;
+  tokenId: number;
+  price: string;
+  seller: string;
+  radiation: {
+    level: string;
+    value: number;
+  };
+  attributes: {
+    trait: string;
+    value: string;
+  }[];
+  status: 'active' | 'pending' | 'sold';
+  imageUrl?: string;
+  modelUrl?: string; // New field for 3D model URL
 }

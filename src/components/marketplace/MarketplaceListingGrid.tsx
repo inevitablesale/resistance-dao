@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ToxicCard, ToxicCardContent } from "@/components/ui/toxic-card";
 import { ToxicBadge } from "@/components/ui/toxic-badge";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { DrippingSlime } from "@/components/ui/dripping-slime";
-import { Skull, Biohazard, ChevronRight, Filter, SearchCode, Users, Target, Shield, Radiation, ShieldX } from "lucide-react";
+import { ModelPreview } from "@/components/marketplace/ModelPreview";
+import { Skull, Biohazard, ChevronRight, Filter, SearchCode, Users, Target, Shield, Radiation, ShieldX, Image, Cube } from "lucide-react";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 export type MarketplaceListingType = 'survivor' | 'bounty-hunter' | 'equipment' | 'settlement';
@@ -27,6 +28,7 @@ export interface MarketplaceListing {
   }[];
   status: 'active' | 'pending' | 'sold';
   imageUrl?: string;
+  modelUrl?: string; // Added field for 3D model URL
 }
 
 interface MarketplaceListingGridProps {
@@ -45,6 +47,7 @@ export function MarketplaceListingGrid({
   onListingClick
 }: MarketplaceListingGridProps) {
   const { setShowAuthFlow, isConnected } = useWalletConnection();
+  const [modelViewEnabled, setModelViewEnabled] = useState(true);
 
   // Get icon based on listing type
   const getListingTypeIcon = (type: MarketplaceListingType) => {
@@ -69,6 +72,10 @@ export function MarketplaceListingGrid({
     return "text-toxic-neon border-toxic-neon/70 shadow-[0_0_8px_rgba(57,255,20,0.3)]";
   };
 
+  const toggleModelView = () => {
+    setModelViewEnabled(!modelViewEnabled);
+  };
+
   return (
     <div className={className}>
       <div className="flex items-center justify-between mb-4">
@@ -77,6 +84,24 @@ export function MarketplaceListingGrid({
         </h3>
         
         <div className="flex items-center gap-2">
+          <ToxicButton 
+            variant="ghost" 
+            size="sm" 
+            className="text-toxic-neon hover:bg-toxic-dark/20"
+            onClick={toggleModelView}
+          >
+            {modelViewEnabled ? (
+              <>
+                <Image className="h-4 w-4 mr-1" />
+                2D View
+              </>
+            ) : (
+              <>
+                <Cube className="h-4 w-4 mr-1" />
+                3D View
+              </>
+            )}
+          </ToxicButton>
           <ToxicButton 
             variant="ghost" 
             size="sm" 
@@ -106,7 +131,15 @@ export function MarketplaceListingGrid({
             >
               <ToxicCardContent className="p-0">
                 <div className="relative h-48 bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-t-lg overflow-hidden">
-                  {listing.imageUrl ? (
+                  {/* Show 3D model if available and 3D view is enabled */}
+                  {listing.modelUrl && modelViewEnabled ? (
+                    <ModelPreview 
+                      modelUrl={listing.modelUrl} 
+                      height="100%" 
+                      width="100%" 
+                      autoRotate={true} 
+                    />
+                  ) : listing.imageUrl ? (
                     <img 
                       src={listing.imageUrl} 
                       alt={listing.name} 
@@ -121,6 +154,7 @@ export function MarketplaceListingGrid({
                       )}
                     </div>
                   )}
+                  
                   <DrippingSlime position="top" dripsCount={5} toxicGreen={true} showIcons={false} />
                   <div className="absolute top-2 right-2">
                     <div className="px-2 py-1 rounded-full bg-black/60 text-xs text-toxic-neon font-mono">
@@ -133,6 +167,13 @@ export function MarketplaceListingGrid({
                       <span>{listing.type.replace('-', ' ').toUpperCase()}</span>
                     </ToxicBadge>
                   </div>
+                  {listing.modelUrl && (
+                    <div className="absolute top-2 right-12">
+                      <ToxicBadge variant="secondary" className="bg-toxic-neon/20 text-toxic-neon">
+                        <Cube className="h-3 w-3 mr-1" /> 3D
+                      </ToxicBadge>
+                    </div>
+                  )}
                   <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60">
                     <div className="flex items-center justify-between">
                       <span className="text-toxic-neon text-xs font-mono">TYPE: {listing.type.toUpperCase()}</span>
