@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Target, Biohazard, Zap, Shield, Activity, Hammer } from 'lucide-react';
 import { ToxicCard } from '@/components/ui/toxic-card';
@@ -40,13 +41,15 @@ interface MarketplaceListingGridProps {
   title?: string;
   onListingClick?: (listing: MarketplaceListing) => void;
   className?: string;
+  currentRadiationLevel?: number; // Global radiation level (0-100)
 }
 
 export function MarketplaceListingGrid({ 
   listings, 
   title, 
   onListingClick, 
-  className = "" 
+  className = "",
+  currentRadiationLevel = 100 // Default to full radiation
 }: MarketplaceListingGridProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -64,6 +67,20 @@ export function MarketplaceListingGrid({
   const handleNext = () => {
     if (hasNext) {
       setCurrentIndex(currentIndex + 1);
+    }
+  };
+  
+  // Calculate radiation overlay level for model preview based on global radiation and NFT type
+  const getModelRadiationLevel = (listing: MarketplaceListing): number => {
+    if (listing.type === 'sentinel') {
+      // Sentinels have less radiation than the global level (they're clearing it)
+      return Math.max(0, currentRadiationLevel - 20);
+    } else if (listing.type === 'bounty-hunter') {
+      // Bounty hunters have the same radiation as global
+      return currentRadiationLevel;
+    } else {
+      // Survivors have more radiation than global (they're more affected)
+      return Math.min(100, currentRadiationLevel + 10);
     }
   };
   
@@ -172,7 +189,7 @@ export function MarketplaceListingGrid({
                   </div>
                 )}
                 
-                {/* Model Preview with fixed height */}
+                {/* Model Preview with radiation overlay */}
                 <div className="relative w-full h-64 bg-gradient-to-b from-black/40 to-black/90">
                   {listing.modelUrl ? (
                     <ModelPreview
@@ -181,6 +198,8 @@ export function MarketplaceListingGrid({
                       width="100%"
                       autoRotate={true}
                       className="rounded-none"
+                      radiationLevel={getModelRadiationLevel(listing)}
+                      animateRadiation={false} // Don't animate in listing grid for performance
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-black/50">

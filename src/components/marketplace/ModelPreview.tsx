@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { RadiationOverlay } from '@/components/radiation/RadiationOverlay';
 
 interface ModelPreviewProps {
   modelUrl: string;
@@ -11,6 +12,8 @@ interface ModelPreviewProps {
   height?: string;
   width?: string;
   autoRotate?: boolean;
+  radiationLevel?: number; // Added radiation level prop
+  animateRadiation?: boolean; // Whether to animate radiation dissipation
 }
 
 export const ModelPreview: React.FC<ModelPreviewProps> = ({ 
@@ -18,11 +21,14 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   className = "", 
   height = "200px", 
   width = "100%",
-  autoRotate = true
+  autoRotate = true,
+  radiationLevel = 0, // Default to no radiation
+  animateRadiation = true
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [modelLoaded, setModelLoaded] = useState(false);
   
   useEffect(() => {
     if (!containerRef.current) return;
@@ -33,7 +39,6 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
-    // Remove the opacity setting as it's not supported on Color
     
     // Add ambient light
     const ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
@@ -107,6 +112,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         // Add model to scene
         scene.add(gltf.scene);
         setLoading(false);
+        setModelLoaded(true);
       },
       (xhr) => {
         // Progress callback
@@ -165,25 +171,31 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   }, [modelUrl, autoRotate]);
   
   return (
-    <div 
-      ref={containerRef} 
-      className={`relative rounded-lg overflow-hidden ${className}`} 
-      style={{ height, width }}
+    <RadiationOverlay 
+      radiationLevel={radiationLevel}
+      animate={animateRadiation && modelLoaded}
+      className={`${className}`}
     >
-      {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-          <Loader2 className="h-8 w-8 text-toxic-neon animate-spin" />
-        </div>
-      )}
-      
-      {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/70">
-          <div className="text-apocalypse-red text-center p-4">
-            <p>{error}</p>
-            <p className="text-xs mt-2">Try a different model or check the URL</p>
+      <div 
+        ref={containerRef} 
+        className="w-full h-full rounded-lg overflow-hidden" 
+        style={{ height, width }}
+      >
+        {loading && !error && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+            <Loader2 className="h-8 w-8 text-toxic-neon animate-spin" />
           </div>
-        </div>
-      )}
-    </div>
+        )}
+        
+        {error && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+            <div className="text-apocalypse-red text-center p-4">
+              <p>{error}</p>
+              <p className="text-xs mt-2">Try a different model or check the URL</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </RadiationOverlay>
   );
 };

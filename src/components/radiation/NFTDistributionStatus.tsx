@@ -61,6 +61,29 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
   
   // Calculate radiation reduction
   const radiationReduction = totalClaimed * 0.1;
+  
+  // Calculate radiation visibility level based on claimed Sentinels
+  const getRadiationVisibility = (claimedSentinels: number): string => {
+    if (claimedSentinels <= 100) return "10% Exposed";
+    if (claimedSentinels <= 300) return "25% Exposed";
+    if (claimedSentinels <= 600) return "50% Exposed";
+    if (claimedSentinels <= 1000) return "75% Exposed";
+    return "100% Exposed";
+  };
+  
+  // Get radiation effect description
+  const getRadiationEffect = (claimedSentinels: number): string => {
+    if (claimedSentinels <= 100) return "Heavy Fog, Intense Radiation Glow";
+    if (claimedSentinels <= 300) return "Pulsing Radiation with Small Breaks";
+    if (claimedSentinels <= 600) return "Thin Fog, Radiation Dissipating";
+    if (claimedSentinels <= 1000) return "Faint Radiation Glow Remaining";
+    return "No More Radiation, Full Detail";
+  };
+
+  // Get sentinel claimed count
+  const sentinelClaimed = nftSupplies.find(supply => supply.type === 'sentinel')?.claimed || 0;
+  const visibilityStatus = getRadiationVisibility(sentinelClaimed);
+  const radiationEffect = getRadiationEffect(sentinelClaimed);
 
   return (
     <ToxicCard className={`bg-black/80 border-toxic-neon/30 p-5 ${className}`}>
@@ -84,6 +107,29 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
           variant="radiation" 
           className="h-3" 
         />
+      </div>
+      
+      {/* Radiation Reveal Status Section */}
+      <div className="mb-6 bg-black/40 rounded-lg p-3 border border-toxic-neon/20">
+        <h3 className="text-toxic-neon font-mono mb-2">Radiation Dissipation Status</h3>
+        <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
+          <div>
+            <span className="text-white/70 block mb-1">Sentinel Reveal Progress</span>
+            <span className="text-toxic-neon font-mono">{sentinelClaimed} / 1500</span>
+            <ToxicProgress 
+              value={(sentinelClaimed / 1500) * 100}
+              variant="radiation" 
+              className="h-2 mt-1" 
+            />
+          </div>
+          <div>
+            <span className="text-white/70 block mb-1">Current Visibility</span>
+            <span className="text-toxic-neon font-mono">{visibilityStatus}</span>
+          </div>
+        </div>
+        <div className="text-xs text-white/60 italic">
+          Current Effect: <span className="text-toxic-neon">{radiationEffect}</span>
+        </div>
       </div>
       
       <div className="space-y-4">

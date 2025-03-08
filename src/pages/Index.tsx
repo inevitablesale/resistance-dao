@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -508,6 +507,7 @@ const Index = () => {
                 listings={sentinelListings} 
                 title="FOUNDER SENTINELS: Governance & Oversight" 
                 onListingClick={handleListingClick}
+                currentRadiationLevel={currentRadiation}
                 className="mb-8"
               />
               
@@ -515,6 +515,7 @@ const Index = () => {
                 listings={bountyHunterListings} 
                 title="BOUNTY HUNTERS: Enforcers & Funders" 
                 onListingClick={handleListingClick}
+                currentRadiationLevel={currentRadiation}
                 className="mb-8"
               />
               
@@ -522,6 +523,7 @@ const Index = () => {
                 listings={survivorListings} 
                 title="SURVIVORS: Builders & Innovators" 
                 onListingClick={handleListingClick}
+                currentRadiationLevel={currentRadiation}
               />
             </div>
           </div>
