@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -66,6 +65,10 @@ import { MarketplaceListingGrid, MarketplaceListing } from "@/components/marketp
 import { MarketplaceStatusPanel } from "@/components/marketplace/MarketplaceStatusPanel";
 import { MarketplaceActivityFeed, MarketplaceActivity } from "@/components/marketplace/MarketplaceActivityFeed";
 import { MarketplaceQuickActions } from "@/components/marketplace/MarketplaceQuickActions";
+import { ChroniclePanel } from "@/components/chronicle/ChroniclePanel";
+import { CharacterProgress } from "@/components/chronicle/CharacterProgress";
+import { TerritoryStatus } from "@/components/chronicle/TerritoryStatus";
+import { WastelandSurvivalGuideEnhanced } from "@/components/chronicle/WastelandSurvivalGuideEnhanced";
 
 type AuthState = "unauthenticated" | "authenticating" | "breaching" | "authenticated";
 
@@ -78,6 +81,7 @@ const Index = () => {
   
   const [authState, setAuthState] = useState<AuthState>("unauthenticated");
   const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
+  const [activeRole, setActiveRole] = useState<'sentinel' | 'pioneer'>('sentinel');
   
   useEffect(() => {
     if (isConnected && authState === "unauthenticated") {
@@ -292,106 +296,6 @@ const Index = () => {
     navigate('/marketplace');
   };
 
-  const WastelandSurvivalGuide = () => (
-    <div className="mb-8 bg-black/40 border border-toxic-neon/20 rounded-xl p-6 relative broken-glass">
-      <div className="scanline"></div>
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
-          <Radiation className="h-6 w-6 mr-2" /> WASTELAND SURVIVAL GUIDE
-        </h3>
-      </div>
-      
-      <div className="mb-6 p-4 bg-black/50 border border-apocalypse-red/30 rounded-lg relative">
-        <div className="flex gap-3">
-          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-apocalypse-red/20 flex items-center justify-center">
-            <Biohazard className="w-6 h-6 text-apocalypse-red" />
-          </div>
-          <div>
-            <h4 className="text-lg font-mono text-apocalypse-red mb-2">Resistance Protocol</h4>
-            <p className="text-white/80 mb-3 text-sm">
-              The <span className="text-apocalypse-red font-semibold">Resistance</span> connects sentinels and pioneers to rebuild from the ashes of the old financial world.
-            </p>
-            <p className="text-white/80 mb-3 text-sm">
-              Whether you're a <span className="text-toxic-neon font-semibold">Sentinel tracking resources and territories</span> or a <span className="text-toxic-neon font-semibold">Pioneer building settlements and innovations</span>, our network facilitates wasteland justice and rebuilding efforts.
-            </p>
-            <div className="text-white/80 text-sm bg-apocalypse-red/10 p-3 border-l-2 border-apocalypse-red">
-              <span className="text-toxic-neon font-semibold block mb-1">» COMING SOON «</span>
-              Settlement Control | Territory Expansion | Network Influence - Expanding the Resistance with more ways to survive and rebuild.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 rounded-full bg-toxic-neon/10">
-              <Eye className="w-5 h-5 text-toxic-neon" />
-            </div>
-            <h4 className="text-lg font-mono text-toxic-neon">Become a Sentinel</h4>
-          </div>
-          <p className="text-white/70 text-sm mb-3">
-            Direct network resources, monitor territories, and establish strategic outposts. Shape the wasteland's future through resource allocation.
-          </p>
-          <div className="flex justify-end">
-            <ToxicButton 
-              variant="outline" 
-              size="sm" 
-              className="text-toxic-neon border-toxic-neon/30"
-              onClick={() => navigate('/hunt')}
-            >
-              Direct <ChevronRight className="ml-1 h-4 w-4" />
-            </ToxicButton>
-          </div>
-        </div>
-        
-        <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 rounded-full bg-toxic-neon/10">
-              <Hammer className="w-5 h-5 text-toxic-neon" />
-            </div>
-            <h4 className="text-lg font-mono text-toxic-neon">Become a Pioneer</h4>
-          </div>
-          <p className="text-white/70 text-sm mb-3">
-            Build settlement projects, lead innovations, and develop technologies. Each pioneer shapes our community from outpost builders to tech innovators.
-          </p>
-          <div className="flex justify-end">
-            <ToxicButton 
-              variant="outline" 
-              size="sm" 
-              className="text-toxic-neon border-toxic-neon/30"
-              onClick={() => navigate('/marketplace/pioneers')}
-            >
-              Build <ChevronRight className="ml-1 h-4 w-4" />
-            </ToxicButton>
-          </div>
-        </div>
-        
-        <div className="bg-black/40 border border-toxic-neon/20 rounded-lg p-4 hover:bg-black/50 hover:border-toxic-neon/30 transition-all">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 rounded-full bg-toxic-neon/10">
-              <Coins className="w-5 h-5 text-toxic-neon" />
-            </div>
-            <h4 className="text-lg font-mono text-toxic-neon">Fund Economy</h4>
-          </div>
-          <p className="text-white/70 text-sm mb-3">
-            Convert your Old World assets to Resistance Dollars (RD). Power the new wasteland economy and gain governance rights in settlement decisions.
-          </p>
-          <div className="flex justify-end">
-            <ToxicButton 
-              variant="outline" 
-              size="sm" 
-              className="text-toxic-neon border-toxic-neon/30"
-              onClick={() => navigate('/buy-rd')}
-            >
-              Convert <ChevronRight className="ml-1 h-4 w-4" />
-            </ToxicButton>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   const renderMarketplace = () => (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -405,7 +309,17 @@ const Index = () => {
           <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Rebuilding From The Ashes</span>
         </div>
         
-        <WastelandSurvivalGuide />
+        <WastelandSurvivalGuideEnhanced className="mb-8" />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="md:col-span-2">
+            <ChroniclePanel className="mb-6" />
+          </div>
+          <div className="md:col-span-1">
+            <CharacterProgress className="mb-6" role={activeRole} />
+            <TerritoryStatus />
+          </div>
+        </div>
 
         <MarketplaceQuickActions 
           className="mb-8"
@@ -423,8 +337,11 @@ const Index = () => {
           <div className="lg:col-span-2">
             <div className="mb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                {/* Sentinel Card - Updated from Bounty Hunter */}
-                <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
+                {/* Sentinel Card */}
+                <ToxicCard 
+                  className={`bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all ${activeRole === 'sentinel' ? 'border-2 border-purple-500/70' : ''}`}
+                  onClick={() => setActiveRole('sentinel')}
+                >
                   <h3 className="text-2xl font-mono text-toxic-neon mb-3">SENTINEL</h3>
                   <p className="text-white/80 mb-4 leading-relaxed">
                     Monitor territories, direct network resources, and track strategic objectives across the wasteland. Guide the resistance by connecting outposts and controlling the flow of critical supplies.
@@ -452,8 +369,11 @@ const Index = () => {
                   </ToxicButton>
                 </ToxicCard>
                 
-                {/* Pioneer Card - Updated from Survivor */}
-                <ToxicCard className="bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all">
+                {/* Pioneer Card */}
+                <ToxicCard 
+                  className={`bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all ${activeRole === 'pioneer' ? 'border-2 border-amber-500/70' : ''}`}
+                  onClick={() => setActiveRole('pioneer')}
+                >
                   <h3 className="text-2xl font-mono text-toxic-neon mb-3">PIONEER</h3>
                   <p className="text-white/80 mb-4 leading-relaxed">
                     Build settlements, develop innovations, and create the foundation for a new civilization. Pioneers lead projects from medical facilities to power networks, shaping our collective future.
@@ -519,19 +439,23 @@ const Index = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-white/70">Network Influence</span>
-                    <span className="text-toxic-neon font-mono">0</span>
+                    <span className="text-toxic-neon font-mono">42</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-white/70">Wasteland Reputation</span>
                     <div className="flex items-center">
-                      <ToxicBadge variant="rating" className="text-toxic-neon">★ 0.0</ToxicBadge>
+                      <ToxicBadge variant="rating" className="text-toxic-neon">★ 3.8</ToxicBadge>
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-white/70">Radiation Level</span>
                     <span className="text-toxic-neon font-mono">
-                      <span className="text-toxic-neon">LOW (5%)</span>
+                      <span className="text-amber-400">MEDIUM (28%)</span>
                     </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/70">Chronicle Entries</span>
+                    <span className="text-toxic-neon font-mono">8</span>
                   </div>
                 </div>
               ) : (
@@ -618,20 +542,20 @@ const Index = () => {
                     variant="outline" 
                     size="sm"
                     className="border-toxic-neon/30"
-                    onClick={() => navigate('/marketplace/inventory')}
+                    onClick={() => navigate('/chronicles')}
                   >
-                    <Globe className="h-4 w-4 mr-1" />
-                    My Territory
+                    <Scroll className="h-4 w-4 mr-1" />
+                    Chronicles
                   </ToxicButton>
                   
                   <ToxicButton 
                     variant="outline" 
                     size="sm"
                     className="border-toxic-neon/30"
-                    onClick={() => navigate('/marketplace/offers')}
+                    onClick={() => navigate('/territories/map')}
                   >
-                    <Target className="h-4 w-4 mr-1" />
-                    Active Missions
+                    <Map className="h-4 w-4 mr-1" />
+                    Territory Map
                   </ToxicButton>
                 </div>
               </ToxicCard>
