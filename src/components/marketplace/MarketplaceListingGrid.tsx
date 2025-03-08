@@ -27,6 +27,7 @@ import {
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
+import { ToxicProgress } from "@/components/ui/toxic-progress";
 
 export type MarketplaceListingType = 'survivor' | 'bounty-hunter' | 'equipment' | 'settlement';
 export type PricingTier = 'early' | 'mid' | 'premium' | 'legacy';
@@ -101,6 +102,12 @@ export function MarketplaceListingGrid({
     if (value >= 80) return "text-apocalypse-red border-apocalypse-red/70 shadow-[0_0_8px_rgba(255,0,0,0.3)]";
     if (value >= 50) return "text-yellow-400 border-yellow-400/70 shadow-[0_0_8px_rgba(255,255,0,0.3)]";
     return "text-toxic-neon border-toxic-neon/70 shadow-[0_0_8px_rgba(57,255,20,0.3)]";
+  };
+
+  const getRadiationBadgeClass = (value: number) => {
+    if (value >= 80) return "bg-black border-apocalypse-red/70 text-apocalypse-red";
+    if (value >= 50) return "bg-black border-yellow-400/70 text-yellow-400";
+    return "bg-black border-toxic-neon/70 text-toxic-neon";
   };
 
   const getPricingTierBadge = (tier?: PricingTier) => {
@@ -225,11 +232,11 @@ export function MarketplaceListingGrid({
           {listings.map((listing) => (
             <ToxicCard 
               key={listing.id} 
-              className={`bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all cursor-pointer ${listing.isLegacyFounder ? 'animate-toxic-pulse' : ''}`}
+              className={`bg-black/90 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all cursor-pointer p-0 ${listing.isLegacyFounder ? 'animate-toxic-pulse' : ''}`}
               onClick={() => handleItemClick(listing)}
             >
               <ToxicCardContent className="p-0">
-                <div className="relative h-48 bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-t-lg overflow-hidden">
+                <div className="relative h-48 bg-gradient-to-b from-transparent to-black/90 rounded-t-lg overflow-hidden">
                   {listing.modelUrl && modelViewEnabled ? (
                     <ModelPreview 
                       modelUrl={listing.modelUrl} 
@@ -244,7 +251,7 @@ export function MarketplaceListingGrid({
                       className="absolute inset-0 w-full h-full object-cover opacity-80"
                     />
                   ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="absolute inset-0 flex items-center justify-center bg-black">
                       {listing.type === 'bounty-hunter' ? (
                         <Skull className="w-20 h-20 text-toxic-neon/50" />
                       ) : (
@@ -254,109 +261,55 @@ export function MarketplaceListingGrid({
                   )}
                   
                   <DrippingSlime position="top" dripsCount={5} toxicGreen={true} showIcons={false} />
-                  <div className="absolute top-2 right-2">
-                    <div className="px-2 py-1 rounded-full bg-black/60 text-xs text-toxic-neon font-mono">
-                      #{listing.tokenId}
-                    </div>
-                  </div>
-                  <div className="absolute top-2 left-2">
-                    <ToxicBadge variant="marketplace" className="flex items-center gap-1">
-                      {getListingTypeIcon(listing.type)}
-                      <span>{listing.type.replace('-', ' ').toUpperCase()}</span>
-                    </ToxicBadge>
-                  </div>
-                  {listing.modelUrl && (
-                    <div className="absolute top-2 right-12">
-                      <ToxicBadge variant="secondary" className="bg-toxic-neon/20 text-toxic-neon">
-                        <Box className="h-3 w-3 mr-1" /> 3D
-                      </ToxicBadge>
-                    </div>
-                  )}
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60">
-                    <div className="flex items-center justify-between">
-                      <span className="text-toxic-neon text-xs font-mono">TYPE: {listing.type.toUpperCase()}</span>
-                      <span className="text-toxic-neon text-xs font-mono">PRICE: {listing.price}</span>
+                  
+                  <div className="absolute top-0 left-0 right-0 p-2">
+                    <div className="bg-black/60 border border-toxic-neon/30 rounded-full px-4 py-1 flex items-center justify-center mx-auto max-w-[90%]">
+                      <Target className="h-4 w-4 mr-2 text-apocalypse-red" />
+                      <span className="text-toxic-neon font-mono uppercase tracking-wider text-sm">Bounty Hunter</span>
                     </div>
                   </div>
                 </div>
-                <div className="p-4">
-                  <div className="flex flex-col gap-2 mb-3">
-                    <h4 className="text-xl font-mono text-toxic-neon">{listing.name}</h4>
-                    
-                    {/* Tier & Legacy Status */}
-                    <div className="flex flex-wrap gap-2">
-                      {getPricingTierBadge(listing.pricingTier)}
-                      {getStakingStatusBadge(listing.stakingStatus)}
+                
+                <div className="p-4 bg-black">
+                  {/* Type and Price line - aligned horizontally */}
+                  <div className="flex justify-between font-mono text-sm mb-4">
+                    <div className="text-toxic-neon flex items-center">
+                      <span className="text-white/60 mr-1">TYPE:</span>
+                      {listing.type === 'bounty-hunter' ? 'BOUNTY-HUNTER' : listing.type.toUpperCase()}
+                    </div>
+                    <div className="text-toxic-neon">
+                      <span className="text-white/60 mr-1">PRICE:</span>
+                      {listing.price}
                     </div>
                   </div>
                   
-                  <div className="flex items-center mb-3">
+                  {/* Name */}
+                  <h4 className="text-2xl font-mono text-toxic-neon mb-4 text-center">{listing.name}</h4>
+                  
+                  {/* Radiation Level Badge */}
+                  <div className="flex justify-center mb-4">
                     <ToxicBadge 
                       variant="secondary" 
-                      className={`flex items-center gap-1 ${getRadiationColor(listing.radiation.value)}`}
+                      className={`border px-4 py-1 rounded-full ${getRadiationBadgeClass(listing.radiation.value)}`}
                     >
-                      <Radiation className="h-3 w-3 mr-1" />
+                      <Radiation className="h-4 w-4 mr-2" />
                       RAD LEVEL: {listing.radiation.level} ({listing.radiation.value}%)
                     </ToxicBadge>
                   </div>
                   
-                  {/* Reputation & Governance Power */}
-                  {(listing.reputation !== undefined || listing.governancePower !== undefined) && (
-                    <div className="space-y-2 mb-3 bg-black/30 p-2 rounded border border-toxic-neon/20">
-                      {listing.reputation !== undefined && (
-                        <div>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="text-white/60">Reputation</span>
-                            <span className="text-toxic-neon/90">{listing.reputation}/100</span>
-                          </div>
-                          <Progress value={listing.reputation || 0} className="h-1" />
-                        </div>
-                      )}
-                      
-                      {listing.governancePower !== undefined && (
-                        <div>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="text-white/60 flex items-center">
-                              <Vote className="h-3 w-3 mr-1" /> Governance Power
-                            </span>
-                            <span className="text-yellow-400">{listing.governancePower}/10</span>
-                          </div>
-                          <Progress value={listing.governancePower * 10 || 0} className="h-1" />
-                        </div>
-                      )}
-                      
-                      {listing.projectHistory !== undefined && (
-                        <div className="flex justify-between text-xs">
-                          <span className="text-white/60">Projects Completed</span>
-                          <span className="text-toxic-neon/90">{listing.projectHistory}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  
-                  {/* Staking Rewards */}
-                  {listing.stakingStatus === 'active' && listing.stakingRewards && (
-                    <div className="bg-toxic-dark/30 p-2 rounded border border-toxic-neon/30 mb-3">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-white/60 flex items-center">
-                          <Coins className="h-3 w-3 mr-1" /> Staking Rewards
-                        </span>
-                        <span className="text-toxic-neon font-mono">{listing.stakingRewards}</span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="space-y-2 mb-4">
+                  {/* Attributes - aligned in two columns */}
+                  <div className="space-y-2 mb-6">
                     {listing.attributes.slice(0, 3).map((attr, idx) => (
-                      <div key={idx} className="flex justify-between text-xs">
+                      <div key={idx} className="flex justify-between text-sm">
                         <span className="text-white/60">{attr.trait}</span>
-                        <span className="text-toxic-neon/90">{attr.value}</span>
+                        <span className="text-toxic-neon">{attr.value}</span>
                       </div>
                     ))}
                   </div>
                   
+                  {/* Button */}
                   <ToxicButton 
-                    className="w-full mt-2 bg-toxic-dark border-toxic-neon/50 hover:bg-toxic-dark/80 text-sm group transition-all duration-300"
+                    className="w-full bg-black border-toxic-neon hover:bg-toxic-dark/80 text-sm group transition-all duration-300"
                     size="sm"
                     variant="marketplace"
                     onClick={(e) => {
@@ -370,7 +323,7 @@ export function MarketplaceListingGrid({
                   >
                     {isConnected ? (
                       <>
-                        <Target className="h-4 w-4 mr-1 group-hover:animate-pulse" /> View Listing
+                        <Target className="h-4 w-4 mr-1 group-hover:animate-pulse" /> View Details
                       </>
                     ) : (
                       <>
