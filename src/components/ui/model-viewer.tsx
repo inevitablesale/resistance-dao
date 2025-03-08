@@ -34,7 +34,7 @@ const ModelLoader = () => {
 const Model = ({ 
   url, 
   autoRotate = true, 
-  radiationEffect = true,
+  radiationEffect = false,
   rotationSpeed = 0.005
 }: { 
   url: string;
@@ -176,7 +176,7 @@ export const ModelViewer = ({
   height = "300px",
   backgroundColor = "transparent",
   autoRotate = true,
-  radiationEffect = true,
+  radiationEffect = false,
   rotationSpeed = 0.005,
   showControls = true,
   onError,
@@ -245,3 +245,4 @@ export const ModelViewer = ({
 
 // Preload the model to avoid jank when it's first displayed
 useGLTF.preload('https://gateway.pinata.cloud/ipfs/bafybeic2yffnslotf33yojsihiyv73rmxenstfwcxnyws5ktxp2mptkb3q');
+
