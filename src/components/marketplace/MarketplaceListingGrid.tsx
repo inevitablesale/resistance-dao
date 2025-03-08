@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { ToxicCard, ToxicCardContent } from "@/components/ui/toxic-card";
 import { ToxicBadge } from "@/components/ui/toxic-badge";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { DrippingSlime } from "@/components/ui/dripping-slime";
 import { ModelPreview } from "@/components/marketplace/ModelPreview";
-import { Skull, Biohazard, ChevronRight, Filter, SearchCode, Users, Target, Shield, Radiation, ShieldX, Image, Box } from "lucide-react";
+import { Skull, Biohazard, ChevronRight, Filter, SearchCode, Users, Target, Shield, Radiation, ShieldX, Image, Box3D } from "lucide-react";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 export type MarketplaceListingType = 'survivor' | 'bounty-hunter' | 'equipment' | 'settlement';
@@ -95,7 +94,7 @@ export function MarketplaceListingGrid({
               </>
             ) : (
               <>
-                <Box className="h-4 w-4 mr-1" />
+                <Box3D className="h-4 w-4 mr-1" />
                 3D View
               </>
             )}
@@ -167,7 +166,7 @@ export function MarketplaceListingGrid({
                   {listing.modelUrl && (
                     <div className="absolute top-2 right-12">
                       <ToxicBadge variant="secondary" className="bg-toxic-neon/20 text-toxic-neon">
-                        <Box className="h-3 w-3 mr-1" /> 3D
+                        <Box3D className="h-3 w-3 mr-1" /> 3D
                       </ToxicBadge>
                     </div>
                   )}

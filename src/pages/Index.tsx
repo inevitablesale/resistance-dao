@@ -29,7 +29,7 @@ import {
   PlusCircle,
   Search,
   ShoppingBag,
-  Box
+  Box3D
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToxicButton } from "@/components/ui/toxic-button";
@@ -718,3 +718,4 @@ const Index = () => {
 };
 
 export default Index;
+
