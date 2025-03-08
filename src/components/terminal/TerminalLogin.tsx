@@ -174,20 +174,27 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
           <div className="flex items-start gap-3">
             <Info className="h-5 w-5 text-toxic-neon flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-toxic-neon font-mono text-sm mb-2">HOW TO GET ACCESS CODE</h3>
+              <h3 className="text-toxic-neon font-mono text-sm mb-2">NEED AN ACCESS CODE?</h3>
               <p className="text-white/80 text-sm mb-2">
                 Join the Resistance LinkedIn group to receive your access code and connect with fellow survivors.
               </p>
-              <a 
-                href="https://www.linkedin.com/groups/14310213/" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="flex items-center gap-2 text-toxic-neon text-sm hover:underline hover:text-toxic-neon/80 transition-colors mt-1"
-              >
-                <ExternalLink className="h-4 w-4" />
-                <span>Join Resistance LinkedIn Group</span>
-              </a>
-              <p className="text-white/60 text-xs mt-2">
+              <div className="flex flex-col sm:flex-row gap-3 mt-3">
+                <a 
+                  href="https://www.linkedin.com/groups/14310213/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="w-full"
+                >
+                  <ToxicButton
+                    variant="glowing"
+                    className="w-full uppercase font-mono flex items-center justify-center"
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    <span>Gain Access Code</span>
+                  </ToxicButton>
+                </a>
+              </div>
+              <p className="text-white/60 text-xs mt-3">
                 <span className="text-apocalypse-red">*</span> Default access code: "resistance"
               </p>
             </div>
