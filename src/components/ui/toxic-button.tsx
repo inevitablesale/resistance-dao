@@ -13,6 +13,7 @@ const toxicButtonVariants = cva(
         outline: "border border-toxic-neon/80 bg-transparent text-toxic-neon shadow-[0_0_10px_rgba(57,255,20,0.2)]",
         ghost: "bg-transparent text-toxic-neon hover:bg-toxic-neon/10",
         glowing: "bg-toxic-dark/90 text-toxic-neon border border-toxic-neon shadow-[0_0_15px_rgba(57,255,20,0.5)]",
+        marketplace: "bg-toxic-dark/80 text-toxic-neon border border-toxic-neon/80 shadow-[0_0_12px_rgba(57,255,20,0.4)] hover:bg-toxic-dark/60",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -50,6 +51,13 @@ const ToxicButton = React.forwardRef<HTMLButtonElement, ToxicButtonProps>(
           <>
             <span className="absolute inset-0 bg-toxic-neon/5 animate-pulse"></span>
             <span className="absolute -inset-[1px] border border-toxic-neon/50 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+          </>
+        )}
+        {variant === 'marketplace' && (
+          <>
+            <span className="absolute inset-0 bg-toxic-neon/5 animate-pulse"></span>
+            <span className="absolute -inset-[1px] border border-toxic-neon/70 rounded-md opacity-50 group-hover:opacity-100 transition-opacity duration-300"></span>
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-toxic-neon/20 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-[gradient_3s_ease-in-out_infinite]"></span>
           </>
         )}
       </Comp>

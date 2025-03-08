@@ -15,6 +15,9 @@ const toxicBadgeVariants = cva(
           "border-transparent bg-black/40 text-toxic-muted border border-toxic-muted/30",
         outline: "text-toxic-neon border border-toxic-neon/50",
         danger: "bg-red-950 text-red-400 border border-red-500/50 shadow-[0_0_8px_rgba(255,0,0,0.3)]",
+        marketplace: "bg-toxic-dark/70 text-toxic-neon border border-toxic-neon/70 shadow-[0_0_10px_rgba(57,255,20,0.4)]",
+        status: "bg-black/60 text-toxic-neon border border-toxic-neon/40 shadow-[0_0_6px_rgba(57,255,20,0.2)]",
+        rating: "bg-toxic-dark/80 text-toxic-neon border-2 border-toxic-neon/60 shadow-[0_0_12px_rgba(57,255,20,0.5)]",
       },
     },
     defaultVariants: {
