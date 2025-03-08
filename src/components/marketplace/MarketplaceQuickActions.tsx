@@ -2,10 +2,11 @@
 import React from 'react';
 import { ToxicButton } from '@/components/ui/toxic-button';
 import { ToxicCard } from '@/components/ui/toxic-card';
-import { ShoppingBag, Target, Shield, ListFilter, Search, PlusCircle, UserPlus, Settings } from 'lucide-react';
+import { ShoppingBag, Target, Shield, ListFilter, Search, PlusCircle, UserPlus, Settings, Award, Radiation, Star, Coins } from 'lucide-react';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { useNavigate } from 'react-router-dom';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
+import { Badge } from '@/components/ui/badge';
 
 interface MarketplaceQuickActionsProps {
   className?: string;
@@ -44,24 +45,24 @@ export function MarketplaceQuickActions({
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="flex flex-col items-center bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4 hover:bg-toxic-dark/40 hover:border-toxic-neon/30 transition-all">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-toxic-dark border border-toxic-neon/50 mb-3">
-              <PlusCircle className="h-5 w-5 text-toxic-neon" />
+          <div className="flex flex-col items-center bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4 hover:bg-toxic-dark/40 hover:border-toxic-neon/30 transition-all group">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-toxic-dark border border-toxic-neon/50 mb-3 group-hover:border-toxic-neon group-hover:scale-110 transition-all">
+              <PlusCircle className="h-5 w-5 text-toxic-neon group-hover:animate-pulse" />
             </div>
             <span className="text-toxic-neon text-sm font-medium mb-2">Create Listing</span>
             <ToxicButton 
               variant="marketplace" 
               size="sm" 
-              className="w-full"
+              className="w-full group-hover:animate-toxic-pulse"
               onClick={() => handleAction(onCreateListing)}
             >
               List Asset
             </ToxicButton>
           </div>
           
-          <div className="flex flex-col items-center bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4 hover:bg-toxic-dark/40 hover:border-toxic-neon/30 transition-all">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-toxic-dark border border-toxic-neon/50 mb-3">
-              <Search className="h-5 w-5 text-toxic-neon" />
+          <div className="flex flex-col items-center bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4 hover:bg-toxic-dark/40 hover:border-toxic-neon/30 transition-all group">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-toxic-dark border border-toxic-neon/50 mb-3 group-hover:border-toxic-neon group-hover:scale-110 transition-all">
+              <Search className="h-5 w-5 text-toxic-neon group-hover:animate-pulse" />
             </div>
             <span className="text-toxic-neon text-sm font-medium mb-2">Browse Market</span>
             <ToxicButton 
@@ -74,11 +75,14 @@ export function MarketplaceQuickActions({
             </ToxicButton>
           </div>
           
-          <div className="flex flex-col items-center bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4 hover:bg-toxic-dark/40 hover:border-toxic-neon/30 transition-all">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-toxic-dark border border-toxic-neon/50 mb-3">
-              <Target className="h-5 w-5 text-toxic-neon" />
+          <div className="flex flex-col items-center bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4 hover:bg-toxic-dark/40 hover:border-toxic-neon/30 transition-all group">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-toxic-dark border border-toxic-neon/50 mb-3 group-hover:border-toxic-neon group-hover:scale-110 transition-all">
+              <Target className="h-5 w-5 text-toxic-neon group-hover:animate-pulse" />
             </div>
             <span className="text-toxic-neon text-sm font-medium mb-2">Bounty Hunters</span>
+            <div className="mb-2 flex justify-center">
+              <Badge className="bg-purple-900/60 text-purple-300 text-xs">NEW TIERS</Badge>
+            </div>
             <ToxicButton 
               variant="outline" 
               size="sm" 
@@ -89,11 +93,14 @@ export function MarketplaceQuickActions({
             </ToxicButton>
           </div>
           
-          <div className="flex flex-col items-center bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4 hover:bg-toxic-dark/40 hover:border-toxic-neon/30 transition-all">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-toxic-dark border border-toxic-neon/50 mb-3">
-              <Shield className="h-5 w-5 text-toxic-neon" />
+          <div className="flex flex-col items-center bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4 hover:bg-toxic-dark/40 hover:border-toxic-neon/30 transition-all group">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-toxic-dark border border-toxic-neon/50 mb-3 group-hover:border-toxic-neon group-hover:scale-110 transition-all">
+              <Shield className="h-5 w-5 text-toxic-neon group-hover:animate-pulse" />
             </div>
             <span className="text-toxic-neon text-sm font-medium mb-2">Survivors</span>
+            <div className="mb-2 flex justify-center">
+              <Badge className="bg-amber-900/60 text-amber-300 text-xs">STAKING</Badge>
+            </div>
             <ToxicButton 
               variant="outline" 
               size="sm" 
@@ -104,6 +111,40 @@ export function MarketplaceQuickActions({
             </ToxicButton>
           </div>
         </div>
+        
+        {/* New NFT pricing & distribution info */}
+        {isConnected && (
+          <div className="bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4">
+            <h4 className="text-toxic-neon font-mono text-sm mb-3 flex items-center">
+              <Radiation className="h-4 w-4 mr-2" /> NFT PRICING & DISTRIBUTION
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div className="bg-black/40 p-3 rounded border border-purple-500/30 flex flex-col">
+                <div className="flex items-center text-purple-300 mb-1">
+                  <Award className="h-4 w-4 mr-1" /> Legacy Founders
+                </div>
+                <span className="text-white/70">800 Airdropped</span>
+                <span className="text-toxic-neon mt-1">Status: Active</span>
+              </div>
+              
+              <div className="bg-black/40 p-3 rounded border border-green-500/30 flex flex-col">
+                <div className="flex items-center text-green-300 mb-1">
+                  <Star className="h-4 w-4 mr-1" /> Early Adopters
+                </div>
+                <span className="text-white/70">250 @ 50 RD</span>
+                <span className="text-toxic-neon mt-1">Status: Selling</span>
+              </div>
+              
+              <div className="bg-black/40 p-3 rounded border border-amber-500/30 flex flex-col">
+                <div className="flex items-center text-amber-300 mb-1">
+                  <Coins className="h-4 w-4 mr-1" /> Staking Rewards
+                </div>
+                <span className="text-white/70">Earn RD over time</span>
+                <span className="text-toxic-neon mt-1">Hunters & Survivors</span>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Only show the connect prompt when not connected */}
         {!isConnected && (
