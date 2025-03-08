@@ -24,7 +24,7 @@ export function TerminalTypewriter({
   const [displayText, setDisplayText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
   const [isComplete, setIsComplete] = useState(false);
-  const [initializationComplete, setInitializationComplete] = useState(false);
+  const [initializationComplete, setInitializationComplete] = useState(marketplaceMode ? true : false);
   const [currentLine, setCurrentLine] = useState(0);
   const [accessCode, setAccessCode] = useState("");
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -40,6 +40,11 @@ export function TerminalTypewriter({
   
   // Handle initialization sequence typing - with faster line transition
   useEffect(() => {
+    if (marketplaceMode) {
+      // Skip initialization for marketplace mode
+      return;
+    }
+    
     if (currentLine < initLines.length) {
       let i = 0;
       const interval = setInterval(() => {
@@ -59,7 +64,7 @@ export function TerminalTypewriter({
       setInitializationComplete(true);
       setCurrentLine(prev => prev + 1);
     }
-  }, [currentLine, typeDelay]);
+  }, [currentLine, typeDelay, marketplaceMode]);
   
   // Handle cursor blinking
   useEffect(() => {
@@ -124,23 +129,27 @@ export function TerminalTypewriter({
               </div>
             ) : (
               <>
-                {initLines.map((line, index) => (
-                  <div key={index} className="terminal-line">
-                    <span className="text-toxic-neon font-mono">
-                      {index === 0 ? (
-                        <span className="text-toxic-neon">_&gt; {line}</span>
-                      ) : (
-                        line
-                      )}
-                    </span>
-                  </div>
-                ))}
-                
-                <div className="terminal-line">
-                  <span className="text-toxic-neon font-mono">
-                    resistance@secure:~$
-                  </span>
-                </div>
+                {!marketplaceMode && (
+                  <>
+                    {initLines.map((line, index) => (
+                      <div key={index} className="terminal-line">
+                        <span className="text-toxic-neon font-mono">
+                          {index === 0 ? (
+                            <span className="text-toxic-neon">_&gt; {line}</span>
+                          ) : (
+                            line
+                          )}
+                        </span>
+                      </div>
+                    ))}
+                    
+                    <div className="terminal-line">
+                      <span className="text-toxic-neon font-mono">
+                        resistance@secure:~$
+                      </span>
+                    </div>
+                  </>
+                )}
                 
                 {isConnected ? (
                   <div className="terminal-line mt-3">
@@ -172,9 +181,11 @@ export function TerminalTypewriter({
                       </div>
                     </div>
                     
-                    <div className="terminal-hint mt-3">
-                      <span className="text-toxic-neon/70 text-xs font-mono">// Access code is "resistance"</span>
-                    </div>
+                    {!marketplaceMode && (
+                      <div className="terminal-hint mt-3">
+                        <span className="text-toxic-neon/70 text-xs font-mono">// Access code is "resistance"</span>
+                      </div>
+                    )}
                     
                     {!marketplaceMode && (
                       <div className="terminal-footer mt-4">
