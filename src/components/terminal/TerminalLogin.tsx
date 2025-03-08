@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Shield, Skull, LockKeyhole, AlertTriangle, Terminal } from "lucide-react";
+import { Shield, LockKeyhole, AlertTriangle, Terminal } from "lucide-react";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 
@@ -48,17 +47,19 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
     // Demo authentication - in a real app, you'd validate against a server
     addTerminalMessage(`> VALIDATING ACCESS CODE: ${accessCode.replace(/./g, '*')}`);
     
+    // Reduced authentication time from 2000ms to 500ms
     setTimeout(() => {
       if (accessCode === "resistance" || accessCode === "admin") {
         addTerminalMessage("> ACCESS CODE VALIDATED");
         addTerminalMessage("> INITIATING SECURE PROTOCOL...");
-        setTimeout(handleLoginSuccess, 1500);
+        // Reduced success delay from 1500ms to 300ms
+        setTimeout(handleLoginSuccess, 300);
       } else {
         setIsAuthenticating(false);
         setLoginErrors(["ERROR: INVALID ACCESS CODE"]);
         addTerminalMessage("> AUTHENTICATION FAILED");
       }
-    }, 2000);
+    }, 500);
   };
 
   const handleWalletConnect = () => {
@@ -66,9 +67,10 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
     setLoginErrors([]);
     addTerminalMessage("> INITIALIZING WALLET CONNECTION...");
     
+    // Reduced wallet connection delay from 1000ms to 300ms
     setTimeout(() => {
       connect();
-    }, 1000);
+    }, 300);
   };
 
   const handleLoginSuccess = () => {
