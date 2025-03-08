@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicProgress } from '@/components/ui/toxic-progress';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
+import { ToxicButton } from '@/components/ui/toxic-button';
 import { User, Shield, Zap, Target, Award, Flag, Network, BookOpen, Radiation, Eye, Hammer, X, Plus, ChevronDown } from 'lucide-react';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
 import { ModelPreview } from '@/components/marketplace/ModelPreview';
 import { motion } from 'framer-motion';
-import { ToxicButton } from '@/components/ui/toxic-button';
 
 interface CharacterProgressProps {
   className?: string;
@@ -90,7 +90,7 @@ export function CharacterProgress({ className, role }: CharacterProgressProps) {
       </div>
       
       {/* Image/Model Container - Fixed height */}
-      <div className="relative h-[220px] w-full bg-gradient-to-b from-black/30 to-black/90">
+      <div className="relative h-64 w-full bg-gradient-to-b from-black/30 to-black/90">
         {getRoleBadge()}
         
         {/* 3D Model View */}
@@ -103,29 +103,14 @@ export function CharacterProgress({ className, role }: CharacterProgressProps) {
         />
         
         {/* Quick Stats Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-sm p-2 flex justify-between">
-          <div className="flex flex-col items-center">
-            <Shield className="w-3 h-3 text-toxic-neon mb-1" />
-            <span className="text-xs text-toxic-neon">{characterStats.reputation}%</span>
-            <span className="text-[10px] text-white/60">REP</span>
+        <div className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-sm p-3 flex justify-between">
+          <div className="text-lg font-mono text-toxic-neon truncate pr-2">
+            Wasteland Survivor
           </div>
-          
-          <div className="flex flex-col items-center">
-            <Network className="w-3 h-3 text-toxic-neon mb-1" />
-            <span className="text-xs text-toxic-neon">{characterStats.influence}%</span>
-            <span className="text-[10px] text-white/60">INF</span>
-          </div>
-          
-          <div className="flex flex-col items-center">
-            <Radiation className="w-3 h-3 text-toxic-neon mb-1" />
-            <span className="text-xs text-toxic-neon">{characterStats.radiation}%</span>
-            <span className="text-[10px] text-white/60">RAD</span>
-          </div>
-          
-          <div className="flex flex-col items-center">
-            <Flag className="w-3 h-3 text-toxic-neon mb-1" />
-            <span className="text-xs text-toxic-neon">{characterStats.territories}</span>
-            <span className="text-[10px] text-white/60">TERR</span>
+          <div className="flex-shrink-0 text-toxic-neon font-mono">
+            <ToxicBadge variant="rating" className="text-xs">
+              <Radiation className="w-3 h-3 mr-1" /> {characterStats.radiation}%
+            </ToxicBadge>
           </div>
         </div>
       </div>

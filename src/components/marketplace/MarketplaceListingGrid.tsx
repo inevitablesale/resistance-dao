@@ -1,375 +1,210 @@
 
-import React, { useState } from 'react';
-import { ToxicCard, ToxicCardContent } from "@/components/ui/toxic-card";
-import { ToxicBadge } from "@/components/ui/toxic-badge";
-import { ToxicButton } from "@/components/ui/toxic-button";
-import { DrippingSlime } from "@/components/ui/dripping-slime";
-import { ModelPreview } from "@/components/marketplace/ModelPreview";
-import { 
-  Skull, 
-  Biohazard, 
-  ChevronRight, 
-  Filter, 
-  SearchCode, 
-  Users, 
-  Target, 
-  Shield, 
-  Radiation, 
-  ShieldX, 
-  Image, 
-  Box, 
-  Star, 
-  Award, 
-  Coins, 
-  Badge,
-  Vote
-} from "lucide-react";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useNavigate } from "react-router-dom";
-import { Progress } from "@/components/ui/progress";
-import { ToxicProgress } from "@/components/ui/toxic-progress";
+import React, { useState, useRef } from 'react';
+import { ChevronLeft, ChevronRight, Target, Biohazard, Zap } from 'lucide-react';
+import { ToxicCard } from '@/components/ui/toxic-card';
+import { ToxicBadge } from '@/components/ui/toxic-badge';
+import { ToxicProgress } from '@/components/ui/toxic-progress';
+import { ToxicButton } from '@/components/ui/toxic-button';
+import { ModelPreview } from './ModelPreview';
+import { motion } from 'framer-motion';
 
-export type MarketplaceListingType = 'survivor' | 'bounty-hunter' | 'equipment' | 'settlement';
-export type PricingTier = 'early' | 'mid' | 'premium' | 'legacy';
-export type StakingStatus = 'active' | 'inactive' | 'locked';
+export interface MarketplaceAttribute {
+  trait: string;
+  value: string;
+}
+
+export interface RadiationLevel {
+  level: string;
+  value: number;
+}
 
 export interface MarketplaceListing {
   id: number;
-  type: MarketplaceListingType;
+  type?: 'bounty-hunter' | 'survivor' | 'equipment';
   name: string;
-  description?: string;
   tokenId: number;
   price: string;
   seller: string;
-  radiation: {
-    level: string;
-    value: number;
-  };
-  attributes: {
-    trait: string;
-    value: string;
-  }[];
-  status: 'active' | 'pending' | 'sold';
-  imageUrl?: string;
+  radiation?: RadiationLevel;
+  attributes?: MarketplaceAttribute[];
+  status: 'active' | 'sold' | 'auction';
   modelUrl?: string;
-  
-  // New fields based on economic strategy
-  isLegacyFounder?: boolean;
-  pricingTier?: PricingTier;
-  stakingStatus?: StakingStatus;
-  stakingRewards?: string;
-  reputation?: number;
-  governancePower?: number;
-  projectHistory?: number;
 }
 
 interface MarketplaceListingGridProps {
   listings: MarketplaceListing[];
-  title: string;
-  emptyMessage?: string;
-  className?: string;
+  title?: string;
   onListingClick?: (listing: MarketplaceListing) => void;
+  className?: string;
 }
 
 export function MarketplaceListingGrid({ 
   listings, 
   title, 
-  emptyMessage = "No listings found in the wasteland",
-  className,
-  onListingClick
+  onListingClick, 
+  className = "" 
 }: MarketplaceListingGridProps) {
-  const { setShowAuthFlow } = useWalletConnection();
-  const [modelViewEnabled, setModelViewEnabled] = useState(true);
-  const navigate = useNavigate();
-  const { isConnected } = useWalletConnection();
-
-  const getListingTypeIcon = (type: MarketplaceListingType) => {
-    switch(type) {
-      case 'survivor':
-        return <Shield className="h-4 w-4 text-toxic-neon" />;
-      case 'bounty-hunter':
-        return <Target className="h-4 w-4 text-apocalypse-red" />;
-      case 'equipment':
-        return <Radiation className="h-4 w-4 text-toxic-neon" />;
-      case 'settlement':
-        return <Users className="h-4 w-4 text-toxic-muted" />;
-      default:
-        return <Biohazard className="h-4 w-4 text-toxic-neon" />;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  const visibleListings = listings.slice(currentIndex, currentIndex + 2);
+  const hasNext = currentIndex + 2 < listings.length;
+  const hasPrev = currentIndex > 0;
+  
+  const handlePrev = () => {
+    if (hasPrev) {
+      setCurrentIndex(currentIndex - 1);
     }
   };
-
-  const getRadiationColor = (value: number) => {
-    if (value >= 80) return "text-apocalypse-red border-apocalypse-red/70 shadow-[0_0_8px_rgba(255,0,0,0.3)]";
-    if (value >= 50) return "text-yellow-400 border-yellow-400/70 shadow-[0_0_8px_rgba(255,255,0,0.3)]";
-    return "text-toxic-neon border-toxic-neon/70 shadow-[0_0_8px_rgba(57,255,20,0.3)]";
+  
+  const handleNext = () => {
+    if (hasNext) {
+      setCurrentIndex(currentIndex + 1);
+    }
   };
-
-  const getRadiationBadgeClass = (value: number) => {
-    if (value >= 80) return "bg-black border-apocalypse-red/70 text-apocalypse-red";
-    if (value >= 50) return "bg-black border-yellow-400/70 text-yellow-400";
-    return "bg-black border-toxic-neon/70 text-toxic-neon";
-  };
-
-  const getPricingTierBadge = (tier?: PricingTier) => {
-    if (!tier) return null;
+  
+  const getRadiationBadgeColor = (level?: string) => {
+    if (!level) return 'bg-toxic-neon/20 text-toxic-neon';
     
-    switch(tier) {
-      case 'legacy':
-        return (
-          <ToxicBadge variant="rating" className="flex items-center gap-1 bg-purple-900/50 text-purple-300 border-purple-500/70">
-            <Award className="h-3 w-3 mr-1" />
-            LEGACY FOUNDER
-          </ToxicBadge>
-        );
-      case 'early':
-        return (
-          <ToxicBadge variant="rating" className="flex items-center gap-1 bg-green-900/50 text-green-300 border-green-500/70">
-            <Star className="h-3 w-3 mr-1" />
-            EARLY ADOPTER
-          </ToxicBadge>
-        );
-      case 'mid':
-        return (
-          <ToxicBadge variant="rating" className="flex items-center gap-1 bg-blue-900/50 text-blue-300 border-blue-500/70">
-            <Badge className="h-3 w-3 mr-1" />
-            MID TIER
-          </ToxicBadge>
-        );
-      case 'premium':
-        return (
-          <ToxicBadge variant="rating" className="flex items-center gap-1 bg-amber-900/50 text-amber-300 border-amber-500/70">
-            <Award className="h-3 w-3 mr-1" />
-            PREMIUM
-          </ToxicBadge>
-        );
+    switch (level.toLowerCase()) {
+      case 'low':
+        return 'bg-toxic-neon/30 text-toxic-neon border-toxic-neon/40';
+      case 'medium':
+        return 'bg-amber-500/30 text-amber-400 border-amber-500/40';
+      case 'high':
+        return 'bg-orange-500/30 text-orange-400 border-orange-500/40';
+      case 'critical':
+        return 'bg-apocalypse-red/30 text-apocalypse-red border-apocalypse-red/40';
       default:
-        return null;
+        return 'bg-toxic-neon/20 text-toxic-neon border-toxic-neon/40';
     }
   };
-
-  const getStakingStatusBadge = (status?: StakingStatus) => {
-    if (!status) return null;
-    
-    switch(status) {
-      case 'active':
-        return (
-          <ToxicBadge variant="marketplace" className="flex items-center gap-1 bg-toxic-dark/70 text-toxic-neon border-toxic-neon/70">
-            <Coins className="h-3 w-3 mr-1" />
-            STAKED
-          </ToxicBadge>
-        );
-      case 'locked':
-        return (
-          <ToxicBadge variant="marketplace" className="flex items-center gap-1 bg-blue-900/50 text-blue-300 border-blue-500/70">
-            <ShieldX className="h-3 w-3 mr-1" />
-            LOCKED
-          </ToxicBadge>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const toggleModelView = () => {
-    setModelViewEnabled(!modelViewEnabled);
-  };
-
-  const handleItemClick = (listing: MarketplaceListing) => {
-    if (onListingClick) {
-      onListingClick(listing);
-    } else {
-      navigate(`/marketplace/${listing.id}`);
-    }
-  };
-
+  
   return (
-    <div className={className}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
-          <Radiation className="h-5 w-5 mr-2" /> {title}
-        </h3>
-        
-        <div className="flex items-center gap-2">
-          <ToxicButton 
-            variant="ghost" 
-            size="sm" 
-            className="text-toxic-neon hover:bg-toxic-dark/20"
-            onClick={toggleModelView}
-          >
-            {modelViewEnabled ? (
-              <>
-                <Image className="h-4 w-4 mr-1" />
-                2D View
-              </>
-            ) : (
-              <>
-                <Box className="h-4 w-4 mr-1" />
-                3D View
-              </>
-            )}
-          </ToxicButton>
-          <ToxicButton 
-            variant="ghost" 
-            size="sm" 
-            className="text-toxic-neon hover:bg-toxic-dark/20"
-          >
-            <Filter className="h-4 w-4 mr-1" />
-            Filter
-          </ToxicButton>
-          <ToxicButton 
-            variant="ghost" 
-            size="sm" 
-            className="text-toxic-neon hover:bg-toxic-dark/20"
-          >
-            <SearchCode className="h-4 w-4 mr-1" />
-            Search
-          </ToxicButton>
-        </div>
-      </div>
-      
-      {listings.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {listings.map((listing) => (
-            <ToxicCard 
-              key={listing.id} 
-              className={`bg-black/90 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all cursor-pointer p-0 ${listing.isLegacyFounder ? 'animate-toxic-pulse' : ''}`}
-              onClick={() => handleItemClick(listing)}
+    <div className={`w-full ${className}`}>
+      {title && (
+        <div className="mb-4 flex justify-between items-center">
+          <h2 className="text-lg font-mono text-toxic-neon">{title}</h2>
+          <div className="flex gap-2">
+            <ToxicButton 
+              variant="outline" 
+              size="icon" 
+              className="h-8 w-8 border-toxic-neon/40"
+              onClick={handlePrev}
+              disabled={!hasPrev}
             >
-              <ToxicCardContent className="p-0">
-                <div className="relative h-48 bg-gradient-to-b from-transparent to-black/90 rounded-t-lg overflow-hidden">
-                  {listing.modelUrl && modelViewEnabled ? (
-                    <ModelPreview 
-                      modelUrl={listing.modelUrl} 
-                      height="100%" 
-                      width="100%" 
-                      autoRotate={true} 
-                    />
-                  ) : listing.imageUrl ? (
-                    <img 
-                      src={listing.imageUrl} 
-                      alt={listing.name} 
-                      className="absolute inset-0 w-full h-full object-cover opacity-80"
+              <ChevronLeft className="h-4 w-4 text-toxic-neon" />
+            </ToxicButton>
+            <ToxicButton 
+              variant="outline" 
+              size="icon" 
+              className="h-8 w-8 border-toxic-neon/40"
+              onClick={handleNext}
+              disabled={!hasNext}
+            >
+              <ChevronRight className="h-4 w-4 text-toxic-neon" />
+            </ToxicButton>
+          </div>
+        </div>
+      )}
+      
+      <div ref={scrollContainerRef} className="relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {visibleListings.map((listing) => (
+            <motion.div
+              key={listing.id}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="h-full"
+            >
+              <ToxicCard 
+                className="bg-black/80 border-toxic-neon/30 p-0 h-full flex flex-col hover:border-toxic-neon/60 transition-all cursor-pointer relative overflow-hidden"
+                onClick={() => onListingClick && onListingClick(listing)}
+              >
+                {/* Type Badge */}
+                <div className="absolute top-3 left-3 z-10">
+                  <ToxicBadge variant="marketplace" className="bg-black/60 border-toxic-neon/50">
+                    <Target className="w-3 h-3 mr-1 text-apocalypse-red" /> 
+                    BOUNTY HUNTER
+                  </ToxicBadge>
+                </div>
+                
+                {/* Model Preview with fixed height */}
+                <div className="relative w-full h-64 bg-gradient-to-b from-black/40 to-black/90">
+                  {listing.modelUrl ? (
+                    <ModelPreview
+                      modelUrl={listing.modelUrl}
+                      height="100%"
+                      width="100%"
+                      autoRotate={true}
+                      className="rounded-none"
                     />
                   ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black">
-                      {listing.type === 'bounty-hunter' ? (
-                        <Skull className="w-20 h-20 text-toxic-neon/50" />
-                      ) : (
-                        <Biohazard className="w-20 h-20 text-toxic-neon/50" />
-                      )}
+                    <div className="w-full h-full flex items-center justify-center bg-black/50">
+                      <Zap className="w-12 h-12 text-toxic-neon/20" />
                     </div>
                   )}
                   
-                  <DrippingSlime position="top" dripsCount={5} toxicGreen={true} showIcons={false} />
-                  
-                  <div className="absolute top-0 left-0 right-0 p-2">
-                    <div className="bg-black/60 border border-toxic-neon/30 rounded-full px-4 py-1 flex items-center justify-center mx-auto max-w-[90%]">
-                      <Target className="h-4 w-4 mr-2 text-apocalypse-red" />
-                      <span className="text-toxic-neon font-mono uppercase tracking-wider text-sm">Bounty Hunter</span>
+                  {/* Quick Stats Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/70 backdrop-blur-sm flex justify-between items-center">
+                    <div className="text-lg font-mono text-toxic-neon truncate pr-2">
+                      {listing.name}
+                    </div>
+                    <div className="flex-shrink-0 text-lg font-mono text-toxic-neon">
+                      {listing.price}
                     </div>
                   </div>
                 </div>
                 
-                <div className="p-4 bg-black">
-                  {/* Type and Price line - aligned horizontally */}
-                  <div className="flex justify-between font-mono text-sm mb-4">
-                    <div className="text-toxic-neon flex items-center">
-                      <span className="text-white/60 mr-1">TYPE:</span>
-                      {listing.type === 'bounty-hunter' ? 'BOUNTY-HUNTER' : listing.type.toUpperCase()}
-                    </div>
-                    <div className="text-toxic-neon">
-                      <span className="text-white/60 mr-1">PRICE:</span>
-                      {listing.price}
-                    </div>
-                  </div>
-                  
-                  {/* Name */}
-                  <h4 className="text-2xl font-mono text-toxic-neon mb-4 text-center">{listing.name}</h4>
-                  
-                  {/* Radiation Level Badge */}
-                  <div className="flex justify-center mb-4">
+                {/* Radiation Level Badge */}
+                {listing.radiation && (
+                  <div className="px-4 py-3">
                     <ToxicBadge 
-                      variant="secondary" 
-                      className={`border px-4 py-1 rounded-full ${getRadiationBadgeClass(listing.radiation.value)}`}
+                      variant="status" 
+                      className={`w-full flex justify-between items-center py-2 ${getRadiationBadgeColor(listing.radiation.level)}`}
                     >
-                      <Radiation className="h-4 w-4 mr-2" />
-                      RAD LEVEL: {listing.radiation.level} ({listing.radiation.value}%)
+                      <span className="flex items-center">
+                        <Biohazard className="w-3.5 h-3.5 mr-1.5" /> RAD LEVEL: {listing.radiation.level}
+                      </span>
+                      <span>({listing.radiation.value}%)</span>
                     </ToxicBadge>
                   </div>
-                  
-                  {/* Attributes - aligned in two columns */}
-                  <div className="space-y-2 mb-6">
-                    {listing.attributes.slice(0, 3).map((attr, idx) => (
-                      <div key={idx} className="flex justify-between text-sm">
-                        <span className="text-white/60">{attr.trait}</span>
-                        <span className="text-toxic-neon">{attr.value}</span>
+                )}
+                
+                {/* Attributes */}
+                {listing.attributes && (
+                  <div className="px-4 pb-4 mt-2 grid grid-cols-2 gap-x-4 gap-y-2">
+                    {listing.attributes.map((attr, idx) => (
+                      <div key={idx} className="flex justify-between">
+                        <span className="text-white/70">{attr.trait}</span>
+                        <span className="text-toxic-neon font-mono">{attr.value}</span>
                       </div>
                     ))}
                   </div>
-                  
-                  {/* Button */}
-                  <ToxicButton 
-                    className="w-full bg-black border-toxic-neon hover:bg-toxic-dark/80 text-sm group transition-all duration-300"
-                    size="sm"
-                    variant="marketplace"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (isConnected) {
-                        handleItemClick(listing);
-                      } else {
-                        setShowAuthFlow(true);
-                      }
-                    }}
-                  >
-                    {isConnected ? (
-                      <>
-                        <Target className="h-4 w-4 mr-1 group-hover:animate-pulse" /> View Details
-                      </>
-                    ) : (
-                      <>
-                        <Shield className="h-4 w-4 mr-1 group-hover:animate-pulse" /> Connect to View
-                      </>
-                    )}
-                  </ToxicButton>
-                </div>
-              </ToxicCardContent>
-            </ToxicCard>
+                )}
+              </ToxicCard>
+            </motion.div>
           ))}
         </div>
-      ) : (
-        <div className="text-center py-12 bg-toxic-neon/5 rounded-lg border border-toxic-neon/20">
-          <Biohazard className="h-12 w-12 mx-auto mb-4 text-toxic-neon/40" />
-          <p className="text-white/70 mb-4">{emptyMessage}</p>
-          <ToxicButton 
-            variant="marketplace"
-            onClick={() => setShowAuthFlow(true)}
-          >
-            {isConnected ? (
-              <>
-                <Target className="h-4 w-4 mr-2" />
-                Create Listing
-              </>
-            ) : (
-              <>
-                <Radiation className="h-4 w-4 mr-2" />
-                Create First Listing
-              </>
-            )}
-          </ToxicButton>
+        
+        {/* Page Indicator for Mobile */}
+        <div className="mt-4 flex justify-center gap-2 md:hidden">
+          {listings.map((_, idx) => (
+            <button
+              key={idx}
+              className={`w-2 h-2 rounded-full ${
+                idx >= currentIndex && idx < currentIndex + 2
+                  ? "bg-toxic-neon"
+                  : "bg-toxic-neon/30"
+              }`}
+              onClick={() => setCurrentIndex(idx)}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
         </div>
-      )}
-      
-      {listings.length > 0 && (
-        <div className="flex justify-center mt-6">
-          <ToxicButton 
-            variant="outline" 
-            size="sm" 
-            className="text-toxic-neon hover:bg-toxic-dark/20 border-toxic-neon/30 group"
-          >
-            View All <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
-          </ToxicButton>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
