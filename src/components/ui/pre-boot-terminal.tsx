@@ -27,12 +27,12 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     const bootMessages = [
-      'Initializing secure terminal...',
-      'Establishing encrypted connection...',
-      '[WARNING]: Connection masking enabled',
-      'Routing through decentralized nodes...',
-      'RESISTANCE NETWORK TERMINAL v3.27',
-      'Authentication required:',
+      '[SURVIVAL_PROTOCOL] ESTABLISHING SECURE TRANSMISSION...',
+      '[WARNING] WASTELAND RADIATION LEVELS CRITICAL - ENCRYPTION REQUIRED',
+      'SCANNING FOR SURVIVORS...',
+      'SURVIVOR SIGNAL DETECTED',
+      'ATTEMPTING SECURE CONNECTION...',
+      'RESISTANCE AUTHENTICATION REQUIRED:',
     ];
 
     const typeMessage = (messageIndex: number = 0, charIndex: number = 0) => {
@@ -135,11 +135,11 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         
         setCommandLine(prev => 
           prev + 
-          '\n\n> CREDENTIAL VERIFIED' +
-          '\n> ACCESS LEVEL: RESISTANCE MEMBER' + 
-          '\n> INITIALIZING SECURE BOOT SEQUENCE...' +
-          '\n> ESTABLISHING ENCRYPTED CHANNEL...' +
-          '\n> SYSTEM BREACH IMMINENT...'
+          '\n\n> RESISTANCE CREDENTIALS VERIFIED' +
+          '\n> ACCESS LEVEL: WASTELAND SURVIVOR' + 
+          '\n> INITIALIZING SECURE COMMS...' +
+          '\n> RADIATION SHIELDING ACTIVE...' +
+          '\n> WASTELAND CONNECTION ESTABLISHED'
         );
         
         setTimeout(() => {
@@ -155,10 +155,10 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
         
         setCommandLine(prev => 
           prev + 
-          '\n\n> ERROR: INVALID CREDENTIALS' + 
+          '\n\n> ERROR: INVALID SURVIVOR CREDENTIALS' + 
           '\n> ACCESS DENIED' +
-          '\n> SECURITY PROTOCOLS ENGAGED' +
-          '\n> ATTEMPTS LOGGED'
+          '\n> RADIATION SHIELDING INACTIVE' +
+          '\n> HOSTILE ENTITIES MAY DETECT TRANSMISSION'
         );
         
         setPassword('');
@@ -215,9 +215,9 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }} 
               className="text-toxic-neon"
             >
-              <Terminal className="h-4 w-4 text-toxic-neon" />
+              <Radiation className="h-4 w-4 text-toxic-neon" />
             </motion.div>
-            <span className="text-toxic-neon/90 text-xs tracking-wider">RESISTANCE_SECURE_SHELL</span>
+            <span className="text-toxic-neon/90 text-xs tracking-wider">RESISTANCE_SECURE_COMMS</span>
             <div className="ml-auto flex gap-1.5">
               <div className="h-2 w-2 rounded-full bg-apocalypse-red/80 animate-pulse"></div>
               <div className="h-2 w-2 rounded-full bg-toxic-neon/50"></div>
@@ -229,7 +229,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
             className="flex-1 text-toxic-neon mb-4 whitespace-pre-line overflow-y-auto terminal-scrollbar max-h-[300px] transition-all duration-300"
           >
             {commandLine}
-            {terminalReady && <span className="terminal-prompt block mt-2 text-toxic-neon/90">resistance@secure:~$</span>}
+            {terminalReady && <span className="terminal-prompt block mt-2 text-toxic-neon/90">resistance@wasteland:~$</span>}
           </div>
           
           {terminalReady && (
@@ -251,7 +251,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter access code"
+                      placeholder="Enter Resistance Access Code"
                       className={cn(
                         "bg-black/60 text-toxic-neon border-toxic-neon/40 pl-8 focus-visible:ring-toxic-neon/30 font-mono",
                         "transition-all duration-300",
@@ -308,7 +308,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                     disabled={authStatus === 'checking' || authStatus === 'success'}
                   >
                     <span className="z-10 flex items-center">
-                      <Terminal className="w-4 h-4 mr-2" />
+                      <Radiation className="w-4 h-4 mr-2" />
                       {authStatus === 'checking' ? 'Verifying...' : 'Submit'}
                     </span>
                     <span className="absolute inset-0 bg-toxic-neon/0 hover:bg-toxic-neon/20 transition-colors duration-300"></span>
@@ -329,7 +329,7 @@ export function PreBootTerminal({ onAuthenticated }: PreBootTerminalProps) {
                     />
                     
                     <div className="relative py-3 px-4 bg-black/70 backdrop-blur-sm rounded border border-toxic-neon/10 inline-block group">
-                      <div className="access-code-message text-toxic-neon/60 font-mono text-sm mb-2">// Get access code by joining our LinkedIn group</div>
+                      <div className="access-code-message text-toxic-neon/60 font-mono text-sm mb-2">// Access code: resistance</div>
                       <a 
                         href="https://www.linkedin.com/groups/12657922/" 
                         target="_blank" 

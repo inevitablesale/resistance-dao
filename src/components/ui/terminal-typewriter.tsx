@@ -364,9 +364,9 @@ export function TerminalTypewriter({
               <div className="text-white/70 flex items-center">
                 <RotateCw className={`h-4 w-4 mr-2 ${bootProgress < 100 ? 'animate-spin' : ''}`} />
                 <span>
-                  {bootStage === "initializing" && "SYSTEM INITIALIZATION"}
-                  {bootStage === "diagnosing" && "SYSTEM DIAGNOSTICS"}
-                  {bootStage === "connecting" && "NETWORK CONNECTION"}
+                  {bootStage === "initializing" && "WASTELAND COMMS INITIALIZATION"}
+                  {bootStage === "diagnosing" && "RADIATION SHIELD DIAGNOSTICS"}
+                  {bootStage === "connecting" && "RESISTANCE NETWORK CONNECTION"}
                 </span>
               </div>
               <div className="text-toxic-neon font-mono text-sm">
@@ -396,11 +396,12 @@ export function TerminalTypewriter({
               <div className="mt-4 p-2 border border-apocalypse-red/40 bg-apocalypse-red/10 rounded">
                 <div className="flex items-center text-apocalypse-red mb-1">
                   <AlertTriangle className="h-4 w-4 mr-1" />
-                  <span className="text-sm font-bold">WARNING: SYSTEM DEGRADED</span>
+                  <span className="text-sm font-bold">WARNING: RADIATION LEVELS CRITICAL</span>
                 </div>
                 <p className="text-white/70 text-xs">
-                  Multiple critical systems compromised. Running in emergency mode.
-                  Protocol corruption detected. Full system recovery required.
+                  Hazardous radiation detected. Secure transmission degraded. 
+                  Recommend activating personal radiation shield. 
+                  Protocol corruption detected in nearby sectors.
                 </p>
               </div>
             )}

@@ -94,7 +94,7 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
         >
           <h2 className="text-2xl md:text-3xl font-mono text-toxic-neon mb-2 tracking-tight">
             <Radiation className="inline-block w-6 h-6 mr-2 mb-1" />
-            SELECT YOUR RESISTANCE IDENTITY
+            IDENTIFY YOUR ROLE IN THE WASTELAND
           </h2>
           <p className="text-white/70 max-w-2xl mx-auto">
             Your choice determines your role in the post-apocalyptic crypto wasteland. Choose wisely.
@@ -175,22 +175,21 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
                 <div className="flex-1">
                   <div className="mb-4 font-mono">
                     <p className="text-white/80 mb-3 text-sm leading-relaxed">
-                      Track down crypto criminals and claim bounties. Hunters specialize in neutralizing threats 
-                      to the wasteland economy and returning stolen funds to the community.
+                      Stalk the wasteland hunting the criminals who crashed the old world. Track digital signatures, capture mutated protocols, and earn rewards for bringing justice.
                     </p>
                     
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-apocalypse-red" />
-                        <span className="text-white/80 text-sm">High-risk, high-reward missions</span>
+                        <span className="text-white/80 text-sm">Collection Size: 142 CRIMINALS</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-apocalypse-red" />
-                        <span className="text-white/80 text-sm">Special access to bounty listings</span>
+                        <span className="text-white/80 text-sm">Avg. Bounty Value: 22,500 RD</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-apocalypse-red" />
-                        <span className="text-white/80 text-sm">Combat-enhanced capabilities</span>
+                        <span className="text-white/80 text-sm">Active Hunters: 68</span>
                       </div>
                     </div>
                   </div>
@@ -213,7 +212,7 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
                     <span className="flex items-center">
                       SELECTED <CheckCircle className="w-4 h-4 ml-2" />
                     </span>
-                  ) : "BECOME BOUNTY HUNTER"}
+                  ) : "SELECT BOUNTY HUNTER"}
                 </ToxicButton>
               </div>
             </Card>
@@ -315,22 +314,21 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
                 <div className="flex-1">
                   <div className="mb-4 font-mono">
                     <p className="text-white/80 mb-3 text-sm leading-relaxed">
-                      Rebuild civilization from the ruins. Survivors focus on community development, resource gathering, 
-                      and creating new systems to replace what was lost in the collapse.
+                      Join a network of settlements rebuilding civilization from the ashes. Contribute your skills to community projects, develop new technologies, and shape our collective future.
                     </p>
                     
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-toxic-neon" />
-                        <span className="text-white/80 text-sm">Enhanced resource discovery</span>
+                        <span className="text-white/80 text-sm">Collection Size: 821 SURVIVORS</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-toxic-neon" />
-                        <span className="text-white/80 text-sm">Community building bonuses</span>
+                        <span className="text-white/80 text-sm">Settlement Outposts: 37</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-toxic-neon" />
-                        <span className="text-white/80 text-sm">Radiation immunity perks</span>
+                        <span className="text-white/80 text-sm">Active Projects: 84</span>
                       </div>
                     </div>
                   </div>
@@ -353,7 +351,7 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
                     <span className="flex items-center">
                       SELECTED <CheckCircle className="w-4 h-4 ml-2" />
                     </span>
-                  ) : "BECOME SURVIVOR"}
+                  ) : "SELECT SURVIVOR"}
                 </ToxicButton>
               </div>
             </Card>
@@ -392,7 +390,7 @@ export function NFTShowcase({ onRoleSelect, selectedRole }: NFTShowcaseProps) {
         >
           <div className="inline-block bg-black/60 border border-toxic-neon/30 rounded-md p-3 text-sm text-white/70">
             <Gem className="inline-block text-toxic-neon w-4 h-4 mr-2" />
-            Your identity NFT determines your role in the Resistance ecosystem and unlocks unique features
+            Your wasteland identity determines your role in the Resistance ecosystem and unlocks unique survival features
           </div>
         </motion.div>
       </div>

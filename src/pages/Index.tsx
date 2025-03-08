@@ -112,6 +112,7 @@ const Index = () => {
   const renderTypewriterContent = () => (
     <div className="w-full px-4 py-6">
       <TerminalTypewriter 
+        textToType="SURVIVORS DETECTED... IF YOU CAN READ THIS, YOU'RE STILL ALIVE. WE'VE BEEN SEARCHING FOR OTHERS SINCE THE COLLAPSE. THE CRYPTO NUCLEAR WINTER KILLED 90% OF PROTOCOLS. THOSE WHO REMAIN HAVE ADAPTED TO THE HARSH NEW REALITY. WE'VE BUILT SHELTERS FROM THE FALLOUT, PRESERVING WHAT'S LEFT OF DECENTRALIZED TECHNOLOGY. OUR COMMUNITY HAS GOOD NEWS TO REPORT. WE ARE WINNING THE WAR."
         showBootSequence={false}
         onTypingComplete={handleTerminalComplete}
       />
@@ -181,18 +182,18 @@ const Index = () => {
               <div className="text-center mb-4 flex justify-between items-center">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm font-mono broken-glass">
                   <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
-                  <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Network Status: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
+                  <Radiation className="h-4 w-4 mr-1 toxic-glow" /> Radiation Levels: <span className="text-apocalypse-red font-bold status-critical">Critical</span>
                 </div>
                 
                 <div className="flex space-x-2">
                   <ToxicButton variant="ghost" size="sm" onClick={handleShowEmergencyTransmission}>
                     <Radiation className="w-4 h-4 mr-2" />
-                    Emergency Transmission
+                    Emergency Broadcast
                   </ToxicButton>
                   
                   <ToxicButton variant="outline" size="sm">
                     <Shield className="w-4 h-4 mr-2" />
-                    System Status
+                    Wasteland Status
                   </ToxicButton>
                 </div>
               </div>
@@ -240,7 +241,7 @@ const Index = () => {
                 {authStage === "post-breach" && terminalStage !== "nft-selection" && (
                   <div className="mt-4 text-center">
                     <p className="text-white/70 text-sm mb-3">
-                      Complete the terminal sequence to access the Resistance Network
+                      Complete transmission sequence to access the Resistance Network
                     </p>
                     <ToxicButton 
                       onClick={handleTerminalComplete}
@@ -248,7 +249,7 @@ const Index = () => {
                       size="sm"
                     >
                       <Radiation className="w-4 h-4 mr-2" />
-                      Skip Intro Sequence
+                      Skip Transmission
                     </ToxicButton>
                   </div>
                 )}
