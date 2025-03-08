@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -585,6 +586,12 @@ const Index = () => {
   const renderDesktopEnvironment = () => (
     <PostAuthLayout
       onAppOpened={() => setInitialAppOpened(true)}
+      mainContent={
+        <div className="p-4">
+          <h2 className="text-2xl text-toxic-neon mb-4">Network Status</h2>
+          <p className="text-white/70">Accessing network status information...</p>
+        </div>
+      }
     />
   );
 
@@ -702,4 +709,46 @@ const Index = () => {
                 {/* Terminal header */}
                 <div className="flex items-center justify-between mb-4 border-b border-toxic-neon/20 pb-2">
                   <div className="flex items-center">
-                    <Radiation className="w
+                    <Radiation className="w-5 h-5 text-toxic-neon mr-2" />
+                    <h2 className="text-toxic-neon text-xl font-mono">RESISTANCE NETWORK</h2>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <ToxicBadge variant="alert" className="animate-pulse">
+                      <AlertTriangle className="w-3 h-3 mr-1" /> SECURITY BREACH
+                    </ToxicBadge>
+                    
+                    <ToxicBadge variant="warning">
+                      <Clock className="w-3 h-3 mr-1" /> 12:45:22
+                    </ToxicBadge>
+                  </div>
+                </div>
+                
+                {/* Progress indicator - only show during pre-boot */}
+                {shouldShowProgressIndicator() && (
+                  <div className="mb-4">
+                    <ProgressIndicator
+                      stages={[
+                        { id: "scan", label: "SECURITY SCAN", completed: true },
+                        { id: "auth", label: "AUTHENTICATION", completed: false },
+                        { id: "node", label: "NODE CONNECTION", completed: false },
+                        { id: "access", label: "SYSTEM ACCESS", completed: false }
+                      ]}
+                    />
+                  </div>
+                )}
+                
+                {/* Main content */}
+                <div className="h-[calc(100%-4rem)]">
+                  {renderMainContent()}
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Index;
