@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
@@ -5,7 +6,7 @@ import { useWalletConnection } from "@/hooks/useWalletConnection";
 import Twitter from "./icons/Twitter";
 import Linked from "./icons/Linked";
 import { Button } from "@/components/ui/button";
-import { Rocket } from "lucide-react";
+import { Rocket, Target } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -90,6 +91,24 @@ const Nav = () => {
         </Breadcrumb>
       );
     }
+    
+    if (path === '/hunt') {
+      return (
+        <Breadcrumb>
+          <BreadcrumbList className="text-white/60">
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/" className="hover:text-white">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="text-white/40" />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-white">Wasteland Hunter</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      );
+    }
 
     return null;
   };
@@ -102,13 +121,32 @@ const Nav = () => {
     <nav className="fixed top-0 left-0 right-0 z-[100]">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-md border-b border-white/5" />
       <div className="container h-full mx-auto px-4 relative">
-        <div className="flex items-center justify-between h-full">
+        <div className="flex items-center justify-between h-full py-4">
           <div className="flex items-center gap-4">
-            {location.pathname === '/' ? null : (
-              hideHomeRoutes.includes(location.pathname) ? (
-                <Link to="/" className="text-white/80 hover:text-white transition-colors">
-                  Home
+            {location.pathname === '/' ? (
+              <div className="flex items-center gap-4">
+                <Link to="/proposals" className="text-white/80 hover:text-white transition-colors">
+                  Proposals
                 </Link>
+                <Link to="/hunt" className="text-white/80 hover:text-white transition-colors flex items-center">
+                  <Target className="h-4 w-4 mr-1" />
+                  Hunt
+                </Link>
+              </div>
+            ) : (
+              hideHomeRoutes.includes(location.pathname) ? (
+                <div className="flex items-center gap-4">
+                  <Link to="/" className="text-white/80 hover:text-white transition-colors">
+                    Home
+                  </Link>
+                  <Link to="/proposals" className="text-white/80 hover:text-white transition-colors">
+                    Proposals
+                  </Link>
+                  <Link to="/hunt" className="text-white/80 hover:text-white transition-colors flex items-center">
+                    <Target className="h-4 w-4 mr-1" />
+                    Hunt
+                  </Link>
+                </div>
               ) : (
                 getBreadcrumbs()
               )
@@ -148,6 +186,6 @@ const Nav = () => {
       </div>
     </nav>
   );
-};
+}
 
 export default Nav;
