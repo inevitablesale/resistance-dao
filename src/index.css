@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -252,4 +251,37 @@ button:focus {
   --secondary-btn-bg: rgba(255, 255, 255, 0.1);
   --secondary-btn-border: rgba(255, 255, 255, 0.2);
   --secondary-btn-text: rgba(255, 255, 255, 0.8);
+}
+
+/* Button shine animation */
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Gradient pulse animation */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Primary button pulse effect */
+@keyframes primary-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(57, 255, 20, 0.8);
+  }
 }

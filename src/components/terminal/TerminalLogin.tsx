@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Shield, LockKeyhole, AlertTriangle, Terminal, ExternalLink } from "lucide-react";
@@ -147,23 +148,29 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
           )}
         </motion.div>
 
-        <form onSubmit={handleSubmit} className="mb-6">
+        <form onSubmit={handleSubmit} className="mb-8">
           <div className="flex flex-col md:flex-row gap-4">
-            <input
-              type="password"
-              value={accessCode}
-              onChange={(e) => setAccessCode(e.target.value)}
-              disabled={isAuthenticating}
-              placeholder="ENTER ACCESS CODE"
-              className="flex-1 bg-black/60 border border-toxic-neon/30 text-toxic-neon p-3 rounded font-mono focus:outline-none focus:border-toxic-neon"
-            />
+            <div className="relative flex-1">
+              <input
+                type="password"
+                value={accessCode}
+                onChange={(e) => setAccessCode(e.target.value)}
+                disabled={isAuthenticating}
+                placeholder="ENTER ACCESS CODE"
+                className="w-full bg-black/80 border-2 border-toxic-neon/60 text-toxic-neon p-3 rounded font-mono focus:outline-none focus:border-toxic-neon focus:shadow-[0_0_12px_rgba(57,255,20,0.4)] transition-all duration-300"
+              />
+              <span className="absolute top-1/2 -translate-y-1/2 right-3 text-toxic-neon/50 pointer-events-none text-xs">
+                [ACCESS]
+              </span>
+            </div>
             <ToxicButton 
               type="submit" 
               disabled={isAuthenticating}
-              variant="marketplace"
-              className="uppercase font-mono flex items-center justify-center py-3 text-base"
+              variant="primary"
+              size="xl"
+              className="uppercase font-mono flex items-center justify-center text-base md:w-auto w-full"
             >
-              <LockKeyhole className="h-4 w-4 mr-2" />
+              <LockKeyhole className="h-5 w-5 mr-2" />
               Authenticate
             </ToxicButton>
           </div>
@@ -171,19 +178,26 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
 
         <div className="flex justify-center items-center gap-2 text-white/60 mb-6">
           <span className="border-t border-white/20 flex-grow"></span>
-          <span className="text-sm">OR</span>
+          <span className="text-sm px-2">OR</span>
           <span className="border-t border-white/20 flex-grow"></span>
         </div>
 
         <ToxicButton 
           onClick={handleWalletConnect} 
           disabled={isAuthenticating}
-          variant="glowing"
-          className="w-full uppercase font-mono flex items-center justify-center py-3 text-base mb-6"
+          variant="secondary"
+          size="lg"
+          className="w-full uppercase font-mono flex items-center justify-center py-3 text-base mb-8"
         >
-          <Shield className="h-4 w-4 mr-2" />
+          <Shield className="h-5 w-5 mr-2" />
           Connect Crypto Wallet
         </ToxicButton>
+
+        <div className="flex justify-center items-center gap-2 text-white/60 mb-6">
+          <span className="border-t border-white/20 flex-grow"></span>
+          <span className="text-sm px-2">OR</span>
+          <span className="border-t border-white/20 flex-grow"></span>
+        </div>
 
         <a 
           href="https://www.linkedin.com/groups/12657922/" 
@@ -192,15 +206,16 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
           className="block w-full"
         >
           <ToxicButton
-            variant="outline"
-            className="w-full uppercase font-mono flex items-center justify-center py-3 text-base"
+            variant="tertiary"
+            size="default"
+            className="w-full uppercase font-mono flex items-center justify-center py-2.5 text-sm"
           >
             <ExternalLink className="h-4 w-4 mr-2" />
             <span>Gain Access Code</span>
           </ToxicButton>
         </a>
 
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center">
           <div className="text-white/40 text-xs flex items-center justify-center gap-2">
             <AlertTriangle className="h-3 w-3" />
             <span>UNAUTHORIZED ACCESS WILL BE TRACED</span>
