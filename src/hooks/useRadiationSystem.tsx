@@ -14,6 +14,8 @@ export interface FeatureUnlock {
   description: string;
   unlocked: boolean;
   category: 'economic' | 'social' | 'governance';
+  icon?: string;
+  narrative?: string;
 }
 
 export interface RadiationSystemData {
@@ -26,6 +28,7 @@ export interface RadiationSystemData {
   isLoading: boolean;
   error: string | null;
   status: 'Critical Danger' | 'High Risk' | 'Settlement Formation' | 'Economic Stability' | 'Flourishing Economy' | 'Civilization Rebuilt';
+  narrativeContext: string;
 }
 
 export const useRadiationSystem = () => {
@@ -33,54 +36,60 @@ export const useRadiationSystem = () => {
   const { getProvider } = useWalletProvider();
   const { toast } = useToast();
   const [data, setData] = useState<RadiationSystemData>({
-    currentRadiation: 100,
+    currentRadiation: 100, // Start at 100% radiation
     totalHolders: 0,
     radiationReduction: 0,
-    reductionPerHolder: 0.1,
+    reductionPerHolder: 0.1, // 0.1% reduction per holder
     featureUnlocks: [],
     nextFeatureUnlock: null,
     isLoading: true,
     error: null,
-    status: 'Critical Danger'
+    status: 'Critical Danger',
+    narrativeContext: 'The Last Archive remains inaccessible. Radiation levels are critical, preventing access to humanity\'s collective knowledge. Each NFT holder strengthens our connection to this lost database.'
   });
 
-  // Define feature unlocks
+  // Define feature unlocks with enhanced narrative
   const defineFeatureUnlocks = (currentRadiation: number) => {
     const features: FeatureUnlock[] = [
       {
         radiationLevel: 100,
-        name: "Referral System",
-        description: "Generate referral links and earn 50% of each NFT purchase",
+        name: "The Archive Awakens",
+        description: "First connection to the Archive established",
         unlocked: currentRadiation <= 100,
-        category: 'economic'
+        category: 'economic',
+        narrative: "The first data packets break through the static. The Archive acknowledges our presence, but most systems remain locked down."
       },
       {
         radiationLevel: 90,
-        name: "Job Board",
-        description: "Bounty Hunters can post jobs for Survivors",
+        name: "Survivor Network",
+        description: "Basic communication channels open between Archive users",
         unlocked: currentRadiation <= 90,
-        category: 'economic'
+        category: 'social',
+        narrative: "Scattered survivor groups begin to connect through the Archive. The knowledge sharing begins, albeit limited by radiation interference."
       },
       {
         radiationLevel: 75,
-        name: "Settlement Fundraising",
-        description: "Fund new settlements and basic trading",
+        name: "Memory Fragments",
+        description: "First historical records and critical knowledge become accessible",
         unlocked: currentRadiation <= 75,
-        category: 'social'
+        category: 'economic',
+        narrative: "Fragments of the old world's knowledge start to surface. Technological schematics, agricultural data, and medical information begin to flow."
       },
       {
         radiationLevel: 50,
-        name: "Full Marketplace",
-        description: "Complete marketplace opens with all features",
+        name: "Resource Coordination",
+        description: "Advanced resource tracking and allocation systems activate",
         unlocked: currentRadiation <= 50,
-        category: 'economic'
+        category: 'economic',
+        narrative: "The Archive's resource management protocols come online. For the first time since the collapse, communities can coordinate efforts across vast distances."
       },
       {
         radiationLevel: 25,
-        name: "Trade Routes",
-        description: "Establish trade routes between settlements",
+        name: "Governance Restoration",
+        description: "Democratic systems and decision-making frameworks restored",
         unlocked: currentRadiation <= 25,
-        category: 'governance'
+        category: 'governance',
+        narrative: "The Archive reveals the accumulated wisdom of thousands of years of governance systems. A new society begins to form around these rediscovered principles."
       }
     ];
 
@@ -88,7 +97,7 @@ export const useRadiationSystem = () => {
     return { features, nextFeature };
   };
 
-  // Get radiation status
+  // Get radiation status with narrative context
   const getRadiationStatus = (level: number) => {
     if (level > 90) return "Critical Danger";
     if (level > 75) return "High Risk";
@@ -98,32 +107,34 @@ export const useRadiationSystem = () => {
     return "Civilization Rebuilt";
   };
 
+  // Get narrative context based on radiation level
+  const getNarrativeContext = (level: number) => {
+    if (level > 90) return "The Last Archive remains inaccessible. Radiation levels are critical, preventing access to humanity's collective knowledge. Each NFT holder strengthens our connection to this lost database.";
+    if (level > 75) return "Faint signals penetrate the noise. The Archive's basic systems flicker to life, offering glimpses of the knowledge within. The Resistance grows stronger with each new member.";
+    if (level > 50) return "The Archive's defenses recognize allied signatures. More systems come online as radiation levels decrease. Communities begin forming around the rediscovered knowledge.";
+    if (level > 25) return "The Archive's vast libraries begin systematic restoration. Technologies long forgotten return to humanity's grasp. A new era of rebuilding has begun.";
+    return "The Archive stands fully restored, a beacon of humanity's resilience. What was once lost is found again, guiding us toward a future brighter than our past.";
+  };
+
   // Fetch radiation data from contract
   const fetchRadiationData = async () => {
-    if (!isConnected) {
-      return;
-    }
-
     try {
       setData(prev => ({ ...prev, isLoading: true, error: null }));
       
-      const walletProvider = await getProvider();
-      const contract = new ethers.Contract(
-        FACTORY_ADDRESS,
-        FACTORY_ABI,
-        walletProvider.provider
-      );
-
-      // Mock data for now - replace with actual contract calls
-      const radiationLevel = 94;
-      const holderCount = 925;
-      const reductionPerHolder = 0.1;
+      // For now, use mock data matching contract's initial state
+      // In the future, this should connect to the contract
+      const radiationLevel = 100; // Starting at 100%
+      const holderCount = 0;      // No holders initially
+      const reductionPerHolder = 0.1; // 0.1% reduction per holder
       
       // Calculate radiation reduction
       const radiationReduction = holderCount * reductionPerHolder;
       
       // Define features and next feature
       const { features, nextFeature } = defineFeatureUnlocks(radiationLevel);
+      
+      // Get narrative context
+      const narrativeContext = getNarrativeContext(radiationLevel);
       
       // Update state
       setData({
@@ -135,7 +146,8 @@ export const useRadiationSystem = () => {
         nextFeatureUnlock: nextFeature,
         isLoading: false,
         error: null,
-        status: getRadiationStatus(radiationLevel) as RadiationSystemData['status']
+        status: getRadiationStatus(radiationLevel) as RadiationSystemData['status'],
+        narrativeContext
       });
 
     } catch (error) {
@@ -168,19 +180,24 @@ export const useRadiationSystem = () => {
         provider: walletProvider.provider,
         contractAddress: FACTORY_ADDRESS,
         abi: FACTORY_ABI,
-        eventName: 'RadiationUpdated' // Replace with actual event name
+        eventName: 'RadiationLevelUpdated' // Match the event name in the contract
       };
 
       const subscription = subscribeToRadiationEvents(
         eventConfig,
         (event) => {
           // Update radiation data when event is received
-          const radiationLevel = event.level;
+          // Fix: Use the correct property names from the RadiationEvent interface
+          const radiationLevel = event.level / 100; // Convert from basis points if needed
           const holderCount = event.holderCount;
           const reductionPerHolder = 0.1;
           const radiationReduction = holderCount * reductionPerHolder;
           const { features, nextFeature } = defineFeatureUnlocks(radiationLevel);
           
+          // Get narrative context for the updated radiation level
+          const narrativeContext = getNarrativeContext(radiationLevel);
+          
+          // Fix: Include narrativeContext in the state update
           setData({
             currentRadiation: radiationLevel,
             totalHolders: holderCount,
@@ -190,7 +207,8 @@ export const useRadiationSystem = () => {
             nextFeatureUnlock: nextFeature,
             isLoading: false,
             error: null,
-            status: getRadiationStatus(radiationLevel) as RadiationSystemData['status']
+            status: getRadiationStatus(radiationLevel) as RadiationSystemData['status'],
+            narrativeContext: narrativeContext
           });
           
           toast({
