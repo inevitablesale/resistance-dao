@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
@@ -9,44 +8,33 @@ import { DrippingSlime } from "@/components/ui/dripping-slime";
 import { TerminalLogin } from '@/components/terminal/TerminalLogin';
 import { BreachSequence } from '@/components/terminal/BreachSequence';
 import { StoryTerminal } from '@/components/terminal/StoryTerminal';
-import { RadiationSystem } from '@/components/radiation/RadiationSystem';
-import { NFTDistributionStatus } from '@/components/radiation/NFTDistributionStatus';
-import { ReferralSystem } from '@/components/radiation/ReferralSystem';
-import { NFTCollectionDisplay } from '@/components/radiation/NFTCollectionDisplay';
 import { useRadiationSystem } from '@/hooks/useRadiationSystem';
-import { 
-  Unlock, 
-  AlertTriangle, 
-  Shield,
-  Biohazard, 
-  Radiation, 
-  ExternalLink,
-  Info
-} from "lucide-react";
-import { ToxicButton } from "@/components/ui/toxic-button";
-import { ToxicCard } from "@/components/ui/toxic-card";
-import { ToxicProgress } from "@/components/ui/toxic-progress";
-import { ToxicBadge } from "@/components/ui/toxic-badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Radiation, Database, Network, Shield } from "lucide-react";
+import { ArchiveIntro } from '@/components/archive/ArchiveIntro';
+import { ArchiveNFTReveal } from '@/components/archive/ArchiveNFTReveal';
+import { ArchiveTimeline } from '@/components/archive/ArchiveTimeline';
+import { ArchiveCallToAction } from '@/components/archive/ArchiveCallToAction';
 
 type AuthState = "unauthenticated" | "authenticating" | "breaching" | "authenticated";
 
 const Index = () => {
-  const navigate = useNavigate();
   const { isConnected } = useCustomWallet();
   const { connect } = useWalletConnection();
   const { 
     currentRadiation, 
     totalHolders, 
-    radiationReduction, 
+    radiationReduction,
+    reductionPerHolder, 
     featureUnlocks, 
     nextFeatureUnlock,
     isLoading: isLoadingRadiation,
-    status: radiationStatus
+    status: radiationStatus,
+    narrativeContext
   } = useRadiationSystem();
   
   const [authState, setAuthState] = useState<AuthState>("unauthenticated");
-  const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
+  const [showIntro, setShowIntro] = useState(true);
+  const [showStoryTerminal, setShowStoryTerminal] = useState(false);
   
   useEffect(() => {
     if (isConnected && authState === "unauthenticated") {
@@ -60,23 +48,34 @@ const Index = () => {
   
   const handleBreachComplete = () => {
     setAuthState("authenticated");
+    setShowIntro(true);
   };
 
-  // OpenSea collection URL
-  const openSeaUrl = "https://opensea.io/collection/resistance-collection";
+  const handleIntroContinue = () => {
+    setShowIntro(false);
+    setShowStoryTerminal(true);
+  };
 
-  const renderMarketplace = () => (
+  const renderArchiveContent = () => (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
       className="max-w-5xl mx-auto"
     >
+      {showIntro && (
+        <ArchiveIntro 
+          currentRadiation={currentRadiation} 
+          narrativeContext={narrativeContext}
+          onContinue={handleIntroContinue} 
+        />
+      )}
+      
       <div className="text-left mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
           <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
-          <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> 
-          Wasteland Status: <span className={`${
+          <Radiation className="h-4 w-4 mr-1 toxic-glow" /> 
+          Archive Status: <span className={`${
             currentRadiation > 75 ? "text-apocalypse-red" : 
             currentRadiation > 50 ? "text-amber-400" : 
             "text-toxic-neon"
@@ -85,107 +84,78 @@ const Index = () => {
           </span>
         </div>
         
-        <StoryTerminal 
-          initiallyOpen={storyTerminalOpen} 
-          onClose={() => setStoryTerminalOpen(false)} 
-          className="mb-8" 
-        />
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="md:col-span-1">
-            <RadiationSystem 
-              currentRadiation={currentRadiation} 
-              totalNFTsClaimed={totalHolders} 
-              className="mb-6"
-            />
-            <ReferralSystem
-              earnings={0}
-              totalReferrals={0}
-            />
-          </div>
-          <div className="md:col-span-2">
-            <NFTDistributionStatus className="mb-6" />
-            
-            <ToxicCard className="bg-black/80 border-toxic-neon/30 p-5 mb-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-full bg-toxic-neon/10">
-                  <Shield className="h-6 w-6 text-toxic-neon" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-mono text-toxic-neon">Resistance Collection NFTs</h2>
-                  <p className="text-white/60 text-sm">19 Unique NFTs - Each Reducing Global Radiation</p>
-                </div>
-              </div>
-              
-              <p className="text-white/70 mb-4">
-                Each unique holder of a Resistance Collection NFT helps reduce the global radiation level by 0.1%. 
-                As radiation decreases, new features of the wasteland economy will unlock.
-              </p>
-              
-              <div className="bg-black/40 rounded-lg p-3 mb-4 border border-toxic-neon/20">
-                <div className="flex justify-between mb-2">
-                  <span className="text-white/70">Total Supply</span>
-                  <span className="text-toxic-neon font-mono">19 NFTs</span>
-                </div>
-                <div className="flex justify-between mb-2">
-                  <span className="text-white/70">Current Unique Holders</span>
-                  <span className="text-toxic-neon font-mono">{totalHolders}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-white/70">Radiation Reduction</span>
-                  <span className="text-toxic-neon font-mono">-{radiationReduction.toFixed(1)}%</span>
-                </div>
-              </div>
-              
-              {nextFeatureUnlock && (
-                <div className="bg-black/50 border border-amber-500/30 rounded-lg p-3 mb-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertTriangle className="h-4 w-4 text-amber-400" />
-                    <h4 className="text-amber-400 font-mono">Next Feature Unlock</h4>
-                  </div>
-                  <p className="text-white/70 text-sm mb-2">
-                    {nextFeatureUnlock.name}: {nextFeatureUnlock.description}
-                  </p>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/50">Required Radiation Level</span>
-                    <span className="text-amber-400 font-mono">{nextFeatureUnlock.radiationLevel}%</span>
-                  </div>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex justify-between text-xs mt-1 cursor-help">
-                          <span className="text-white/50">More Holders Needed</span>
-                          <span className="text-amber-400 font-mono">
-                            ~{Math.ceil((currentRadiation - nextFeatureUnlock.radiationLevel) / 0.1)} holders
-                          </span>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-xs max-w-[200px]">
-                          Each unique holder reduces radiation by 0.1%. Currently at {currentRadiation}%, need to reach {nextFeatureUnlock.radiationLevel}%.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              )}
-              
-              <ToxicButton 
-                variant="default" 
-                className="w-full"
-                onClick={() => window.open(openSeaUrl, "_blank")}
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                View Collection on OpenSea
-              </ToxicButton>
-            </ToxicCard>
-          </div>
-        </div>
-
-        <div className="mb-8">
-          <NFTCollectionDisplay 
-            currentRadiation={currentRadiation} 
+        {showStoryTerminal && (
+          <StoryTerminal 
+            initiallyOpen={true} 
+            onClose={() => setShowStoryTerminal(false)} 
+            className="mb-8" 
           />
+        )}
+        
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
+          <div className="md:col-span-5">
+            <div className="sticky top-24">
+              <div className="text-center mb-6">
+                <motion.div 
+                  className="inline-block p-3 rounded-full bg-black/60 border border-toxic-neon/30 radiation-pulse-circles mb-3"
+                  animate={{ scale: [0.98, 1.02, 0.98] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <div className="relative">
+                    <Radiation className="h-16 w-16 text-toxic-neon opacity-90" />
+                    <div className="absolute inset-0 flex items-center justify-center text-black font-mono text-lg font-bold">
+                      {currentRadiation}%
+                    </div>
+                  </div>
+                </motion.div>
+                <h1 className="text-xl md:text-2xl font-mono text-toxic-neon mb-1">The Last Archive</h1>
+                <p className="text-white/70 text-sm max-w-md mx-auto">
+                  Global radiation levels are preventing full access to humanity's knowledge repository. 
+                  Each NFT holder reduces interference by 0.1%.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                <div className="bg-black/60 border border-toxic-neon/20 rounded-lg p-3 text-center">
+                  <Database className="h-5 w-5 text-toxic-neon mx-auto mb-2" />
+                  <div className="text-xs text-white/60">Archive Units</div>
+                  <div className="text-lg font-mono text-toxic-neon">{totalHolders}/19</div>
+                </div>
+                <div className="bg-black/60 border border-toxic-neon/20 rounded-lg p-3 text-center">
+                  <Network className="h-5 w-5 text-toxic-neon mx-auto mb-2" />
+                  <div className="text-xs text-white/60">Reduction</div>
+                  <div className="text-lg font-mono text-toxic-neon">-{radiationReduction.toFixed(1)}%</div>
+                </div>
+                <div className="bg-black/60 border border-toxic-neon/20 rounded-lg p-3 text-center">
+                  <Shield className="h-5 w-5 text-toxic-neon mx-auto mb-2" />
+                  <div className="text-xs text-white/60">Status</div>
+                  <div className="text-lg font-mono text-toxic-neon truncate text-xs md:text-sm">
+                    {radiationStatus}
+                  </div>
+                </div>
+              </div>
+              
+              <ArchiveTimeline 
+                currentRadiation={currentRadiation}
+                totalHolders={totalHolders}
+                reductionPerHolder={reductionPerHolder}
+                featureUnlocks={featureUnlocks}
+                nextFeatureUnlock={nextFeatureUnlock}
+              />
+            </div>
+          </div>
+          
+          <div className="md:col-span-7">
+            <ArchiveNFTReveal 
+              currentRadiation={currentRadiation}
+              totalHolders={totalHolders}
+            />
+            
+            <ArchiveCallToAction 
+              currentRadiation={currentRadiation}
+              totalHolders={totalHolders}
+            />
+          </div>
         </div>
       </div>
     </motion.div>
@@ -211,7 +181,7 @@ const Index = () => {
           {authState === "unauthenticated" ? (
             <TerminalLogin onLoginSuccess={handleLoginSuccess} />
           ) : authState === "authenticated" ? (
-            renderMarketplace()
+            renderArchiveContent()
           ) : null}
         </div>
       </section>
