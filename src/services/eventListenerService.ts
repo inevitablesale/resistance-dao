@@ -22,6 +22,23 @@ export interface ProposalEvent {
   transactionHash: string;
 }
 
+interface CharacterMetadata {
+  name: string;
+  description: string;
+  image: string;
+  animation_url?: string;
+  character_model_cid?: string;
+  external_url: string;
+  attributes: Array<{
+    trait_type: string;
+    value: string | number;
+    display_type?: string;
+    max_value?: number;
+  }>;
+  bounty_data?: any;
+  party_data?: any;
+}
+
 const activeListeners = new Map<string, EventSubscription>();
 
 export const subscribeToProposalEvents = (
@@ -117,6 +134,22 @@ export const waitForProposalCreation = async (
       }
     );
   });
+};
+
+// Character metadata fetch utility
+export const fetchCharacterMetadata = async (
+  metadataUri: string
+): Promise<CharacterMetadata | null> => {
+  try {
+    const response = await fetch(metadataUri);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch metadata: ${response.statusText}`);
+    }
+    return await response.json() as CharacterMetadata;
+  } catch (error) {
+    console.error('Failed to fetch character metadata:', error);
+    return null;
+  }
 };
 
 // Cleanup function to remove all active listeners
