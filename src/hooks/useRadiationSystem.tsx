@@ -187,12 +187,17 @@ export const useRadiationSystem = () => {
         eventConfig,
         (event) => {
           // Update radiation data when event is received
-          const radiationLevel = event.newLevel / 100; // Convert from basis points if needed
-          const holderCount = event.uniqueHolderCount;
+          // Fix: Use the correct property names from the RadiationEvent interface
+          const radiationLevel = event.level / 100; // Convert from basis points if needed
+          const holderCount = event.holderCount;
           const reductionPerHolder = 0.1;
           const radiationReduction = holderCount * reductionPerHolder;
           const { features, nextFeature } = defineFeatureUnlocks(radiationLevel);
           
+          // Get narrative context for the updated radiation level
+          const narrativeContext = getNarrativeContext(radiationLevel);
+          
+          // Fix: Include narrativeContext in the state update
           setData({
             currentRadiation: radiationLevel,
             totalHolders: holderCount,
@@ -202,7 +207,8 @@ export const useRadiationSystem = () => {
             nextFeatureUnlock: nextFeature,
             isLoading: false,
             error: null,
-            status: getRadiationStatus(radiationLevel) as RadiationSystemData['status']
+            status: getRadiationStatus(radiationLevel) as RadiationSystemData['status'],
+            narrativeContext: narrativeContext
           });
           
           toast({
