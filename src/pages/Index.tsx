@@ -11,48 +11,9 @@ import { StoryTerminal } from '@/components/terminal/StoryTerminal';
 import { RadiationSystem } from '@/components/radiation/RadiationSystem';
 import { NFTDistributionStatus } from '@/components/radiation/NFTDistributionStatus';
 import { ReferralSystem } from '@/components/radiation/ReferralSystem';
-
-import { 
-  Rocket, 
-  Coins, 
-  Users, 
-  Share2, 
-  Check, 
-  ChevronRight, 
-  Building2, 
-  CircleDollarSign,
-  Scale,
-  FileText,
-  ChevronRight as ArrowIcon,
-  Clock,
-  Target,
-  Wallet,
-  RefreshCw,
-  Radiation,
-  Skull,
-  Zap,
-  Shield,
-  Image,
-  Biohazard,
-  ShieldX,
-  UserX,
-  Bug,
-  Bomb,
-  Crosshair,
-  PlusCircle,
-  Search,
-  ShoppingBag,
-  Box,
-  Eye, 
-  Map,
-  Globe,
-  Network,
-  Wrench,
-  Hammer,
-  Lightbulb,
-  Flag,
-  Scroll
-} from "lucide-react";
+import { NFTCollectionDisplay } from '@/components/radiation/NFTCollectionDisplay';
+import { useRadiationSystem } from '@/hooks/useRadiationSystem';
+import { Unlock, AlertTriangle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -84,6 +45,15 @@ const Index = () => {
   const { data: nftBalance = 0, isLoading: isLoadingNFT } = useNFTBalance("0x1234..."); // Demo address
   const { isConnected, address } = useCustomWallet();
   const { connect } = useWalletConnection();
+  const { 
+    currentRadiation, 
+    totalHolders, 
+    radiationReduction, 
+    featureUnlocks, 
+    nextFeatureUnlock,
+    isLoading: isLoadingRadiation,
+    status: radiationStatus
+  } = useRadiationSystem();
   
   const [authState, setAuthState] = useState<AuthState>("unauthenticated");
   const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
@@ -91,8 +61,6 @@ const Index = () => {
   const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
   
   // New states for radiation system
-  const [currentRadiation, setCurrentRadiation] = useState(94); // Start at 94% radiation
-  const [totalNFTsClaimed, setTotalNFTsClaimed] = useState(925); // Mock data - total claimed NFTs
   const [referralEarnings, setReferralEarnings] = useState(375); // Mock data - earnings in MATIC
   const [totalReferrals, setTotalReferrals] = useState(15); // Mock data - total referrals
   
@@ -139,7 +107,6 @@ const Index = () => {
     bountyHunterRatio: 35
   };
   
-  // Updated NFT listings with proper roles
   const sentinelListings: MarketplaceListing[] = [
     {
       id: 1,
@@ -394,7 +361,13 @@ const Index = () => {
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
           <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
           <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> 
-          Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Radiation Level: {currentRadiation}%</span>
+          Wasteland Status: <span className={`${
+            currentRadiation > 75 ? "text-apocalypse-red" : 
+            currentRadiation > 50 ? "text-amber-400" : 
+            "text-toxic-neon"
+          } font-bold status-critical`}>
+            Radiation Level: {currentRadiation}%
+          </span>
         </div>
         
         <StoryTerminal 
@@ -405,12 +378,11 @@ const Index = () => {
         
         <WastelandSurvivalGuideEnhanced className="mb-8" />
         
-        {/* New Radiation System Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-1">
             <RadiationSystem 
               currentRadiation={currentRadiation} 
-              totalNFTsClaimed={totalNFTsClaimed} 
+              totalNFTsClaimed={totalHolders} 
               className="mb-6"
             />
             <ReferralSystem
@@ -422,6 +394,12 @@ const Index = () => {
             <NFTDistributionStatus className="mb-6" />
             <ChroniclePanel className="mb-6" />
           </div>
+        </div>
+
+        <div className="mb-8">
+          <NFTCollectionDisplay 
+            currentRadiation={currentRadiation} 
+          />
         </div>
 
         <MarketplaceQuickActions 
@@ -439,6 +417,7 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
             <div className="mb-8">
+              <h2 className="text-2xl font-mono text-toxic-neon mb-4">Character Classes & Abilities</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <ToxicCard 
                   className={`bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all ${activeRole === 'sentinel' ? 'border-2 border-purple-500/70' : ''}`}
@@ -503,6 +482,90 @@ const Index = () => {
                 </ToxicCard>
               </div>
               
+              <div className="bg-black/70 border border-toxic-neon/30 rounded-lg p-5 mb-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 rounded-full bg-toxic-neon/10">
+                    <Unlock className="h-6 w-6 text-toxic-neon" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-mono text-toxic-neon">Feature Unlocks</h3>
+                    <p className="text-white/60 text-sm">
+                      Radiation Level: {currentRadiation}% | Status: {radiationStatus}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                  {featureUnlocks.map((feature) => (
+                    <div 
+                      key={feature.radiationLevel}
+                      className={`p-4 rounded-lg border ${
+                        feature.unlocked 
+                          ? 'border-toxic-neon/30 bg-toxic-neon/10' 
+                          : 'border-white/10 bg-black/40'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        {feature.category === 'economic' ? (
+                          <Coins className="h-5 w-5 text-amber-400" />
+                        ) : feature.category === 'social' ? (
+                          <Users className="h-5 w-5 text-blue-400" />
+                        ) : (
+                          <Scale className="h-5 w-5 text-purple-400" />
+                        )}
+                        <h4 className={`font-mono ${feature.unlocked ? 'text-toxic-neon' : 'text-white/70'}`}>
+                          {feature.name}
+                        </h4>
+                      </div>
+                      <p className={`text-sm mb-3 ${feature.unlocked ? 'text-white/80' : 'text-white/50'}`}>
+                        {feature.description}
+                      </p>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-white/60">Required Level</span>
+                        <span className={feature.unlocked ? 'text-toxic-neon' : 'text-white/50'}>
+                          {feature.radiationLevel}%
+                        </span>
+                      </div>
+                      <div className="mt-2 flex justify-end">
+                        {feature.unlocked ? (
+                          <ToxicBadge variant="outline" className="text-toxic-neon border-toxic-neon/30">
+                            <Check className="h-3 w-3 mr-1" /> Unlocked
+                          </ToxicBadge>
+                        ) : (
+                          <ToxicBadge variant="outline" className="text-white/50 border-white/20">
+                            <Lock className="h-3 w-3 mr-1" /> Locked
+                          </ToxicBadge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {nextFeatureUnlock && (
+                  <div className="bg-black/50 border border-amber-500/30 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertTriangle className="h-5 w-5 text-amber-400" />
+                      <h4 className="text-amber-400 font-mono">Next Feature Unlock</h4>
+                    </div>
+                    <p className="text-white/70 text-sm mb-3">
+                      {nextFeatureUnlock.description}
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/60 text-xs">
+                        Current: {currentRadiation}% → Target: {nextFeatureUnlock.radiationLevel}%
+                      </span>
+                      <span className="text-amber-400 text-xs">
+                        Need {Math.max(0, currentRadiation - nextFeatureUnlock.radiationLevel)} more % reduction
+                      </span>
+                    </div>
+                    <ToxicProgress 
+                      value={Math.min(100, (currentRadiation / nextFeatureUnlock.radiationLevel) * 100)} 
+                      className="h-2 mt-2" 
+                    />
+                  </div>
+                )}
+              </div>
+              
               <MarketplaceListingGrid 
                 listings={sentinelListings} 
                 title="FOUNDER SENTINELS: Governance & Oversight" 
@@ -529,57 +592,90 @@ const Index = () => {
           </div>
           
           <div className="lg:col-span-1">
+            <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4 mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 rounded-full bg-toxic-neon/10">
+                  <Radiation className="w-5 h-5 text-toxic-neon" />
+                </div>
+                <h3 className="text-lg font-mono text-toxic-neon">Radiation Impact</h3>
+              </div>
+              
+              <div className="space-y-3 mb-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-white/70">Global Radiation</span>
+                    <span className={`font-mono ${
+                      currentRadiation > 75 ? 'text-apocalypse-red' :
+                      currentRadiation > 50 ? 'text-amber-400' :
+                      'text-toxic-neon'
+                    }`}>{currentRadiation}%</span>
+                  </div>
+                  <ToxicProgress value={100 - currentRadiation} variant="radiation" className="h-2" />
+                </div>
+                
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-white/70">Total NFT Holders</span>
+                    <span className="text-toxic-neon font-mono">{totalHolders}</span>
+                  </div>
+                  <ToxicProgress value={(totalHolders / 2000) * 100} variant="governance" className="h-2" />
+                </div>
+                
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-white/70">Radiation Reduction</span>
+                    <span className="text-toxic-neon font-mono">-{radiationReduction.toFixed(1)}%</span>
+                  </div>
+                  <ToxicProgress value={(radiationReduction / 100) * 100} variant="radiation" className="h-2" />
+                </div>
+              </div>
+              
+              <div className="bg-black/40 rounded-lg p-3 border border-toxic-neon/20 mb-4">
+                <h4 className="text-toxic-neon text-sm font-mono mb-2">Status Effects</h4>
+                <div className="space-y-2 text-xs">
+                  {radiationStatus === 'Critical Danger' && (
+                    <div className="flex items-start gap-2">
+                      <Skull className="h-4 w-4 text-apocalypse-red shrink-0 mt-0.5" />
+                      <p className="text-white/70">Hostile environment, minimal visibility, wasteland barely habitable. Limited character abilities.</p>
+                    </div>
+                  )}
+                  {radiationStatus === 'High Risk' && (
+                    <div className="flex items-start gap-2">
+                      <ShieldX className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                      <p className="text-white/70">Settlements forming but unstable. Characters beginning to reveal themselves through the radiation.</p>
+                    </div>
+                  )}
+                  {radiationStatus === 'Settlement Formation' && (
+                    <div className="flex items-start gap-2">
+                      <Building2 className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                      <p className="text-white/70">Settlements establishing trade networks. More characters visible, marketplace expanding.</p>
+                    </div>
+                  )}
+                  {(radiationStatus === 'Economic Stability' || radiationStatus === 'Flourishing Economy') && (
+                    <div className="flex items-start gap-2">
+                      <Coins className="h-4 w-4 text-toxic-neon shrink-0 mt-0.5" />
+                      <p className="text-white/70">Economy stabilizing, most characters revealed. Full marketplace and governance systems active.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <ToxicButton 
+                variant="outline" 
+                className="w-full border-toxic-neon/40"
+                onClick={() => navigate('/radiation')}
+              >
+                <Radiation className="h-4 w-4 mr-2" />
+                Radiation System Details
+              </ToxicButton>
+            </ToxicCard>
+            
             <MarketplaceActivityFeed 
               activities={recentActivities} 
               isLoading={isRefreshingActivity}
               onRefresh={handleRefreshActivity}
               className="mb-6"
             />
-            
-            <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4 mb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="p-2 rounded-full bg-toxic-neon/10">
-                  <Shield className="w-5 h-5 text-toxic-neon" />
-                </div>
-                <h3 className="text-lg font-mono text-toxic-neon">Resistance Status</h3>
-              </div>
-              
-              {isConnected ? (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">Network Influence</span>
-                    <span className="text-toxic-neon font-mono">42</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">Wasteland Reputation</span>
-                    <div className="flex items-center">
-                      <ToxicBadge variant="rating" className="text-toxic-neon">★ 3.8</ToxicBadge>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">Radiation Level</span>
-                    <span className="text-toxic-neon font-mono">
-                      <span className="text-amber-400">MEDIUM (28%)</span>
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">Referral Earnings</span>
-                    <span className="text-toxic-neon font-mono">{referralEarnings} MATIC</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-6 bg-toxic-neon/5 rounded-lg">
-                  <p className="text-white/70 mb-4">Connect to view your resistance status</p>
-                  <ToxicButton 
-                    variant="marketplace"
-                    onClick={connect}
-                  >
-                    <Radiation className="h-4 w-4 mr-2" />
-                    ACTIVATE SURVIVAL BEACON
-                  </ToxicButton>
-                </div>
-              )}
-            </ToxicCard>
             
             <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4 mb-6">
               <div className="flex items-center gap-2 mb-4">
