@@ -6,7 +6,10 @@ export type ErrorCategory =
   | 'validation'
   | 'transaction'
   | 'token'
-  | 'initialization'  // Added this category
+  | 'initialization'
+  | 'chronicle'
+  | 'territory'
+  | 'character'
   | 'unknown';
 
 export interface ErrorDetails {
@@ -32,6 +35,60 @@ export class ProposalError extends Error {
 
 export const categorizeError = (error: any): ErrorDetails => {
   console.log('Categorizing error:', error);
+
+  // Chronicle specific errors
+  if (
+    error.message?.includes('chronicle') ||
+    error.message?.includes('story') ||
+    error.message?.includes('journal')
+  ) {
+    return {
+      category: 'chronicle',
+      message: 'Chronicle operation failed',
+      recoverySteps: [
+        'Verify your chronicle content meets requirements',
+        'Check if you have permission to submit to this territory',
+        'Ensure your character has sufficient reputation'
+      ],
+      technicalDetails: error.message
+    };
+  }
+
+  // Territory specific errors
+  if (
+    error.message?.includes('territory') ||
+    error.message?.includes('location') ||
+    error.message?.includes('region')
+  ) {
+    return {
+      category: 'territory',
+      message: 'Territory operation failed',
+      recoverySteps: [
+        'Check if the territory is accessible',
+        'Verify your radiation protection level',
+        'Ensure you have the required influence level'
+      ],
+      technicalDetails: error.message
+    };
+  }
+
+  // Character specific errors
+  if (
+    error.message?.includes('character') ||
+    error.message?.includes('survivor') ||
+    error.message?.includes('rank')
+  ) {
+    return {
+      category: 'character',
+      message: 'Character operation failed',
+      recoverySteps: [
+        'Ensure your character meets the requirements',
+        'Check your character status and radiation level',
+        'Verify your reputation is sufficient'
+      ],
+      technicalDetails: error.message
+    };
+  }
 
   // Wallet errors
   if (

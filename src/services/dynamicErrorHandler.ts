@@ -53,6 +53,33 @@ const ERROR_MAPPINGS: Record<string, DynamicErrorMapping> = {
       'Check transaction parameters',
       'Try again with higher gas limit'
     ]
+  },
+  CHRONICLE_ERROR: {
+    category: 'chronicle',
+    message: 'Chronicle operation failed',
+    recoverySteps: [
+      'Check your chronicle content',
+      'Verify territory requirements',
+      'Ensure your character has sufficient reputation'
+    ]
+  },
+  TERRITORY_ERROR: {
+    category: 'territory',
+    message: 'Territory operation failed',
+    recoverySteps: [
+      'Verify territory access requirements',
+      'Check radiation levels',
+      'Ensure your character has sufficient influence'
+    ]
+  },
+  CHARACTER_ERROR: {
+    category: 'character',
+    message: 'Character operation failed',
+    recoverySteps: [
+      'Check character requirements',
+      'Verify rank progression criteria',
+      'Ensure you have the required achievements'
+    ]
   }
 };
 
@@ -68,6 +95,57 @@ export const handleDynamicError = (error: unknown): ProposalError => {
         'Please wait for initialization to complete',
         'Try refreshing the page if this persists'
       ]
+    });
+  }
+
+  // Chronicle-specific errors
+  if (error instanceof Error && 
+     (error.message.includes('chronicle') || 
+      error.message.includes('story') || 
+      error.message.includes('wasteland'))) {
+    return new ProposalError({
+      category: 'chronicle',
+      message: 'Chronicle operation failed',
+      recoverySteps: [
+        'Verify your chronicle content meets requirements',
+        'Check if you have permission to submit to this territory',
+        'Ensure your character has sufficient reputation'
+      ],
+      technicalDetails: error.stack
+    });
+  }
+
+  // Territory-specific errors
+  if (error instanceof Error && 
+     (error.message.includes('territory') || 
+      error.message.includes('region') || 
+      error.message.includes('radiation'))) {
+    return new ProposalError({
+      category: 'territory',
+      message: 'Territory operation failed',
+      recoverySteps: [
+        'Check if the territory is accessible',
+        'Verify your radiation protection level',
+        'Ensure you have the required influence level'
+      ],
+      technicalDetails: error.stack
+    });
+  }
+
+  // Character-specific errors
+  if (error instanceof Error && 
+     (error.message.includes('character') || 
+      error.message.includes('survivor') || 
+      error.message.includes('rank'))) {
+    return new ProposalError({
+      category: 'character',
+      message: 'Character operation failed',
+      recoverySteps: [
+        'Ensure your character meets the requirements',
+        'Check your character status and radiation level',
+        'Verify your reputation is sufficient'
+      ],
+      technicalDetails: error.stack
     });
   }
 

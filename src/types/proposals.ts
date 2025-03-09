@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { IPFSContent } from "./content";
 
@@ -49,6 +50,28 @@ export enum IntegrationStrategy {
   MERGING_OPERATIONS = 0,
   CULTURE_INTEGRATION = 1,
   SYSTEMS_CONSOLIDATION = 2
+}
+
+export enum ChronicleStatus {
+  PENDING = 0,
+  APPROVED = 1,
+  FEATURED = 2,
+  REJECTED = 3
+}
+
+export enum WastelandRank {
+  SURVIVOR = 0,
+  SCOUT = 1,
+  RAIDER = 2,
+  WARLORD = 3,
+  LEGEND = 4
+}
+
+export enum TerritoryStatus {
+  CONTESTED = 0,
+  CONTROLLED = 1,
+  HOSTILE = 2,
+  NEUTRAL = 3
 }
 
 export interface TeamMember {
@@ -186,5 +209,39 @@ export interface ProposalEvent {
   nftMetadata?: NFTMetadata;
   pledgedAmount?: string;
   error?: string;
-  voteCount?: number;  // Added this property
+  voteCount?: number;
+}
+
+export interface ChronicleEntry {
+  id: string;
+  title: string;
+  description: string;
+  timestamp: number;
+  territory: string;
+  status: ChronicleStatus;
+  impact: number;
+  author: string;
+  tokenId: string;
+}
+
+export interface Territory {
+  id: string;
+  name: string;
+  controlLevel: number;
+  activeStories: number;
+  contributorsCount: number;
+  radiationLevel: number;
+  status: TerritoryStatus;
+}
+
+export interface WastelandCharacter {
+  tokenId: string;
+  rank: WastelandRank;
+  reputation: number;
+  influence: number;
+  radiationLevel: number;
+  territories: string[];
+  chronicleEntries: string[];
+  modelUri: string;
+  owner: string;
 }
