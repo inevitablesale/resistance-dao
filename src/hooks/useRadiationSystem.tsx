@@ -33,10 +33,10 @@ export const useRadiationSystem = () => {
   const { getProvider } = useWalletProvider();
   const { toast } = useToast();
   const [data, setData] = useState<RadiationSystemData>({
-    currentRadiation: 100,
+    currentRadiation: 100, // Start at 100% radiation
     totalHolders: 0,
     radiationReduction: 0,
-    reductionPerHolder: 0.1,
+    reductionPerHolder: 0.1, // 0.1% reduction per holder
     featureUnlocks: [],
     nextFeatureUnlock: null,
     isLoading: true,
@@ -100,24 +100,14 @@ export const useRadiationSystem = () => {
 
   // Fetch radiation data from contract
   const fetchRadiationData = async () => {
-    if (!isConnected) {
-      return;
-    }
-
     try {
       setData(prev => ({ ...prev, isLoading: true, error: null }));
       
-      const walletProvider = await getProvider();
-      const contract = new ethers.Contract(
-        FACTORY_ADDRESS,
-        FACTORY_ABI,
-        walletProvider.provider
-      );
-
-      // Mock data for now - replace with actual contract calls
-      const radiationLevel = 94;
-      const holderCount = 925;
-      const reductionPerHolder = 0.1;
+      // For now, use mock data matching contract's initial state
+      // In the future, this should connect to the contract
+      const radiationLevel = 100; // Starting at 100%
+      const holderCount = 0;      // No holders initially
+      const reductionPerHolder = 0.1; // 0.1% reduction per holder
       
       // Calculate radiation reduction
       const radiationReduction = holderCount * reductionPerHolder;
@@ -168,15 +158,15 @@ export const useRadiationSystem = () => {
         provider: walletProvider.provider,
         contractAddress: FACTORY_ADDRESS,
         abi: FACTORY_ABI,
-        eventName: 'RadiationUpdated' // Replace with actual event name
+        eventName: 'RadiationLevelUpdated' // Match the event name in the contract
       };
 
       const subscription = subscribeToRadiationEvents(
         eventConfig,
         (event) => {
           // Update radiation data when event is received
-          const radiationLevel = event.level;
-          const holderCount = event.holderCount;
+          const radiationLevel = event.newLevel / 100; // Convert from basis points if needed
+          const holderCount = event.uniqueHolderCount;
           const reductionPerHolder = 0.1;
           const radiationReduction = holderCount * reductionPerHolder;
           const { features, nextFeature } = defineFeatureUnlocks(radiationLevel);

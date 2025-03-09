@@ -84,7 +84,7 @@ export function RadiationSystem({ currentRadiation, totalNFTsClaimed, className 
   };
 
   // OpenSea collection URL
-  const openSeaUrl = "https://opensea.io/collection/resistance-collection"; // Replace with your actual collection URL
+  const openSeaUrl = "https://opensea.io/collection/resistance-collection";
 
   return (
     <ToxicCard className={`bg-black/80 border-toxic-neon/30 p-5 ${className}`}>
@@ -130,7 +130,7 @@ export function RadiationSystem({ currentRadiation, totalNFTsClaimed, className 
         </div>
       </div>
       
-      {/* New - NFT Collection Info */}
+      {/* NFT Collection Info */}
       <div className="bg-black/40 rounded-lg p-3 mb-4 border border-amber-500/30">
         <div className="flex items-center gap-2 mb-2">
           <Shield className="h-5 w-5 text-amber-400" />
