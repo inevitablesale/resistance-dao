@@ -13,7 +13,21 @@ import { NFTDistributionStatus } from '@/components/radiation/NFTDistributionSta
 import { ReferralSystem } from '@/components/radiation/ReferralSystem';
 import { NFTCollectionDisplay } from '@/components/radiation/NFTCollectionDisplay';
 import { useRadiationSystem } from '@/hooks/useRadiationSystem';
-import { Unlock, AlertTriangle, Lock } from "lucide-react";
+import { 
+  Unlock, 
+  AlertTriangle, 
+  Lock, 
+  Check,
+  Skull,
+  Building2,
+  CircleDollarSign,
+  Network,
+  Eye,
+  Target,
+  Scroll as ScrollIcon,
+  MapPin
+} from "lucide-react";
+import { Biohazard, Coins, Users, Scale, ShieldX, Radiation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -60,7 +74,6 @@ const Index = () => {
   const [activeRole, setActiveRole] = useState<'sentinel' | 'pioneer'>('sentinel');
   const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
   
-  // New states for radiation system
   const [referralEarnings, setReferralEarnings] = useState(375); // Mock data - earnings in MATIC
   const [totalReferrals, setTotalReferrals] = useState(15); // Mock data - total referrals
   
@@ -80,7 +93,6 @@ const Index = () => {
   
   const handleRefreshActivity = () => {
     setIsRefreshingActivity(true);
-    // Simulate refresh delay
     setTimeout(() => {
       setIsRefreshingActivity(false);
     }, 1000);
@@ -749,7 +761,7 @@ const Index = () => {
                     className="border-toxic-neon/30"
                     onClick={() => navigate('/chronicles')}
                   >
-                    <Scroll className="h-4 w-4 mr-1" />
+                    <ScrollIcon className="h-4 w-4 mr-1" />
                     Chronicles
                   </ToxicButton>
                   
@@ -759,7 +771,7 @@ const Index = () => {
                     className="border-toxic-neon/30"
                     onClick={() => navigate('/territories/map')}
                   >
-                    <Map className="h-4 w-4 mr-1" />
+                    <MapPin className="h-4 w-4 mr-1" />
                     Territory Map
                   </ToxicButton>
                 </div>
