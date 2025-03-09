@@ -4,7 +4,8 @@ import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
 import { ToxicProgress } from '@/components/ui/toxic-progress';
 import { ToxicButton } from '@/components/ui/toxic-button';
-import { Radiation, Biohazard, Lock, Unlock, AlertTriangle, Target, Coins, Users, Building2, Globe } from 'lucide-react';
+import { Radiation, Biohazard, Lock, Unlock, AlertTriangle, Target, Coins, Users, Building2, Globe, Shield, ExternalLink, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface FeatureUnlock {
   radiationLevel: number;
@@ -66,6 +67,12 @@ export function RadiationSystem({ currentRadiation, totalNFTsClaimed, className 
   // Calculate radiation reduction
   const radiationReduction = totalNFTsClaimed * 0.1;
   
+  // Calculate remaining reduction needed for next unlock
+  const remainingReductionNeeded = nextFeature ? Math.max(0, currentRadiation - nextFeature.radiationLevel) : 0;
+  
+  // Calculate how many more unique holders needed
+  const moreHoldersNeeded = Math.ceil(remainingReductionNeeded / 0.1);
+  
   // Get radiation status label
   const getRadiationStatusLabel = (level: number) => {
     if (level > 90) return "Critical Danger";
@@ -75,6 +82,9 @@ export function RadiationSystem({ currentRadiation, totalNFTsClaimed, className 
     if (level > 0) return "Flourishing Economy";
     return "Civilization Rebuilt";
   };
+
+  // OpenSea collection URL
+  const openSeaUrl = "https://opensea.io/collection/resistance-collection";
 
   return (
     <ToxicCard className={`bg-black/80 border-toxic-neon/30 p-5 ${className}`}>
@@ -115,9 +125,69 @@ export function RadiationSystem({ currentRadiation, totalNFTsClaimed, className 
           <span className="text-toxic-neon font-mono">-{radiationReduction.toFixed(1)}%</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-white/70">Each NFT Reduces</span>
+          <span className="text-white/70">Each Unique Holder Reduces</span>
           <span className="text-toxic-neon font-mono">-0.1%</span>
         </div>
+      </div>
+      
+      {/* NFT Collection Info */}
+      <div className="bg-black/40 rounded-lg p-3 mb-4 border border-amber-500/30">
+        <div className="flex items-center gap-2 mb-2">
+          <Shield className="h-5 w-5 text-amber-400" />
+          <h3 className="text-amber-400 font-mono">NFT Collection</h3>
+        </div>
+        <p className="text-white/70 text-sm mb-3">
+          Each unique NFT holder reduces the global radiation by 0.1%. Claim or buy NFTs to help rebuild the wasteland economy!
+        </p>
+        <div className="flex flex-col space-y-2">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex justify-between text-xs items-center">
+                  <span className="flex items-center text-white/70">
+                    <Info className="h-3 w-3 mr-1 text-toxic-neon" /> 
+                    Total Supply
+                  </span>
+                  <span className="text-toxic-neon font-mono">19 NFTs</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs max-w-[200px]">
+                  The collection consists of 19 unique NFTs from the Resistance Collection
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
+          {nextFeature && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex justify-between text-xs items-center">
+                    <span className="flex items-center text-white/70">
+                      <Info className="h-3 w-3 mr-1 text-amber-400" /> 
+                      Holders Needed for Next Unlock
+                    </span>
+                    <span className="text-amber-400 font-mono">{moreHoldersNeeded} holders</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs max-w-[200px]">
+                    Each unique NFT holder reduces radiation by 0.1%. Need {remainingReductionNeeded.toFixed(1)}% reduction to unlock {nextFeature.name}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
+        <ToxicButton 
+          variant="outline" 
+          className="w-full mt-3 border-amber-500/30 text-amber-400"
+          onClick={() => window.open(openSeaUrl, "_blank")}
+        >
+          <ExternalLink className="h-4 w-4 mr-2" />
+          Claim/Buy NFTs on OpenSea
+        </ToxicButton>
       </div>
       
       <h3 className="text-lg font-mono text-toxic-neon mb-3">Feature Unlocks</h3>
@@ -163,6 +233,17 @@ export function RadiationSystem({ currentRadiation, totalNFTsClaimed, className 
             <span className="text-white/50">Requires Radiation Level</span>
             <span className="text-amber-400 font-mono">{nextFeature.radiationLevel}%</span>
           </div>
+          <div className="flex justify-between text-xs mt-1">
+            <span className="text-white/50">Current Reduction Progress</span>
+            <span className="text-amber-400 font-mono">
+              {radiationReduction.toFixed(1)}% / {(100 - nextFeature.radiationLevel).toFixed(1)}%
+            </span>
+          </div>
+          <ToxicProgress 
+            value={(radiationReduction / (100 - nextFeature.radiationLevel)) * 100}
+            variant="radiation" 
+            className="h-2 mt-2" 
+          />
         </div>
       )}
       
