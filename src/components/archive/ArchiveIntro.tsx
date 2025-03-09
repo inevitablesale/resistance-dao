@@ -26,9 +26,10 @@ export const ArchiveIntro = ({ currentRadiation, narrativeContext, onContinue }:
   
   useEffect(() => {
     if (textIndex < introText.length - 1) {
+      // Reduced timeout from 1800ms to 600ms (3x faster)
       const timer = setTimeout(() => {
         setTextIndex(prev => prev + 1);
-      }, 1800);
+      }, 600);
       return () => clearTimeout(timer);
     }
   }, [textIndex, introText.length]);
@@ -40,6 +41,11 @@ export const ArchiveIntro = ({ currentRadiation, narrativeContext, onContinue }:
     }, 500);
   };
   
+  // Displays all text immediately if user clicks anywhere
+  const handleSkip = () => {
+    setTextIndex(introText.length - 1);
+  };
+  
   return (
     <AnimatePresence>
       {showIntro && (
@@ -48,6 +54,7 @@ export const ArchiveIntro = ({ currentRadiation, narrativeContext, onContinue }:
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 flex items-center justify-center z-50 bg-black/90 backdrop-blur-sm"
+          onClick={handleSkip} // Added skip functionality on click anywhere
         >
           <div className="terminal-outer-container max-w-3xl w-full">
             <div className="terminal-middle-container">
