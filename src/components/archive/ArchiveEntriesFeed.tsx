@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Book, FileText, Filter, Search } from 'lucide-react';
+import { Book, FileText, Filter, Search, User, Globe, Scale } from 'lucide-react';
 import { ArchiveEntry, ArchiveEntryData } from './ArchiveEntry';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
 
@@ -59,7 +59,7 @@ export const ArchiveEntriesFeed = ({ currentRadiation, entries }: ArchiveEntries
           />
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             className={`px-3 py-1 rounded text-sm flex items-center gap-1 border ${
               categoryFilter === null 
@@ -91,6 +91,39 @@ export const ArchiveEntriesFeed = ({ currentRadiation, entries }: ArchiveEntries
             onClick={() => setCategoryFilter('technical')}
           >
             <FileText className="h-3 w-3" /> Technical
+          </button>
+          
+          <button
+            className={`px-3 py-1 rounded text-sm flex items-center gap-1 border ${
+              categoryFilter === 'survivor' 
+                ? 'bg-purple-400/20 border-purple-400/50 text-purple-400' 
+                : 'bg-transparent border-white/20 text-white/60 hover:bg-black/50'
+            }`}
+            onClick={() => setCategoryFilter('survivor')}
+          >
+            <User className="h-3 w-3" /> Survivor
+          </button>
+          
+          <button
+            className={`px-3 py-1 rounded text-sm flex items-center gap-1 border ${
+              categoryFilter === 'economic' 
+                ? 'bg-blue-400/20 border-blue-400/50 text-blue-400' 
+                : 'bg-transparent border-white/20 text-white/60 hover:bg-black/50'
+            }`}
+            onClick={() => setCategoryFilter('economic')}
+          >
+            <Globe className="h-3 w-3" /> Economic
+          </button>
+          
+          <button
+            className={`px-3 py-1 rounded text-sm flex items-center gap-1 border ${
+              categoryFilter === 'governance' 
+                ? 'bg-gray-400/20 border-gray-400/50 text-gray-400' 
+                : 'bg-transparent border-white/20 text-white/60 hover:bg-black/50'
+            }`}
+            onClick={() => setCategoryFilter('governance')}
+          >
+            <Scale className="h-3 w-3" /> Governance
           </button>
         </div>
       </div>

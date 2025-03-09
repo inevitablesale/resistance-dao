@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Book, Calendar, Clock, FileText, Globe, User } from 'lucide-react';
+import { Book, Calendar, Clock, FileText, Globe, User, Scale } from 'lucide-react';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
 
 export interface ArchiveEntryData {
   id: string;
   title: string;
   date: string;
-  category: 'historical' | 'technical' | 'survivor' | 'economic';
+  category: 'historical' | 'technical' | 'survivor' | 'economic' | 'governance';
   excerpt: string;
   content: string;
   location?: string;
@@ -33,6 +33,8 @@ export const ArchiveEntry = ({ entry, expanded = false, onToggleExpand }: Archiv
         return <User className="h-4 w-4 text-purple-400" />;
       case 'economic':
         return <Globe className="h-4 w-4 text-blue-400" />;
+      case 'governance':
+        return <Scale className="h-4 w-4 text-gray-400" />;
       default:
         return <Book className="h-4 w-4" />;
     }
@@ -44,6 +46,7 @@ export const ArchiveEntry = ({ entry, expanded = false, onToggleExpand }: Archiv
       case 'technical': return 'Technical Manual';
       case 'survivor': return 'Survivor Log';
       case 'economic': return 'Economic Analysis';
+      case 'governance': return 'Governance Protocol';
       default: return 'Archive Entry';
     }
   };
