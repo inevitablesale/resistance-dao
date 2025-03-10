@@ -12,7 +12,7 @@ import { StoryTerminal } from '@/components/terminal/StoryTerminal';
 import { RadiationSystem } from '@/components/radiation/RadiationSystem';
 import { NFTDistributionStatus } from '@/components/radiation/NFTDistributionStatus';
 import { ReferralSystem } from '@/components/radiation/ReferralSystem';
-import { Rocket, Coins, Users, Share2, Check, ChevronRight, Building2, CircleDollarSign, Scale, FileText, ChevronRight as ArrowIcon, Clock, Target, Wallet, RefreshCw, Radiation, Skull, Zap, Shield, Image, Biohazard, ShieldX, UserX, Bug, Bomb, Crosshair, PlusCircle, Search, ShoppingBag, Box, Eye, Map, Globe, Network, Wrench, Hammer, Lightbulb, Flag, Scroll, FileText2 } from "lucide-react";
+import { Rocket, Coins, Users, Share2, Check, ChevronRight, Building2, CircleDollarSign, Scale, FileText, ChevronRight as ArrowIcon, Clock, Target, Wallet, RefreshCw, Radiation, Skull, Zap, Shield, Image, Biohazard, ShieldX, UserX, Bug, Bomb, Crosshair, PlusCircle, Search, ShoppingBag, Box, Eye, Map, Globe, Network, Wrench, Hammer, Lightbulb, Flag, Scroll } from "lucide-react";
 import { ToxicButton as Button } from "@/components/ui/toxic-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ToxicCard, ToxicCardContent, ToxicCardHeader, ToxicCardTitle, ToxicCardDescription, ToxicCardFooter } from "@/components/ui/toxic-card";
