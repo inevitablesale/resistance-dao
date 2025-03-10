@@ -1,11 +1,10 @@
 
 import React, { useState } from 'react';
-import { useCustomWallet } from '@/hooks/useCustomWallet';
 import { useAllContractNFTs, useContractStats, NFTMetadata } from '@/hooks/useContractNFTs';
 import { ToxicCard, ToxicCardContent, ToxicCardHeader, ToxicCardTitle } from '@/components/ui/toxic-card';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
 import { RadiationOverlay } from '@/components/radiation/RadiationOverlay';
-import { Loader2, AlertCircle, Radiation } from 'lucide-react';
+import { Loader2, AlertCircle, Radiation, ExternalLink } from 'lucide-react';
 import { CharacterRevealSlider } from '@/components/marketplace/CharacterRevealSlider';
 
 export const ContractNFTDisplay = () => {
@@ -17,7 +16,7 @@ export const ContractNFTDisplay = () => {
     return (
       <div className="flex flex-col items-center justify-center p-8 bg-black/40 rounded-lg border border-toxic-neon/20">
         <Loader2 className="h-8 w-8 text-toxic-neon animate-spin mb-4" />
-        <p className="text-toxic-neon">Scanning contract for NFTs...</p>
+        <p className="text-toxic-neon">Scanning contract for NFTs via Alchemy API...</p>
         <p className="text-sm text-toxic-muted mt-2">0xdD44d15f54B799e940742195e97A30165A1CD285</p>
       </div>
     );
@@ -29,6 +28,7 @@ export const ContractNFTDisplay = () => {
         <AlertCircle className="h-8 w-8 text-apocalypse-red mb-4" />
         <p className="text-apocalypse-red">Error scanning contract</p>
         <p className="text-sm text-white/70 mt-2">Failed to load NFTs. Please try again later.</p>
+        <p className="text-xs text-white/50 mt-4">{error.toString()}</p>
       </div>
     );
   }
@@ -53,7 +53,17 @@ export const ContractNFTDisplay = () => {
           <p className="text-sm text-toxic-muted">
             {nfts[0]?.contractName || contractStats?.contractName || 'Unknown Collection'} ({nfts[0]?.contractSymbol || contractStats?.contractSymbol || '???'})
           </p>
-          <p className="text-xs text-white/50 mt-1">0xdD44d15f54B799e940742195e97A30165A1CD285</p>
+          <p className="text-xs text-white/50 mt-1">
+            <a 
+              href={`https://polygonscan.com/address/0xdD44d15f54B799e940742195e97A30165A1CD285`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center hover:text-toxic-neon transition-colors"
+            >
+              0xdD44d15f54B799e940742195e97A30165A1CD285
+              <ExternalLink className="ml-1 h-3 w-3" />
+            </a>
+          </p>
         </div>
         <ToxicBadge variant="outline" className="text-toxic-neon">
           {nfts.length} NFTs Found ({contractStats?.totalMinted || '?'} Total Minted)
@@ -72,7 +82,7 @@ export const ContractNFTDisplay = () => {
           <ToxicCard key={nft.tokenId} className="bg-black/40 border-toxic-neon/30 overflow-hidden">
             <ToxicCardHeader>
               <ToxicCardTitle className="flex justify-between items-center">
-                <span className="text-toxic-neon">
+                <span className="text-toxic-neon truncate">
                   {nft.name || `Token #${nft.tokenId}`}
                 </span>
                 <ToxicBadge variant="outline" className="text-xs">
