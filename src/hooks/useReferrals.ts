@@ -9,13 +9,27 @@ import {
   createReferral, 
   processPendingReferralPayments, 
   Referral, 
-  ReferralStats 
+  ReferralStats,
+  initNFTPolling,
+  stopNFTPolling
 } from "@/services/referralService";
 
 export const useReferrals = () => {
   const { toast } = useToast();
   const { address, isConnected } = useCustomWallet();
   const queryClient = useQueryClient();
+
+  // Initialize NFT polling when hook is first mounted
+  useEffect(() => {
+    if (isConnected && address) {
+      const pollingService = initNFTPolling();
+      
+      return () => {
+        // Cleanup polling when component unmounts
+        stopNFTPolling();
+      };
+    }
+  }, [isConnected, address]);
 
   // Get referrals for the connected wallet
   const {

@@ -1,6 +1,11 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  checkBountyHunterOwnership, 
+  startNFTPurchasePolling, 
+  NFTClass 
+} from "@/services/alchemyNFTService";
 
 export interface Referral {
   id: string;
@@ -23,12 +28,49 @@ export interface ReferralStats {
   pendingPayouts: number;
 }
 
+// Singleton for NFT purchase polling
+let nftPollingService: {
+  stop: () => void;
+  addTrackedAddress: (referredAddress: string, referrerAddress: string) => void;
+  removeTrackedAddress: (referredAddress: string) => void;
+} | null = null;
+
+// Initialize NFT polling service
+export const initNFTPolling = () => {
+  if (nftPollingService) return nftPollingService;
+  
+  nftPollingService = startNFTPurchasePolling(async (referredAddress, referrerAddress, tokenId, nftClass) => {
+    console.log(`NFT Purchase detected: ${referredAddress} bought a ${nftClass} (Token ID: ${tokenId})`);
+    await markNftPurchased(referredAddress, tokenId);
+  });
+  
+  return nftPollingService;
+};
+
+// Stop NFT polling service
+export const stopNFTPolling = () => {
+  if (nftPollingService) {
+    nftPollingService.stop();
+    nftPollingService = null;
+  }
+};
+
 // Create a new referral between referrer and referred addresses
 export const createReferral = async (
   referrerAddress: string,
   referredAddress: string
 ): Promise<{ success: boolean; error?: string; referralId?: string }> => {
   try {
+    // First, verify the referrer owns a Bounty Hunter NFT
+    const isVerifiedReferrer = await checkBountyHunterOwnership(referrerAddress);
+    
+    if (!isVerifiedReferrer) {
+      return { 
+        success: false, 
+        error: "Referrer does not own a Bounty Hunter NFT" 
+      };
+    }
+    
     // Prevent self-referrals
     if (referrerAddress.toLowerCase() === referredAddress.toLowerCase()) {
       return { success: false, error: "Cannot refer yourself" };
@@ -66,6 +108,14 @@ export const createReferral = async (
       .select();
 
     if (error) throw error;
+    
+    // Start tracking this referred address for NFT purchases
+    if (nftPollingService) {
+      nftPollingService.addTrackedAddress(referredAddress, referrerAddress);
+    } else {
+      const service = initNFTPolling();
+      service.addTrackedAddress(referredAddress, referrerAddress);
+    }
 
     return { 
       success: true, 
@@ -89,6 +139,15 @@ export const getReferrals = async (
       .order("referral_date", { ascending: false });
 
     if (error) throw error;
+    
+    // Make sure we're tracking all referred addresses
+    if (data && nftPollingService) {
+      data.forEach(referral => {
+        if (!referral.nft_purchased) {
+          nftPollingService!.addTrackedAddress(referral.referred_address, referral.referrer_address);
+        }
+      });
+    }
 
     return { referrals: data || [] };
   } catch (error: any) {
@@ -145,16 +204,36 @@ export const markNftPurchased = async (
   nftTokenId: string
 ): Promise<{ success: boolean; error?: string }> => {
   try {
+    // Check if this address is in our referrals
     const { data, error } = await supabase
+      .from("referrals")
+      .select("*")
+      .eq("referred_address", referredAddress)
+      .eq("nft_purchased", false)
+      .limit(1);
+      
+    if (error) throw error;
+    
+    // If no matching referral found, just return
+    if (!data || data.length === 0) {
+      return { success: true };
+    }
+    
+    // Update the referral to mark as purchased
+    const { error: updateError } = await supabase
       .from("referrals")
       .update({
         nft_purchased: true,
         purchase_date: new Date().toISOString()
       })
-      .eq("referred_address", referredAddress)
-      .select();
+      .eq("id", data[0].id);
 
-    if (error) throw error;
+    if (updateError) throw updateError;
+    
+    // Stop tracking this address since they've made a purchase
+    if (nftPollingService) {
+      nftPollingService.removeTrackedAddress(referredAddress);
+    }
 
     // Trigger the edge function to process payments
     await processPendingReferralPayments();
