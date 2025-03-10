@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { LockKeyhole, AlertTriangle, Terminal, ExternalLink } from "lucide-react";
+import { Shield, LockKeyhole, AlertTriangle, Terminal, ExternalLink } from "lucide-react";
 import { ToxicButton } from "@/components/ui/toxic-button";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 interface TerminalLoginProps {
   onLoginSuccess: () => void;
@@ -17,6 +18,13 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
     "> SECURE CONNECTION ESTABLISHED",
     "> AWAITING AUTHENTICATION..."
   ]);
+  const { connect, isConnected } = useWalletConnection();
+
+  useEffect(() => {
+    if (isConnected) {
+      handleLoginSuccess();
+    }
+  }, [isConnected]);
 
   const addTerminalMessage = (message: string) => {
     setTerminalMessages(prev => [...prev, message]);
@@ -47,6 +55,14 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
       setLoginErrors(["ERROR: INVALID ACCESS CODE"]);
       addTerminalMessage("> AUTHENTICATION FAILED");
     }
+  };
+
+  const handleWalletConnect = () => {
+    setIsAuthenticating(true);
+    setLoginErrors([]);
+    addTerminalMessage("> INITIALIZING WALLET CONNECTION...");
+    
+    connect();
   };
 
   const handleLoginSuccess = () => {
@@ -160,24 +176,51 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
           </div>
         </form>
 
+        <div className="flex justify-center items-center gap-2 text-white/60 mb-6">
+          <span className="border-t border-white/20 flex-grow"></span>
+          <span className="text-sm px-2">OR</span>
+          <span className="border-t border-white/20 flex-grow"></span>
+        </div>
+
+        <ToxicButton 
+          onClick={handleWalletConnect} 
+          disabled={isAuthenticating}
+          variant="secondary"
+          size="lg"
+          className="w-full uppercase font-mono inline-flex items-center justify-center py-3 text-base mb-8"
+        >
+          <Shield className="h-5 w-5 mr-2" />
+          CONNECT CRYPTO WALLET
+        </ToxicButton>
+
+        <div className="flex justify-center items-center gap-2 text-white/60 mb-6">
+          <span className="border-t border-white/20 flex-grow"></span>
+          <span className="text-sm px-2">OR</span>
+          <span className="border-t border-white/20 flex-grow"></span>
+        </div>
+
+        <a 
+          href="https://www.linkedin.com/groups/12657922/" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="block w-full"
+        >
+          <ToxicButton
+            variant="tertiary"
+            size="default"
+            className="w-full uppercase font-mono inline-flex items-center justify-center py-2.5 text-sm"
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            GAIN ACCESS CODE
+          </ToxicButton>
+        </a>
+
         <div className="mt-8 text-center">
           <div className="text-white/40 text-xs flex items-center justify-center gap-2">
             <AlertTriangle className="h-3 w-3" />
             <span>UNAUTHORIZED ACCESS WILL BE TRACED</span>
             <AlertTriangle className="h-3 w-3" />
           </div>
-        </div>
-
-        <div className="mt-6 text-center">
-          <a 
-            href="https://www.linkedin.com/groups/12657922/" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="inline-flex items-center text-toxic-neon/70 hover:text-toxic-neon text-sm"
-          >
-            <ExternalLink className="h-4 w-4 mr-2" />
-            Request access code
-          </a>
         </div>
       </motion.div>
     </div>

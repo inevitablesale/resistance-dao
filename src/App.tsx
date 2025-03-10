@@ -21,7 +21,7 @@ import MarketplaceItemDetails from "./pages/MarketplaceItemDetails";
 import Hunt from "./pages/Hunt";
 import SettlementDetails from "./pages/SettlementDetails";
 import { Toaster } from "./components/ui/toaster";
-import BountyHunters from './pages/BountyHunters';
+import { ResistanceWalletWidget } from "./components/wallet/ResistanceWalletWidget";
 
 const zeroDevConfig = {
   projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -161,7 +161,7 @@ function Layout() {
         <Route path="/r/:referrerAddress" element={<ReferralRedirect />} />
         <Route path="/toxic-theme" element={<ToxicTheme />} />
         <Route path="/marketplace/:id" element={<MarketplaceItemDetails />} />
-        <Route path="/marketplace/bounty-hunters" element={<BountyHunters />} />
+        <Route path="/marketplace/bounty-hunters" element={<Hunt />} />
         <Route path="/marketplace/sentinels" element={<Hunt />} />
         <Route path="/marketplace/survivors" element={<Hunt />} />
         <Route path="/referral" element={<ReferralRedirect />} />
@@ -169,8 +169,14 @@ function Layout() {
         <Route path="/command" element={<Hunt />} />
         <Route path="/settlements/:partyAddress" element={<SettlementDetails />} />
         
+        {/* Redirect redundant paths to /command */}
+        <Route path="/settlements" element={<Navigate to="/command" replace />} />
+        <Route path="/governance" element={<Navigate to="/command" replace />} />
+        <Route path="/my-settlements" element={<Navigate to="/command" replace />} />
+        
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <ResistanceWalletWidget />
     </>
   );
 }

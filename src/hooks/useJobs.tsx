@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -10,17 +11,17 @@ import {
 import { JobMetadata } from "@/utils/settlementConversion";
 import { JobCategory } from "@/components/jobs/JobCategoryIcon";
 
-// Update the mock job data to match real-world bounties
+// Mock job data until we implement the real backend services
 const mockJobs: (JobMetadata & { id: string })[] = [
   {
     id: "job-1",
-    title: "Senior Solidity Developer for DAO Treasury System",
-    description: "We're looking for an experienced Solidity developer to help build our DAO treasury management system. The ideal candidate has experience with multi-signature wallets, token vesting, and governance systems.",
-    category: "protocol-development",
-    reward: "5,000 USDC",
-    deadline: Date.now() + 1000 * 60 * 60 * 24 * 14, // 14 days from now
+    title: "Harvest Resources from Abandoned Factory",
+    description: "We need skilled resource gatherers to extract valuable materials from a recently discovered abandoned factory. The location is relatively safe but requires experience in identifying valuable resources.",
+    category: "resource-gathering",
+    reward: "0.5 ETH",
+    deadline: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 days from now
     maxApplicants: 3,
-    referralReward: "1,000 USDC",
+    referralReward: "0.05 ETH",
     votingDuration: 604800,
     linkedInURL: "",
     creator: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -29,13 +30,13 @@ const mockJobs: (JobMetadata & { id: string })[] = [
   },
   {
     id: "job-2",
-    title: "Community Manager for Discord",
-    description: "Looking for an experienced community manager to help grow and moderate our Discord server. The ideal candidate has experience with Web3 communities and can help create engagement strategies.",
-    category: "community-growth",
-    reward: "2,000 USDC/month",
-    deadline: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 days from now
+    title: "Settlement Security Patrol",
+    description: "Looking for experienced guards to patrol the settlement perimeter. Must have previous security experience and be willing to work night shifts.",
+    category: "security",
+    reward: "0.3 ETH",
+    deadline: Date.now() + 1000 * 60 * 60 * 24 * 14, // 14 days from now
     maxApplicants: 5,
-    referralReward: "400 USDC",
+    referralReward: "0.03 ETH",
     votingDuration: 604800,
     linkedInURL: "",
     creator: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
@@ -44,46 +45,16 @@ const mockJobs: (JobMetadata & { id: string })[] = [
   },
   {
     id: "job-3",
-    title: "Senior React Frontend Developer",
-    description: "We need a skilled React developer to help build our web application. Experience with TypeScript, React Query, and Web3 technologies is required. This is a full-time position.",
-    category: "talent-acquisition",
-    reward: "8,000-12,000 USDC/month",
+    title: "Smart Contract Development for Water Management",
+    description: "We need a skilled developer to create a smart contract system for managing water distribution in our settlement. Experience with Solidity required.",
+    category: "protocol-development",
+    reward: "1.2 ETH",
     deadline: Date.now() + 1000 * 60 * 60 * 24 * 10, // 10 days from now
     maxApplicants: 2,
-    referralReward: "2,000 USDC",
+    referralReward: "0.1 ETH",
     votingDuration: 604800,
     linkedInURL: "",
     creator: "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-    status: "open",
-    applicants: []
-  },
-  {
-    id: "job-4",
-    title: "Educational Content Series on DAO Governance",
-    description: "Create a series of educational content (articles or videos) explaining DAO governance, voting mechanisms, and treasury management in simple terms for newcomers.",
-    category: "content-creation",
-    reward: "3,000 USDC",
-    deadline: Date.now() + 1000 * 60 * 60 * 24 * 21, // 21 days from now
-    maxApplicants: 3,
-    referralReward: "500 USDC",
-    votingDuration: 604800,
-    linkedInURL: "",
-    creator: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-    status: "open",
-    applicants: []
-  },
-  {
-    id: "job-5",
-    title: "Business Development Lead for Partnerships",
-    description: "Find and secure strategic partnerships with other DeFi/DAO protocols. Commission-based role with potential for full-time position.",
-    category: "business-development",
-    reward: "10% of deal value",
-    deadline: Date.now() + 1000 * 60 * 60 * 24 * 30, // 30 days from now
-    maxApplicants: 2,
-    referralReward: "2% of deal value",
-    votingDuration: 604800,
-    linkedInURL: "",
-    creator: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
     status: "open",
     applicants: []
   }
