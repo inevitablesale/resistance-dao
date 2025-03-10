@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { ethers } from "ethers";
-import { PartyProposal, ProposalStatus } from "@/types/proposals";
+import { PartyProposal } from "@/types/proposals";
+import { ProposalStatus } from "@/types/content";
 import { PARTY_PROTOCOL, PARTY_GOVERNANCE_ABI } from "@/lib/constants";
 
 export const useProposals = (partyAddress?: string) => {

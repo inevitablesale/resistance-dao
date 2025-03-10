@@ -141,13 +141,13 @@ export const ProposalCard = ({
                 <span>Support</span>
                 <span>{forPercentage.toFixed(0)}% ({proposal.votesFor})</span>
               </div>
-              <Progress value={forPercentage} className="h-2 bg-black" indicatorColor="bg-green-500" />
+              <Progress value={forPercentage} className="h-2 bg-black" indicatorClassName="bg-green-500" />
               
               <div className="flex justify-between text-sm">
                 <span>Against</span>
                 <span>{(100 - forPercentage).toFixed(0)}% ({proposal.votesAgainst})</span>
               </div>
-              <Progress value={100 - forPercentage} className="h-2 bg-black" indicatorColor="bg-red-500" />
+              <Progress value={100 - forPercentage} className="h-2 bg-black" indicatorClassName="bg-red-500" />
             </div>
             
             {!hasVoted && (
@@ -227,3 +227,4 @@ export const ProposalCard = ({
     </div>
   );
 };
+
