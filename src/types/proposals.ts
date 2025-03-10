@@ -106,7 +106,8 @@ export interface ProposalMetadata {
   title: string;
   description?: string;
   category?: string;
-  investment: {
+  image?: string; // Added image property to fix type error
+  investment?: {
     targetCapital: string;
     description: string;
     drivers?: string[];

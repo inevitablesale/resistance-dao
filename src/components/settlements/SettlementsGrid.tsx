@@ -8,9 +8,10 @@ interface SettlementsGridProps {
   isLoading: boolean;
   formatUSDAmount: (amount: string) => string;
   title: string;
+  className?: string; // Added className prop to support Hunt.tsx
 }
 
-export const SettlementsGrid = ({ settlements, isLoading, formatUSDAmount, title }: SettlementsGridProps) => {
+export const SettlementsGrid = ({ settlements, isLoading, formatUSDAmount, title, className }: SettlementsGridProps) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -29,7 +30,7 @@ export const SettlementsGrid = ({ settlements, isLoading, formatUSDAmount, title
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${className || ''}`}>
       <h2 className="text-2xl font-bold">{title}</h2>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {settlements.map((settlement) => {
@@ -39,7 +40,7 @@ export const SettlementsGrid = ({ settlements, isLoading, formatUSDAmount, title
             category: "Unknown"
           };
           
-          // Calculate progress percentage
+          // Calculate progress percentage - safely access investment props
           const targetCapital = metadata.investment?.targetCapital || "0";
           const pledgedAmount = settlement.pledgedAmount || "0";
           const progress = parseFloat(targetCapital) > 0 

@@ -174,13 +174,14 @@ export default function ThesisSubmission() {
     const checkSurvivorOwnership = async () => {
       if (primaryWallet) {
         try {
-          const hasNFT = await verifySurvivorOwnership(primaryWallet, SURVIVOR_NFT_ADDRESS);
-          setHasSurvivorNFT(hasNFT);
-          
-          if (hasNFT) {
-            // Get the token ID (would need to be implemented)
-            // This is a placeholder - real implementation would get the token ID
-            setSurvivorTokenId("1");
+          const result = await verifySurvivorOwnership(primaryWallet, SURVIVOR_NFT_ADDRESS);
+          if (typeof result === 'boolean') {
+            setHasSurvivorNFT(result);
+          } else if (result && typeof result === 'object') {
+            setHasSurvivorNFT(result.hasNFT);
+            if (result.tokenId) {
+              setSurvivorTokenId(result.tokenId);
+            }
           }
         } catch (error) {
           console.error("Error checking Survivor ownership:", error);
