@@ -29,3 +29,17 @@ export function formatRDAmount(amount: string | number | ethers.BigNumber): stri
     return `${amount} RD`; // Return original amount if formatting fails
   }
 }
+
+/**
+ * Truncates an Ethereum address to a more readable format
+ * @param address The full Ethereum address
+ * @param startChars Number of characters to show at the start (default: 6)
+ * @param endChars Number of characters to show at the end (default: 4)
+ * @returns The truncated address string
+ */
+export function truncateAddress(address: string, startChars: number = 6, endChars: number = 4): string {
+  if (!address) return '';
+  if (address.length <= startChars + endChars) return address;
+  
+  return `${address.slice(0, startChars)}...${address.slice(-endChars)}`;
+}
