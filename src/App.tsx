@@ -20,6 +20,7 @@ import ToxicTheme from "./pages/ToxicTheme";
 import MarketplaceItemDetails from "./pages/MarketplaceItemDetails";
 import Hunt from "./pages/Hunt";
 import SettlementDetails from "./pages/SettlementDetails";
+import BountyManagement from "./pages/BountyManagement";
 import { Toaster } from "./components/ui/toaster";
 import { ResistanceWalletWidget } from "./components/wallet/ResistanceWalletWidget";
 
@@ -166,6 +167,9 @@ function Layout() {
         <Route path="/marketplace/bounty-hunters" element={<Hunt />} />
         <Route path="/marketplace/sentinels" element={<Hunt />} />
         <Route path="/marketplace/survivors" element={<Hunt />} />
+        
+        {/* Bounty management routes */}
+        <Route path="/bounty/management" element={<BountyManagement />} />
         
         {/* Command/Hunt routes */}
         <Route path="/referral" element={<ReferralRedirect />} />

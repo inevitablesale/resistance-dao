@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
 import { executeTransaction, TransactionConfig } from "./transactionManager";
@@ -207,15 +208,18 @@ export async function recordSuccessfulReferral(
 }
 
 /**
- * Deploy a real bounty to the blockchain (would be used in production)
+ * Deploy a real bounty to the blockchain using Party Protocol
  * @param bountyId ID of the bounty to deploy
  * @param wallet Connected wallet
- * @returns Promise resolving to transaction result
+ * @returns Promise resolving to deployed bounty details
  */
-export async function deployBountyToBlockchain(bountyId: string, wallet: any): Promise<any> {
+export async function deployBountyToBlockchain(bountyId: string, wallet: any): Promise<{
+  partyAddress: string;
+  crowdfundAddress: string;
+  transactionHash: string;
+}> {
   try {
-    // This function would interact with the blockchain to deploy the bounty contract
-    // For now, it's a placeholder
+    console.log("Deploying bounty to blockchain:", bountyId);
     
     const bounty = await getBounty(bountyId);
     
@@ -223,19 +227,97 @@ export async function deployBountyToBlockchain(bountyId: string, wallet: any): P
       throw new Error("Bounty not found");
     }
     
-    console.log("Deploying bounty to blockchain:", bounty);
+    // Get the wallet address
+    const walletClient = await wallet.getWalletClient();
+    if (!walletClient) {
+      throw new Error("Wallet client not available");
+    }
     
-    // In a real implementation, this would:
-    // 1. Create a Party for the bounty
-    // 2. Fund the Party with the total budget
-    // 3. Set up the reward distribution rules
+    const provider = new ethers.providers.Web3Provider(walletClient as any);
+    const signer = provider.getSigner();
+    const signerAddress = await signer.getAddress();
     
+    // Set up a Party for the bounty
+    const partyOptions: PartyOptions = {
+      name: `Bounty: ${bounty.name}`,
+      hosts: [signerAddress], // The bounty creator is the host
+      votingDuration: 3 * 24 * 60 * 60, // 3 days in seconds
+      executionDelay: 1 * 24 * 60 * 60, // 1 day in seconds
+      passThresholdBps: 5000, // 50%
+      allowPublicProposals: true,
+      description: bounty.description,
+      metadataURI: ""  // Will be set after IPFS upload
+    };
+    
+    toast({
+      title: "Creating Bounty Party",
+      description: "Setting up a Party contract for your bounty..."
+    });
+    
+    // Create a Party for the bounty
+    const partyAddress = await createParty(wallet, partyOptions);
+    
+    // Set up a Crowdfund for the bounty
+    const crowdfundOptions: CrowdfundOptions = {
+      initialContributor: signerAddress,
+      minContribution: ethers.utils.parseEther("0.01").toString(), // 0.01 ETH min
+      maxContribution: ethers.utils.parseEther(bounty.totalBudget.toString()).toString(),
+      maxTotalContributions: ethers.utils.parseEther(bounty.totalBudget.toString()).toString(),
+      duration: 30 * 24 * 60 * 60 // 30 days in seconds
+    };
+    
+    const bountyMetadata = {
+      name: bounty.name,
+      description: bounty.description,
+      rewardAmount: bounty.rewardAmount,
+      rewardType: "fixed", // Default to fixed rewards
+      bountyType: "nft_referral", // Default type
+      successCriteria: "Successful referral of a new user",
+      createdBy: signerAddress,
+      createdAt: Math.floor(Date.now() / 1000)
+    };
+    
+    toast({
+      title: "Creating Bounty Funding",
+      description: "Setting up funding for your bounty..."
+    });
+    
+    // Create a Crowdfund for the bounty
+    const crowdfundAddress = await createEthCrowdfund(
+      wallet,
+      partyAddress,
+      crowdfundOptions,
+      bountyMetadata
+    );
+    
+    // Update the bounty in localStorage with blockchain details
+    const bounties = await getBounties();
+    const bountyIndex = bounties.findIndex((b: Bounty) => b.id === bountyId);
+    
+    if (bountyIndex !== -1) {
+      bounties[bountyIndex].partyAddress = partyAddress;
+      bounties[bountyIndex].crowdfundAddress = crowdfundAddress;
+      localStorage.setItem("bounties", JSON.stringify(bounties));
+    }
+    
+    toast({
+      title: "Bounty Deployed",
+      description: "Your bounty has been successfully deployed to the blockchain!"
+    });
+    
+    // Return the addresses and a mock transaction hash
     return {
-      transactionHash: `0x${Math.random().toString(36).substring(2, 15)}`,
-      blockNumber: Math.floor(Math.random() * 1000000)
+      partyAddress,
+      crowdfundAddress,
+      transactionHash: `0x${Math.random().toString(36).substring(2, 15)}`
     };
   } catch (error) {
     console.error("Error deploying bounty to blockchain:", error);
+    toast({
+      title: "Deployment Failed",
+      description: error instanceof Error ? error.message : "Failed to deploy bounty",
+      variant: "destructive"
+    });
     throw new ProposalError({
       category: 'contract',
       message: 'Failed to deploy bounty to blockchain',
@@ -245,5 +327,176 @@ export async function deployBountyToBlockchain(bountyId: string, wallet: any): P
         'Try again later'
       ]
     });
+  }
+}
+
+/**
+ * Distribute rewards to successful referrers
+ * @param bountyId ID of the bounty
+ * @param referrerAddress Address of the referrer to reward
+ * @param amount Amount to reward
+ * @param wallet Connected wallet
+ * @returns Promise resolving to transaction result
+ */
+export async function distributeRewards(
+  bountyId: string,
+  referrerAddress: string,
+  amount: number,
+  wallet: any
+): Promise<ethers.ContractTransaction | null> {
+  try {
+    console.log("Distributing rewards for bounty:", bountyId);
+    
+    const bounty = await getBounty(bountyId);
+    
+    if (!bounty) {
+      throw new Error("Bounty not found");
+    }
+    
+    if (!bounty.partyAddress) {
+      throw new Error("Bounty not deployed to blockchain");
+    }
+    
+    // Get wallet provider and signer
+    const walletClient = await wallet.getWalletClient();
+    if (!walletClient) {
+      throw new Error("Wallet client not available");
+    }
+    
+    const provider = new ethers.providers.Web3Provider(walletClient as any);
+    const signer = provider.getSigner();
+    
+    // Create a transaction config
+    const txConfig: TransactionConfig = {
+      type: 'contract',
+      description: `Distributing ${amount} MATIC to ${referrerAddress}`,
+      timeout: 180000, // 3 minutes
+      maxRetries: 3,
+      backoffMs: 5000
+    };
+    
+    // In a real implementation, we would use the Party's distribution mechanism
+    // For now, we'll directly transfer MATIC to the referrer
+    const amountWei = ethers.utils.parseEther(amount.toString());
+    
+    // Execute transaction to transfer MATIC
+    const tx = await executeTransaction(
+      () => signer.sendTransaction({
+        to: referrerAddress,
+        value: amountWei
+      }),
+      txConfig,
+      provider
+    );
+    
+    // Update the bounty stats
+    const bounties = await getBounties();
+    const bountyIndex = bounties.findIndex((b: Bounty) => b.id === bountyId);
+    
+    if (bountyIndex !== -1) {
+      bounties[bountyIndex].usedBudget += amount;
+      bounties[bountyIndex].remainingBudget -= amount;
+      bounties[bountyIndex].successCount += 1;
+      localStorage.setItem("bounties", JSON.stringify(bounties));
+    }
+    
+    toast({
+      title: "Reward Sent",
+      description: `Successfully sent ${amount} MATIC to ${referrerAddress.substring(0, 6)}...${referrerAddress.substring(38)}`
+    });
+    
+    return tx;
+  } catch (error) {
+    console.error("Error distributing rewards:", error);
+    toast({
+      title: "Reward Failed",
+      description: error instanceof Error ? error.message : "Failed to distribute reward",
+      variant: "destructive"
+    });
+    return null;
+  }
+}
+
+/**
+ * Fund an existing bounty with additional budget
+ * @param bountyId ID of the bounty to fund
+ * @param amount Amount to add to the budget
+ * @param wallet Connected wallet
+ * @returns Promise resolving to updated bounty
+ */
+export async function fundBounty(
+  bountyId: string,
+  amount: number,
+  wallet: any
+): Promise<Bounty | null> {
+  try {
+    console.log("Funding bounty:", bountyId, "with amount:", amount);
+    
+    const bounty = await getBounty(bountyId);
+    
+    if (!bounty) {
+      throw new Error("Bounty not found");
+    }
+    
+    // If bounty is deployed on blockchain, use crowdfund contract
+    if (bounty.partyAddress && bounty.crowdfundAddress) {
+      // Get wallet provider and signer
+      const walletClient = await wallet.getWalletClient();
+      if (!walletClient) {
+        throw new Error("Wallet client not available");
+      }
+      
+      const provider = new ethers.providers.Web3Provider(walletClient as any);
+      const signer = provider.getSigner();
+      
+      // Create a transaction config
+      const txConfig: TransactionConfig = {
+        type: 'contract',
+        description: `Adding ${amount} MATIC to bounty: ${bounty.name}`,
+        timeout: 180000, // 3 minutes
+        maxRetries: 3,
+        backoffMs: 5000
+      };
+      
+      // Convert amount to wei
+      const amountWei = ethers.utils.parseEther(amount.toString());
+      
+      // Execute transaction to transfer MATIC to crowdfund
+      await executeTransaction(
+        () => signer.sendTransaction({
+          to: bounty.crowdfundAddress,
+          value: amountWei
+        }),
+        txConfig,
+        provider
+      );
+    }
+    
+    // Update the bounty stats in localStorage
+    const bounties = await getBounties();
+    const bountyIndex = bounties.findIndex((b: Bounty) => b.id === bountyId);
+    
+    if (bountyIndex !== -1) {
+      bounties[bountyIndex].totalBudget += amount;
+      bounties[bountyIndex].remainingBudget += amount;
+      localStorage.setItem("bounties", JSON.stringify(bounties));
+      
+      toast({
+        title: "Bounty Funded",
+        description: `Successfully added ${amount} MATIC to the bounty budget`
+      });
+      
+      return bounties[bountyIndex];
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("Error funding bounty:", error);
+    toast({
+      title: "Funding Failed",
+      description: error instanceof Error ? error.message : "Failed to fund bounty",
+      variant: "destructive"
+    });
+    return null;
   }
 }

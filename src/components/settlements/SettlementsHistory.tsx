@@ -1,239 +1,136 @@
 
-import { useEffect, useState } from "react";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useWalletProvider } from "@/hooks/useWalletProvider";
-import { ethers } from "ethers";
-import { FACTORY_ADDRESS, FACTORY_ABI, RD_PRICE_USD } from "@/lib/constants";
-import { getFromIPFS } from "@/services/ipfsService";
-import { ProposalMetadata, ProposalEvent } from "@/types/proposals";
-import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { loadingStates } from "@/components/proposals/LoadingStates";
-import { ProposalLoadingCard } from "@/components/proposals/ProposalLoadingCard";
-import { SettlementsGrid } from "./SettlementsGrid";
-import { convertProposalsToSettlements } from "@/utils/settlementConversion";
-
-const formatUSDAmount = (rdAmount: string): string => {
-  const amount = parseFloat(rdAmount);
-  if (isNaN(amount)) return "$0.00";
-  const usdAmount = amount * RD_PRICE_USD;
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  }).format(usdAmount);
-};
+import { ToxicButton } from "@/components/ui/toxic-button";
+import { Shield, Clock, Users, DollarSign, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { getBounties, Bounty } from "@/services/bountyService";
 
 export const SettlementsHistory = () => {
-  const [settlementEvents, setSettlementEvents] = useState<ProposalEvent[]>([]);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [loadingStateIndex, setLoadingStateIndex] = useState(0);
-  const { isConnected, connect, address } = useWalletConnection();
-  const { getProvider } = useWalletProvider();
-  const { toast } = useToast();
+  const [bounties, setBounties] = useState<Bounty[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const updateSettlementData = (tokenId: string, updates: Partial<ProposalEvent>) => {
-    setSettlementEvents(current =>
-      current.map(event =>
-        event.tokenId === tokenId
-          ? { ...event, ...updates }
-          : event
-      )
-    );
+  useEffect(() => {
+    const loadBounties = async () => {
+      try {
+        const allBounties = await getBounties();
+        // Only show active bounties
+        const active = allBounties.filter(b => b.status === "active");
+        setBounties(active);
+      } catch (error) {
+        console.error("Error loading bounties:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadBounties();
+  }, []);
+
+  const handleViewBounty = (id: string) => {
+    navigate(`/bounty/${id}`);
   };
 
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+  const handleManageBounties = () => {
+    navigate('/bounty/management');
+  };
 
-    if (isInitialLoading) {
-      const cycleLoadingStates = () => {
-        setLoadingStateIndex(prev => {
-          if (prev < loadingStates.length - 1) {
-            timeoutId = setTimeout(cycleLoadingStates, 1000);
-            return prev + 1;
-          }
-          return prev;
-        });
-      };
-
-      timeoutId = setTimeout(cycleLoadingStates, 1000);
-    }
-
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [isInitialLoading]);
-
-  useEffect(() => {
-    const fetchSettlementMetadata = async (settlement: ProposalEvent, contract: ethers.Contract) => {
-      try {
-        console.log(`\n=== Fetching metadata for settlement #${settlement.tokenId} ===`);
-        
-        updateSettlementData(settlement.tokenId, { isLoading: true });
-
-        // Get token URI and pledged amount in parallel
-        const [tokenUri, settlementData, voteEvents] = await Promise.all([
-          contract.tokenURI(settlement.tokenId),
-          contract.proposals(settlement.tokenId),
-          contract.queryFilter(contract.filters.ProposalVoted(settlement.tokenId))
-        ]);
-
-        console.log('Token URI:', tokenUri);
-        console.log('Pledged resources:', ethers.utils.formatEther(settlementData.totalPledged), 'RD');
-        console.log('Support events:', voteEvents.length);
-
-        if (tokenUri) {
-          console.log('Fetching IPFS data...');
-          try {
-            const metadata = await getFromIPFS<ProposalMetadata>(
-              tokenUri.replace('ipfs://', ''),
-              'proposal'
-            );
-            console.log('IPFS metadata retrieved:', metadata);
-
-            // Calculate total pledged from events
-            const totalPledged = voteEvents.reduce((sum, event) => {
-              return sum.add(event.args?.pledgeAmount || 0);
-            }, ethers.BigNumber.from(0));
-
-            updateSettlementData(settlement.tokenId, {
-              metadata,
-              pledgedAmount: ethers.utils.formatEther(totalPledged),
-              isLoading: false,
-              voteCount: voteEvents.length
-            });
-          } catch (ipfsError) {
-            console.error('IPFS fetch error:', ipfsError);
-            updateSettlementData(settlement.tokenId, {
-              isLoading: false,
-              error: `IPFS fetch failed: ${ipfsError.message}`
-            });
-          }
-        }
-      } catch (error: any) {
-        console.error(`Error processing settlement #${settlement.tokenId}:`, error);
-        updateSettlementData(settlement.tokenId, {
-          isLoading: false,
-          error: error.message
-        });
-      }
-    };
-
-    const fetchSettlementData = async () => {
-      if (!isConnected) return;
-
-      try {
-        setIsInitialLoading(true);
-        const walletProvider = await getProvider();
-        console.log('\n=== Scanning for Settlements ===');
-        console.log('Using Factory Address:', FACTORY_ADDRESS);
-        
-        const contract = new ethers.Contract(
-          FACTORY_ADDRESS,
-          FACTORY_ABI,
-          walletProvider.provider
-        );
-
-        // Get latest block for reference
-        const latestBlock = await walletProvider.provider.getBlockNumber();
-        console.log('Current block:', latestBlock);
-
-        // Fetch ALL historical events from block 0
-        console.log('Fetching events from genesis block');
-
-        const filter = contract.filters.ProposalCreated();
-        console.log('Scanning for settlement creation events...');
-        const events = await contract.queryFilter(filter, 0, latestBlock);
-        console.log('Found settlements:', events.length);
-        
-        console.log('Settlement details:', events.map(e => ({
-          blockNumber: e.blockNumber,
-          args: e.args ? {
-            proposalId: e.args.proposalId?.toString(),
-            creator: e.args.creator
-          } : 'No args'
-        })));
-
-        const initialSettlements = events
-          .map(event => {
-            if (!event.args) {
-              console.warn('Event missing args:', event);
-              return null;
-            }
-            
-            const settlement: ProposalEvent = {
-              tokenId: event.args.proposalId.toString(),
-              creator: event.args.creator,
-              blockNumber: event.blockNumber,
-              transactionHash: event.transactionHash,
-              isLoading: true
-            };
-            
-            return settlement;
-          })
-          .filter((settlement): settlement is ProposalEvent => settlement !== null);
-
-        console.log('Processed settlements:', initialSettlements);
-
-        if (initialSettlements.length === 0) {
-          console.log('No settlements found in events');
-          setIsInitialLoading(false);
-          return;
-        }
-
-        // Sort by block number (newest first)
-        initialSettlements.sort((a, b) => b.blockNumber - a.blockNumber);
-        setSettlementEvents(initialSettlements);
-        setIsInitialLoading(false);
-
-        // Fetch metadata for each settlement with delay to avoid rate limiting
-        for (const settlement of initialSettlements) {
-          try {
-            await fetchSettlementMetadata(settlement, contract);
-            // Add small delay between requests to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 500));
-          } catch (error) {
-            console.error(`Error fetching metadata for settlement ${settlement.tokenId}:`, error);
-          }
-        }
-
-      } catch (error: any) {
-        console.error("Error scanning for settlements:", error);
-        toast({
-          title: "Scan Error",
-          description: "Failed to scan for settlements. Please try again.",
-          variant: "destructive",
-        });
-        setIsInitialLoading(false);
-      }
-    };
-
-    fetchSettlementData();
-  }, [isConnected, getProvider]);
-
-  if (!isConnected) {
+  if (isLoading) {
     return (
-      <Card className="bg-black/40 border-white/10">
-        <CardContent className="p-6 text-center">
-          <p className="text-white/60 mb-4">Connect your device to scan for settlements</p>
-          <Button onClick={connect} className="bg-gradient-to-r from-toxic-neon/70 to-toxic-neon/50 hover:from-toxic-neon/80 hover:to-toxic-neon/60 text-black">
-            Connect Device
-          </Button>
-        </CardContent>
+      <div className="flex items-center justify-center h-40">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-toxic-neon"></div>
+      </div>
+    );
+  }
+
+  if (bounties.length === 0) {
+    return (
+      <Card className="bg-toxic-dark/40 border border-zinc-800 p-8 text-center">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-toxic-neon/10 flex items-center justify-center">
+            <Shield className="w-8 h-8 text-toxic-neon/60" />
+          </div>
+          <div>
+            <h3 className="text-xl font-medium text-white">No Active Bounties</h3>
+            <p className="text-zinc-400 max-w-md mx-auto mt-2">
+              No active bounties found. Create your first bounty to start growing your network.
+            </p>
+            <ToxicButton 
+              variant="primary"
+              className="mt-4"
+              onClick={handleManageBounties}
+            >
+              Manage Bounties
+            </ToxicButton>
+          </div>
+        </div>
       </Card>
     );
   }
 
-  if (isInitialLoading) {
-    return <ProposalLoadingCard loadingState={loadingStates[loadingStateIndex]} />;
-  }
-
   return (
-    <SettlementsGrid 
-      settlements={settlementEvents}
-      isLoading={isInitialLoading}
-      formatUSDAmount={formatUSDAmount}
-      title="Active Settlements"
-    />
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <div className="text-lg font-medium text-white">Active Bounties</div>
+        <Button 
+          variant="outline" 
+          className="text-toxic-neon border-zinc-700 hover:bg-zinc-800"
+          onClick={handleManageBounties}
+        >
+          Manage All Bounties
+        </Button>
+      </div>
+      
+      <div className="space-y-4">
+        {bounties.map((bounty) => (
+          <Card 
+            key={bounty.id} 
+            className="bg-toxic-dark/40 border border-toxic-neon/10 hover:border-toxic-neon/40 transition-all duration-300"
+          >
+            <div className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-toxic-neon/10 flex items-center justify-center">
+                    <Shield className="w-4 h-4 text-toxic-neon" />
+                  </div>
+                  <h3 className="text-lg font-medium text-white">{bounty.name}</h3>
+                  <div className="ml-2 px-2 py-0.5 text-xs bg-toxic-neon/10 rounded text-toxic-neon">
+                    {bounty.rewardAmount} MATIC/referral
+                  </div>
+                </div>
+                
+                <p className="text-zinc-400 text-sm mb-4 line-clamp-2">{bounty.description}</p>
+                
+                <div className="flex flex-wrap gap-4 text-xs text-zinc-400">
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>Expires: {new Date(bounty.expiresAt * 1000).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5" />
+                    <span>{bounty.hunterCount} hunters</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <DollarSign className="w-3.5 h-3.5" />
+                    <span>{bounty.remainingBudget} MATIC remaining</span>
+                  </div>
+                </div>
+              </div>
+              
+              <ToxicButton
+                variant="secondary"
+                className="whitespace-nowrap"
+                onClick={() => handleViewBounty(bounty.id)}
+              >
+                View Details
+                <ChevronRight className="w-4 h-4" />
+              </ToxicButton>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
   );
 };
