@@ -426,28 +426,7 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
             <div className="mb-8">
-              <MarketplaceListingGrid 
-                listings={sentinelListings} 
-                title="FOUNDER SENTINELS: Governance & Oversight" 
-                onListingClick={handleListingClick}
-                currentRadiationLevel={currentRadiation}
-                className="mb-8"
-              />
-              
-              <MarketplaceListingGrid 
-                listings={bountyHunterListings} 
-                title="BOUNTY HUNTERS: Enforcers & Funders" 
-                onListingClick={handleListingClick}
-                currentRadiationLevel={currentRadiation}
-                className="mb-8"
-              />
-              
-              <MarketplaceListingGrid 
-                listings={survivorListings} 
-                title="SURVIVORS: Builders & Innovators" 
-                onListingClick={handleListingClick}
-                currentRadiationLevel={currentRadiation}
-              />
+              {/* Sentinel, Bounty Hunter, and Survivor listings sections removed */}
             </div>
           </div>
           
@@ -502,42 +481,6 @@ const Index = () => {
                   </ToxicButton>
                 </div>
               )}
-            </ToxicCard>
-            
-            <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4 mb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="p-2 rounded-full bg-toxic-neon/10">
-                  <CircleDollarSign className="w-5 h-5 text-toxic-neon" />
-                </div>
-                <h3 className="text-lg font-mono text-toxic-neon">Fuel The New Economy</h3>
-              </div>
-              <p className="text-white/70 text-sm mb-4">
-                PRESALE NOW ACTIVE - Join the first wave of wasteland rebuilders.
-              </p>
-              <p className="text-white/70 text-sm mb-4">
-                Convert your Old World currency (USDC) into Resistance Dollars (RD) to establish trade networks and power the post-apocalyptic economy.
-              </p>
-              <div className="bg-black/50 border border-toxic-neon/20 p-3 rounded-md mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-white/70">Exchange Rate</span>
-                  <span className="text-sm text-toxic-neon font-mono">1 USDC = 1 RD</span>
-                </div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-white/70">Minimum Contribution</span>
-                  <span className="text-sm text-toxic-neon font-mono">10 USDC</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-white/70">Protocol Fee</span>
-                  <span className="text-sm text-toxic-neon font-mono">0.5%</span>
-                </div>
-              </div>
-              <ToxicButton
-                variant="marketplace"
-                className="w-full"
-                onClick={() => navigate('/buy-rd')}
-              >
-                {isConnected ? "ACCESS FUNDING TERMINAL" : "JOIN THE RESISTANCE ECONOMY"}
-              </ToxicButton>
             </ToxicCard>
             
             {isConnected && (
