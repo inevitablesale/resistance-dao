@@ -1,58 +1,14 @@
 
 import React from "react";
 import { JobsDashboard } from "@/components/jobs/JobsDashboard";
-import { useNFTRoles } from "@/hooks/useNFTRoles";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useSettlements } from "@/hooks/useSettlements";
 import { ReferralSystem } from "@/components/radiation/ReferralSystem";
-import { Shield, Target, AlertTriangle, Briefcase } from "lucide-react";
+import { Target, Briefcase } from "lucide-react";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { Link } from "react-router-dom";
 
 export const Hunt = () => {
-  const { primaryRole, isLoading: isLoadingRoles } = useNFTRoles();
-  
-  if (isLoadingRoles) {
-    return (
-      <div className="container mx-auto p-4 h-screen flex items-center justify-center">
-        <div className="animate-pulse text-center">
-          <h2 className="text-2xl font-bold mb-4">Loading role information...</h2>
-          <div className="h-4 w-32 bg-slate-700 rounded mx-auto"></div>
-        </div>
-      </div>
-    );
-  }
-
-  // If user has no NFT role, show access restriction
-  if (primaryRole === 'Unknown') {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <Card className="max-w-md w-full border-gray-800 bg-gray-900/80 backdrop-blur-sm">
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-3 mb-2">
-              <AlertTriangle className="h-6 w-6 text-toxic-neon" />
-              <CardTitle className="text-2xl text-white">Access Restricted</CardTitle>
-            </div>
-            <CardDescription className="text-gray-400">
-              You need a membership NFT to access the job marketplace
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-gray-300">
-            <p className="mb-4">
-              The job marketplace is only available to Sentinel, Survivor, and Bounty Hunter NFT holders.
-              Purchase an NFT to access exclusive jobs and earn rewards.
-            </p>
-          </CardContent>
-          <CardFooter className="pt-2">
-            <ToxicButton className="w-full" variant="primary" asChild>
-              <a href="/buy-membership-nft">Get Membership NFT</a>
-            </ToxicButton>
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-black">
       <div className="bg-gradient-to-r from-gray-900 to-black py-16 px-4 border-b border-gray-800">

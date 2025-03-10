@@ -1,56 +1,12 @@
 
 import React from "react";
-import { useNFTRoles } from "@/hooks/useNFTRoles";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, Target, Trophy, ArrowRight, Zap } from "lucide-react";
+import { Target, Trophy, ArrowRight, Zap } from "lucide-react";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { BountyCategories } from "@/components/bounty/BountyCategories";
 import { ReferralSystem } from "@/components/radiation/ReferralSystem";
 
 const BountyHunters = () => {
-  const { primaryRole, isLoading: isLoadingRoles } = useNFTRoles();
-  
-  if (isLoadingRoles) {
-    return (
-      <div className="container mx-auto p-4 h-screen flex items-center justify-center">
-        <div className="animate-pulse text-center">
-          <h2 className="text-2xl font-bold mb-4">Loading role information...</h2>
-          <div className="h-4 w-32 bg-slate-700 rounded mx-auto"></div>
-        </div>
-      </div>
-    );
-  }
-
-  // If user has no NFT role, show access restriction
-  if (primaryRole === 'Unknown') {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <Card className="max-w-md w-full border-gray-800 bg-gray-900/80 backdrop-blur-sm">
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-3 mb-2">
-              <AlertTriangle className="h-6 w-6 text-toxic-neon" />
-              <CardTitle className="text-2xl text-white">Access Restricted</CardTitle>
-            </div>
-            <CardDescription className="text-gray-400">
-              You need a membership NFT to access the bounty hunter marketplace
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-gray-300">
-            <p className="mb-4">
-              The bounty hunter marketplace is only available to Sentinel, Survivor, and Bounty Hunter NFT holders.
-              Purchase an NFT to access exclusive bounties and earn rewards.
-            </p>
-          </CardContent>
-          <CardFooter className="pt-2">
-            <ToxicButton className="w-full" variant="primary" asChild>
-              <a href="/buy-membership-nft">Get Membership NFT</a>
-            </ToxicButton>
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-black">
       <div className="bg-gradient-to-r from-gray-900 to-black py-16 px-4 border-b border-gray-800">
