@@ -1,35 +1,155 @@
 
-/**
- * Uploads data to IPFS
- * @param data The data to upload
- * @returns The IPFS URI
- */
-export async function uploadToIPFS(data: any): Promise<string> {
-  // In a production environment, this would use actual IPFS integration
-  // For now, simulate a successful upload
-  console.log("Uploading to IPFS:", data);
-  
-  // Create mock IPFS hash based on current timestamp
-  const mockIpfsHash = `ipfs://QmHash${Date.now().toString(16)}`;
-  
-  console.log("IPFS upload successful:", mockIpfsHash);
-  return mockIpfsHash;
-}
+import { Buffer } from 'buffer';
+import { ProposalMetadata } from '@/types/proposals';
+import { IPFSContent } from '@/types/content';
 
-/**
- * Fetches data from IPFS
- * @param uri The IPFS URI
- * @returns The fetched data
- */
-export async function fetchFromIPFS(uri: string): Promise<any> {
-  // In a production environment, this would fetch from actual IPFS
-  // For now, return a mock response
-  console.log("Fetching from IPFS:", uri);
-  
-  // Mock data structure
-  return {
-    name: "Mock IPFS Data",
-    description: "This is mock data that would normally be fetched from IPFS",
-    timestamp: Date.now()
-  };
-}
+// IPFS settings
+const IPFS_API_URL = 'https://api.pinata.cloud';
+const IPFS_GATEWAY_URL = 'https://blue-shaggy-halibut-668.mypinata.cloud/ipfs';
+
+// Pinata credentials
+const PINATA_CREDENTIALS = {
+  PINATA_API_KEY: 'c1395b5d3677c459fd05',
+  PINATA_API_SECRET: '87d9bb7ce78d82cc263059c8feb6df0d01fb53e2b9cfab1d364acf873331f53e'
+};
+
+export const getFromIPFS = async <T extends ProposalMetadata | IPFSContent>(
+  hash: string,
+  type: 'proposal' | 'content'
+): Promise<T> => {
+  try {
+    console.log('\n=== Starting IPFS Retrieval ===');
+    console.log('Getting data for hash:', hash);
+    
+    if (hash.startsWith('ipfs://')) {
+      hash = hash.substring(7);
+    }
+    
+    const gatewayUrl = `${IPFS_GATEWAY_URL}/${hash}`;
+    console.log('Fetching from IPFS gateway:', gatewayUrl);
+    
+    const response = await fetch(gatewayUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch from IPFS: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Data retrieved from IPFS:', data);
+    console.log('=== IPFS Retrieval Complete ===\n');
+    
+    return data as T;
+  } catch (error) {
+    console.error('Error in IPFS retrieval:', error);
+    throw error; // Propagate the error instead of returning mock data
+  }
+};
+
+export const uploadToIPFS = async <T extends object>(
+  content: T
+): Promise<string> => {
+  try {
+    console.log('\n=== Starting IPFS Upload ===');
+    console.log('Content to upload:', JSON.stringify(content, null, 2));
+    
+    const response = await fetch(`${IPFS_API_URL}/pinning/pinJSONToIPFS`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'pinata_api_key': PINATA_CREDENTIALS.PINATA_API_KEY,
+        'pinata_secret_api_key': PINATA_CREDENTIALS.PINATA_API_SECRET
+      },
+      body: JSON.stringify(content)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Pinata upload failed:', errorText);
+      throw new Error('Failed to upload to Pinata');
+    }
+    
+    const result = await response.json();
+    const ipfsHash = result.IpfsHash;
+    console.log('Upload successful! IPFS hash:', ipfsHash);
+    console.log('=== IPFS Upload Complete ===\n');
+    
+    return `ipfs://${ipfsHash}`;
+  } catch (error) {
+    console.error('Error uploading to IPFS:', error);
+    throw error; // Propagate the error instead of returning mock data
+  }
+};
+
+export const getModelFromIPFS = async (hash: string): Promise<string> => {
+  try {
+    console.log('\n=== Retrieving 3D Model from IPFS ===');
+    console.log('Model hash:', hash);
+    
+    if (hash.startsWith('ipfs://')) {
+      hash = hash.substring(7);
+    }
+    
+    // Return gateway URL
+    const gatewayUrl = `${IPFS_GATEWAY_URL}/${hash}`;
+    console.log('Gateway URL for model:', gatewayUrl);
+    console.log('=== Model Retrieval Complete ===\n');
+    
+    return gatewayUrl;
+  } catch (error) {
+    console.error('Error retrieving model from IPFS:', error);
+    throw error;
+  }
+};
+
+export const uploadModelToIPFS = async (
+  modelFile: File
+): Promise<string> => {
+  try {
+    console.log('\n=== Starting 3D Model Upload to IPFS ===');
+    console.log('Uploading model:', modelFile.name);
+    
+    const formData = new FormData();
+    formData.append('file', modelFile);
+    
+    const metadata = JSON.stringify({
+      name: modelFile.name,
+      keyvalues: {
+        contentType: modelFile.type,
+        size: modelFile.size.toString(),
+        uploadDate: new Date().toISOString()
+      }
+    });
+    
+    formData.append('pinataMetadata', metadata);
+    
+    const options = JSON.stringify({
+      cidVersion: 1
+    });
+    
+    formData.append('pinataOptions', options);
+    
+    const response = await fetch(`${IPFS_API_URL}/pinning/pinFileToIPFS`, {
+      method: 'POST',
+      headers: {
+        'pinata_api_key': PINATA_CREDENTIALS.PINATA_API_KEY,
+        'pinata_secret_api_key': PINATA_CREDENTIALS.PINATA_API_SECRET
+      },
+      body: formData
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Pinata upload failed:', errorText);
+      throw new Error('Failed to upload model to Pinata');
+    }
+    
+    const result = await response.json();
+    const ipfsHash = result.IpfsHash;
+    console.log('Model upload successful! IPFS hash:', ipfsHash);
+    console.log('=== 3D Model Upload Complete ===\n');
+    
+    return `ipfs://${ipfsHash}`;
+  } catch (error) {
+    console.error('Error uploading model to IPFS:', error);
+    throw error;
+  }
+};

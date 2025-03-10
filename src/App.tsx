@@ -21,7 +21,6 @@ import MarketplaceItemDetails from "./pages/MarketplaceItemDetails";
 import Hunt from "./pages/Hunt";
 import SettlementDetails from "./pages/SettlementDetails";
 import BountyManagement from "./pages/BountyManagement";
-import BountyCreate from "./pages/BountyCreate";
 import { Toaster } from "./components/ui/toaster";
 import { ResistanceWalletWidget } from "./components/wallet/ResistanceWalletWidget";
 
@@ -171,7 +170,6 @@ function Layout() {
         
         {/* Bounty management routes */}
         <Route path="/bounty/management" element={<BountyManagement />} />
-        <Route path="/bounty/create" element={<BountyCreate />} />
         
         {/* Command/Hunt routes */}
         <Route path="/referral" element={<ReferralRedirect />} />
