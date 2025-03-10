@@ -9,10 +9,11 @@ import {
   X, 
   ArrowRight 
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { ToxicButton } from "@/components/ui/toxic-button";
+import { ToxicCard } from "@/components/ui/toxic-card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { DrippingSlime } from "@/components/ui/dripping-slime";
 
 export type ProposalTemplateType = 
   | "rewardDistribution" 
@@ -127,6 +128,7 @@ interface ProposalTemplatesProps {
 
 export const ProposalTemplates = ({ onSelectTemplate }: ProposalTemplatesProps) => {
   const [selectedTemplate, setSelectedTemplate] = useState<ProposalTemplateType | null>(null);
+  const [hoveredTemplate, setHoveredTemplate] = useState<ProposalTemplateType | null>(null);
 
   const handleSelectTemplate = (template: ProposalTemplate) => {
     setSelectedTemplate(template.id);
@@ -134,32 +136,37 @@ export const ProposalTemplates = ({ onSelectTemplate }: ProposalTemplatesProps) 
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-white mb-2">Choose a Proposal Template</h2>
+    <div className="space-y-6 relative">
+      <div className="relative z-10">
+        <h2 className="text-xl font-bold text-toxic-neon toxic-glow mb-2">Choose a Proposal Template</h2>
         <p className="text-white/60">Select a template to create a governance proposal</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+        <DrippingSlime position="both" dripsCount={6} className="absolute inset-0 pointer-events-none" />
+        
         {PROPOSAL_TEMPLATES.map((template) => (
-          <Card
+          <ToxicCard
             key={template.id}
             className={cn(
               "relative border cursor-pointer transition-all duration-200 hover:border-toxic-neon/70 hover:shadow-[0_0_15px_rgba(57,255,20,0.2)] bg-black/60",
               selectedTemplate === template.id 
                 ? "border-toxic-neon shadow-[0_0_20px_rgba(57,255,20,0.3)]" 
                 : "border-white/10",
-              template.isEmergency ? "border-red-500/30 hover:border-red-500/70" : ""
+              template.isEmergency ? "border-red-500/30 hover:border-red-500/70" : "",
+              hoveredTemplate === template.id ? "transform scale-[1.02] transition-transform duration-300" : ""
             )}
             onClick={() => handleSelectTemplate(template)}
+            onMouseEnter={() => setHoveredTemplate(template.id)}
+            onMouseLeave={() => setHoveredTemplate(null)}
           >
             {template.isRecommended && (
-              <div className="absolute -top-3 -right-3 bg-toxic-neon text-black text-xs font-bold py-1 px-3 rounded-full">
+              <div className="absolute -top-3 -right-3 bg-toxic-neon text-black text-xs font-bold py-1 px-3 rounded-full animate-pulse">
                 Recommended
               </div>
             )}
             {template.isEmergency && (
-              <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs font-bold py-1 px-3 rounded-full">
+              <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs font-bold py-1 px-3 rounded-full flash-beacon">
                 Emergency
               </div>
             )}
@@ -186,12 +193,12 @@ export const ProposalTemplates = ({ onSelectTemplate }: ProposalTemplatesProps) 
                 ))}
               </div>
             </div>
-          </Card>
+          </ToxicCard>
         ))}
       </div>
 
       <div className="flex justify-end">
-        <Button
+        <ToxicButton
           className="bg-toxic-neon hover:bg-toxic-neon/90 text-black font-medium gap-2"
           disabled={!selectedTemplate}
           onClick={() => {
@@ -200,7 +207,7 @@ export const ProposalTemplates = ({ onSelectTemplate }: ProposalTemplatesProps) 
           }}
         >
           Continue with Template <ArrowRight className="w-4 h-4" />
-        </Button>
+        </ToxicButton>
       </div>
     </div>
   );
