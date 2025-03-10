@@ -14,9 +14,15 @@ const BOUNTIES_DATA = [
     totalBudget: 500,
     usedBudget: 125,
     successCount: 25,
+    hunterCount: 8,
     expiresAt: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
     status: "active",
-    partyAddress: "0x1234567890123456789012345678901234567890"
+    partyAddress: "0x1234567890123456789012345678901234567890",
+    eligibleNFTs: ["0x123", "0x456"],
+    requireVerification: true,
+    allowPublicHunters: true,
+    maxReferralsPerHunter: 10,
+    bountyType: "nft_referral"
   },
   {
     id: "b2",
@@ -26,9 +32,15 @@ const BOUNTIES_DATA = [
     totalBudget: 1000,
     usedBudget: 200,
     successCount: 20,
+    hunterCount: 5,
     expiresAt: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 15, // 15 days from now
     status: "active",
-    partyAddress: null
+    partyAddress: null,
+    eligibleNFTs: [],
+    requireVerification: false,
+    allowPublicHunters: true,
+    maxReferralsPerHunter: 5,
+    bountyType: "token_referral"
   },
   {
     id: "b3",
@@ -38,9 +50,15 @@ const BOUNTIES_DATA = [
     totalBudget: 200,
     usedBudget: 46,
     successCount: 23,
+    hunterCount: 12,
     expiresAt: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 60, // 60 days from now
     status: "active",
-    partyAddress: null
+    partyAddress: null,
+    eligibleNFTs: [],
+    requireVerification: true,
+    allowPublicHunters: false,
+    maxReferralsPerHunter: 20,
+    bountyType: "social_media"
   }
 ];
 
@@ -52,10 +70,23 @@ export interface Bounty {
   totalBudget: number;
   usedBudget: number;
   successCount: number;
+  hunterCount: number;
   expiresAt: number;
   status: "active" | "paused" | "expired" | "completed";
   partyAddress: string | null;
+  eligibleNFTs: string[];
+  requireVerification: boolean;
+  allowPublicHunters: boolean;
+  maxReferralsPerHunter: number;
+  bountyType: "nft_referral" | "token_referral" | "social_media";
 }
+
+// Add a computed property for remaining budget
+Object.defineProperty(Bounty.prototype, "remainingBudget", {
+  get: function() {
+    return this.totalBudget - this.usedBudget;
+  }
+});
 
 export interface BountyCreationParams {
   name: string;
@@ -72,13 +103,29 @@ export interface BountyCreationParams {
   bountyType: "nft_referral" | "token_referral" | "social_media";
 }
 
-export const getBounties = async (): Promise<Bounty[]> => {
+export interface BountyOptions {
+  includeExpired?: boolean;
+  includeCompleted?: boolean;
+}
+
+export const getBounties = async (status?: string): Promise<Bounty[]> => {
   // In a real app, this would fetch from an API or blockchain
   return new Promise(resolve => {
     setTimeout(() => {
-      resolve([...BOUNTIES_DATA]);
+      if (status) {
+        const filteredBounties = BOUNTIES_DATA.filter(b => b.status === status) as Bounty[];
+        resolve(filteredBounties);
+      } else {
+        resolve(BOUNTIES_DATA as Bounty[]);
+      }
     }, 800);
   });
+};
+
+export const getBounty = async (bountyId: string): Promise<Bounty | null> => {
+  const bounties = await getBounties();
+  const bounty = bounties.find(b => b.id === bountyId);
+  return bounty || null;
 };
 
 export const createBounty = async (
@@ -103,13 +150,19 @@ export const createBounty = async (
       totalBudget: params.totalBudget,
       usedBudget: 0,
       successCount: 0,
+      hunterCount: 0,
       expiresAt: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * params.duration),
       status: "active",
-      partyAddress: null
+      partyAddress: null,
+      eligibleNFTs: params.eligibleNFTs,
+      requireVerification: params.requireVerification,
+      allowPublicHunters: params.allowPublicHunters,
+      maxReferralsPerHunter: params.maxReferralsPerHunter,
+      bountyType: params.bountyType
     };
     
     // Add to our mock data
-    BOUNTIES_DATA.push(newBounty);
+    BOUNTIES_DATA.push(newBounty as any);
     
     // Simulate a delay for API call
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -212,4 +265,89 @@ export const deployBountyToBlockchain = async (
       ]
     });
   }
+};
+
+// Functions needed by other components
+export const recordSuccessfulReferral = async (
+  bountyId: string,
+  referrerId: string,
+  referredUser: string
+): Promise<boolean> => {
+  console.log(`Recording successful referral for bounty ${bountyId} by ${referrerId} for user ${referredUser}`);
+  
+  const bounty = await getBounty(bountyId);
+  if (!bounty) return false;
+  
+  // In a real app, this would interact with the smart contract
+  // For now, update the mock data
+  const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
+  if (bountyIndex !== -1) {
+    BOUNTIES_DATA[bountyIndex].successCount += 1;
+    BOUNTIES_DATA[bountyIndex].usedBudget += BOUNTIES_DATA[bountyIndex].rewardAmount;
+  }
+  
+  // Simulate a delay for blockchain transaction
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  return true;
+};
+
+export const distributeRewards = async (
+  bountyId: string,
+  wallet: any
+): Promise<boolean> => {
+  console.log(`Distributing rewards for bounty ${bountyId}`);
+  
+  if (!wallet) {
+    throw new Error("Wallet not connected");
+  }
+  
+  // Simulate a delay for blockchain transaction
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  return true;
+};
+
+export const updateBountyStatus = async (
+  bountyId: string,
+  newStatus: "active" | "paused" | "expired" | "completed",
+  wallet: any
+): Promise<boolean> => {
+  console.log(`Updating bounty ${bountyId} status to ${newStatus}`);
+  
+  if (!wallet) {
+    throw new Error("Wallet not connected");
+  }
+  
+  const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
+  if (bountyIndex !== -1) {
+    BOUNTIES_DATA[bountyIndex].status = newStatus;
+  }
+  
+  // Simulate a delay for blockchain transaction
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  return true;
+};
+
+export const fundBounty = async (
+  bountyId: string,
+  additionalFunds: number,
+  wallet: any
+): Promise<boolean> => {
+  console.log(`Adding ${additionalFunds} to bounty ${bountyId}`);
+  
+  if (!wallet) {
+    throw new Error("Wallet not connected");
+  }
+  
+  const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
+  if (bountyIndex !== -1) {
+    BOUNTIES_DATA[bountyIndex].totalBudget += additionalFunds;
+  }
+  
+  // Simulate a delay for blockchain transaction
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  return true;
 };

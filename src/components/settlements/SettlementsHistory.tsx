@@ -114,7 +114,7 @@ export const SettlementsHistory = () => {
                   </div>
                   <div className="flex items-center gap-1.5">
                     <DollarSign className="w-3.5 h-3.5" />
-                    <span>{bounty.remainingBudget} MATIC remaining</span>
+                    <span>{bounty.totalBudget - bounty.usedBudget} MATIC remaining</span>
                   </div>
                 </div>
               </div>

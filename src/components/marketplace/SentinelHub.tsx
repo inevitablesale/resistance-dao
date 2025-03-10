@@ -85,6 +85,11 @@ export const SentinelHub: React.FC = () => {
     setSelectedTemplate(null);
     setActiveTab("create");
   };
+
+  // Calculate remaining budget for a bounty
+  const getRemainingBudget = (bounty: Bounty) => {
+    return bounty.totalBudget - bounty.usedBudget;
+  };
   
   return (
     <div className="space-y-6">
@@ -195,7 +200,7 @@ export const SentinelHub: React.FC = () => {
                           </div>
                           <div>
                             <p className="text-gray-400">Remaining</p>
-                            <p className="text-toxic-neon font-mono">{bounty.remainingBudget} MATIC</p>
+                            <p className="text-toxic-neon font-mono">{getRemainingBudget(bounty)} MATIC</p>
                           </div>
                           <div>
                             <p className="text-gray-400">Successful</p>
@@ -364,7 +369,7 @@ export const SentinelHub: React.FC = () => {
                         </div>
                         <div>
                           <p className="text-gray-400">Remaining</p>
-                          <p className="text-toxic-neon font-mono">{bounty.remainingBudget} MATIC</p>
+                          <p className="text-toxic-neon font-mono">{getRemainingBudget(bounty)} MATIC</p>
                         </div>
                         <div>
                           <p className="text-gray-400">Successful</p>
