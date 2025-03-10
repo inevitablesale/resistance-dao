@@ -6,6 +6,7 @@ import { Shield, Target, Biohazard } from 'lucide-react';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
 import { getCharactersGroupedByRole } from '@/services/characterMetadata';
 import { type OpenSeaNFT } from '@/services/openseaService';
+import { ModelPreview } from '@/components/marketplace/ModelPreview';
 
 interface CharacterShowcaseProps {
   className?: string;
@@ -50,6 +51,78 @@ export const CharacterShowcase: React.FC<CharacterShowcaseProps> = ({
     navigate(`/nft/${tokenId}`);
   };
 
+  // Enhanced NFT card with 3D model and radiation cloud
+  const EnhancedNFTCard = ({ nft, radiation }: { nft: OpenSeaNFT, radiation: number }) => {
+    return (
+      <div className="bg-black/70 border border-toxic-neon/30 hover:border-toxic-neon/60 transition-all cursor-pointer rounded-lg overflow-hidden"
+        onClick={() => handleViewNFT(nft.identifier)}>
+        <div className="h-40 bg-gradient-to-b from-toxic-neon/20 to-black/60 relative">
+          {nft.animation_url ? (
+            <ModelPreview 
+              modelUrl={nft.animation_url}
+              height="100%"
+              width="100%"
+              autoRotate={true}
+              radiationLevel={radiation}
+              useRadiationCloud={true}
+              radiationCloudUrl="bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
+              revealValue={20} // Show just a hint of the character
+            />
+          ) : nft.image_url ? (
+            <img 
+              src={nft.image_url} 
+              alt={nft.name || `NFT #${nft.identifier}`} 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "/placeholder.svg";
+              }}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <Biohazard className="h-12 w-12 text-toxic-neon/30" />
+            </div>
+          )}
+          
+          <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60">
+            <div className="flex items-center justify-between">
+              <ToxicBadge variant="outline" className="flex items-center gap-1 text-xs">
+                <Biohazard className="h-4 w-4 text-toxic-neon" />
+                <span>#{nft.identifier}</span>
+              </ToxicBadge>
+              <span className={`text-xs font-mono ${radiation > 70 ? "text-apocalypse-red" : radiation > 40 ? "text-yellow-400" : "text-toxic-neon"}`}>
+                RAD {radiation}%
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="p-3">
+          <h3 className="text-toxic-neon font-mono text-sm truncate">
+            {nft.name || `Wasteland NFT #${nft.identifier}`}
+          </h3>
+          
+          {nft.traits && nft.traits.find(t => t.trait_type === "Role") && (
+            <div className="text-xs text-white/70 mt-1">
+              Role: <span className="text-toxic-neon">
+                {nft.traits.find(t => t.trait_type === "Role")?.value}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const getRadiationLevel = (nft: OpenSeaNFT): number => {
+    const radiationTrait = nft.traits.find(trait => 
+      trait.trait_type.toLowerCase() === 'radiation' || 
+      trait.trait_type.toLowerCase() === 'radiation level'
+    );
+    
+    return radiationTrait ? parseInt(radiationTrait.value, 10) : Math.floor(Math.random() * 100);
+  };
+
   return (
     <div className={`mb-8 ${className}`}>
       <h2 className="text-xl font-mono text-toxic-neon mb-4 flex items-center gap-2">
@@ -74,11 +147,10 @@ export const CharacterShowcase: React.FC<CharacterShowcaseProps> = ({
               ))
             ) : (
               characters.sentinels.map(nft => (
-                <NFTCard 
+                <EnhancedNFTCard 
                   key={nft.identifier} 
-                  nft={nft} 
-                  onClick={() => handleViewNFT(nft.identifier)}
-                  className="transition-transform hover:scale-105"
+                  nft={nft}
+                  radiation={getRadiationLevel(nft)}
                 />
               ))
             )}
@@ -101,11 +173,10 @@ export const CharacterShowcase: React.FC<CharacterShowcaseProps> = ({
               ))
             ) : (
               characters.survivors.map(nft => (
-                <NFTCard 
+                <EnhancedNFTCard 
                   key={nft.identifier} 
-                  nft={nft} 
-                  onClick={() => handleViewNFT(nft.identifier)}
-                  className="transition-transform hover:scale-105"
+                  nft={nft}
+                  radiation={getRadiationLevel(nft)}
                 />
               ))
             )}
@@ -128,11 +199,10 @@ export const CharacterShowcase: React.FC<CharacterShowcaseProps> = ({
               ))
             ) : (
               characters.bountyHunters.map(nft => (
-                <NFTCard 
+                <EnhancedNFTCard 
                   key={nft.identifier} 
-                  nft={nft} 
-                  onClick={() => handleViewNFT(nft.identifier)}
-                  className="transition-transform hover:scale-105"
+                  nft={nft}
+                  radiation={getRadiationLevel(nft)}
                 />
               ))
             )}

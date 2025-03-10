@@ -1,81 +1,43 @@
 
+import { type OpenSeaNFT } from "@/services/openseaService";
 import { toast } from "@/components/ui/use-toast";
 
-// Character Roles
-export enum NFTRole {
-  SENTINEL = "SENTINEL",
-  SURVIVOR = "SURVIVOR",
-  BOUNTY_HUNTER = "BOUNTY_HUNTER"
-}
+// Character types
+export type CharacterRole = 'Sentinel' | 'Survivor' | 'Bounty Hunter';
 
-// Character Type definition
-export interface CharacterType {
-  role: NFTRole;
-  maxSupply: number;
-  minted: number;
-  name: string;
-  metadataCID: string;
-}
-
-// Character metadata interface
 export interface CharacterMetadata {
+  id: number;
+  tokenId: string;
   name: string;
   description: string;
-  image: string;
-  attributes: Array<{
+  image_url: string;
+  model_url?: string;
+  role: CharacterRole;
+  radiation_level: number;
+  rarity: string;
+  traits: Array<{
     trait_type: string;
-    value: string | number;
+    value: string;
   }>;
 }
 
-// Define constants for character type supplies
-const SENTINEL_PER_TYPE = 100;
-const OTHER_ROLES_PER_TYPE = 150;
-
-// Character types with metadata CIDs from Pinata
-export const characterTypes: Record<number, CharacterType> = {
-  // SENTINELS (Types 1..7)
-  1: { role: NFTRole.SENTINEL, maxSupply: SENTINEL_PER_TYPE, minted: 0, name: "DAO Enforcer", metadataCID: "bafkreibo6bk5dezlsii7imuabncv7tihxwbi4f4urds75l7nuy2rnxfkru" },
-  2: { role: NFTRole.SENTINEL, maxSupply: SENTINEL_PER_TYPE, minted: 0, name: "Insolvent Medic", metadataCID: "bafkreid7oobbrlbxcnnigfcwfbgr5m3dmsl6wemsuaxluzd54ioclneubq" },
-  3: { role: NFTRole.SENTINEL, maxSupply: SENTINEL_PER_TYPE, minted: 0, name: "Liquidation Phantom", metadataCID: "bafkreicfsovqdpu3byxvyfev4y7xdmqz3hggewsuyx4brifoscercektpy" },
-  4: { role: NFTRole.SENTINEL, maxSupply: SENTINEL_PER_TYPE, minted: 0, name: "Margin Call Marauder", metadataCID: "bafkreiaasojzt45tw5jkohgwvibtth6nl4jlognknercfpgir6zjpw335u" },
-  5: { role: NFTRole.SENTINEL, maxSupply: SENTINEL_PER_TYPE, minted: 0, name: "Overleveraged Berserker", metadataCID: "bafkreihigf4xjzy4jrqkm7wsxxdtokwew4m3njdxt6hheb67nuit47byta" },
-  6: { role: NFTRole.SENTINEL, maxSupply: SENTINEL_PER_TYPE, minted: 0, name: "Rugged Nomad", metadataCID: "bafkreibhb3upqoifbl77jbrqxp2puudelcrjf45jnfkdqipef6skzpewti" },
-  7: { role: NFTRole.SENTINEL, maxSupply: SENTINEL_PER_TYPE, minted: 0, name: "Yield Farm Executioner", metadataCID: "bafkreibo5yjsmqlt2cc7olqeuz2wxref7oe54bmallzl4mgwkt3xsnjlqi" },
-  // SURVIVORS (Types 8..10)
-  8: { role: NFTRole.SURVIVOR, maxSupply: OTHER_ROLES_PER_TYPE, minted: 0, name: "Rugpull Veteran", metadataCID: "bafkreiek2ihnc7fmpwzseitea2vflvwdmm6qvn4vydd5ww6wgipntf3w7a" },
-  9: { role: NFTRole.SURVIVOR, maxSupply: OTHER_ROLES_PER_TYPE, minted: 0, name: "Blacklist Exile", metadataCID: "bafkreica5ugau5cjah7hkwz4ko36oqxkg2v4swqpxnhzi7z4wgftl76q5m" },
-  10: { role: NFTRole.SURVIVOR, maxSupply: OTHER_ROLES_PER_TYPE, minted: 0, name: "Failed Validator", metadataCID: "bafkreigw5k75stzjhamdjtwlssbolhxepbeglfs3qoyowgu2q4n2fnfszy" },
-  // BOUNTY HUNTERS (Types 11..16)
-  11: { role: NFTRole.BOUNTY_HUNTER, maxSupply: OTHER_ROLES_PER_TYPE, minted: 0, name: "Chain Reaper", metadataCID: "bafkreifepvbd2shm4uxfysdxtva5mjs7fqnxbxehutcoqfblmcgtp7h7ka" },
-  12: { role: NFTRole.BOUNTY_HUNTER, maxSupply: OTHER_ROLES_PER_TYPE, minted: 0, name: "Forked Hunter", metadataCID: "bafkreierebrs3yw24r7wgkezgok6lhbiwqwwgen5fnfqxm6cqul644x3fe" },
-  13: { role: NFTRole.BOUNTY_HUNTER, maxSupply: OTHER_ROLES_PER_TYPE, minted: 0, name: "Liquidated Tracker", metadataCID: "bafkreiajc2mwtirx3423mbf55scuniqlwh3ph2cglk7y2nbd764r6g6ine" },
-  14: { role: NFTRole.BOUNTY_HUNTER, maxSupply: OTHER_ROLES_PER_TYPE, minted: 0, name: "Oracle Stalker", metadataCID: "bafkreieytk2bsis7fdavqu74t3dgquew36ppycxnlbxt6dgzudjakcrexq" },
-  15: { role: NFTRole.BOUNTY_HUNTER, maxSupply: OTHER_ROLES_PER_TYPE, minted: 0, name: "Slippage Sniper", metadataCID: "bafkreidrcpfmaken4gsbeweqthzrg3bkcxi344bftqwndiapeo6pm4msda" },
-  16: { role: NFTRole.BOUNTY_HUNTER, maxSupply: OTHER_ROLES_PER_TYPE, minted: 0, name: "Sandwich Hunter", metadataCID: "bafkreigxfbvntll522na4la6b4cdvp5g74jztgjhgdmz2b5uv7uaieywie" }
-};
-
-// Convert characterType to OpenSeaNFT format for compatibility with existing components
-export const convertToOpenSeaNFT = (characterType: CharacterType, typeId: number, metadata: CharacterMetadata) => {
+// Convert character metadata to OpenSeaNFT format for compatibility
+export const convertToNFT = (character: CharacterMetadata): OpenSeaNFT => {
   return {
-    identifier: typeId.toString(),
+    identifier: character.tokenId,
     collection: "resistance-wasteland",
     contract: "0xdD44d15f54B799e940742195e97A30165A1CD285",
     token_standard: "ERC721",
-    name: characterType.name,
-    description: metadata.description || `A ${characterType.role.toLowerCase()} in the post-apocalyptic wasteland.`,
-    image_url: metadata.image || `/placeholder.svg`,
-    metadata_url: `ipfs://${characterType.metadataCID}`,
+    name: character.name,
+    description: character.description,
+    image_url: character.image_url,
+    metadata_url: "",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     is_disabled: false,
     is_nsfw: false,
-    traits: metadata.attributes.map(attr => ({
-      trait_type: attr.trait_type,
-      value: attr.value.toString(),
-      display_type: null,
-    })),
-    animation_url: null,
+    traits: character.traits,
+    animation_url: character.model_url || null,
     is_suspicious: false,
     creator: null,
     owners: [
@@ -85,109 +47,385 @@ export const convertToOpenSeaNFT = (characterType: CharacterType, typeId: number
       },
     ],
     rarity: {
-      rank: Math.floor(Math.random() * 1000) + 1,
+      rank: Math.floor(Math.random() * 100) + 1,
       score: Math.random() * 100,
       total: 1000,
     },
   };
 };
 
-// Cache for character metadata to avoid repeated fetching
-const metadataCache: Record<string, CharacterMetadata> = {};
+// Character data - includes our predefined characters
+const characterData: CharacterMetadata[] = [
+  {
+    id: 1,
+    tokenId: "1",
+    name: "Sentinel Alpha",
+    description: "Leader of the Sentinel faction, protector of the wasteland survivors.",
+    image_url: "/images/characters/sentinel-01.jpg",
+    model_url: "bafybeibekhofrvk7beimkculpeyum4wvcvyd7rhsst4wppnrwyqvw5i4ke",
+    role: "Sentinel",
+    radiation_level: 25,
+    rarity: "Legendary",
+    traits: [
+      { trait_type: "Role", value: "Sentinel" },
+      { trait_type: "Radiation Level", value: "25" },
+      { trait_type: "Strength", value: "9" },
+      { trait_type: "Agility", value: "7" },
+      { trait_type: "Intelligence", value: "8" },
+      { trait_type: "Leadership", value: "10" },
+    ]
+  },
+  {
+    id: 2,
+    tokenId: "2",
+    name: "Survivor Echo",
+    description: "A resourceful survivor who has adapted to the toxic wasteland.",
+    image_url: "/images/characters/survivor-01.jpg",
+    model_url: "bafybeihpgxrm2ichhfyrwkpni5omrdnkomxktv5uybjyqvuagoe73mn7bu",
+    role: "Survivor",
+    radiation_level: 45,
+    rarity: "Rare",
+    traits: [
+      { trait_type: "Role", value: "Survivor" },
+      { trait_type: "Radiation Level", value: "45" },
+      { trait_type: "Strength", value: "6" },
+      { trait_type: "Agility", value: "8" },
+      { trait_type: "Intelligence", value: "7" },
+      { trait_type: "Resourcefulness", value: "9" },
+    ]
+  },
+  {
+    id: 3,
+    tokenId: "3",
+    name: "Bounty Hunter Vex",
+    description: "A ruthless hunter who tracks down targets for payment.",
+    image_url: "/images/characters/bounty-hunter-01.jpg",
+    model_url: "bafybeidymb7wlx2clkvdnbxsyb5jfg46i6bgu4zmnl5tt2f7lpjbyvpjtm",
+    role: "Bounty Hunter",
+    radiation_level: 60,
+    rarity: "Epic",
+    traits: [
+      { trait_type: "Role", value: "Bounty Hunter" },
+      { trait_type: "Radiation Level", value: "60" },
+      { trait_type: "Strength", value: "8" },
+      { trait_type: "Agility", value: "9" },
+      { trait_type: "Intelligence", value: "6" },
+      { trait_type: "Lethality", value: "9" },
+    ]
+  },
+  {
+    id: 4,
+    tokenId: "4",
+    name: "Sentinel Guardian",
+    description: "A dedicated protector of the wasteland safe zones.",
+    image_url: "/images/characters/sentinel-02.jpg",
+    model_url: "bafybeibdfykzadcbcplapkgpqcvtieswlyvzv2qgf6k7yzmvxdrzq3ar2q",
+    role: "Sentinel",
+    radiation_level: 35,
+    rarity: "Uncommon",
+    traits: [
+      { trait_type: "Role", value: "Sentinel" },
+      { trait_type: "Radiation Level", value: "35" },
+      { trait_type: "Strength", value: "8" },
+      { trait_type: "Agility", value: "6" },
+      { trait_type: "Intelligence", value: "7" },
+      { trait_type: "Resilience", value: "9" },
+    ]
+  },
+  {
+    id: 5,
+    tokenId: "5",
+    name: "Survivor Nova",
+    description: "A survivor with immunity to certain radiation effects.",
+    image_url: "/images/characters/survivor-02.jpg",
+    model_url: "bafybeicfmxnp43c2v5rhuuh6riyxxhyb2gmnkulzgr7fxnlpwsxcvx35ry",
+    role: "Survivor",
+    radiation_level: 80,
+    rarity: "Epic",
+    traits: [
+      { trait_type: "Role", value: "Survivor" },
+      { trait_type: "Radiation Level", value: "80" },
+      { trait_type: "Strength", value: "5" },
+      { trait_type: "Agility", value: "7" },
+      { trait_type: "Intelligence", value: "9" },
+      { trait_type: "Radiation Resistance", value: "10" },
+    ]
+  },
+  {
+    id: 6,
+    tokenId: "6",
+    name: "Bounty Hunter Raze",
+    description: "An expert tracker who never fails to find their target.",
+    image_url: "/images/characters/bounty-hunter-02.jpg",
+    model_url: "bafybeiakow7qyvh3jtn6vdq4sqcmzkqyjmcpxcnzxgdeipn6kd3ulrskv4",
+    role: "Bounty Hunter",
+    radiation_level: 50,
+    rarity: "Rare",
+    traits: [
+      { trait_type: "Role", value: "Bounty Hunter" },
+      { trait_type: "Radiation Level", value: "50" },
+      { trait_type: "Strength", value: "7" },
+      { trait_type: "Agility", value: "10" },
+      { trait_type: "Intelligence", value: "8" },
+      { trait_type: "Tracking", value: "10" },
+    ]
+  },
+  {
+    id: 7,
+    tokenId: "7",
+    name: "Sentinel Warden",
+    description: "A tech-enhanced sentinel with advanced combat capabilities.",
+    image_url: "/images/characters/sentinel-03.jpg",
+    model_url: "bafybeicrn5lh7kls7qtfbx3hbgqseyrrbrmnc7kxzgy7y54ygxgslpw6ba",
+    role: "Sentinel",
+    radiation_level: 30,
+    rarity: "Legendary",
+    traits: [
+      { trait_type: "Role", value: "Sentinel" },
+      { trait_type: "Radiation Level", value: "30" },
+      { trait_type: "Strength", value: "9" },
+      { trait_type: "Agility", value: "8" },
+      { trait_type: "Intelligence", value: "9" },
+      { trait_type: "Tech Mastery", value: "10" },
+    ]
+  },
+  {
+    id: 8,
+    tokenId: "8",
+    name: "Survivor Ghost",
+    description: "A stealthy survivor who has mastered the art of remaining unseen.",
+    image_url: "/images/characters/survivor-03.jpg",
+    model_url: "bafybeiekpitgwfjthioaglxhwxtui5iivz6rmttoibgud5eygws3uq5peu",
+    role: "Survivor",
+    radiation_level: 40,
+    rarity: "Uncommon",
+    traits: [
+      { trait_type: "Role", value: "Survivor" },
+      { trait_type: "Radiation Level", value: "40" },
+      { trait_type: "Strength", value: "6" },
+      { trait_type: "Agility", value: "10" },
+      { trait_type: "Intelligence", value: "8" },
+      { trait_type: "Stealth", value: "10" },
+    ]
+  },
+  {
+    id: 9,
+    tokenId: "9",
+    name: "Bounty Hunter Null",
+    description: "A mysterious hunter with a perfect record of successful captures.",
+    image_url: "/images/characters/bounty-hunter-03.jpg",
+    model_url: "bafybeicm5qw5kso35vebgxakvspj3qsofpkmuhvpxotwsk5rprq5lqmpbm",
+    role: "Bounty Hunter",
+    radiation_level: 70,
+    rarity: "Legendary",
+    traits: [
+      { trait_type: "Role", value: "Bounty Hunter" },
+      { trait_type: "Radiation Level", value: "70" },
+      { trait_type: "Strength", value: "9" },
+      { trait_type: "Agility", value: "9" },
+      { trait_type: "Intelligence", value: "9" },
+      { trait_type: "Adaptability", value: "10" },
+    ]
+  },
+  {
+    id: 10,
+    tokenId: "10",
+    name: "Sentinel Forge",
+    description: "A sentinel specialized in repairing and building technology.",
+    image_url: "/images/characters/sentinel-04.jpg",
+    model_url: "bafybeigbvfvhlsb72pxdmmupidmef2yocfavs4ldnbfkp7vbk7fvrz6wqq",
+    role: "Sentinel",
+    radiation_level: 20,
+    rarity: "Common",
+    traits: [
+      { trait_type: "Role", value: "Sentinel" },
+      { trait_type: "Radiation Level", value: "20" },
+      { trait_type: "Strength", value: "8" },
+      { trait_type: "Agility", value: "5" },
+      { trait_type: "Intelligence", value: "10" },
+      { trait_type: "Engineering", value: "10" },
+    ]
+  },
+  {
+    id: 11,
+    tokenId: "11",
+    name: "Survivor Drift",
+    description: "A nomadic survivor who never stays in one place for long.",
+    image_url: "/images/characters/survivor-04.jpg",
+    model_url: "bafybeicfsmttgshkn2q3mlj4vctmwb7xoxnfzwdmhlefn7snvr2j3x4q5m",
+    role: "Survivor",
+    radiation_level: 55,
+    rarity: "Rare",
+    traits: [
+      { trait_type: "Role", value: "Survivor" },
+      { trait_type: "Radiation Level", value: "55" },
+      { trait_type: "Strength", value: "7" },
+      { trait_type: "Agility", value: "9" },
+      { trait_type: "Intelligence", value: "8" },
+      { trait_type: "Survival", value: "10" },
+    ]
+  },
+  {
+    id: 12,
+    tokenId: "12",
+    name: "Bounty Hunter Cross",
+    description: "A strategic hunter who plans every move with precision.",
+    image_url: "/images/characters/bounty-hunter-04.jpg",
+    model_url: "bafybeidiuujaqoq2sjfwh7u6j3sveavgfyv7g2vr35vnqgvb3sge42iyui",
+    role: "Bounty Hunter",
+    radiation_level: 40,
+    rarity: "Uncommon",
+    traits: [
+      { trait_type: "Role", value: "Bounty Hunter" },
+      { trait_type: "Radiation Level", value: "40" },
+      { trait_type: "Strength", value: "7" },
+      { trait_type: "Agility", value: "7" },
+      { trait_type: "Intelligence", value: "10" },
+      { trait_type: "Strategy", value: "9" },
+    ]
+  },
+  {
+    id: 13,
+    tokenId: "13",
+    name: "Sentinel Pulse",
+    description: "A sentinel with enhanced vision who can detect radiation fluctuations.",
+    image_url: "/images/characters/sentinel-05.jpg",
+    model_url: "bafybeicvvl64jcbdcnj6p4pnlefutcpd6mwwndqnz7ymqfifzkkszk5zl4",
+    role: "Sentinel",
+    radiation_level: 45,
+    rarity: "Epic",
+    traits: [
+      { trait_type: "Role", value: "Sentinel" },
+      { trait_type: "Radiation Level", value: "45" },
+      { trait_type: "Strength", value: "6" },
+      { trait_type: "Agility", value: "7" },
+      { trait_type: "Intelligence", value: "9" },
+      { trait_type: "Perception", value: "10" },
+    ]
+  },
+  {
+    id: 14,
+    tokenId: "14",
+    name: "Survivor Spark",
+    description: "A survivor who harnesses radiation to power salvaged technology.",
+    image_url: "/images/characters/survivor-05.jpg",
+    model_url: "bafybeib5n4g7qixwugrbipaa2o6h6gr4mvagxvyxrja565mbbzod5avtv4",
+    role: "Survivor",
+    radiation_level: 75,
+    rarity: "Legendary",
+    traits: [
+      { trait_type: "Role", value: "Survivor" },
+      { trait_type: "Radiation Level", value: "75" },
+      { trait_type: "Strength", value: "5" },
+      { trait_type: "Agility", value: "6" },
+      { trait_type: "Intelligence", value: "10" },
+      { trait_type: "Energy Manipulation", value: "9" },
+    ]
+  },
+  {
+    id: 15,
+    tokenId: "15",
+    name: "Bounty Hunter Shadow",
+    description: "A hunter who operates only at night, using darkness as cover.",
+    image_url: "/images/characters/bounty-hunter-05.jpg",
+    model_url: "bafybeihmbhjsik7iw7nwlys4ckxdhaiwixg5y6odgepvogolj7xkrlxgm4",
+    role: "Bounty Hunter",
+    radiation_level: 65,
+    rarity: "Epic",
+    traits: [
+      { trait_type: "Role", value: "Bounty Hunter" },
+      { trait_type: "Radiation Level", value: "65" },
+      { trait_type: "Strength", value: "8" },
+      { trait_type: "Agility", value: "10" },
+      { trait_type: "Intelligence", value: "7" },
+      { trait_type: "Stealth", value: "10" },
+    ]
+  },
+  {
+    id: 16,
+    tokenId: "16",
+    name: "Sentinel Nexus",
+    description: "The most advanced sentinel, with unique radiation immunity.",
+    image_url: "/images/characters/sentinel-06.jpg",
+    model_url: "bafybeid7rxuopx5r2p2mbtvchzpnqwwphqtx22zs7coyhcw33csd6l24vy",
+    role: "Sentinel",
+    radiation_level: 90,
+    rarity: "Mythic",
+    traits: [
+      { trait_type: "Role", value: "Sentinel" },
+      { trait_type: "Radiation Level", value: "90" },
+      { trait_type: "Strength", value: "10" },
+      { trait_type: "Agility", value: "9" },
+      { trait_type: "Intelligence", value: "10" },
+      { trait_type: "Augmentation", value: "10" },
+    ]
+  },
+];
 
-// Function to fetch character metadata from Pinata
-export const fetchCharacterMetadata = async (cid: string): Promise<CharacterMetadata> => {
+// Get all the characters
+export const getAllCharacters = (): Promise<CharacterMetadata[]> => {
+  return Promise.resolve([...characterData]);
+};
+
+// Get character by ID
+export const getCharacterById = (id: number): Promise<CharacterMetadata | undefined> => {
+  const character = characterData.find(char => char.id === id);
+  return Promise.resolve(character);
+};
+
+// Get character by token ID
+export const getCharacterByTokenId = (tokenId: string): Promise<CharacterMetadata | undefined> => {
+  const character = characterData.find(char => char.tokenId === tokenId);
+  return Promise.resolve(character);
+};
+
+// Group characters by role
+export const getCharactersGroupedByRole = async (): Promise<{
+  sentinels: OpenSeaNFT[];
+  survivors: OpenSeaNFT[];
+  bountyHunters: OpenSeaNFT[];
+}> => {
   try {
-    // Check if metadata is already in cache
-    if (metadataCache[cid]) {
-      return metadataCache[cid];
-    }
-
-    // Fetch metadata from Pinata gateway
-    const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${cid}`;
-    console.log('Fetching character metadata from:', ipfsUrl);
+    console.log("Fetching characters grouped by role");
+    const allCharacters = await getAllCharacters();
     
-    const response = await fetch(ipfsUrl);
+    const sentinels = allCharacters
+      .filter(char => char.role === "Sentinel")
+      .map(char => convertToNFT(char));
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch metadata: ${response.statusText}`);
-    }
+    const survivors = allCharacters
+      .filter(char => char.role === "Survivor")
+      .map(char => convertToNFT(char));
     
-    const metadata = await response.json();
+    const bountyHunters = allCharacters
+      .filter(char => char.role === "Bounty Hunter")
+      .map(char => convertToNFT(char));
     
-    // Cache the metadata
-    metadataCache[cid] = metadata;
-    
-    return metadata;
+    return { sentinels, survivors, bountyHunters };
   } catch (error) {
-    console.error('Error fetching character metadata:', error);
+    console.error("Error fetching characters by role:", error);
     toast({
-      title: "Error loading character metadata",
-      description: "Using fallback data instead",
+      title: "Error fetching characters",
+      description: "Could not load character data. Please try again later.",
       variant: "destructive"
     });
     
-    // Return fallback metadata
-    return {
-      name: "Unknown Character",
-      description: "Metadata unavailable",
-      image: "/placeholder.svg",
-      attributes: [
-        { trait_type: "Role", value: "Unknown" },
-        { trait_type: "Radiation Level", value: Math.floor(Math.random() * 100) }
-      ]
-    };
+    return { sentinels: [], survivors: [], bountyHunters: [] };
   }
 };
 
-// Get character type by ID
-export const getCharacterTypeById = (id: number): CharacterType | null => {
-  return characterTypes[id] || null;
-};
-
-// Get all character types of a specific role
-export const getCharactersByRole = (role: NFTRole): {id: number, character: CharacterType}[] => {
-  return Object.entries(characterTypes)
-    .filter(([_, character]) => character.role === role)
-    .map(([id, character]) => ({ id: parseInt(id), character }));
-};
-
-// Function to fetch multiple characters with their metadata
-export const fetchCharactersWithMetadata = async (characterIds: number[]): Promise<Array<{id: number, nft: any}>> => {
-  const results = await Promise.all(
-    characterIds.map(async (id) => {
-      const character = getCharacterTypeById(id);
-      if (!character) return null;
-      
-      try {
-        const metadata = await fetchCharacterMetadata(character.metadataCID);
-        const nft = convertToOpenSeaNFT(character, id, metadata);
-        return { id, nft };
-      } catch (error) {
-        console.error(`Error fetching metadata for character ${id}:`, error);
-        return null;
-      }
-    })
-  );
-  
-  return results.filter(Boolean) as Array<{id: number, nft: any}>;
-};
-
-// Get characters grouped by role with metadata
-export const getCharactersGroupedByRole = async () => {
-  const sentinelIds = getCharactersByRole(NFTRole.SENTINEL).map(item => item.id);
-  const survivorIds = getCharactersByRole(NFTRole.SURVIVOR).map(item => item.id);
-  const bountyHunterIds = getCharactersByRole(NFTRole.BOUNTY_HUNTER).map(item => item.id);
-  
-  const [sentinels, survivors, bountyHunters] = await Promise.all([
-    fetchCharactersWithMetadata(sentinelIds),
-    fetchCharactersWithMetadata(survivorIds),
-    fetchCharactersWithMetadata(bountyHunterIds)
-  ]);
-  
-  return {
-    sentinels: sentinels.map(item => item.nft),
-    survivors: survivors.map(item => item.nft),
-    bountyHunters: bountyHunters.map(item => item.nft)
-  };
+// Get character NFT by token ID
+export const getCharacterNFTByTokenId = async (tokenId: string): Promise<OpenSeaNFT | null> => {
+  try {
+    const character = await getCharacterByTokenId(tokenId);
+    
+    if (character) {
+      return convertToNFT(character);
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("Error fetching character NFT:", error);
+    return null;
+  }
 };

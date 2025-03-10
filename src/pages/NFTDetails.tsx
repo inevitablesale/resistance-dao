@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNFTMetadata } from '@/hooks/useNFTMetadata';
 import { ToxicCard, ToxicCardContent, ToxicCardHeader, ToxicCardTitle, ToxicCardFooter } from '@/components/ui/toxic-card';
@@ -8,12 +8,15 @@ import { ToxicBadge } from '@/components/ui/toxic-badge';
 import { ArrowLeft, ExternalLink, Biohazard, Shield, ShieldAlert, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CONTRACT_ADDRESS } from '@/hooks/useNFTCollection';
+import { CharacterRevealSlider } from '@/components/marketplace/CharacterRevealSlider';
+import { ModelPreview } from '@/components/marketplace/ModelPreview';
 
 const NFTDetails: React.FC = () => {
   const { tokenId } = useParams<{ tokenId: string }>();
   const navigate = useNavigate();
   const { data: nft, isLoading, error } = useNFTMetadata(tokenId || '');
-
+  const [revealValue, setRevealValue] = useState(20); // Start with character mostly obscured
+  
   const handleBack = () => {
     navigate(-1);
   };
@@ -121,9 +124,33 @@ const NFTDetails: React.FC = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* NFT Image */}
+          {/* NFT Image with 3D Model and Radiation Cloud */}
           <div className="bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-lg overflow-hidden border border-toxic-neon/30">
-            {nft.image_url ? (
+            {nft.animation_url ? (
+              <div className="w-full h-full flex flex-col">
+                <div className="h-[400px] relative">
+                  <ModelPreview 
+                    modelUrl={nft.animation_url}
+                    height="100%"
+                    width="100%"
+                    autoRotate={true}
+                    radiationLevel={parseInt(radiationLevel, 10)}
+                    useRadiationCloud={true}
+                    radiationCloudUrl="bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
+                    revealValue={revealValue}
+                    showControls={true}
+                  />
+                </div>
+                
+                {/* Radiation Reveal Slider */}
+                <div className="p-4 bg-black/60">
+                  <CharacterRevealSlider 
+                    value={revealValue} 
+                    onChange={setRevealValue} 
+                  />
+                </div>
+              </div>
+            ) : nft.image_url ? (
               <img 
                 src={nft.image_url} 
                 alt={nft.name || `NFT #${nft.identifier}`} 
