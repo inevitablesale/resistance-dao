@@ -1,10 +1,9 @@
 import { Bounty, getBounty } from './bountyService';
 
-// Only updating the relevant part where the remainingBudget is referenced
 export const processBountyReferral = async (
   bountyId: string,
   referrerId: string,
-  referredAddress: string
+  targetAddress: string
 ): Promise<{ success: boolean, error?: string }> => {
   try {
     const bounty = await getBounty(bountyId);
@@ -14,11 +13,12 @@ export const processBountyReferral = async (
     }
     
     // Check if bounty has enough budget
-    const remainingBudget = bounty.remainingBudget !== undefined ? 
-      bounty.remainingBudget : (bounty.totalBudget - bounty.usedBudget);
+    const remainingBudgetValue = bounty.remainingBudget !== undefined ? 
+      bounty.remainingBudget : 
+      (bounty.totalBudget - bounty.usedBudget);
     
-    if (remainingBudget < bounty.rewardAmount) {
-      return { success: false, error: "Bounty has insufficient funds" };
+    if (remainingBudgetValue < bounty.rewardAmount) {
+      return { success: false, error: "Bounty budget depleted" };
     }
     
     // Check if bounty is active
@@ -38,7 +38,7 @@ export const processBountyReferral = async (
     // 3. Update the bounty's used budget and success count
     
     // For now, we'll just simulate success
-    console.log(`Processed referral for bounty ${bountyId}: ${referrerId} referred ${referredAddress}`);
+    console.log(`Processed referral for bounty ${bountyId}: ${referrerId} referred ${targetAddress}`);
     
     return { success: true };
   } catch (error) {

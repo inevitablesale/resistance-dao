@@ -130,8 +130,8 @@ export default function BountyReferralDashboard() {
                         <div className="text-xs text-zinc-400 flex items-center gap-1.5">
                           <DollarSign className="w-3.5 h-3.5" />
                           <span>
-                            {bounty.remainingBudget !== undefined ? 
-                              bounty.remainingBudget : (bounty.totalBudget - bounty.usedBudget)} MATIC remaining
+                            {selectedBounty.remainingBudget !== undefined ? 
+                              selectedBounty.remainingBudget : (selectedBounty.totalBudget - selectedBounty.usedBudget)} MATIC remaining
                           </span>
                         </div>
                       </div>

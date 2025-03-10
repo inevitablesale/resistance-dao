@@ -1,72 +1,70 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useWalletConnection } from '@/hooks/useWalletConnection';
+import { useCustomWallet } from '@/hooks/useCustomWallet';
 import {
   getBounties,
   createBounty,
+  getBounty,
   recordSuccessfulReferral,
-  BountyOptions,
-  BountyCreationParams,
   distributeRewards,
   updateBountyStatus,
   fundBounty,
-  Bounty
+  BountyCreationParams,
+  Bounty,
+  BountyOptions
 } from '@/services/bountyService';
 
 export const useBountyActions = () => {
-  const { toast } = useToast();
-  const { address, primaryWallet, isConnected } = useWalletConnection();
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const { wallet } = useCustomWallet();
 
-  const fetchBounties = async (options?: BountyOptions) => {
+  const handleCreateBounty = async (params: BountyCreationParams) => {
+    if (!wallet) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to create a bounty.",
+        variant: "destructive",
+      });
+      return null;
+    }
+
     setIsLoading(true);
     try {
-      // We pass status instead of options here since getBounties accepts a status string
-      const status = options?.includeExpired ? undefined : 'active';
-      const bounties = await getBounties(status);
-      return bounties;
-    } catch (error) {
-      console.error('Error fetching bounties:', error);
+      const newBounty = await createBounty(params, wallet);
+      
       toast({
-        title: 'Failed to fetch bounties',
-        description: 'There was an error loading bounties. Please try again.',
-        variant: 'destructive',
+        title: "Bounty Created",
+        description: `Your bounty "${params.name}" has been created successfully.`,
       });
-      return [];
+      
+      return newBounty;
+    } catch (error) {
+      console.error("Error creating bounty:", error);
+      toast({
+        title: "Creation Failed",
+        description: error instanceof Error ? error.message : "Failed to create bounty",
+        variant: "destructive",
+      });
+      return null;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCreateBounty = async (bountyParams: BountyCreationParams) => {
-    if (!isConnected || !primaryWallet) {
-      toast({
-        title: 'Wallet Required',
-        description: 'Please connect your wallet to create a bounty',
-        variant: 'destructive',
-      });
-      return null;
-    }
-
+  const fetchBounties = async (status?: string) => {
     setIsLoading(true);
     try {
-      const newBounty = await createBounty(bountyParams, primaryWallet);
-      
-      toast({
-        title: 'Bounty Created!',
-        description: `${newBounty.name} has been created successfully.`,
-      });
-      
-      return newBounty;
+      const bounties = await getBounties(status);
+      return bounties;
     } catch (error) {
-      console.error('Error creating bounty:', error);
+      console.error("Error fetching bounties:", error);
       toast({
-        title: 'Failed to Create Bounty',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
+        title: "Fetch Failed",
+        description: "Could not load bounties",
+        variant: "destructive",
       });
-      return null;
+      return [];
     } finally {
       setIsLoading(false);
     }
@@ -79,24 +77,24 @@ export const useBountyActions = () => {
       
       if (result.success) {
         toast({
-          title: 'Referral Recorded',
-          description: 'The referral has been recorded successfully.',
+          title: "Referral Recorded",
+          description: "The referral has been successfully recorded.",
         });
-        return true;
       } else {
         toast({
-          title: 'Failed to Record Referral',
-          description: result.error || 'There was an error recording the referral',
-          variant: 'destructive',
+          title: "Recording Failed",
+          description: result.error || "Failed to record the referral",
+          variant: "destructive",
         });
-        return false;
       }
+      
+      return result.success;
     } catch (error) {
-      console.error('Error recording referral:', error);
+      console.error("Error recording referral:", error);
       toast({
-        title: 'Error Recording Referral',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
+        title: "Recording Failed",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
       });
       return false;
     } finally {
@@ -105,39 +103,39 @@ export const useBountyActions = () => {
   };
 
   const handleDistributeRewards = async (bountyId: string) => {
-    if (!isConnected || !primaryWallet) {
+    if (!wallet) {
       toast({
-        title: 'Wallet Required',
-        description: 'Please connect your wallet to distribute rewards',
-        variant: 'destructive',
+        title: "Wallet Required",
+        description: "Please connect your wallet to distribute rewards",
+        variant: "destructive",
       });
       return false;
     }
 
     setIsLoading(true);
     try {
-      const result = await distributeRewards(bountyId, primaryWallet);
+      const result = await distributeRewards(bountyId, wallet);
       
       if (result.success) {
         toast({
-          title: 'Rewards Distributed',
-          description: 'The rewards have been distributed successfully.',
+          title: "Rewards Distributed",
+          description: "The rewards have been distributed successfully.",
         });
         return true;
       } else {
         toast({
-          title: 'Failed to Distribute Rewards',
-          description: result.error || 'There was an error distributing rewards',
-          variant: 'destructive',
+          title: "Failed to Distribute Rewards",
+          description: result.error || "There was an error distributing rewards",
+          variant: "destructive",
         });
         return false;
       }
     } catch (error) {
-      console.error('Error distributing rewards:', error);
+      console.error("Error distributing rewards:", error);
       toast({
-        title: 'Error Distributing Rewards',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
+        title: "Error Distributing Rewards",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
       });
       return false;
     } finally {
@@ -149,39 +147,39 @@ export const useBountyActions = () => {
     bountyId: string,
     newStatus: "active" | "paused" | "expired" | "completed"
   ) => {
-    if (!isConnected || !primaryWallet) {
+    if (!wallet) {
       toast({
-        title: 'Wallet Required',
-        description: 'Please connect your wallet to update bounty status',
-        variant: 'destructive',
+        title: "Wallet Required",
+        description: "Please connect your wallet to update bounty status",
+        variant: "destructive",
       });
       return false;
     }
 
     setIsLoading(true);
     try {
-      const result = await updateBountyStatus(bountyId, newStatus, primaryWallet);
+      const result = await updateBountyStatus(bountyId, newStatus, wallet);
       
       if (result.success) {
         toast({
-          title: 'Status Updated',
+          title: "Status Updated",
           description: `Bounty status has been updated to ${newStatus}.`,
         });
         return true;
       } else {
         toast({
-          title: 'Failed to Update Status',
-          description: result.error || 'There was an error updating the status',
-          variant: 'destructive',
+          title: "Failed to Update Status",
+          description: result.error || "There was an error updating the status",
+          variant: "destructive",
         });
         return false;
       }
     } catch (error) {
-      console.error('Error updating bounty status:', error);
+      console.error("Error updating bounty status:", error);
       toast({
-        title: 'Error Updating Status',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
+        title: "Error Updating Status",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
       });
       return false;
     } finally {
@@ -190,39 +188,39 @@ export const useBountyActions = () => {
   };
 
   const handleFundBounty = async (bountyId: string, additionalFunds: number) => {
-    if (!isConnected || !primaryWallet) {
+    if (!wallet) {
       toast({
-        title: 'Wallet Required',
-        description: 'Please connect your wallet to fund a bounty',
-        variant: 'destructive',
+        title: "Wallet Required",
+        description: "Please connect your wallet to fund a bounty",
+        variant: "destructive",
       });
       return false;
     }
 
     setIsLoading(true);
     try {
-      const result = await fundBounty(bountyId, additionalFunds, primaryWallet);
+      const result = await fundBounty(bountyId, additionalFunds, wallet);
       
       if (result.success) {
         toast({
-          title: 'Bounty Funded',
+          title: "Bounty Funded",
           description: `Successfully added ${additionalFunds} MATIC to the bounty.`,
         });
         return true;
       } else {
         toast({
-          title: 'Failed to Fund Bounty',
-          description: result.error || 'There was an error funding the bounty',
-          variant: 'destructive',
+          title: "Failed to Fund Bounty",
+          description: result.error || "There was an error funding the bounty",
+          variant: "destructive",
         });
         return false;
       }
     } catch (error) {
-      console.error('Error funding bounty:', error);
+      console.error("Error funding bounty:", error);
       toast({
-        title: 'Error Funding Bounty',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
+        title: "Error Funding Bounty",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
       });
       return false;
     } finally {
@@ -232,11 +230,11 @@ export const useBountyActions = () => {
 
   return {
     isLoading,
+    handleCreateBounty,
     fetchBounties,
-    createBounty: handleCreateBounty,
-    recordReferral: handleRecordReferral,
-    distributeRewards: handleDistributeRewards,
-    updateBountyStatus: handleUpdateBountyStatus,
-    fundBounty: handleFundBounty,
+    handleRecordReferral,
+    handleDistributeRewards,
+    handleUpdateBountyStatus,
+    handleFundBounty,
   };
 };

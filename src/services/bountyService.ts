@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
 import { executeTransaction } from "./transactionManager";
@@ -16,13 +15,13 @@ const BOUNTIES_DATA = [
     successCount: 25,
     hunterCount: 8,
     expiresAt: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30, // 30 days from now
-    status: "active",
+    status: "active" as const,
     partyAddress: "0x1234567890123456789012345678901234567890",
     eligibleNFTs: ["0x123", "0x456"],
     requireVerification: true,
     allowPublicHunters: true,
     maxReferralsPerHunter: 10,
-    bountyType: "nft_referral"
+    bountyType: "nft_referral" as const
   },
   {
     id: "b2",
@@ -79,7 +78,6 @@ export interface Bounty {
   allowPublicHunters: boolean;
   maxReferralsPerHunter: number;
   bountyType: "nft_referral" | "token_referral" | "social_media";
-  // Add a getter for remainingBudget
   remainingBudget?: number;
 }
 
@@ -115,16 +113,19 @@ export const getBounties = async (status?: string): Promise<Bounty[]> => {
   // In a real app, this would fetch from an API or blockchain
   return new Promise(resolve => {
     setTimeout(() => {
-      let bounties: Bounty[];
+      let filteredBounties: typeof BOUNTIES_DATA;
       
       if (status) {
-        bounties = BOUNTIES_DATA.filter(b => b.status === status) as Bounty[];
+        filteredBounties = BOUNTIES_DATA.filter(b => b.status === status);
       } else {
-        bounties = BOUNTIES_DATA as Bounty[];
+        filteredBounties = [...BOUNTIES_DATA];
       }
       
-      // Add remaining budget to each bounty
-      bounties = bounties.map(calculateRemainingBudget);
+      // Convert to proper Bounty type with remaining budget
+      const bounties: Bounty[] = filteredBounties.map(b => ({
+        ...b,
+        remainingBudget: b.totalBudget - b.usedBudget
+      }));
       
       resolve(bounties);
     }, 800);
@@ -277,7 +278,6 @@ export const deployBountyToBlockchain = async (
   }
 };
 
-// Functions needed by other components
 export const recordSuccessfulReferral = async (
   bountyId: string,
   referrerId: string,
