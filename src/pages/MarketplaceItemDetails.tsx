@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -45,10 +44,14 @@ import { DrippingSlime } from "@/components/ui/dripping-slime";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { MarketplaceListing, MarketplaceListingType } from "@/components/marketplace/MarketplaceListingGrid";
+import { MarketplaceListing } from "@/components/marketplace/MarketplaceListingGrid";
 
-// Mockup data for testing
-const MOCKUP_LISTINGS: Record<string, MarketplaceListing> = {
+interface ExtendedMarketplaceListing extends MarketplaceListing {
+  description: string;
+  modelUrl?: string;
+}
+
+const MOCKUP_LISTINGS: Record<string, ExtendedMarketplaceListing> = {
   "1": {
     id: 1,
     type: 'bounty-hunter',
@@ -147,7 +150,6 @@ const MOCKUP_LISTINGS: Record<string, MarketplaceListing> = {
   }
 };
 
-// Activity history mockup for item
 type ActivityType = 'listing' | 'offer' | 'sale' | 'transfer' | 'mint';
 
 interface ItemActivity {
@@ -193,7 +195,7 @@ const MOCKUP_ACTIVITY: ItemActivity[] = [
   }
 ];
 
-const getTypeIcon = (type: MarketplaceListingType) => {
+const getTypeIcon = (type: string) => {
   switch(type) {
     case 'survivor':
       return <Shield className="h-5 w-5 text-toxic-neon" />;
@@ -236,16 +238,14 @@ export default function MarketplaceItemDetails() {
   const navigate = useNavigate();
   const { isConnected, address } = useCustomWallet();
   const { connect } = useWalletConnection();
-  const [item, setItem] = useState<MarketplaceListing | null>(null);
+  const [item, setItem] = useState<ExtendedMarketplaceListing | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchaseStep, setPurchaseStep] = useState(0);
   const [offerAmount, setOfferAmount] = useState('');
   
   useEffect(() => {
-    // In a real app, you would fetch the item data from your API or blockchain
     setLoading(true);
     
-    // Simulate API call with timeout
     const timer = setTimeout(() => {
       if (id && MOCKUP_LISTINGS[id]) {
         setItem(MOCKUP_LISTINGS[id]);
@@ -263,7 +263,6 @@ export default function MarketplaceItemDetails() {
     }
     
     setPurchaseStep(1);
-    // In a real app, you would integrate with your marketplace contract here
   };
   
   const handleMakeOffer = () => {
@@ -272,12 +271,11 @@ export default function MarketplaceItemDetails() {
       return;
     }
     
-    // In a real app, you would show an offer modal and handle the offer submission
     alert('Make offer functionality would be implemented here');
   };
   
   const handleBackToMarketplace = () => {
-    navigate(-1); // Go back to previous page
+    navigate(-1);
   };
   
   if (loading) {
@@ -339,7 +337,6 @@ export default function MarketplaceItemDetails() {
           </Button>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left column - 3D Model */}
             <div className="lg:col-span-1">
               <ToxicCard className="bg-black/70 border-toxic-neon/30 mb-6">
                 <ToxicCardContent className="p-0">
@@ -401,7 +398,6 @@ export default function MarketplaceItemDetails() {
               </ToxicCard>
             </div>
             
-            {/* Middle column - Item Details & Purchase */}
             <div className="lg:col-span-1">
               <ToxicCard className="bg-black/70 border-toxic-neon/30 mb-6">
                 <ToxicCardHeader>
@@ -490,7 +486,6 @@ export default function MarketplaceItemDetails() {
               </ToxicCard>
             </div>
             
-            {/* Right column - Item Properties & Activity */}
             <div className="lg:col-span-1">
               <Tabs defaultValue="properties" className="w-full mb-6">
                 <TabsList className="w-full bg-black/80 border-b border-toxic-neon/30">

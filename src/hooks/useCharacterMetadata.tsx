@@ -1,76 +1,63 @@
 
 import { useState, useEffect } from 'react';
-import { getFromIPFS } from '@/services/ipfsService';
+import { CharacterMetadata } from '@/types/character';
 
-export interface CharacterMetadata {
-  name: string;
-  description: string;
-  image?: string;
-  model_url?: string;
-  radiation_cloud_url?: string;
-  attributes?: Array<{
-    trait_type: string;
-    value: string;
-  }>;
-  ipfsCID: string;
-  role: 'SENTINEL' | 'SURVIVOR' | 'BOUNTY_HUNTER';
-}
+const PINATA_GATEWAY_URL = "https://gateway.pinata.cloud/ipfs/";
 
-interface UseCharacterMetadataProps {
-  ipfsCID: string;
-  role: 'SENTINEL' | 'SURVIVOR' | 'BOUNTY_HUNTER';
-  name: string;
-}
-
-export const useCharacterMetadata = ({ ipfsCID, role, name }: UseCharacterMetadataProps) => {
+export const useCharacterMetadata = (ipfsCID: string, role: "SURVIVOR" | "SENTINEL" | "BOUNTY_HUNTER", characterName: string) => {
   const [metadata, setMetadata] = useState<CharacterMetadata | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Skip fetch if no CID provided
-    if (!ipfsCID) {
-      setLoading(false);
-      return;
-    }
-
     const fetchMetadata = async () => {
-      try {
-        setLoading(true);
-        
-        // Check if we have a cached version
-        const cachedData = sessionStorage.getItem(`character-metadata-${ipfsCID}`);
-        if (cachedData) {
-          setMetadata(JSON.parse(cachedData));
-          setLoading(false);
-          return;
-        }
+      if (!ipfsCID) {
+        setIsLoading(false);
+        setError("No IPFS CID provided");
+        return;
+      }
 
-        // Fetch from IPFS if not cached
-        const data = await getFromIPFS(ipfsCID, 'content');
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Build the Pinata gateway URL
+        const url = `${PINATA_GATEWAY_URL}${ipfsCID}`;
         
-        // Build full metadata object
+        // Fetch the metadata from IPFS
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch metadata: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        // Create a standardized metadata object with required fields
         const characterMetadata: CharacterMetadata = {
-          ...data,
           ipfsCID,
           role,
-          name: name || data.name
+          name: characterName,
+          description: data.description || `A ${role.toLowerCase().replace('_', ' ')} character in the Resistance universe.`,
+          image: data.image || `${PINATA_GATEWAY_URL}${ipfsCID}`,
+          attributes: data.attributes || [],
+          modelUrl: data.model_url || null,
+          radiationCloudUrl: data.radiation_cloud_url || null
         };
         
-        // Cache the result
-        sessionStorage.setItem(`character-metadata-${ipfsCID}`, JSON.stringify(characterMetadata));
-        
         setMetadata(characterMetadata);
-        setLoading(false);
       } catch (err) {
-        console.error('Error fetching character metadata:', err);
-        setError(err instanceof Error ? err : new Error('Failed to fetch character metadata'));
-        setLoading(false);
+        console.error("Error fetching character metadata:", err);
+        setError(err instanceof Error ? err.message : "Unknown error fetching metadata");
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchMetadata();
-  }, [ipfsCID, role, name]);
+  }, [ipfsCID, role, characterName]);
 
-  return { metadata, loading, error };
+  return { metadata, isLoading, error };
 };
+
+export default useCharacterMetadata;

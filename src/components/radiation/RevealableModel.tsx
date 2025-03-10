@@ -1,163 +1,131 @@
 
 import React, { useState, useEffect } from 'react';
 import { ModelPreview } from '@/components/marketplace/ModelPreview';
-import { Loader2, Radiation, ShieldCheck } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ToxicButton } from '@/components/ui/toxic-button';
+import { ToxicProgress } from '@/components/ui/toxic-progress';
+import { Radiation, Skull, AlertTriangle } from 'lucide-react';
 import { useCharacterMetadata } from '@/hooks/useCharacterMetadata';
+import { CharacterType } from '@/types/character';
 
 // Default radiation cloud model URL
-const RADIATION_CLOUD_MODEL = "https://gateway.pinata.cloud/ipfs/bafybeifqzxpq7qlc3vq4rkyt3owfxdhsqnfv5xqgkgfipwsb46szdkgrfi";
+const DEFAULT_RADIATION_CLOUD = "https://gateway.pinata.cloud/ipfs/bafybeihfebnoakbibi53tqkqarh6vjzuksdwuw66yrope5vaprbhw4k2tm";
+// Default character model URL if metadata doesn't provide one
+const DEFAULT_CHARACTER_MODEL = "https://gateway.pinata.cloud/ipfs/bafybeig47okn4sqqbajhje57htkxw6py3tdms7boyc3hkvvr4qlj7zsabu";
 
 interface RevealableModelProps {
-  ipfsCID: string;
-  role: 'SENTINEL' | 'SURVIVOR' | 'BOUNTY_HUNTER';
-  name: string;
+  character: CharacterType;
+  role: "SURVIVOR" | "SENTINEL" | "BOUNTY_HUNTER";
+  isRevealed: boolean;
+  onReveal: () => void;
   className?: string;
   height?: string;
-  width?: string;
-  autoRotate?: boolean;
-  revealed?: boolean;
-  onReveal?: () => void;
 }
 
-export const RevealableModel: React.FC<RevealableModelProps> = ({ 
-  ipfsCID, 
+export function RevealableModel({ 
+  character,
   role,
-  name,
-  className = "", 
-  height = "200px", 
-  width = "100%",
-  autoRotate = true,
-  revealed = false,
-  onReveal
-}) => {
-  const [isRevealed, setIsRevealed] = useState(revealed);
-  const [isRevealing, setIsRevealing] = useState(false);
-  const { metadata, loading, error } = useCharacterMetadata({ ipfsCID, role, name });
+  isRevealed,
+  onReveal,
+  className = "",
+  height = "100%"
+}: RevealableModelProps) {
+  const [revealProgress, setRevealProgress] = useState(0);
+  const [revealState, setRevealState] = useState<'idle' | 'scanning' | 'revealed'>('idle');
+  const { metadata, isLoading, error } = useCharacterMetadata(character.ipfsCID, role, character.name);
   
-  // Check if user has already revealed this item
   useEffect(() => {
-    const revealedStatus = localStorage.getItem(`revealed-${ipfsCID}`);
-    if (revealedStatus === 'true') {
-      setIsRevealed(true);
+    if (isRevealed && revealState !== 'revealed') {
+      setRevealState('scanning');
+      const timer = setInterval(() => {
+        setRevealProgress(prev => {
+          const newProgress = prev + (Math.random() * 5);
+          if (newProgress >= 100) {
+            clearInterval(timer);
+            setTimeout(() => {
+              setRevealState('revealed');
+            }, 500);
+            return 100;
+          }
+          return newProgress;
+        });
+      }, 100);
+      
+      return () => clearInterval(timer);
     }
-  }, [ipfsCID]);
+  }, [isRevealed, revealState]);
   
-  // Update when revealed prop changes
+  // Reset state when character changes
   useEffect(() => {
-    setIsRevealed(revealed);
-  }, [revealed]);
+    if (!isRevealed) {
+      setRevealProgress(0);
+      setRevealState('idle');
+    }
+  }, [character.id, isRevealed]);
   
-  const handleReveal = () => {
-    setIsRevealing(true);
-    
-    // Simulate reveal animation
-    setTimeout(() => {
-      setIsRevealed(true);
-      setIsRevealing(false);
-      
-      // Store reveal status
-      localStorage.setItem(`revealed-${ipfsCID}`, 'true');
-      
-      // Call the callback if provided
-      if (onReveal) {
-        onReveal();
-      }
-    }, 2500);
-  };
-  
-  if (loading) {
+  // Handle loading state
+  if (isLoading) {
     return (
-      <div 
-        className={`relative flex items-center justify-center bg-black/70 ${className}`} 
-        style={{ height, width }}
-      >
-        <Loader2 className="h-8 w-8 text-toxic-neon animate-spin" />
+      <div className={`w-full flex flex-col items-center justify-center bg-black/50 ${className}`} style={{ height }}>
+        <Radiation className="h-16 w-16 text-toxic-neon animate-pulse mb-4" />
+        <p className="text-toxic-neon font-mono text-sm">Loading Character Data...</p>
       </div>
     );
   }
   
-  if (error) {
+  // Handle error state
+  if (error || !metadata) {
     return (
-      <div 
-        className={`relative flex items-center justify-center bg-black/70 ${className}`} 
-        style={{ height, width }}
-      >
-        <div className="text-apocalypse-red text-center p-4">
-          <p>Error loading model</p>
-          <p className="text-xs mt-2">Please try again later</p>
-        </div>
+      <div className={`w-full flex flex-col items-center justify-center bg-black/50 ${className}`} style={{ height }}>
+        <AlertTriangle className="h-16 w-16 text-apocalypse-red mb-4" />
+        <p className="text-apocalypse-red font-mono text-sm">Error Loading Character</p>
+        <p className="text-white/60 text-xs mt-2">{error || "Metadata unavailable"}</p>
       </div>
     );
   }
+  
+  // Determine which model to show
+  const modelUrl = revealState === 'revealed' 
+    ? (metadata.modelUrl || DEFAULT_CHARACTER_MODEL)
+    : (metadata.radiationCloudUrl || DEFAULT_RADIATION_CLOUD);
   
   return (
-    <div 
-      className={`relative overflow-hidden ${className}`} 
-      style={{ height, width }}
-    >
-      <AnimatePresence>
-        {!isRevealed && !isRevealing && (
-          <motion.div 
-            className="absolute inset-0 z-10"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <ModelPreview
-              modelUrl={RADIATION_CLOUD_MODEL}
-              height="100%"
-              width="100%"
-              autoRotate={autoRotate}
-              className="bg-black/70"
-            />
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
-              <Radiation className="w-12 h-12 text-toxic-neon mb-4" />
-              <h3 className="text-toxic-neon font-mono text-lg mb-2">Radiation Contaminated</h3>
-              <p className="text-white/70 text-sm mb-4 text-center px-4">
-                This character is locked behind radiation.
-              </p>
+    <div className={`relative w-full ${className}`} style={{ height }}>
+      <ModelPreview
+        modelUrl={modelUrl}
+        height={height}
+        width="100%"
+        autoRotate={true}
+      />
+      
+      {/* Overlay for non-revealed state */}
+      {revealState !== 'revealed' && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
+          {revealState === 'idle' ? (
+            <div className="text-center">
+              <Radiation className="h-16 w-16 text-toxic-neon mx-auto mb-4" />
+              <p className="text-toxic-neon font-mono mb-4">Character Concealed by Radiation</p>
               <ToxicButton 
-                variant="toxic" 
-                onClick={handleReveal}
-                className="bg-toxic-neon/20 hover:bg-toxic-neon/30"
+                variant="secondary"
+                onClick={onReveal}
               >
-                <ShieldCheck className="h-4 w-4 mr-2" />
-                Clear Radiation
+                <Skull className="h-4 w-4 mr-2" />
+                Initiate Scan
               </ToxicButton>
             </div>
-          </motion.div>
-        )}
-        
-        {isRevealing && (
-          <motion.div 
-            className="absolute inset-0 z-20 flex items-center justify-center bg-toxic-neon/10 backdrop-blur-md"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="text-center">
-              <Loader2 className="h-16 w-16 text-toxic-neon animate-spin mx-auto mb-4" />
-              <h3 className="text-toxic-neon font-mono text-xl mb-2">Clearing Radiation</h3>
-              <p className="text-white/70">Decontaminating character data...</p>
+          ) : (
+            <div className="w-3/4 text-center">
+              <Radiation className="h-12 w-12 text-toxic-neon animate-pulse mx-auto mb-4" />
+              <p className="text-toxic-neon font-mono text-sm mb-2">Radiation Scan in Progress</p>
+              <ToxicProgress 
+                value={revealProgress} 
+                variant="radiation" 
+                className="h-2 mb-2" 
+              />
+              <p className="text-toxic-muted text-xs">{revealProgress.toFixed(0)}% Complete</p>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      <motion.div 
-        className={`${!isRevealed && !isRevealing ? 'opacity-0' : 'opacity-100'}`}
-        transition={{ duration: 0.5 }}
-      >
-        <ModelPreview
-          modelUrl={`https://gateway.pinata.cloud/ipfs/${ipfsCID}`}
-          height="100%"
-          width="100%"
-          autoRotate={autoRotate}
-        />
-      </motion.div>
+          )}
+        </div>
+      )}
     </div>
   );
-};
+}

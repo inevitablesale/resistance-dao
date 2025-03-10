@@ -165,7 +165,7 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
             </div>
             
             <ToxicButton 
-              variant={supply.type === 'sentinel' ? 'default' : supply.type === 'bounty-hunter' ? 'destructive' : 'outline'}
+              variant={supply.type === 'sentinel' ? 'default' : supply.type === 'bounty-hunter' ? 'secondary' : 'outline'}
               size="sm"
               className="w-full"
               onClick={() => window.open(supply.openSeaLink, '_blank')}
