@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { ethers } from "ethers"; // Import ethers correctly
+import { ethers } from "ethers"; 
 import { useToast } from "./use-toast";
 import { NFTClass, getPrimaryRole } from "@/services/alchemyService";
 import { 
@@ -39,7 +39,7 @@ export const useReferrals = () => {
   }, [primaryWallet]);
   
   // Fetch referrals the user has created
-  const { data: userReferrals, isLoading: isLoadingReferrals, refetch: refetchReferrals } = useQuery({
+  const { data: userReferrals = [], isLoading: isLoadingReferrals, refetch: refetchReferrals } = useQuery({
     queryKey: ['userReferrals', primaryWallet?.address],
     queryFn: async () => {
       if (!primaryWallet) return [];
@@ -54,6 +54,11 @@ export const useReferrals = () => {
     },
     enabled: !!primaryWallet,
   });
+
+  // For compatibility with ReferralDashboard component
+  const referrals = userReferrals;
+  const isCreatingReferral = false;
+  const canCreateReferral = userRole === 'Bounty Hunter';
   
   // Create a new referral pool
   const createReferral = async (
@@ -227,6 +232,10 @@ export const useReferrals = () => {
     submitNewReferral,
     claimReward,
     generateReferralLink,
-    refetchReferrals
+    refetchReferrals,
+    // Added for compatibility with ReferralDashboard
+    referrals,
+    isCreatingReferral,
+    canCreateReferral
   };
 };

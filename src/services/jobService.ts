@@ -5,7 +5,7 @@ import { uploadToIPFS } from "./ipfsService";
 import { JobMetadata } from "@/utils/settlementConversion";
 import { NFTClass } from "./alchemyService";
 
-// Properly define JobCategory as an enum or string literal type
+// Define the JobCategory type
 export type JobCategory = 
   | 'settlement-building' 
   | 'resource-gathering' 
@@ -13,12 +13,44 @@ export type JobCategory =
   | 'technology' 
   | 'governance' 
   | 'scouting' 
-  | 'trading'
+  | 'trading' 
   | 'protocol-development' 
-  | 'waste-management'
+  | 'waste-management' 
   | 'other';
 
-// Define necessary interfaces
+// Define the job status type
+export type JobStatus = 'open' | 'in-progress' | 'completed' | 'cancelled';
+
+// Define the application status type
+export type ApplicationStatus = 'pending' | 'accepted' | 'rejected';
+
+// Define the referral status type
+export type ReferralStatus = 'pending' | 'accepted' | 'rejected';
+
+// Define the JobApplication type
+export interface JobApplication {
+  id: string;
+  jobId: string;
+  applicant: string;
+  status: ApplicationStatus;
+  submittedAt: number;
+  // Additional application details
+  message?: string;
+  experience?: string;
+  portfolio?: string;
+}
+
+// Define the JobReferral type
+export interface JobReferral {
+  id: string;
+  jobId: string;
+  referrer: string;
+  applicant: string;
+  status: ReferralStatus;
+  createdAt: number;
+}
+
+// Define the JobListing type
 export interface JobListing {
   id: string;
   title: string;
@@ -29,7 +61,7 @@ export interface JobListing {
   creator: string;
   creatorRole: NFTClass;
   requiredRole: NFTClass;
-  status: 'open' | 'filled' | 'closed' | 'expired';
+  status: JobStatus;
   maxApplicants: number;
   referralReward: string;
   settlementId: string;
@@ -37,28 +69,14 @@ export interface JobListing {
   applications?: JobApplication[];
 }
 
-export interface JobApplication {
-  id: string;
-  jobId: string; 
-  applicant: string;
-  applicantRole: NFTClass;
-  status: 'pending' | 'accepted' | 'rejected';
-  submittedAt: number;
-}
-
-export interface JobReferral {
-  id: string;
-  jobId: string;
-  referrer: string;
-  referredUser: string;
-  status: 'pending' | 'accepted' | 'rejected';
-  referralReward: string;
-  createdAt: number;
-}
-
-// Create job listing
+/**
+ * Creates a job listing
+ * @param wallet User wallet
+ * @param metadata Job metadata
+ * @returns Job ID if successful, null otherwise
+ */
 export const createJobListing = async (
-  primaryWallet: Wallet | DynamicContext['primaryWallet'],
+  wallet: Wallet | DynamicContext['primaryWallet'],
   metadata: JobMetadata
 ): Promise<string | null> => {
   try {
@@ -81,14 +99,47 @@ export const createJobListing = async (
   }
 };
 
-// Submit application for a job
+/**
+ * Submits a job application
+ * @param wallet User wallet
+ * @param jobId Job ID
+ * @param applicationDetails Application details
+ * @returns Success status
+ */
+export const submitJobApplication = async (
+  wallet: Wallet | DynamicContext['primaryWallet'],
+  jobId: string,
+  applicationDetails: {
+    message: string;
+    experience: string;
+    portfolio?: string;
+  }
+): Promise<boolean> => {
+  try {
+    console.log(`Submitting application for job ${jobId}`);
+    
+    // Mock implementation for development
+    return true;
+  } catch (error) {
+    console.error("Error submitting job application:", error);
+    return false;
+  }
+};
+
+/**
+ * Submits a job referral
+ * @param wallet User wallet
+ * @param jobId Job ID
+ * @param referredUser Referred user address
+ * @returns Success status
+ */
 export const submitJobReferral = async (
   wallet: Wallet | DynamicContext['primaryWallet'],
   jobId: string,
   referredUser: string
 ): Promise<boolean> => {
   try {
-    console.log(`Submitting referral for job ${jobId}, referred user: ${referredUser}`);
+    console.log(`Submitting referral for job ${jobId}, user ${referredUser}`);
     
     // Mock implementation for development
     return true;
@@ -98,13 +149,18 @@ export const submitJobReferral = async (
   }
 };
 
-// Accept job application
+/**
+ * Accepts a job application
+ * @param wallet User wallet
+ * @param applicationId Application ID
+ * @returns Success status
+ */
 export const acceptJobApplication = async (
   wallet: Wallet | DynamicContext['primaryWallet'],
   applicationId: string
 ): Promise<boolean> => {
   try {
-    console.log(`Accepting job application: ${applicationId}`);
+    console.log(`Accepting application ${applicationId}`);
     
     // Mock implementation for development
     return true;
@@ -114,13 +170,18 @@ export const acceptJobApplication = async (
   }
 };
 
-// Reject job application
+/**
+ * Rejects a job application
+ * @param wallet User wallet
+ * @param applicationId Application ID
+ * @returns Success status
+ */
 export const rejectJobApplication = async (
   wallet: Wallet | DynamicContext['primaryWallet'],
   applicationId: string
 ): Promise<boolean> => {
   try {
-    console.log(`Rejecting job application: ${applicationId}`);
+    console.log(`Rejecting application ${applicationId}`);
     
     // Mock implementation for development
     return true;
@@ -130,13 +191,18 @@ export const rejectJobApplication = async (
   }
 };
 
-// Cancel job listing
+/**
+ * Cancels a job listing
+ * @param wallet User wallet
+ * @param jobId Job ID
+ * @returns Success status
+ */
 export const cancelJobListing = async (
   wallet: Wallet | DynamicContext['primaryWallet'],
   jobId: string
 ): Promise<boolean> => {
   try {
-    console.log(`Cancelling job listing: ${jobId}`);
+    console.log(`Cancelling job ${jobId}`);
     
     // Mock implementation for development
     return true;

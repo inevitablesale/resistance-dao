@@ -1,6 +1,7 @@
 
 import { ProposalEvent } from "@/types/proposals";
 import { NFTClass } from "@/services/alchemyService";
+import { JobCategory } from "@/services/jobService";
 
 export interface Settlement {
   id: string;
@@ -29,7 +30,7 @@ export interface Settlement {
 export interface JobMetadata {
   title: string;
   description: string;
-  category: string;
+  category: JobCategory;
   reward: string;
   deadline: number;
   creator: string;

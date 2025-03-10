@@ -1,45 +1,46 @@
 
-import { JobCategory } from '@/services/jobService';
-import { 
-  Building2, 
-  ShoppingBag, 
-  Shield, 
-  Cpu, 
-  Scale, 
-  Binoculars, 
-  Coins, 
-  Code, 
-  Trash2, 
-  HelpCircle 
-} from 'lucide-react';
-import { LucideProps } from 'lucide-react';
+import { Buildings, Pickaxe, Shield, Cpu, GalleryVertical, Crosshair, BarChart4, Code, Trash2, HelpCircle } from "lucide-react";
+import { JobCategory } from "@/services/jobService";
 
-interface JobCategoryIconProps extends LucideProps {
+interface JobCategoryIconProps {
   category: JobCategory;
+  className?: string;
 }
 
-export const JobCategoryIcon = ({ category, ...props }: JobCategoryIconProps) => {
+export const JobCategoryIcon = ({ category, className = "w-4 h-4" }: JobCategoryIconProps) => {
+  let Icon;
+  
   switch (category) {
     case 'settlement-building':
-      return <Building2 {...props} />;
+      Icon = Buildings;
+      break;
     case 'resource-gathering':
-      return <ShoppingBag {...props} />;
+      Icon = Pickaxe;
+      break;
     case 'security':
-      return <Shield {...props} />;
+      Icon = Shield;
+      break;
     case 'technology':
-      return <Cpu {...props} />;
+      Icon = Cpu;
+      break;
     case 'governance':
-      return <Scale {...props} />;
+      Icon = GalleryVertical;
+      break;
     case 'scouting':
-      return <Binoculars {...props} />;
+      Icon = Crosshair;
+      break;
     case 'trading':
-      return <Coins {...props} />;
+      Icon = BarChart4;
+      break;
     case 'protocol-development':
-      return <Code {...props} />;
+      Icon = Code;
+      break;
     case 'waste-management':
-      return <Trash2 {...props} />;
-    case 'other':
+      Icon = Trash2;
+      break;
     default:
-      return <HelpCircle {...props} />;
+      Icon = HelpCircle;
   }
+  
+  return <Icon className={className} />;
 };

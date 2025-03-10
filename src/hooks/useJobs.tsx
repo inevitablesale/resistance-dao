@@ -41,7 +41,7 @@ export const useJobs = () => {
   }, [primaryWallet]);
   
   // Fetch all jobs
-  const { data: jobs, isLoading: isLoadingJobs, refetch: refetchJobs } = useQuery({
+  const { data: jobs = [], isLoading: isLoadingJobs, refetch: refetchJobs } = useQuery({
     queryKey: ['jobs'],
     queryFn: async () => {
       // Mock jobs data
@@ -66,7 +66,6 @@ export const useJobs = () => {
               id: 'app-001',
               jobId: 'job-001',
               applicant: '0xabcd...1234',
-              applicantRole: 'Survivor',
               status: 'pending',
               submittedAt: Date.now() - 24 * 60 * 60 * 1000 // 1 day ago
             }
@@ -79,22 +78,23 @@ export const useJobs = () => {
   });
   
   // Fetch user's job listings
-  const { data: userJobs, isLoading: isLoadingUserJobs } = useQuery({
+  const { data: userJobs = [], isLoading: isLoadingUserJobs } = useQuery({
     queryKey: ['userJobs', primaryWallet?.address],
     queryFn: async () => {
       if (!primaryWallet) return [];
       
+      const address = await primaryWallet.address;
       // Filter jobs created by the user
-      return jobs?.filter(job => job.creator === await primaryWallet.address) || [];
+      return jobs.filter(job => job.creator === address) || [];
     },
-    enabled: !!primaryWallet && !!jobs
+    enabled: !!primaryWallet && !!jobs.length
   });
   
   // Fetch user's job applications
-  const { data: userApplications, isLoading: isLoadingUserApplications } = useQuery({
+  const { data: userApplications = [], isLoading: isLoadingUserApplications } = useQuery({
     queryKey: ['userApplications', primaryWallet?.address],
     queryFn: async () => {
-      if (!primaryWallet || !jobs) return [];
+      if (!primaryWallet || !jobs.length) return [];
       
       const address = await primaryWallet.address;
       
@@ -111,8 +111,18 @@ export const useJobs = () => {
       
       return applications;
     },
-    enabled: !!primaryWallet && !!jobs
+    enabled: !!primaryWallet && !!jobs.length
   });
+
+  // For compatibility with JobsDashboard component
+  const myApplications = userApplications;
+  const isLoadingMyApplications = isLoadingUserApplications;
+  const createdJobs = userJobs;
+  const isLoadingCreatedJobs = isLoadingUserJobs;
+  const availableJobs = jobs;
+  const myReferrals: JobReferral[] = [];
+  const isLoadingMyReferrals = false;
+  const canCreateJob = userRole === 'Sentinel' || userRole === 'Survivor';
   
   // Create a new job listing
   const createJob = async (metadata: Omit<JobMetadata, 'createdAt' | 'creatorRole' | 'votingDuration' | 'linkedInURL'>) => {
@@ -357,6 +367,16 @@ export const useJobs = () => {
     acceptApplication,
     rejectApplication,
     cancelJob,
-    refetchJobs
+    refetchJobs,
+    // Added for compatibility with JobsDashboard
+    myApplications,
+    isLoadingMyApplications,
+    createdJobs,
+    isLoadingCreatedJobs,
+    availableJobs,
+    myReferrals,
+    isLoadingMyReferrals,
+    canCreateJob,
+    primaryRole: userRole
   };
 };
