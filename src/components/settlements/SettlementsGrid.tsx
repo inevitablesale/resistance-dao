@@ -1,27 +1,65 @@
 
 import React from 'react';
 import { SettlementCard } from './SettlementCard';
-import { Settlement } from '@/hooks/useSettlements';
+import { ProposalEvent } from '@/types/proposals';
+import { Settlement, convertProposalsToSettlements } from '@/utils/settlementConversion';
 
 interface SettlementsGridProps {
-  settlements: Settlement[];
+  settlements: ProposalEvent[] | Settlement[];
+  isLoading?: boolean;
+  title?: string;
+  formatUSDAmount?: (amount: string) => string;
+  className?: string;
 }
 
-export const SettlementsGrid: React.FC<SettlementsGridProps> = ({ settlements }) => {
-  if (settlements.length === 0) {
+export const SettlementsGrid: React.FC<SettlementsGridProps> = ({ 
+  settlements, 
+  isLoading = false,
+  title = "Active Settlements",
+  formatUSDAmount = (amount) => `$${parseFloat(amount).toLocaleString()}`,
+  className = ""
+}) => {
+  // Convert ProposalEvent[] to Settlement[] if needed
+  const settlementData = Array.isArray(settlements) && settlements.length > 0 && 'tokenId' in settlements[0] 
+    ? convertProposalsToSettlements(settlements as ProposalEvent[])
+    : settlements as Settlement[];
+
+  if (isLoading) {
     return (
-      <div className="text-center py-12 bg-black/30 border border-toxic-neon/20 rounded-lg">
-        <h3 className="text-xl text-toxic-neon mb-2">No settlements found</h3>
-        <p className="text-gray-400">No settlements match your current criteria</p>
+      <div className={`bg-black/60 p-6 rounded-xl border border-toxic-neon/30 ${className}`}>
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-toxic-neon/20 rounded-md w-1/3"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-80 bg-toxic-neon/10 rounded-xl"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!settlementData || settlementData.length === 0) {
+    return (
+      <div className={`bg-black/60 p-6 rounded-xl border border-toxic-neon/30 text-center py-12 ${className}`}>
+        <h3 className="text-xl text-toxic-neon mb-2">No Settlements Found</h3>
+        <p className="text-white/60">There are no active settlements at this time.</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {settlements.map((settlement) => (
-        <SettlementCard key={settlement.id} settlement={settlement} />
-      ))}
+    <div className={`bg-black/60 p-6 rounded-xl border border-toxic-neon/30 ${className}`}>
+      <h2 className="text-2xl font-mono text-toxic-neon mb-6">{title}</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {settlementData.map((settlement) => (
+          <SettlementCard 
+            key={settlement.id}
+            settlement={settlement}
+            formatUSDAmount={formatUSDAmount}
+          />
+        ))}
+      </div>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -19,66 +18,49 @@ import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { ResistanceWalletWidget } from '@/components/wallet/ResistanceWalletWidget';
 import { ToxicProgress } from '@/components/ui/toxic-progress';
 import { ProposalEvent } from '@/types/proposals';
+import { Settlement } from '@/utils/settlementConversion';
 
 const Hunt = () => {
   const navigate = useNavigate();
   const { isConnected, connect } = useWalletConnection();
   const [activeTab, setActiveTab] = useState('settlements');
   
-  const mockSettlements: ProposalEvent[] = [
+  const mockSettlements: Settlement[] = [
     {
-      tokenId: "1",
+      id: "1",
+      name: "Wasteland Outpost Alpha",
+      description: "A fortified settlement on the edge of the toxic zone",
+      createdAt: new Date().toISOString(),
       creator: "0x123...",
-      blockNumber: 123456,
-      transactionHash: "0xabc...",
-      isLoading: false,
-      metadata: {
-        title: "Wasteland Outpost Alpha",
-        description: "A fortified settlement on the edge of the toxic zone",
-        investment: {
-          targetCapital: "50000",
-          description: "Resources for expansion and defense"
-        },
-        votingDuration: 604800,
-        linkedInURL: ""
-      },
-      pledgedAmount: "25000"
+      targetCapital: "50000",
+      pledgedAmount: "25000",
+      backers: 12,
+      status: "active",
+      remainingTime: "6 days"
     },
     {
-      tokenId: "2",
+      id: "2",
+      name: "Green Haven Refuge",
+      description: "An agricultural settlement with radiation-resistant crops",
+      createdAt: new Date().toISOString(),
       creator: "0x456...",
-      blockNumber: 123457,
-      transactionHash: "0xdef...",
-      isLoading: false,
-      metadata: {
-        title: "Green Haven Refuge",
-        description: "An agricultural settlement with radiation-resistant crops",
-        investment: {
-          targetCapital: "40000",
-          description: "Advanced farming technology and security"
-        },
-        votingDuration: 604800,
-        linkedInURL: ""
-      },
-      pledgedAmount: "32000"
+      targetCapital: "40000",
+      pledgedAmount: "32000",
+      backers: 18,
+      status: "active",
+      remainingTime: "4 days"
     },
     {
-      tokenId: "3",
+      id: "3",
+      name: "Radiation Springs",
+      description: "Trading hub with access to clean water sources",
+      createdAt: new Date().toISOString(),
       creator: "0x789...",
-      blockNumber: 123458,
-      transactionHash: "0xghi...",
-      isLoading: false,
-      metadata: {
-        title: "Radiation Springs",
-        description: "Trading hub with access to clean water sources",
-        investment: {
-          targetCapital: "60000",
-          description: "Water purification systems and market expansion"
-        },
-        votingDuration: 604800,
-        linkedInURL: ""
-      },
-      pledgedAmount: "15000"
+      targetCapital: "60000",
+      pledgedAmount: "15000",
+      backers: 7,
+      status: "active",
+      remainingTime: "12 days"
     }
   ];
 
@@ -498,3 +480,4 @@ const Hunt = () => {
 };
 
 export default Hunt;
+

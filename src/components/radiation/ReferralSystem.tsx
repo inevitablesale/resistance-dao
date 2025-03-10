@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicButton } from '@/components/ui/toxic-button';
@@ -8,7 +7,14 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+
+interface ReferralInfo {
+  referrerAddress: string;
+  referredAddress: string;
+  referralDate: string;
+  nftPurchased: boolean;
+  paymentProcessed: boolean;
+}
 
 interface ReferralSystemProps {
   earnings?: number;
@@ -42,31 +48,27 @@ export function ReferralSystem({ earnings = 0, totalReferrals = 0, className = "
     }
   }, [getReferrer, isConnected]);
   
-  // Load referral data from Supabase when wallet is connected
+  // Load referral data from localStorage when wallet is connected
   useEffect(() => {
     if (!isConnected || !address) return;
     
-    const fetchReferralData = async () => {
+    const fetchReferralData = () => {
       setLoading(true);
       try {
-        // Query for referrals where this user is the referrer
-        const { data: referrals, error } = await supabase
-          .from('referrals')
-          .select('*')
-          .eq('referrer_address', address);
+        // Get referral data from localStorage
+        const storedReferrals = localStorage.getItem(`referrals_${address}`);
+        const referrals: ReferralInfo[] = storedReferrals ? JSON.parse(storedReferrals) : [];
           
-        if (error) throw error;
-        
-        if (referrals) {
+        if (referrals && referrals.length > 0) {
           // Count total, pending, and completed referrals
-          const pending = referrals.filter(r => !r.nft_purchased).length;
-          const completed = referrals.filter(r => r.nft_purchased).length;
+          const pending = referrals.filter(r => !r.nftPurchased).length;
+          const completed = referrals.filter(r => r.nftPurchased).length;
           
           // Calculate earnings ($25 per completed referral)
           const totalEarnings = completed * 25;
           
           // Count pending payouts
-          const pendingPayouts = referrals.filter(r => r.nft_purchased && !r.payment_processed).length * 25;
+          const pendingPayouts = referrals.filter(r => r.nftPurchased && !r.paymentProcessed).length * 25;
           
           setReferralStats({
             totalReferrals: referrals.length,

@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { loadingStates } from "@/components/proposals/LoadingStates";
 import { ProposalLoadingCard } from "@/components/proposals/ProposalLoadingCard";
 import { SettlementsGrid } from "./SettlementsGrid";
+import { convertProposalsToSettlements } from "@/utils/settlementConversion";
 
 const formatUSDAmount = (rdAmount: string): string => {
   const amount = parseFloat(rdAmount);

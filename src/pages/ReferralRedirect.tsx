@@ -5,6 +5,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { Progress } from "@/components/ui/progress";
 
+interface ReferralInfo {
+  referrerAddress: string;
+  referredAddress: string;
+  referralDate: string;
+  nftPurchased: boolean;
+  paymentProcessed: boolean;
+}
+
 const ReferralRedirect = () => {
   const { referrerAddress } = useParams();
   const navigate = useNavigate();
@@ -31,7 +39,7 @@ const ReferralRedirect = () => {
     return () => {
       if (intervalId) window.clearInterval(intervalId);
     };
-  }, []);
+  }, [referrerAddress]);
 
   useEffect(() => {
     // If progress reaches 100%, redirect
@@ -48,6 +56,28 @@ const ReferralRedirect = () => {
       if (referrerAddress && referrerAddress.length > 0) {
         console.log("Storing referrer address:", referrerAddress);
         localStorage.setItem("referrer_address", referrerAddress);
+        
+        // If the user is connected, also store the referral relationship
+        if (isConnected && address) {
+          const currentDate = new Date().toISOString();
+          const newReferral: ReferralInfo = {
+            referrerAddress: referrerAddress,
+            referredAddress: address,
+            referralDate: currentDate,
+            nftPurchased: false,
+            paymentProcessed: false
+          };
+          
+          // Get existing referrals for this referrer
+          const storedReferrals = localStorage.getItem(`referrals_${referrerAddress}`);
+          const referrals: ReferralInfo[] = storedReferrals ? JSON.parse(storedReferrals) : [];
+          
+          // Add the new referral and save back to localStorage
+          referrals.push(newReferral);
+          localStorage.setItem(`referrals_${referrerAddress}`, JSON.stringify(referrals));
+          
+          console.log("Stored referral relationship:", newReferral);
+        }
         
         toast({
           title: "Welcome to Resistance DAO!",

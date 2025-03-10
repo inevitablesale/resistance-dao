@@ -9,6 +9,14 @@ import { sentinelContributeToParty } from "@/services/partyProtocolService";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 
+interface ReferralInfo {
+  referrerAddress: string;
+  referredAddress: string;
+  referralDate: string;
+  nftPurchased: boolean;
+  paymentProcessed: boolean;
+}
+
 interface ContributionPanelProps {
   settlementId: string;
   settlementName: string;
@@ -74,9 +82,23 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
         description: `You've contributed ${contribution} ETH to the settlement.`,
       });
       
-      // If this user was referred, log it
+      // If this user was referred, record the purchase completion
       if (referrer) {
         console.log(`Referral purchase completed. Referrer: ${referrer}, Buyer: ${address}`);
+        
+        // Update the referral in localStorage to mark as purchased
+        const storedReferrals = localStorage.getItem(`referrals_${referrer}`);
+        if (storedReferrals) {
+          const referrals: ReferralInfo[] = JSON.parse(storedReferrals);
+          const updatedReferrals = referrals.map(ref => {
+            if (ref.referredAddress === address) {
+              return { ...ref, nftPurchased: true };
+            }
+            return ref;
+          });
+          
+          localStorage.setItem(`referrals_${referrer}`, JSON.stringify(updatedReferrals));
+        }
         
         // Notify the user about the referral bonus
         toast({
