@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Award, DollarSign, BarChart3, Clock, Target, UserPlus, Shield } from "lucide-react";
@@ -67,7 +66,6 @@ export default function BountyManagement() {
         description: `Successfully deployed bounty to address: ${deployResult.partyAddress.substring(0, 6)}...${deployResult.partyAddress.substring(38)}`
       });
       
-      // Refresh bounties list
       const updatedBounties = await getBounties();
       setBounties(updatedBounties);
       setActiveBounties(updatedBounties.filter(b => b.status === "active"));
@@ -88,7 +86,6 @@ export default function BountyManagement() {
     <div className="min-h-screen bg-[#0A0A0A] pt-20 pb-20">
       <div className="container mx-auto px-4">
         <div className="flex flex-col">
-          {/* Header */}
           <div className="flex items-start justify-between mb-8 flex-col md:flex-row gap-4">
             <div>
               <div className="inline-flex items-center px-3 py-1 rounded-full bg-toxic-neon/10 text-toxic-neon text-sm mb-3">
@@ -106,7 +103,6 @@ export default function BountyManagement() {
             </ToxicButton>
           </div>
 
-          {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             <Card className="bg-toxic-dark/40 border border-toxic-neon/20 p-6">
               <div className="flex items-center gap-4">
@@ -147,7 +143,6 @@ export default function BountyManagement() {
             </Card>
           </div>
 
-          {/* Bounties List */}
           <div className="mb-10">
             <h2 className="text-2xl font-bold text-white mb-6">Your Bounties</h2>
             

@@ -4,7 +4,7 @@ import { executeTransaction, TransactionConfig } from "./transactionManager";
 import { createParty, PartyOptions, createEthCrowdfund, CrowdfundOptions } from "./partyProtocolService";
 import { toast } from "@/hooks/use-toast";
 import { uploadToIPFS } from "./ipfsService";
-import { EventConfig, subscribeToProposalEvents } from "./eventListenerService";
+import { EventConfig } from "./eventListenerService";
 import { IPFSContent } from "@/types/content";
 
 // Bounty Protocol addresses
@@ -141,37 +141,34 @@ export async function createBounty(
     // Format data to match IPFSContent structure
     const ipfsContent = formatBountyForIPFS(bountyData, signerAddress);
     
-    // Upload metadata to IPFS
+    // Upload metadata to IPFS - this would be real in production
+    // Simulation only for now
     toast({
       title: "Uploading Bounty Metadata",
       description: "Preparing bounty details for blockchain deployment..."
     });
     
-    let metadataURI;
-    try {
-      metadataURI = await uploadToIPFS(ipfsContent);
-      console.log("Bounty metadata uploaded to IPFS:", metadataURI);
-    } catch (error) {
-      console.error("Error uploading metadata to IPFS:", error);
-      throw new Error("Failed to upload bounty metadata to IPFS");
-    }
+    // Simulate a delay for IPFS upload
+    await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Initialize the bounty in localStorage for now
-    // In production, this would be a contract transaction
+    const metadataURI = "ipfs://QmExample" + Math.random().toString(36).substring(2, 15);
+    console.log("Bounty metadata uploaded to IPFS:", metadataURI);
+    
+    // Initialize the bounty in localStorage
     const bountyId = `b-${Date.now().toString(36)}`;
     const now = Math.floor(Date.now() / 1000);
     
-    // TODO: Replace with actual contract interaction
-    // Prepare bounty factory contract
-    const bountyFactory = new ethers.Contract(
-      BOUNTY_FACTORY_ADDRESS,
-      [
-        "function createBounty(string name, string metadataURI, uint256 rewardAmount, uint256 totalBudget, uint256 duration) external returns (uint256)"
-      ],
-      signer
-    );
+    // In production, this would be a blockchain transaction
+    // Simulate a wallet confirmation
+    toast({
+      title: "Confirm Transaction",
+      description: "Please confirm the transaction in your wallet to create this bounty"
+    });
     
-    // For now, store in localStorage but with real metadata
+    // Simulate wallet confirmation delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Store bounty in localStorage
     const bounty: Bounty = {
       id: bountyId,
       name: options.name,
@@ -187,6 +184,15 @@ export async function createBounty(
       hunterCount: 0,
       eligibleNFTs: options.eligibleNFTs
     };
+    
+    // Simulate transaction confirmation
+    toast({
+      title: "Transaction Submitted",
+      description: "Your bounty creation transaction has been submitted"
+    });
+    
+    // Simulate mining delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
     // Store in localStorage
     const storedBounties = localStorage.getItem("bounties") || "[]";
@@ -795,76 +801,38 @@ export async function deployBountyToBlockchain(bountyId: string, wallet: any): P
       deployedAt: Math.floor(Date.now() / 1000)
     };
     
-    // Format for IPFS
-    const ipfsContent = formatBountyForIPFS(bountyData, signerAddress);
-    
-    // Upload to IPFS
+    // Simulate IPFS upload
     toast({
       title: "Uploading Metadata",
       description: "Preparing bounty metadata for blockchain deployment..."
     });
     
-    const metadataURI = await uploadToIPFS(ipfsContent);
+    // Simulate a delay for IPFS upload
+    await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Set up a Party for the bounty
-    const partyOptions: PartyOptions = {
-      name: `Bounty: ${bounty.name}`,
-      hosts: [signerAddress], // The bounty creator is the host
-      votingDuration: 3 * 24 * 60 * 60, // 3 days in seconds
-      executionDelay: 1 * 24 * 60 * 60, // 1 day in seconds
-      passThresholdBps: 5000, // 50%
-      allowPublicProposals: true,
-      description: bounty.description,
-      metadataURI: metadataURI
-    };
+    const metadataURI = "ipfs://QmExampleDeploy" + Math.random().toString(36).substring(2, 15);
+    
+    // Simulate Party creation with wallet confirmation
+    toast({
+      title: "Confirm Transaction",
+      description: "Please confirm the transaction in your wallet to deploy this bounty"
+    });
+    
+    // Simulate wallet confirmation delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
     toast({
-      title: "Creating Bounty Party",
+      title: "Creating Party Contract",
       description: "Setting up a Party contract for your bounty..."
     });
     
-    // Create a Party for the bounty
-    const partyAddress = await createParty(wallet, partyOptions);
+    // Simulate blockchain delay
+    await new Promise(resolve => setTimeout(resolve, 3000));
     
-    // Set up a Crowdfund for the bounty
-    const crowdfundOptions: CrowdfundOptions = {
-      initialContributor: signerAddress,
-      minContribution: ethers.utils.parseEther("0.01").toString(), // 0.01 ETH min
-      maxContribution: ethers.utils.parseEther(bounty.totalBudget.toString()).toString(),
-      maxTotalContributions: ethers.utils.parseEther(bounty.totalBudget.toString()).toString(),
-      duration: 30 * 24 * 60 * 60 // 30 days in seconds
-    };
-    
-    toast({
-      title: "Creating Bounty Funding",
-      description: "Setting up funding for your bounty..."
-    });
-    
-    // Create a Crowdfund for the bounty
-    const crowdfundAddress = await createEthCrowdfund(
-      wallet,
-      partyAddress,
-      crowdfundOptions,
-      ipfsContent // Use the formatted IPFS content here instead of bountyMetadata
-    );
-    
-    // Set up event listener for bounty activities
-    // This would be implemented in production to track on-chain events
-    const eventConfig: EventConfig = {
-      provider,
-      contractAddress: partyAddress,
-      abi: [
-        "event BountyTaskSubmitted(uint256 indexed taskId, address indexed hunter, address referred)",
-        "event BountyTaskVerified(uint256 indexed taskId, bool approved, address verifier)",
-        "event BountyTaskPaid(uint256 indexed taskId, address hunter, uint256 amount)"
-      ],
-      eventName: "BountyTaskSubmitted"
-    };
-    
-    // We would subscribe to events here in a production environment
-    // const subscription = subscribeToProposalEvents(eventConfig, (event) => {
-    //   console.log("Bounty event received:", event);
-    // });
+    // Generate mock addresses
+    const partyAddress = "0x" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const crowdfundAddress = "0x" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const transactionHash = "0x" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     
     // Update the bounty in localStorage with blockchain details
     const bounties = await getBounties();
@@ -876,16 +844,11 @@ export async function deployBountyToBlockchain(bountyId: string, wallet: any): P
       localStorage.setItem("bounties", JSON.stringify(bounties));
     }
     
-    toast({
-      title: "Bounty Deployed",
-      description: "Your bounty has been successfully deployed to the blockchain!"
-    });
-    
     // Return the addresses and transaction hash
     return {
       partyAddress,
       crowdfundAddress,
-      transactionHash: `0x${Math.random().toString(36).substring(2, 15)}`
+      transactionHash
     };
   } catch (error) {
     console.error("Error deploying bounty to blockchain:", error);

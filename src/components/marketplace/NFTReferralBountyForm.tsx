@@ -47,6 +47,7 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
   const { createSettlement, isProcessing } = usePartyTransactions();
   const [estimatedGasCost, setEstimatedGasCost] = useState("~1.2 MATIC");
   const { primaryWallet } = useWalletConnection();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const defaultValues: NFTReferralFormValues = {
     name: template?.title || "NFT Referral Program",
@@ -78,6 +79,8 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
   
   const onSubmit = async (data: NFTReferralFormValues) => {
     try {
+      setIsSubmitting(true);
+      
       if (!primaryWallet) {
         toast({
           title: "Wallet Not Connected",
@@ -86,6 +89,11 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
         });
         return;
       }
+      
+      toast({
+        title: "Creating Bounty",
+        description: "Please wait while we create your bounty...",
+      });
       
       const result = await createBounty({
         name: data.name,
@@ -107,7 +115,7 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
           title: "Bounty Created!",
           description: "Your NFT referral bounty has been created successfully",
         });
-        navigate("/marketplace/bounty-hunters/manage");
+        navigate("/bounty/management");
       }
     } catch (error: any) {
       console.error("Error creating bounty:", error);
@@ -116,6 +124,8 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
         description: error.message || "There was an error creating your bounty",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -383,7 +393,7 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
                   Cancel
                 </Button>
               )}
-              <ToxicButton type="submit" disabled={isProcessing}>
+              <ToxicButton type="submit" disabled={isProcessing || isSubmitting}>
                 {isProcessing ? "Creating Bounty..." : "Create Bounty"}
               </ToxicButton>
             </div>

@@ -7,7 +7,10 @@ import {
   AlertTriangle, 
   Check, 
   X, 
-  ArrowRight 
+  ArrowRight,
+  Coins,
+  UserPlus,
+  Target
 } from "lucide-react";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { ToxicCard } from "@/components/ui/toxic-card";
@@ -20,6 +23,8 @@ export type ProposalTemplateType =
   | "resourceAllocation" 
   | "membershipRules" 
   | "emergencyAction" 
+  | "nftReferral"
+  | "talentBounty"
   | "custom";
 
 export interface ProposalTransaction {
@@ -35,11 +40,12 @@ export interface ProposalTemplate {
   title: string;
   description: string;
   icon: React.ReactNode;
-  defaultTransactions: ProposalTransaction[];
+  defaultTransactions?: ProposalTransaction[];
   defaultTitle: string;
   defaultDescription: string;
   isEmergency?: boolean;
   isRecommended?: boolean;
+  type?: "proposal" | "bounty";
 }
 
 const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
@@ -66,7 +72,8 @@ const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
         signature: "transfer(address,uint256)",
         description: "Send rewards to settlement treasury"
       }
-    ]
+    ],
+    type: "proposal"
   },
   {
     id: "resourceAllocation",
@@ -83,7 +90,8 @@ const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
         signature: "transfer(address,uint256)",
         description: "Fund infrastructure improvement"
       }
-    ]
+    ],
+    type: "proposal"
   },
   {
     id: "membershipRules",
@@ -100,7 +108,8 @@ const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
         signature: "updateVotingSettings(uint256)",
         description: "Update voting threshold"
       }
-    ]
+    ],
+    type: "proposal"
   },
   {
     id: "emergencyAction",
@@ -118,17 +127,44 @@ const PROPOSAL_TEMPLATES: ProposalTemplate[] = [
         signature: "executeEmergencyAction(bytes)",
         description: "Execute emergency protocol"
       }
-    ]
+    ],
+    type: "proposal"
+  },
+  // New Bounty Templates
+  {
+    id: "nftReferral",
+    title: "NFT Referral Bounty",
+    description: "Reward hunters for referring new NFT minters",
+    icon: <Gift className="w-6 h-6 text-toxic-neon" />,
+    isRecommended: true,
+    defaultTitle: "NFT Referral Bounty",
+    defaultDescription: "Set up a bounty that rewards community members for bringing in new NFT minters.",
+    type: "bounty"
+  },
+  {
+    id: "talentBounty",
+    title: "Talent Acquisition",
+    description: "Find and recruit talent for the network",
+    icon: <UserPlus className="w-6 h-6 text-blue-400" />,
+    defaultTitle: "Talent Acquisition Bounty",
+    defaultDescription: "Create a bounty to attract developers, designers, and other talent to the network.",
+    type: "bounty"
   }
 ];
 
 interface ProposalTemplatesProps {
   onSelectTemplate: (template: ProposalTemplate) => void;
+  type?: "proposal" | "bounty" | "all";
 }
 
-export const ProposalTemplates = ({ onSelectTemplate }: ProposalTemplatesProps) => {
+export const ProposalTemplates = ({ onSelectTemplate, type = "all" }: ProposalTemplatesProps) => {
   const [selectedTemplate, setSelectedTemplate] = useState<ProposalTemplateType | null>(null);
   const [hoveredTemplate, setHoveredTemplate] = useState<ProposalTemplateType | null>(null);
+
+  // Filter templates based on type
+  const filteredTemplates = type === "all" 
+    ? PROPOSAL_TEMPLATES 
+    : PROPOSAL_TEMPLATES.filter(template => template.type === type || template.type === undefined);
 
   const handleSelectTemplate = (template: ProposalTemplate) => {
     setSelectedTemplate(template.id);
@@ -138,14 +174,20 @@ export const ProposalTemplates = ({ onSelectTemplate }: ProposalTemplatesProps) 
   return (
     <div className="space-y-6 relative">
       <div className="relative z-10">
-        <h2 className="text-xl font-bold text-toxic-neon toxic-glow mb-2">Choose a Proposal Template</h2>
-        <p className="text-white/60">Select a template to create a governance proposal</p>
+        <h2 className="text-xl font-bold text-toxic-neon toxic-glow mb-2">
+          {type === "bounty" ? "Choose a Bounty Template" : "Choose a Proposal Template"}
+        </h2>
+        <p className="text-white/60">
+          {type === "bounty" 
+            ? "Select a template to create a bounty program"
+            : "Select a template to create a governance proposal"}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
         <DrippingSlime position="both" dripsCount={6} className="absolute inset-0 pointer-events-none" />
         
-        {PROPOSAL_TEMPLATES.map((template) => (
+        {filteredTemplates.map((template) => (
           <ToxicCard
             key={template.id}
             className={cn(
@@ -184,13 +226,33 @@ export const ProposalTemplates = ({ onSelectTemplate }: ProposalTemplatesProps) 
               <Separator className="my-4 bg-white/10" />
               
               <div className="space-y-3">
-                <p className="text-sm text-white/80">Default transactions:</p>
-                {template.defaultTransactions.map((tx, index) => (
-                  <div key={index} className="text-sm text-white/70 flex items-center gap-2">
-                    <Check className="w-4 h-4 text-toxic-neon/70" />
-                    <span>{tx.description || `Transaction ${index + 1}`}</span>
-                  </div>
-                ))}
+                {template.defaultTransactions ? (
+                  <>
+                    <p className="text-sm text-white/80">Default transactions:</p>
+                    {template.defaultTransactions.map((tx, index) => (
+                      <div key={index} className="text-sm text-white/70 flex items-center gap-2">
+                        <Check className="w-4 h-4 text-toxic-neon/70" />
+                        <span>{tx.description || `Transaction ${index + 1}`}</span>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-white/80">Benefits:</p>
+                    <div className="text-sm text-white/70 flex items-center gap-2">
+                      <Check className="w-4 h-4 text-toxic-neon/70" />
+                      <span>Automated reward distribution</span>
+                    </div>
+                    <div className="text-sm text-white/70 flex items-center gap-2">
+                      <Check className="w-4 h-4 text-toxic-neon/70" />
+                      <span>Transparent referral tracking</span>
+                    </div>
+                    <div className="text-sm text-white/70 flex items-center gap-2">
+                      <Check className="w-4 h-4 text-toxic-neon/70" />
+                      <span>Customizable success criteria</span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </ToxicCard>
