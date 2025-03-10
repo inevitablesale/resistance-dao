@@ -1,305 +1,226 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Loader2 } from 'lucide-react';
+import { cn } from "@/lib/utils";
+import { Lock, ExternalLink, Terminal } from "lucide-react";
+import { Input } from "./input";
 
 interface TerminalTypewriterProps {
-  lines: string[];
-  typingSpeed?: number;
-  pauseBetweenLines?: number;
-  startDelay?: number;
-  onComplete?: () => void;
-  highlightColor?: string;
-  loop?: boolean;
-  waitForClick?: boolean;
+  textToType?: string;
+  typeDelay?: number;
   className?: string;
-  autoStart?: boolean;
-  interactive?: boolean;
-  commands?: Record<string, (args: string[]) => string | Promise<string>>;
-  initialPrompt?: string;
-  compactMode?: boolean;
+  isConnected?: boolean;
+  onConnect?: () => void;
+  marketplaceMode?: boolean;
 }
 
-interface TerminalTypewriterCommands {
-  [key: string]: (args: string[]) => string | Promise<string>;
-}
-
-export const TerminalTypewriter: React.FC<TerminalTypewriterProps> = ({
-  lines,
-  typingSpeed = 30,
-  pauseBetweenLines = 800,
-  startDelay = 500,
-  onComplete,
-  highlightColor = "#39ff14",
-  loop = false,
-  waitForClick = false,
-  className = "",
-  autoStart = true,
-  interactive = false,
-  commands = {},
-  initialPrompt = "> ",
-  compactMode = false
-}) => {
-  const [visibleLines, setVisibleLines] = useState<string[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [currentCharIndex, setCurrentCharIndex] = useState(0);
-  const [completed, setCompleted] = useState(false);
-  const [waitingForClick, setWaitingForClick] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
-  const [commandInput, setCommandInput] = useState("");
-  const [commandHistory, setCommandHistory] = useState<string[]>([]);
-  const [historyPosition, setHistoryPosition] = useState(-1);
-  const [isProcessingCommand, setIsProcessingCommand] = useState(false);
-  const [prompt, setPrompt] = useState(initialPrompt);
+export function TerminalTypewriter({
+  textToType = "Enter access code",
+  typeDelay = 20, // Much faster typing speed (was 70)
+  className,
+  isConnected = false,
+  onConnect,
+  marketplaceMode = false
+}: TerminalTypewriterProps) {
+  const [displayText, setDisplayText] = useState("");
+  const [cursorVisible, setCursorVisible] = useState(true);
+  const [isComplete, setIsComplete] = useState(false);
+  const [initializationComplete, setInitializationComplete] = useState(marketplaceMode ? true : false);
+  const [currentLine, setCurrentLine] = useState(0);
+  const [accessCode, setAccessCode] = useState("");
+  const terminalRef = useRef<HTMLDivElement>(null);
   
-  const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const autoScrollRef = useRef<HTMLDivElement>(null);
+  // Simplified initialization lines (fewer lines for quicker display)
+  const initLines = [
+    "RESISTANCE_SECURE_SHELL",
+    "Initializing secure terminal...",
+    "Establishing connection...",
+    "RESISTANCE NETWORK v3.27",
+    "Authentication required:"
+  ];
   
-  const defaultCommands: TerminalTypewriterCommands = {
-    help: () => {
-      const availableCmds = ["help", "clear", ...Object.keys(commands)];
-      return `Available commands: ${availableCmds.join(", ")}`;
-    },
-    clear: () => {
-      setVisibleLines([]);
-      return "";
-    }
-  };
-  
-  const allCommands = { ...defaultCommands, ...commands };
-  
+  // Handle initialization sequence typing - with faster line transition
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.focus();
-    }
-  }, []);
-  
-  useEffect(() => {
-    if (interactive && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [interactive, visibleLines]);
-  
-  useEffect(() => {
-    // Auto-scroll to bottom
-    if (autoScrollRef.current) {
-      autoScrollRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [visibleLines]);
-  
-  useEffect(() => {
-    if (autoStart) {
-      const timer = setTimeout(() => {
-        startTyping();
-      }, startDelay);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [autoStart]);
-  
-  const startTyping = () => {
-    if (currentIndex < lines.length && !isTyping) {
-      setIsTyping(true);
-      typeNextChar();
-    }
-  };
-  
-  const typeNextChar = () => {
-    if (currentIndex >= lines.length) {
-      finishTyping();
+    if (marketplaceMode) {
+      // Skip initialization for marketplace mode
       return;
     }
     
-    const currentLine = lines[currentIndex];
-    
-    if (currentCharIndex < currentLine.length) {
-      const timer = setTimeout(() => {
-        setVisibleLines(prev => {
-          const newLines = [...prev];
-          const visiblePart = currentLine.substring(0, currentCharIndex + 1);
-          
-          if (newLines[currentIndex]) {
-            newLines[currentIndex] = visiblePart;
-          } else {
-            newLines.push(visiblePart);
-          }
-          
-          return newLines;
-        });
-        
-        setCurrentCharIndex(currentCharIndex + 1);
-        typeNextChar();
-      }, typingSpeed);
-      
-      return () => clearTimeout(timer);
-    } else {
-      // Current line completed
-      if (waitForClick && currentIndex < lines.length - 1) {
-        setWaitingForClick(true);
-        setIsTyping(false);
-      } else {
-        const timer = setTimeout(() => {
-          setCurrentIndex(currentIndex + 1);
-          setCurrentCharIndex(0);
-          typeNextChar();
-        }, pauseBetweenLines);
-        
-        return () => clearTimeout(timer);
-      }
-    }
-  };
-  
-  const finishTyping = () => {
-    setIsTyping(false);
-    setCurrentIndex(0);
-    setCurrentCharIndex(0);
-    setCompleted(true);
-    
-    if (loop) {
-      const timer = setTimeout(() => {
-        setVisibleLines([]);
-        setCompleted(false);
-        startTyping();
-      }, pauseBetweenLines * 2);
-      
-      return () => clearTimeout(timer);
-    }
-    
-    if (onComplete) {
-      onComplete();
-    }
-  };
-  
-  const handleClick = () => {
-    if (waitingForClick) {
-      setWaitingForClick(false);
-      setCurrentIndex(currentIndex + 1);
-      setCurrentCharIndex(0);
-      setIsTyping(true);
-      typeNextChar();
-    } else if (!isTyping && !completed) {
-      startTyping();
-    }
-  };
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCommandInput(e.target.value);
-  };
-  
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      executeCommand();
-    } else if (e.key === "ArrowUp") {
-      // Navigate up through command history
-      if (commandHistory.length > 0 && historyPosition < commandHistory.length - 1) {
-        const newPosition = historyPosition + 1;
-        setHistoryPosition(newPosition);
-        setCommandInput(commandHistory[commandHistory.length - 1 - newPosition]);
-      }
-    } else if (e.key === "ArrowDown") {
-      // Navigate down through command history
-      if (historyPosition > 0) {
-        const newPosition = historyPosition - 1;
-        setHistoryPosition(newPosition);
-        setCommandInput(commandHistory[commandHistory.length - 1 - newPosition]);
-      } else if (historyPosition === 0) {
-        setHistoryPosition(-1);
-        setCommandInput("");
-      }
-    }
-  };
-  
-  const executeCommand = async () => {
-    if (commandInput.trim() === "") return;
-    
-    const fullCommand = commandInput.trim();
-    const commandParts = fullCommand.split(" ");
-    const command = commandParts[0].toLowerCase();
-    const args = commandParts.slice(1);
-    
-    // Add command to visible lines
-    const cmdDisplayLine = `${prompt}${fullCommand}`;
-    setVisibleLines(prev => [...prev, cmdDisplayLine]);
-    
-    // Add to command history
-    setCommandHistory(prev => [...prev, fullCommand]);
-    setHistoryPosition(-1);
-    setCommandInput("");
-    
-    // Process command
-    setIsProcessingCommand(true);
-    try {
-      if (allCommands[command]) {
-        const result = await allCommands[command](args);
-        if (result) {
-          // Split result by newlines and add each line
-          const resultLines = result.split("\n");
-          setVisibleLines(prev => [...prev, ...resultLines]);
+    if (currentLine < initLines.length) {
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i <= initLines[currentLine].length) {
+          setDisplayText(prev => initLines[currentLine].substring(0, i));
+          i++;
+        } else {
+          clearInterval(interval);
+          setTimeout(() => {
+            setCurrentLine(prev => prev + 1);
+          }, 150); // Faster transition between lines (was 300)
         }
-      } else {
-        setVisibleLines(prev => [...prev, `Command not found: ${command}. Type 'help' for available commands.`]);
-      }
-    } catch (error) {
-      console.error("Error executing command:", error);
-      setVisibleLines(prev => [...prev, `Error executing command: ${error}`]);
-    } finally {
-      setIsProcessingCommand(false);
+      }, typeDelay);
+      
+      return () => clearInterval(interval);
+    } else if (currentLine === initLines.length) {
+      setInitializationComplete(true);
+      setCurrentLine(prev => prev + 1);
+    }
+  }, [currentLine, typeDelay, marketplaceMode]);
+  
+  // Handle cursor blinking
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      setCursorVisible(prev => !prev);
+    }, 500);
+    
+    return () => clearInterval(cursorInterval);
+  }, []);
+
+  // Scroll to bottom when content changes
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [displayText, isConnected, isComplete, currentLine]);
+  
+  const handleSubmit = () => {
+    if (onConnect) {
+      onConnect();
     }
   };
   
-  const formatLine = (line: string, index: number) => {
-    // Process any highlight markers like <<highlight>>text<<>>
-    return line.replace(/<<highlight>>(.*?)<<>>/g, `<span style="color: ${highlightColor}">$1</span>`);
+  const handleAccessCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAccessCode(e.target.value);
   };
-  
-  const getCompactClass = () => {
-    return compactMode ? "terminal-compact" : "";
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSubmit();
+    }
   };
   
   return (
-    <div 
-      ref={containerRef}
-      className={`terminal-container ${getCompactClass()} ${className}`} 
-      onClick={handleClick}
-      tabIndex={0}
-    >
-      <div className="terminal-content">
-        {visibleLines.map((line, index) => (
-          <div 
-            key={index} 
-            className="terminal-line"
-            dangerouslySetInnerHTML={{ __html: formatLine(line, index) }}
-          />
-        ))}
-        
-        {waitingForClick && (
-          <div className="terminal-prompt">
-            <span className="terminal-prompt-text">Click to continue...</span>
+    <div className={cn("terminal-outer-container relative backdrop-blur-sm", className)}>
+      <div className="scanline"></div>
+      <div className="terminal-middle-container">
+        <div 
+          ref={terminalRef} 
+          className="terminal-container"
+        >
+          <div className="terminal-header">
+            <div className="flex items-center">
+              <Terminal className="w-4 h-4 mr-2 text-toxic-neon" />
+              <span className="text-toxic-neon text-sm font-mono">RESISTANCE_SECURE_SHELL</span>
+              <div className="ml-2 w-2 h-2 rounded-full bg-toxic-neon animate-pulse"></div>
+            </div>
+            <div className="flex gap-2">
+              <div className="w-3 h-3 rounded-full bg-apocalypse-red"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-toxic-neon/70"></div>
+            </div>
           </div>
-        )}
-        
-        {interactive && (
-          <div className="terminal-input-container">
-            <span className="terminal-prompt-text">{prompt}</span>
-            <input
-              ref={inputRef}
-              type="text"
-              className="terminal-input"
-              value={commandInput}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              disabled={isProcessingCommand}
-              aria-label="Terminal command input"
-            />
-            {isProcessingCommand && (
-              <Loader2 className="terminal-loading-indicator animate-spin" />
+          
+          <div className="terminal-content">
+            {!initializationComplete ? (
+              <div className="terminal-line">
+                <span className="text-toxic-neon font-mono">
+                  {displayText}
+                  {cursorVisible && <span className="cursor">_</span>}
+                </span>
+              </div>
+            ) : (
+              <>
+                {!marketplaceMode && (
+                  <>
+                    {initLines.map((line, index) => (
+                      <div key={index} className="terminal-line">
+                        <span className="text-toxic-neon font-mono">
+                          {index === 0 ? (
+                            <span className="text-toxic-neon">_&gt; {line}</span>
+                          ) : (
+                            line
+                          )}
+                        </span>
+                      </div>
+                    ))}
+                    
+                    <div className="terminal-line">
+                      <span className="text-toxic-neon font-mono">
+                        resistance@secure:~$
+                      </span>
+                    </div>
+                  </>
+                )}
+                
+                {isConnected ? (
+                  <div className="terminal-line mt-3">
+                    <div className="animate-pulse text-toxic-neon font-mono">
+                      Access granted. Welcome to the Resistance.
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {!marketplaceMode ? (
+                      <>
+                        <div className="terminal-input-container mt-4">
+                          <div className="access-code-container">
+                            <div className="flex items-center w-full relative">
+                              <Lock className="access-code-icon absolute left-3 z-10 text-toxic-neon" size={16} />
+                              <Input
+                                type="password"
+                                placeholder="Enter access code"
+                                className="access-code-input pl-10"
+                                value={accessCode}
+                                onChange={handleAccessCodeChange}
+                                onKeyDown={handleKeyDown}
+                              />
+                              <button 
+                                onClick={handleSubmit}
+                                className="submit-button ml-3 active:transform active:translate-y-0.5 transition-transform"
+                              >
+                                <span className="mr-2">Submit</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="terminal-hint mt-3">
+                          <span className="text-toxic-neon/70 text-xs font-mono">// Access code is "resistance"</span>
+                        </div>
+                        
+                        <div className="terminal-footer mt-4">
+                          <a 
+                            href="https://www.linkedin.com/groups/14310213/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="linkedin-link"
+                          >
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            <span>Join Resistance LinkedIn Group</span>
+                          </a>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="terminal-line mt-2">
+                        <div className="text-toxic-neon font-mono">
+                          {textToType} {cursorVisible && <span className="cursor">_</span>}
+                        </div>
+                        <div className="mt-3">
+                          <button 
+                            onClick={handleSubmit}
+                            className="submit-button active:transform active:translate-y-0.5 transition-transform"
+                          >
+                            <span className="mr-2">Connect</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
             )}
           </div>
-        )}
-        
-        <div ref={autoScrollRef} />
+        </div>
       </div>
     </div>
   );
-};
+}
