@@ -7,14 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
 import { useToast } from '@/hooks/use-toast';
-
-interface ReferralInfo {
-  referrerAddress: string;
-  referredAddress: string;
-  referralDate: string;
-  nftPurchased: boolean;
-  paymentProcessed: boolean;
-}
+import { getReferralsByReferrer, ReferralInfo } from '@/services/referralService';
 
 interface ReferralSystemProps {
   earnings?: number;
@@ -48,16 +41,15 @@ export function ReferralSystem({ earnings = 0, totalReferrals = 0, className = "
     }
   }, [getReferrer, isConnected]);
   
-  // Load referral data from localStorage when wallet is connected
+  // Load referral data from using the referral service
   useEffect(() => {
     if (!isConnected || !address) return;
     
-    const fetchReferralData = () => {
+    const fetchReferralData = async () => {
       setLoading(true);
       try {
-        // Get referral data from localStorage
-        const storedReferrals = localStorage.getItem(`referrals_${address}`);
-        const referrals: ReferralInfo[] = storedReferrals ? JSON.parse(storedReferrals) : [];
+        // Get referral data using the service
+        const referrals = await getReferralsByReferrer(address);
           
         if (referrals && referrals.length > 0) {
           // Count total, pending, and completed referrals

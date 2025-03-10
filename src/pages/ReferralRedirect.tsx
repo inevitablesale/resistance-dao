@@ -4,14 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { Progress } from "@/components/ui/progress";
-
-interface ReferralInfo {
-  referrerAddress: string;
-  referredAddress: string;
-  referralDate: string;
-  nftPurchased: boolean;
-  paymentProcessed: boolean;
-}
+import { createReferral, storeReferrerAddress } from "@/services/referralService";
 
 const ReferralRedirect = () => {
   const { referrerAddress } = useParams();
@@ -54,29 +47,18 @@ const ReferralRedirect = () => {
     const processReferral = async () => {
       // Store the referrer address in localStorage if it's valid
       if (referrerAddress && referrerAddress.length > 0) {
-        console.log("Storing referrer address:", referrerAddress);
-        localStorage.setItem("referrer_address", referrerAddress);
+        console.log("Processing referrer address:", referrerAddress);
+        // Store for all users, even if not connected yet
+        storeReferrerAddress(referrerAddress);
         
-        // If the user is connected, also store the referral relationship
+        // If the user is connected, also create the referral relationship
         if (isConnected && address) {
-          const currentDate = new Date().toISOString();
-          const newReferral: ReferralInfo = {
-            referrerAddress: referrerAddress,
-            referredAddress: address,
-            referralDate: currentDate,
-            nftPurchased: false,
-            paymentProcessed: false
-          };
-          
-          // Get existing referrals for this referrer
-          const storedReferrals = localStorage.getItem(`referrals_${referrerAddress}`);
-          const referrals: ReferralInfo[] = storedReferrals ? JSON.parse(storedReferrals) : [];
-          
-          // Add the new referral and save back to localStorage
-          referrals.push(newReferral);
-          localStorage.setItem(`referrals_${referrerAddress}`, JSON.stringify(referrals));
-          
-          console.log("Stored referral relationship:", newReferral);
+          try {
+            await createReferral(referrerAddress, address);
+            console.log("Stored referral relationship between", referrerAddress, "and", address);
+          } catch (error) {
+            console.error("Error creating referral:", error);
+          }
         }
         
         toast({
