@@ -20,7 +20,7 @@ export interface VotingPowerInfo {
 export const useVotingPower = (): VotingPowerInfo => {
   const { primaryWallet } = useDynamicContext();
   const { primaryRole, isSentinel, isSurvivor, isBountyHunter } = useNFTRoles();
-  const { data: nftBalance = 0 } = useNFTBalance(primaryWallet?.address);
+  const { data: nftBalanceData } = useNFTBalance(primaryWallet?.address);
 
   // Define power multipliers by role
   const sentinelMultiplier = 3;
@@ -28,7 +28,7 @@ export const useVotingPower = (): VotingPowerInfo => {
   const bountyHunterMultiplier = 1;
 
   // Calculate base units (number of NFTs owned)
-  const baseVotingUnits = nftBalance;
+  const baseVotingUnits = nftBalanceData?.balance || 0;
 
   // Calculate role-specific multiplier
   const getMultiplier = () => {

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicButton } from '@/components/ui/toxic-button';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
-import { Target, Copy, Share2, Check, ArrowUp, Coins, DollarSign, Users, Gift, Link, Clock, Award } from 'lucide-react';
+import { Target, Copy, Share2, Check, ArrowUp, Coins, DollarSign, Users, Gift, Link, Clock, Award, Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { useCustomWallet } from '@/hooks/useCustomWallet';

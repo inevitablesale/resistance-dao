@@ -4,6 +4,13 @@ import { getNFTBalanceByContract, fetchNFTsForAddress, RESISTANCE_NFT_ADDRESS } 
 import { markTokenAsAirdrop, isTokenAirdrop } from "@/services/nftPurchaseEvents";
 import { useToast } from "@/hooks/use-toast";
 
+export interface NFTBalanceResult {
+  balance: number;
+  nfts: any[];
+  purchasedCount?: number;
+  airdropCount?: number;
+}
+
 export const useNFTBalance = (address?: string) => {
   const { toast } = useToast();
   
