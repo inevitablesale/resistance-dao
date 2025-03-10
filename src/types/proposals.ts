@@ -189,3 +189,21 @@ export interface ProposalEvent {
   error?: string;
   voteCount?: number;
 }
+
+export interface PartyProposal {
+  id: string;
+  title: string;
+  description: string;
+  proposer: string;
+  status: 'active' | 'passed' | 'failed' | 'executed' | 'ready';
+  votesFor: number;
+  votesAgainst: number;
+  createdAt: number;
+  timeRemaining: string;
+  transactions: {
+    target: string;
+    value: string;
+    calldata: string;
+    signature?: string;
+  }[];
+}

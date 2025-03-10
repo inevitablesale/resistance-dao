@@ -7,8 +7,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 import { ContributionPanel } from "@/components/settlements/ContributionPanel";
+import { GovernancePanel } from "@/components/settlements/GovernancePanel";
 import { useWalletProvider } from "@/hooks/useWalletProvider";
-import { Shield, Users, Zap, Clock } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Shield, Users, Zap, Clock, FileText, GavelIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { 
   FACTORY_ADDRESS, 
@@ -160,151 +162,196 @@ export default function SettlementDetails() {
               <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent" />
             </div>
           ) : (
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* Main content */}
-              <div className="md:col-span-2">
-                <div className="bg-[#111] rounded-xl border border-white/5 p-6 space-y-6">
-                  <h2 className="text-xl font-semibold">Settlement Vision</h2>
-                  <p className="text-gray-300">{settlement.description}</p>
-                  
-                  {metadata?.fundingBreakdown && metadata.fundingBreakdown.length > 0 && (
-                    <>
-                      <Separator className="my-6 bg-white/10" />
-                      <h2 className="text-xl font-semibold">Funding Breakdown</h2>
-                      <div className="space-y-2">
-                        {metadata.fundingBreakdown.map((item, index) => (
-                          <div key={index} className="flex justify-between">
-                            <span className="text-gray-400">{item.category}</span>
-                            <span className="font-mono">{item.amount} ETH</span>
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="bg-[#111] mb-6">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="governance">Governance</TabsTrigger>
+                <TabsTrigger value="contributors">Contributors</TabsTrigger>
+              </TabsList>
+            
+              <TabsContent value="overview">
+                <div className="grid md:grid-cols-3 gap-8">
+                  {/* Main content */}
+                  <div className="md:col-span-2">
+                    <div className="bg-[#111] rounded-xl border border-white/5 p-6 space-y-6">
+                      <h2 className="text-xl font-semibold">Settlement Vision</h2>
+                      <p className="text-gray-300">{settlement.description}</p>
+                      
+                      {metadata?.fundingBreakdown && metadata.fundingBreakdown.length > 0 && (
+                        <>
+                          <Separator className="my-6 bg-white/10" />
+                          <h2 className="text-xl font-semibold">Funding Breakdown</h2>
+                          <div className="space-y-2">
+                            {metadata.fundingBreakdown.map((item, index) => (
+                              <div key={index} className="flex justify-between">
+                                <span className="text-gray-400">{item.category}</span>
+                                <span className="font-mono">{item.amount} ETH</span>
+                              </div>
+                            ))}
                           </div>
-                        ))}
+                        </>
+                      )}
+                      
+                      <Separator className="my-6 bg-white/10" />
+                      
+                      <h2 className="text-xl font-semibold">Funding Progress</h2>
+                      <div className="bg-black/50 h-4 w-full rounded-full overflow-hidden">
+                        <div 
+                          className="bg-blue-500 h-full rounded-full" 
+                          style={{ 
+                            width: `${Math.min(
+                              100, 
+                              (parseFloat(settlement.totalRaised) / parseFloat(settlement.targetAmount)) * 100
+                            )}%` 
+                          }}
+                        />
                       </div>
-                    </>
-                  )}
+                      <div className="flex justify-between text-sm text-gray-400">
+                        <span>{settlement.totalRaised} ETH raised</span>
+                        <span>Target: {settlement.targetAmount} ETH</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-4 mt-4">
+                        <div className="bg-[#0a1020] p-4 rounded-xl">
+                          <div className="flex items-center gap-2 text-blue-400 mb-2">
+                            <Users className="w-4 h-4" />
+                            <span className="text-sm">Backers</span>
+                          </div>
+                          <span className="text-2xl font-bold">{settlement.backerCount}</span>
+                        </div>
+                        
+                        <div className="bg-[#0a1020] p-4 rounded-xl">
+                          <div className="flex items-center gap-2 text-blue-400 mb-2">
+                            <Zap className="w-4 h-4" />
+                            <span className="text-sm">Progress</span>
+                          </div>
+                          <span className="text-2xl font-bold">
+                            {Math.round((parseFloat(settlement.totalRaised) / parseFloat(settlement.targetAmount)) * 100)}%
+                          </span>
+                        </div>
+                        
+                        <div className="bg-[#0a1020] p-4 rounded-xl">
+                          <div className="flex items-center gap-2 text-blue-400 mb-2">
+                            <Clock className="w-4 h-4" />
+                            <span className="text-sm">Remaining</span>
+                          </div>
+                          <span className="text-2xl font-bold">{settlement.remainingTime}</span>
+                        </div>
+                      </div>
+                      
+                      {metadata?.team && metadata.team.length > 0 && (
+                        <>
+                          <Separator className="my-6 bg-white/10" />
+                          <h2 className="text-xl font-semibold">Settlement Team</h2>
+                          <div className="grid grid-cols-2 gap-4">
+                            {metadata.team.map((member, index) => (
+                              <div key={index} className="bg-[#0a1020] p-4 rounded-xl">
+                                <h3 className="font-medium">{member.name}</h3>
+                                <p className="text-gray-400 text-sm">{member.role}</p>
+                                <div className="flex gap-2 mt-2">
+                                  {member.linkedin && (
+                                    <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs">
+                                      LinkedIn
+                                    </a>
+                                  )}
+                                  {member.github && (
+                                    <a href={member.github} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs">
+                                      GitHub
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
                   
-                  <Separator className="my-6 bg-white/10" />
-                  
-                  <h2 className="text-xl font-semibold">Funding Progress</h2>
-                  <div className="bg-black/50 h-4 w-full rounded-full overflow-hidden">
-                    <div 
-                      className="bg-blue-500 h-full rounded-full" 
-                      style={{ 
-                        width: `${Math.min(
-                          100, 
-                          (parseFloat(settlement.totalRaised) / parseFloat(settlement.targetAmount)) * 100
-                        )}%` 
-                      }}
+                  {/* Sidebar */}
+                  <div>
+                    <ContributionPanel 
+                      settlementId={partyAddress || ''} 
+                      settlementName={settlement.name}
+                      onSuccess={refreshData}
                     />
-                  </div>
-                  <div className="flex justify-between text-sm text-gray-400">
-                    <span>{settlement.totalRaised} ETH raised</span>
-                    <span>Target: {settlement.targetAmount} ETH</span>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-4 mt-4">
-                    <div className="bg-[#0a1020] p-4 rounded-xl">
-                      <div className="flex items-center gap-2 text-blue-400 mb-2">
-                        <Users className="w-4 h-4" />
-                        <span className="text-sm">Backers</span>
-                      </div>
-                      <span className="text-2xl font-bold">{settlement.backerCount}</span>
-                    </div>
                     
-                    <div className="bg-[#0a1020] p-4 rounded-xl">
-                      <div className="flex items-center gap-2 text-blue-400 mb-2">
-                        <Zap className="w-4 h-4" />
-                        <span className="text-sm">Progress</span>
+                    {metadata?.socials && (
+                      <div className="bg-[#111] rounded-xl border border-white/5 p-6 space-y-4 mt-6">
+                        <h2 className="text-lg font-semibold">Connect</h2>
+                        <div className="grid grid-cols-2 gap-2">
+                          {metadata.socials.twitter && (
+                            <a 
+                              href={metadata.socials.twitter} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="bg-[#0a1020] p-2 rounded-lg text-center text-sm text-blue-400 hover:bg-[#0a1030]"
+                            >
+                              Twitter
+                            </a>
+                          )}
+                          {metadata.socials.discord && (
+                            <a 
+                              href={metadata.socials.discord} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="bg-[#0a1020] p-2 rounded-lg text-center text-sm text-blue-400 hover:bg-[#0a1030]"
+                            >
+                              Discord
+                            </a>
+                          )}
+                          {metadata.socials.telegram && (
+                            <a 
+                              href={metadata.socials.telegram} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="bg-[#0a1020] p-2 rounded-lg text-center text-sm text-blue-400 hover:bg-[#0a1030]"
+                            >
+                              Telegram
+                            </a>
+                          )}
+                        </div>
                       </div>
-                      <span className="text-2xl font-bold">
-                        {Math.round((parseFloat(settlement.totalRaised) / parseFloat(settlement.targetAmount)) * 100)}%
-                      </span>
-                    </div>
-                    
-                    <div className="bg-[#0a1020] p-4 rounded-xl">
-                      <div className="flex items-center gap-2 text-blue-400 mb-2">
-                        <Clock className="w-4 h-4" />
-                        <span className="text-sm">Remaining</span>
-                      </div>
-                      <span className="text-2xl font-bold">{settlement.remainingTime}</span>
-                    </div>
+                    )}
                   </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="governance">
+                <GovernancePanel 
+                  partyAddress={partyAddress || ''}
+                  isHost={settlement.creator.toLowerCase() === primaryWallet?.address?.toLowerCase()}
+                />
+              </TabsContent>
+              
+              <TabsContent value="contributors">
+                <div className="bg-[#111] rounded-xl border border-white/5 p-6 space-y-6">
+                  <h2 className="text-xl font-semibold">Settlement Contributors</h2>
                   
-                  {metadata?.team && metadata.team.length > 0 && (
-                    <>
-                      <Separator className="my-6 bg-white/10" />
-                      <h2 className="text-xl font-semibold">Settlement Team</h2>
-                      <div className="grid grid-cols-2 gap-4">
-                        {metadata.team.map((member, index) => (
-                          <div key={index} className="bg-[#0a1020] p-4 rounded-xl">
-                            <h3 className="font-medium">{member.name}</h3>
-                            <p className="text-gray-400 text-sm">{member.role}</p>
-                            <div className="flex gap-2 mt-2">
-                              {member.linkedin && (
-                                <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs">
-                                  LinkedIn
-                                </a>
-                              )}
-                              {member.github && (
-                                <a href={member.github} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs">
-                                  GitHub
-                                </a>
-                              )}
-                            </div>
+                  {settlement.backerCount === 0 ? (
+                    <div className="text-center py-20 text-gray-400">
+                      <Users className="w-16 h-16 mx-auto mb-4 opacity-20" />
+                      <p>No contributors yet. Be the first to support this settlement!</p>
+                    </div>
+                  ) : (
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {/* In a real implementation, you would fetch and display actual contributors */}
+                      {Array.from({ length: settlement.backerCount }).map((_, index) => (
+                        <div key={index} className="bg-[#0a1020] p-4 rounded-xl flex items-center gap-3">
+                          <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                            <Users className="w-5 h-5 text-blue-400" />
                           </div>
-                        ))}
-                      </div>
-                    </>
+                          <div>
+                            <div className="font-medium">Sentinel #{index + 1}</div>
+                            <div className="text-sm text-gray-400">Contributed {(Math.random() * 5).toFixed(2)} ETH</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
-              </div>
-              
-              {/* Sidebar */}
-              <div>
-                <ContributionPanel 
-                  settlementId={partyAddress || ''} 
-                  settlementName={settlement.name}
-                  onSuccess={refreshData}
-                />
-                
-                {metadata?.socials && (
-                  <div className="bg-[#111] rounded-xl border border-white/5 p-6 space-y-4 mt-6">
-                    <h2 className="text-lg font-semibold">Connect</h2>
-                    <div className="grid grid-cols-2 gap-2">
-                      {metadata.socials.twitter && (
-                        <a 
-                          href={metadata.socials.twitter} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="bg-[#0a1020] p-2 rounded-lg text-center text-sm text-blue-400 hover:bg-[#0a1030]"
-                        >
-                          Twitter
-                        </a>
-                      )}
-                      {metadata.socials.discord && (
-                        <a 
-                          href={metadata.socials.discord} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="bg-[#0a1020] p-2 rounded-lg text-center text-sm text-blue-400 hover:bg-[#0a1030]"
-                        >
-                          Discord
-                        </a>
-                      )}
-                      {metadata.socials.telegram && (
-                        <a 
-                          href={metadata.socials.telegram} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="bg-[#0a1020] p-2 rounded-lg text-center text-sm text-blue-400 hover:bg-[#0a1030]"
-                        >
-                          Telegram
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+              </TabsContent>
+            </Tabs>
           )}
         </div>
       </div>
