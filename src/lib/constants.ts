@@ -56,9 +56,11 @@ export const FACTORY_ABI = [
 
 // Party Protocol Constants on Polygon
 export const PARTY_PROTOCOL = {
-  FACTORY_ADDRESS: "0x80393bC5719fcd72A6dF004E9aB5277201775c31",
-  ETH_CROWDFUND_ADDRESS: "0xEE8ea16cF5dB5cC2aEE8984E673B83F2D29c2797",
+  // Polygon Mainnet addresses
+  FACTORY_ADDRESS: "0x4ec46A5C10fd795CEc3bBC6F85b372465B1051f3",
+  ETH_CROWDFUND_ADDRESS: "0x60534a0b5C8B8119c713f2dDb30f2eB31E31D1F9",
   PARTY_IMPLEMENTATION: "0x4ec46A5C10fd795CEc3bBC6F85b372465B1051f3",
+  PARTY_HELPER_ADDRESS: "0xc48CF9807BC36b5859bc480bE4Cb6D18C1F5BB10",
   GOVERNANCE_ADDRESS: "0x87a86CAD115a46F515f3456AE63c39FedB0f8Ab4",
   EXECUTION_DELAY: 24 * 60 * 60, // 1 day in seconds
   PASS_THRESHOLD_BPS: 5000, // 50%
@@ -67,20 +69,46 @@ export const PARTY_PROTOCOL = {
 
 // Party Protocol ABIs
 export const PARTY_FACTORY_ABI = [
-  "function createParty(tuple(address authority, string name, address[] hosts, uint40 votingDuration, uint40 executionDelay, uint16 passThresholdBps, address[] proposers, tuple(tuple(uint8 basicProposalEngineType, bytes[] targetAddresses, uint256[] values, bytes[] calldatas, string[] signatures) proposalEngineOpts, bool enableAddAuthorityProposal, bool allowPublicProposals, bool allowUriChanges, bool allowCustomProposals) proposalConfig)) returns (address)",
-  "function createEthCrowdfund(address rendererBase, string name, string symbol, uint256 contribution, address gateKeeper, bytes gateKeeperId, address initialContributor, uint96 initialDelegate, uint96 minContribution, uint96 maxContribution, uint96 maxTotalContributions, uint40 duration, uint40 fundingSplitBps, address[] fundingSplitRecipient, bytes[] tokenGateOptions, bool disableContributingForExistingCard, address, string contentHash) returns (address)"
+  // Core Functions
+  "function createParty(tuple(string name, address[] hosts, uint40 votingDuration, uint40 executionDelay, uint16 passThresholdBps, bool allowPublicProposals, string metadataURI)) external returns (address)",
+  // View Functions
+  "function getGovernanceOpts(address governanceImpl) external view returns (tuple(address authority, uint40 votingDuration, uint40 executionDelay, uint16 passThresholdBps, address preciousTokenAddress, uint256 preciousTokenId, bool rageQuitTimestampMs, bool isBondingCurveAllowed, address[] allowedProposalExecutions) opts)",
+  // Events
+  "event PartyCreated(address indexed party, address[] hosts, uint256 timestamp)"
 ];
 
 export const ETH_CROWDFUND_ABI = [
-  "function initialize(address payable partyDao, address tokenProvider, address splitRecipient, uint16 splitBps) returns (bytes32)",
-  "function contribute(address delegate, string memo, bytes gatekeeperData) payable returns (uint256)",
-  "function setContributingForExistingCardDisabled(bool disabled)"
+  // Core Functions
+  "function createEthCrowdfund(address party, tuple(address initialContributor, uint96 minContribution, uint96 maxContribution, uint96 maxTotalContributions, uint40 duration, string metadataURI)) external returns (address)",
+  "function contribute(address delegate) external payable returns (uint256)",
+  "function contribute(address delegate, bytes memory gatekeeperData) external payable returns (uint256)",
+  // View Functions
+  "function getCrowdfundSettings() external view returns (tuple(address party, address initialContributor, uint96 minContribution, uint96 maxContribution, uint96 maxTotalContributions, uint40 duration, uint96 exchangeRate, uint96 fundingSplitBps, address fundingSplitRecipient, uint256 totalContributions, uint40 timestamp, string metadataURI, bool settled))",
+  "function getContribution(address contributor) external view returns (uint256)",
+  // Events
+  "event Contributed(address indexed contributor, address indexed delegate, uint256 amount, uint256 timestamp)",
+  "event CrowdfundCreated(address indexed crowdfund, address indexed party, uint256 timestamp)"
 ];
 
 export const PARTY_GOVERNANCE_ABI = [
-  "function propose(tuple(uint8 basicProposalEngineType, bytes[] targetAddresses, uint256[] values, bytes[] calldatas, string[] signatures) proposalEngineOpts, string description, bytes progressData) returns (uint256 proposalId)",
-  "function execute(uint256 proposalId, tuple(address[] targets, uint256[] values, bytes[] calldatas, string[] signatures) proposalData, uint256 flags, bytes progressData) returns (bytes[] execResults)",
-  "function cancelProposal(uint256 proposalId)"
+  // Core Functions
+  "function propose(tuple(uint8 basicProposalEngineType, bytes[] targetAddresses, uint256[] values, bytes[] calldatas, string[] signatures) proposalEngineOpts, string description, bytes progressData) external returns (uint256 proposalId)",
+  "function execute(uint256 proposalId, tuple(address[] targets, uint256[] values, bytes[] calldatas, string[] signatures) proposalData, uint256 flags, bytes progressData) external returns (bytes[] execResults)",
+  "function vote(uint256 proposalId, uint8 vote) external",
+  "function cancelProposal(uint256 proposalId) external",
+  // View Functions
+  "function getProposalStateInfo(uint256 proposalId) external view returns (tuple(uint8 status, uint40 executionTime, address proposer, uint24 votesFor, uint24 votesAgainst, uint24 passThresholdBps, uint40 totalVotingPower, bytes32 proposalHash))",
+  "function getVotingPowerAt(address voter, uint40 timestamp) external view returns (uint96)",
+  // Events
+  "event ProposalCreated(uint256 indexed proposalId, address indexed proposer, tuple(uint8 status, uint40 executionTime, address proposer, uint24 votesFor, uint24 votesAgainst, uint24 passThresholdBps, uint40 totalVotingPower, bytes32 proposalHash) info, uint256 timestamp)",
+  "event ProposalVoted(uint256 indexed proposalId, address indexed voter, uint8 vote, uint256 weight)",
+  "event ProposalExecuted(uint256 indexed proposalId, address executor, bytes[] execResults)"
+];
+
+export const PARTY_HELPER_ABI = [
+  "function getRageQuitETHAmount(address receiver, address party, uint256[] tokenIds) external view returns (uint256 ethAmount)",
+  "function rageQuit(address party, uint256[] tokenIds, address receiver) external",
+  "function getVotingPower(address party, address voter) external view returns (uint256)"
 ];
 
 // Survivor NFT Contract

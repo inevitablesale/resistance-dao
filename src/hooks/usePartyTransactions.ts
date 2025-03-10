@@ -9,6 +9,8 @@ import {
   createEthCrowdfund,
   verifySurvivorOwnership,
   updateSurvivorMetadata,
+  getVotingPower,
+  getPartyDetails,
   PartyOptions,
   CrowdfundOptions
 } from "@/services/partyProtocolService";
@@ -154,10 +156,40 @@ export const usePartyTransactions = () => {
     }
   };
   
+  const getVotingPowerForUser = async (partyAddress: string, userAddress?: string) => {
+    try {
+      const { provider } = await getProvider();
+      const signerAddress = userAddress || await provider.getSigner().getAddress();
+      
+      const votingPower = await getVotingPower(
+        provider,
+        partyAddress,
+        signerAddress
+      );
+      
+      return votingPower;
+    } catch (error) {
+      console.error("Error getting voting power:", error);
+      return "0";
+    }
+  };
+  
+  const getPartyInfo = async (partyAddress: string) => {
+    try {
+      const { provider } = await getProvider();
+      return await getPartyDetails(provider, partyAddress);
+    } catch (error) {
+      console.error("Error getting party details:", error);
+      return null;
+    }
+  };
+  
   return {
     contribute,
     createSettlement,
     checkSurvivorStatus,
+    getVotingPowerForUser,
+    getPartyInfo,
     isProcessing
   };
 };
