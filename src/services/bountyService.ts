@@ -845,7 +845,7 @@ export async function deployBountyToBlockchain(bountyId: string, wallet: any): P
       wallet,
       partyAddress,
       crowdfundOptions,
-      bountyMetadata
+      ipfsContent // Use the formatted IPFS content here instead of bountyMetadata
     );
     
     // Set up event listener for bounty activities
@@ -1140,9 +1140,13 @@ export async function recordSuccessfulReferral(
       throw new Error("Failed to verify referral task");
     }
     
-    // Process reward if configured for auto-payment
+    // Get bounty options to check if auto-payment is enabled
+    // Instead of accessing bounty.allowPublicHunters directly, we'll check if the task can be auto-paid
+    // based on verification status
     let paymentResult = null;
-    if (bounty.allowPublicHunters && wallet) {
+    const taskIsVerified = verifiedTask.status === "verified";
+    
+    if (taskIsVerified && wallet) {
       paymentResult = await payBountyTaskReward(task.id, wallet);
     }
     
