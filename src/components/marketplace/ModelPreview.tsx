@@ -1,5 +1,6 @@
+
 import React, { useRef, useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RotateCcw } from 'lucide-react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -683,6 +684,18 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
             </div>
           </div>
         )}
+        
+        <div className="absolute top-2 right-2 flex space-x-2">
+          <ToxicButton 
+            variant="outline" 
+            size="sm" 
+            className="bg-black/50 border-toxic-neon/40 text-toxic-neon"
+            onClick={() => setAutoRotate(!autoRotate)}
+          >
+            <RotateCcw className={`h-4 w-4 mr-1 ${autoRotate ? 'animate-spin' : ''}`} />
+            {autoRotate ? 'Stop' : 'Rotate'}
+          </ToxicButton>
+        </div>
       </div>
     </div>
   );

@@ -367,13 +367,6 @@ export default function MarketplaceItemDetails() {
                         <RotateCcw className={`h-4 w-4 mr-1 ${autoRotate ? 'animate-spin' : ''}`} />
                         {autoRotate ? 'Stop' : 'Rotate'}
                       </ToxicButton>
-                      <ToxicButton 
-                        variant="outline" 
-                        size="sm" 
-                        className="bg-black/50 border-toxic-neon/40 text-toxic-neon"
-                      >
-                        <Eye className="h-4 w-4 mr-1" /> Fullscreen
-                      </ToxicButton>
                     </div>
                   </div>
                 </ToxicCardContent>
