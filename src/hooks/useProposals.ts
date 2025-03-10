@@ -5,6 +5,7 @@ import { PartyProposal } from "@/types/proposals";
 import { ProposalStatus } from "@/types/content";
 import { PARTY_PROTOCOL, PARTY_GOVERNANCE_ABI } from "@/lib/constants";
 import { toast } from "@/hooks/use-toast";
+import { getFromIPFS } from "@/services/ipfsService";
 
 export const useProposals = (partyAddress?: string) => {
   return useQuery({
@@ -46,24 +47,37 @@ export const useProposals = (partyAddress?: string) => {
             const proposalStatus = await contract.getProposalStatus(proposalId);
             const votes = await contract.getProposalVotes(proposalId);
             
-            // Get metadata for the proposal
+            // Default proposal info
             let title = "Proposal " + proposalId.toString();
             let description = "";
             
             try {
-              if (proposal.proposalData && proposal.proposalData.length > 0) {
-                // Try to decode the metadata from the proposal data
-                const metadataUri = proposal.proposalData.metadataUri || "";
+              // Try to fetch metadata from IPFS if available
+              if (proposal.proposalData && proposal.proposalData.metadataUri) {
+                const metadataUri = proposal.proposalData.metadataUri;
+                console.log("Metadata URI found:", metadataUri);
+                
                 if (metadataUri && metadataUri.startsWith("ipfs://")) {
-                  // In a real implementation, fetch from IPFS
-                  console.log("Would fetch metadata from IPFS:", metadataUri);
-                  // For now, use placeholder
-                  title = "On-chain Proposal " + proposalId.toString();
-                  description = "This proposal's details are stored on-chain.";
+                  const ipfsHash = metadataUri.replace("ipfs://", "");
+                  console.log("Fetching metadata from IPFS hash:", ipfsHash);
+                  
+                  try {
+                    const metadata = await getFromIPFS(ipfsHash, 'proposal');
+                    console.log("IPFS metadata fetched:", metadata);
+                    
+                    if (metadata) {
+                      title = metadata.title || title;
+                      description = metadata.description || description;
+                    }
+                  } catch (ipfsError) {
+                    console.error("Error fetching from IPFS:", ipfsError);
+                    // Continue with default title and description
+                  }
                 }
               }
             } catch (metadataError) {
-              console.error("Error fetching proposal metadata:", metadataError);
+              console.error("Error processing proposal metadata:", metadataError);
+              // Continue with default title and description
             }
             
             // Calculate time remaining if the proposal is active
@@ -79,6 +93,10 @@ export const useProposals = (partyAddress?: string) => {
                 if (remainingDays === 0) {
                   const remainingHours = Math.floor(remainingSeconds / 3600);
                   timeRemaining = `${remainingHours} hours`;
+                  if (remainingHours === 0) {
+                    const remainingMinutes = Math.floor(remainingSeconds / 60);
+                    timeRemaining = `${remainingMinutes} minutes`;
+                  }
                 }
               }
             }
@@ -151,16 +169,17 @@ export const useProposals = (partyAddress?: string) => {
 };
 
 // Map contract status codes to UI status
+// These mappings are verified against Party Protocol status codes
+// https://github.com/PartyDAO/party-protocol/blob/main/contracts/party/PartyGovernance.sol
 function mapContractStatusToUIStatus(statusCode: number): ProposalStatus {
-  // These mappings need to be adjusted based on the actual contract status codes
   switch (statusCode) {
-    case 0: return "active";
-    case 1: return "passed";
-    case 2: return "ready";
-    case 3: return "executed";
-    case 4: return "cancelled";
-    case 5: return "defeated";
-    case 6: return "expired";
-    default: return "active";
+    case 0: return "active";    // Voting is in progress
+    case 1: return "passed";    // Passed but not yet executable
+    case 2: return "ready";     // Ready to be executed
+    case 3: return "executed";  // Successfully executed
+    case 4: return "cancelled"; // Cancelled by proposer or another mechanism
+    case 5: return "defeated";  // Failed to meet voting threshold
+    case 6: return "expired";   // Passed but not executed within timeframe
+    default: return "active";   // Default fallback
   }
 }
