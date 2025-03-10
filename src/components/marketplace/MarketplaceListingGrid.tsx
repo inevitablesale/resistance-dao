@@ -74,30 +74,26 @@ const getOpenSeaLink = (type: MarketplaceListingType) => {
   }
 };
 
-// Helper to find character metadata by name
-const findCharacterByName = (name: string) => {
-  // Search in all character types
-  const allCharacters = [
-    ...CHARACTERS.SENTINEL_CHARACTERS,
-    ...CHARACTERS.BOUNTY_HUNTER_CHARACTERS,
-    ...CHARACTERS.SURVIVOR_CHARACTERS
-  ];
+// Get the character model URL based on character name and type directly from CHARACTERS
+const getCharacterModelUrl = (name: string, type: MarketplaceListingType): string | null => {
+  let characterList;
   
-  return allCharacters.find(char => char.name === name);
-};
-
-// Get default model URL based on character type if metadata isn't found
-const getDefaultModelUrl = (type: MarketplaceListingType) => {
   switch(type) {
     case 'sentinel':
-      return `https://gateway.pinata.cloud/ipfs/${CHARACTERS.SENTINEL_CHARACTERS[0].ipfsCID}`;
+      characterList = CHARACTERS.SENTINEL_CHARACTERS;
+      break;
     case 'bounty-hunter':
-      return `https://gateway.pinata.cloud/ipfs/${CHARACTERS.BOUNTY_HUNTER_CHARACTERS[0].ipfsCID}`;
+      characterList = CHARACTERS.BOUNTY_HUNTER_CHARACTERS;
+      break;
     case 'survivor':
-      return `https://gateway.pinata.cloud/ipfs/${CHARACTERS.SURVIVOR_CHARACTERS[0].ipfsCID}`;
+      characterList = CHARACTERS.SURVIVOR_CHARACTERS;
+      break;
     default:
       return null;
   }
+  
+  const character = characterList.find(char => char.name === name);
+  return character ? `https://gateway.pinata.cloud/ipfs/${character.ipfsCID}` : null;
 };
 
 export function MarketplaceListingGrid({ listings, className = "", title, onListingClick }: MarketplaceListingGridProps) {
@@ -139,14 +135,8 @@ export function MarketplaceListingGrid({ listings, className = "", title, onList
         animate="show"
       >
         {listings.map((listing) => {
-          // Try to find character metadata by name to get the real IPFS CID
-          const characterMetadata = findCharacterByName(listing.name);
-          
-          // If character metadata isn't found, use default for type or fallback to listing's modelUrl or null
-          const modelUrl = characterMetadata 
-            ? `https://gateway.pinata.cloud/ipfs/${characterMetadata.ipfsCID}` 
-            : (listing.modelUrl || getDefaultModelUrl(listing.type));
-          
+          // Get the model URL directly from our CHARACTERS data structure
+          const modelUrl = getCharacterModelUrl(listing.name, listing.type) || listing.modelUrl;
           const openSeaLink = getOpenSeaLink(listing.type);
           
           return (
