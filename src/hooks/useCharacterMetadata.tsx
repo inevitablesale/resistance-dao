@@ -17,7 +17,9 @@ export const useCharacterMetadata = (characterId: number) => {
       }
       return getCharacterById(characterId);
     },
-    enabled: !!characterId && !isNaN(characterId) && characterId > 0
+    enabled: !!characterId && !isNaN(characterId) && characterId > 0,
+    staleTime: 300000, // 5 minutes
+    cacheTime: 600000, // 10 minutes
   });
 
   // Fetch the actual model metadata from Pinata if we have a CID
@@ -33,7 +35,10 @@ export const useCharacterMetadata = (characterId: number) => {
       }
       return await fetchMetadataFromCID(character.character_model_cid);
     },
-    enabled: !!character?.character_model_cid
+    enabled: !!character?.character_model_cid,
+    staleTime: 300000, // 5 minutes
+    cacheTime: 600000, // 10 minutes
+    retry: 1, // Limit retries to avoid excessive requests
   });
 
   // Convert character metadata to OpenSeaNFT format for compatibility

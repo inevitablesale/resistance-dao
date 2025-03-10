@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNFTMetadata } from '@/hooks/useNFTMetadata';
@@ -20,22 +19,15 @@ const NFTDetails: React.FC = () => {
   const { toast } = useToast();
   
   useEffect(() => {
-    if (nft && !isLoading) {
-      console.log(`NFT details loaded for token ${tokenId}:`, {
-        name: nft.name,
-        animation_url: nft.animation_url,
-        image_url: nft.image_url,
-      });
-      
-      if (metadata) {
-        console.log('Metadata loaded:', metadata);
+    if (nft && !isLoading && metadata && !metadata.notified) {
+      if (metadata && !metadata.fallback) {
         toast({
           title: "Metadata loaded",
           description: `Successfully loaded metadata for ${nft.name}`,
         });
       }
     }
-  }, [nft, metadata, tokenId, isLoading, toast]);
+  }, [nft, metadata, isLoading, toast]);
   
   const handleBack = () => {
     navigate(-1);

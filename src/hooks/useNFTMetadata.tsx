@@ -20,6 +20,8 @@ export const useNFTMetadata = (tokenId: string) => {
       return await getCharacterNFTByTokenId(tokenId);
     },
     enabled: !!tokenId && !isValidCharacterId,
+    staleTime: 300000, // 5 minutes
+    cacheTime: 600000, // 10 minutes
   });
   
   if (isValidCharacterId) {

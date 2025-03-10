@@ -1,4 +1,3 @@
-
 // This service handles the mapping of character CIDs from the smart contract
 
 // Hardcoded CID mapping based on the contract data
@@ -55,20 +54,31 @@ export const fetchMetadataFromCID = async (cid: string): Promise<any> => {
   }
   
   try {
-    console.log(`Fetching metadata from CID: ${cid}`);
     const url = getCIDGatewayUrl(cid);
-    const response = await fetch(url);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
+    const response = await fetch(url, { 
+      signal: controller.signal,
+      cache: 'force-cache' // Try to use cached response if available
+    });
+    
+    clearTimeout(timeoutId);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch metadata: ${response.status} ${response.statusText}`);
     }
     
     const metadata = await response.json();
-    console.log(`Successfully fetched metadata for CID: ${cid}`, metadata);
     return metadata;
   } catch (error) {
     console.error(`Error fetching metadata for CID ${cid}:`, error);
-    throw error;
+    // Return a basic fallback metadata so the app doesn't keep retrying
+    return { 
+      error: true,
+      message: error instanceof Error ? error.message : 'Failed to fetch metadata',
+      fallback: true 
+    };
   }
 };
 
