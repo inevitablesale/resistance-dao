@@ -51,7 +51,7 @@ const Index = () => {
   } = useWalletConnection();
   const [authState, setAuthState] = useState<AuthState>("unauthenticated");
   const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
-  const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
+  const [storyTerminalOpen, setStoryTerminalOpen] = useState(false); // Changed from true to false
 
   // New states for radiation system
   const [currentRadiation, setCurrentRadiation] = useState(94); // Start at 94% radiation
