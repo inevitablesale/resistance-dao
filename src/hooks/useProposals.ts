@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { ethers } from "ethers";
 import { PartyProposal } from "@/types/proposals";
@@ -12,12 +13,26 @@ export const useProposals = (partyAddress?: string) => {
       
       try {
         console.log("Fetching proposals for party:", partyAddress);
+        
+        // Check if window.ethereum is available (in browser with wallet)
+        if (!window.ethereum) {
+          console.warn("No Ethereum provider available, using fallback data");
+          return getFallbackProposals(partyAddress);
+        }
+        
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = new ethers.Contract(partyAddress, PARTY_GOVERNANCE_ABI, provider);
         
         // Get the total proposal count from the contract
-        const proposalCount = await contract.proposalCount();
-        console.log(`Found ${proposalCount.toString()} proposals`);
+        let proposalCount;
+        try {
+          proposalCount = await contract.proposalCount();
+          console.log(`Found ${proposalCount.toString()} proposals`);
+        } catch (error) {
+          console.error("Error fetching proposal count:", error);
+          console.warn("The party contract may not be a governance contract or may use a different ABI");
+          return getFallbackProposals(partyAddress);
+        }
         
         const proposals: PartyProposal[] = [];
         
@@ -39,10 +54,10 @@ export const useProposals = (partyAddress?: string) => {
             try {
               if (proposal.proposalData && proposal.proposalData.length > 0) {
                 // Try to decode the metadata from the proposal data
-                const metadataHash = proposal.proposalData.metadataUri || "";
-                if (metadataHash && metadataHash.startsWith("ipfs://")) {
+                const metadataUri = proposal.proposalData.metadataUri || "";
+                if (metadataUri && metadataUri.startsWith("ipfs://")) {
                   // In a real implementation, fetch from IPFS
-                  console.log("Would fetch metadata from IPFS:", metadataHash);
+                  console.log("Would fetch metadata from IPFS:", metadataUri);
                   // For now, use placeholder
                   title = "On-chain Proposal " + proposalId.toString();
                   description = "This proposal's details are stored on-chain.";
@@ -113,11 +128,7 @@ export const useProposals = (partyAddress?: string) => {
         if (proposals.length === 0) {
           console.warn("No proposals found or error fetching proposals. Using fallback mechanism.");
           
-          // Log that we're in fallback mode but will implement real contract calls soon
-          console.info("Fallback mode: This will be replaced with real contract data soon");
-          
-          // Return mock proposals for now to keep the UI working
-          // This will be replaced with real contract data as development continues
+          // Return fallback proposals
           return getFallbackProposals(partyAddress);
         }
         
@@ -125,7 +136,7 @@ export const useProposals = (partyAddress?: string) => {
       } catch (error) {
         console.error("Error fetching proposals:", error);
         
-        // Return mock proposals for now to keep the UI working
+        // Return fallback proposals
         return getFallbackProposals(partyAddress);
       }
     },

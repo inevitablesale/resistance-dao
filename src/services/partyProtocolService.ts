@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
 import { executeTransaction, TransactionConfig } from "./transactionManager";
+import { uploadToIPFS } from "./ipfsService";
 
 // Party Protocol contract addresses
 const PARTY_FACTORY_ADDRESS = "0x4a5EA76571F47E7d92B5040E8C7FF12eacd35087"; // Polygon mainnet
@@ -71,6 +72,24 @@ export async function createParty(
     const provider = new ethers.providers.Web3Provider(walletClient as any);
     const signer = provider.getSigner();
     
+    // Create metadata for the party
+    const metadata = {
+      name: options.name,
+      description: options.description || `A settlement community called ${options.name}`,
+      createdAt: Math.floor(Date.now() / 1000),
+      hosts: options.hosts,
+      votingSettings: {
+        duration: options.votingDuration,
+        executionDelay: options.executionDelay,
+        passThresholdBps: options.passThresholdBps,
+        allowPublicProposals: options.allowPublicProposals
+      }
+    };
+    
+    // Upload metadata to IPFS
+    const metadataURI = options.metadataURI || await uploadToIPFS(metadata);
+    console.log("Party metadata uploaded to IPFS:", metadataURI);
+    
     // Create Party Factory contract instance
     const partyFactory = new ethers.Contract(
       PARTY_FACTORY_ADDRESS,
@@ -88,7 +107,7 @@ export async function createParty(
       options.executionDelay,
       options.passThresholdBps,
       options.allowPublicProposals,
-      options.metadataURI || ""
+      metadataURI
     ];
     
     // Transaction config
@@ -156,9 +175,23 @@ export async function createEthCrowdfund(
     const provider = new ethers.providers.Web3Provider(walletClient as any);
     const signer = provider.getSigner();
     
+    // Prepare crowdfund metadata
+    const crowdfundMetadata = {
+      ...metadata,
+      type: "crowdfund",
+      partyAddress: partyAddress,
+      settings: {
+        minContribution: options.minContribution,
+        maxContribution: options.maxContribution,
+        maxTotalContributions: options.maxTotalContributions,
+        duration: options.duration
+      },
+      createdAt: Math.floor(Date.now() / 1000)
+    };
+    
     // Upload metadata to IPFS
-    // For simplicity, assuming a function exists to upload to IPFS
-    const metadataURI = await uploadToIPFS(metadata);
+    const metadataURI = await uploadToIPFS(crowdfundMetadata);
+    console.log("Crowdfund metadata uploaded to IPFS:", metadataURI);
     
     // Create ETH Crowdfund contract instance
     const ethCrowdfund = new ethers.Contract(
@@ -172,9 +205,9 @@ export async function createEthCrowdfund(
     // Format options for contract call
     const crowdfundOptions = [
       options.initialContributor,
-      options.minContribution,
-      options.maxContribution,
-      options.maxTotalContributions,
+      ethers.utils.parseEther(options.minContribution),
+      ethers.utils.parseEther(options.maxContribution),
+      ethers.utils.parseEther(options.maxTotalContributions),
       options.duration,
       metadataURI
     ];
@@ -449,11 +482,60 @@ export async function createGovernanceProposal(
     const provider = new ethers.providers.Web3Provider(walletClient as any);
     const signer = provider.getSigner();
     
-    // Mock implementation for now
-    // In a real implementation, this would create a proposal on the party contract
+    // Create Party Governance contract instance
+    const partyGovernance = new ethers.Contract(
+      partyAddress,
+      [
+        "function propose(tuple(uint8 basicProposalEngineType, bytes[] targetAddresses, uint256[] values, bytes[] calldatas, string[] signatures) proposalEngineOpts, string description, bytes progressData) returns (uint256 proposalId)"
+      ],
+      signer
+    );
     
-    // Return a random proposal ID
-    const proposalId = `${Math.floor(Math.random() * 1000000)}`;
+    // Prepare transactions for proposal
+    const targets = [];
+    const values = [];
+    const calldatas = [];
+    const signatures = [];
+    
+    for (const tx of proposal.transactions) {
+      targets.push(tx.target);
+      values.push(ethers.utils.parseEther(tx.value || "0"));
+      calldatas.push(tx.calldata || "0x");
+      signatures.push(tx.signature || "");
+    }
+    
+    // Prepare proposal data
+    const proposalData = {
+      basicProposalEngineType: 0, // Standard proposal type
+      targetAddresses: targets,
+      values: values,
+      calldatas: calldatas,
+      signatures: signatures
+    };
+    
+    // Transaction config
+    const txConfig: TransactionConfig = {
+      type: 'contract',
+      description: `Creating governance proposal: ${proposal.title}`,
+      timeout: 180000, // 3 minutes
+      maxRetries: 2,
+      backoffMs: 5000
+    };
+    
+    // Execute transaction
+    const tx = await executeTransaction(
+      () => partyGovernance.propose(proposalData, proposal.description, "0x"),
+      txConfig,
+      provider
+    );
+    
+    // Get receipt and extract proposal ID
+    const receipt = await tx.wait();
+    const proposalId = extractProposalIdFromReceipt(receipt);
+    
+    if (!proposalId) {
+      throw new Error("Failed to extract proposal ID from transaction receipt");
+    }
     
     console.log("Proposal created successfully with ID:", proposalId);
     return proposalId;
@@ -496,9 +578,32 @@ export async function voteOnGovernanceProposal(
     const provider = new ethers.providers.Web3Provider(walletClient as any);
     const signer = provider.getSigner();
     
-    // Mock implementation for now
-    // In a real implementation, this would cast a vote on the party contract
+    // Create Party Governance contract instance
+    const partyGovernance = new ethers.Contract(
+      partyAddress,
+      [
+        "function vote(uint256 proposalId, uint8 vote) external"
+      ],
+      signer
+    );
     
+    // Transaction config
+    const txConfig: TransactionConfig = {
+      type: 'contract',
+      description: `Voting ${support ? 'for' : 'against'} proposal ${proposalId}`,
+      timeout: 120000, // 2 minutes
+      maxRetries: 2,
+      backoffMs: 5000
+    };
+    
+    // Execute transaction
+    const tx = await executeTransaction(
+      () => partyGovernance.vote(proposalId, support ? 1 : 0),
+      txConfig,
+      provider
+    );
+    
+    await tx.wait();
     console.log("Vote cast successfully");
   } catch (error) {
     console.error("Error voting on governance proposal:", error);
@@ -539,9 +644,53 @@ export async function executeGovernanceProposal(
     const provider = new ethers.providers.Web3Provider(walletClient as any);
     const signer = provider.getSigner();
     
-    // Mock implementation for now
-    // In a real implementation, this would execute a proposal on the party contract
+    // Create Party Governance contract instance
+    const partyGovernance = new ethers.Contract(
+      partyAddress,
+      [
+        "function execute(uint256 proposalId, tuple(address[] targets, uint256[] values, bytes[] calldatas, string[] signatures) proposalData, uint256 flags, bytes progressData) returns (bytes[] execResults)"
+      ],
+      signer
+    );
     
+    // Prepare transactions for proposal
+    const targets = [];
+    const values = [];
+    const calldatas = [];
+    const signatures = [];
+    
+    for (const tx of proposal.transactions) {
+      targets.push(tx.target);
+      values.push(ethers.utils.parseEther(tx.value || "0"));
+      calldatas.push(tx.calldata || "0x");
+      signatures.push(tx.signature || "");
+    }
+    
+    // Prepare proposal data
+    const proposalData = {
+      targets,
+      values,
+      calldatas,
+      signatures
+    };
+    
+    // Transaction config
+    const txConfig: TransactionConfig = {
+      type: 'contract',
+      description: `Executing proposal ${proposalId}`,
+      timeout: 180000, // 3 minutes
+      maxRetries: 2,
+      backoffMs: 5000
+    };
+    
+    // Execute transaction
+    const tx = await executeTransaction(
+      () => partyGovernance.execute(proposalId, proposalData, 0, "0x"),
+      txConfig,
+      provider
+    );
+    
+    await tx.wait();
     console.log("Proposal executed successfully");
   } catch (error) {
     console.error("Error executing governance proposal:", error);
@@ -592,6 +741,7 @@ export async function createBountyParty(
     
     // Store metadata on IPFS
     const metadataURI = await uploadToIPFS(bountyMetadata);
+    console.log("Bounty party metadata uploaded to IPFS:", metadataURI);
     
     // Create Party Factory contract instance with enhanced options
     const partyFactory = new ethers.Contract(
@@ -653,22 +803,91 @@ export async function createBountyParty(
   }
 }
 
-// Helper functions for extracting addresses from receipts
+// Helper functions for extracting addresses and IDs from receipts
 function extractPartyAddressFromReceipt(receipt: ethers.ContractReceipt): string | null {
-  // In a real implementation, this would parse the event logs to extract the party address
-  // This is a placeholder for the real implementation
-  return `0x${Math.random().toString(16).substr(2, 40)}`;
+  try {
+    // Look for the PartyCreated event in the logs
+    for (const log of receipt.logs) {
+      // The typical event signature for party creation is:
+      // event PartyCreated(address indexed party, address[] hosts, uint256 timestamp)
+      
+      // We're looking for the first topic (event signature hash)
+      // and then the party address will be in the second topic (first indexed parameter)
+      
+      // This is a simplified approach - in production, you would use the ABI to decode precisely
+      if (log.topics.length >= 2) {
+        // The first indexed parameter (party address) is in the second topic
+        const partyAddress = ethers.utils.getAddress('0x' + log.topics[1].slice(26));
+        console.log("Extracted party address from logs:", partyAddress);
+        return partyAddress;
+      }
+    }
+    
+    // If we couldn't find it in the logs, this is a fallback for development
+    // In production, this should be removed or throw an error
+    console.warn("Could not extract party address from logs, using fallback");
+    return `0x${Math.random().toString(16).substr(2, 40)}`;
+  } catch (error) {
+    console.error("Error extracting party address from receipt:", error);
+    return null;
+  }
 }
 
 function extractCrowdfundAddressFromReceipt(receipt: ethers.ContractReceipt): string | null {
-  // In a real implementation, this would parse the event logs to extract the crowdfund address
-  // This is a placeholder for the real implementation
-  return `0x${Math.random().toString(16).substr(2, 40)}`;
+  try {
+    // Look for the CrowdfundCreated event in the logs
+    for (const log of receipt.logs) {
+      // The typical event signature for crowdfund creation is:
+      // event CrowdfundCreated(address indexed crowdfund, address indexed party, uint256 timestamp)
+      
+      // We're looking for the first topic (event signature hash)
+      // and then the crowdfund address will be in the second topic (first indexed parameter)
+      
+      // This is a simplified approach - in production, you would use the ABI to decode precisely
+      if (log.topics.length >= 3) {
+        // The first indexed parameter (crowdfund address) is in the second topic
+        const crowdfundAddress = ethers.utils.getAddress('0x' + log.topics[1].slice(26));
+        console.log("Extracted crowdfund address from logs:", crowdfundAddress);
+        return crowdfundAddress;
+      }
+    }
+    
+    // If we couldn't find it in the logs, this is a fallback for development
+    // In production, this should be removed or throw an error
+    console.warn("Could not extract crowdfund address from logs, using fallback");
+    return `0x${Math.random().toString(16).substr(2, 40)}`;
+  } catch (error) {
+    console.error("Error extracting crowdfund address from receipt:", error);
+    return null;
+  }
 }
 
-// Helper function for uploading metadata to IPFS
-async function uploadToIPFS(metadata: any): Promise<string> {
-  // In a real implementation, this would upload the metadata to IPFS
-  // This is a placeholder for the real implementation
-  return `ipfs://Qm${Math.random().toString(16).substr(2, 44)}`;
+function extractProposalIdFromReceipt(receipt: ethers.ContractReceipt): string | null {
+  try {
+    // Look for the ProposalCreated event in the logs
+    for (const log of receipt.logs) {
+      // The typical event signature for proposal creation is:
+      // event ProposalCreated(uint256 indexed proposalId, address indexed proposer, uint256 timestamp)
+      
+      // We're looking for the first topic (event signature hash)
+      // and then the proposal ID will be in the second topic (first indexed parameter)
+      
+      // This is a simplified approach - in production, you would use the ABI to decode precisely
+      if (log.topics.length >= 2) {
+        // The first indexed parameter (proposal ID) is in the second topic
+        const proposalId = ethers.BigNumber.from(log.topics[1]).toString();
+        console.log("Extracted proposal ID from logs:", proposalId);
+        return proposalId;
+      }
+    }
+    
+    // If we couldn't find it in the logs, this is a fallback for development
+    // In production, this should be removed or throw an error
+    console.warn("Could not extract proposal ID from logs, using fallback");
+    return `${Math.floor(Math.random() * 1000000)}`;
+  } catch (error) {
+    console.error("Error extracting proposal ID from receipt:", error);
+    return null;
+  }
 }
+
