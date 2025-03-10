@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -91,14 +90,13 @@ export const useReferrals = () => {
         description: "Please approve the transaction to create your referral pool.",
       });
       
-      // Create referral with all required arguments
+      // Create referral with all required arguments - removing the extraData as the 6th argument
       const referralId = await createReferral(
         primaryWallet as unknown as ethers.Wallet, 
         type, 
         name, 
         description, 
-        rewardPercentage,
-        extraData
+        rewardPercentage
       );
       
       if (referralId) {
@@ -147,13 +145,12 @@ export const useReferrals = () => {
         description: "Please approve the transaction to submit your referral.",
       });
       
-      // Submit referral with all required arguments
+      // Submit referral with the correct number of arguments
       const success = await submitReferral(
         primaryWallet as unknown as ethers.Wallet,
         referralId,
         referredAddress,
-        metadata,
-        referrerTier
+        metadata
       );
       
       if (success) {

@@ -168,7 +168,7 @@ export const createJobListing = async (
         version: 1,
         language: "en",
         tags: [metadata.category],
-        coverImage: metadata.image || ""
+        coverImage: metadata.coverImage || "" // Using coverImage instead of image
       }
     };
     
