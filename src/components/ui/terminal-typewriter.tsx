@@ -15,7 +15,7 @@ interface TerminalTypewriterProps {
 
 export function TerminalTypewriter({
   textToType = "Enter access code",
-  typeDelay = 20, // Much faster typing speed (was 70)
+  typeDelay = 15, // Even faster typing speed (was 20)
   className,
   isConnected = false,
   onConnect,
@@ -29,13 +29,11 @@ export function TerminalTypewriter({
   const [accessCode, setAccessCode] = useState("");
   const terminalRef = useRef<HTMLDivElement>(null);
   
-  // Simplified initialization lines (fewer lines for quicker display)
+  // Even more compact initialization lines
   const initLines = [
-    "RESISTANCE_SECURE_SHELL",
-    "Initializing secure terminal...",
-    "Establishing connection...",
-    "RESISTANCE NETWORK v3.27",
-    "Authentication required:"
+    "RESISTANCE_NETWORK v2.31",
+    "SECURE CONNECTION ESTABLISHED",
+    "AWAITING AUTHENTICATION..."
   ];
   
   // Handle initialization sequence typing - with faster line transition
@@ -55,7 +53,7 @@ export function TerminalTypewriter({
           clearInterval(interval);
           setTimeout(() => {
             setCurrentLine(prev => prev + 1);
-          }, 150); // Faster transition between lines (was 300)
+          }, 100); // Even faster transition between lines (was 150)
         }
       }, typeDelay);
       
@@ -108,21 +106,21 @@ export function TerminalTypewriter({
         >
           <div className="terminal-header">
             <div className="flex items-center">
-              <Terminal className="w-4 h-4 mr-2 text-toxic-neon" />
-              <span className="text-toxic-neon text-sm font-mono">RESISTANCE_SECURE_SHELL</span>
-              <div className="ml-2 w-2 h-2 rounded-full bg-toxic-neon animate-pulse"></div>
+              <Terminal className="w-3.5 h-3.5 mr-1.5 text-toxic-neon" /> {/* Reduced size */}
+              <span className="text-toxic-neon text-xs font-mono">RESISTANCE_SECURE_SHELL</span> {/* Reduced text size */}
+              <div className="ml-1.5 w-1.5 h-1.5 rounded-full bg-toxic-neon animate-pulse"></div> {/* Reduced size */}
             </div>
-            <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-apocalypse-red"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div className="w-3 h-3 rounded-full bg-toxic-neon/70"></div>
+            <div className="flex gap-1.5"> {/* Reduced gap */}
+              <div className="w-2.5 h-2.5 rounded-full bg-apocalypse-red"></div> {/* Reduced size */}
+              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div> {/* Reduced size */}
+              <div className="w-2.5 h-2.5 rounded-full bg-toxic-neon/70"></div> {/* Reduced size */}
             </div>
           </div>
           
           <div className="terminal-content">
             {!initializationComplete ? (
               <div className="terminal-line">
-                <span className="text-toxic-neon font-mono">
+                <span className="text-toxic-neon font-mono text-sm"> {/* Reduced text size */}
                   {displayText}
                   {cursorVisible && <span className="cursor">_</span>}
                 </span>
@@ -133,18 +131,18 @@ export function TerminalTypewriter({
                   <>
                     {initLines.map((line, index) => (
                       <div key={index} className="terminal-line">
-                        <span className="text-toxic-neon font-mono">
+                        <span className="text-toxic-neon font-mono text-sm"> {/* Reduced text size */}
                           {index === 0 ? (
-                            <span className="text-toxic-neon">_&gt; {line}</span>
+                            <span className="text-toxic-neon">&gt; {line}</span>
                           ) : (
-                            line
+                            <span className="text-toxic-neon">&gt; {line}</span>
                           )}
                         </span>
                       </div>
                     ))}
                     
                     <div className="terminal-line">
-                      <span className="text-toxic-neon font-mono">
+                      <span className="text-toxic-neon font-mono text-sm">
                         resistance@secure:~$
                       </span>
                     </div>
@@ -152,8 +150,8 @@ export function TerminalTypewriter({
                 )}
                 
                 {isConnected ? (
-                  <div className="terminal-line mt-3">
-                    <div className="animate-pulse text-toxic-neon font-mono">
+                  <div className="terminal-line mt-2"> {/* Reduced margin */}
+                    <div className="animate-pulse text-toxic-neon font-mono text-sm"> {/* Reduced text size */}
                       Access granted. Welcome to the Resistance.
                     </div>
                   </div>
@@ -161,55 +159,55 @@ export function TerminalTypewriter({
                   <>
                     {!marketplaceMode ? (
                       <>
-                        <div className="terminal-input-container mt-4">
+                        <div className="terminal-input-container mt-3"> {/* Reduced margin */}
                           <div className="access-code-container">
                             <div className="flex items-center w-full relative">
-                              <Lock className="access-code-icon absolute left-3 z-10 text-toxic-neon" size={16} />
+                              <Lock className="access-code-icon absolute left-3 z-10 text-toxic-neon" size={14} /> {/* Reduced size */}
                               <Input
                                 type="password"
                                 placeholder="Enter access code"
-                                className="access-code-input pl-10"
+                                className="access-code-input text-sm pl-9 py-2" {/* Reduced text and padding */}
                                 value={accessCode}
                                 onChange={handleAccessCodeChange}
                                 onKeyDown={handleKeyDown}
                               />
                               <button 
                                 onClick={handleSubmit}
-                                className="submit-button ml-3 active:transform active:translate-y-0.5 transition-transform"
+                                className="submit-button ml-2 text-xs py-2 px-3" {/* Reduced size, margin and padding */}
                               >
-                                <span className="mr-2">Submit</span>
+                                <span>Submit</span>
                               </button>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="terminal-hint mt-3">
+                        <div className="terminal-hint mt-2"> {/* Reduced margin */}
                           <span className="text-toxic-neon/70 text-xs font-mono">// Access code is "resistance"</span>
                         </div>
                         
-                        <div className="terminal-footer mt-4">
+                        <div className="terminal-footer mt-3"> {/* Reduced margin */}
                           <a 
                             href="https://www.linkedin.com/groups/14310213/" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="linkedin-link"
+                            className="linkedin-link text-xs" {/* Reduced text size */}
                           >
-                            <ExternalLink className="w-4 h-4 mr-2" />
+                            <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> {/* Reduced size and margin */}
                             <span>Join Resistance LinkedIn Group</span>
                           </a>
                         </div>
                       </>
                     ) : (
-                      <div className="terminal-line mt-2">
-                        <div className="text-toxic-neon font-mono">
+                      <div className="terminal-line mt-2"> {/* Reduced margin */}
+                        <div className="text-toxic-neon font-mono text-sm"> {/* Reduced text size */}
                           {textToType} {cursorVisible && <span className="cursor">_</span>}
                         </div>
-                        <div className="mt-3">
+                        <div className="mt-2"> {/* Reduced margin */}
                           <button 
                             onClick={handleSubmit}
-                            className="submit-button active:transform active:translate-y-0.5 transition-transform"
+                            className="submit-button text-xs py-2 px-3" {/* Reduced text size and padding */}
                           >
-                            <span className="mr-2">Connect</span>
+                            <span>Connect</span>
                           </button>
                         </div>
                       </div>

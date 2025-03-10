@@ -82,46 +82,47 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
     animate: { 
       opacity: 1,
       transition: { 
-        staggerChildren: 0.2,
-        delayChildren: 0.3
+        staggerChildren: 0.1, // Reduced from 0.2
+        delayChildren: 0.2 // Reduced from 0.3
       }
     }
   };
 
   const itemVariants = {
-    initial: { opacity: 0, y: 10 },
+    initial: { opacity: 0, y: 5 }, // Reduced y from 10 to 5
     animate: { opacity: 1, y: 0 }
   };
 
   return (
     <div className="max-w-lg mx-auto">
       <motion.div 
-        className="mb-8 text-center"
+        className="mb-6 text-center" // Reduced mb-8 to mb-6
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 0.8 }} // Reduced from 1
       >
-        <h1 className="text-5xl md:text-6xl font-mono text-toxic-neon mb-6 toxic-glow">THE RESISTANCE</h1>
-        <p className="text-lg text-white/80 mb-8">
+        <h1 className="text-5xl md:text-6xl font-mono text-toxic-neon mb-4 toxic-glow">THE RESISTANCE</h1>
+        <p className="text-lg text-white/80 mb-6"> {/* Reduced mb-8 to mb-6 */}
           Enter access code to infiltrate the network
         </p>
       </motion.div>
 
       <motion.div 
-        className="bg-black/70 border border-toxic-neon/30 p-6 rounded-lg broken-glass relative overflow-hidden"
+        className="bg-black/70 border border-toxic-neon/30 p-5 rounded-lg broken-glass relative overflow-hidden" // Reduced p-6 to p-5
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.4 }} // Reduced from 0.5
       >
         <div className="scanline"></div>
         
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-2 mb-4"> {/* Reduced gap-3 to gap-2 and mb-6 to mb-4 */}
           <Terminal className="h-5 w-5 text-toxic-neon" />
           <h2 className="text-xl font-mono text-toxic-neon">TERMINAL ACCESS</h2>
         </div>
 
         <motion.div 
-          className="terminal-output bg-black/90 p-4 rounded font-mono text-sm text-toxic-neon mb-6 h-48 overflow-y-auto flex flex-col"
+          className="terminal-output bg-black/90 p-3 rounded font-mono text-sm text-toxic-neon mb-5 h-36 overflow-y-auto flex flex-col"
+          // Reduced p-4 to p-3, mb-6 to mb-5, and h-48 to h-36
           variants={terminalVariants}
           initial="initial"
           animate="animate"
@@ -130,7 +131,7 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
             <motion.div 
               key={`${message}-${index}`}
               variants={itemVariants}
-              className="mb-1 terminal-line"
+              className="mb-0.5 terminal-line" // Reduced mb-1 to mb-0.5
             >
               {message}
             </motion.div>
@@ -139,7 +140,7 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
             <motion.div 
               key={`error-${index}`}
               variants={itemVariants}
-              className="text-apocalypse-red mb-1"
+              className="text-apocalypse-red mb-0.5" // Reduced mb-1 to mb-0.5
             >
               {error}
             </motion.div>
@@ -148,16 +149,16 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="mt-2 flex items-center"
+              className="mt-1 flex items-center" // Reduced mt-2 to mt-1
             >
-              <span className="animate-pulse mr-2">▋</span>
+              <span className="animate-pulse mr-1">▋</span> {/* Reduced mr-2 to mr-1 */}
               <span>Processing...</span>
             </motion.div>
           )}
         </motion.div>
 
-        <form onSubmit={handleSubmit} className="mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
+        <form onSubmit={handleSubmit} className="mb-6"> {/* Reduced mb-8 to mb-6 */}
+          <div className="flex flex-col md:flex-row gap-3"> {/* Reduced gap-4 to gap-3 */}
             <div className="relative flex-1">
               <input
                 type="password"
@@ -165,7 +166,8 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
                 onChange={(e) => setAccessCode(e.target.value)}
                 disabled={isAuthenticating}
                 placeholder="ENTER ACCESS CODE"
-                className="w-full bg-black/80 border-2 border-toxic-neon/60 text-toxic-neon p-3 rounded font-mono focus:outline-none focus:border-toxic-neon focus:shadow-[0_0_12px_rgba(57,255,20,0.4)] transition-all duration-300"
+                className="w-full bg-black/80 border-2 border-toxic-neon/60 text-toxic-neon p-2.5 rounded font-mono focus:outline-none focus:border-toxic-neon focus:shadow-[0_0_12px_rgba(57,255,20,0.4)] transition-all duration-300"
+                // Reduced p-3 to p-2.5
               />
               <span className="absolute top-1/2 -translate-y-1/2 right-3 text-toxic-neon/50 pointer-events-none text-xs">
                 [ACCESS]
@@ -175,16 +177,16 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
               type="submit" 
               disabled={isAuthenticating}
               variant="primary"
-              size="xl"
+              size="lg" // Changed from xl to lg for a more compact look
               className="uppercase font-mono inline-flex items-center justify-center text-base md:w-auto w-full"
             >
-              <LockKeyhole className="h-5 w-5 mr-2" />
+              <LockKeyhole className="h-4 w-4 mr-2" /> {/* Reduced from h-5 w-5 */}
               AUTHENTICATE
             </ToxicButton>
           </div>
         </form>
 
-        <div className="flex justify-center items-center gap-2 text-white/60 mb-6">
+        <div className="flex justify-center items-center gap-2 text-white/60 mb-4"> {/* Reduced mb-6 to mb-4 */}
           <span className="border-t border-white/20 flex-grow"></span>
           <span className="text-sm px-2">OR</span>
           <span className="border-t border-white/20 flex-grow"></span>
@@ -194,14 +196,14 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
           onClick={handleWalletConnect} 
           disabled={isAuthenticating}
           variant="secondary"
-          size="lg"
-          className="w-full uppercase font-mono inline-flex items-center justify-center py-3 text-base mb-8"
+          size="md" // Changed from lg to md for a more compact look
+          className="w-full uppercase font-mono inline-flex items-center justify-center py-2.5 text-base mb-6" // Reduced py-3 to py-2.5 and mb-8 to mb-6
         >
-          <Shield className="h-5 w-5 mr-2" />
+          <Shield className="h-4 w-4 mr-2" /> {/* Reduced from h-5 w-5 */}
           CONNECT CRYPTO WALLET
         </ToxicButton>
 
-        <div className="flex justify-center items-center gap-2 text-white/60 mb-6">
+        <div className="flex justify-center items-center gap-2 text-white/60 mb-4"> {/* Reduced mb-6 to mb-4 */}
           <span className="border-t border-white/20 flex-grow"></span>
           <span className="text-sm px-2">OR</span>
           <span className="border-t border-white/20 flex-grow"></span>
@@ -215,15 +217,15 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
         >
           <ToxicButton
             variant="tertiary"
-            size="default"
-            className="w-full uppercase font-mono inline-flex items-center justify-center py-2.5 text-sm"
+            size="sm" // Changed from default to sm for a more compact look
+            className="w-full uppercase font-mono inline-flex items-center justify-center py-2 text-sm" // Reduced py-2.5 to py-2
           >
-            <ExternalLink className="h-4 w-4 mr-2" />
+            <ExternalLink className="h-3.5 w-3.5 mr-2" /> {/* Reduced from h-4 w-4 */}
             GAIN ACCESS CODE
           </ToxicButton>
         </a>
 
-        <div className="mt-8 text-center">
+        <div className="mt-6 text-center"> {/* Reduced mt-8 to mt-6 */}
           <div className="text-white/40 text-xs flex items-center justify-center gap-2">
             <AlertTriangle className="h-3 w-3" />
             <span>UNAUTHORIZED ACCESS WILL BE TRACED</span>
