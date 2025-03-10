@@ -19,12 +19,14 @@ const NFTDetails: React.FC = () => {
   const { toast } = useToast();
   
   useEffect(() => {
-    if (nft && !isLoading && metadata && !metadata.notified) {
-      if (metadata && !metadata.fallback) {
-        toast({
-          title: "Metadata loaded",
-          description: `Successfully loaded metadata for ${nft.name}`,
-        });
+    if (nft && !isLoading && metadata && !metadata.notified && !metadata.fallback && !metadata.error) {
+      toast({
+        title: "Metadata loaded",
+        description: `Successfully loaded metadata for ${nft.name}`,
+      });
+      
+      if (metadata) {
+        metadata.notified = true;
       }
     }
   }, [nft, metadata, isLoading, toast]);

@@ -21,7 +21,7 @@ export const useNFTMetadata = (tokenId: string) => {
     },
     enabled: !!tokenId && !isValidCharacterId,
     staleTime: 300000, // 5 minutes
-    cacheTime: 600000, // 10 minutes
+    gcTime: 600000, // 10 minutes (formerly cacheTime)
   });
   
   if (isValidCharacterId) {

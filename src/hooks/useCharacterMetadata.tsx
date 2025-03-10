@@ -19,7 +19,7 @@ export const useCharacterMetadata = (characterId: number) => {
     },
     enabled: !!characterId && !isNaN(characterId) && characterId > 0,
     staleTime: 300000, // 5 minutes
-    cacheTime: 600000, // 10 minutes
+    gcTime: 600000, // 10 minutes (formerly cacheTime)
   });
 
   // Fetch the actual model metadata from Pinata if we have a CID
@@ -37,7 +37,7 @@ export const useCharacterMetadata = (characterId: number) => {
     },
     enabled: !!character?.character_model_cid,
     staleTime: 300000, // 5 minutes
-    cacheTime: 600000, // 10 minutes
+    gcTime: 600000, // 10 minutes (formerly cacheTime)
     retry: 1, // Limit retries to avoid excessive requests
   });
 

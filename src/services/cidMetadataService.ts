@@ -1,3 +1,4 @@
+
 // This service handles the mapping of character CIDs from the smart contract
 
 // Hardcoded CID mapping based on the contract data
@@ -47,7 +48,7 @@ export const isValidCID = (cid: string): boolean => {
   return cid.startsWith('baf') && cid.length > 40;
 };
 
-// Fetch metadata from a CID using Pinata gateway
+// Fetch metadata from a CID using Pinata gateway - THIS IS THE MAIN FUNCTION
 export const fetchMetadataFromCID = async (cid: string): Promise<any> => {
   if (!isValidCID(cid)) {
     throw new Error(`Invalid CID format: ${cid}`);
@@ -58,9 +59,13 @@ export const fetchMetadataFromCID = async (cid: string): Promise<any> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
+    // Direct request to Pinata gateway
     const response = await fetch(url, { 
       signal: controller.signal,
-      cache: 'force-cache' // Try to use cached response if available
+      cache: 'force-cache', // Try to use cached response if available
+      headers: {
+        'Accept': 'application/json'
+      }
     });
     
     clearTimeout(timeoutId);
@@ -70,14 +75,20 @@ export const fetchMetadataFromCID = async (cid: string): Promise<any> => {
     }
     
     const metadata = await response.json();
+    
+    // Add a property to track whether we've already shown a notification for this metadata
+    metadata.notified = false;
+    
     return metadata;
   } catch (error) {
     console.error(`Error fetching metadata for CID ${cid}:`, error);
-    // Return a basic fallback metadata so the app doesn't keep retrying
+    
+    // Return a basic fallback metadata object instead of throwing
     return { 
       error: true,
       message: error instanceof Error ? error.message : 'Failed to fetch metadata',
-      fallback: true 
+      fallback: true,
+      notified: true // Prevent notification for fallback metadata
     };
   }
 };
