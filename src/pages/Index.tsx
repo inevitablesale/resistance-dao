@@ -157,7 +157,7 @@ const Index = () => {
       ],
       status: 'active',
       description: "Strategic Commander with veteran rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreibo6bk5dezlsii7imuabncv7tihxwbi4f4urds75l7nuy2rnxfkru"
+      modelUrl: "bafkreibo6bk5dezlsii7imuabncv7tihxwbi4f4urds75l7nuy2rnxfkru"
     },
     {
       id: 2,
@@ -177,7 +177,7 @@ const Index = () => {
       ],
       status: 'active',
       description: "Financial Overseer with elite rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreid7oobbrlbxcnnigfcwfbgr5m3dmsl6wemsuaxluzd54ioclneubq"
+      modelUrl: "bafkreid7oobbrlbxcnnigfcwfbgr5m3dmsl6wemsuaxluzd54ioclneubq"
     },
     {
       id: 3,
@@ -197,7 +197,7 @@ const Index = () => {
       ],
       status: 'active',
       description: "Trade Commissioner with legend rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreicfsovqdpu3byxvyfev4y7xdmqz3hggewsuyx4brifoscercektpy"
+      modelUrl: "bafkreicfsovqdpu3byxvyfev4y7xdmqz3hggewsuyx4brifoscercektpy"
     }
   ];
   
@@ -220,7 +220,7 @@ const Index = () => {
       ],
       status: 'active',
       description: "Protocol Tracker with feared rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreifepvbd2shm4uxfysdxtva5mjs7fqnxbxehutcoqfblmcgtp7h7ka"
+      modelUrl: "bafkreifepvbd2shm4uxfysdxtva5mjs7fqnxbxehutcoqfblmcgtp7h7ka"
     },
     {
       id: 5,
@@ -240,7 +240,7 @@ const Index = () => {
       ],
       status: 'active',
       description: "Asset Recovery with respected rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreierebrs3yw24r7wgkezgok6lhbiwqwwgen5fnfqxm6cqul644x3fe"
+      modelUrl: "bafkreierebrs3yw24r7wgkezgok6lhbiwqwwgen5fnfqxm6cqul644x3fe"
     },
     {
       id: 6,
@@ -260,7 +260,7 @@ const Index = () => {
       ],
       status: 'active',
       description: "Network Infiltrator with infamous rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreiajc2mwtirx3423mbf55scuniqlwh3ph2cglk7y2nbd764r6g6ine"
+      modelUrl: "bafkreiajc2mwtirx3423mbf55scuniqlwh3ph2cglk7y2nbd764r6g6ine"
     }
   ];
   
@@ -283,7 +283,7 @@ const Index = () => {
       ],
       status: 'active',
       description: "Engineer Pioneer with veteran rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreiek2ihnc7fmpwzseitea2vflvwdmm6qvn4vydd5ww6wgipntf3w7a"
+      modelUrl: "bafkreiek2ihnc7fmpwzseitea2vflvwdmm6qvn4vydd5ww6wgipntf3w7a"
     },
     {
       id: 8,
@@ -303,7 +303,7 @@ const Index = () => {
       ],
       status: 'active',
       description: "Medic Support with skilled rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreica5ugau5cjah7hkwz4ko36oqxkg2v4swqpxnhzi7z4wgftl76q5m"
+      modelUrl: "bafkreica5ugau5cjah7hkwz4ko36oqxkg2v4swqpxnhzi7z4wgftl76q5m"
     },
     {
       id: 9,
@@ -323,7 +323,7 @@ const Index = () => {
       ],
       status: 'active',
       description: "Settlement Leader with master rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreigw5k75stzjhamdjtwlssbolhxepbeglfs3qoyowgu2q4n2fnfszy"
+      modelUrl: "bafkreigw5k75stzjhamdjtwlssbolhxepbeglfs3qoyowgu2q4n2fnfszy"
     }
   ];
 
