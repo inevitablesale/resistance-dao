@@ -24,15 +24,15 @@ export function RadiationOverlay({
   const [currentRadiation, setCurrentRadiation] = useState(radiationLevel);
   
   // Calculate opacity based on radiation level (inverse relationship)
-  const overlayOpacity = currentRadiation / 100;
+  const overlayOpacity = Math.min(0.8, currentRadiation / 100); // Cap at 80% opacity to ensure visibility
   
   // Define radiation colors based on level
   const getRadiationColor = (level: number) => {
-    if (level > 90) return 'from-apocalypse-red/90 to-apocalypse-red/70';
-    if (level > 70) return 'from-orange-500/90 to-orange-500/70';
-    if (level > 40) return 'from-amber-400/80 to-amber-400/60';
-    if (level > 10) return 'from-toxic-neon/70 to-toxic-neon/50';
-    return 'from-toxic-neon/30 to-toxic-neon/10';
+    if (level > 90) return 'from-apocalypse-red/80 to-apocalypse-red/60';
+    if (level > 70) return 'from-orange-500/80 to-orange-500/60';
+    if (level > 40) return 'from-amber-400/70 to-amber-400/50';
+    if (level > 10) return 'from-toxic-neon/60 to-toxic-neon/40';
+    return 'from-toxic-neon/20 to-toxic-neon/10';
   };
   
   // Animate radiation dissipation effect
@@ -86,7 +86,8 @@ export function RadiationOverlay({
           initial={{ opacity: overlayOpacity }}
           animate={{ opacity: overlayOpacity }}
           transition={{ duration: 0.5 }}
-          className={`absolute inset-0 bg-gradient-to-br ${getRadiationColor(currentRadiation)} backdrop-blur-sm z-10`}
+          className={`absolute inset-0 bg-gradient-to-br ${getRadiationColor(currentRadiation)} backdrop-blur-sm pointer-events-none z-10`}
+          style={{ mixBlendMode: 'screen' }}
         >
           {/* Radiation particles effect */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-toxic-neon/20 to-transparent opacity-70"></div>

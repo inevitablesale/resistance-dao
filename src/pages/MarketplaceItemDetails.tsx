@@ -239,13 +239,43 @@ export default function MarketplaceItemDetails() {
   const [purchaseStep, setPurchaseStep] = useState(0);
   const [offerAmount, setOfferAmount] = useState('');
   const [revealValue, setRevealValue] = useState(20);
+  const [characterMetadata, setCharacterMetadata] = useState<any>(null);
   
   useEffect(() => {
+    const fetchCharacterMetadata = async (ipfsHash: string) => {
+      try {
+        if (!ipfsHash) return;
+        
+        let metadataUrl = ipfsHash;
+        if (!ipfsHash.startsWith('http')) {
+          metadataUrl = `https://gateway.pinata.cloud/ipfs/${ipfsHash.replace('ipfs://', '')}`;
+        }
+        
+        console.log('Fetching character metadata from:', metadataUrl);
+        const response = await fetch(metadataUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch metadata: ${response.status} ${response.statusText}`);
+        }
+        
+        const metadata = await response.json();
+        console.log('Character metadata:', metadata);
+        setCharacterMetadata(metadata);
+      } catch (error) {
+        console.error('Error fetching character metadata:', error);
+      }
+    };
+    
     setLoading(true);
     
     const timer = setTimeout(() => {
       if (id && MOCKUP_LISTINGS[id]) {
-        setItem(MOCKUP_LISTINGS[id]);
+        const currentItem = MOCKUP_LISTINGS[id];
+        setItem(currentItem);
+        
+        if (currentItem.modelUrl) {
+          fetchCharacterMetadata(currentItem.modelUrl);
+        }
       }
       setLoading(false);
     }, 1000);
@@ -419,15 +449,22 @@ export default function MarketplaceItemDetails() {
                       TOKEN #{item.tokenId}
                     </ToxicBadge>
                   </div>
-                  <ToxicCardTitle>{item.name}</ToxicCardTitle>
+                  <ToxicCardTitle>{characterMetadata?.name || item.name}</ToxicCardTitle>
                   <ToxicCardDescription>
                     Listed by {item.seller} • {item.status === 'active' ? 'Active' : 'Inactive'}
                   </ToxicCardDescription>
                 </ToxicCardHeader>
                 <ToxicCardContent>
                   <p className="text-white/80 mb-6">
-                    {item.description || "No description available for this wasteland asset."}
+                    {characterMetadata?.description || item.description || "No description available for this wasteland asset."}
                   </p>
+                  
+                  {characterMetadata?.background_story && (
+                    <div className="p-3 bg-black/50 border border-toxic-neon/20 rounded-lg mb-4">
+                      <h4 className="text-toxic-neon text-sm mb-2">Background</h4>
+                      <p className="text-white/80 text-sm">{characterMetadata.background_story}</p>
+                    </div>
+                  )}
                   
                   <div className="p-4 bg-black/50 border border-toxic-neon/30 rounded-lg mb-6">
                     <div className="flex justify-between items-center mb-2">
@@ -516,12 +553,32 @@ export default function MarketplaceItemDetails() {
                   <ToxicCard className="bg-black/70 border-toxic-neon/30">
                     <ToxicCardContent>
                       <div className="space-y-3">
-                        {item.attributes.map((attr, idx) => (
+                        {(characterMetadata?.attributes || item.attributes).map((attr, idx) => (
                           <div key={idx} className="p-3 bg-black/50 border border-toxic-neon/20 rounded">
                             <div className="text-sm text-white/60 mb-1">{attr.trait}</div>
                             <div className="text-toxic-neon font-mono">{attr.value}</div>
                           </div>
                         ))}
+                        
+                        {characterMetadata?.power_level && (
+                          <div className="p-3 bg-black/50 border border-toxic-neon/20 rounded">
+                            <div className="text-sm text-white/60 mb-1">Power Level</div>
+                            <div className="text-toxic-neon font-mono">{characterMetadata.power_level}</div>
+                          </div>
+                        )}
+                        
+                        {characterMetadata?.special_abilities && (
+                          <div className="p-3 bg-black/50 border border-toxic-neon/20 rounded">
+                            <div className="text-sm text-white/60 mb-1">Special Abilities</div>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {characterMetadata.special_abilities.map((ability, idx) => (
+                                <ToxicBadge key={idx} variant="outline" className="bg-toxic-neon/10">
+                                  {ability}
+                                </ToxicBadge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </ToxicCardContent>
                   </ToxicCard>
@@ -606,11 +663,11 @@ export default function MarketplaceItemDetails() {
                 <ToxicCardContent>
                   <div className="space-y-4">
                     <p className="text-white/80 text-sm">
-                      {item.type === 'bounty-hunter' ? (
+                      {characterMetadata?.background_story || (item.type === 'bounty-hunter' ? (
                         "Bounty hunters require special handling protocols due to their high radiation levels and mutant abilities. Ensure proper containment when not actively hunting."
                       ) : (
                         "Survivors are valuable assets for rebuilding settlements and maintaining wasteland outposts. Their skills can be crucial for long-term survival."
-                      )}
+                      ))}
                     </p>
                     
                     <div className="flex justify-between">
