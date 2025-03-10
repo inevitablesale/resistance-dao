@@ -79,34 +79,34 @@ const ReferralRedirect = () => {
   }, [referrerAddress, address, isConnected, toast]);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-      <div className="relative z-10 w-full max-w-md p-8 rounded-xl bg-black/50 border border-toxic-neon/30 shadow-[0_0_30px_rgba(57,255,20,0.2)]">
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="relative z-10 w-full max-w-md p-8 rounded-xl bg-gray-900/50 border border-gray-800 shadow-lg">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-toxic-neon mb-4">Welcome to Resistance DAO</h1>
+          <h1 className="text-3xl font-bold text-blue-400 mb-4">Welcome to Resistance DAO</h1>
           <p className="text-white mb-6">Processing your Bounty Hunter referral...</p>
           
           <div className="w-full mb-4">
-            <Progress value={progress} className="h-2" />
+            <Progress value={progress} className="h-2 bg-gray-800" />
           </div>
           
           <div className="flex justify-between mb-6 text-sm">
-            <div className={`flex items-center gap-1 ${progress >= 33 ? 'text-toxic-neon' : 'text-white/40'}`}>
+            <div className={`flex items-center gap-1 ${progress >= 33 ? 'text-blue-400' : 'text-gray-500'}`}>
               <Shield className="w-4 h-4" /> 
               <span>Validating</span>
             </div>
-            <div className={`flex items-center gap-1 ${progress >= 66 ? 'text-toxic-neon' : 'text-white/40'}`}>
+            <div className={`flex items-center gap-1 ${progress >= 66 ? 'text-blue-400' : 'text-gray-500'}`}>
               <Zap className="w-4 h-4" /> 
               <span>Storing</span>
             </div>
-            <div className={`flex items-center gap-1 ${progress >= 100 ? 'text-toxic-neon' : 'text-white/40'}`}>
+            <div className={`flex items-center gap-1 ${progress >= 100 ? 'text-blue-400' : 'text-gray-500'}`}>
               <Users className="w-4 h-4" /> 
               <span>Complete</span>
             </div>
           </div>
           
-          <p className="text-toxic-neon font-medium mb-4">{processingStep}...</p>
+          <p className="text-blue-400 font-medium mb-4">{processingStep}...</p>
           
-          <p className="text-white/60 text-sm">
+          <p className="text-gray-400 text-sm">
             You're being referred by a Bounty Hunter from the wasteland. 
             They'll earn rewards when you purchase an NFT.
           </p>
