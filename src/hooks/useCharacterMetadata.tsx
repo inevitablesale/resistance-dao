@@ -5,10 +5,9 @@ import {
   fetchCharacterMetadata, 
   convertToOpenSeaNFT 
 } from '@/services/characterMetadata';
-import { type OpenSeaNFT } from '@/services/openseaService';
 
 export const useCharacterMetadata = (characterId: number) => {
-  const [nft, setNft] = useState<OpenSeaNFT | null>(null);
+  const [nft, setNft] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 

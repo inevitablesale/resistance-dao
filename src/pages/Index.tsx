@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -33,6 +32,7 @@ import { TerritoryStatus } from "@/components/chronicle/TerritoryStatus";
 import { ModelPreview } from '@/components/marketplace/ModelPreview';
 import { NFTCollectionDisplay } from '@/components/nft/NFTCollectionDisplay';
 import { CharacterShowcase } from '@/components/nft/CharacterShowcase';
+import { NeonSign } from '@/components/ui/neon-sign';
 
 type AuthState = "unauthenticated" | "authenticating" | "breaching" | "authenticated";
 
@@ -53,7 +53,6 @@ const Index = () => {
   const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
   const [storyTerminalOpen, setStoryTerminalOpen] = useState(false);
 
-  // New states for radiation system
   const [currentRadiation, setCurrentRadiation] = useState(94); // Start at 94% radiation
   const [totalNFTsClaimed, setTotalNFTsClaimed] = useState(925); // Mock data - total claimed NFTs
   const [referralEarnings, setReferralEarnings] = useState(375); // Mock data - earnings in MATIC
@@ -128,7 +127,6 @@ const Index = () => {
     address: "0x789...012"
   }];
   
-  // Wasteland Operations component as shown in the image
   const WastelandOperations = () => (
     <ToxicCard className="bg-black/80 border-toxic-neon/50 p-6 mx-auto mb-8 max-w-2xl shadow-[0_0_15px_rgba(57,255,20,0.25)]">
       <div className="flex items-center gap-3 mb-6">
@@ -176,15 +174,12 @@ const Index = () => {
           Wasteland Status: <span className="text-apocalypse-red font-semibold status-critical">Radiation Level: {currentRadiation}%</span>
         </div>
         
-        {/* Wasteland Operations at the top */}
         <WastelandOperations />
         
-        {/* Character Showcase - New addition */}
         <CharacterShowcase />
         
         <StoryTerminal initiallyOpen={storyTerminalOpen} onClose={() => setStoryTerminalOpen(false)} className="mb-8" />
         
-        {/* NFT Collection Display */}
         <NFTCollectionDisplay className="mb-8" title="Resistance Wasteland NFTs" />
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

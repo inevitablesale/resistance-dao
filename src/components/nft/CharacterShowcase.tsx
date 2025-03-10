@@ -5,7 +5,6 @@ import { NFTCard } from './NFTCard';
 import { Shield, Target, Biohazard } from 'lucide-react';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
 import { getCharactersGroupedByRole } from '@/services/characterMetadata';
-import { type OpenSeaNFT } from '@/services/openseaService';
 
 interface CharacterShowcaseProps {
   className?: string;
@@ -16,9 +15,9 @@ export const CharacterShowcase: React.FC<CharacterShowcaseProps> = ({
 }) => {
   const navigate = useNavigate();
   const [characters, setCharacters] = useState<{
-    sentinels: OpenSeaNFT[];
-    survivors: OpenSeaNFT[];
-    bountyHunters: OpenSeaNFT[];
+    sentinels: any[];
+    survivors: any[];
+    bountyHunters: any[];
   }>({
     sentinels: [],
     survivors: [],
