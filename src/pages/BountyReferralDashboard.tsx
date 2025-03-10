@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Target, Gift, Wallet, Users, Link, ArrowUpRight, Award, ChevronRight } from 'lucide-react';
+import { Target, Gift, Wallet, Users, Link, ArrowUpRight, Award, ChevronRight, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
 import { ToxicCard } from '@/components/ui/toxic-card';
@@ -127,7 +127,13 @@ export default function BountyReferralDashboard() {
                       </div>
                       <div className="flex justify-between items-center border-b border-gray-800 pb-2">
                         <span className="text-zinc-400">Remaining Budget</span>
-                        <span className="text-toxic-neon font-mono">{selectedBounty.remainingBudget} MATIC</span>
+                        <div className="text-xs text-zinc-400 flex items-center gap-1.5">
+                          <DollarSign className="w-3.5 h-3.5" />
+                          <span>
+                            {bounty.remainingBudget !== undefined ? 
+                              bounty.remainingBudget : (bounty.totalBudget - bounty.usedBudget)} MATIC remaining
+                          </span>
+                        </div>
                       </div>
                       <div className="flex justify-between items-center border-b border-gray-800 pb-2">
                         <span className="text-zinc-400">Expiration</span>

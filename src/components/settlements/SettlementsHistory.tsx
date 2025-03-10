@@ -15,10 +15,8 @@ export const SettlementsHistory = () => {
   useEffect(() => {
     const loadBounties = async () => {
       try {
-        const allBounties = await getBounties();
-        // Only show active bounties
-        const active = allBounties.filter(b => b.status === "active");
-        setBounties(active);
+        const allBounties = await getBounties('active');
+        setBounties(allBounties);
       } catch (error) {
         console.error("Error loading bounties:", error);
       } finally {
@@ -114,7 +112,7 @@ export const SettlementsHistory = () => {
                   </div>
                   <div className="flex items-center gap-1.5">
                     <DollarSign className="w-3.5 h-3.5" />
-                    <span>{bounty.totalBudget - bounty.usedBudget} MATIC remaining</span>
+                    <span>{bounty.remainingBudget !== undefined ? bounty.remainingBudget : (bounty.totalBudget - bounty.usedBudget)} MATIC remaining</span>
                   </div>
                 </div>
               </div>

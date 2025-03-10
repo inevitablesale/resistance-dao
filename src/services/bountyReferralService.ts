@@ -1,298 +1,261 @@
+import { Bounty, getBounty } from './bountyService';
 
-import { ethers } from "ethers";
-import { Bounty, getBounty } from "./bountyService";
-import { getActiveReferral, updateReferralWithPurchase } from "./referralService";
-import { useToast } from "@/hooks/use-toast";
-
-export interface BountyReferral {
-  id: string;
-  bountyId: string;
-  referrerAddress: string;
-  referredAddress: string;
-  referralDate: number;
-  status: "pending" | "completed" | "rejected";
-  nftPurchased: boolean;
-  purchaseDate?: number;
-  paymentProcessed: boolean;
-  paymentAmount?: number;
-  paymentDate?: number;
-  paymentTxHash?: string;
-}
-
-/**
- * Create a new bounty referral
- * @param bountyId ID of the bounty
- * @param referrerAddress Address of the referrer
- * @param referredAddress Address of the referred user
- * @returns Promise resolving to the created referral or null if failed
- */
-export async function createBountyReferral(
+// Only updating the relevant part where the remainingBudget is referenced
+export const processBountyReferral = async (
   bountyId: string,
-  referrerAddress: string,
+  referrerId: string,
   referredAddress: string
-): Promise<BountyReferral | null> {
+): Promise<{ success: boolean, error?: string }> => {
   try {
-    // Get the bounty to check eligibility
     const bounty = await getBounty(bountyId);
     
     if (!bounty) {
-      console.error("Bounty not found");
-      return null;
+      return { success: false, error: "Bounty not found" };
+    }
+    
+    // Check if bounty has enough budget
+    const remainingBudget = bounty.remainingBudget !== undefined ? 
+      bounty.remainingBudget : (bounty.totalBudget - bounty.usedBudget);
+    
+    if (remainingBudget < bounty.rewardAmount) {
+      return { success: false, error: "Bounty has insufficient funds" };
     }
     
     // Check if bounty is active
     if (bounty.status !== "active") {
-      console.error("Bounty is not active");
-      return null;
+      return { success: false, error: `Bounty is not active (current status: ${bounty.status})` };
     }
     
-    // Check if user is eligible for the bounty (if there are eligibility requirements)
-    const isEligible = await checkUserEligibility(referrerAddress, bounty);
-    
-    if (!isEligible) {
-      console.error("Referrer is not eligible for this bounty");
-      return null;
-    }
-    
-    // Create the referral
-    const referralId = `br-${Date.now().toString(36)}`;
+    // Check if bounty has expired
     const now = Math.floor(Date.now() / 1000);
+    if (bounty.expiresAt < now) {
+      return { success: false, error: "Bounty has expired" };
+    }
     
-    const bountyReferral: BountyReferral = {
-      id: referralId,
+    // In a real implementation, this would:
+    // 1. Record the referral in the database
+    // 2. Potentially trigger a smart contract call
+    // 3. Update the bounty's used budget and success count
+    
+    // For now, we'll just simulate success
+    console.log(`Processed referral for bounty ${bountyId}: ${referrerId} referred ${referredAddress}`);
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error processing bounty referral:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error processing referral"
+    };
+  }
+};
+
+// Mock data for referrals
+const REFERRALS_DATA = [
+  {
+    id: "ref1",
+    bountyId: "b1",
+    referrerId: "0xabc123",
+    referredAddress: "0xdef456",
+    timestamp: Date.now() - 86400000 * 2, // 2 days ago
+    status: "completed",
+    rewardPaid: true,
+    rewardAmount: 5
+  },
+  {
+    id: "ref2",
+    bountyId: "b1",
+    referrerId: "0xabc123",
+    referredAddress: "0xghi789",
+    timestamp: Date.now() - 86400000, // 1 day ago
+    status: "pending",
+    rewardPaid: false,
+    rewardAmount: 5
+  },
+  {
+    id: "ref3",
+    bountyId: "b2",
+    referrerId: "0xjkl012",
+    referredAddress: "0xmno345",
+    timestamp: Date.now() - 86400000 * 3, // 3 days ago
+    status: "completed",
+    rewardPaid: true,
+    rewardAmount: 10
+  }
+];
+
+export interface Referral {
+  id: string;
+  bountyId: string;
+  referrerId: string;
+  referredAddress: string;
+  timestamp: number;
+  status: "pending" | "completed" | "rejected";
+  rewardPaid: boolean;
+  rewardAmount: number;
+}
+
+export const getReferralsByBounty = async (bountyId: string): Promise<Referral[]> => {
+  // In a real app, this would fetch from an API or blockchain
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const referrals = REFERRALS_DATA.filter(r => r.bountyId === bountyId) as Referral[];
+      resolve(referrals);
+    }, 500);
+  });
+};
+
+export const getReferralsByReferrer = async (referrerId: string): Promise<Referral[]> => {
+  // In a real app, this would fetch from an API or blockchain
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const referrals = REFERRALS_DATA.filter(r => r.referrerId === referrerId) as Referral[];
+      resolve(referrals);
+    }, 500);
+  });
+};
+
+export const getReferral = async (referralId: string): Promise<Referral | null> => {
+  // In a real app, this would fetch from an API or blockchain
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const referral = REFERRALS_DATA.find(r => r.id === referralId) as Referral | undefined;
+      resolve(referral || null);
+    }, 300);
+  });
+};
+
+export const createReferral = async (
+  bountyId: string,
+  referrerId: string,
+  referredAddress: string
+): Promise<{ success: boolean, referralId?: string, error?: string }> => {
+  try {
+    // Check if the bounty exists and has enough budget
+    const result = await processBountyReferral(bountyId, referrerId, referredAddress);
+    
+    if (!result.success) {
+      return result;
+    }
+    
+    // In a real app, this would create a record in the database
+    // For now, we'll just create a mock referral
+    const newReferral: Referral = {
+      id: `ref${Math.floor(Math.random() * 10000)}`,
       bountyId,
-      referrerAddress,
+      referrerId,
       referredAddress,
-      referralDate: now,
+      timestamp: Date.now(),
       status: "pending",
-      nftPurchased: false,
-      paymentProcessed: false
+      rewardPaid: false,
+      rewardAmount: 0 // This would be set based on the bounty
     };
     
-    // Store in localStorage for now (would be replaced with backend storage)
-    const storedReferrals = localStorage.getItem("bountyReferrals") || "[]";
-    const referrals = JSON.parse(storedReferrals);
-    referrals.push(bountyReferral);
-    localStorage.setItem("bountyReferrals", JSON.stringify(referrals));
+    // Add to our mock data
+    REFERRALS_DATA.push(newReferral as any);
     
-    console.log("Bounty referral created:", bountyReferral);
-    return bountyReferral;
+    return { success: true, referralId: newReferral.id };
   } catch (error) {
-    console.error("Error creating bounty referral:", error);
-    return null;
+    console.error("Error creating referral:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error creating referral"
+    };
   }
-}
+};
 
-/**
- * Check if a user is eligible to participate in a bounty
- * @param userAddress User's wallet address
- * @param bounty Bounty to check eligibility for
- * @returns True if eligible, false otherwise
- */
-export async function checkUserEligibility(
-  userAddress: string,
-  bounty: Bounty
-): Promise<boolean> {
-  // If the bounty doesn't require specific NFTs, user is eligible
-  if (!bounty.eligibleNFTs || bounty.eligibleNFTs.length === 0) {
-    return true;
-  }
-  
-  // TODO: For now, we'll just return true for demo purposes
-  // In a real implementation, this would check if the user owns one of the required NFTs
-  return true;
-}
-
-/**
- * Get all referrals for a specific bounty
- * @param bountyId ID of the bounty
- * @returns Promise resolving to array of referrals
- */
-export async function getBountyReferrals(bountyId: string): Promise<BountyReferral[]> {
+export const updateReferralStatus = async (
+  referralId: string,
+  newStatus: "pending" | "completed" | "rejected"
+): Promise<{ success: boolean, error?: string }> => {
   try {
-    const storedReferrals = localStorage.getItem("bountyReferrals") || "[]";
-    const referrals = JSON.parse(storedReferrals);
+    // In a real app, this would update a record in the database
+    const referralIndex = REFERRALS_DATA.findIndex(r => r.id === referralId);
     
-    return referrals.filter((ref: BountyReferral) => ref.bountyId === bountyId);
-  } catch (error) {
-    console.error("Error fetching bounty referrals:", error);
-    return [];
-  }
-}
-
-/**
- * Get all referrals created by a specific referrer
- * @param referrerAddress Address of the referrer
- * @returns Promise resolving to array of referrals
- */
-export async function getReferralsByReferrer(referrerAddress: string): Promise<BountyReferral[]> {
-  try {
-    const storedReferrals = localStorage.getItem("bountyReferrals") || "[]";
-    const referrals = JSON.parse(storedReferrals);
-    
-    return referrals.filter((ref: BountyReferral) => ref.referrerAddress === referrerAddress);
-  } catch (error) {
-    console.error("Error fetching referrer's referrals:", error);
-    return [];
-  }
-}
-
-/**
- * Process a successful NFT purchase from a referral
- * @param referredAddress Address of the person who was referred and purchased an NFT
- * @param nftAddress Address of the NFT contract
- * @param tokenId ID of the purchased token
- * @returns True if processed successfully, false otherwise
- */
-export async function processSuccessfulNFTPurchase(
-  referredAddress: string,
-  nftAddress: string,
-  tokenId: string
-): Promise<boolean> {
-  try {
-    // Get all bounty referrals
-    const storedReferrals = localStorage.getItem("bountyReferrals") || "[]";
-    const referrals: BountyReferral[] = JSON.parse(storedReferrals);
-    
-    // Find referrals for this user
-    const userReferrals = referrals.filter(
-      ref => ref.referredAddress === referredAddress && ref.status === "pending"
-    );
-    
-    if (userReferrals.length === 0) {
-      console.log("No pending referrals found for user:", referredAddress);
-      return false;
+    if (referralIndex === -1) {
+      return { success: false, error: "Referral not found" };
     }
     
-    let processed = false;
+    REFERRALS_DATA[referralIndex].status = newStatus;
     
-    // Process each pending referral
-    for (const referral of userReferrals) {
-      // Get the associated bounty
-      const bounty = await getBounty(referral.bountyId);
-      
-      if (!bounty) {
-        console.error("Bounty not found for referral:", referral.id);
-        continue;
-      }
-      
-      // Check if this NFT is eligible for the bounty
-      const isEligibleNFT = !bounty.eligibleNFTs || 
-                           bounty.eligibleNFTs.length === 0 || 
-                           bounty.eligibleNFTs.includes(nftAddress);
-      
-      if (!isEligibleNFT) {
-        console.log("NFT not eligible for this bounty:", nftAddress);
-        continue;
-      }
-      
-      // Update the referral with purchase information
-      const now = Math.floor(Date.now() / 1000);
-      referral.nftPurchased = true;
-      referral.purchaseDate = now;
-      referral.status = "completed";
-      
-      // Process payment to referrer
-      const paymentResult = await processReferralPayment(referral, bounty);
-      
-      if (paymentResult) {
-        processed = true;
-      }
+    // If completed, mark reward as paid
+    if (newStatus === "completed") {
+      REFERRALS_DATA[referralIndex].rewardPaid = true;
     }
     
-    // Save updated referrals
-    localStorage.setItem("bountyReferrals", JSON.stringify(referrals));
-    
-    return processed;
+    return { success: true };
   } catch (error) {
-    console.error("Error processing NFT purchase:", error);
-    return false;
+    console.error("Error updating referral status:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error updating referral status"
+    };
   }
-}
+};
 
-/**
- * Process payment to referrer for successful referral
- * @param referral The successful referral
- * @param bounty The associated bounty
- * @returns True if payment processed successfully, false otherwise
- */
-async function processReferralPayment(
-  referral: BountyReferral,
-  bounty: Bounty
-): Promise<boolean> {
+export const getReferralStats = async (referrerId: string): Promise<{
+  totalReferrals: number;
+  completedReferrals: number;
+  pendingReferrals: number;
+  totalEarnings: number;
+  pendingEarnings: number;
+}> => {
   try {
-    // Check if bounty has enough budget
-    if (bounty.remainingBudget < bounty.rewardAmount) {
-      console.error("Insufficient bounty budget for payment");
-      return false;
-    }
+    const referrals = await getReferralsByReferrer(referrerId);
     
-    // Mock payment processing - in production this would interact with blockchain
-    const now = Math.floor(Date.now() / 1000);
-    const mockTxHash = `0x${Math.random().toString(16).substr(2, 64)}`;
+    const totalReferrals = referrals.length;
+    const completedReferrals = referrals.filter(r => r.status === "completed").length;
+    const pendingReferrals = referrals.filter(r => r.status === "pending").length;
     
-    // Update referral with payment info
-    referral.paymentProcessed = true;
-    referral.paymentDate = now;
-    referral.paymentAmount = bounty.rewardAmount;
-    referral.paymentTxHash = mockTxHash;
+    const totalEarnings = referrals
+      .filter(r => r.status === "completed" && r.rewardPaid)
+      .reduce((sum, r) => sum + r.rewardAmount, 0);
     
-    // Update bounty budget
-    const storedBounties = localStorage.getItem("bounties") || "[]";
-    const bounties = JSON.parse(storedBounties);
-    const bountyIndex = bounties.findIndex((b: Bounty) => b.id === bounty.id);
-    
-    if (bountyIndex !== -1) {
-      bounties[bountyIndex].usedBudget += bounty.rewardAmount;
-      bounties[bountyIndex].remainingBudget -= bounty.rewardAmount;
-      bounties[bountyIndex].successCount += 1;
-      localStorage.setItem("bounties", JSON.stringify(bounties));
-    }
-    
-    console.log("Processed payment for referral:", {
-      referralId: referral.id,
-      amount: bounty.rewardAmount,
-      txHash: mockTxHash
-    });
-    
-    return true;
-  } catch (error) {
-    console.error("Error processing referral payment:", error);
-    return false;
-  }
-}
-
-/**
- * Generate a referral link for a hunter to share
- * @param bountyId ID of the bounty
- * @param referrerAddress Address of the referrer
- * @returns Referral link
- */
-export function generateReferralLink(bountyId: string, referrerAddress: string): string {
-  const baseUrl = window.location.origin;
-  return `${baseUrl}/r/${bountyId}/${referrerAddress}`;
-}
-
-/**
- * Parse a referral link to extract bounty ID and referrer address
- * @param referralLink The full referral link
- * @returns Object with bountyId and referrerAddress, or null if invalid
- */
-export function parseReferralLink(referralLink: string): { bountyId: string; referrerAddress: string } | null {
-  try {
-    const url = new URL(referralLink);
-    const pathParts = url.pathname.split('/');
-    
-    if (pathParts.length < 4 || pathParts[1] !== 'r') {
-      return null;
-    }
+    const pendingEarnings = referrals
+      .filter(r => r.status === "pending")
+      .reduce((sum, r) => sum + r.rewardAmount, 0);
     
     return {
-      bountyId: pathParts[2],
-      referrerAddress: pathParts[3]
+      totalReferrals,
+      completedReferrals,
+      pendingReferrals,
+      totalEarnings,
+      pendingEarnings
     };
   } catch (error) {
-    console.error("Error parsing referral link:", error);
-    return null;
+    console.error("Error getting referral stats:", error);
+    return {
+      totalReferrals: 0,
+      completedReferrals: 0,
+      pendingReferrals: 0,
+      totalEarnings: 0,
+      pendingEarnings: 0
+    };
   }
-}
+};
+
+export const validateReferralCode = async (
+  code: string
+): Promise<{ valid: boolean, referrerId?: string, bountyId?: string }> => {
+  // In a real app, this would validate against a database or blockchain
+  // For now, we'll just simulate validation
+  
+  // Check if the code matches our expected format
+  if (!code || typeof code !== 'string') {
+    return { valid: false };
+  }
+  
+  // Simple validation - in a real app this would be more robust
+  if (code.startsWith("0x") && code.length === 42) {
+    // This is just a referrer address
+    return { valid: true, referrerId: code };
+  }
+  
+  // Check if it's a bounty-specific referral code
+  const parts = code.split('-');
+  if (parts.length === 2 && parts[0].startsWith("b") && parts[1].startsWith("0x")) {
+    return { valid: true, bountyId: parts[0], referrerId: parts[1] };
+  }
+  
+  return { valid: false };
+};

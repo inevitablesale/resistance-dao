@@ -79,14 +79,9 @@ export interface Bounty {
   allowPublicHunters: boolean;
   maxReferralsPerHunter: number;
   bountyType: "nft_referral" | "token_referral" | "social_media";
+  // Add a getter for remainingBudget
+  remainingBudget?: number;
 }
-
-// Add a computed property for remaining budget
-Object.defineProperty(Bounty.prototype, "remainingBudget", {
-  get: function() {
-    return this.totalBudget - this.usedBudget;
-  }
-});
 
 export interface BountyCreationParams {
   name: string;
@@ -108,16 +103,30 @@ export interface BountyOptions {
   includeCompleted?: boolean;
 }
 
+// Helper function to calculate remaining budget
+const calculateRemainingBudget = (bounty: Bounty): Bounty => {
+  return {
+    ...bounty,
+    remainingBudget: bounty.totalBudget - bounty.usedBudget
+  };
+};
+
 export const getBounties = async (status?: string): Promise<Bounty[]> => {
   // In a real app, this would fetch from an API or blockchain
   return new Promise(resolve => {
     setTimeout(() => {
+      let bounties: Bounty[];
+      
       if (status) {
-        const filteredBounties = BOUNTIES_DATA.filter(b => b.status === status) as Bounty[];
-        resolve(filteredBounties);
+        bounties = BOUNTIES_DATA.filter(b => b.status === status) as Bounty[];
       } else {
-        resolve(BOUNTIES_DATA as Bounty[]);
+        bounties = BOUNTIES_DATA as Bounty[];
       }
+      
+      // Add remaining budget to each bounty
+      bounties = bounties.map(calculateRemainingBudget);
+      
+      resolve(bounties);
     }, 800);
   });
 };
@@ -158,7 +167,8 @@ export const createBounty = async (
       requireVerification: params.requireVerification,
       allowPublicHunters: params.allowPublicHunters,
       maxReferralsPerHunter: params.maxReferralsPerHunter,
-      bountyType: params.bountyType
+      bountyType: params.bountyType,
+      remainingBudget: params.totalBudget // Initial remaining budget
     };
     
     // Add to our mock data
@@ -272,82 +282,118 @@ export const recordSuccessfulReferral = async (
   bountyId: string,
   referrerId: string,
   referredUser: string
-): Promise<boolean> => {
+): Promise<{ success: boolean, error?: string }> => {
   console.log(`Recording successful referral for bounty ${bountyId} by ${referrerId} for user ${referredUser}`);
   
-  const bounty = await getBounty(bountyId);
-  if (!bounty) return false;
-  
-  // In a real app, this would interact with the smart contract
-  // For now, update the mock data
-  const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
-  if (bountyIndex !== -1) {
-    BOUNTIES_DATA[bountyIndex].successCount += 1;
-    BOUNTIES_DATA[bountyIndex].usedBudget += BOUNTIES_DATA[bountyIndex].rewardAmount;
+  try {
+    const bounty = await getBounty(bountyId);
+    if (!bounty) return { success: false, error: "Bounty not found" };
+    
+    // In a real app, this would interact with the smart contract
+    // For now, update the mock data
+    const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
+    if (bountyIndex !== -1) {
+      BOUNTIES_DATA[bountyIndex].successCount += 1;
+      BOUNTIES_DATA[bountyIndex].usedBudget += BOUNTIES_DATA[bountyIndex].rewardAmount;
+    }
+    
+    // Simulate a delay for blockchain transaction
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error recording referral:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error recording referral"
+    };
   }
-  
-  // Simulate a delay for blockchain transaction
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  return true;
 };
 
 export const distributeRewards = async (
   bountyId: string,
   wallet: any
-): Promise<boolean> => {
+): Promise<{ success: boolean, error?: string }> => {
   console.log(`Distributing rewards for bounty ${bountyId}`);
   
-  if (!wallet) {
-    throw new Error("Wallet not connected");
+  try {
+    if (!wallet) {
+      return { success: false, error: "Wallet not connected" };
+    }
+    
+    // Simulate a delay for blockchain transaction
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error distributing rewards:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error distributing rewards"
+    };
   }
-  
-  // Simulate a delay for blockchain transaction
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
-  return true;
 };
 
 export const updateBountyStatus = async (
   bountyId: string,
   newStatus: "active" | "paused" | "expired" | "completed",
   wallet: any
-): Promise<boolean> => {
+): Promise<{ success: boolean, error?: string }> => {
   console.log(`Updating bounty ${bountyId} status to ${newStatus}`);
   
-  if (!wallet) {
-    throw new Error("Wallet not connected");
+  try {
+    if (!wallet) {
+      return { success: false, error: "Wallet not connected" };
+    }
+    
+    const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
+    if (bountyIndex !== -1) {
+      BOUNTIES_DATA[bountyIndex].status = newStatus;
+    } else {
+      return { success: false, error: "Bounty not found" };
+    }
+    
+    // Simulate a delay for blockchain transaction
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating bounty status:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error updating status"
+    };
   }
-  
-  const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
-  if (bountyIndex !== -1) {
-    BOUNTIES_DATA[bountyIndex].status = newStatus;
-  }
-  
-  // Simulate a delay for blockchain transaction
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  return true;
 };
 
 export const fundBounty = async (
   bountyId: string,
   additionalFunds: number,
   wallet: any
-): Promise<boolean> => {
+): Promise<{ success: boolean, error?: string }> => {
   console.log(`Adding ${additionalFunds} to bounty ${bountyId}`);
   
-  if (!wallet) {
-    throw new Error("Wallet not connected");
+  try {
+    if (!wallet) {
+      return { success: false, error: "Wallet not connected" };
+    }
+    
+    const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
+    if (bountyIndex !== -1) {
+      BOUNTIES_DATA[bountyIndex].totalBudget += additionalFunds;
+    } else {
+      return { success: false, error: "Bounty not found" };
+    }
+    
+    // Simulate a delay for blockchain transaction
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error funding bounty:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error funding bounty"
+    };
   }
-  
-  const bountyIndex = BOUNTIES_DATA.findIndex(b => b.id === bountyId);
-  if (bountyIndex !== -1) {
-    BOUNTIES_DATA[bountyIndex].totalBudget += additionalFunds;
-  }
-  
-  // Simulate a delay for blockchain transaction
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  return true;
 };

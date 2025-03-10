@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Copy, Share2, Check, QrCode, ArrowUpRight, Award, Trophy } from 'lucide-react';
 import { ToxicButton } from '@/components/ui/toxic-button';
@@ -32,15 +31,13 @@ const ReferralLinkManager: React.FC<ReferralLinkManagerProps> = ({
   useEffect(() => {
     const loadBounties = async () => {
       try {
-        const allBounties = await getBounties();
-        // Filter to only show active bounties
-        const active = allBounties.filter(b => b.status === "active");
-        setActiveBounties(active);
+        const allBounties = await getBounties('active');
+        setActiveBounties(allBounties);
         
         // Set default selected bounty if there are any
-        if (active.length > 0 && !selectedBountyId) {
-          setSelectedBountyId(active[0].id);
-          onBountySelect?.(active[0].id);
+        if (allBounties.length > 0 && !selectedBountyId) {
+          setSelectedBountyId(allBounties[0].id);
+          onBountySelect?.(allBounties[0].id);
         }
       } catch (error) {
         console.error("Error loading bounties for referral:", error);
