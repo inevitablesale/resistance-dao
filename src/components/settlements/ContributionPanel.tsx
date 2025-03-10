@@ -6,6 +6,7 @@ import { Shield, Send } from "lucide-react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { sentinelContributeToParty } from "@/services/partyProtocolService";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 interface ContributionPanelProps {
   settlementId: string;
@@ -17,10 +18,27 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
   const [contribution, setContribution] = useState("");
   const [isContributing, setIsContributing] = useState(false);
   const { primaryWallet } = useDynamicContext();
+  const { isConnected, connect } = useWalletConnection();
   const { toast } = useToast();
 
   const handleContribute = async () => {
-    if (!primaryWallet || !contribution || !settlementId) return;
+    if (!isConnected) {
+      toast({
+        title: "Wallet Connection Required",
+        description: "Please connect your wallet to contribute to this settlement",
+      });
+      connect();
+      return;
+    }
+    
+    if (!primaryWallet || !contribution || !settlementId) {
+      toast({
+        title: "Invalid Contribution",
+        description: "Please enter a valid contribution amount",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsContributing(true);
     try {
@@ -75,13 +93,15 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
               value={contribution}
               onChange={(e) => setContribution(e.target.value)}
               className="bg-black/50 border-white/10"
+              min="0"
+              step="0.01"
             />
           </div>
         </div>
         
         <Button
           onClick={handleContribute}
-          disabled={isContributing || !contribution}
+          disabled={isContributing || !contribution || parseFloat(contribution) <= 0}
           className="w-full bg-blue-500 hover:bg-blue-600"
         >
           {isContributing ? (

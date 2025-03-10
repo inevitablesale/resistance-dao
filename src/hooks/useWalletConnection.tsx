@@ -116,7 +116,11 @@ export const useWalletConnection = () => {
         if (!hasConnectedBefore) {
           console.log("First-time wallet connection detected. Redirecting to settings page.");
           localStorage.setItem('wallet_has_connected', 'true');
-          navigate('/settings');
+          
+          // Using a timeout to allow the UI to update before navigation
+          setTimeout(() => {
+            navigate('/settings');
+          }, 500);
         }
       } else {
         console.log("Wallet connected but waiting for user initialization...");

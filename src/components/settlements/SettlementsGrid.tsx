@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Plus } from 'lucide-react';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
+import { useToast } from '@/hooks/use-toast';
 
 interface SettlementsGridProps {
   settlements: ProposalEvent[];
@@ -23,6 +25,21 @@ export const SettlementsGrid: React.FC<SettlementsGridProps> = ({
   className = ""
 }) => {
   const navigate = useNavigate();
+  const { isConnected, connect } = useWalletConnection();
+  const { toast } = useToast();
+  
+  const handleCreateSettlement = () => {
+    if (!isConnected) {
+      toast({
+        title: "Wallet connection required",
+        description: "Please connect your wallet to create a settlement.",
+      });
+      connect();
+      return;
+    }
+    
+    navigate('/thesis');
+  };
   
   if (isLoading) {
     return (
@@ -50,7 +67,7 @@ export const SettlementsGrid: React.FC<SettlementsGridProps> = ({
         <h3 className="text-xl font-semibold mb-2">No settlements found</h3>
         <p className="text-gray-400 mb-6">There are currently no active settlements to display.</p>
         <Button 
-          onClick={() => navigate('/thesis')}
+          onClick={handleCreateSettlement}
           className="bg-blue-500 hover:bg-blue-600 gap-2"
         >
           <Plus className="w-4 h-4" />
@@ -75,7 +92,18 @@ export const SettlementsGrid: React.FC<SettlementsGridProps> = ({
 
   return (
     <div className={`space-y-6 ${className}`}>
-      {title && <h2 className="text-2xl font-bold mb-4">{title}</h2>}
+      {title && (
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">{title}</h2>
+          <Button 
+            onClick={handleCreateSettlement}
+            className="bg-blue-500 hover:bg-blue-600 gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Create Settlement
+          </Button>
+        </div>
+      )}
       
       <Tabs defaultValue="all">
         <TabsList className="bg-black/40 border border-white/10 mb-6">

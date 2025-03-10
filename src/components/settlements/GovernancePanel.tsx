@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { ethers } from "ethers";
@@ -16,6 +17,7 @@ import {
 import { ProposalForm } from "./ProposalForm";
 import { ProposalCard } from "./ProposalCard";
 import { useProposals } from "@/hooks/useProposals";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 export const GovernancePanel = ({ 
   partyAddress, 
@@ -26,16 +28,22 @@ export const GovernancePanel = ({
 }) => {
   const { toast } = useToast();
   const { primaryWallet } = useDynamicContext();
+  const { isConnected, connect } = useWalletConnection();
   const [showForm, setShowForm] = useState(false);
   const { data: proposals = [], isLoading, refetch } = useProposals(partyAddress);
 
   const handleProposalSubmit = async (proposal: GovernanceProposal) => {
-    if (!primaryWallet) {
+    if (!isConnected) {
       toast({
         title: "Wallet Not Connected",
         description: "Please connect your wallet to create a proposal.",
         variant: "destructive"
       });
+      connect();
+      return;
+    }
+    
+    if (!primaryWallet) {
       return;
     }
     
@@ -58,23 +66,28 @@ export const GovernancePanel = ({
       
       setShowForm(false);
       refetch();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating proposal:", error);
       toast({
         title: "Error Creating Proposal",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        description: error.message || "Unknown error occurred",
         variant: "destructive"
       });
     }
   };
 
   const handleVote = async (proposalId: string, support: boolean) => {
-    if (!primaryWallet) {
+    if (!isConnected) {
       toast({
         title: "Wallet Not Connected",
         description: "Please connect your wallet to vote.",
         variant: "destructive"
       });
+      connect();
+      return;
+    }
+    
+    if (!primaryWallet) {
       return;
     }
     
@@ -97,23 +110,28 @@ export const GovernancePanel = ({
       });
       
       refetch();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error voting on proposal:", error);
       toast({
         title: "Error Submitting Vote",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        description: error.message || "Unknown error occurred",
         variant: "destructive"
       });
     }
   };
 
   const handleExecute = async (proposalId: string, proposal: GovernanceProposal) => {
-    if (!primaryWallet) {
+    if (!isConnected) {
       toast({
         title: "Wallet Not Connected",
         description: "Please connect your wallet to execute this proposal.",
         variant: "destructive"
       });
+      connect();
+      return;
+    }
+    
+    if (!primaryWallet) {
       return;
     }
     
@@ -136,11 +154,11 @@ export const GovernancePanel = ({
       });
       
       refetch();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error executing proposal:", error);
       toast({
         title: "Error Executing Proposal",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        description: error.message || "Unknown error occurred",
         variant: "destructive"
       });
     }
@@ -152,9 +170,28 @@ export const GovernancePanel = ({
         <h2 className="text-xl font-semibold">Settlement Governance</h2>
         {!showForm && (
           <Button 
-            onClick={() => setShowForm(true)}
+            onClick={() => {
+              if (!isConnected) {
+                toast({
+                  title: "Wallet Not Connected",
+                  description: "Please connect your wallet to create a proposal.",
+                });
+                connect();
+                return;
+              }
+              
+              if (!isHost) {
+                toast({
+                  title: "Host Permission Required",
+                  description: "Only settlement hosts can create proposals.",
+                  variant: "destructive"
+                });
+                return;
+              }
+              
+              setShowForm(true);
+            }}
             className="bg-blue-500 hover:bg-blue-600 gap-2"
-            disabled={!isHost}
           >
             <Plus className="w-4 h-4" />
             New Proposal

@@ -1,88 +1,159 @@
 
-import { Link } from "react-router-dom";
-import { ethers } from "ethers";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import React from 'react';
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Clock, Shield, Zap } from "lucide-react";
-import { GovernanceStats } from "./GovernanceStats";
+import { Button } from "@/components/ui/button";
+import { Clock, Check, X, ExternalLink, Shield } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
+import { useToast } from '@/hooks/use-toast';
 
-interface SettlementCardProps {
-  settlement: {
-    id: string;
-    name: string;
-    description: string;
-    totalRaised: string;
-    targetAmount: string;
-    remainingTime: string;
-    status: string;
-    image?: string;
-  };
+interface Settlement {
+  id: string;
+  name: string;
+  description: string;
+  totalRaised: string;
+  targetAmount: string;
+  remainingTime: string;
+  status: 'active' | 'completed' | 'funded' | 'failed';
+  image?: string;
 }
 
-export const SettlementCard = ({ settlement }: SettlementCardProps) => {
-  const progressPercentage = Math.min(
+interface SettlementCardProps {
+  settlement: Settlement;
+}
+
+export const SettlementCard: React.FC<SettlementCardProps> = ({ settlement }) => {
+  const navigate = useNavigate();
+  const { isConnected, connect } = useWalletConnection();
+  const { toast } = useToast();
+  
+  // Calculate progress percentage
+  const progress = Math.min(
     100,
-    (parseFloat(settlement.totalRaised) / parseFloat(settlement.targetAmount)) * 100
+    (Number(settlement.totalRaised) / Number(settlement.targetAmount)) * 100
   );
   
-  return (
-    <Link to={`/settlement/${settlement.id}`}>
-      <Card className="bg-[#0a0a0a] border border-white/5 hover:border-blue-500/30 transition-all duration-200 h-full overflow-hidden flex flex-col">
-        <div className="relative">
-          <div className="h-36 bg-gradient-to-b from-blue-900/20 to-blue-700/5 flex items-center justify-center">
-            {settlement.image ? (
-              <img 
-                src={settlement.image} 
-                alt={settlement.name} 
-                className="w-full h-full object-cover" 
-              />
-            ) : (
-              <Shield className="w-12 h-12 text-blue-400/30" />
-            )}
+  const statusBadge = () => {
+    switch (settlement.status) {
+      case 'active':
+        return (
+          <div className="flex items-center gap-1 bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full text-xs">
+            <Clock className="w-3 h-3" />
+            <span>Active</span>
           </div>
-          <Badge 
-            className={`absolute top-3 right-3 ${
-              settlement.status === 'active' 
-                ? 'bg-green-500/20 hover:bg-green-500/20 text-green-400' 
-                : settlement.status === 'completed'
-                  ? 'bg-blue-500/20 hover:bg-blue-500/20 text-blue-400'
-                  : 'bg-red-500/20 hover:bg-red-500/20 text-red-400'
-            }`}
-          >
-            {settlement.status === 'active' ? 'Active' : 
-             settlement.status === 'completed' ? 'Funded' : 'Failed'}
-          </Badge>
+        );
+      case 'funded':
+      case 'completed':
+        return (
+          <div className="flex items-center gap-1 bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-xs">
+            <Check className="w-3 h-3" />
+            <span>Funded</span>
+          </div>
+        );
+      case 'failed':
+        return (
+          <div className="flex items-center gap-1 bg-red-500/20 text-red-400 px-2 py-1 rounded-full text-xs">
+            <X className="w-3 h-3" />
+            <span>Failed</span>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+  
+  const handleCardClick = () => {
+    navigate(`/proposals/${settlement.id}`);
+  };
+  
+  const handleContributeClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click from triggering
+    
+    if (!isConnected) {
+      toast({
+        title: "Wallet Connection Required",
+        description: "Please connect your wallet to contribute to this settlement",
+      });
+      connect();
+      return;
+    }
+    
+    navigate(`/proposals/${settlement.id}`);
+  };
+  
+  return (
+    <Card 
+      className="bg-[#0a0a0a] border border-white/5 overflow-hidden hover:border-blue-500/20 transition-all cursor-pointer group"
+      onClick={handleCardClick}
+    >
+      <div className="h-36 bg-gradient-to-b from-blue-900/20 to-blue-700/5 overflow-hidden">
+        {settlement.image && (
+          <img 
+            src={settlement.image} 
+            alt={settlement.name} 
+            className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity"
+          />
+        )}
+      </div>
+      
+      <CardContent className="p-4">
+        <div className="flex justify-between items-start mb-3">
+          <h3 className="text-lg font-semibold group-hover:text-blue-400 transition-colors">{settlement.name}</h3>
+          {statusBadge()}
         </div>
         
-        <CardContent className="p-4 flex-1 flex flex-col">
-          <h3 className="font-bold text-lg mb-1 line-clamp-1">{settlement.name}</h3>
-          <p className="text-gray-400 text-sm mb-3 line-clamp-2">{settlement.description}</p>
-          
-          <div className="mt-auto space-y-3">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Funding</span>
-              <span>{ethers.utils.commify(settlement.totalRaised)} / {ethers.utils.commify(settlement.targetAmount)} ETH</span>
+        <p className="text-gray-400 text-sm mb-4 line-clamp-2">{settlement.description}</p>
+        
+        <div className="space-y-4">
+          <div>
+            <div className="flex justify-between text-xs text-gray-400 mb-1">
+              <span>Funding Progress</span>
+              <span>{progress.toFixed(0)}%</span>
             </div>
-            
-            <Progress value={progressPercentage} className="h-1.5 bg-gray-800" />
-            
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-1 text-xs text-gray-400">
-                <Clock className="w-3 h-3" />
-                <span>{settlement.remainingTime}</span>
-              </div>
-              
-              <div className="flex items-center gap-1 text-xs text-blue-400">
-                <Zap className="w-3 h-3" />
-                <span>{progressPercentage.toFixed(0)}% Funded</span>
-              </div>
-            </div>
-            
-            <GovernanceStats settlementId={settlement.id} compact={true} />
+            <Progress value={progress} className="h-2" />
           </div>
-        </CardContent>
-      </Card>
-    </Link>
+          
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <div className="text-xs text-gray-400">Raised</div>
+              <div className="font-semibold">{settlement.totalRaised} ETH</div>
+            </div>
+            <div>
+              <div className="text-xs text-gray-400">Target</div>
+              <div className="font-semibold">{settlement.targetAmount} ETH</div>
+            </div>
+          </div>
+          
+          {settlement.status === 'active' && (
+            <div className="text-xs text-gray-400 flex items-center">
+              <Clock className="w-3.5 h-3.5 mr-1 text-blue-400" />
+              <span>{settlement.remainingTime} remaining</span>
+            </div>
+          )}
+        </div>
+      </CardContent>
+      
+      <CardFooter className="p-4 pt-0">
+        {settlement.status === 'active' ? (
+          <Button 
+            className="w-full bg-blue-500 hover:bg-blue-600 gap-2"
+            onClick={handleContributeClick}
+          >
+            <Shield className="w-4 h-4" />
+            Contribute
+          </Button>
+        ) : (
+          <Button 
+            variant="outline" 
+            className="w-full border-white/10 hover:bg-white/5 gap-2"
+            onClick={handleCardClick}
+          >
+            <ExternalLink className="w-4 h-4" />
+            View Details
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
   );
 };
