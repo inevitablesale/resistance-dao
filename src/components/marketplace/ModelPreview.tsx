@@ -24,7 +24,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !modelUrl) return;
     
     setLoading(true);
     
@@ -108,10 +108,10 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     
     window.addEventListener('resize', handleResize);
     
-    // Get proper Pinata gateway URL
+    // Transform modelUrl into a proper IPFS gateway URL
     let modelUrlToUse = modelUrl;
     
-    // If it's just a hash, convert to Pinata URL
+    // If it's just a hash, convert to Pinata Gateway URL
     if (modelUrl && !modelUrl.includes('://')) {
       modelUrlToUse = `https://gateway.pinata.cloud/ipfs/${modelUrl}`;
     }
@@ -143,6 +143,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       },
       (error) => {
         console.error('Error loading model:', error);
+        setLoading(false);
       }
     );
     

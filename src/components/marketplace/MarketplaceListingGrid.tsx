@@ -113,18 +113,15 @@ export function MarketplaceListingGrid({ listings, className = "", title, onList
       >
         {listings.map((listing) => {
           const openSeaLink = getOpenSeaLink(listing.type);
-          const ipfsHash = listing.modelUrl && !listing.modelUrl.includes('://') 
-            ? listing.modelUrl 
-            : listing.modelUrl?.replace('https://gateway.pinata.cloud/ipfs/', '');
           
           return (
             <motion.div key={listing.id} variants={itemVariants}>
               <ToxicCard className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all overflow-hidden">
                 <div className="p-0">
                   <div className="h-40 bg-gradient-to-b from-toxic-neon/20 to-black/60 relative overflow-hidden">
-                    {ipfsHash ? (
+                    {listing.modelUrl ? (
                       <ModelPreview 
-                        modelUrl={ipfsHash} 
+                        modelUrl={listing.modelUrl} 
                         height="100%"
                         width="100%"
                         autoRotate={true}
@@ -132,7 +129,7 @@ export function MarketplaceListingGrid({ listings, className = "", title, onList
                     ) : (
                       <div className="flex flex-col items-center justify-center h-full">
                         <Biohazard className="h-12 w-12 text-toxic-neon/30 mb-2" />
-                        <p className="text-sm text-toxic-neon/60">Loading model...</p>
+                        <p className="text-sm text-toxic-neon/60">No model available</p>
                       </div>
                     )}
                     <div className="absolute top-2 right-2">
