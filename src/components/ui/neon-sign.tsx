@@ -22,9 +22,14 @@ export const NeonSign = ({
   const [secondLineFlicker, setSecondLineFlicker] = useState<Array<0 | 0.5 | 1>>([]);
   
   useEffect(() => {
-    // Create initial flicker states for each line (fully lit)
-    setFirstLineFlicker(Array(firstLine.length).fill(1));
-    setSecondLineFlicker(Array(secondLine.length).fill(1));
+    // Create initial flicker states for each character
+    if (firstLine) {
+      setFirstLineFlicker(Array(firstLine.length).fill(1));
+    }
+    
+    if (secondLine) {
+      setSecondLineFlicker(Array(secondLine.length).fill(1));
+    }
     
     // Set up the flicker interval with slower timing
     const intensityMap = {
@@ -35,21 +40,25 @@ export const NeonSign = ({
     
     // Main flicker interval - occasionally dim random letters
     const flickerInterval = setInterval(() => {
-      setFirstLineFlicker(prev => {
-        // Most letters stay on, only a few change
-        return prev.map(state => Math.random() > 0.9 ? (Math.random() > 0.5 ? 1 : 0.5) : state);
-      });
+      if (firstLine) {
+        setFirstLineFlicker(prev => {
+          // Most letters stay on, only a few change
+          return prev.map(state => Math.random() > 0.9 ? (Math.random() > 0.5 ? 1 : 0.5) : state);
+        });
+      }
       
-      setSecondLineFlicker(prev => {
-        // Most letters stay on, only a few change
-        return prev.map(state => Math.random() > 0.9 ? (Math.random() > 0.5 ? 1 : 0.5) : state);
-      });
+      if (secondLine) {
+        setSecondLineFlicker(prev => {
+          // Most letters stay on, only a few change
+          return prev.map(state => Math.random() > 0.9 ? (Math.random() > 0.5 ? 1 : 0.5) : state);
+        });
+      }
     }, intensityMap[flickerIntensity]);
     
     // Special effect interval - one letter completely out, one at half brightness in each line
     const specialEffectInterval = setInterval(() => {
       // First line special effect
-      if (firstLine.length > 1) {
+      if (firstLine && firstLine.length > 1) {
         setFirstLineFlicker(prev => {
           const newState = [...prev];
           // Pick a random letter to turn completely off
@@ -69,7 +78,7 @@ export const NeonSign = ({
       }
       
       // Second line special effect
-      if (secondLine.length > 1) {
+      if (secondLine && secondLine.length > 1) {
         setSecondLineFlicker(prev => {
           const newState = [...prev];
           // Pick a random letter to turn completely off
@@ -155,9 +164,9 @@ export const NeonSign = ({
       {/* Wire backing effect - one above first line, one between lines, one below second line */}
       <div className="absolute inset-0 rounded-lg overflow-hidden">
         <div className="absolute inset-0 flex flex-col items-center justify-center opacity-40">
-          <div className="h-0.5 w-4/5 bg-gray-500 mb-3 rounded-full"></div>
-          <div className="h-0.5 w-4/5 bg-gray-500 my-6 rounded-full"></div>
-          <div className="h-0.5 w-4/5 bg-gray-500 mt-3 rounded-full"></div>
+          <div className="h-0.5 w-4/5 bg-gray-500 mb-5 rounded-full"></div>
+          <div className="h-0.5 w-4/5 bg-gray-500 my-10 rounded-full"></div>
+          <div className="h-0.5 w-4/5 bg-gray-500 mt-5 rounded-full"></div>
         </div>
       </div>
       
@@ -172,7 +181,7 @@ export const NeonSign = ({
       ) : (
         // Two-line display with increased vertical spacing
         <div className="relative z-10">
-          <h1 className="text-5xl md:text-7xl tracking-wider mb-6 leading-tight">
+          <h1 className="text-5xl md:text-7xl tracking-wider mb-10 leading-tight">
             {renderNeonText(firstLine, firstLineFlicker)}
           </h1>
           <h1 className="text-5xl md:text-7xl tracking-wider leading-tight">
