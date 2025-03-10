@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
 import { executeTransaction, TransactionConfig } from "./transactionManager";
@@ -27,6 +26,16 @@ export interface CrowdfundOptions {
   maxContribution: string;
   maxTotalContributions: string;
   duration: number;
+}
+
+// Interface for Bounty-specific Party options
+export interface BountyPartyOptions extends PartyOptions {
+  rewardAmount: number;
+  maxParticipants: number;
+  startTime: number;
+  endTime: number;
+  verificationRequired: boolean;
+  targetRequirements: string[];
 }
 
 // Interface for Governance Proposal
@@ -543,6 +552,102 @@ export async function executeGovernanceProposal(
         'Check your wallet connection',
         'Ensure the proposal is ready to execute',
         'Try again later'
+      ]
+    });
+  }
+}
+
+/**
+ * Creates a new Party specifically configured for bounty distribution
+ * @param wallet Connected wallet to use for transaction
+ * @param options Bounty party creation options
+ * @returns Promise resolving to the address of the created Party
+ */
+export async function createBountyParty(
+  wallet: any,
+  options: BountyPartyOptions
+): Promise<string> {
+  try {
+    console.log("Creating bounty party with options:", options);
+    
+    const walletClient = await wallet.getWalletClient();
+    if (!walletClient) {
+      throw new Error("Wallet client not available");
+    }
+    
+    const provider = new ethers.providers.Web3Provider(walletClient as any);
+    const signer = provider.getSigner();
+    
+    // Enhanced metadata for bounty-specific details
+    const bountyMetadata = {
+      type: "bounty",
+      rewardAmount: options.rewardAmount,
+      maxParticipants: options.maxParticipants,
+      startTime: options.startTime,
+      endTime: options.endTime,
+      verificationRequired: options.verificationRequired,
+      targetRequirements: options.targetRequirements,
+      createdAt: Math.floor(Date.now() / 1000)
+    };
+    
+    // Store metadata on IPFS
+    const metadataURI = await uploadToIPFS(bountyMetadata);
+    
+    // Create Party Factory contract instance with enhanced options
+    const partyFactory = new ethers.Contract(
+      PARTY_FACTORY_ADDRESS,
+      [
+        "function createParty(tuple(string name, address[] hosts, uint40 votingDuration, uint40 executionDelay, uint16 passThresholdBps, bool allowPublicProposals, string metadataURI)) external returns (address)"
+      ],
+      signer
+    );
+    
+    // Format options for contract call
+    const partyOptions = [
+      options.name,
+      options.hosts,
+      options.votingDuration,
+      options.executionDelay,
+      options.passThresholdBps,
+      options.allowPublicProposals,
+      metadataURI
+    ];
+    
+    // Transaction config
+    const txConfig: TransactionConfig = {
+      type: 'contract',
+      description: `Creating bounty party: ${options.name}`,
+      timeout: 180000,
+      maxRetries: 3,
+      backoffMs: 5000
+    };
+    
+    // Execute transaction
+    const tx = await executeTransaction(
+      () => partyFactory.createParty(partyOptions),
+      txConfig,
+      provider
+    );
+    
+    // Extract party address from receipt
+    const receipt = await tx.wait();
+    const partyAddress = extractPartyAddressFromReceipt(receipt);
+    
+    if (!partyAddress) {
+      throw new Error("Failed to extract party address from transaction receipt");
+    }
+    
+    console.log("Bounty party created successfully:", partyAddress);
+    return partyAddress;
+  } catch (error) {
+    console.error("Error creating bounty party:", error);
+    throw new ProposalError({
+      category: 'contract',
+      message: 'Failed to create bounty party',
+      recoverySteps: [
+        'Check your wallet connection',
+        'Ensure you have enough ETH for gas fees',
+        'Try again with different parameters'
       ]
     });
   }

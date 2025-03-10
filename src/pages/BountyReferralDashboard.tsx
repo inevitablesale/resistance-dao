@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Target, Gift, Wallet, Users, Link, ArrowUpRight, Award, ChevronRight } from 'lucide-react';
@@ -23,7 +22,6 @@ export default function BountyReferralDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentBountyId, setCurrentBountyId] = useState<string | undefined>(bountyId);
   
-  // Stats for the reward display (mock data for now)
   const [completedReferrals, setCompletedReferrals] = useState(0);
   const [pendingPayouts, setPendingPayouts] = useState(0);
   const [totalEarnings, setTotalEarnings] = useState(0);
@@ -36,9 +34,7 @@ export default function BountyReferralDashboard() {
           const bounty = await getBounty(currentBountyId);
           setSelectedBounty(bounty);
           
-          // In a real implementation, these would be fetched from the blockchain
           if (bounty) {
-            // Random numbers for demonstration
             const completed = Math.floor(Math.random() * 10);
             setCompletedReferrals(completed);
             setPendingPayouts(Math.floor(Math.random() * 100));
@@ -68,7 +64,6 @@ export default function BountyReferralDashboard() {
     <div className="min-h-screen bg-[#0A0A0A] pt-20 pb-20">
       <div className="container mx-auto px-4">
         <div className="flex flex-col">
-          {/* Header */}
           <div className="mb-8">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-toxic-neon/10 text-toxic-neon text-sm mb-3">
               <Target className="w-4 h-4 mr-2" />
@@ -81,7 +76,6 @@ export default function BountyReferralDashboard() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Referral Tools */}
             <div className="lg:col-span-2 space-y-6">
               <ToxicCard className="p-6 border-toxic-neon/20">
                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
@@ -157,7 +151,6 @@ export default function BountyReferralDashboard() {
               <ReferralStatsTracker bountyId={currentBountyId} />
             </div>
             
-            {/* Right Column - Rewards & Performance */}
             <div className="space-y-6">
               <ToxicCard className="p-6 border-toxic-neon/20">
                 <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
@@ -228,7 +221,7 @@ export default function BountyReferralDashboard() {
                   Create your own bounty programs to incentivize community growth and engagement.
                 </p>
                 <ToxicButton 
-                  variant="amber" 
+                  variant="marketplace" 
                   className="w-full justify-between"
                   onClick={() => window.location.href = "/bounty/create"}
                 >
