@@ -239,7 +239,7 @@ export default function MarketplaceItemDetails() {
   const [loading, setLoading] = useState(true);
   const [purchaseStep, setPurchaseStep] = useState(0);
   const [offerAmount, setOfferAmount] = useState('');
-  const [revealValue, setRevealValue] = useState(100);
+  const [revealValue, setRevealValue] = useState(20);
   const [autoRotate, setAutoRotate] = useState(false);
   
   useEffect(() => {
@@ -398,7 +398,7 @@ export default function MarketplaceItemDetails() {
                       <div className="flex justify-between mb-1">
                         <span className="text-sm text-white/70">Current Level:</span>
                         <span className={`text-sm font-mono ${getRadiationColor(item?.radiation.value)}`}>
-                          {item?.radiation.level} ({item?.radiation.value}%)
+                          {item?.radiation.level} ({item?.radiation.value}%) 
                         </span>
                       </div>
                       <ToxicProgress value={item?.radiation.value} max={100} />
