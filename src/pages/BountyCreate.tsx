@@ -32,11 +32,10 @@ export default function BountyCreate() {
           {selectedTemplate ? (
             <NFTReferralBountyForm template={selectedTemplate} onBack={handleBack} />
           ) : (
-            <ProposalTemplates onSelectTemplate={handleSelectTemplate} />
+            <ProposalTemplates onSelectTemplate={handleSelectTemplate} type="bounty" />
           )}
         </div>
       </div>
-      <ResistanceWalletWidget />
     </div>
   );
 }

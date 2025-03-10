@@ -1,405 +1,346 @@
-import React, { useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Award, Coins, Link, UserPlus, Wallet, Diamond, Gift, Check } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { ToxicCard } from "@/components/ui/toxic-card";
-import { ToxicButton } from "@/components/ui/toxic-button";
-import { Progress } from "@/components/ui/progress";
-import { createBounty } from "@/services/bountyService";
-import { usePartyTransactions } from "@/hooks/usePartyTransactions";
-import { calculatePriceStructure, formatCryptoAmount } from "@/utils/priceCalculator";
-import { useWalletConnection } from "@/hooks/useWalletConnection";
 
-const nftReferralFormSchema = z.object({
-  name: z.string().min(3, "Bounty name must be at least 3 characters"),
-  description: z.string().min(10, "Please provide a more detailed description"),
-  rewardPerReferral: z.coerce.number().min(1, "Minimum reward is 1 MATIC").max(1000, "Maximum reward is 1000 MATIC"),
-  totalBudget: z.coerce.number().min(20, "Minimum budget is 20 MATIC"),
-  duration: z.coerce.number().min(1, "Minimum duration is 1 day").max(365, "Maximum duration is 365 days"),
-  maxReferralsPerHunter: z.coerce.number().min(1, "Minimum is 1 referral per hunter").optional().default(0),
-  allowPublicHunters: z.boolean().default(true),
-  requireVerification: z.boolean().default(false),
-  eligibleNFTs: z.string().optional(),
-  successCriteria: z.string().min(5, "Please specify success criteria"),
+import { useState } from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Save, Gift, Calendar, Target, Coins, Users } from "lucide-react";
+import { ToxicButton } from "@/components/ui/toxic-button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { 
+  Form, 
+  FormControl, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage 
+} from "@/components/ui/form";
+import { 
+  ToxicCard, 
+  ToxicCardContent, 
+  ToxicCardHeader, 
+  ToxicCardTitle, 
+  ToxicCardDescription 
+} from "@/components/ui/toxic-card";
+import { DrippingSlime } from "@/components/ui/dripping-slime";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useToast } from "@/hooks/use-toast";
+import { createBounty } from "@/services/bountyService";
+import { useNavigate } from "react-router-dom";
+import { Separator } from "@/components/ui/separator";
+import { ProposalTemplate } from "@/components/settlements/ProposalTemplates";
+import { createBountyParty, BountyPartyOptions } from "@/services/partyProtocolService";
+
+const formSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters").max(100, "Name cannot exceed 100 characters"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  rewardAmount: z.coerce.number().min(0.001, "Reward must be at least 0.001 MATIC"),
+  totalBudget: z.coerce.number().min(0.1, "Budget must be at least 0.1 MATIC"),
+  expiration: z.coerce.number().min(1, "Expiration must be at least 1 day").max(365, "Expiration cannot exceed 365 days"),
+  successCriteria: z.string().min(5, "Success criteria must be at least 5 characters"),
+  maxParticipants: z.coerce.number().int().min(1, "Must allow at least 1 participant").optional().default(100)
 });
 
-type NFTReferralFormValues = z.infer<typeof nftReferralFormSchema>;
+type NFTReferralBountyFormValues = z.infer<typeof formSchema>;
 
 interface NFTReferralBountyFormProps {
-  template?: any;
-  onBack?: () => void;
+  template?: ProposalTemplate;
+  onBack: () => void;
 }
 
-export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFormProps) {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { createSettlement, isProcessing } = usePartyTransactions();
-  const [estimatedGasCost, setEstimatedGasCost] = useState("~1.2 MATIC");
-  const { primaryWallet } = useWalletConnection();
+export const NFTReferralBountyForm = ({ template, onBack }: NFTReferralBountyFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const defaultValues: NFTReferralFormValues = {
-    name: template?.title || "NFT Referral Program",
-    description: template?.description || "Reward community members for referring new users to mint NFTs",
-    rewardPerReferral: 20,
-    totalBudget: 500,
-    duration: 30,
-    maxReferralsPerHunter: 0,
-    allowPublicHunters: true,
-    requireVerification: false,
-    eligibleNFTs: "0x60534a0b5C8B8119c713f2dDb30f2eB31E31D1F9",
-    successCriteria: "User must mint at least one NFT using the referral link",
-  };
-  
-  const form = useForm<NFTReferralFormValues>({
-    resolver: zodResolver(nftReferralFormSchema),
-    defaultValues,
+  const { address, primaryWallet } = useWalletConnection();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const form = useForm<NFTReferralBountyFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: template?.defaultTitle || "NFT Referral Bounty",
+      description: template?.defaultDescription || "Reward community members for referring new NFT minters",
+      rewardAmount: 0.1,
+      totalBudget: 1,
+      expiration: 30,
+      successCriteria: "User must mint an NFT using referrer's link",
+      maxParticipants: 100
+    }
   });
-  
-  const watchTotalBudget = form.watch("totalBudget");
-  const watchRewardPerReferral = form.watch("rewardPerReferral");
-  
-  const estimatedReferrals = Math.floor(watchTotalBudget / watchRewardPerReferral);
-  
-  const priceBreakdown = calculatePriceStructure(
-    watchTotalBudget - (watchTotalBudget * 0.02),
-    'MATIC'
-  );
-  
-  const onSubmit = async (data: NFTReferralFormValues) => {
+
+  const onSubmit = async (data: NFTReferralBountyFormValues) => {
+    if (!address || !primaryWallet) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to create a bounty",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
     try {
-      setIsSubmitting(true);
-      
-      if (!primaryWallet) {
-        toast({
-          title: "Wallet Not Connected",
-          description: "Please connect your wallet to create a bounty",
-          variant: "destructive"
-        });
-        return;
-      }
-      
       toast({
         title: "Creating Bounty",
-        description: "Please wait while we create your bounty...",
+        description: "Preparing your bounty program...",
       });
-      
-      const result = await createBounty({
+
+      // Create bounty in database first
+      const bounty = await createBounty({
         name: data.name,
         description: data.description,
-        rewardType: "fixed",
-        rewardAmount: data.rewardPerReferral,
+        rewardAmount: data.rewardAmount,
         totalBudget: data.totalBudget,
-        duration: data.duration,
-        maxReferralsPerHunter: data.maxReferralsPerHunter || 0,
-        allowPublicHunters: data.allowPublicHunters,
-        requireVerification: data.requireVerification,
-        eligibleNFTs: data.eligibleNFTs?.split(",").map(addr => addr.trim()) || [],
+        startDate: new Date().getTime() / 1000,
+        expiresAt: new Date().getTime() / 1000 + (data.expiration * 24 * 60 * 60),
+        creatorAddress: address,
         successCriteria: data.successCriteria,
-        bountyType: "nft_referral",
-      }, primaryWallet);
-      
-      if (result) {
-        toast({
-          title: "Bounty Created!",
-          description: "Your NFT referral bounty has been created successfully",
-        });
-        navigate("/bounty/management");
-      }
-    } catch (error: any) {
+        status: "draft",
+        usedBudget: 0,
+        successCount: 0,
+        maxParticipants: data.maxParticipants,
+        requiresVerification: true
+      });
+
+      // After creating the bounty entity, navigate to the management page
+      toast({
+        title: "Bounty Created!",
+        description: "Your bounty is ready to be deployed to the blockchain",
+      });
+
+      navigate("/bounty/management");
+    } catch (error) {
       console.error("Error creating bounty:", error);
       toast({
-        title: "Failed to Create Bounty",
-        description: error.message || "There was an error creating your bounty",
-        variant: "destructive",
+        title: "Creation Failed",
+        description: error instanceof Error ? error.message : "Failed to create bounty",
+        variant: "destructive"
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
-    <Card className="bg-gray-900/60 border border-toxic-neon/20">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Gift className="h-5 w-5 text-toxic-neon" />
-              Create NFT Referral Bounty
-            </CardTitle>
-            <CardDescription>
-              Set up a bounty program that rewards hunters for bringing in NFT minters
-            </CardDescription>
+    <div className="space-y-6 relative">
+      <DrippingSlime position="top" dripsCount={8} className="absolute inset-0 pointer-events-none" />
+
+      <button 
+        onClick={onBack}
+        className="text-toxic-neon hover:text-toxic-neon/80 flex items-center gap-1 text-sm mb-4 relative z-10"
+      >
+        <ArrowLeft className="w-4 h-4" /> Back to templates
+      </button>
+
+      <ToxicCard className="relative overflow-visible mb-6 border-toxic-neon/30">
+        <ToxicCardHeader className="flex flex-row items-start gap-4">
+          <div className="h-10 w-10 rounded-full bg-toxic-neon/10 flex items-center justify-center">
+            <Gift className="w-6 h-6 text-toxic-neon" />
           </div>
-          {onBack && (
-            <Button variant="ghost" onClick={onBack}>
-              Back to Templates
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Bounty Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="NFT Referral Program" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Describe your bounty program" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="grid grid-cols-2 gap-4">
+          <div className="flex-1">
+            <ToxicCardTitle>Create NFT Referral Bounty</ToxicCardTitle>
+            <ToxicCardDescription className="mt-2">
+              Set up a new bounty to reward community members for referring new NFT minters.
+            </ToxicCardDescription>
+          </div>
+        </ToxicCardHeader>
+        <ToxicCardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-6">
                   <FormField
                     control={form.control}
-                    name="rewardPerReferral"
+                    name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Reward Per Referral (MATIC)</FormLabel>
-                        <FormControl>
-                          <Input type="number" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Amount paid to hunter per successful referral
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="totalBudget"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Total Budget (MATIC)</FormLabel>
-                        <FormControl>
-                          <Input type="number" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Maximum total to spend on this bounty
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <FormField
-                  control={form.control}
-                  name="duration"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Duration (Days)</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        How long will this bounty program run?
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="eligibleNFTs"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Eligible NFT Contracts</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Contract addresses, comma separated" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        Which NFT contracts are eligible for referral rewards?
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="successCriteria"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Success Criteria</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., User mints at least 1 NFT" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        What must happen for a referral to be successful?
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
-              <div className="space-y-6">
-                <ToxicCard className="border border-toxic-neon/30 bg-black/50">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-toxic-neon text-lg">Bounty Preview</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Reward Per Referral:</span>
-                        <span className="text-white font-mono">{watchRewardPerReferral} MATIC</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Platform Fee (2%):</span>
-                        <span className="text-white font-mono">{(watchTotalBudget * 0.02).toFixed(2)} MATIC</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Net Reward Pool:</span>
-                        <span className="text-toxic-neon font-mono">{(watchTotalBudget * 0.98).toFixed(2)} MATIC</span>
-                      </div>
-                      <Separator className="my-2 bg-gray-800" />
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Estimated Referrals:</span>
-                        <span className="text-white font-mono">{estimatedReferrals}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Estimated Gas Cost:</span>
-                        <span className="text-white font-mono">{estimatedGasCost}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-2">
-                      <p className="text-sm text-gray-400 mb-2">Referral Link Format:</p>
-                      <code className="bg-black/60 text-toxic-neon p-2 rounded text-xs block overflow-x-auto">
-                        https://resistance-dao.com/r/{'{bountyId}'}/{'{referrerAddress}'}
-                      </code>
-                    </div>
-                    
-                    <div className="pt-2">
-                      <p className="text-sm text-gray-400 mb-1">Pool Utilization:</p>
-                      <Progress value={0} className="h-2" />
-                      <div className="flex justify-between text-xs text-gray-500 mt-1">
-                        <span>0 Used</span>
-                        <span>{estimatedReferrals} Available</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </ToxicCard>
-                
-                <div className="space-y-4 bg-black/30 p-4 rounded-lg border border-gray-800">
-                  <h3 className="text-white font-medium mb-2">Advanced Settings</h3>
-                  
-                  <FormField
-                    control={form.control}
-                    name="maxReferralsPerHunter"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Max Referrals Per Hunter</FormLabel>
+                        <FormLabel className="text-toxic-neon">Bounty Name</FormLabel>
                         <FormControl>
                           <Input 
-                            type="number" 
+                            placeholder="NFT Referral Program" 
+                            className="bg-black/50 border-toxic-neon/30 focus:border-toxic-neon/60" 
                             {...field} 
-                            placeholder="0 for unlimited"
                           />
                         </FormControl>
-                        <FormDescription className="text-xs">
-                          Limit how many referrals a single hunter can make (0 = unlimited)
-                        </FormDescription>
-                        <FormMessage />
+                        <FormMessage className="text-red-400" />
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
-                    name="allowPublicHunters"
+                    name="description"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-800 p-3">
-                        <div className="space-y-0.5">
-                          <FormLabel>Allow Public Hunters</FormLabel>
-                          <FormDescription className="text-xs">
-                            Anyone can participate as a bounty hunter
-                          </FormDescription>
-                        </div>
+                      <FormItem>
+                        <FormLabel className="text-toxic-neon">Description</FormLabel>
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
+                          <Textarea 
+                            placeholder="Describe the bounty program and its goals..."
+                            className="min-h-24 bg-black/50 border-toxic-neon/30 focus:border-toxic-neon/60"
+                            {...field} 
                           />
                         </FormControl>
+                        <FormMessage className="text-red-400" />
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
-                    name="requireVerification"
+                    name="successCriteria"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-800 p-3">
-                        <div className="space-y-0.5">
-                          <FormLabel>Require Manual Verification</FormLabel>
-                          <FormDescription className="text-xs">
-                            Manually review and approve each referral
-                          </FormDescription>
-                        </div>
+                      <FormItem>
+                        <FormLabel className="text-toxic-neon">Success Criteria</FormLabel>
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
+                          <Textarea 
+                            placeholder="Define what constitutes a successful referral..."
+                            className="min-h-24 bg-black/50 border-toxic-neon/30 focus:border-toxic-neon/60"
+                            {...field} 
                           />
                         </FormControl>
+                        <FormMessage className="text-red-400" />
                       </FormItem>
                     )}
                   />
                 </div>
+
+                <div className="space-y-6">
+                  <div className="p-4 border border-toxic-neon/20 rounded-md bg-black/30 radiation-scan-lines mb-6">
+                    <h3 className="text-toxic-neon text-sm font-medium mb-3 flex items-center">
+                      <Coins className="w-4 h-4 mr-2" />
+                      Reward Configuration
+                    </h3>
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="rewardAmount"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white/70">Reward Per Referral (MATIC)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                step="0.001"
+                                min="0.001"
+                                className="bg-black/50 border-toxic-neon/30 focus:border-toxic-neon/60"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage className="text-red-400" />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="totalBudget"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white/70">Total Budget (MATIC)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number"
+                                step="0.1"
+                                min="0.1" 
+                                className="bg-black/50 border-toxic-neon/30 focus:border-toxic-neon/60"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage className="text-red-400" />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="p-4 border border-toxic-neon/20 rounded-md bg-black/30 radiation-scan-lines">
+                    <h3 className="text-toxic-neon text-sm font-medium mb-3 flex items-center">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Duration & Limits
+                    </h3>
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="expiration"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white/70">Duration (days)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number"
+                                min="1"
+                                max="365" 
+                                className="bg-black/50 border-toxic-neon/30 focus:border-toxic-neon/60"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage className="text-red-400" />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="maxParticipants"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white/70">Maximum Participants</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number"
+                                min="1"
+                                className="bg-black/50 border-toxic-neon/30 focus:border-toxic-neon/60"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage className="text-red-400" />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            <div className="flex justify-end gap-4 pt-4">
-              {onBack && (
-                <Button type="button" variant="outline" onClick={onBack}>
-                  Cancel
-                </Button>
-              )}
-              <ToxicButton type="submit" disabled={isProcessing || isSubmitting}>
-                {isProcessing ? "Creating Bounty..." : "Create Bounty"}
-              </ToxicButton>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+
+              <Separator className="bg-toxic-neon/10" />
+
+              <div className="flex justify-between items-center">
+                <div className="text-white/60 text-sm">
+                  Maximum Possible Referrals: {form.watch("totalBudget") && form.watch("rewardAmount") ? Math.floor(form.watch("totalBudget") / form.watch("rewardAmount")) : 0}
+                </div>
+                
+                <div className="space-x-2">
+                  <ToxicButton 
+                    type="button" 
+                    variant="tertiary"
+                    onClick={onBack}
+                  >
+                    Cancel
+                  </ToxicButton>
+                  <ToxicButton 
+                    type="submit" 
+                    variant="primary"
+                    disabled={isSubmitting}
+                    className="gap-2"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2"></div>
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        Create Bounty
+                      </>
+                    )}
+                  </ToxicButton>
+                </div>
+              </div>
+            </form>
+          </Form>
+        </ToxicCardContent>
+      </ToxicCard>
+    </div>
   );
-}
+};
