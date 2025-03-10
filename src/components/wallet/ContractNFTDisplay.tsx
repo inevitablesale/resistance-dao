@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
-import { useContractNFTs, NFTMetadata } from '@/hooks/useContractNFTs';
+import { useAllContractNFTs, useContractStats, NFTMetadata } from '@/hooks/useContractNFTs';
 import { ToxicCard, ToxicCardContent, ToxicCardHeader, ToxicCardTitle } from '@/components/ui/toxic-card';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
 import { RadiationOverlay } from '@/components/radiation/RadiationOverlay';
@@ -10,8 +10,8 @@ import { CharacterRevealSlider } from '@/components/marketplace/CharacterRevealS
 
 export const ContractNFTDisplay = () => {
   const [radiationLevel, setRadiationLevel] = useState(50);
-  const { address } = useCustomWallet();
-  const { data: nfts, isLoading, error } = useContractNFTs(address);
+  const { data: nfts, isLoading, error } = useAllContractNFTs(100); // Get first 100 NFTs
+  const { data: contractStats } = useContractStats();
   
   if (isLoading) {
     return (
@@ -39,10 +39,7 @@ export const ContractNFTDisplay = () => {
         <Radiation className="h-8 w-8 text-toxic-neon mb-4" />
         <p className="text-toxic-neon">No NFTs found in this contract</p>
         <p className="text-sm text-toxic-muted mt-2">
-          {address ? 
-            `Address ${address.substring(0, 6)}...${address.substring(address.length - 4)} doesn't own any NFTs from this contract.` : 
-            'Please connect your wallet to view your NFTs.'
-          }
+          The contract appears to have no minted NFTs yet.
         </p>
       </div>
     );
@@ -54,12 +51,12 @@ export const ContractNFTDisplay = () => {
         <div>
           <h2 className="text-xl font-mono text-toxic-neon">Contract NFTs</h2>
           <p className="text-sm text-toxic-muted">
-            {nfts[0]?.contractName || 'Unknown Collection'} ({nfts[0]?.contractSymbol || '???'})
+            {nfts[0]?.contractName || contractStats?.contractName || 'Unknown Collection'} ({nfts[0]?.contractSymbol || contractStats?.contractSymbol || '???'})
           </p>
           <p className="text-xs text-white/50 mt-1">0xdD44d15f54B799e940742195e97A30165A1CD285</p>
         </div>
         <ToxicBadge variant="outline" className="text-toxic-neon">
-          {nfts.length} NFTs Found
+          {nfts.length} NFTs Found ({contractStats?.totalMinted || '?'} Total Minted)
         </ToxicBadge>
       </div>
       

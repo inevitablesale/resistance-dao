@@ -90,11 +90,8 @@ const Index = () => {
   const [activeRole, setActiveRole] = useState<'sentinel' | 'pioneer'>('sentinel');
   const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
   
-  // New states for radiation system
+  // New states for radiation system - these will be fetched from the contract now
   const [currentRadiation, setCurrentRadiation] = useState(94); // Start at 94% radiation
-  const [totalNFTsClaimed, setTotalNFTsClaimed] = useState(925); // Mock data - total claimed NFTs
-  const [referralEarnings, setReferralEarnings] = useState(375); // Mock data - earnings in MATIC
-  const [totalReferrals, setTotalReferrals] = useState(15); // Mock data - total referrals
   
   useEffect(() => {
     if (isConnected && authState === "unauthenticated") {
@@ -394,7 +391,7 @@ const Index = () => {
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
           <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
           <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> 
-          Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Radiation Level: {currentRadiation}%</span>
+          Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Scanning Radiation Level...</span>
         </div>
         
         <StoryTerminal 
@@ -405,17 +402,13 @@ const Index = () => {
         
         <WastelandSurvivalGuideEnhanced className="mb-8" />
         
-        {/* New Radiation System Section */}
+        {/* Updated Radiation System Section - Using NFT Contract data */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-1">
-            <RadiationSystem 
-              currentRadiation={currentRadiation} 
-              totalNFTsClaimed={totalNFTsClaimed} 
-              className="mb-6"
-            />
+            <RadiationSystem className="mb-6" />
             <ReferralSystem
-              earnings={referralEarnings}
-              totalReferrals={totalReferrals}
+              earnings={375} // Mock data - static
+              totalReferrals={15} // Mock data - static
             />
           </div>
           <div className="md:col-span-2">
