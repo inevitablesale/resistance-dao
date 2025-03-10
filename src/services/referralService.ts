@@ -1,17 +1,10 @@
-import { DynamicWallet } from "@dynamic-labs/sdk-react-core";
-import { ethers } from "ethers";
+
+import { Wallet } from "ethers";
+import { DynamicContext } from "@dynamic-labs/sdk-react-core";
 import { uploadToIPFS } from "./ipfsService";
 import { ReferralMetadata } from "@/utils/settlementConversion";
 
-// Party Protocol contract addresses (these would be defined in constants)
-const PARTY_FACTORY_ADDRESS = "0x12345..."; // Placeholder
-const PARTY_PROTOCOL_ABI = []; // Placeholder
-
-export enum ReferralStatus {
-  PENDING = "pending",
-  COMPLETED = "completed",
-  CLAIMED = "claimed"
-}
+export type ReferralStatus = 'pending' | 'active' | 'completed' | 'expired' | 'claimed';
 
 export interface Referral {
   id: string;
@@ -26,123 +19,123 @@ export interface Referral {
   createdAt: number;
 }
 
-// Create a new referral pool using Party Protocol
+/**
+ * Creates a referral pool
+ * @param wallet User wallet
+ * @param metadata Referral metadata
+ * @returns Referral ID if successful, null otherwise
+ */
 export const createReferralPool = async (
-  wallet: DynamicWallet,
+  wallet: Wallet | DynamicContext['primaryWallet'],
   metadata: ReferralMetadata
-): Promise<string> => {
+): Promise<string | null> => {
   try {
     console.log("Creating referral pool with metadata:", metadata);
     
-    // In a real implementation, this would:
-    // 1. Create a new Party through PartyFactory
-    // 2. Configure the party for referral tracking
-    // 3. Set permissions and reward distribution
-    
-    // Mock implementation for development
-    
     // Upload metadata to IPFS
     const ipfsHash = await uploadToIPFS(metadata);
-    console.log("Referral metadata uploaded to IPFS:", ipfsHash);
+    if (!ipfsHash) {
+      throw new Error("Failed to upload referral metadata to IPFS");
+    }
     
-    // Generate a mock referral ID - in production this would be the Party address
-    const referralId = `ref_${Date.now()}`;
-    
-    // In production, you would actually interact with the blockchain here
+    // Mock implementation for development
+    const referralId = `referral-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    console.log(`Created referral pool with ID: ${referralId}`);
     
     return referralId;
   } catch (error) {
     console.error("Error creating referral pool:", error);
-    throw error;
+    return null;
   }
 };
 
-// Submit a new referral (would be implemented as a proposal to the Party)
+/**
+ * Submits a referral
+ * @param wallet User wallet
+ * @param referralId Referral ID
+ * @param referredAddress Referred address
+ * @returns Success status
+ */
 export const submitReferral = async (
-  wallet: DynamicWallet,
+  wallet: Wallet | DynamicContext['primaryWallet'],
   referralId: string,
   referredAddress: string
 ): Promise<boolean> => {
   try {
-    console.log(`Submitting referral: ${referralId} for address ${referredAddress}`);
+    console.log(`Submitting referral ${referralId} for address ${referredAddress}`);
     
     // Mock implementation for development
-    // In production, this would create a proposal to the Party
-    
     return true;
   } catch (error) {
     console.error("Error submitting referral:", error);
-    throw error;
+    return false;
   }
 };
 
-// Claim a referral reward from the Party
+/**
+ * Claims a referral reward
+ * @param wallet User wallet
+ * @param referralId Referral ID
+ * @returns Success status
+ */
 export const claimReferralReward = async (
-  wallet: DynamicWallet,
+  wallet: Wallet | DynamicContext['primaryWallet'],
   referralId: string
 ): Promise<boolean> => {
   try {
-    console.log(`Claiming reward for referral: ${referralId}`);
+    console.log(`Claiming reward for referral ${referralId}`);
     
     // Mock implementation for development
-    // In production, this would execute the claim function on the Party
-    
     return true;
   } catch (error) {
     console.error("Error claiming referral reward:", error);
-    throw error;
+    return false;
   }
 };
 
-// Get referrals for a user
+/**
+ * Gets referrals for a user
+ * @param address User address
+ * @returns Array of referrals
+ */
 export const getReferrals = async (address: string): Promise<Referral[]> => {
   try {
-    console.log(`Getting referrals for address: ${address}`);
+    console.log(`Getting referrals for address ${address}`);
     
     // Mock implementation for development
-    // In production, this would query the blockchain for Parties created by the user
-    
-    return [
+    const mockReferrals: Referral[] = [
       {
-        id: "ref_123",
-        name: "NFT Sale Referral",
-        description: "Earn rewards for referring users who buy our NFTs",
-        type: "nft_purchase",
+        id: "ref-001",
+        name: "NFT Membership Referral",
+        description: "Earn rewards for referring new members to purchase NFTs",
+        type: "nft-membership",
         referrer: address,
         rewardPercentage: 10,
-        status: ReferralStatus.PENDING,
-        createdAt: Math.floor(Date.now() / 1000) - 86400 // 1 day ago
-      },
-      {
-        id: "ref_456",
-        name: "Job Applicant Referral",
-        description: "Rewards for successful job applicant referrals",
-        type: "job_applicant",
-        referrer: address,
-        rewardPercentage: 5,
-        referredAddress: "0x9876...",
-        status: ReferralStatus.COMPLETED,
-        reward: "0.25",
-        createdAt: Math.floor(Date.now() / 1000) - 172800 // 2 days ago
+        status: 'active',
+        createdAt: Date.now()
       }
     ];
+    
+    return mockReferrals;
   } catch (error) {
     console.error("Error getting referrals:", error);
     return [];
   }
 };
 
-// Get status of a specific referral
+/**
+ * Gets referral status
+ * @param referralId Referral ID
+ * @returns Referral status
+ */
 export const getReferralStatus = async (referralId: string): Promise<ReferralStatus> => {
   try {
-    console.log(`Getting status for referral: ${referralId}`);
+    console.log(`Getting status for referral ${referralId}`);
     
     // Mock implementation for development
-    // In production, this would query the Party status
-    
-    return ReferralStatus.PENDING;
+    return 'active';
   } catch (error) {
     console.error("Error getting referral status:", error);
-    throw error;
+    return 'expired';
   }
 };

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { ethers } from "ethers"; // Import ethers
+import { ethers } from "ethers"; // Import ethers correctly
 import { useToast } from "./use-toast";
 import { NFTClass, getPrimaryRole } from "@/services/alchemyService";
 import { 
@@ -11,22 +11,10 @@ import {
   claimReferralReward,
   getReferrals,
   getReferralStatus,
-  ReferralStatus
+  ReferralStatus,
+  Referral
 } from "@/services/referralService";
 import { ReferralMetadata } from "@/utils/settlementConversion";
-
-export interface Referral {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  referrer: string;
-  rewardPercentage: number;
-  referredAddress?: string;
-  status: ReferralStatus;
-  reward?: string;
-  createdAt: number;
-}
 
 export const useReferrals = () => {
   const { toast } = useToast();
