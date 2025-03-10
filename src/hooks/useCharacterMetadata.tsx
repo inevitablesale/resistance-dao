@@ -2,12 +2,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCharacterById, getCharacterNFTByTokenId, type CharacterMetadata } from "@/services/characterMetadata";
 import { type OpenSeaNFT } from "@/services/openseaService";
+import { fetchMetadataFromCID } from "@/services/cidMetadataService";
 
 export const useCharacterMetadata = (characterId: number) => {
   const {
     data: character,
-    isLoading,
-    error
+    isLoading: characterLoading,
+    error: characterError
   } = useQuery({
     queryKey: ['character', characterId],
     queryFn: () => {
@@ -15,6 +16,23 @@ export const useCharacterMetadata = (characterId: number) => {
       return getCharacterById(characterId);
     },
     enabled: !!characterId && !isNaN(characterId)
+  });
+
+  // Fetch the actual model metadata from Pinata if we have a CID
+  const {
+    data: modelMetadata,
+    isLoading: modelLoading,
+    error: modelError
+  } = useQuery({
+    queryKey: ['character-model-metadata', character?.character_model_cid],
+    queryFn: () => {
+      if (!character?.character_model_cid) {
+        throw new Error('No model CID available');
+      }
+      console.log(`Fetching model metadata for CID: ${character.character_model_cid}`);
+      return fetchMetadataFromCID(character.character_model_cid);
+    },
+    enabled: !!character?.character_model_cid
   });
 
   // Log character data when it's available
@@ -26,6 +44,11 @@ export const useCharacterMetadata = (characterId: number) => {
       role: character.role,
       traits: character.traits
     });
+  }
+
+  // Log model metadata when it's available
+  if (modelMetadata) {
+    console.log(`Model metadata for character ${character?.name}:`, modelMetadata);
   }
 
   // Convert character metadata to OpenSeaNFT format for compatibility
@@ -67,8 +90,9 @@ export const useCharacterMetadata = (characterId: number) => {
 
   return {
     character,
+    modelMetadata,
     nft,
-    isLoading,
-    error
+    isLoading: characterLoading || (!!character?.character_model_cid && modelLoading),
+    error: characterError || modelError
   };
 };

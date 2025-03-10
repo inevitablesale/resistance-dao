@@ -47,3 +47,37 @@ export const isValidCID = (cid: string): boolean => {
   // Simple validation - CIDs typically start with 'baf' for IPFS v1
   return cid.startsWith('baf') && cid.length > 40;
 };
+
+// Fetch metadata from a CID using Pinata gateway
+export const fetchMetadataFromCID = async (cid: string): Promise<any> => {
+  if (!isValidCID(cid)) {
+    throw new Error(`Invalid CID format: ${cid}`);
+  }
+  
+  try {
+    console.log(`Fetching metadata from CID: ${cid}`);
+    const url = getCIDGatewayUrl(cid);
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch metadata: ${response.status} ${response.statusText}`);
+    }
+    
+    const metadata = await response.json();
+    console.log(`Successfully fetched metadata for CID: ${cid}`, metadata);
+    return metadata;
+  } catch (error) {
+    console.error(`Error fetching metadata for CID ${cid}:`, error);
+    throw error;
+  }
+};
+
+// Fetch character metadata by name
+export const fetchCharacterMetadataByName = async (name: string): Promise<any> => {
+  const cid = getCharacterCIDByName(name);
+  if (!cid) {
+    throw new Error(`No CID found for character: ${name}`);
+  }
+  
+  return fetchMetadataFromCID(cid);
+};

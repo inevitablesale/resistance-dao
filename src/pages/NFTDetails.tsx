@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNFTMetadata } from '@/hooks/useNFTMetadata';
@@ -9,12 +10,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CONTRACT_ADDRESS } from '@/hooks/useNFTCollection';
 import { CharacterRevealSlider } from '@/components/marketplace/CharacterRevealSlider';
 import { ModelPreview } from '@/components/marketplace/ModelPreview';
+import { useToast } from '@/components/ui/use-toast';
 
 const NFTDetails: React.FC = () => {
   const { tokenId } = useParams<{ tokenId: string }>();
   const navigate = useNavigate();
-  const { data: nft, isLoading, error } = useNFTMetadata(tokenId || '');
+  const { data: nft, isLoading, error, metadata } = useNFTMetadata(tokenId || '');
   const [revealValue, setRevealValue] = useState(20); // Start with character mostly obscured
+  const { toast } = useToast();
   
   useEffect(() => {
     if (nft) {
@@ -25,7 +28,15 @@ const NFTDetails: React.FC = () => {
         traits: nft.traits.map(t => `${t.trait_type}: ${t.value}`).join(', ')
       });
     }
-  }, [nft, tokenId]);
+    
+    if (metadata) {
+      console.log('Metadata from Pinata:', metadata);
+      toast({
+        title: "Metadata loaded",
+        description: `Successfully loaded metadata for ${nft?.name}`,
+      });
+    }
+  }, [nft, tokenId, metadata, toast]);
   
   const handleBack = () => {
     navigate(-1);
