@@ -8,15 +8,12 @@ import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProposal } from "@/hooks/useProposal";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useProposalStats } from "@/hooks/useProposalStats";
 
 const ProposalDetails = () => {
   const { tokenId } = useParams();
   const navigate = useNavigate();
   const { isConnected, connect } = useWalletConnection();
   const { data: proposal, isLoading, error } = useProposal(tokenId);
-  // Enable proposal stats only on the proposal details page
-  const { data: stats } = useProposalStats(true);
 
   if (!isConnected) {
     return (

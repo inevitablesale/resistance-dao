@@ -7,12 +7,10 @@ import { Card } from "@/components/ui/card";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
 import { motion } from "framer-motion";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { useProposalStats } from "@/hooks/useProposalStats";
 
 const Proposals = () => {
   const navigate = useNavigate();
   const { isConnected, connect } = useWalletConnection();
-  const { data: stats } = useProposalStats(true); // Explicitly enable proposal stats fetching
   
   const settlementSteps = [{
     icon: Layers,

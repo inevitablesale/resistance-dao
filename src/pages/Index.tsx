@@ -80,7 +80,7 @@ type AuthState = "unauthenticated" | "authenticating" | "breaching" | "authentic
 
 const Index = () => {
   const navigate = useNavigate();
-  const { data: stats, isLoading: isLoadingStats } = useProposalStats(false); // Disable proposal stats fetching on index page
+  const { data: stats, isLoading: isLoadingStats } = useProposalStats();
   const { data: nftBalance = 0, isLoading: isLoadingNFT } = useNFTBalance("0x1234..."); // Demo address
   const { isConnected, address } = useCustomWallet();
   const { connect } = useWalletConnection();
@@ -90,17 +90,15 @@ const Index = () => {
   const [activeRole, setActiveRole] = useState<'sentinel' | 'pioneer'>('sentinel');
   const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
   
+  // New states for radiation system
   const [currentRadiation, setCurrentRadiation] = useState(94); // Start at 94% radiation
-  
-  const [referralEarnings, setReferralEarnings] = useState(0);
+  const [totalNFTsClaimed, setTotalNFTsClaimed] = useState(925); // Mock data - total claimed NFTs
+  const [referralEarnings, setReferralEarnings] = useState(375); // Mock data - earnings in MATIC
+  const [totalReferrals, setTotalReferrals] = useState(15); // Mock data - total referrals
   
   useEffect(() => {
     if (isConnected && authState === "unauthenticated") {
       setAuthState("authenticated");
-    }
-    
-    if (isConnected) {
-      setReferralEarnings(25.75); // Example value - in a real app, this would come from an API or blockchain call
     }
   }, [isConnected]);
   
@@ -141,6 +139,7 @@ const Index = () => {
     bountyHunterRatio: 35
   };
   
+  // Updated NFT listings with proper roles
   const sentinelListings: MarketplaceListing[] = [
     {
       id: 1,
@@ -395,7 +394,7 @@ const Index = () => {
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
           <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
           <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> 
-          Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Scanning Radiation Level...</span>
+          Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Radiation Level: {currentRadiation}%</span>
         </div>
         
         <StoryTerminal 
@@ -406,12 +405,17 @@ const Index = () => {
         
         <WastelandSurvivalGuideEnhanced className="mb-8" />
         
+        {/* New Radiation System Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-1">
-            <RadiationSystem className="mb-6" />
+            <RadiationSystem 
+              currentRadiation={currentRadiation} 
+              totalNFTsClaimed={totalNFTsClaimed} 
+              className="mb-6"
+            />
             <ReferralSystem
-              earnings={375} // Mock data - static
-              totalReferrals={15} // Mock data - static
+              earnings={referralEarnings}
+              totalReferrals={totalReferrals}
             />
           </div>
           <div className="md:col-span-2">

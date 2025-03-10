@@ -1,43 +1,68 @@
+
 import React from 'react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicProgress } from '@/components/ui/toxic-progress';
 import { ToxicButton } from '@/components/ui/toxic-button';
-import { Shield, Target, Hammer, Radiation, Loader2 } from 'lucide-react';
-import { useContractStats } from '@/hooks/useContractNFTs';
-import { useCustomWallet } from '@/hooks/useCustomWallet';
+import { Shield, Target, Hammer, Radiation } from 'lucide-react';
+
+interface NFTSupply {
+  type: 'sentinel' | 'bounty-hunter' | 'survivor';
+  name: string;
+  icon: React.ReactNode;
+  total: number;
+  claimed: number;
+  free: number;
+  cost: number | 'Free';
+  description: string;
+}
 
 interface NFTDistributionStatusProps {
   className?: string;
 }
 
 export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusProps) {
-  const { data: contractStats, isLoading: isLoadingStats } = useContractStats();
-  const { isConnected } = useCustomWallet();
-  
-  // Total supply targets for each NFT type
-  const TOTAL_SENTINELS = 1500;
-  const TOTAL_BOUNTY_HUNTERS = 500;
-  const TOTAL_SURVIVORS = 1500;
-  
-  // Get the total claimed NFTs (from contract stats)
-  const totalClaimed = contractStats?.totalMinted || 0;
-  
-  // Calculate the total NFT supply for all types
-  const totalNFTs = TOTAL_SENTINELS + TOTAL_BOUNTY_HUNTERS + TOTAL_SURVIVORS;
-  
-  // Calculate the claimed percentage
+  const nftSupplies: NFTSupply[] = [
+    {
+      type: 'sentinel',
+      name: "Founder Sentinels",
+      icon: <Shield className="h-5 w-5 text-purple-400" />,
+      total: 1500,
+      claimed: 326,
+      free: 821,
+      cost: 50,
+      description: "Governance & Economic Oversight"
+    },
+    {
+      type: 'bounty-hunter',
+      name: "Bounty Hunters",
+      icon: <Target className="h-5 w-5 text-apocalypse-red" />,
+      total: 500,
+      claimed: 187,
+      free: 500,
+      cost: 'Free',
+      description: "Enforcers & Funders"
+    },
+    {
+      type: 'survivor',
+      name: "Survivors",
+      icon: <Hammer className="h-5 w-5 text-amber-400" />,
+      total: 1500,
+      claimed: 412,
+      free: 0,
+      cost: 50,
+      description: "Builders & Innovators"
+    }
+  ];
+
+  // Calculate total claimed and percentage
+  const totalNFTs = nftSupplies.reduce((sum, supply) => sum + supply.total, 0);
+  const totalClaimed = nftSupplies.reduce((sum, supply) => sum + supply.claimed, 0);
   const claimedPercentage = (totalClaimed / totalNFTs) * 100;
   
-  // Calculate radiation reduction - each NFT reduces radiation by 0.1%
+  // Calculate radiation reduction
   const radiationReduction = totalClaimed * 0.1;
   
-  // Estimated distribution by role (simplified)
-  // For a real implementation, we'd need to analyze the actual NFT metadata attributes
-  const estimatedSentinels = Math.floor(totalClaimed * (TOTAL_SENTINELS / totalNFTs));
-  const estimatedBountyHunters = Math.floor(totalClaimed * (TOTAL_BOUNTY_HUNTERS / totalNFTs));
-  const estimatedSurvivors = totalClaimed - estimatedSentinels - estimatedBountyHunters;
-  
-  // Calculate radiation visibility level based on estimated claimed Sentinels
+  // Calculate radiation visibility level based on claimed Sentinels
   const getRadiationVisibility = (claimedSentinels: number): string => {
     if (claimedSentinels <= 100) return "10% Exposed";
     if (claimedSentinels <= 300) return "25% Exposed";
@@ -55,56 +80,10 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
     return "No More Radiation, Full Detail";
   };
 
-  // Get visibility and effect based on estimated Sentinels
-  const visibilityStatus = getRadiationVisibility(estimatedSentinels);
-  const radiationEffect = getRadiationEffect(estimatedSentinels);
-  
-  // Define NFT supplies with metadata
-  const nftSupplies = [
-    {
-      type: 'sentinel',
-      name: "Founder Sentinels",
-      icon: <Shield className="h-5 w-5 text-purple-400" />,
-      total: TOTAL_SENTINELS,
-      claimed: estimatedSentinels,
-      free: Math.max(0, TOTAL_SENTINELS - estimatedSentinels),
-      cost: 50,
-      description: "Governance & Economic Oversight"
-    },
-    {
-      type: 'bounty-hunter',
-      name: "Bounty Hunters",
-      icon: <Target className="h-5 w-5 text-apocalypse-red" />,
-      total: TOTAL_BOUNTY_HUNTERS,
-      claimed: estimatedBountyHunters,
-      free: Math.max(0, TOTAL_BOUNTY_HUNTERS - estimatedBountyHunters),
-      cost: 'Free',
-      description: "Enforcers & Funders"
-    },
-    {
-      type: 'survivor',
-      name: "Survivors",
-      icon: <Hammer className="h-5 w-5 text-amber-400" />,
-      total: TOTAL_SURVIVORS,
-      claimed: estimatedSurvivors,
-      free: 0, // No free survivors
-      cost: 50,
-      description: "Builders & Innovators"
-    }
-  ];
-
-  // Loading state
-  if (isLoadingStats) {
-    return (
-      <ToxicCard className={`bg-black/80 border-toxic-neon/30 p-5 ${className}`}>
-        <div className="flex flex-col items-center justify-center py-8">
-          <Loader2 className="h-8 w-8 text-toxic-neon animate-spin mb-4" />
-          <p className="text-toxic-neon">Loading Contract Data...</p>
-          <p className="text-sm text-toxic-muted mt-2">Scanning blockchain for NFT distribution stats</p>
-        </div>
-      </ToxicCard>
-    );
-  }
+  // Get sentinel claimed count
+  const sentinelClaimed = nftSupplies.find(supply => supply.type === 'sentinel')?.claimed || 0;
+  const visibilityStatus = getRadiationVisibility(sentinelClaimed);
+  const radiationEffect = getRadiationEffect(sentinelClaimed);
 
   return (
     <ToxicCard className={`bg-black/80 border-toxic-neon/30 p-5 ${className}`}>
@@ -114,9 +93,7 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
         </div>
         <div>
           <h2 className="text-xl font-mono text-toxic-neon">NFT Distribution Status</h2>
-          <p className="text-white/60 text-sm">
-            {contractStats?.contractName || "Unknown"} ({contractStats?.contractSymbol || "???"}) - Total Minted: {totalClaimed}
-          </p>
+          <p className="text-white/60 text-sm">Total Radiation Reduction: {radiationReduction.toFixed(1)}%</p>
         </div>
       </div>
       
@@ -138,9 +115,9 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
         <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
           <div>
             <span className="text-white/70 block mb-1">Sentinel Reveal Progress</span>
-            <span className="text-toxic-neon font-mono">{estimatedSentinels} / {TOTAL_SENTINELS}</span>
+            <span className="text-toxic-neon font-mono">{sentinelClaimed} / 1500</span>
             <ToxicProgress 
-              value={(estimatedSentinels / TOTAL_SENTINELS) * 100}
+              value={(sentinelClaimed / 1500) * 100}
               variant="radiation" 
               className="h-2 mt-1" 
             />
@@ -173,10 +150,7 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
               </div>
               <ToxicProgress 
                 value={(supply.claimed / supply.total) * 100}
-                variant={
-                  supply.type === 'sentinel' ? 'governance' : 
-                  supply.type === 'bounty-hunter' ? 'reputation' : 'staking'
-                }
+                variant={supply.type === 'sentinel' ? 'governance' : supply.type === 'bounty-hunter' ? 'reputation' : 'staking'}
                 className="h-2"
               />
             </div>
@@ -184,7 +158,7 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
             <div className="grid grid-cols-2 gap-2 text-xs mb-3">
               <div className="bg-black/30 p-2 rounded">
                 <span className="text-white/60 block">Free Claims</span>
-                <span className="text-toxic-neon font-mono">{supply.free} remaining</span>
+                <span className="text-toxic-neon font-mono">{Math.max(0, supply.free - supply.claimed)} remaining</span>
               </div>
               <div className="bg-black/30 p-2 rounded">
                 <span className="text-white/60 block">Cost</span>
@@ -195,16 +169,11 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
             </div>
             
             <ToxicButton 
-              variant={
-                supply.type === 'sentinel' ? 'default' : 
-                supply.type === 'bounty-hunter' ? 'primary' : 'outline'
-              }
+              variant={supply.type === 'sentinel' ? 'default' : supply.type === 'bounty-hunter' ? 'primary' : 'outline'}
               size="sm"
               className="w-full"
-              disabled={!isConnected}
-              onClick={() => window.open(`/mint/${supply.type}`, "_blank")}
             >
-              {isConnected ? `Claim ${supply.name.replace('s', '')}` : "Connect Wallet to Claim"}
+              Claim {supply.name.replace('s', '')}
             </ToxicButton>
           </div>
         ))}

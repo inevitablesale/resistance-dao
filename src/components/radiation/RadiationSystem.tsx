@@ -4,9 +4,7 @@ import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
 import { ToxicProgress } from '@/components/ui/toxic-progress';
 import { ToxicButton } from '@/components/ui/toxic-button';
-import { Radiation, Biohazard, Lock, Unlock, AlertTriangle, Target, Coins, Users, Building2, Globe, Loader2 } from 'lucide-react';
-import { useContractStats } from '@/hooks/useContractNFTs';
-import { useCustomWallet } from '@/hooks/useCustomWallet';
+import { Radiation, Biohazard, Lock, Unlock, AlertTriangle, Target, Coins, Users, Building2, Globe } from 'lucide-react';
 
 interface FeatureUnlock {
   radiationLevel: number;
@@ -17,22 +15,12 @@ interface FeatureUnlock {
 }
 
 interface RadiationSystemProps {
+  currentRadiation: number;
+  totalNFTsClaimed: number;
   className?: string;
 }
 
-export function RadiationSystem({ className = "" }: RadiationSystemProps) {
-  const { data: contractStats, isLoading: isLoadingStats } = useContractStats();
-  const { isConnected, address } = useCustomWallet();
-  
-  // Total NFTs claimed (from contract stats)
-  const totalNFTsClaimed = contractStats?.totalMinted || 0;
-  
-  // Calculate radiation reduction - each NFT reduces radiation by 0.1%
-  const radiationReduction = totalNFTsClaimed * 0.1;
-  
-  // Calculate current radiation level (starting from 100%)
-  const currentRadiation = Math.max(0, 100 - radiationReduction);
-  
+export function RadiationSystem({ currentRadiation, totalNFTsClaimed, className = "" }: RadiationSystemProps) {
   // Feature unlocks based on radiation levels
   const featureUnlocks: FeatureUnlock[] = [
     {
@@ -75,6 +63,9 @@ export function RadiationSystem({ className = "" }: RadiationSystemProps) {
   // Find the next feature to unlock
   const nextFeature = featureUnlocks.find(feature => !feature.unlocked);
   
+  // Calculate radiation reduction
+  const radiationReduction = totalNFTsClaimed * 0.1;
+  
   // Get radiation status label
   const getRadiationStatusLabel = (level: number) => {
     if (level > 90) return "Critical Danger";
@@ -84,19 +75,6 @@ export function RadiationSystem({ className = "" }: RadiationSystemProps) {
     if (level > 0) return "Flourishing Economy";
     return "Civilization Rebuilt";
   };
-
-  // Loading state
-  if (isLoadingStats) {
-    return (
-      <ToxicCard className={`bg-black/80 border-toxic-neon/30 p-5 ${className}`}>
-        <div className="flex flex-col items-center justify-center py-8">
-          <Loader2 className="h-8 w-8 text-toxic-neon animate-spin mb-4" />
-          <p className="text-toxic-neon">Loading Radiation Data...</p>
-          <p className="text-sm text-toxic-muted mt-2">Scanning blockchain for NFT contract status</p>
-        </div>
-      </ToxicCard>
-    );
-  }
 
   return (
     <ToxicCard className={`bg-black/80 border-toxic-neon/30 p-5 ${className}`}>
@@ -113,7 +91,7 @@ export function RadiationSystem({ className = "" }: RadiationSystemProps) {
       <div className="mb-6">
         <div className="flex justify-between mb-2">
           <span className="text-white/70">Current Level</span>
-          <span className="text-toxic-neon font-mono">{currentRadiation.toFixed(1)}%</span>
+          <span className="text-toxic-neon font-mono">{currentRadiation}%</span>
         </div>
         <ToxicProgress 
           value={100 - currentRadiation} 
@@ -189,25 +167,14 @@ export function RadiationSystem({ className = "" }: RadiationSystemProps) {
       )}
       
       <div className="mt-4">
-        {isConnected ? (
-          <ToxicButton 
-            variant="default" 
-            className="w-full"
-            onClick={() => window.open(`/referral?address=${address}`, "_blank")}
-          >
-            <Target className="h-4 w-4 mr-2" />
-            Generate Referral Link
-          </ToxicButton>
-        ) : (
-          <ToxicButton 
-            variant="outline" 
-            className="w-full border-toxic-neon/30"
-            onClick={() => window.document.getElementById('connect-wallet-btn')?.click()}
-          >
-            <Radiation className="h-4 w-4 mr-2" />
-            Connect Wallet to Generate Link
-          </ToxicButton>
-        )}
+        <ToxicButton 
+          variant="default" 
+          className="w-full"
+          onClick={() => window.open("/referral", "_blank")}
+        >
+          <Target className="h-4 w-4 mr-2" />
+          Generate Referral Link
+        </ToxicButton>
       </div>
     </ToxicCard>
   );

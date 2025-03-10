@@ -46,7 +46,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { MarketplaceListing, MarketplaceListingType } from "@/components/marketplace/MarketplaceListingGrid";
-import { ContractNFTDisplay } from "@/components/wallet/ContractNFTDisplay";
 
 const MOCKUP_LISTINGS: Record<string, MarketplaceListing> = {
   "1": {

@@ -16,24 +16,11 @@ interface ProposalStats {
   successRate: number;
 }
 
-// Cache mechanism to prevent excessive calls
-let cachedProposalStats: ProposalStats | null = null;
-let statsCacheTimestamp = 0;
-const STATS_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
-export const useProposalStats = (enabled = true) => {
+export const useProposalStats = () => {
   return useQuery({
     queryKey: ['proposal-stats'],
     queryFn: async (): Promise<ProposalStats> => {
-      // Check if we have cached data that's still fresh
-      const now = Date.now();
-      if (cachedProposalStats && (now - statsCacheTimestamp) < STATS_CACHE_DURATION) {
-        console.log("Using cached proposal stats, age:", (now - statsCacheTimestamp) / 1000, "seconds");
-        return cachedProposalStats;
-      }
-      
       try {
-        console.log("Cache expired or not available, fetching new proposal stats");
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
 
@@ -80,29 +67,16 @@ export const useProposalStats = (enabled = true) => {
         // Get active proposals count
         let activeProposals = 0;
         const currentTime = Math.floor(Date.now() / 1000);
-        
-        // Safe way to process proposals without causing excessive calls
-        try {
-          // Only check the first 10 proposals to avoid excessive calls
-          const proposalIds = proposalEvents.map(event => 
-            event.args ? event.args.proposalId.toString() : '0'
-          ).slice(0, 10);
+
+        // Process each proposal
+        for (const event of proposalEvents) {
+          if (!event.args) continue;
+          const proposalId = event.args.proposalId.toString();
+          const proposalData = await contract.proposals(proposalId);
           
-          for (const proposalId of proposalIds) {
-            try {
-              const proposalData = await contract.proposals(proposalId);
-              if (proposalData.votingEnds.toNumber() > currentTime) {
-                activeProposals++;
-              }
-            } catch (err) {
-              console.log(`Error fetching proposal ${proposalId}, skipping: ${err}`);
-              // Continue with the next proposal instead of failing
-            }
+          if (proposalData.votingEnds.toNumber() > currentTime) {
+            activeProposals++;
           }
-        } catch (err) {
-          console.error("Error checking proposals:", err);
-          // Default to the number of proposal events as an estimate
-          activeProposals = proposalEvents.length;
         }
 
         // Get recent activities (last 5 events, sorted by timestamp)
@@ -143,23 +117,15 @@ export const useProposalStats = (enabled = true) => {
           successRate
         });
 
-        const stats = {
+        return {
           totalHolders: uniqueAddresses.size,
           totalLockedValue: totalLockedValueUSD,
           activeProposals,
           recentActivities: allActivities,
           successRate
         };
-        
-        // Cache the new results
-        cachedProposalStats = stats;
-        statsCacheTimestamp = now;
-        
-        return stats;
       } catch (error) {
         console.error("Error fetching proposal stats:", error);
-        
-        // Return default values if something goes wrong
         return {
           totalHolders: 0,
           totalLockedValue: 0,
@@ -169,12 +135,6 @@ export const useProposalStats = (enabled = true) => {
         };
       }
     },
-    // Set a longer stale time to prevent excessive refetching
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchInterval: 5 * 60 * 1000, // Only refetch every 5 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    enabled // Add enabled flag to control when the query runs
+    refetchInterval: 30000 // Refetch every 30 seconds
   });
 };

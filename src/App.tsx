@@ -19,7 +19,6 @@ import ToxicTheme from "./pages/ToxicTheme";
 import MarketplaceItemDetails from "./pages/MarketplaceItemDetails";
 import Hunt from "./pages/Hunt";
 import { Toaster } from "./components/ui/toaster";
-import { ContractNFTDisplay } from "./components/wallet/ContractNFTDisplay";
 
 const zeroDevConfig = {
   projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -165,11 +164,6 @@ function Layout() {
         <Route path="/referral" element={<ReferralRedirect />} />
         <Route path="/hunt" element={<Hunt />} />
         <Route path="/command" element={<Hunt />} />
-        <Route path="/contract-nfts" element={
-          <div className="container mx-auto px-4 py-8">
-            <ContractNFTDisplay />
-          </div>
-        } />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
