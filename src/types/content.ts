@@ -20,3 +20,6 @@ export interface IPFSContent {
 // Define common status types for referrals
 export type ReferralStatus = 'active' | 'claimed' | 'expired' | 'completed' | 'pending' | 'rejected' | 'paid';
 
+// Define governance proposal status types to match Party Protocol
+export type ProposalStatus = 'active' | 'passed' | 'ready' | 'executed' | 'cancelled' | 'defeated' | 'expired';
+

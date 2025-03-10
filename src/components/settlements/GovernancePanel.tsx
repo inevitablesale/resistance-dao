@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { ethers } from "ethers";
@@ -20,6 +19,7 @@ import { VotingPowerDisplay } from "./VotingPowerDisplay";
 import { useProposals } from "@/hooks/useProposals";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useVotingPower } from "@/hooks/useVotingPower";
+import { ProposalStatus } from "@/types/content";
 
 export const GovernancePanel = ({ 
   partyAddress, 
@@ -221,8 +221,9 @@ export const GovernancePanel = ({
             <TabsList className="bg-black/40 border border-white/10">
               <TabsTrigger value="active">Active</TabsTrigger>
               <TabsTrigger value="passed">Passed</TabsTrigger>
+              <TabsTrigger value="ready">Ready</TabsTrigger>
               <TabsTrigger value="executed">Executed</TabsTrigger>
-              <TabsTrigger value="failed">Failed</TabsTrigger>
+              <TabsTrigger value="defeated">Failed</TabsTrigger>
             </TabsList>
             
             <TabsContent value="active" className="space-y-4 mt-4">
@@ -244,7 +245,7 @@ export const GovernancePanel = ({
                       proposal={proposal}
                       onVote={handleVote}
                       onExecute={handleExecute}
-                      canExecute={hasExecutionPower && proposal.status === 'ready'}
+                      canExecute={false}
                     />
                   ))
               )}
@@ -263,6 +264,31 @@ export const GovernancePanel = ({
               ) : (
                 proposals
                   .filter(p => p.status === 'passed')
+                  .map(proposal => (
+                    <ProposalCard 
+                      key={proposal.id}
+                      proposal={proposal}
+                      onVote={handleVote}
+                      onExecute={handleExecute}
+                      canExecute={false}
+                    />
+                  ))
+              )}
+            </TabsContent>
+            
+            <TabsContent value="ready" className="space-y-4 mt-4">
+              {isLoading ? (
+                <div className="flex justify-center py-10">
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" />
+                </div>
+              ) : proposals.filter(p => p.status === 'ready').length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  <Clock className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                  <p>No ready proposals</p>
+                </div>
+              ) : (
+                proposals
+                  .filter(p => p.status === 'ready')
                   .map(proposal => (
                     <ProposalCard 
                       key={proposal.id}
@@ -301,19 +327,19 @@ export const GovernancePanel = ({
               )}
             </TabsContent>
             
-            <TabsContent value="failed" className="space-y-4 mt-4">
+            <TabsContent value="defeated" className="space-y-4 mt-4">
               {isLoading ? (
                 <div className="flex justify-center py-10">
                   <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" />
                 </div>
-              ) : proposals.filter(p => p.status === 'failed').length === 0 ? (
+              ) : proposals.filter(p => p.status === 'defeated' || p.status === 'cancelled' || p.status === 'expired').length === 0 ? (
                 <div className="text-center py-8 text-gray-400">
                   <X className="w-10 h-10 mx-auto mb-2 opacity-30" />
                   <p>No failed proposals</p>
                 </div>
               ) : (
                 proposals
-                  .filter(p => p.status === 'failed')
+                  .filter(p => p.status === 'defeated' || p.status === 'cancelled' || p.status === 'expired')
                   .map(proposal => (
                     <ProposalCard 
                       key={proposal.id}

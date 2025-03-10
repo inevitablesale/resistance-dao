@@ -1,6 +1,5 @@
-
 import { ethers } from "ethers";
-import { IPFSContent } from "./content";
+import { IPFSContent, ProposalStatus } from "./content";
 
 export enum FirmSize {
   BELOW_1M = 0,
@@ -197,7 +196,7 @@ export interface PartyProposal {
   title: string;
   description: string;
   proposer: string;
-  status: 'active' | 'passed' | 'failed' | 'executed' | 'ready';
+  status: ProposalStatus;
   votesFor: number;
   votesAgainst: number;
   createdAt: number;
