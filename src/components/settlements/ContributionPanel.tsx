@@ -77,9 +77,9 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
   };
 
   return (
-    <div className="bg-[#111] rounded-xl border border-white/5 p-6 space-y-6">
-      <h2 className="text-xl font-semibold flex items-center gap-2">
-        <Shield className="w-5 h-5 text-blue-400" />
+    <div className="bg-[#111] rounded-xl border border-toxic-neon/30 p-6 space-y-6 shadow-[0_0_15px_rgba(57,255,20,0.15)]">
+      <h2 className="text-xl font-semibold flex items-center gap-2 text-toxic-neon">
+        <Shield className="w-5 h-5 text-toxic-neon" />
         Sentinel Contribution
       </h2>
       
@@ -92,7 +92,7 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
               placeholder="0.0"
               value={contribution}
               onChange={(e) => setContribution(e.target.value)}
-              className="bg-black/50 border-white/10 text-white"
+              className="bg-black/50 border-toxic-neon/20 text-white focus:border-toxic-neon/50 focus:ring-toxic-neon/20"
               min="0"
               step="0.01"
             />
@@ -102,11 +102,11 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
         <Button
           onClick={handleContribute}
           disabled={isContributing || !contribution || parseFloat(contribution) <= 0}
-          className="w-full bg-blue-500 hover:bg-blue-600"
+          className="w-full bg-toxic-dark text-toxic-neon border border-toxic-neon/60 shadow-[0_0_10px_rgba(57,255,20,0.3)] hover:bg-toxic-dark/80 hover:shadow-[0_0_15px_rgba(57,255,20,0.4)]"
         >
           {isContributing ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-toxic-neon border-t-transparent mr-2" />
               Processing...
             </>
           ) : (
@@ -117,7 +117,7 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
           )}
         </Button>
         
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-toxic-neon/70">
           By contributing, you'll receive governance rights in this settlement proportional to your contribution.
         </div>
       </div>

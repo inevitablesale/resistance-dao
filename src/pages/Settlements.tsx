@@ -22,9 +22,9 @@ export default function Settlements() {
   
   // Data for pie chart
   const statusData = [
-    { name: 'Active', value: 8, color: '#22c55e' },
+    { name: 'Active', value: 8, color: '#39FF14' },
     { name: 'Funded', value: 3, color: '#3b82f6' },
-    { name: 'Failed', value: 1, color: '#ef4444' },
+    { name: 'Failed', value: 1, color: '#ea384c' },
   ];
 
   // Customize view based on current route
@@ -34,19 +34,19 @@ export default function Settlements() {
         return {
           title: "Governance",
           description: "Participate in governance decisions for settlements you've contributed to as a Sentinel.",
-          icon: <Gavel className="w-8 h-8 text-blue-400 mb-3" />
+          icon: <Gavel className="w-8 h-8 text-toxic-neon mb-3" />
         };
       case "/my-settlements":
         return {
           title: "My Contributions",
           description: "View and manage all the settlements you've contributed to as a Sentinel.",
-          icon: <User className="w-8 h-8 text-blue-400 mb-3" />
+          icon: <User className="w-8 h-8 text-toxic-neon mb-3" />
         };
       default:
         return {
           title: "Settlements",
           description: "Discover and support settlements being built in the wasteland.",
-          icon: <Shield className="w-8 h-8 text-blue-400 mb-3" />
+          icon: <Shield className="w-8 h-8 text-toxic-neon mb-3" />
         };
     }
   };
@@ -54,14 +54,14 @@ export default function Settlements() {
   const { title, description, icon } = renderPageTitle();
 
   return (
-    <div className="min-h-screen bg-black text-white pt-20">
+    <div className="min-h-screen bg-[#0A0A0A] text-white pt-20">
       <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
         <div className="flex flex-col space-y-8">
           {/* Custom Header for different routes */}
           {currentPath !== "/settlements" && (
             <div className="text-center mb-8">
               {icon}
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">{title}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-toxic-neon">{title}</h1>
               <p className="text-gray-300 max-w-2xl mx-auto">{description}</p>
             </div>
           )}
@@ -74,41 +74,41 @@ export default function Settlements() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               {/* Key metrics */}
               <div className="col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card className="bg-[#111] border-white/5">
+                <Card className="bg-[#111] border-toxic-neon/20 shadow-[0_0_10px_rgba(57,255,20,0.1)]">
                   <CardContent className="p-4 flex flex-col">
                     <span className="text-gray-400 text-sm mb-2">Active</span>
                     <div className="flex items-center">
-                      <Building2 className="text-blue-400 mr-2 w-5 h-5" />
+                      <Building2 className="text-toxic-neon mr-2 w-5 h-5" />
                       <span className="text-2xl font-bold">{settlementStats.activeCount}</span>
                     </div>
                   </CardContent>
                 </Card>
                 
-                <Card className="bg-[#111] border-white/5">
+                <Card className="bg-[#111] border-toxic-neon/20 shadow-[0_0_10px_rgba(57,255,20,0.1)]">
                   <CardContent className="p-4 flex flex-col">
                     <span className="text-gray-400 text-sm mb-2">Sentinels</span>
                     <div className="flex items-center">
-                      <Users className="text-blue-400 mr-2 w-5 h-5" />
+                      <Users className="text-toxic-neon mr-2 w-5 h-5" />
                       <span className="text-2xl font-bold">{settlementStats.totalInvestors}</span>
                     </div>
                   </CardContent>
                 </Card>
                 
-                <Card className="bg-[#111] border-white/5">
+                <Card className="bg-[#111] border-toxic-neon/20 shadow-[0_0_10px_rgba(57,255,20,0.1)]">
                   <CardContent className="p-4 flex flex-col">
                     <span className="text-gray-400 text-sm mb-2">Total ETH</span>
                     <div className="flex items-center">
-                      <Archive className="text-blue-400 mr-2 w-5 h-5" />
+                      <Archive className="text-toxic-neon mr-2 w-5 h-5" />
                       <span className="text-2xl font-bold">{settlementStats.totalFunding}</span>
                     </div>
                   </CardContent>
                 </Card>
                 
-                <Card className="bg-[#111] border-white/5">
+                <Card className="bg-[#111] border-toxic-neon/20 shadow-[0_0_10px_rgba(57,255,20,0.1)]">
                   <CardContent className="p-4 flex flex-col">
                     <span className="text-gray-400 text-sm mb-2">Avg Funding</span>
                     <div className="flex items-center">
-                      <Clock className="text-blue-400 mr-2 w-5 h-5" />
+                      <Clock className="text-toxic-neon mr-2 w-5 h-5" />
                       <span className="text-2xl font-bold">{settlementStats.avgFundingRate}%</span>
                     </div>
                   </CardContent>
@@ -116,7 +116,7 @@ export default function Settlements() {
               </div>
               
               {/* Status distribution */}
-              <Card className="bg-[#111] border-white/5">
+              <Card className="bg-[#111] border-toxic-neon/20 shadow-[0_0_10px_rgba(57,255,20,0.1)]">
                 <CardContent className="p-4">
                   <h3 className="text-sm text-gray-400 mb-2">Settlement Status</h3>
                   <div className="h-[120px]">
@@ -138,7 +138,7 @@ export default function Settlements() {
                         <Tooltip 
                           formatter={(value: number) => [`${value} Settlements`, 'Count']}
                           labelFormatter={(index: number) => statusData[index].name}
-                          contentStyle={{ background: '#111', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                          contentStyle={{ background: '#111', border: '1px solid rgba(57,255,20,0.2)', borderRadius: '8px' }}
                           itemStyle={{ color: '#fff' }}
                           labelStyle={{ color: '#fff', fontWeight: 'bold' }}
                         />
