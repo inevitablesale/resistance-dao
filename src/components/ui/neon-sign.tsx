@@ -18,11 +18,11 @@ export const NeonSign = ({
   flickerIntensity = 'medium' 
 }: NeonSignProps) => {
   const [flickerState, setFlickerState] = useState<Array<0 | 0.5 | 1>>([]);
-  const combinedText = text || (firstLine + secondLine);
+  const displayText = text || `${firstLine}${secondLine}`;
   
   useEffect(() => {
     // Create initial flicker state for each letter (fully lit)
-    setFlickerState(Array(combinedText.length).fill(1));
+    setFlickerState(Array(displayText.length).fill(1));
     
     // Set up the flicker interval with slower timing
     const intensityMap = {
@@ -44,11 +44,11 @@ export const NeonSign = ({
       setFlickerState(prev => {
         const newState = [...prev];
         // Pick a random letter to turn completely off
-        const offIndex = Math.floor(Math.random() * combinedText.length);
+        const offIndex = Math.floor(Math.random() * displayText.length);
         // Pick another random letter for half brightness
         let halfIndex;
         do {
-          halfIndex = Math.floor(Math.random() * combinedText.length);
+          halfIndex = Math.floor(Math.random() * displayText.length);
         } while (halfIndex === offIndex); // Ensure they're not the same letter
         
         // Set the states
@@ -63,7 +63,7 @@ export const NeonSign = ({
       clearInterval(flickerInterval);
       clearInterval(specialEffectInterval);
     };
-  }, [combinedText, flickerIntensity]);
+  }, [displayText, flickerIntensity]);
   
   const getStyleForState = (state: 0 | 0.5 | 1) => {
     switch(state) {
@@ -142,7 +142,7 @@ export const NeonSign = ({
       ) : (
         // Two-line display with proper spacing
         <div className="relative z-10">
-          <h1 className="text-5xl md:text-7xl tracking-wider mb-2 leading-tight">
+          <h1 className="text-5xl md:text-7xl tracking-wider mb-3 leading-tight">
             {renderNeonText(firstLine)}
           </h1>
           <h1 className="text-5xl md:text-7xl tracking-wider leading-tight">
