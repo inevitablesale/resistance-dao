@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -20,7 +19,6 @@ export const useReferrals = () => {
   const { primaryWallet } = useDynamicContext();
   const [userRole, setUserRole] = useState<NFTClass>('Unknown');
   
-  // Check user role on mount
   useEffect(() => {
     const checkRole = async () => {
       if (primaryWallet) {
@@ -37,7 +35,6 @@ export const useReferrals = () => {
     checkRole();
   }, [primaryWallet]);
   
-  // Fetch referrals the user has created
   const { data: userReferrals = [], isLoading: isLoadingReferrals, refetch: refetchReferrals } = useQuery({
     queryKey: ['userReferrals', primaryWallet?.address],
     queryFn: async () => {
@@ -54,12 +51,10 @@ export const useReferrals = () => {
     enabled: !!primaryWallet,
   });
 
-  // For compatibility with ReferralDashboard component
   const referrals = userReferrals;
   const isCreatingReferral = false;
   const canCreateReferral = userRole === 'Bounty Hunter';
   
-  // Create a new referral
   const createNewReferral = async (
     type: string,
     name: string,
@@ -91,7 +86,6 @@ export const useReferrals = () => {
         description: "Please approve the transaction to create your referral pool.",
       });
       
-      // Create referral with all required arguments
       const referralId = await createReferral(
         primaryWallet as unknown as ethers.Wallet, 
         type, 
@@ -106,7 +100,6 @@ export const useReferrals = () => {
           description: "Your referral pool has been created successfully.",
         });
         
-        // Refresh referrals list
         refetchReferrals();
         
         return referralId;
@@ -124,7 +117,6 @@ export const useReferrals = () => {
     }
   };
   
-  // Submit a referral
   const submitNewReferral = async (
     referralId: string, 
     referredAddress: string,
@@ -145,12 +137,11 @@ export const useReferrals = () => {
         description: "Please approve the transaction to submit your referral.",
       });
       
-      // Submit referral with the correct number of arguments
       const success = await submitReferral(
         primaryWallet as unknown as ethers.Wallet,
         referralId,
-        referredAddress,
-        metadata
+        "",
+        referredAddress
       );
       
       if (success) {
@@ -159,7 +150,6 @@ export const useReferrals = () => {
           description: "Your referral has been submitted successfully.",
         });
         
-        // Refresh referrals list
         refetchReferrals();
         
         return true;
@@ -177,7 +167,6 @@ export const useReferrals = () => {
     }
   };
   
-  // Claim a referral reward
   const claimReward = async (referralId: string) => {
     if (!primaryWallet) {
       toast({
@@ -205,7 +194,6 @@ export const useReferrals = () => {
           description: "Your referral reward has been claimed successfully.",
         });
         
-        // Refresh referrals list
         refetchReferrals();
         
         return true;
@@ -223,7 +211,6 @@ export const useReferrals = () => {
     }
   };
   
-  // Generate referral link
   const generateReferralLink = (referralId: string) => {
     return `${window.location.origin}/referrals/${referralId}`;
   };
@@ -237,7 +224,6 @@ export const useReferrals = () => {
     claimReward,
     generateReferralLink,
     refetchReferrals,
-    // Added for compatibility with ReferralDashboard
     referrals,
     isCreatingReferral,
     canCreateReferral

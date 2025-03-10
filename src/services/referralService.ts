@@ -1,4 +1,3 @@
-
 import { Wallet } from "ethers";
 import { uploadToIPFS } from "./ipfsService";
 import { ReferralMetadata } from "@/utils/settlementConversion";
@@ -10,6 +9,7 @@ import {
   updateBountyHunterReferralStats
 } from "./jobService";
 import { DynamicContextType } from "@dynamic-labs/sdk-react-core";
+import { ProposalMetadata, IPFSContent } from "@/types/proposals";
 
 // Define export type for Referral status
 export type ReferralStatus = 'active' | 'pending' | 'completed' | 'expired';
@@ -47,12 +47,6 @@ export type WalletLike = Wallet | {
 
 /**
  * Creates a new referral using Party Protocol
- * @param wallet User wallet
- * @param type Referral type
- * @param name Referral name
- * @param description Referral description
- * @param rewardPercentage Reward percentage
- * @returns Referral ID if successful, null otherwise
  */
 export const createReferral = async (
   wallet: WalletLike,
@@ -64,21 +58,21 @@ export const createReferral = async (
   try {
     console.log(`Creating ${type} referral: ${name}`);
     
-    // Create referral metadata
+    // Create referral metadata that matches ProposalMetadata requirements
     const metadata: ReferralMetadata = {
-      title: name, // Required for ProposalMetadata
       name,
       description,
-      type,
-      referrer: typeof wallet === 'object' && 'address' in wallet ? wallet.address || "" : "",
       rewardPercentage,
-      createdAt: Math.floor(Date.now() / 1000),
+      title: name, // Required for ProposalMetadata
       votingDuration: 86400 * 3, // 3 days in seconds
-      linkedInURL: "" // Required field for ProposalMetadata
+      linkedInURL: "", // Required field for ProposalMetadata
+      type, // Add type property that we added to ReferralMetadata
+      referrer: typeof wallet === 'object' && 'address' in wallet ? wallet.address || "" : "",
+      createdAt: Math.floor(Date.now() / 1000)
     };
     
-    // Upload metadata to IPFS
-    const ipfsHash = await uploadToIPFS(metadata);
+    // Cast to ProposalMetadata to fix the type error
+    const ipfsHash = await uploadToIPFS(metadata as unknown as ProposalMetadata);
     if (!ipfsHash) {
       throw new Error("Failed to upload referral metadata to IPFS");
     }
@@ -154,17 +148,13 @@ export const getReferrals = async (
  * @param jobId Job ID
  * @param partyAddress Party address for the job
  * @param referredAddress Address of the referred user
- * @param jobReward Job reward amount
- * @param referralPercentage Referral reward percentage
  * @returns Success status
  */
 export const submitReferral = async (
   wallet: WalletLike,
   jobId: string,
   partyAddress: string,
-  referredAddress: string,
-  jobReward: string,
-  referralPercentage: number = 10
+  referredAddress: string
 ): Promise<boolean> => {
   try {
     console.log(`Submitting referral ${jobId} for user ${referredAddress}`);
@@ -328,4 +318,3 @@ export const getReferralStats = async (
     };
   }
 };
-

@@ -138,56 +138,53 @@ const getWalletAddress = async (wallet: WalletLike): Promise<string> => {
 /**
  * Creates a job listing using Party Protocol
  * @param wallet User wallet
- * @param metadata Job metadata
+ * @param jobMetadata Job metadata
  * @param votingDuration Voting duration in seconds
  * @param linkedInURL LinkedIn URL for verification
  * @returns Job ID if successful, null otherwise
  */
 export const createJobListing = async (
-  wallet: WalletLike,
-  metadata: JobMetadata,
-  votingDuration: number = 7 * 24 * 60 * 60, // 7 days default
-  linkedInURL: string = "https://linkedin.com/in/default" // Default LinkedIn URL
+  wallet: any,
+  jobMetadata: JobMetadata
 ): Promise<string | null> => {
   try {
-    console.log("Creating job listing with metadata:", metadata);
+    console.log("Creating job listing with metadata:", jobMetadata);
     
     if (!('getWalletClient' in wallet)) {
       throw new Error("Wallet must be a Dynamic SDK wallet to create a Party Protocol job");
     }
     
-    // Create IPFS content object from job metadata
-    const ipfsContent: IPFSContent = {
-      contentSchema: "job-listing-v1",
-      contentType: "job-listing",
-      title: metadata.title,
-      content: metadata.description,
-      metadata: {
-        author: await getWalletAddress(wallet),
-        publishedAt: Math.floor(Date.now() / 1000),
-        version: 1,
-        language: "en",
-        tags: [metadata.category],
-        coverImage: metadata.coverImage || "" // Using coverImage instead of image
-      }
+    // Convert JobMetadata to ProposalMetadata for IPFS upload
+    const proposalMetadata: ProposalMetadata = {
+      title: jobMetadata.title,
+      description: jobMetadata.description,
+      category: jobMetadata.category,
+      votingDuration: jobMetadata.votingDuration,
+      linkedInURL: jobMetadata.linkedInURL,
+      investment: {
+        targetCapital: jobMetadata.reward,
+        description: jobMetadata.description,
+      },
+      submissionTimestamp: Date.now(),
+      submitter: jobMetadata.creator
     };
     
     // Upload metadata to IPFS
-    const ipfsHash = await uploadToIPFS(ipfsContent);
+    const ipfsHash = await uploadToIPFS(proposalMetadata);
     if (!ipfsHash) {
       throw new Error("Failed to upload job metadata to IPFS");
     }
     
     // Create party configuration
     const partyOptions = {
-      name: `Job: ${metadata.title}`,
+      name: `Job: ${jobMetadata.title}`,
       hosts: [await getWalletAddress(wallet)],
-      votingDuration: votingDuration,
+      votingDuration: jobMetadata.votingDuration,
       executionDelay: 1 * 24 * 60 * 60, // 1 day in seconds
       passThresholdBps: 5000, // 50%
       proposers: [], // Anyone can propose (apply for the job)
       allowPublicProposals: true,
-      description: metadata.description,
+      description: jobMetadata.description,
       metadataURI: `ipfs://${ipfsHash}`
     };
     
@@ -202,7 +199,7 @@ export const createJobListing = async (
       initialContributor: await getWalletAddress(wallet),
       minContribution: ethers.utils.parseEther("0.01").toString(), // 0.01 ETH
       maxContribution: ethers.utils.parseEther("10").toString(), // 10 ETH
-      maxTotalContributions: ethers.utils.parseEther(metadata.reward).toString(),
+      maxTotalContributions: ethers.utils.parseEther(jobMetadata.reward).toString(),
       duration: 30 * 24 * 60 * 60 // 30 days
     };
     
@@ -210,7 +207,7 @@ export const createJobListing = async (
       wallet as NonNullable<DynamicContextType['primaryWallet']>,
       partyAddress,
       crowdfundOptions,
-      metadata
+      jobMetadata
     );
     
     // Create a unique job ID

@@ -1,28 +1,32 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { ethers } from "ethers";
 import { useToast } from "./use-toast";
-import { NFTClass, getPrimaryRole } from "@/services/alchemyService";
-import { 
-  JobCategory,
-  JobListing,
-  JobApplication,
-  JobReferral,
+import {
+  NFTClass,
+  getPrimaryRole,
+  getNFTsForOwner,
+} from "@/services/alchemyService";
+import {
   createJobListing,
-  submitJobReferral,
-  acceptJobApplication,
-  rejectJobApplication,
-  cancelJobListing
+  getJobs,
+  Job,
+  applyForJob,
+  getJobApplicants,
+  JobApplicant,
+  approveJobApplicant,
+  rejectJobApplicant,
+  completeJob,
+  cancelJob,
 } from "@/services/jobService";
 import { JobMetadata } from "@/utils/settlementConversion";
 
-// Hook for job-related functionality
 export const useJobs = () => {
   const { toast } = useToast();
   const { primaryWallet } = useDynamicContext();
-  const [userRole, setUserRole] = useState<NFTClass>('Unknown');
-  
+  const [userRole, setUserRole] = useState<NFTClass>("Unknown");
+
   // Check user role on mount
   useEffect(() => {
     const checkRole = async () => {
@@ -36,380 +40,385 @@ export const useJobs = () => {
         }
       }
     };
-    
+
     checkRole();
   }, [primaryWallet]);
-  
-  // Fetch all jobs
-  const { data: jobs = [], isLoading: isLoadingJobs, refetch: refetchJobs } = useQuery({
-    queryKey: ['jobs'],
+
+  // Fetch jobs
+  const {
+    data: jobs = [],
+    isLoading: isLoadingJobs,
+    refetch: refetchJobs,
+  } = useQuery({
+    queryKey: ["jobs"],
     queryFn: async () => {
-      // Mock jobs data
-      const mockJobs: JobListing[] = [
-        {
-          id: 'job-001',
-          title: 'Settlement Architect',
-          description: 'Design and implement a new settlement structure',
-          category: 'settlement-building',
-          reward: '500',
-          deadline: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days from now
-          creator: '0x1234...5678',
-          creatorRole: 'Sentinel',
-          requiredRole: 'Survivor',
-          status: 'open',
-          maxApplicants: 5,
-          referralReward: '50',
-          settlementId: 'settlement-001',
-          createdAt: Date.now(),
-          applications: [
-            {
-              id: `app-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-              jobId: 'job-001',
-              applicant: '0xabcd...1234',
-              status: 'pending' as const,
-              submittedAt: Math.floor(Date.now() / 1000),
-              createdAt: Math.floor(Date.now() / 1000),
-              message: 'Sample message',
-              experience: 'Sample experience',
-              portfolio: 'Sample portfolio'
-            }
-          ]
-        }
-      ];
-      
-      return mockJobs;
-    }
-  });
-  
-  // Fetch user's job listings
-  const { data: userJobs = [], isLoading: isLoadingUserJobs } = useQuery({
-    queryKey: ['userJobs', primaryWallet?.address],
-    queryFn: async () => {
-      if (!primaryWallet) return [];
-      
-      const address = await primaryWallet.address;
-      // Filter jobs created by the user
-      return jobs.filter(job => job.creator === address) || [];
+      try {
+        return await getJobs();
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+        return [];
+      }
     },
-    enabled: !!primaryWallet && !!jobs.length
-  });
-  
-  // Fetch user's job applications
-  const { data: userApplications = [], isLoading: isLoadingUserApplications } = useQuery({
-    queryKey: ['userApplications', primaryWallet?.address],
-    queryFn: async () => {
-      if (!primaryWallet || !jobs.length) return [];
-      
-      const address = await primaryWallet.address;
-      
-      // Gather all applications by the user
-      const applications: JobApplication[] = [];
-      
-      jobs.forEach(job => {
-        job.applications?.forEach(app => {
-          if (app.applicant === address) {
-            applications.push(app);
-          }
-        });
-      });
-      
-      return applications;
-    },
-    enabled: !!primaryWallet && !!jobs.length
   });
 
-  // For compatibility with JobsDashboard component
-  const myApplications = userApplications;
-  const isLoadingMyApplications = isLoadingUserApplications;
-  const createdJobs = userJobs;
-  const isLoadingCreatedJobs = isLoadingUserJobs;
-  const availableJobs = jobs;
-  const myReferrals: JobReferral[] = [];
-  const isLoadingMyReferrals = false;
-  const canCreateJob = userRole === 'Sentinel' || userRole === 'Survivor';
-  
-  // Create a new job listing
-  const createJob = async (metadata: Omit<JobMetadata, 'createdAt' | 'creatorRole' | 'votingDuration' | 'linkedInURL'>) => {
+  // Create a new job
+  const createJob = async (jobData: Omit<JobMetadata, 'votingDuration' | 'linkedInURL'>) => {
     if (!primaryWallet) {
       toast({
         title: "Wallet Required",
-        description: "Please connect your wallet to create a job listing.",
+        description: "Please connect your wallet to create a job.",
         variant: "destructive",
       });
       return null;
     }
-    
-    if (userRole !== 'Sentinel' && userRole !== 'Survivor') {
+
+    if (userRole !== "Settlement Owner") {
       toast({
         title: "Access Denied",
-        description: "Only Sentinels and Survivors can create job listings.",
+        description: "Only Settlement Owners can create jobs.",
         variant: "destructive",
       });
       return null;
     }
-    
+
     try {
       toast({
-        title: "Creating Job Listing",
-        description: "Please approve the transaction to create your job listing.",
+        title: "Creating Job",
+        description:
+          "Please approve the transaction to create your job listing.",
       });
-      
-      const creatorAddress = await primaryWallet.address;
-      
-      // Create job metadata
-      const fullMetadata: JobMetadata = {
-        ...metadata,
-        creator: creatorAddress,
-        creatorRole: userRole,
-        createdAt: Math.floor(Date.now() / 1000),
-        votingDuration: 7 * 24 * 60 * 60, // 7 days default
-        linkedInURL: "https://linkedin.com/in/resistance" // Default placeholder
+
+      const wallet = await primaryWallet.getWalletClient();
+      const address = await wallet.getAddress();
+
+      // Create job metadata with required fields
+      const metadata: JobMetadata = {
+        ...jobData,
+        votingDuration: 604800, // Default 7 days
+        linkedInURL: "", // Empty default
+        creator: address, // This is now allowed in JobMetadata
       };
-      
-      // Pass all required arguments to createJobListing
-      const jobId = await createJobListing(
-        primaryWallet, 
-        fullMetadata, 
-        fullMetadata.votingDuration,
-        fullMetadata.linkedInURL
-      );
-      
+
+      const jobId = await createJobListing(wallet, metadata);
+
       if (jobId) {
         toast({
           title: "Job Created",
           description: "Your job listing has been created successfully.",
         });
-        
+
         // Refresh jobs list
         refetchJobs();
-        
+
         return jobId;
       }
-      
+
       return null;
     } catch (error) {
       console.error("Error creating job:", error);
       toast({
         title: "Error Creating Job",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
       });
       return null;
     }
   };
-  
-  // Submit a job referral
-  const submitReferral = async (jobId: string, referredUser: string, partyAddress: string = "") => {
+
+  // Apply for a job
+  const applyToJob = async (jobId: string) => {
     if (!primaryWallet) {
       toast({
         title: "Wallet Required",
-        description: "Please connect your wallet to submit a referral.",
+        description: "Please connect your wallet to apply for this job.",
         variant: "destructive",
       });
       return false;
     }
-    
-    if (userRole !== 'Bounty Hunter') {
+
+    if (userRole !== "Bounty Hunter") {
       toast({
         title: "Access Denied",
-        description: "Only Bounty Hunters can submit referrals.",
+        description: "Only Bounty Hunters can apply for jobs.",
         variant: "destructive",
       });
       return false;
     }
-    
+
     try {
       toast({
-        title: "Submitting Referral",
-        description: "Please approve the transaction to submit your referral.",
+        title: "Applying for Job",
+        description: "Please approve the transaction to apply for this job.",
       });
-      
-      // Pass all required arguments to submitJobReferral
-      const success = await submitJobReferral(
-        primaryWallet, 
-        jobId, 
-        partyAddress,
-        referredUser
-      );
-      
+
+      const wallet = await primaryWallet.getWalletClient();
+      const success = await applyForJob(wallet, jobId);
+
       if (success) {
         toast({
-          title: "Referral Submitted",
-          description: "Your referral has been submitted successfully.",
+          title: "Application Submitted",
+          description: "Your application has been submitted successfully.",
         });
-        
+
         // Refresh jobs list
         refetchJobs();
-        
+
         return true;
       }
-      
+
       return false;
     } catch (error) {
-      console.error("Error submitting referral:", error);
+      console.error("Error applying for job:", error);
       toast({
-        title: "Error Submitting Referral",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        title: "Error Applying for Job",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
       });
       return false;
     }
   };
-  
-  // Accept a job application
-  const acceptApplication = async (applicationId: string, partyAddress: string = "", proposalId: string = "") => {
+
+  // Get job applicants
+  const getApplicants = async (jobId: string): Promise<JobApplicant[]> => {
+    try {
+      return await getJobApplicants(jobId);
+    } catch (error) {
+      console.error("Error fetching job applicants:", error);
+      return [];
+    }
+  };
+
+  // Approve a job applicant
+  const approveApplicant = async (jobId: string, applicantAddress: string) => {
     if (!primaryWallet) {
       toast({
         title: "Wallet Required",
-        description: "Please connect your wallet to accept the application.",
+        description: "Please connect your wallet to approve this applicant.",
         variant: "destructive",
       });
       return false;
     }
-    
+
+    if (userRole !== "Settlement Owner") {
+      toast({
+        title: "Access Denied",
+        description: "Only Settlement Owners can approve job applicants.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     try {
-      // Pass all required arguments to acceptJobApplication
-      const success = await acceptJobApplication(
-        primaryWallet, 
-        partyAddress, 
-        proposalId, 
-        applicationId
-      );
-      
+      toast({
+        title: "Approving Applicant",
+        description:
+          "Please approve the transaction to approve this job applicant.",
+      });
+
+      const wallet = await primaryWallet.getWalletClient();
+      const success = await approveJobApplicant(wallet, jobId, applicantAddress);
+
       if (success) {
         toast({
-          title: "Application Accepted",
-          description: "The application has been accepted successfully.",
+          title: "Applicant Approved",
+          description: "You have successfully approved the job applicant.",
         });
-        
+
         // Refresh jobs list
         refetchJobs();
-        
+
         return true;
       }
-      
+
       return false;
     } catch (error) {
-      console.error("Error accepting application:", error);
+      console.error("Error approving applicant:", error);
       toast({
-        title: "Error Accepting Application",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        title: "Error Approving Applicant",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
       });
       return false;
     }
   };
-  
-  // Reject a job application
-  const rejectApplication = async (applicationId: string, partyAddress: string = "", proposalId: string = "") => {
+
+  // Reject a job applicant
+  const rejectApplicant = async (jobId: string, applicantAddress: string) => {
     if (!primaryWallet) {
       toast({
         title: "Wallet Required",
-        description: "Please connect your wallet to reject the application.",
+        description: "Please connect your wallet to reject this applicant.",
         variant: "destructive",
       });
       return false;
     }
-    
+
+    if (userRole !== "Settlement Owner") {
+      toast({
+        title: "Access Denied",
+        description: "Only Settlement Owners can reject job applicants.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     try {
-      // Pass all required arguments to rejectJobApplication
-      const success = await rejectJobApplication(
-        primaryWallet, 
-        partyAddress, 
-        proposalId, 
-        applicationId
-      );
-      
+      toast({
+        title: "Rejecting Applicant",
+        description:
+          "Please approve the transaction to reject this job applicant.",
+      });
+
+      const wallet = await primaryWallet.getWalletClient();
+      const success = await rejectJobApplicant(wallet, jobId, applicantAddress);
+
       if (success) {
         toast({
-          title: "Application Rejected",
-          description: "The application has been rejected.",
+          title: "Applicant Rejected",
+          description: "You have successfully rejected the job applicant.",
         });
-        
+
         // Refresh jobs list
         refetchJobs();
-        
+
         return true;
       }
-      
+
       return false;
     } catch (error) {
-      console.error("Error rejecting application:", error);
+      console.error("Error rejecting applicant:", error);
       toast({
-        title: "Error Rejecting Application",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        title: "Error Rejecting Applicant",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
       });
       return false;
     }
   };
-  
-  // Cancel a job listing
-  const cancelJob = async (jobId: string, partyAddress: string = "") => {
+
+  // Complete a job
+  const completeExistingJob = async (jobId: string) => {
     if (!primaryWallet) {
       toast({
         title: "Wallet Required",
-        description: "Please connect your wallet to cancel the job.",
+        description: "Please connect your wallet to complete this job.",
         variant: "destructive",
       });
       return false;
     }
-    
+
+    if (userRole !== "Settlement Owner") {
+      toast({
+        title: "Access Denied",
+        description: "Only Settlement Owners can complete jobs.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     try {
-      // Pass all required arguments to cancelJobListing
-      const success = await cancelJobListing(
-        primaryWallet, 
-        partyAddress, 
-        jobId
-      );
-      
+      toast({
+        title: "Completing Job",
+        description: "Please approve the transaction to complete this job.",
+      });
+
+      const wallet = await primaryWallet.getWalletClient();
+      const success = await completeJob(wallet, jobId);
+
       if (success) {
         toast({
-          title: "Job Cancelled",
-          description: "The job listing has been cancelled.",
+          title: "Job Completed",
+          description: "You have successfully completed the job.",
         });
-        
+
         // Refresh jobs list
         refetchJobs();
-        
+
         return true;
       }
-      
+
       return false;
     } catch (error) {
-      console.error("Error cancelling job:", error);
+      console.error("Error completing job:", error);
       toast({
-        title: "Error Cancelling Job",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        title: "Error Completing Job",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
       });
       return false;
     }
   };
-  
+
+  // Cancel a job
+  const cancelExistingJob = async (jobId: string) => {
+    if (!primaryWallet) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to cancel this job.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (userRole !== "Settlement Owner") {
+      toast({
+        title: "Access Denied",
+        description: "Only Settlement Owners can cancel jobs.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    try {
+      toast({
+        title: "Canceling Job",
+        description: "Please approve the transaction to cancel this job.",
+      });
+
+      const wallet = await primaryWallet.getWalletClient();
+      const success = await cancelJob(wallet, jobId);
+
+      if (success) {
+        toast({
+          title: "Job Canceled",
+          description: "You have successfully canceled the job.",
+        });
+
+        // Refresh jobs list
+        refetchJobs();
+
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Error canceling job:", error);
+      toast({
+        title: "Error Canceling Job",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
   return {
     userRole,
     jobs,
-    userJobs,
-    userApplications,
     isLoadingJobs,
-    isLoadingUserJobs,
-    isLoadingUserApplications,
     createJob,
-    submitReferral,
-    acceptApplication,
-    rejectApplication,
-    cancelJob,
+    applyToJob,
+    getApplicants,
+    approveApplicant,
+    rejectApplicant,
+    completeJob: completeExistingJob,
+    cancelJob: cancelExistingJob,
     refetchJobs,
-    // Added for compatibility with JobsDashboard
-    myApplications,
-    isLoadingMyApplications,
-    createdJobs,
-    isLoadingCreatedJobs,
-    availableJobs,
-    myReferrals,
-    isLoadingMyReferrals,
-    canCreateJob,
-    primaryRole: userRole
   };
 };
