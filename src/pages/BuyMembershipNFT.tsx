@@ -13,8 +13,8 @@ import { ethers } from "ethers";
 
 const BuyMembershipNFT: React.FC = () => {
   const { isConnected, address } = useCustomWallet();
-  const { data: nftBalance, isLoading: isLoadingNFT } = useNFTBalance(address);
-  const hasMembershipNFT = nftBalance && nftBalance > 0;
+  const { data: nftBalanceData } = useNFTBalance(address);
+  const hasMembershipNFT = nftBalanceData && nftBalanceData.balance > 0;
   const navigate = useNavigate();
   const { toast } = useToast();
   const { getProvider } = useWalletProvider();

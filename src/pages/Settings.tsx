@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,8 +16,8 @@ const Settings: React.FC = () => {
   const [isFirstVisit, setIsFirstVisit] = useState(false);
   const navigate = useNavigate();
   
-  const { data: nftBalance, isLoading: isLoadingNFT } = useNFTBalance(address);
-  const hasMembershipNFT = nftBalance && nftBalance > 0;
+  const { data: nftBalanceData, isLoading: isLoadingNFT } = useNFTBalance(address);
+  const hasMembershipNFT = nftBalanceData && nftBalanceData.balance > 0;
   
   // Check if this is the first visit after connecting wallet
   useEffect(() => {
