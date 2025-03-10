@@ -15,6 +15,7 @@ export const useCharacterMetadata = (characterId: number) => {
       if (!characterId || characterId === 0) {
         return null;
       }
+      console.log('🔴 Fetching character by ID:', characterId);
       return getCharacterById(characterId);
     },
     enabled: !!characterId && !isNaN(characterId) && characterId > 0,
@@ -33,13 +34,13 @@ export const useCharacterMetadata = (characterId: number) => {
       if (!character?.character_model_cid) {
         throw new Error('No model CID available');
       }
-      console.log('Fetching metadata from CID:', character.character_model_cid);
+      console.log('🔴 Fetching metadata from CID:', character.character_model_cid);
       const metadata = await fetchMetadataFromCID(character.character_model_cid);
-      console.log('Pinata metadata response:', metadata);
+      console.log('🔴 Pinata metadata response in hook:', metadata);
       return metadata;
     },
     enabled: !!character?.character_model_cid,
-    staleTime: 300000, // 5 minutes
+    staleTime: 0, // No stale time to ensure fresh data
     gcTime: 600000, // 10 minutes (formerly cacheTime)
     retry: 1, // Limit retries to avoid excessive requests
   });
@@ -64,7 +65,7 @@ export const useCharacterMetadata = (characterId: number) => {
     })),
     // Use character_model_cid if available, properly formatted as a Pinata gateway URL
     animation_url: character.character_model_cid 
-      ? `https://gateway.pinata.cloud/ipfs/${character.character_model_cid}`
+      ? `https://blue-shaggy-halibut-668.mypinata.cloud/ipfs/${character.character_model_cid}`
       : character.model_url || null,
     is_suspicious: false,
     creator: null,

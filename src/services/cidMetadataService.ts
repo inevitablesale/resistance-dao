@@ -26,10 +26,10 @@ export const characterCIDMapping: Record<string, string> = {
   "Sandwich Hunter": "bafkreigxfbvntll522na4la6b4cdvp5g74jztgjhgdmz2b5uv7uaieywie"
 };
 
-// Convert a CID to a Pinata gateway URL
+// Convert a CID to a Pinata gateway URL - UPDATED to use blue-shaggy-halibut-668.mypinata.cloud
 export const getCIDGatewayUrl = (cid: string): string => {
   if (!cid) return '';
-  return `https://gateway.pinata.cloud/ipfs/${cid}`;
+  return `https://blue-shaggy-halibut-668.mypinata.cloud/ipfs/${cid}`;
 };
 
 // Get a character CID by name
@@ -56,7 +56,7 @@ export const fetchMetadataFromCID = async (cid: string): Promise<any> => {
   
   try {
     const url = getCIDGatewayUrl(cid);
-    console.log('Fetching from Pinata URL:', url);
+    console.log('🔴 Fetching from Pinata URL:', url);
     
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -73,19 +73,19 @@ export const fetchMetadataFromCID = async (cid: string): Promise<any> => {
     clearTimeout(timeoutId);
     
     if (!response.ok) {
-      console.error(`Pinata request failed: ${response.status} ${response.statusText}`);
+      console.error(`🔴 Pinata request failed: ${response.status} ${response.statusText}`);
       throw new Error(`Failed to fetch metadata: ${response.status} ${response.statusText}`);
     }
     
     const responseText = await response.text();
-    console.log('Raw Pinata response:', responseText);
+    console.log('🔴 Raw Pinata response text:', responseText);
     
     let metadata;
     try {
       metadata = JSON.parse(responseText);
-      console.log('Parsed Pinata metadata:', metadata);
+      console.log('🔴 Parsed Pinata metadata:', metadata);
     } catch (e) {
-      console.error('Failed to parse Pinata response as JSON:', e);
+      console.error('🔴 Failed to parse Pinata response as JSON:', e);
       throw new Error('Invalid JSON response from Pinata');
     }
     
@@ -94,7 +94,7 @@ export const fetchMetadataFromCID = async (cid: string): Promise<any> => {
     
     return metadata;
   } catch (error) {
-    console.error(`Error fetching metadata for CID ${cid}:`, error);
+    console.error(`🔴 Error fetching metadata for CID ${cid}:`, error);
     
     // Return a basic fallback metadata object instead of throwing
     return { 
