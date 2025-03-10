@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
 import { executeTransaction, TransactionConfig } from "./transactionManager";
@@ -6,6 +5,7 @@ import { createParty, PartyOptions, createEthCrowdfund, CrowdfundOptions } from 
 import { toast } from "@/hooks/use-toast";
 import { uploadToIPFS } from "./ipfsService";
 import { EventConfig, subscribeToProposalEvents } from "./eventListenerService";
+import { IPFSContent } from "@/types/content";
 
 // Bounty Protocol addresses
 const BOUNTY_FACTORY_ADDRESS = "0x4a5EA76571F47E7d92B5040E8C7FF12eacd35087"; // Polygon mainnet
@@ -75,6 +75,31 @@ export interface BountyTask {
 }
 
 /**
+ * Format bounty metadata to match IPFSContent structure
+ * @param bountyData Bounty data to format
+ * @param creator Address of the creator
+ * @returns IPFSContent structure
+ */
+function formatBountyForIPFS(bountyData: any, creator: string): IPFSContent {
+  return {
+    contentSchema: "bounty-v1",
+    contentType: "application/json",
+    title: bountyData.name,
+    content: bountyData.description,
+    metadata: {
+      author: creator,
+      publishedAt: Math.floor(Date.now() / 1000),
+      version: 1,
+      tags: [bountyData.bountyType, "bounty", "referral"],
+      bountyDetails: {
+        ...bountyData,
+        creator
+      }
+    }
+  };
+}
+
+/**
  * Creates a new bounty using Party Protocol
  * @param options Bounty creation options
  * @param wallet Connected wallet to use for transaction
@@ -97,7 +122,7 @@ export async function createBounty(
     const signerAddress = await signer.getAddress();
     
     // Create bounty metadata for IPFS
-    const bountyMetadata = {
+    const bountyData = {
       name: options.name,
       description: options.description,
       rewardType: options.rewardType,
@@ -110,9 +135,11 @@ export async function createBounty(
       eligibleNFTs: options.eligibleNFTs,
       successCriteria: options.successCriteria,
       bountyType: options.bountyType,
-      creator: signerAddress,
       createdAt: Math.floor(Date.now() / 1000)
     };
+    
+    // Format data to match IPFSContent structure
+    const ipfsContent = formatBountyForIPFS(bountyData, signerAddress);
     
     // Upload metadata to IPFS
     toast({
@@ -122,7 +149,7 @@ export async function createBounty(
     
     let metadataURI;
     try {
-      metadataURI = await uploadToIPFS(bountyMetadata);
+      metadataURI = await uploadToIPFS(ipfsContent);
       console.log("Bounty metadata uploaded to IPFS:", metadataURI);
     } catch (error) {
       console.error("Error uploading metadata to IPFS:", error);
@@ -754,8 +781,8 @@ export async function deployBountyToBlockchain(bountyId: string, wallet: any): P
     const signer = provider.getSigner();
     const signerAddress = await signer.getAddress();
     
-    // Create enhanced bounty metadata for IPFS
-    const bountyMetadata = {
+    // Create enhanced bounty metadata
+    const bountyData = {
       name: bounty.name,
       description: bounty.description,
       rewardAmount: bounty.rewardAmount,
@@ -765,9 +792,11 @@ export async function deployBountyToBlockchain(bountyId: string, wallet: any): P
       expiresAt: bounty.expiresAt,
       status: bounty.status,
       eligibleNFTs: bounty.eligibleNFTs || [],
-      creator: signerAddress,
       deployedAt: Math.floor(Date.now() / 1000)
     };
+    
+    // Format for IPFS
+    const ipfsContent = formatBountyForIPFS(bountyData, signerAddress);
     
     // Upload to IPFS
     toast({
@@ -775,7 +804,7 @@ export async function deployBountyToBlockchain(bountyId: string, wallet: any): P
       description: "Preparing bounty metadata for blockchain deployment..."
     });
     
-    const metadataURI = await uploadToIPFS(bountyMetadata);
+    const metadataURI = await uploadToIPFS(ipfsContent);
     
     // Set up a Party for the bounty
     const partyOptions: PartyOptions = {
@@ -1054,5 +1083,79 @@ export async function fundBounty(
       variant: "destructive"
     });
     return null;
+  }
+}
+
+/**
+ * Record a successful referral for a bounty
+ * @param bountyId ID of the bounty
+ * @param referrerAddress Address of the referrer
+ * @param referredAddress Address of the referred user
+ * @param wallet Connected wallet
+ * @returns Promise resolving to referral details
+ */
+export async function recordSuccessfulReferral(
+  bountyId: string,
+  referrerAddress: string,
+  referredAddress: string,
+  wallet: any
+): Promise<{
+  success: boolean;
+  referralId?: string;
+  transactionHash?: string;
+  error?: string;
+}> {
+  try {
+    console.log("Recording successful referral for bounty:", bountyId);
+    
+    // Get the bounty
+    const bounty = await getBounty(bountyId);
+    if (!bounty) {
+      throw new Error("Bounty not found");
+    }
+    
+    // Verify the referrer is a registered hunter
+    const hunter = await getHunter(referrerAddress);
+    if (!hunter) {
+      // Auto-register the hunter if not registered
+      await registerHunter(referrerAddress);
+    }
+    
+    // Create a new task for this referral
+    const task = await submitBountyTask(
+      bountyId,
+      referrerAddress,
+      referredAddress,
+      `Successful referral: ${referredAddress} referred by ${referrerAddress}`
+    );
+    
+    if (!task) {
+      throw new Error("Failed to create referral task");
+    }
+    
+    // Auto-verify the task
+    const verifiedTask = await verifyBountyTask(task.id, true, "system");
+    
+    if (!verifiedTask) {
+      throw new Error("Failed to verify referral task");
+    }
+    
+    // Process reward if configured for auto-payment
+    let paymentResult = null;
+    if (bounty.allowPublicHunters && wallet) {
+      paymentResult = await payBountyTaskReward(task.id, wallet);
+    }
+    
+    return {
+      success: true,
+      referralId: task.id,
+      transactionHash: paymentResult?.transactionHash,
+    };
+  } catch (error) {
+    console.error("Error recording successful referral:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error recording referral"
+    };
   }
 }

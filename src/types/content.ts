@@ -18,4 +18,4 @@ export interface IPFSContent {
 }
 
 // Define common status types for referrals
-export type ReferralStatus = 'active' | 'claimed' | 'expired' | 'completed';
+export type ReferralStatus = 'active' | 'claimed' | 'expired' | 'completed' | 'pending' | 'rejected' | 'paid';

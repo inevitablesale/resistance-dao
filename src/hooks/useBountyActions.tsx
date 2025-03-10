@@ -1,61 +1,54 @@
 
 import { useState } from "react";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
-import { useWalletProvider } from "@/hooks/useWalletProvider";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { 
-  createBounty, 
-  getBounties, 
-  getBounty, 
-  updateBountyStatus,
+  createBounty,
   recordSuccessfulReferral,
-  deployBountyToBlockchain,
-  Bounty,
-  BountyOptions
+  BountyOptions,
+  deployBountyToBlockchain, 
+  distributeRewards,
+  updateBountyStatus,
+  fundBounty
 } from "@/services/bountyService";
 
 export const useBountyActions = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const { primaryWallet } = useDynamicContext();
-  const { getProvider } = useWalletProvider();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const { primaryWallet, isConnected, connect } = useWalletConnection();
   
-  /**
-   * Create a new bounty
-   */
-  const createNewBounty = async (options: BountyOptions): Promise<Bounty | null> => {
-    if (!primaryWallet) {
+  const handleCreateBounty = async (options: BountyOptions) => {
+    if (!isConnected || !primaryWallet) {
       toast({
-        title: "Wallet Required",
+        title: "Wallet Not Connected",
         description: "Please connect your wallet to create a bounty",
         variant: "destructive"
       });
+      
+      // Prompt to connect wallet
+      await connect();
       return null;
     }
     
+    setIsLoading(true);
+    
     try {
-      setIsLoading(true);
-      toast({
-        title: "Creating Bounty...",
-        description: "Please approve the transaction in your wallet",
-      });
-      
-      const bounty = await createBounty(options);
+      // Call createBounty with wallet parameter
+      const bounty = await createBounty(options, primaryWallet);
       
       if (bounty) {
         toast({
           title: "Bounty Created",
-          description: "Your bounty program has been created successfully",
+          description: `'${bounty.name}' bounty created successfully`
         });
-        return bounty;
       }
       
-      throw new Error("Failed to create bounty");
+      return bounty;
     } catch (error: any) {
       console.error("Error creating bounty:", error);
       toast({
         title: "Bounty Creation Failed",
-        description: error.message || "There was an error creating your bounty",
+        description: error.message || "Failed to create bounty",
         variant: "destructive"
       });
       return null;
@@ -64,125 +57,49 @@ export const useBountyActions = () => {
     }
   };
   
-  /**
-   * List all bounties
-   */
-  const listBounties = async (status?: string): Promise<Bounty[]> => {
-    try {
-      setIsLoading(true);
-      return await getBounties(status);
-    } catch (error) {
-      console.error("Error listing bounties:", error);
-      toast({
-        title: "Error Loading Bounties",
-        description: "Failed to load bounty programs",
-        variant: "destructive"
-      });
-      return [];
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  /**
-   * Get a single bounty by ID
-   */
-  const getBountyDetails = async (bountyId: string): Promise<Bounty | null> => {
-    try {
-      setIsLoading(true);
-      return await getBounty(bountyId);
-    } catch (error) {
-      console.error("Error getting bounty details:", error);
-      toast({
-        title: "Error Loading Bounty",
-        description: "Failed to load bounty details",
-        variant: "destructive"
-      });
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  /**
-   * Update a bounty's status
-   */
-  const changeBountyStatus = async (
-    bountyId: string, 
-    status: "active" | "paused" | "expired" | "completed"
-  ): Promise<Bounty | null> => {
-    if (!primaryWallet) {
-      toast({
-        title: "Wallet Required",
-        description: "Please connect your wallet to update a bounty",
-        variant: "destructive"
-      });
-      return null;
-    }
-    
-    try {
-      setIsLoading(true);
-      
-      const bounty = await updateBountyStatus(bountyId, status);
-      
-      if (bounty) {
-        toast({
-          title: "Bounty Updated",
-          description: `Bounty status changed to ${status}`,
-        });
-        return bounty;
-      }
-      
-      throw new Error("Failed to update bounty status");
-    } catch (error: any) {
-      console.error("Error updating bounty status:", error);
-      toast({
-        title: "Status Update Failed",
-        description: error.message || "There was an error updating the bounty status",
-        variant: "destructive"
-      });
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  /**
-   * Record a successful referral
-   */
-  const recordReferralSuccess = async (
+  const handleRecordReferral = async (
     bountyId: string,
     referrerAddress: string,
     referredAddress: string
-  ): Promise<Bounty | null> => {
-    if (!primaryWallet) {
+  ) => {
+    if (!isConnected || !primaryWallet) {
       toast({
-        title: "Wallet Required",
+        title: "Wallet Not Connected",
         description: "Please connect your wallet to record a referral",
         variant: "destructive"
       });
       return null;
     }
     
+    setIsLoading(true);
+    
     try {
-      setIsLoading(true);
+      const result = await recordSuccessfulReferral(
+        bountyId,
+        referrerAddress,
+        referredAddress,
+        primaryWallet
+      );
       
-      const bounty = await recordSuccessfulReferral(bountyId, referrerAddress, referredAddress);
-      
-      if (bounty) {
+      if (result.success) {
         toast({
           title: "Referral Recorded",
-          description: "The successful referral has been recorded and the reward will be processed",
+          description: "The referral was successfully recorded"
         });
-        return bounty;
+      } else {
+        toast({
+          title: "Referral Failed",
+          description: result.error || "Failed to record referral",
+          variant: "destructive"
+        });
       }
       
-      throw new Error("Failed to record successful referral");
+      return result;
     } catch (error: any) {
       console.error("Error recording referral:", error);
       toast({
-        title: "Recording Failed",
-        description: error.message || "There was an error recording the referral",
+        title: "Referral Failed",
+        description: error.message || "Failed to record referral",
         variant: "destructive"
       });
       return null;
@@ -191,42 +108,68 @@ export const useBountyActions = () => {
     }
   };
   
-  /**
-   * Deploy a bounty to the blockchain
-   */
-  const deployBounty = async (bountyId: string): Promise<any> => {
-    if (!primaryWallet) {
+  const deployBounty = async (bountyId: string) => {
+    if (!isConnected || !primaryWallet) {
       toast({
-        title: "Wallet Required",
+        title: "Wallet Not Connected",
         description: "Please connect your wallet to deploy a bounty",
         variant: "destructive"
       });
       return null;
     }
     
+    setIsLoading(true);
+    
     try {
-      setIsLoading(true);
-      toast({
-        title: "Deploying Bounty...",
-        description: "Please approve the transaction in your wallet",
-      });
-      
       const result = await deployBountyToBlockchain(bountyId, primaryWallet);
       
-      if (result) {
-        toast({
-          title: "Bounty Deployed",
-          description: "Your bounty has been successfully deployed to the blockchain",
-        });
-        return result;
-      }
+      toast({
+        title: "Bounty Deployed",
+        description: "The bounty was successfully deployed to the blockchain"
+      });
       
-      throw new Error("Failed to deploy bounty");
+      return result;
     } catch (error: any) {
       console.error("Error deploying bounty:", error);
       toast({
         title: "Deployment Failed",
-        description: error.message || "There was an error deploying the bounty",
+        description: error.message || "Failed to deploy bounty",
+        variant: "destructive"
+      });
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const addFunds = async (bountyId: string, amount: number) => {
+    if (!isConnected || !primaryWallet) {
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet to add funds",
+        variant: "destructive"
+      });
+      return null;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const result = await fundBounty(bountyId, amount, primaryWallet);
+      
+      if (result) {
+        toast({
+          title: "Funding Successful",
+          description: `Added ${amount} MATIC to the bounty`
+        });
+      }
+      
+      return result;
+    } catch (error: any) {
+      console.error("Error funding bounty:", error);
+      toast({
+        title: "Funding Failed",
+        description: error.message || "Failed to add funds",
         variant: "destructive"
       });
       return null;
@@ -236,12 +179,10 @@ export const useBountyActions = () => {
   };
   
   return {
-    createNewBounty,
-    listBounties,
-    getBountyDetails,
-    changeBountyStatus,
-    recordReferralSuccess,
+    createBounty: handleCreateBounty,
+    recordReferral: handleRecordReferral,
     deployBounty,
+    addFunds,
     isLoading
   };
 };

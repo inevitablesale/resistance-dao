@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -20,6 +19,7 @@ import { Progress } from "@/components/ui/progress";
 import { createBounty } from "@/services/bountyService";
 import { usePartyTransactions } from "@/hooks/usePartyTransactions";
 import { calculatePriceStructure, formatCryptoAmount } from "@/utils/priceCalculator";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
 
 const nftReferralFormSchema = z.object({
   name: z.string().min(3, "Bounty name must be at least 3 characters"),
@@ -46,18 +46,18 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
   const { toast } = useToast();
   const { createSettlement, isProcessing } = usePartyTransactions();
   const [estimatedGasCost, setEstimatedGasCost] = useState("~1.2 MATIC");
+  const { primaryWallet } = useWalletConnection();
   
-  // Default form values based on the template
   const defaultValues: NFTReferralFormValues = {
     name: template?.title || "NFT Referral Program",
     description: template?.description || "Reward community members for referring new users to mint NFTs",
-    rewardPerReferral: 20, // Default reward is 20 MATIC per referral
-    totalBudget: 500, // Default budget is 500 MATIC
-    duration: 30, // Default duration is 30 days
-    maxReferralsPerHunter: 0, // 0 means unlimited
+    rewardPerReferral: 20,
+    totalBudget: 500,
+    duration: 30,
+    maxReferralsPerHunter: 0,
     allowPublicHunters: true,
     requireVerification: false,
-    eligibleNFTs: "0x60534a0b5C8B8119c713f2dDb30f2eB31E31D1F9", // Default to ETH Crowdfund address
+    eligibleNFTs: "0x60534a0b5C8B8119c713f2dDb30f2eB31E31D1F9",
     successCriteria: "User must mint at least one NFT using the referral link",
   };
   
@@ -69,18 +69,24 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
   const watchTotalBudget = form.watch("totalBudget");
   const watchRewardPerReferral = form.watch("rewardPerReferral");
   
-  // Calculate estimated referrals possible with the budget
   const estimatedReferrals = Math.floor(watchTotalBudget / watchRewardPerReferral);
   
-  // Calculate price breakdown
   const priceBreakdown = calculatePriceStructure(
-    watchTotalBudget - (watchTotalBudget * 0.02), // 2% platform fee
+    watchTotalBudget - (watchTotalBudget * 0.02),
     'MATIC'
   );
   
   const onSubmit = async (data: NFTReferralFormValues) => {
     try {
-      // Create the bounty using our new service
+      if (!primaryWallet) {
+        toast({
+          title: "Wallet Not Connected",
+          description: "Please connect your wallet to create a bounty",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       const result = await createBounty({
         name: data.name,
         description: data.description,
@@ -94,7 +100,7 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
         eligibleNFTs: data.eligibleNFTs?.split(",").map(addr => addr.trim()) || [],
         successCriteria: data.successCriteria,
         bountyType: "nft_referral",
-      });
+      }, primaryWallet);
       
       if (result) {
         toast({
@@ -255,7 +261,6 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
               </div>
               
               <div className="space-y-6">
-                {/* Preview and Settings */}
                 <ToxicCard className="border border-toxic-neon/30 bg-black/50">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-toxic-neon text-lg">Bounty Preview</CardTitle>
