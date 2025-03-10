@@ -5,12 +5,12 @@ import { IPFSContent } from '@/types/content';
 
 // IPFS settings
 const IPFS_API_URL = 'https://api.pinata.cloud';
+const IPFS_GATEWAY_URL = 'https://blue-shaggy-halibut-668.mypinata.cloud/ipfs';
 
-// In a real application, these would come from environment variables
-// For now, we'll use placeholders that will be replaced with actual credentials
+// Pinata credentials
 const PINATA_CREDENTIALS = {
-  PINATA_API_KEY: process.env.PINATA_API_KEY || 'mock-api-key',
-  PINATA_API_SECRET: process.env.PINATA_API_SECRET || 'mock-api-secret'
+  PINATA_API_KEY: 'c1395b5d3677c459fd05',
+  PINATA_API_SECRET: '87d9bb7ce78d82cc263059c8feb6df0d01fb53e2b9cfab1d364acf873331f53e'
 };
 
 export const getFromIPFS = async <T extends ProposalMetadata | IPFSContent>(
@@ -21,19 +21,11 @@ export const getFromIPFS = async <T extends ProposalMetadata | IPFSContent>(
     console.log('\n=== Starting IPFS Retrieval ===');
     console.log('Getting data for hash:', hash);
     
-    // In a development environment without actual IPFS access,
-    // we can return mock data based on the hash
-    if (hash.startsWith('mock-')) {
-      console.log('Using mock data for development');
-      return createMockDataFromHash(hash, type) as T;
-    }
-    
-    // For real IPFS access, use Pinata gateway
     if (hash.startsWith('ipfs://')) {
       hash = hash.substring(7);
     }
     
-    const gatewayUrl = `https://gateway.pinata.cloud/ipfs/${hash}`;
+    const gatewayUrl = `${IPFS_GATEWAY_URL}/${hash}`;
     console.log('Fetching from IPFS gateway:', gatewayUrl);
     
     const response = await fetch(gatewayUrl);
@@ -48,8 +40,7 @@ export const getFromIPFS = async <T extends ProposalMetadata | IPFSContent>(
     return data as T;
   } catch (error) {
     console.error('Error in IPFS retrieval:', error);
-    // In case of error, return a fallback response
-    return createMockDataFromHash(hash, type) as T;
+    throw error; // Propagate the error instead of returning mock data
   }
 };
 
@@ -60,16 +51,6 @@ export const uploadToIPFS = async <T extends object>(
     console.log('\n=== Starting IPFS Upload ===');
     console.log('Content to upload:', JSON.stringify(content, null, 2));
     
-    // For development environments without actual IPFS access, 
-    // return a mock hash
-    if (process.env.NODE_ENV === 'development' && !PINATA_CREDENTIALS.PINATA_API_KEY.startsWith('real-')) {
-      const mockHash = `mock-${Math.random().toString(36).substring(2, 15)}`;
-      console.log('Using mock IPFS hash for development:', mockHash);
-      console.log('=== IPFS Upload Complete ===\n');
-      return mockHash;
-    }
-    
-    // For real Pinata API access
     const response = await fetch(`${IPFS_API_URL}/pinning/pinJSONToIPFS`, {
       method: 'POST',
       headers: {
@@ -94,48 +75,9 @@ export const uploadToIPFS = async <T extends object>(
     return `ipfs://${ipfsHash}`;
   } catch (error) {
     console.error('Error uploading to IPFS:', error);
-    // In case of error with real Pinata API, return a mock hash for development
-    const mockHash = `mock-${Math.random().toString(36).substring(2, 15)}`;
-    console.log('Using fallback mock IPFS hash due to error:', mockHash);
-    return mockHash;
+    throw error; // Propagate the error instead of returning mock data
   }
 };
-
-// Helper function to create mock data based on a hash
-function createMockDataFromHash(hash: string, type: 'proposal' | 'content'): any {
-  if (type === 'proposal') {
-    return {
-      title: `Mock Proposal ${hash.substring(0, 8)}`,
-      description: `This is a mock proposal generated for hash ${hash}`,
-      category: 'Mock Category',
-      image: 'https://via.placeholder.com/300',
-      investment: {
-        targetCapital: '1000',
-        description: 'Mock investment description',
-        drivers: ['Innovation', 'Growth', 'Sustainability']
-      },
-      votingDuration: 604800, // 7 days
-      linkedInURL: 'https://linkedin.com/company/mock',
-      submissionTimestamp: Math.floor(Date.now() / 1000),
-      submitter: '0x1234567890123456789012345678901234567890',
-      status: 'active'
-    };
-  } else {
-    return {
-      contentSchema: '1.0.0',
-      contentType: 'article',
-      title: `Mock Content ${hash.substring(0, 8)}`,
-      content: `This is mock content generated for hash ${hash}`,
-      metadata: {
-        author: 'Mock Author',
-        publishedAt: Math.floor(Date.now() / 1000),
-        version: 1,
-        language: 'en',
-        tags: ['mock', 'content', 'ipfs']
-      }
-    };
-  }
-}
 
 export const getModelFromIPFS = async (hash: string): Promise<string> => {
   try {
@@ -147,7 +89,7 @@ export const getModelFromIPFS = async (hash: string): Promise<string> => {
     }
     
     // Return gateway URL
-    const gatewayUrl = `https://gateway.pinata.cloud/ipfs/${hash}`;
+    const gatewayUrl = `${IPFS_GATEWAY_URL}/${hash}`;
     console.log('Gateway URL for model:', gatewayUrl);
     console.log('=== Model Retrieval Complete ===\n');
     
@@ -165,15 +107,6 @@ export const uploadModelToIPFS = async (
     console.log('\n=== Starting 3D Model Upload to IPFS ===');
     console.log('Uploading model:', modelFile.name);
     
-    // For development environments, return a mock hash
-    if (process.env.NODE_ENV === 'development' && !PINATA_CREDENTIALS.PINATA_API_KEY.startsWith('real-')) {
-      const mockHash = `mock-model-${Math.random().toString(36).substring(2, 15)}`;
-      console.log('Using mock IPFS hash for development:', mockHash);
-      console.log('=== 3D Model Upload Complete ===\n');
-      return mockHash;
-    }
-    
-    // For real Pinata API access
     const formData = new FormData();
     formData.append('file', modelFile);
     
@@ -217,7 +150,6 @@ export const uploadModelToIPFS = async (
     return `ipfs://${ipfsHash}`;
   } catch (error) {
     console.error('Error uploading model to IPFS:', error);
-    // Return a mock hash in case of error
-    return `mock-model-${Math.random().toString(36).substring(2, 15)}`;
+    throw error;
   }
 };

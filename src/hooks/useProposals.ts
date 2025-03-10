@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { PartyProposal } from "@/types/proposals";
 import { ProposalStatus } from "@/types/content";
 import { PARTY_PROTOCOL, PARTY_GOVERNANCE_ABI } from "@/lib/constants";
+import { toast } from "@/hooks/use-toast";
 
 export const useProposals = (partyAddress?: string) => {
   return useQuery({
@@ -16,8 +17,7 @@ export const useProposals = (partyAddress?: string) => {
         
         // Check if window.ethereum is available (in browser with wallet)
         if (!window.ethereum) {
-          console.warn("No Ethereum provider available, using fallback data");
-          return getFallbackProposals(partyAddress);
+          throw new Error("No Ethereum provider available");
         }
         
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -30,8 +30,7 @@ export const useProposals = (partyAddress?: string) => {
           console.log(`Found ${proposalCount.toString()} proposals`);
         } catch (error) {
           console.error("Error fetching proposal count:", error);
-          console.warn("The party contract may not be a governance contract or may use a different ABI");
-          return getFallbackProposals(partyAddress);
+          throw new Error("The party contract may not be a governance contract or may use a different ABI");
         }
         
         const proposals: PartyProposal[] = [];
@@ -121,27 +120,40 @@ export const useProposals = (partyAddress?: string) => {
             proposals.push(parsedProposal);
           } catch (proposalError) {
             console.error(`Error fetching proposal ${i}:`, proposalError);
+            toast({
+              title: "Error fetching proposal",
+              description: `Could not load proposal #${i+1}. Please try again later.`,
+              variant: "destructive"
+            });
           }
         }
         
-        // If no proposals found through contract or there was an error, provide fallback
+        // If no proposals found through contract
         if (proposals.length === 0) {
-          console.warn("No proposals found or error fetching proposals. Using fallback mechanism.");
-          
-          // Return fallback proposals
-          return getFallbackProposals(partyAddress);
+          throw new Error("No proposals found");
         }
         
         return proposals;
       } catch (error) {
         console.error("Error fetching proposals:", error);
-        
-        // Return fallback proposals
-        return getFallbackProposals(partyAddress);
+        toast({
+          title: "Failed to fetch proposals",
+          description: `Could not fetch proposals for party ${partyAddress}`,
+          variant: "destructive"
+        });
+        throw error; // Propagate the error to be handled by react-query
       }
     },
     enabled: !!partyAddress,
-    refetchInterval: 30000 // Refresh every 30 seconds
+    refetchInterval: 30000, // Refresh every 30 seconds
+    retry: 2,
+    onError: () => {
+      toast({
+        title: "Error loading proposals",
+        description: "Could not load proposals for this party. Please try again later.",
+        variant: "destructive"
+      });
+    }
   });
 };
 
@@ -158,69 +170,4 @@ function mapContractStatusToUIStatus(statusCode: number): ProposalStatus {
     case 6: return "expired";
     default: return "active";
   }
-}
-
-// Fallback function for development until contract integration is complete
-function getFallbackProposals(partyAddress: string): PartyProposal[] {
-  console.log("Using fallback proposal data for development");
-  
-  return [
-    {
-      id: '1',
-      title: 'Fund Distribution to Contributors',
-      description: 'This proposal will allocate 5 ETH to the development team for their work on establishing the settlement infrastructure.',
-      proposer: '0x1234567890123456789012345678901234567890',
-      status: 'active',
-      votesFor: 15,
-      votesAgainst: 5,
-      createdAt: Math.floor(Date.now() / 1000) - 86400, // 1 day ago
-      timeRemaining: '6 days',
-      transactions: [
-        {
-          target: '0x2345678901234567890123456789012345678901',
-          value: '5',
-          calldata: '0x',
-          signature: 'transfer(address,uint256)'
-        }
-      ]
-    },
-    {
-      id: '2',
-      title: 'Update Settlement Rules',
-      description: 'Modify the settlement governance rules to require 60% majority for all future proposals.',
-      proposer: '0x1234567890123456789012345678901234567890',
-      status: 'passed',
-      votesFor: 25,
-      votesAgainst: 3,
-      createdAt: Math.floor(Date.now() / 1000) - 172800, // 2 days ago
-      timeRemaining: '0 days',
-      transactions: [
-        {
-          target: partyAddress,
-          value: '0',
-          calldata: '0x',
-          signature: 'updateVotingSettings(uint256)'
-        }
-      ]
-    },
-    {
-      id: '3',
-      title: 'Resource Allocation for Defense',
-      description: 'Allocate 2 ETH for securing the settlement perimeter with enhanced protection mechanisms.',
-      proposer: '0x3456789012345678901234567890123456789012',
-      status: 'executed',
-      votesFor: 30,
-      votesAgainst: 1,
-      createdAt: Math.floor(Date.now() / 1000) - 345600, // 4 days ago
-      timeRemaining: '0 days',
-      transactions: [
-        {
-          target: '0x4567890123456789012345678901234567890123',
-          value: '2',
-          calldata: '0x',
-          signature: 'fundSecurity()'
-        }
-      ]
-    }
-  ];
 }
