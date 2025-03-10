@@ -1,10 +1,13 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Shield, Target, AlertTriangle, Biohazard, Clock, User } from 'lucide-react';
+import { Shield, Target, AlertTriangle, Biohazard, Clock, User, ExternalLink } from 'lucide-react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
+import { ToxicButton } from '@/components/ui/toxic-button';
 import { ModelPreview } from './ModelPreview';
+import { CHARACTERS } from '@/components/radiation/NFTDistributionStatus';
 
 export type MarketplaceListingType = 'sentinel' | 'bounty-hunter' | 'survivor' | 'settlement' | 'equipment';
 
@@ -58,6 +61,31 @@ const getRadiationColor = (value: number) => {
   return "text-toxic-neon";
 };
 
+const getOpenSeaLink = (type: MarketplaceListingType) => {
+  switch(type) {
+    case 'sentinel':
+      return "https://opensea.io/collection/resistance-sentinels";
+    case 'bounty-hunter':
+      return "https://opensea.io/collection/resistance-bounty-hunters";
+    case 'survivor':
+      return "https://opensea.io/collection/resistance-survivors";
+    default:
+      return "https://opensea.io/collection/resistance";
+  }
+};
+
+// Helper to find character metadata by name
+const findCharacterByName = (name: string) => {
+  // Search in all character types
+  const allCharacters = [
+    ...CHARACTERS.SENTINEL_CHARACTERS,
+    ...CHARACTERS.BOUNTY_HUNTER_CHARACTERS,
+    ...CHARACTERS.SURVIVOR_CHARACTERS
+  ];
+  
+  return allCharacters.find(char => char.name === name);
+};
+
 export function MarketplaceListingGrid({ listings, className = "", title, onListingClick }: MarketplaceListingGridProps) {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -96,18 +124,23 @@ export function MarketplaceListingGrid({ listings, className = "", title, onList
         initial="hidden"
         animate="show"
       >
-        {listings.map((listing) => (
-          <motion.div key={listing.id} variants={itemVariants}>
-            <div 
-              onClick={() => onListingClick && onListingClick(listing)}
-              className="cursor-pointer"
-            >
+        {listings.map((listing) => {
+          // Try to find character metadata by name to get the real IPFS CID
+          const characterMetadata = findCharacterByName(listing.name);
+          const modelUrl = characterMetadata 
+            ? `https://gateway.pinata.cloud/ipfs/${characterMetadata.ipfsCID}` 
+            : listing.modelUrl;
+          
+          const openSeaLink = getOpenSeaLink(listing.type);
+          
+          return (
+            <motion.div key={listing.id} variants={itemVariants}>
               <ToxicCard className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all overflow-hidden">
                 <div className="p-0">
                   <div className="h-40 bg-gradient-to-b from-toxic-neon/20 to-black/60 relative overflow-hidden">
-                    {listing.modelUrl ? (
+                    {modelUrl ? (
                       <ModelPreview 
-                        modelUrl={listing.modelUrl} 
+                        modelUrl={modelUrl} 
                         height="100%"
                         width="100%"
                         autoRotate={true}
@@ -144,12 +177,36 @@ export function MarketplaceListingGrid({ listings, className = "", title, onList
                         RAD {listing.radiation.value}%
                       </span>
                     </div>
+                    
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      <ToxicButton 
+                        variant="outline" 
+                        size="sm"
+                        className="border-toxic-neon/30"
+                        onClick={() => onListingClick && onListingClick(listing)}
+                      >
+                        View Details
+                      </ToxicButton>
+                      
+                      <ToxicButton 
+                        variant="outline" 
+                        size="sm"
+                        className="border-toxic-neon/30"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(openSeaLink, '_blank');
+                        }}
+                      >
+                        <ExternalLink className="h-3 w-3 mr-1" />
+                        OpenSea
+                      </ToxicButton>
+                    </div>
                   </div>
                 </div>
               </ToxicCard>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          );
+        })}
       </motion.div>
     </div>
   );
