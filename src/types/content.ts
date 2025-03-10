@@ -1,3 +1,4 @@
+
 export interface IPFSContent {
   contentSchema: string;
   contentType: string;

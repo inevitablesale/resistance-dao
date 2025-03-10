@@ -1,320 +1,199 @@
-import { Wallet } from "ethers";
+
+import { ethers } from "ethers";
 import { uploadToIPFS } from "./ipfsService";
-import { ReferralMetadata } from "@/utils/settlementConversion";
-import { NFTClass } from "./alchemyService";
-import { 
-  submitJobReferral, 
-  calculateReferralReward,
-  getBountyHunterTierMultiplier,
-  updateBountyHunterReferralStats
-} from "./jobService";
-import { DynamicContextType } from "@dynamic-labs/sdk-react-core";
-import { ProposalMetadata, IPFSContent } from "@/types/proposals";
+import { IPFSContent } from "@/types/content";
+import { ProposalMetadata } from "@/types/proposals";
 
-// Define export type for Referral status
-export type ReferralStatus = 'active' | 'pending' | 'completed' | 'expired';
+// Import the correct types from the job types file
+import { JobMetadata, JobStatus, mapJobStatusToProposalStatus } from "@/types/jobs";
 
-// Define the Referral type
-export interface Referral {
-  id: string;
+export interface ReferralMetadata {
   type: string;
-  name: string;
-  description: string;
-  referrer: string;
-  referredUsers: string[];
-  rewardPercentage: number;
-  rewards: number;
+  referralCode: string;
+  referrerAddress: string;
+  refereeAddress?: string;
   createdAt: number;
-  status: ReferralStatus;
-  // Party Protocol specific fields
-  partyAddress?: string;
-  proposalId?: string;
+  claimedAt?: number;
+  reward?: string;
+  jobId?: string;
+  status: 'active' | 'claimed' | 'expired';
+  [key: string]: any;
 }
 
-// Define a type that accepts either ethers.Wallet or Dynamic SDK wallet
-export type WalletLike = Wallet | {
-  address?: string;
-  isConnected?: () => Promise<boolean> | boolean;
-  getWalletClient?: () => Promise<any>;
-  disconnect?: () => Promise<void>;
-  connector?: {
-    name?: string;
-    chainId?: number;
-    showWallet?: (options: any) => void;
-    openWallet?: (options: any) => void;
-  };
+// Mock referrals data
+const mockReferrals: ReferralMetadata[] = [
+  {
+    type: "job",
+    referralCode: "JOB1-REF123",
+    referrerAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 3, // 3 days ago
+    reward: "0.05 ETH",
+    jobId: "job-1",
+    status: 'active',
+  },
+  {
+    type: "job",
+    referralCode: "JOB2-REF456",
+    referrerAddress: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 1, // 1 day ago
+    reward: "0.03 ETH",
+    jobId: "job-2",
+    status: 'active',
+  }
+];
+
+// Get referrals for a user
+export const getReferrals = async (address: string): Promise<ReferralMetadata[]> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  return mockReferrals.filter(ref => ref.referrerAddress === address);
 };
 
-/**
- * Creates a new referral using Party Protocol
- */
-export const createReferral = async (
-  wallet: WalletLike,
-  type: string,
-  name: string,
-  description: string,
-  rewardPercentage: number
-): Promise<string | null> => {
+// Create a referral code for a job
+export const createJobReferral = async (
+  wallet: any,
+  jobId: string,
+  jobReward: string
+): Promise<string> => {
   try {
-    console.log(`Creating ${type} referral: ${name}`);
+    const address = await wallet.getAddress();
     
-    // Create referral metadata that matches ProposalMetadata requirements
-    const metadata: ReferralMetadata = {
-      name,
-      description,
-      rewardPercentage,
-      title: name, // Required for ProposalMetadata
-      votingDuration: 86400 * 3, // 3 days in seconds
-      linkedInURL: "", // Required field for ProposalMetadata
-      type, // Add type property that we added to ReferralMetadata
-      referrer: typeof wallet === 'object' && 'address' in wallet ? wallet.address || "" : "",
-      createdAt: Math.floor(Date.now() / 1000)
+    // Calculate referral reward (10% of job reward)
+    const referralPercentage = 0.1;
+    const referralRewardValue = parseFloat(jobReward) * referralPercentage;
+    const referralReward = `${referralRewardValue} ETH`;
+    
+    // Generate a unique referral code
+    const referralCode = `${jobId}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    
+    // Create referral metadata
+    const referral: ReferralMetadata = {
+      type: "job",
+      referralCode,
+      referrerAddress: address,
+      createdAt: Date.now(),
+      reward: referralReward,
+      jobId,
+      status: 'active',
     };
     
-    // Cast to ProposalMetadata to fix the type error
-    const ipfsHash = await uploadToIPFS(metadata as unknown as ProposalMetadata);
-    if (!ipfsHash) {
-      throw new Error("Failed to upload referral metadata to IPFS");
-    }
+    // Add to mock data
+    mockReferrals.push(referral);
     
-    // Generate referral ID
-    const referralId = `ref-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    console.log(`Created referral with ID: ${referralId}`);
-    
-    return referralId;
+    return referralCode;
   } catch (error) {
-    console.error("Error creating referral:", error);
-    return null;
+    console.error("Error creating job referral:", error);
+    throw error;
   }
 };
 
-/**
- * Get referrals for a user
- * @param userAddress User address
- * @param userRole User's NFT class/role
- * @returns Array of referrals
- */
-export const getReferrals = async (
-  userAddress: string,
-  userRole: NFTClass = 'Unknown'
-): Promise<Referral[]> => {
-  try {
-    console.log(`Getting referrals for user ${userAddress} with role ${userRole}`);
-    
-    // Only Bounty Hunters should have active referrals
-    if (userRole !== 'Bounty Hunter') {
-      return [];
-    }
-    
-    // Mock implementation for development
-    // In a real implementation, this would query the user's Bounty Hunter NFT
-    // and extract the referrals from bounty_data.referral_system.active_referrals
-    
-    return [
-      {
-        id: `ref-${Date.now()}-1`,
-        type: "nft-membership",
-        name: "Sentinel Referral",
-        description: "Earn rewards by referring new Sentinel NFT holders",
-        referrer: userAddress,
-        referredUsers: [],
-        rewardPercentage: 5,
-        rewards: 0,
-        createdAt: Math.floor(Date.now() / 1000) - 86400,
-        status: 'active'
-      },
-      {
-        id: `ref-${Date.now()}-2`,
-        type: "job-posting",
-        name: "Settlement Builder Job",
-        description: "Refer qualified candidates for settlement building positions",
-        referrer: userAddress,
-        referredUsers: [],
-        rewardPercentage: 10,
-        rewards: 0,
-        createdAt: Math.floor(Date.now() / 1000) - 172800,
-        status: 'active'
-      }
-    ];
-  } catch (error) {
-    console.error("Error getting referrals:", error);
-    return [];
-  }
+// Check if a referral code is valid
+export const validateReferralCode = async (referralCode: string): Promise<boolean> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  const referral = mockReferrals.find(ref => ref.referralCode === referralCode);
+  return !!referral && referral.status === 'active';
 };
 
-/**
- * Submits a new job referral using Party Protocol
- * @param wallet User wallet
- * @param jobId Job ID
- * @param partyAddress Party address for the job
- * @param referredAddress Address of the referred user
- * @returns Success status
- */
-export const submitReferral = async (
-  wallet: WalletLike,
-  jobId: string,
-  partyAddress: string,
-  referredAddress: string
+// Claim a referral
+export const claimReferral = async (
+  wallet: any,
+  referralCode: string
 ): Promise<boolean> => {
   try {
-    console.log(`Submitting referral ${jobId} for user ${referredAddress}`);
+    const address = await wallet.getAddress();
     
-    if (!('getWalletClient' in wallet)) {
-      throw new Error("Wallet must be a Dynamic SDK wallet to submit a Party Protocol referral");
+    const referral = mockReferrals.find(ref => ref.referralCode === referralCode);
+    if (!referral || referral.status !== 'active') {
+      return false;
     }
     
-    // Get the referrer's address
-    let referrerAddress = "";
-    if (typeof wallet === 'object' && 'address' in wallet) {
-      referrerAddress = wallet.address || "";
-    } else if ('getWalletClient' in wallet) {
-      const walletClient = await wallet.getWalletClient();
-      if (walletClient && walletClient.getAddress) {
-        referrerAddress = await walletClient.getAddress();
-      }
-    }
-    
-    if (!referrerAddress) {
-      throw new Error("Could not determine referrer address");
-    }
-    
-    // Get the referrer's tier multiplier (based on Bounty Hunter NFT metadata)
-    const tierMultiplier = await getBountyHunterTierMultiplier(referrerAddress);
-    
-    // Calculate the referral reward
-    const referralReward = calculateReferralReward(
-      jobReward,
-      tierMultiplier,
-      referralPercentage
-    );
-    
-    console.log(`Calculated referral reward: ${referralReward} ETH (${tierMultiplier}x multiplier)`);
-    
-    // Submit the referral through the job service
-    const result = await submitJobReferral(
-      wallet,
-      jobId,
-      partyAddress,
-      referredAddress
-    );
-    
-    if (result) {
-      // Update the Bounty Hunter's referral stats
-      // This would normally be handled by the smart contract, but we're doing it here
-      // for the mock implementation
-      await updateBountyHunterReferralStats(
-        referrerAddress,
-        {
-          referralId: `ref-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-          jobId,
-          applicantAddress: referredAddress,
-          applicantClass: 'Unknown', // Would need to query the applicant's NFT
-          rewardAmount: referralReward
-        }
-      );
-    }
-    
-    return result;
-  } catch (error) {
-    console.error("Error submitting referral:", error);
-    return false;
-  }
-};
-
-/**
- * Claims a referral reward using Party Protocol
- * @param wallet User wallet
- * @param referralId Referral ID
- * @param partyAddress Party address
- * @param proposalId Proposal ID for the accepted referral
- * @returns Success status
- */
-export const claimReferralReward = async (
-  wallet: WalletLike,
-  referralId: string,
-  partyAddress: string,
-  proposalId: string
-): Promise<boolean> => {
-  try {
-    console.log(`Claiming reward for referral ${referralId}`);
-    
-    if (!('getWalletClient' in wallet)) {
-      throw new Error("Wallet must be a Dynamic SDK wallet to claim a Party Protocol referral reward");
-    }
-    
-    // In a real implementation, this would create a proposal to distribute
-    // the referral reward from the party to the referrer
-    // For now, we'll just return success
+    // Update referral data
+    referral.refereeAddress = address;
+    referral.claimedAt = Date.now();
+    referral.status = 'claimed';
     
     return true;
   } catch (error) {
-    console.error("Error claiming referral reward:", error);
+    console.error("Error claiming referral:", error);
     return false;
   }
 };
 
-/**
- * Gets the tier information for a Bounty Hunter
- * @param bountyHunterAddress Address of the Bounty Hunter NFT holder
- * @returns Tier information
- */
-export const getBountyHunterTier = async (
-  bountyHunterAddress: string
-): Promise<{
-  currentTier: string;
-  totalReferrals: number;
-  tierMultiplier: number;
-  nextTierThreshold: number;
-}> => {
+// Upload referral data to IPFS
+export const uploadReferralToIPFS = async (
+  referralMetadata: ReferralMetadata,
+  jobMetadata?: JobMetadata
+): Promise<string> => {
   try {
-    // This would normally query the Bounty Hunter NFT metadata
-    // For now we'll return mock data
-    return {
-      currentTier: "Initiate",
-      totalReferrals: 0,
-      tierMultiplier: 1.0,
-      nextTierThreshold: 5
+    // Calculate referral reward if it's a job referral
+    let referralReward = referralMetadata.reward;
+    if (jobMetadata && jobMetadata.reward) {
+      // Default to 10% if not specified
+      const referralPercentage = 0.1;
+      const jobRewardValue = parseFloat(jobMetadata.reward);
+      const referralRewardValue = jobRewardValue * referralPercentage;
+      referralReward = `${referralRewardValue} ETH`;
+    }
+    
+    // Create IPFS content structure
+    const content: IPFSContent = {
+      contentSchema: "referral-v1",
+      contentType: "referral",
+      title: `Referral: ${referralMetadata.referralCode}`,
+      content: "Referral data",
+      metadata: {
+        ...referralMetadata,
+        reward: referralReward,
+      },
     };
+    
+    // Upload to IPFS
+    const ipfsHash = await uploadToIPFS(content);
+    return ipfsHash;
   } catch (error) {
-    console.error("Error getting Bounty Hunter tier:", error);
-    return {
-      currentTier: "Unknown",
-      totalReferrals: 0,
-      tierMultiplier: 1.0,
-      nextTierThreshold: 999
-    };
+    console.error("Error uploading referral to IPFS:", error);
+    throw error;
   }
 };
 
-/**
- * Gets the referral statistics for a Bounty Hunter
- * @param bountyHunterAddress Address of the Bounty Hunter NFT holder
- * @returns Referral statistics
- */
-export const getReferralStats = async (
-  bountyHunterAddress: string
-): Promise<{
-  sentinelReferrals: number;
-  survivorReferrals: number;
-  hunterReferrals: number;
-  totalEarnings: number;
-}> => {
+// Update useReferrals hook to fix the argument mismatch
+export const processReferralCreation = async (
+  wallet: any,
+  jobId: string,
+  jobReward: string,
+  jobTitle: string,
+  referralPercentage: number
+): Promise<string> => {
   try {
-    // This would normally query the Bounty Hunter NFT metadata
-    // For now we'll return mock data
-    return {
-      sentinelReferrals: 0,
-      survivorReferrals: 0,
-      hunterReferrals: 0,
-      totalEarnings: 0
+    const address = await wallet.getAddress();
+    
+    // Generate a unique referral code
+    const referralCode = `${jobId}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    
+    // Calculate referral reward
+    const referralRewardValue = parseFloat(jobReward) * referralPercentage;
+    const referralReward = `${referralRewardValue} ETH`;
+    
+    // Create referral metadata
+    const referral: ReferralMetadata = {
+      type: "job",
+      referralCode,
+      referrerAddress: address,
+      createdAt: Date.now(),
+      reward: referralReward,
+      jobId,
+      status: 'active',
     };
+    
+    // Add to mock data
+    mockReferrals.push(referral);
+    
+    return referralCode;
   } catch (error) {
-    console.error("Error getting referral stats:", error);
-    return {
-      sentinelReferrals: 0,
-      survivorReferrals: 0,
-      hunterReferrals: 0,
-      totalEarnings: 0
-    };
+    console.error("Error processing referral creation:", error);
+    throw error;
   }
 };

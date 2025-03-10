@@ -1,66 +1,63 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { ethers } from "ethers"; 
 import { useToast } from "./use-toast";
-import { NFTClass, getPrimaryRole } from "@/services/alchemyService";
-import { 
-  createReferral, 
-  submitReferral, 
-  claimReferralReward,
+import {
   getReferrals,
-  Referral,
-  ReferralStatus
+  createJobReferral,
+  validateReferralCode,
+  claimReferral,
+  ReferralMetadata,
+  processReferralCreation
 } from "@/services/referralService";
-import { ReferralMetadata } from "@/utils/settlementConversion";
 
 export const useReferrals = () => {
   const { toast } = useToast();
   const { primaryWallet } = useDynamicContext();
-  const [userRole, setUserRole] = useState<NFTClass>('Unknown');
-  
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+
+  // Get wallet address when it changes
   useEffect(() => {
-    const checkRole = async () => {
+    const getAddress = async () => {
       if (primaryWallet) {
         try {
           const address = await primaryWallet.address;
-          const role = await getPrimaryRole(address);
-          setUserRole(role);
+          setWalletAddress(address);
         } catch (error) {
-          console.error("Error checking user role:", error);
+          console.error("Error getting address:", error);
         }
+      } else {
+        setWalletAddress(null);
       }
     };
-    
-    checkRole();
+
+    getAddress();
   }, [primaryWallet]);
-  
-  const { data: userReferrals = [], isLoading: isLoadingReferrals, refetch: refetchReferrals } = useQuery({
-    queryKey: ['userReferrals', primaryWallet?.address],
+
+  // Fetch user's referrals
+  const {
+    data: referrals = [],
+    isLoading: isLoadingReferrals,
+    refetch: refetchReferrals,
+  } = useQuery({
+    queryKey: ["referrals", walletAddress],
     queryFn: async () => {
-      if (!primaryWallet) return [];
-      
+      if (!walletAddress) return [];
       try {
-        const address = await primaryWallet.address;
-        return await getReferrals(address);
+        return await getReferrals(walletAddress);
       } catch (error) {
         console.error("Error fetching referrals:", error);
         return [];
       }
     },
-    enabled: !!primaryWallet,
+    enabled: !!walletAddress,
   });
 
-  const referrals = userReferrals;
-  const isCreatingReferral = false;
-  const canCreateReferral = userRole === 'Bounty Hunter';
-  
-  const createNewReferral = async (
-    type: string,
-    name: string,
-    description: string,
-    rewardPercentage: number,
-    extraData: any = {}
+  // Create a job referral
+  const createReferral = async (
+    jobId: string,
+    jobReward: string
   ) => {
     if (!primaryWallet) {
       toast({
@@ -70,162 +67,162 @@ export const useReferrals = () => {
       });
       return null;
     }
-    
-    if (userRole !== 'Bounty Hunter') {
-      toast({
-        title: "Access Denied",
-        description: "Only Bounty Hunters can create referrals.",
-        variant: "destructive",
-      });
-      return null;
-    }
-    
+
     try {
       toast({
         title: "Creating Referral",
-        description: "Please approve the transaction to create your referral pool.",
+        description: "Please wait while we create your referral code.",
       });
-      
-      const referralId = await createReferral(
-        primaryWallet as unknown as ethers.Wallet, 
-        type, 
-        name, 
-        description, 
-        rewardPercentage
-      );
-      
-      if (referralId) {
+
+      const wallet = await primaryWallet.getWalletClient();
+      const referralCode = await createJobReferral(wallet, jobId, jobReward);
+
+      if (referralCode) {
         toast({
           title: "Referral Created",
-          description: "Your referral pool has been created successfully.",
+          description: `Your referral code is: ${referralCode}`,
         });
-        
+
+        // Refresh referrals list
         refetchReferrals();
-        
-        return referralId;
+
+        return referralCode;
       }
-      
+
       return null;
     } catch (error) {
       console.error("Error creating referral:", error);
       toast({
         title: "Error Creating Referral",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
       });
       return null;
     }
   };
-  
-  const submitNewReferral = async (
-    referralId: string, 
-    referredAddress: string,
-    metadata: any = {}
+
+  // Validate a referral code
+  const validateReferral = async (referralCode: string) => {
+    try {
+      return await validateReferralCode(referralCode);
+    } catch (error) {
+      console.error("Error validating referral:", error);
+      return false;
+    }
+  };
+
+  // Claim a referral
+  const claimReferralCode = async (referralCode: string) => {
+    if (!primaryWallet) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to claim this referral.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    try {
+      toast({
+        title: "Claiming Referral",
+        description: "Please wait while we process your referral claim.",
+      });
+
+      const wallet = await primaryWallet.getWalletClient();
+      const success = await claimReferral(wallet, referralCode);
+
+      if (success) {
+        toast({
+          title: "Referral Claimed",
+          description: "You have successfully claimed this referral.",
+        });
+
+        return true;
+      }
+
+      toast({
+        title: "Referral Claim Failed",
+        description: "Unable to claim this referral code.",
+        variant: "destructive",
+      });
+
+      return false;
+    } catch (error) {
+      console.error("Error claiming referral:", error);
+      toast({
+        title: "Error Claiming Referral",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  // Create a referral for a job with detailed information
+  const processReferral = async (
+    jobId: string,
+    jobReward: string,
+    jobTitle: string,
+    referralPercentage: number = 0.1 // Default 10%
   ) => {
     if (!primaryWallet) {
       toast({
         title: "Wallet Required",
-        description: "Please connect your wallet to submit a referral.",
+        description: "Please connect your wallet to create a referral.",
         variant: "destructive",
       });
-      return false;
+      return null;
     }
-    
+
     try {
       toast({
-        title: "Submitting Referral",
-        description: "Please approve the transaction to submit your referral.",
+        title: "Creating Referral",
+        description: "Please wait while we create your referral code.",
       });
-      
-      const success = await submitReferral(
-        primaryWallet as unknown as ethers.Wallet,
-        referralId,
-        "",
-        referredAddress
+
+      const wallet = await primaryWallet.getWalletClient();
+      const referralCode = await processReferralCreation(
+        wallet, 
+        jobId, 
+        jobReward, 
+        jobTitle, 
+        referralPercentage
       );
-      
-      if (success) {
+
+      if (referralCode) {
         toast({
-          title: "Referral Submitted",
-          description: "Your referral has been submitted successfully.",
+          title: "Referral Created",
+          description: `Your referral code is: ${referralCode}`,
         });
-        
+
+        // Refresh referrals list
         refetchReferrals();
-        
-        return true;
+
+        return referralCode;
       }
-      
-      return false;
+
+      return null;
     } catch (error) {
-      console.error("Error submitting referral:", error);
+      console.error("Error creating referral:", error);
       toast({
-        title: "Error Submitting Referral",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        title: "Error Creating Referral",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
       });
-      return false;
+      return null;
     }
   };
-  
-  const claimReward = async (referralId: string) => {
-    if (!primaryWallet) {
-      toast({
-        title: "Wallet Required",
-        description: "Please connect your wallet to claim your reward.",
-        variant: "destructive",
-      });
-      return false;
-    }
-    
-    try {
-      toast({
-        title: "Claiming Reward",
-        description: "Please approve the transaction to claim your referral reward.",
-      });
-      
-      const success = await claimReferralReward(
-        primaryWallet as unknown as ethers.Wallet,
-        referralId
-      );
-      
-      if (success) {
-        toast({
-          title: "Reward Claimed",
-          description: "Your referral reward has been claimed successfully.",
-        });
-        
-        refetchReferrals();
-        
-        return true;
-      }
-      
-      return false;
-    } catch (error) {
-      console.error("Error claiming reward:", error);
-      toast({
-        title: "Error Claiming Reward",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-  
-  const generateReferralLink = (referralId: string) => {
-    return `${window.location.origin}/referrals/${referralId}`;
-  };
-  
+
   return {
-    userRole,
-    userReferrals,
-    isLoadingReferrals,
-    createReferral: createNewReferral,
-    submitNewReferral,
-    claimReward,
-    generateReferralLink,
-    refetchReferrals,
     referrals,
-    isCreatingReferral,
-    canCreateReferral
+    isLoadingReferrals,
+    createReferral,
+    validateReferral,
+    claimReferralCode,
+    processReferral,
+    refetchReferrals,
   };
 };
