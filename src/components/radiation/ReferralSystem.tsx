@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicButton } from '@/components/ui/toxic-button';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
@@ -8,119 +8,39 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { useReferrals } from '@/hooks/useReferrals';
+import { Link } from 'react-router-dom';
 
 interface ReferralSystemProps {
-  earnings?: number;
-  totalReferrals?: number;
   className?: string;
 }
 
-export function ReferralSystem({ earnings = 0, totalReferrals = 0, className = "" }: ReferralSystemProps) {
-  const { address, isConnected, getReferrer } = useCustomWallet();
+export function ReferralSystem({ className = "" }: ReferralSystemProps) {
+  const { isConnected } = useCustomWallet();
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
-  const [referralStats, setReferralStats] = useState({
-    totalReferrals: totalReferrals || 0,
-    pendingReferrals: 0,
-    completedReferrals: 0,
-    earnings: earnings || 0,
-    pendingPayouts: 0
-  });
-  const [loading, setLoading] = useState(false);
   
-  // Generate referral link based on connected wallet
-  const referralLink = isConnected && address 
-    ? `${window.location.origin}/r/${address}` 
-    : 'Connect wallet to generate your referral link';
-  
-  // Check if this user was referred by someone
-  useEffect(() => {
-    const referrer = getReferrer();
-    if (referrer && isConnected) {
-      console.log("This user was referred by:", referrer);
-    }
-  }, [getReferrer, isConnected]);
-  
-  // Load referral data from Supabase when wallet is connected
-  useEffect(() => {
-    if (!isConnected || !address) return;
-    
-    const fetchReferralData = async () => {
-      setLoading(true);
-      try {
-        // Query for referrals where this user is the referrer
-        const { data: referrals, error } = await supabase
-          .from('referrals')
-          .select('*')
-          .eq('referrer_address', address);
-          
-        if (error) throw error;
-        
-        if (referrals) {
-          // Count total, pending, and completed referrals
-          const pending = referrals.filter(r => !r.nft_purchased).length;
-          const completed = referrals.filter(r => r.nft_purchased).length;
-          
-          // Calculate earnings ($25 per completed referral)
-          const totalEarnings = completed * 25;
-          
-          // Count pending payouts
-          const pendingPayouts = referrals.filter(r => r.nft_purchased && !r.payment_processed).length * 25;
-          
-          setReferralStats({
-            totalReferrals: referrals.length,
-            pendingReferrals: pending,
-            completedReferrals: completed,
-            earnings: totalEarnings,
-            pendingPayouts: pendingPayouts
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching referral data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchReferralData();
-  }, [address, isConnected]);
+  const { 
+    stats, 
+    isLoadingStats, 
+    referralLink,
+    copyReferralLink,
+    shareReferralLink
+  } = useReferrals();
   
   const copyToClipboard = () => {
-    if (!isConnected) return;
-    
-    navigator.clipboard.writeText(referralLink);
+    copyReferralLink();
     setCopied(true);
-    
-    toast({
-      title: "Referral Link Copied!",
-      description: "Your unique referral link has been copied to clipboard.",
-    });
-    
     setTimeout(() => setCopied(false), 2000);
-  };
-  
-  const shareReferral = () => {
-    if (!isConnected) return;
-    
-    if (navigator.share) {
-      navigator.share({
-        title: 'Join the Wasteland Resistance',
-        text: 'Claim your free NFT and help rebuild civilization in the Wasteland!',
-        url: referralLink,
-      });
-    } else {
-      copyToClipboard();
-    }
   };
 
   // Calculate percentage of tier progress
   const tierThresholds = [5, 10, 25, 50, 100];
-  const currentTier = tierThresholds.findIndex(t => referralStats.completedReferrals < t);
+  const currentTier = tierThresholds.findIndex(t => stats.completedReferrals < t);
   const currentThreshold = currentTier > 0 ? tierThresholds[currentTier - 1] : 0;
   const nextThreshold = currentTier >= 0 ? tierThresholds[currentTier] : tierThresholds[0];
   const tierProgress = currentTier >= 0 
-    ? ((referralStats.completedReferrals - currentThreshold) / (nextThreshold - currentThreshold)) * 100
+    ? ((stats.completedReferrals - currentThreshold) / (nextThreshold - currentThreshold)) * 100
     : 100;
   
   const getTierName = (completedReferrals: number) => {
@@ -152,31 +72,31 @@ export function ReferralSystem({ earnings = 0, totalReferrals = 0, className = "
                 <div className="text-white/70 text-sm">Total Earnings</div>
                 <div className="text-xl font-mono text-toxic-neon flex justify-center items-center gap-1">
                   <DollarSign className="h-4 w-4" />
-                  {referralStats.earnings}
+                  {isLoadingStats ? "..." : stats.earnings}
                 </div>
               </div>
               <div className="text-center">
                 <div className="text-white/70 text-sm">Successful Referrals</div>
                 <div className="text-xl font-mono text-toxic-neon flex justify-center items-center gap-1">
                   <Users className="h-4 w-4" />
-                  {referralStats.completedReferrals}
+                  {isLoadingStats ? "..." : stats.completedReferrals}
                 </div>
               </div>
             </div>
             
             <div className="mt-3">
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-white/60">{getTierName(referralStats.completedReferrals)}</span>
+                <span className="text-white/60">{getTierName(stats.completedReferrals)}</span>
                 {currentTier >= 0 && (
                   <span className="text-toxic-neon">
-                    {referralStats.completedReferrals}/{nextThreshold} to {getTierName(nextThreshold)}
+                    {stats.completedReferrals}/{nextThreshold} to {getTierName(nextThreshold)}
                   </span>
                 )}
               </div>
               <Progress 
                 value={tierProgress} 
                 className="h-2"
-                indicatorClassName={referralStats.completedReferrals >= 100 ? "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]" : ""}
+                indicatorClassName={stats.completedReferrals >= 100 ? "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]" : ""}
               />
             </div>
           </div>
@@ -209,7 +129,7 @@ export function ReferralSystem({ earnings = 0, totalReferrals = 0, className = "
             </ToxicButton>
             <ToxicButton 
               variant="outline"
-              onClick={shareReferral}
+              onClick={shareReferralLink}
               className="border-toxic-neon/30"
             >
               <Share2 className="h-4 w-4 mr-2" />
@@ -235,10 +155,10 @@ export function ReferralSystem({ earnings = 0, totalReferrals = 0, className = "
                 <span className="text-white/70">Bounty Hunter</span>
                 <span className="text-toxic-neon">Free Claim</span>
               </div>
-              {referralStats.pendingPayouts > 0 && (
+              {stats.pendingPayouts > 0 && (
                 <div className="flex justify-between pt-2 border-t border-toxic-neon/20">
                   <span className="text-amber-400">Pending Payouts</span>
-                  <span className="text-amber-400">${referralStats.pendingPayouts}</span>
+                  <span className="text-amber-400">${stats.pendingPayouts}</span>
                 </div>
               )}
             </div>
@@ -255,12 +175,14 @@ export function ReferralSystem({ earnings = 0, totalReferrals = 0, className = "
       )}
       
       <div className="mt-4">
-        <ToxicBadge variant="outline" className="w-full flex justify-between items-center py-2 bg-black/40 border-toxic-neon/30">
-          <span className="flex items-center text-white/70">
-            <ArrowUp className="h-3 w-3 mr-1 text-toxic-neon" /> Refer Friends
-          </span>
-          <span className="text-toxic-neon">Lower Radiation</span>
-        </ToxicBadge>
+        <Link to="/referrals">
+          <ToxicBadge variant="outline" className="w-full flex justify-between items-center py-2 bg-black/40 border-toxic-neon/30">
+            <span className="flex items-center text-white/70">
+              <ArrowUp className="h-3 w-3 mr-1 text-toxic-neon" /> View Full Dashboard
+            </span>
+            <span className="text-toxic-neon">Manage Referrals</span>
+          </ToxicBadge>
+        </Link>
       </div>
     </ToxicCard>
   );

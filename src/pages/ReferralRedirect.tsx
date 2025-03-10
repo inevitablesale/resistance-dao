@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { Progress } from "@/components/ui/progress";
+import { createReferral } from "@/services/referralService";
 
 const ReferralRedirect = () => {
   const { referrerAddress } = useParams();
@@ -53,42 +53,16 @@ const ReferralRedirect = () => {
         // If user is connected, record the referral in Supabase
         if (isConnected && address) {
           try {
-            // Check if self-referring (prevent this)
-            if (address.toLowerCase() === referrerAddress.toLowerCase()) {
-              console.log("Self-referral detected - ignoring");
-              return;
+            // Record the referral using our service
+            const result = await createReferral(referrerAddress, address);
+            
+            if (result.success) {
+              console.log("Referral recorded successfully");
+            } else if (result.error !== "This referral already exists") {
+              console.error("Error recording referral:", result.error);
             }
-            
-            // Check if this referral already exists
-            const { data: existingReferrals } = await supabase
-              .from('referrals')
-              .select('id')
-              .eq('referrer_address', referrerAddress)
-              .eq('referred_address', address);
-              
-            if (existingReferrals && existingReferrals.length > 0) {
-              console.log("Referral already exists");
-              return;
-            }
-            
-            // Record the new referral in Supabase
-            const { error } = await supabase
-              .from('referrals')
-              .insert([
-                { 
-                  referrer_address: referrerAddress,
-                  referred_address: address,
-                  referral_date: new Date().toISOString(),
-                  nft_purchased: false,
-                  payment_processed: false
-                }
-              ]);
-              
-            if (error) throw error;
-            
-            console.log("Referral recorded successfully");
           } catch (error) {
-            console.error("Error recording referral:", error);
+            console.error("Error processing referral:", error);
           }
         }
         
