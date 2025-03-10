@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -84,7 +85,6 @@ const Index = () => {
   
   const [authState, setAuthState] = useState<AuthState>("unauthenticated");
   const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
-  const [activeRole, setActiveRole] = useState<'sentinel' | 'pioneer'>('sentinel');
   const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
   
   // New states for radiation system
@@ -115,18 +115,6 @@ const Index = () => {
     }, 1000);
   };
 
-  const handleListingClick = (listing: MarketplaceListing) => {
-    navigate(`/marketplace/${listing.id}`);
-  };
-  
-  const handleCreateListing = () => {
-    navigate('/marketplace/create');
-  };
-  
-  const handleBrowseListings = () => {
-    navigate('/marketplace');
-  };
-
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(Math.round(num));
   };
@@ -148,199 +136,6 @@ const Index = () => {
     bountyHunterRatio: 35
   };
   
-  const sentinelListings: MarketplaceListing[] = [
-    {
-      id: 1,
-      type: 'sentinel',
-      name: "Strategic Commander X-35",
-      tokenId: 1,
-      price: "15,000 RD",
-      seller: "0x1234...5678",
-      radiation: {
-        level: "Immune",
-        value: 100
-      },
-      attributes: [
-        { trait: "Governance Rank", value: "Settlement Architect" },
-        { trait: "Voting Power", value: "High" },
-        { trait: "Investment Ability", value: "Strategic" }
-      ],
-      status: 'active',
-      role: "Strategic Commander",
-      rank: "Veteran",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiheog5wgtnl7ldazmsj3n7xmkgkzpjnix5e4tuxndzw7j3bgkp2n4"
-    },
-    {
-      id: 2,
-      type: 'sentinel',
-      name: "Financial Overseer K-42",
-      tokenId: 42,
-      price: "32,000 RD",
-      seller: "0x8765...4321",
-      radiation: {
-        level: "Immune",
-        value: 100
-      },
-      attributes: [
-        { trait: "Governance Rank", value: "Financial Overseer" },
-        { trait: "Voting Power", value: "Critical" },
-        { trait: "Investment Ability", value: "Economic" }
-      ],
-      status: 'active',
-      role: "Financial Overseer",
-      rank: "Elite",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiavqxeov62wgj6upfpvq6g4vpvot4mnwl3ggunxp27sbfjgs4hlfq"
-    },
-    {
-      id: 3,
-      type: 'sentinel',
-      name: "Trade Commissioner B-007",
-      tokenId: 7,
-      price: "50,000 RD",
-      seller: "0x9876...5432",
-      radiation: {
-        level: "Immune",
-        value: 100
-      },
-      attributes: [
-        { trait: "Governance Rank", value: "Trade Commissioner" },
-        { trait: "Voting Power", value: "High" },
-        { trait: "Investment Ability", value: "Diplomatic" }
-      ],
-      status: 'active',
-      role: "Trade Commissioner",
-      rank: "Legend",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeig47okn4sqqbajhje57htkxw6py3tdms7boyc3hkvvr4qlj7zsabu"
-    }
-  ];
-  
-  const bountyHunterListings: MarketplaceListing[] = [
-    {
-      id: 4,
-      type: 'bounty-hunter',
-      name: "Protocol Tracker S-17",
-      tokenId: 17,
-      price: "18,500 RD",
-      seller: "0x2468...1357",
-      radiation: {
-        level: "Medium",
-        value: 58
-      },
-      attributes: [
-        { trait: "Hunter Class", value: "Scout" },
-        { trait: "Specialization", value: "Protocol Security" },
-        { trait: "Operating Territory", value: "Wastelands" }
-      ],
-      status: 'active',
-      role: "Protocol Tracker",
-      rank: "Feared",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeifzvpyj5znhgjq22cbjyzav5zsvese3m3klbkc4lcdm3fdbbxiooa"
-    },
-    {
-      id: 5,
-      type: 'bounty-hunter',
-      name: "Asset Recovery A-67",
-      tokenId: 67,
-      price: "24,000 RD",
-      seller: "0x1357...2468",
-      radiation: {
-        level: "High",
-        value: 72
-      },
-      attributes: [
-        { trait: "Hunter Class", value: "Apex" },
-        { trait: "Specialization", value: "Asset Recovery" },
-        { trait: "Operating Territory", value: "Cyber Core" }
-      ],
-      status: 'active',
-      role: "Asset Recovery",
-      rank: "Respected"
-    },
-    {
-      id: 6,
-      type: 'bounty-hunter',
-      name: "Network Infiltrator L-89",
-      tokenId: 89,
-      price: "36,500 RD",
-      seller: "0x6543...7890",
-      radiation: {
-        level: "Critical",
-        value: 85
-      },
-      attributes: [
-        { trait: "Hunter Class", value: "Legend" },
-        { trait: "Specialization", value: "Network Infiltration" },
-        { trait: "Operating Territory", value: "Deep Zone" }
-      ],
-      status: 'active',
-      role: "Network Infiltrator",
-      rank: "Infamous"
-    }
-  ];
-  
-  const survivorListings: MarketplaceListing[] = [
-    {
-      id: 7,
-      type: 'survivor',
-      name: "Engineer Pioneer R-12",
-      tokenId: 12,
-      price: "12,500 RD",
-      seller: "0x5555...6666",
-      radiation: {
-        level: "Low",
-        value: 28
-      },
-      attributes: [
-        { trait: "Survivor Role", value: "Engineer" },
-        { trait: "Specialty", value: "Construction" },
-        { trait: "Settlement", value: "New Haven" }
-      ],
-      status: 'active',
-      role: "Engineer",
-      rank: "Veteran"
-    },
-    {
-      id: 8,
-      type: 'survivor',
-      name: "Medic Support M-23",
-      tokenId: 23,
-      price: "9,800 RD",
-      seller: "0x7777...8888",
-      radiation: {
-        level: "Medium",
-        value: 45
-      },
-      attributes: [
-        { trait: "Survivor Role", value: "Medic" },
-        { trait: "Specialty", value: "Medicine" },
-        { trait: "Settlement", value: "Outpost Alpha" }
-      ],
-      status: 'active',
-      role: "Medic",
-      rank: "Skilled"
-    },
-    {
-      id: 9,
-      type: 'survivor',
-      name: "Settlement Leader T-01",
-      tokenId: 1,
-      price: "42,000 RD",
-      seller: "0x9999...0000",
-      radiation: {
-        level: "High",
-        value: 65
-      },
-      attributes: [
-        { trait: "Survivor Role", value: "Settlement Leader" },
-        { trait: "Specialty", value: "Resource Management" },
-        { trait: "Settlement", value: "Reactor City" }
-      ],
-      status: 'active',
-      role: "Settlement Leader",
-      rank: "Master"
-    }
-  ];
-
   const recentActivities: MarketplaceActivity[] = [
     {
       id: "act-1",
@@ -424,7 +219,7 @@ const Index = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
-            {/* Removing the role cards section as requested */}
+            {/* All role cards have been completely removed */}
           </div>
           
           <div className="lg:col-span-1">
