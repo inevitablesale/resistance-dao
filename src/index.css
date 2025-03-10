@@ -1,218 +1,130 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 47.4% 11.2%;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 47.4% 11.2%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --border: 219.5 18.3% 12.9%;
-    --input: 219.5 18.3% 12.9%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --ring: 217.2 32.6% 17.5%;
-  }
+  /* Resistance theme colors */
+  --toxic-neon: #39FF14;
+  --apocalypse-red: #FF3D3D;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings:
-      "rlig" 1,
-      "calt" 1;
-  }
+body {
+  margin: 0;
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: black;
 }
 
-/* Custom Styles */
-.toxic-neon-text {
-  text-shadow: 0 0 5px theme('colors.toxic.neon');
+#root {
+  width: 100%;
 }
 
+/* Post-apocalyptic background */
 .post-apocalyptic-bg {
-  background-image: url('/images/bg/noisy-texture.png');
-  background-size: cover;
-  background-repeat: repeat;
+  background-color: black;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(40, 40, 40, 0.3) 0%, rgba(0, 0, 0, 0.5) 100%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 100%);
+  background-attachment: fixed;
 }
 
-.dust-particles {
+/* Scanline effect */
+.scanline {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('/images/bg/dust-particles.gif');
-  background-size: cover;
-  background-repeat: repeat;
-  opacity: 0.4;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.3;
+}
+
+.scanline::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: rgba(57, 255, 20, 0.5);
+  opacity: 0.75;
+  animation: scanline 6s linear infinite;
+}
+
+@keyframes scanline {
+  0% {
+    top: 0%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+/* Fog overlay */
+.fog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
   pointer-events: none;
   z-index: 1;
 }
 
-.fog-overlay {
-  position: absolute;
+/* Dust particles */
+.dust-particles {
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('/images/bg/fog-overlay.png');
-  background-size: cover;
-  background-repeat: repeat;
-  opacity: 0.3;
-  pointer-events: none;
+  overflow: hidden;
   z-index: 2;
+  pointer-events: none;
 }
 
-/* Terminal Styles */
-.terminal {
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
-  line-height: 1.4;
+.dust-particles::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 0;
+  width: 100%;
+  height: calc(100% + 20px);
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 100px 100px;
+  animation: dust 60s linear infinite;
 }
 
-.terminal-input {
-  color: theme('colors.toxic.neon');
-}
-
-.terminal-output {
-  color: theme('colors.white');
-}
-
-/* Animation Keyframes */
-@keyframes toxic-pulse {
+@keyframes dust {
   0% {
-    box-shadow: 0 0 5px theme('colors.toxic.neon');
-  }
-  50% {
-    box-shadow: 0 0 15px theme('colors.toxic.neon');
+    transform: translateY(0);
   }
   100% {
-    box-shadow: 0 0 5px theme('colors.toxic.neon');
+    transform: translateY(-100px);
   }
 }
 
-.animate-toxic-pulse {
-  animation: toxic-pulse 2s infinite;
-}
-
-/* Radiation Effect Styles */
-.radiation-scan-lines {
-  background-image: linear-gradient(
-    0deg,
-    transparent 0%,
-    rgba(57, 255, 20, 0.1) 50%,
-    transparent 100%
-  );
-  background-size: 100% 4px;
-  animation: scanlines 2s linear infinite;
-}
-
-@keyframes scanlines {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 0 100px;
-  }
-}
-
-.radiation-pulse-circles {
-  filter: blur(1px);
-}
-
-.animation-delay-300 {
-  animation-delay: 300ms;
-}
-
-.flash-critical {
-  animation: flash-critical 1.5s ease-in-out infinite;
-}
-
-@keyframes flash-critical {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
-  }
-}
-
-.toxic-glow {
-  filter: drop-shadow(0 0 5px rgba(57, 255, 20, 0.5));
-}
-
-.status-critical {
-  animation: pulse-text 2s ease-in-out infinite;
-  text-shadow: 0 0 8px rgba(255, 41, 41, 0.7);
-}
-
-@keyframes pulse-text {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
+/* Broken glass effect */
 .broken-glass {
   position: relative;
   overflow: hidden;
@@ -225,7 +137,431 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18l5-7m10 7l-5-7M31 18l5-7m10 7l-5-7M51 18l5-7m10 7l-5-7M71 18l5-7' stroke='rgba(57, 255, 20, 0.05)' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-  opacity: 0.1;
+  background: 
+    linear-gradient(45deg, rgba(255, 255, 255, 0) 45%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0) 45%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0) 55%);
+  background-size: 20px 20px;
   pointer-events: none;
+  z-index: 1;
+}
+
+/* Toxic glow effect */
+.toxic-glow {
+  text-shadow: 0 0 5px var(--toxic-neon), 0 0 10px var(--toxic-neon), 0 0 20px var(--toxic-neon);
+}
+
+/* Enhanced terminal styles */
+.terminal-content {
+  font-family: monospace;
+  line-height: 1.6;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(57, 255, 20, 0.3) rgba(0, 0, 0, 0.5);
+}
+
+.terminal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.terminal-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.terminal-content::-webkit-scrollbar-thumb {
+  background-color: rgba(57, 255, 20, 0.3);
+  border-radius: 20px;
+}
+
+.terminal-content p {
+  margin-bottom: 1rem;
+}
+
+/* Matrix-like rain effect for special terminal sections */
+.matrix-rain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  opacity: 0.2;
+  overflow: hidden;
+}
+
+.matrix-rain::before {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 200%;
+  background: linear-gradient(0deg, 
+    rgba(57, 255, 20, 0) 0%, 
+    rgba(57, 255, 20, 0.1) 75%, 
+    rgba(57, 255, 20, 0.3) 100%
+  );
+  animation: matrix-flow 10s linear infinite;
+}
+
+@keyframes matrix-flow {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(50%);
+  }
+}
+
+/* Critical status flash */
+.flash-critical {
+  animation: flash-red 2s infinite;
+}
+
+@keyframes flash-red {
+  0%, 50%, 100% {
+    background-color: var(--apocalypse-red);
+    box-shadow: 0 0 5px var(--apocalypse-red);
+  }
+  25%, 75% {
+    background-color: rgba(255, 0, 0, 0.3);
+    box-shadow: 0 0 2px rgba(255, 0, 0, 0.3);
+  }
+}
+
+/* Status colors */
+.status-critical {
+  color: var(--apocalypse-red);
+  animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Terminal line typing effect */
+.terminal-line {
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Data stream animation for breach sequence */
+.data-stream-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.data-stream {
+  position: absolute;
+  top: -100px;
+  display: flex;
+  flex-direction: column;
+  animation: dataStream 3s linear infinite;
+  font-family: monospace;
+}
+
+@keyframes dataStream {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+/* Add this CSS for the blinking cursor and typing effect */
+.typing-cursor {
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  background-color: var(--toxic-neon);
+  animation: cursor-blink 1.5s infinite;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+@keyframes cursor-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Remove button focus outline */
+button:focus {
+  outline: none;
+}
+
+/* For new toxic-themed components */
+.toxic-theme {
+  --card-bg: rgba(0, 0, 0, 0.6);
+  --card-border: rgba(57, 255, 20, 0.2);
+  --card-text: rgba(255, 255, 255, 0.8);
+  --heading-color: var(--toxic-neon);
+  --primary-btn-bg: rgba(57, 255, 20, 0.15);
+  --primary-btn-border: rgba(57, 255, 20, 0.3);
+  --primary-btn-text: var(--toxic-neon);
+  --secondary-btn-bg: rgba(255, 255, 255, 0.1);
+  --secondary-btn-border: rgba(255, 255, 255, 0.2);
+  --secondary-btn-text: rgba(255, 255, 255, 0.8);
+}
+
+/* Button shine animation */
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Gradient pulse animation */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Primary button pulse effect */
+@keyframes primary-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(57, 255, 20, 0.8);
+  }
+}
+
+/* Add new Chronicle animation classes */
+@keyframes territory-pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.7);
+  }
+}
+
+@keyframes achievement-unlock {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes chronicle-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Chronicle specific classes */
+.chronicle-entry {
+  animation: chronicle-fade-in 0.3s ease-out forwards;
+}
+
+.territory-pulse {
+  animation: territory-pulse 2s infinite;
+}
+
+.achievement-unlock {
+  animation: achievement-unlock 0.5s ease-out forwards;
+}
+
+.animate-toxic-pulse {
+  animation: territory-pulse 2s infinite;
+}
+
+/* Status colors for territories */
+.status-secured {
+  color: var(--toxic-neon);
+}
+
+.status-contested {
+  color: #FFD700;
+  animation: pulse-yellow 1.5s infinite;
+}
+
+.status-hazardous {
+  color: var(--apocalypse-red);
+  animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-yellow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Updated scanline effect for chronicle entries */
+.chronicle-panel .scanline::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: rgba(57, 255, 20, 0.7);
+  opacity: 0.6;
+  animation: scanline 4s linear infinite;
+}
+
+/* Character progress animations */
+.character-level-up {
+  animation: scale-pop 0.5s ease-out;
+}
+
+@keyframes scale-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.terminal-header {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.terminal-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 6px;
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.1);
+}
+
+.terminal-input-container {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.terminal-middle-container {
+  position: relative;
+  z-index: 10;
+}
+
+.terminal-outer-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.access-code-container {
+  width: 100%;
+  position: relative;
+}
+
+.access-code-input {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  color: var(--toxic-neon);
+  padding: 8px 10px 8px 36px;
+  font-family: monospace;
+  transition: all 0.3s ease;
+}
+
+.access-code-input:focus {
+  border-color: rgba(57, 255, 20, 0.6);
+  box-shadow: 0 0 8px rgba(57, 255, 20, 0.2);
+  outline: none;
+}
+
+.access-code-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--toxic-neon);
+  opacity: 0.7;
+}
+
+.submit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(57, 255, 20, 0.15);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  color: var(--toxic-neon);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-family: monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-button:hover {
+  background-color: rgba(57, 255, 20, 0.25);
+  border-color: rgba(57, 255, 20, 0.5);
+}
+
+.submit-button:active {
+  transform: translateY(1px);
+}
+
+.terminal-footer {
+  padding: 10px;
+  border-top: 1px solid rgba(57, 255, 20, 0.1);
+  display: flex;
+  justify-content: center;
+}
+
+.linkedin-link {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(57, 255, 20, 0.7);
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: color 0.2s;
+}
+
+.linkedin-link:hover {
+  color: var(--toxic-neon);
+}
+
+.terminal-hint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(57, 255, 20, 0.5);
 }

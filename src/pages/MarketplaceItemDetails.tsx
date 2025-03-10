@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -21,7 +22,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModelPreview } from "@/components/marketplace/ModelPreview";
-import { CharacterRevealSlider } from "@/components/marketplace/CharacterRevealSlider";
 import { 
   Card, 
   CardContent, 
@@ -47,6 +47,7 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { MarketplaceListing, MarketplaceListingType } from "@/components/marketplace/MarketplaceListingGrid";
 
+// Mockup data for testing
 const MOCKUP_LISTINGS: Record<string, MarketplaceListing> = {
   "1": {
     id: 1,
@@ -146,6 +147,7 @@ const MOCKUP_LISTINGS: Record<string, MarketplaceListing> = {
   }
 };
 
+// Activity history mockup for item
 type ActivityType = 'listing' | 'offer' | 'sale' | 'transfer' | 'mint';
 
 interface ItemActivity {
@@ -238,11 +240,12 @@ export default function MarketplaceItemDetails() {
   const [loading, setLoading] = useState(true);
   const [purchaseStep, setPurchaseStep] = useState(0);
   const [offerAmount, setOfferAmount] = useState('');
-  const [revealValue, setRevealValue] = useState(100);
   
   useEffect(() => {
+    // In a real app, you would fetch the item data from your API or blockchain
     setLoading(true);
     
+    // Simulate API call with timeout
     const timer = setTimeout(() => {
       if (id && MOCKUP_LISTINGS[id]) {
         setItem(MOCKUP_LISTINGS[id]);
@@ -260,6 +263,7 @@ export default function MarketplaceItemDetails() {
     }
     
     setPurchaseStep(1);
+    // In a real app, you would integrate with your marketplace contract here
   };
   
   const handleMakeOffer = () => {
@@ -268,11 +272,12 @@ export default function MarketplaceItemDetails() {
       return;
     }
     
+    // In a real app, you would show an offer modal and handle the offer submission
     alert('Make offer functionality would be implemented here');
   };
   
   const handleBackToMarketplace = () => {
-    navigate(-1);
+    navigate(-1); // Go back to previous page
   };
   
   if (loading) {
@@ -334,21 +339,17 @@ export default function MarketplaceItemDetails() {
           </Button>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left column - 3D Model */}
             <div className="lg:col-span-1">
               <ToxicCard className="bg-black/70 border-toxic-neon/30 mb-6">
                 <ToxicCardContent className="p-0">
                   <div className="h-[400px] relative">
-                    {item?.modelUrl ? (
+                    {item.modelUrl ? (
                       <ModelPreview 
                         modelUrl={item.modelUrl} 
                         height="400px"
                         width="100%"
                         autoRotate={true}
-                        radiationLevel={revealValue}
-                        animateRadiation={true}
-                        useRadiationCloud={true}
-                        radiationCloudUrl="bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
-                        revealValue={100 - revealValue}
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full bg-gradient-to-b from-toxic-neon/20 to-black/60">
@@ -366,13 +367,6 @@ export default function MarketplaceItemDetails() {
                     </div>
                   </div>
                 </ToxicCardContent>
-                <ToxicCardFooter className="p-3">
-                  <CharacterRevealSlider
-                    value={revealValue}
-                    onChange={setRevealValue}
-                    className="w-full"
-                  />
-                </ToxicCardFooter>
               </ToxicCard>
               
               <ToxicCard className="bg-black/70 border-toxic-neon/30">
@@ -386,11 +380,11 @@ export default function MarketplaceItemDetails() {
                     <div>
                       <div className="flex justify-between mb-1">
                         <span className="text-sm text-white/70">Current Level:</span>
-                        <span className={`text-sm font-mono ${getRadiationColor(item?.radiation.value)}`}>
-                          {item?.radiation.level} ({item?.radiation.value}%)
+                        <span className={`text-sm font-mono ${getRadiationColor(item.radiation.value)}`}>
+                          {item.radiation.level} ({item.radiation.value}%)
                         </span>
                       </div>
-                      <ToxicProgress value={item?.radiation.value} max={100} />
+                      <ToxicProgress value={item.radiation.value} max={100} />
                     </div>
                     
                     <div className="p-3 bg-black/40 border border-yellow-400/30 rounded text-sm">
@@ -407,32 +401,33 @@ export default function MarketplaceItemDetails() {
               </ToxicCard>
             </div>
             
+            {/* Middle column - Item Details & Purchase */}
             <div className="lg:col-span-1">
               <ToxicCard className="bg-black/70 border-toxic-neon/30 mb-6">
                 <ToxicCardHeader>
                   <div className="flex items-center gap-2 mb-2">
                     <ToxicBadge variant="outline" className="flex items-center gap-1">
-                      {getTypeIcon(item?.type)}
-                      <span>{item?.type.replace('-', ' ').toUpperCase()}</span>
+                      {getTypeIcon(item.type)}
+                      <span>{item.type.replace('-', ' ').toUpperCase()}</span>
                     </ToxicBadge>
                     <ToxicBadge variant="secondary" className="flex items-center gap-1 bg-toxic-neon/20 text-toxic-neon">
-                      TOKEN #{item?.tokenId}
+                      TOKEN #{item.tokenId}
                     </ToxicBadge>
                   </div>
-                  <ToxicCardTitle>{item?.name}</ToxicCardTitle>
+                  <ToxicCardTitle>{item.name}</ToxicCardTitle>
                   <ToxicCardDescription>
-                    Listed by {item?.seller} • {item?.status === 'active' ? 'Active' : 'Inactive'}
+                    Listed by {item.seller} • {item.status === 'active' ? 'Active' : 'Inactive'}
                   </ToxicCardDescription>
                 </ToxicCardHeader>
                 <ToxicCardContent>
                   <p className="text-white/80 mb-6">
-                    {item?.description || "No description available for this wasteland asset."}
+                    {item.description || "No description available for this wasteland asset."}
                   </p>
                   
                   <div className="p-4 bg-black/50 border border-toxic-neon/30 rounded-lg mb-6">
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-white/70">Price</span>
-                      <span className="text-2xl font-mono text-toxic-neon">{item?.price}</span>
+                      <span className="text-2xl font-mono text-toxic-neon">{item.price}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-white/60">Approximate USD Value</span>
@@ -495,6 +490,7 @@ export default function MarketplaceItemDetails() {
               </ToxicCard>
             </div>
             
+            {/* Right column - Item Properties & Activity */}
             <div className="lg:col-span-1">
               <Tabs defaultValue="properties" className="w-full mb-6">
                 <TabsList className="w-full bg-black/80 border-b border-toxic-neon/30">
@@ -516,10 +512,10 @@ export default function MarketplaceItemDetails() {
                   <ToxicCard className="bg-black/70 border-toxic-neon/30">
                     <ToxicCardContent>
                       <div className="space-y-3">
-                        {item?.attributes && item.attributes.map((attr, index) => (
-                          <div key={index} className="flex justify-between p-2 border-b border-toxic-neon/10 last:border-0">
-                            <span className="text-white/70">{attr.trait}</span>
-                            <span className="text-toxic-neon font-mono">{attr.value}</span>
+                        {item.attributes.map((attr, idx) => (
+                          <div key={idx} className="p-3 bg-black/50 border border-toxic-neon/20 rounded">
+                            <div className="text-sm text-white/60 mb-1">{attr.trait}</div>
+                            <div className="text-toxic-neon font-mono">{attr.value}</div>
                           </div>
                         ))}
                       </div>
@@ -529,40 +525,66 @@ export default function MarketplaceItemDetails() {
                 
                 <TabsContent value="activity" className="pt-4">
                   <ToxicCard className="bg-black/70 border-toxic-neon/30">
-                    <ToxicCardContent>
+                    <ToxicCardHeader className="pb-0">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-white/60">Recent Activity</div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-toxic-neon hover:bg-toxic-neon/10 p-1 h-auto"
+                          onClick={() => {}}
+                        >
+                          <RefreshCw className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </ToxicCardHeader>
+                    <ToxicCardContent className="overflow-auto max-h-[400px]">
                       <div className="space-y-3">
                         {MOCKUP_ACTIVITY.map((activity) => (
-                          <div 
-                            key={activity.id} 
-                            className="flex items-center p-2 border-b border-toxic-neon/10 last:border-0"
-                          >
-                            <div className="h-8 w-8 rounded-full bg-black flex items-center justify-center mr-3">
-                              {getActivityIcon(activity.type)}
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex justify-between">
-                                <span className="text-white/80">
-                                  {activity.type.charAt(0).toUpperCase() + activity.type.slice(1)}
+                          <div key={activity.id} className="p-3 bg-black/50 border border-toxic-neon/20 rounded">
+                            <div className="flex items-center mb-2">
+                              <div className="flex items-center gap-2">
+                                {getActivityIcon(activity.type)}
+                                <span className="text-white font-medium capitalize">
+                                  {activity.type}
                                 </span>
-                                <span className="text-toxic-muted text-xs">{activity.timestamp}</span>
                               </div>
-                              
-                              <div className="flex justify-between mt-1">
-                                <span className="text-xs text-white/60">
-                                  {activity.type === 'mint' ? 'Minted by' : 
-                                   activity.type === 'transfer' ? 'Transferred from' : 'From'}: {activity.from}
-                                </span>
-                                {activity.price && (
-                                  <span className="text-toxic-neon text-xs font-mono">{activity.price}</span>
-                                )}
+                              <div className="ml-auto text-sm text-white/60">
+                                {activity.timestamp}
                               </div>
-                              
-                              {activity.to && (
-                                <div className="mt-1 text-xs text-white/60">
-                                  To: {activity.to}
-                                </div>
-                              )}
                             </div>
+                            
+                            {activity.price && (
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="text-white/60">Price</span>
+                                <span className="text-toxic-neon font-mono">{activity.price}</span>
+                              </div>
+                            )}
+                            
+                            <div className="flex justify-between text-sm">
+                              <span className="text-white/60">From</span>
+                              <span className="text-white/80">{activity.from}</span>
+                            </div>
+                            
+                            {activity.to && (
+                              <div className="flex justify-between text-sm">
+                                <span className="text-white/60">To</span>
+                                <span className="text-white/80">{activity.to}</span>
+                              </div>
+                            )}
+                            
+                            {activity.txHash && (
+                              <div className="mt-2 text-center">
+                                <a 
+                                  href={`https://polygonscan.com/tx/${activity.txHash}`} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-toxic-neon hover:underline"
+                                >
+                                  View Transaction
+                                </a>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -571,22 +593,94 @@ export default function MarketplaceItemDetails() {
                 </TabsContent>
               </Tabs>
               
-              <div className="flex gap-4">
-                <ToxicButton 
-                  variant="outline" 
-                  className="flex-1 border-toxic-neon/40"
-                  onClick={() => {}}
-                >
-                  <Heart className="h-4 w-4 mr-2" /> Favorite
-                </ToxicButton>
-                <ToxicButton 
-                  variant="outline" 
-                  className="flex-1 border-toxic-neon/40"
-                  onClick={() => {}}
-                >
-                  <Share2 className="h-4 w-4 mr-2" /> Share
-                </ToxicButton>
-              </div>
+              <ToxicCard className="bg-black/70 border-toxic-neon/30">
+                <ToxicCardHeader>
+                  <ToxicCardTitle className="flex items-center gap-2">
+                    <Skull className="h-5 w-5" /> Character Survival Guide
+                  </ToxicCardTitle>
+                </ToxicCardHeader>
+                <ToxicCardContent>
+                  <div className="space-y-4">
+                    <p className="text-white/80 text-sm">
+                      {item.type === 'bounty-hunter' ? (
+                        "Bounty hunters require special handling protocols due to their high radiation levels and mutant abilities. Ensure proper containment when not actively hunting."
+                      ) : (
+                        "Survivors are valuable assets for rebuilding settlements and maintaining wasteland outposts. Their skills can be crucial for long-term survival."
+                      )}
+                    </p>
+                    
+                    <div className="flex justify-between">
+                      <ToxicButton 
+                        variant="outline" 
+                        size="sm"
+                        className="border-toxic-neon/30"
+                      >
+                        <Heart className="h-4 w-4 mr-1" />
+                        Add to Watchlist
+                      </ToxicButton>
+                      
+                      <ToxicButton 
+                        variant="outline" 
+                        size="sm"
+                        className="border-toxic-neon/30"
+                      >
+                        <Share2 className="h-4 w-4 mr-1" />
+                        Share
+                      </ToxicButton>
+                    </div>
+                  </div>
+                </ToxicCardContent>
+              </ToxicCard>
+            </div>
+          </div>
+          
+          <div className="mt-12">
+            <h3 className="text-2xl font-mono text-toxic-neon mb-6 toxic-glow">Similar {item.type === 'bounty-hunter' ? 'Bounty Hunters' : 'Survivors'}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {Object.values(MOCKUP_LISTINGS)
+                .filter(listing => listing.id !== item.id && listing.type === item.type)
+                .slice(0, 4)
+                .map(relatedItem => (
+                  <ToxicCard 
+                    key={relatedItem.id} 
+                    className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all cursor-pointer"
+                    onClick={() => navigate(`/marketplace/${relatedItem.id}`)}
+                  >
+                    <ToxicCardContent className="p-0">
+                      <div className="h-36 bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-t-lg relative overflow-hidden">
+                        {relatedItem.modelUrl ? (
+                          <ModelPreview 
+                            modelUrl={relatedItem.modelUrl} 
+                            height="100%"
+                            width="100%"
+                            autoRotate={true}
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full">
+                            <Biohazard className="h-12 w-12 text-toxic-neon/30" />
+                          </div>
+                        )}
+                        <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60">
+                          <div className="flex items-center justify-between">
+                            <ToxicBadge variant="outline" className="flex items-center gap-1 text-xs">
+                              {getTypeIcon(relatedItem.type)}
+                              <span>#{relatedItem.tokenId}</span>
+                            </ToxicBadge>
+                            <span className="text-toxic-neon text-xs font-mono">{relatedItem.price}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-3">
+                        <h4 className="text-toxic-neon font-mono text-sm truncate mb-1">{relatedItem.name}</h4>
+                        <div className="flex items-center text-xs">
+                          <span className={`${getRadiationColor(relatedItem.radiation.value)}`}>
+                            RAD {relatedItem.radiation.value}%
+                          </span>
+                        </div>
+                      </div>
+                    </ToxicCardContent>
+                  </ToxicCard>
+                ))}
             </div>
           </div>
         </motion.div>
@@ -594,4 +688,3 @@ export default function MarketplaceItemDetails() {
     </div>
   );
 }
-
