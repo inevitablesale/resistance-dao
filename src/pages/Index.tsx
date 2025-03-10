@@ -70,10 +70,8 @@ import { MarketplaceListingGrid, MarketplaceListing } from "@/components/marketp
 import { MarketplaceStatusPanel } from "@/components/marketplace/MarketplaceStatusPanel";
 import { MarketplaceActivityFeed, MarketplaceActivity } from "@/components/marketplace/MarketplaceActivityFeed";
 import { MarketplaceQuickActions } from "@/components/marketplace/MarketplaceQuickActions";
-import { ChroniclePanel } from "@/components/chronicle/ChroniclePanel";
 import { CharacterProgress } from "@/components/chronicle/CharacterProgress";
 import { TerritoryStatus } from "@/components/chronicle/TerritoryStatus";
-import { WastelandSurvivalGuideEnhanced } from "@/components/chronicle/WastelandSurvivalGuideEnhanced";
 import { ModelPreview } from '@/components/marketplace/ModelPreview';
 
 type AuthState = "unauthenticated" | "authenticating" | "breaching" | "authenticated";
@@ -420,7 +418,6 @@ const Index = () => {
           </div>
           <div className="md:col-span-2">
             <NFTDistributionStatus className="mb-6" />
-            <ChroniclePanel className="mb-6" />
           </div>
         </div>
 
