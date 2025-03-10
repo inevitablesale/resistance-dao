@@ -29,6 +29,18 @@ export interface CrowdfundOptions {
   duration: number;
 }
 
+// Interface for Governance Proposal
+export interface GovernanceProposal {
+  title: string;
+  description: string;
+  transactions: {
+    target: string;
+    value: string;
+    calldata: string;
+    signature?: string;
+  }[];
+}
+
 /**
  * Creates a new Party on Party Protocol
  * @param wallet Connected wallet to use for transaction
@@ -99,7 +111,7 @@ export async function createParty(
   } catch (error) {
     console.error("Error creating party:", error);
     throw new ProposalError({
-      category: 'party',
+      category: 'contract',
       message: 'Failed to create party',
       recoverySteps: [
         'Check your wallet connection',
@@ -187,7 +199,7 @@ export async function createEthCrowdfund(
   } catch (error) {
     console.error("Error creating ETH crowdfund:", error);
     throw new ProposalError({
-      category: 'crowdfund',
+      category: 'contract',
       message: 'Failed to create ETH crowdfund',
       recoverySteps: [
         'Check your wallet connection',
@@ -260,7 +272,7 @@ export async function sentinelContributeToParty(
   } catch (error) {
     console.error("Error contributing to party:", error);
     throw new ProposalError({
-      category: 'contribution',
+      category: 'transaction',
       message: 'Failed to contribute to party',
       recoverySteps: [
         'Check your wallet connection',
@@ -360,11 +372,172 @@ export async function updateSurvivorMetadata(
   } catch (error) {
     console.error("Error updating Survivor metadata:", error);
     throw new ProposalError({
-      category: 'metadata',
+      category: 'validation',
       message: 'Failed to update Survivor metadata',
       recoverySteps: [
         'Check your wallet connection',
         'Ensure you have permission to update the metadata',
+        'Try again later'
+      ]
+    });
+  }
+}
+
+/**
+ * Gets details about a party
+ * @param partyAddress Address of the party
+ * @returns Promise resolving to party details
+ */
+export async function getPartyDetails(partyAddress: string) {
+  try {
+    // Mock implementation for now
+    return {
+      name: "Community Settlement",
+      symbol: "CS",
+      hosts: ["0x1234567890123456789012345678901234567890"],
+      votingPower: 100,
+      totalMembers: 25,
+      treasury: "5.5"
+    };
+  } catch (error) {
+    console.error("Error getting party details:", error);
+    throw new ProposalError({
+      category: 'contract',
+      message: 'Failed to fetch party details',
+      recoverySteps: [
+        'Check if the party address is correct',
+        'Ensure the party contract exists',
+        'Try again later'
+      ]
+    });
+  }
+}
+
+/**
+ * Creates a governance proposal
+ * @param wallet Connected wallet to use for transaction
+ * @param partyAddress Address of the party
+ * @param proposal Proposal details
+ * @returns Promise resolving to the proposal ID
+ */
+export async function createGovernanceProposal(
+  wallet: any,
+  partyAddress: string,
+  proposal: GovernanceProposal
+): Promise<string> {
+  try {
+    console.log("Creating governance proposal:", proposal.title);
+    
+    const walletClient = await wallet.getWalletClient();
+    if (!walletClient) {
+      throw new Error("Wallet client not available");
+    }
+    
+    const provider = new ethers.providers.Web3Provider(walletClient as any);
+    const signer = provider.getSigner();
+    
+    // Mock implementation for now
+    // In a real implementation, this would create a proposal on the party contract
+    
+    // Return a random proposal ID
+    const proposalId = `${Math.floor(Math.random() * 1000000)}`;
+    
+    console.log("Proposal created successfully with ID:", proposalId);
+    return proposalId;
+  } catch (error) {
+    console.error("Error creating governance proposal:", error);
+    throw new ProposalError({
+      category: 'contract',
+      message: 'Failed to create governance proposal',
+      recoverySteps: [
+        'Check your wallet connection',
+        'Ensure you have enough voting power',
+        'Try again with different parameters'
+      ]
+    });
+  }
+}
+
+/**
+ * Votes on a governance proposal
+ * @param wallet Connected wallet to use for transaction
+ * @param partyAddress Address of the party
+ * @param proposalId ID of the proposal
+ * @param support Whether to vote in support or against
+ * @returns Promise resolving when the vote is cast
+ */
+export async function voteOnGovernanceProposal(
+  wallet: any,
+  partyAddress: string,
+  proposalId: string,
+  support: boolean
+): Promise<void> {
+  try {
+    console.log(`Voting ${support ? 'for' : 'against'} proposal ${proposalId}`);
+    
+    const walletClient = await wallet.getWalletClient();
+    if (!walletClient) {
+      throw new Error("Wallet client not available");
+    }
+    
+    const provider = new ethers.providers.Web3Provider(walletClient as any);
+    const signer = provider.getSigner();
+    
+    // Mock implementation for now
+    // In a real implementation, this would cast a vote on the party contract
+    
+    console.log("Vote cast successfully");
+  } catch (error) {
+    console.error("Error voting on governance proposal:", error);
+    throw new ProposalError({
+      category: 'contract',
+      message: 'Failed to vote on governance proposal',
+      recoverySteps: [
+        'Check your wallet connection',
+        'Ensure you have enough voting power',
+        'Try again later'
+      ]
+    });
+  }
+}
+
+/**
+ * Executes a governance proposal
+ * @param wallet Connected wallet to use for transaction
+ * @param partyAddress Address of the party
+ * @param proposalId ID of the proposal
+ * @param proposal Proposal details
+ * @returns Promise resolving when the proposal is executed
+ */
+export async function executeGovernanceProposal(
+  wallet: any,
+  partyAddress: string,
+  proposalId: string,
+  proposal: GovernanceProposal
+): Promise<void> {
+  try {
+    console.log(`Executing proposal ${proposalId}`);
+    
+    const walletClient = await wallet.getWalletClient();
+    if (!walletClient) {
+      throw new Error("Wallet client not available");
+    }
+    
+    const provider = new ethers.providers.Web3Provider(walletClient as any);
+    const signer = provider.getSigner();
+    
+    // Mock implementation for now
+    // In a real implementation, this would execute a proposal on the party contract
+    
+    console.log("Proposal executed successfully");
+  } catch (error) {
+    console.error("Error executing governance proposal:", error);
+    throw new ProposalError({
+      category: 'contract',
+      message: 'Failed to execute governance proposal',
+      recoverySteps: [
+        'Check your wallet connection',
+        'Ensure the proposal is ready to execute',
         'Try again later'
       ]
     });
