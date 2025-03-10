@@ -3,7 +3,40 @@ import React from 'react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicProgress } from '@/components/ui/toxic-progress';
 import { ToxicButton } from '@/components/ui/toxic-button';
-import { Shield, Target, Hammer, Radiation } from 'lucide-react';
+import { Shield, Target, Hammer, Radiation, ExternalLink } from 'lucide-react';
+
+// Define character data based on the contract
+export const CHARACTERS = {
+  // SENTINELS (1..7)
+  SENTINEL_CHARACTERS: [
+    { id: 1, name: "DAO Enforcer", ipfsCID: "bafkreibo6bk5dezlsii7imuabncv7tihxwbi4f4urds75l7nuy2rnxfkru" },
+    { id: 2, name: "Insolvent Medic", ipfsCID: "bafkreid7oobbrlbxcnnigfcwfbgr5m3dmsl6wemsuaxluzd54ioclneubq" },
+    { id: 3, name: "Liquidation Phantom", ipfsCID: "bafkreicfsovqdpu3byxvyfev4y7xdmqz3hggewsuyx4brifoscercektpy" },
+    { id: 4, name: "Margin Call Marauder", ipfsCID: "bafkreiaasojzt45tw5jkohgwvibtth6nl4jlognknercfpgir6zjpw335u" },
+    { id: 5, name: "Overleveraged Berserker", ipfsCID: "bafkreihigf4xjzy4jrqkm7wsxxdtokwew4m3njdxt6hheb67nuit47byta" },
+    { id: 6, name: "Rugged Nomad", ipfsCID: "bafkreibhb3upqoifbl77jbrqxp2puudelcrjf45jnfkdqipef6skzpewti" },
+    { id: 7, name: "Yield Farm Executioner", ipfsCID: "bafkreibo5yjsmqlt2cc7olqeuz2wxref7oe54bmallzl4mgwkt3xsnjlqi" }
+  ],
+  // SURVIVORS (8..10)
+  SURVIVOR_CHARACTERS: [
+    { id: 8, name: "Rugpull Veteran", ipfsCID: "bafkreiek2ihnc7fmpwzseitea2vflvwdmm6qvn4vydd5ww6wgipntf3w7a" },
+    { id: 9, name: "Blacklist Exile", ipfsCID: "bafkreica5ugau5cjah7hkwz4ko36oqxkg2v4swqpxnhzi7z4wgftl76q5m" },
+    { id: 10, name: "Failed Validator", ipfsCID: "bafkreigw5k75stzjhamdjtwlssbolhxepbeglfs3qoyowgu2q4n2fnfszy" }
+  ],
+  // BOUNTY HUNTERS (11..16)
+  BOUNTY_HUNTER_CHARACTERS: [
+    { id: 11, name: "Chain Reaper", ipfsCID: "bafkreifepvbd2shm4uxfysdxtva5mjs7fqnxbxehutcoqfblmcgtp7h7ka" },
+    { id: 12, name: "Forked Hunter", ipfsCID: "bafkreierebrs3yw24r7wgkezgok6lhbiwqwwgen5fnfqxm6cqul644x3fe" },
+    { id: 13, name: "Liquidated Tracker", ipfsCID: "bafkreiajc2mwtirx3423mbf55scuniqlwh3ph2cglk7y2nbd764r6g6ine" },
+    { id: 14, name: "Oracle Stalker", ipfsCID: "bafkreieytk2bsis7fdavqu74t3dgquew36ppycxnlbxt6dgzudjakcrexq" },
+    { id: 15, name: "Slippage Sniper", ipfsCID: "bafkreidrcpfmaken4gsbeweqthzrg3bkcxi344bftqwndiapeo6pm4msda" },
+    { id: 16, name: "Sandwich Hunter", ipfsCID: "bafkreigxfbvntll522na4la6b4cdvp5g74jztgjhgdmz2b5uv7uaieywie" }
+  ]
+};
+
+// Constants for supply caps
+const SENTINEL_PER_TYPE = 100;
+const OTHER_ROLES_PER_TYPE = 150;
 
 interface NFTSupply {
   type: 'sentinel' | 'bounty-hunter' | 'survivor';
@@ -14,6 +47,9 @@ interface NFTSupply {
   free: number;
   cost: number | 'Free';
   description: string;
+  // New fields for OpenSea integration
+  openSeaLink?: string;
+  characterList: Array<{ id: number, name: string, ipfsCID: string }>;
 }
 
 interface NFTDistributionStatusProps {
@@ -26,31 +62,37 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
       type: 'sentinel',
       name: "Founder Sentinels",
       icon: <Shield className="h-5 w-5 text-purple-400" />,
-      total: 1500,
+      total: SENTINEL_PER_TYPE * CHARACTERS.SENTINEL_CHARACTERS.length,
       claimed: 326,
       free: 821,
       cost: 50,
-      description: "Governance & Economic Oversight"
+      description: "Governance & Economic Oversight",
+      openSeaLink: "https://opensea.io/collection/resistance-sentinels",
+      characterList: CHARACTERS.SENTINEL_CHARACTERS
     },
     {
       type: 'bounty-hunter',
       name: "Bounty Hunters",
       icon: <Target className="h-5 w-5 text-apocalypse-red" />,
-      total: 500,
+      total: OTHER_ROLES_PER_TYPE * CHARACTERS.BOUNTY_HUNTER_CHARACTERS.length,
       claimed: 187,
       free: 500,
       cost: 'Free',
-      description: "Enforcers & Funders"
+      description: "Enforcers & Funders",
+      openSeaLink: "https://opensea.io/collection/resistance-bounty-hunters",
+      characterList: CHARACTERS.BOUNTY_HUNTER_CHARACTERS
     },
     {
       type: 'survivor',
       name: "Survivors",
       icon: <Hammer className="h-5 w-5 text-amber-400" />,
-      total: 1500,
+      total: OTHER_ROLES_PER_TYPE * CHARACTERS.SURVIVOR_CHARACTERS.length,
       claimed: 412,
       free: 0,
       cost: 50,
-      description: "Builders & Innovators"
+      description: "Builders & Innovators",
+      openSeaLink: "https://opensea.io/collection/resistance-survivors",
+      characterList: CHARACTERS.SURVIVOR_CHARACTERS
     }
   ];
 
@@ -126,8 +168,10 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
               variant={supply.type === 'sentinel' ? 'default' : supply.type === 'bounty-hunter' ? 'destructive' : 'outline'}
               size="sm"
               className="w-full"
+              onClick={() => window.open(supply.openSeaLink, '_blank')}
             >
-              Claim {supply.name.replace('s', '')}
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Get on OpenSea
             </ToxicButton>
           </div>
         ))}
