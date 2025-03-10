@@ -17,6 +17,9 @@ export const useWalletConnection = () => {
           if (walletClient) {
             const addr = await walletClient.getAddress();
             setAddress(addr);
+            
+            // Check for referrer in URL and store it
+            checkAndStoreReferrer();
           }
         }
       } catch (error) {
@@ -28,6 +31,42 @@ export const useWalletConnection = () => {
 
     initWallet();
   }, [primaryWallet]);
+  
+  // Check URL for referrer and store it
+  const checkAndStoreReferrer = () => {
+    try {
+      // Extract referrer from URL if present
+      const urlParams = new URLSearchParams(window.location.search);
+      const referrer = urlParams.get('ref') || urlParams.get('referrer');
+      
+      // Alternatively check if we're in a /r/{referrerAddress} route
+      const pathParts = window.location.pathname.split('/');
+      if (pathParts.length >= 3 && pathParts[1] === 'r') {
+        // If format is /r/{bountyId}/{referrerAddress}
+        if (pathParts.length >= 4) {
+          const bountyId = pathParts[2];
+          const pathReferrer = pathParts[3];
+          
+          localStorage.setItem("referrer_address", pathReferrer);
+          localStorage.setItem("referrer_bounty", bountyId);
+          console.log("Stored referrer info from path:", { bountyId, referrer: pathReferrer });
+        } 
+        // If format is /r/{referrerAddress}
+        else {
+          const pathReferrer = pathParts[2];
+          localStorage.setItem("referrer_address", pathReferrer);
+          console.log("Stored referrer from path:", pathReferrer);
+        }
+      } 
+      // Store from query parameter if found
+      else if (referrer) {
+        localStorage.setItem("referrer_address", referrer);
+        console.log("Stored referrer from query:", referrer);
+      }
+    } catch (error) {
+      console.error("Error handling referrer:", error);
+    }
+  };
 
   const connect = async () => {
     try {
@@ -57,6 +96,14 @@ export const useWalletConnection = () => {
       });
     }
   };
+  
+  const getReferrer = () => {
+    return localStorage.getItem("referrer_address") || undefined;
+  };
+  
+  const getReferrerBounty = () => {
+    return localStorage.getItem("referrer_bounty") || undefined;
+  };
 
   return {
     isConnected: !!address,
@@ -66,6 +113,9 @@ export const useWalletConnection = () => {
     primaryWallet,
     user,
     isPendingInitialization,
-    setShowAuthFlow
+    setShowAuthFlow,
+    getReferrer,
+    getReferrerBounty,
+    checkAndStoreReferrer
   };
 };
