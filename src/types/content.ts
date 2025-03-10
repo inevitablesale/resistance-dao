@@ -16,3 +16,6 @@ export interface IPFSContent {
   };
   [key: string]: any;
 }
+
+// Define common status types for referrals
+export type ReferralStatus = 'active' | 'claimed' | 'expired' | 'completed';

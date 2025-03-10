@@ -1,286 +1,231 @@
-
-import { ethers } from "ethers";
-import { uploadToIPFS } from "./ipfsService";
-import { IPFSContent } from "@/types/content";
-import { JobMetadata } from "@/types/jobs";
+import { supabaseClient } from '@/integrations/supabase/client';
+import { useCustomWallet } from '@/hooks/useCustomWallet';
+import { IPFSContent, ReferralStatus } from '@/types/content';
+import { JobMetadata } from '@/utils/settlementConversion';
 
 export interface ReferralMetadata {
-  id?: string; // Adding id for compatibility with ReferralDashboard
-  type: string;
-  referralCode: string;
-  referrerAddress: string;
-  refereeAddress?: string;
+  id: string;
+  code: string;
+  creator: string;
+  jobId?: string;
   createdAt: number;
+  expiresAt?: number;
+  status: ReferralStatus;
+  claimedBy?: string;
   claimedAt?: number;
   reward?: string;
-  jobId?: string;
-  status: 'active' | 'claimed' | 'expired';
-  name?: string;
-  description?: string;
-  rewardPercentage?: number;
-  [key: string]: any;
+  type: string;
+  name: string;
+  description: string;
+  rewardPercentage: number;
 }
 
-// Re-export ReferralMetadata as Referral for backwards compatibility
-export type Referral = ReferralMetadata;
+export interface Referral extends ReferralMetadata {
+  id: string;
+}
 
-// Mock referrals data
-const mockReferrals: ReferralMetadata[] = [
-  {
-    id: "ref-1",
-    type: "job",
-    referralCode: "JOB1-REF123",
-    referrerAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 3, // 3 days ago
-    reward: "0.05 ETH",
-    jobId: "job-1",
-    status: 'active',
-    name: "Resource Gathering Job",
-    description: "Refer others for this resource gathering opportunity",
-    rewardPercentage: 5,
-  },
-  {
-    id: "ref-2",
-    type: "job",
-    referralCode: "JOB2-REF456",
-    referrerAddress: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 1, // 1 day ago
-    reward: "0.03 ETH",
-    jobId: "job-2",
-    status: 'active',
-    name: "Security Job",
-    description: "Refer others for this security job opportunity",
-    rewardPercentage: 3,
+export const generateReferralCode = (): string => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += characters.charAt(Math.floor(Math.random() * characters.length));
   }
-];
-
-// Get referrals for a user
-export const getReferrals = async (address: string): Promise<ReferralMetadata[]> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  return mockReferrals.filter(ref => ref.referrerAddress === address);
+  return code;
 };
 
-// Create a referral code for a job
-export const createJobReferral = async (
-  wallet: any,
-  jobId: string,
-  jobReward: string
-): Promise<string> => {
-  try {
-    const address = await wallet.getAddress();
-    
-    // Calculate referral reward (10% of job reward)
-    const referralPercentage = 0.1;
-    const referralRewardValue = parseFloat(jobReward) * referralPercentage;
-    const referralReward = `${referralRewardValue} ETH`;
-    
-    // Generate a unique referral code
-    const referralCode = `${jobId}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    
-    // Create referral metadata
-    const referral: ReferralMetadata = {
-      id: `ref-${Date.now()}`,
-      type: "job",
-      referralCode,
-      referrerAddress: address,
-      createdAt: Date.now(),
-      reward: referralReward,
-      jobId,
-      status: 'active',
-    };
-    
-    // Add to mock data
-    mockReferrals.push(referral);
-    
-    return referralCode;
-  } catch (error) {
-    console.error("Error creating job referral:", error);
-    throw error;
-  }
-};
-
-// Check if a referral code is valid
-export const validateReferralCode = async (referralCode: string): Promise<boolean> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  const referral = mockReferrals.find(ref => ref.referralCode === referralCode);
-  return !!referral && referral.status === 'active';
-};
-
-// Claim a referral
-export const claimReferral = async (
-  wallet: any,
-  referralCode: string
-): Promise<boolean> => {
-  try {
-    const address = await wallet.getAddress();
-    
-    const referral = mockReferrals.find(ref => ref.referralCode === referralCode);
-    if (!referral || referral.status !== 'active') {
-      return false;
-    }
-    
-    // Update referral data
-    referral.refereeAddress = address;
-    referral.claimedAt = Date.now();
-    referral.status = 'claimed';
-    
-    return true;
-  } catch (error) {
-    console.error("Error claiming referral:", error);
-    return false;
-  }
-};
-
-// Upload referral data to IPFS
-export const uploadReferralToIPFS = async (
-  referralMetadata: ReferralMetadata,
-  jobMetadata?: JobMetadata
-): Promise<string> => {
-  try {
-    // Calculate referral reward if it's a job referral
-    let referralReward = referralMetadata.reward;
-    if (jobMetadata && jobMetadata.reward) {
-      // Default to 10% if not specified
-      const referralPercentage = 0.1;
-      const jobRewardValue = parseFloat(jobMetadata.reward);
-      const referralRewardValue = jobRewardValue * referralPercentage;
-      referralReward = `${referralRewardValue} ETH`;
-    }
-    
-    // Create IPFS content structure
-    const content: IPFSContent = {
-      contentSchema: "referral-v1",
-      contentType: "referral",
-      title: `Referral: ${referralMetadata.referralCode}`,
-      content: "Referral data",
-      metadata: {
-        ...referralMetadata,
-        reward: referralReward,
-      },
-    };
-    
-    // Upload to IPFS
-    const ipfsHash = await uploadToIPFS(content);
-    return ipfsHash;
-  } catch (error) {
-    console.error("Error uploading referral to IPFS:", error);
-    throw error;
-  }
-};
-
-// Function to create a new referral
 export const createNewReferral = async (
-  wallet: any,
   type: string,
   name: string,
-  description: string,
-  rewardPercentage: number
-): Promise<ReferralMetadata | null> => {
+): Promise<string> => {
+  const referralCode = generateReferralCode();
+  const { address } = useCustomWallet();
+
+  if (!address) {
+    throw new Error('Wallet not connected');
+  }
+
+  const { data, error } = await supabaseClient
+    .from('referrals')
+    .insert([
+      {
+        code: referralCode,
+        creator: address,
+        createdAt: Date.now(),
+        status: 'active',
+        type: type,
+        name: name,
+      },
+    ])
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating referral:', error);
+    throw error;
+  }
+
+  return data.id;
+};
+
+export const getAllReferrals = async (userAddress: string): Promise<ReferralMetadata[]> => {
+    try {
+        const { data, error } = await supabaseClient
+            .from('referrals')
+            .select('*')
+            .eq('creator', userAddress)
+            .order('createdAt', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching referrals:', error);
+            return [];
+        }
+
+        return data || [];
+    } catch (error) {
+        console.error('Error fetching referrals:', error);
+        return [];
+    }
+};
+
+export const getReferralByCode = async (code: string): Promise<ReferralMetadata | null> => {
   try {
-    const address = await wallet.getAddress();
-    
-    // Generate a unique referral code
-    const referralCode = `${type}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    
-    // Create referral metadata
-    const referral: ReferralMetadata = {
-      id: `ref-${Date.now()}`,
-      type,
-      referralCode,
-      referrerAddress: address,
-      createdAt: Date.now(),
-      status: 'active',
-      name,
-      description,
-      rewardPercentage,
-    };
-    
-    // Add to mock data
-    mockReferrals.push(referral);
-    
-    return referral;
+    const { data, error } = await supabaseClient
+      .from('referrals')
+      .select('*')
+      .eq('code', code)
+      .single();
+
+    if (error) {
+      console.error('Error fetching referral by code:', error);
+      return null;
+    }
+
+    return data || null;
   } catch (error) {
-    console.error("Error creating new referral:", error);
+    console.error('Error fetching referral by code:', error);
     return null;
   }
 };
 
-// Process referral claim for rewards
-export const processReferralClaim = async (
-  wallet: any,
-  referralId: string
-): Promise<boolean> => {
+export const validateReferralCode = async (code: string): Promise<boolean> => {
+  const referral = await getReferralByCode(code);
+  return !!referral && referral.status === 'active';
+};
+
+export const claimReferral = async (code: string, userAddress: string): Promise<boolean> => {
   try {
-    const referral = mockReferrals.find(ref => ref.id === referralId);
-    if (!referral || referral.status !== 'completed') {
+    const referral = await getReferralByCode(code);
+
+    if (!referral) {
+      console.error('Referral not found');
       return false;
     }
-    
-    // Process the claim (in a real app, this would interact with a blockchain)
-    referral.status = 'claimed';
-    referral.claimedAt = Date.now();
-    
+
+    if (referral.status !== 'active') {
+      console.error('Referral is not active');
+      return false;
+    }
+
+    const { error } = await supabaseClient
+      .from('referrals')
+      .update({
+        status: 'claimed',
+        claimedBy: userAddress,
+        claimedAt: Date.now(),
+      })
+      .eq('code', code);
+
+    if (error) {
+      console.error('Error claiming referral:', error);
+      return false;
+    }
+
     return true;
   } catch (error) {
-    console.error("Error processing referral claim:", error);
+    console.error('Error claiming referral:', error);
     return false;
   }
 };
 
-// Generate a referral link
-export const generateReferralLink = (referralId: string): string => {
-  const referral = mockReferrals.find(ref => ref.id === referralId);
-  if (!referral) {
-    return '';
-  }
-  
-  // In a real app, this would be a proper URL
-  return `https://wasteland-resistance.com/ref/${referral.referralCode}`;
-};
-
-// Update useReferrals hook to fix the argument mismatch
-export const processReferralCreation = async (
-  wallet: any,
+export const processReferralReward = async (
   jobId: string,
   jobReward: string,
   jobTitle: string,
-  referralPercentage: number = 0.1
-): Promise<string> => {
+  referralCode: string
+): Promise<boolean> => {
   try {
-    const address = await wallet.getAddress();
-    
-    // Generate a unique referral code
-    const referralCode = `${jobId}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    
-    // Calculate referral reward
-    const referralRewardValue = parseFloat(jobReward) * referralPercentage;
-    const referralReward = `${referralRewardValue} ETH`;
-    
-    // Create referral metadata
-    const referral: ReferralMetadata = {
-      id: `ref-${Date.now()}`,
-      type: "job",
-      referralCode,
-      referrerAddress: address,
-      createdAt: Date.now(),
-      reward: referralReward,
-      jobId,
-      status: 'active',
-      name: jobTitle,
-      description: `Referral for ${jobTitle}`,
-      rewardPercentage: referralPercentage * 100,
-    };
-    
-    // Add to mock data
-    mockReferrals.push(referral);
-    
-    return referralCode;
+    const referral = await getReferralByCode(referralCode);
+
+    if (!referral) {
+      console.error('Referral not found');
+      return false;
+    }
+
+    if (referral.status !== 'claimed') {
+      console.error('Referral is not claimed');
+      return false;
+    }
+
+    // Update referral status to completed and add reward details
+    const { error } = await supabaseClient
+      .from('referrals')
+      .update({
+        status: 'completed',
+        reward: jobReward,
+      })
+      .eq('code', referralCode);
+
+    if (error) {
+      console.error('Error processing referral reward:', error);
+      return false;
+    }
+
+    return true;
   } catch (error) {
-    console.error("Error processing referral creation:", error);
-    throw error;
+    console.error('Error processing referral reward:', error);
+    return false;
   }
 };
+
+// Update the function with the status comparison issue
+export const processReferralClaim = async (referralId: string): Promise<boolean> => {
+  try {
+    // Get the referral
+    const { data: referral, error: fetchError } = await supabaseClient
+      .from('referrals')
+      .select('*')
+      .eq('id', referralId)
+      .single();
+    
+    if (fetchError || !referral) {
+      console.error('Error fetching referral:', fetchError);
+      return false;
+    }
+    
+    // Check if the referral is active and can be claimed
+    // Fix the comparison by using the correct status type
+    if (referral.status !== 'active') {
+      console.error('Referral is not active');
+      return false;
+    }
+    
+    // Update the referral status to claimed
+    const { error: updateError } = await supabaseClient
+      .from('referrals')
+      .update({
+        status: 'claimed',
+        claimedAt: new Date().toISOString()
+      })
+      .eq('id', referralId);
+    
+    if (updateError) {
+      console.error('Error updating referral:', updateError);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error processing referral claim:', error);
+    return false;
+  }
+}
