@@ -1,6 +1,5 @@
 
 import { Wallet } from "ethers";
-import { DynamicContext } from "@dynamic-labs/sdk-react-core";
 import { uploadToIPFS } from "./ipfsService";
 import { JobMetadata } from "@/utils/settlementConversion";
 import { NFTClass } from "./alchemyService";
@@ -77,7 +76,7 @@ export interface JobListing {
  * @returns Job ID if successful, null otherwise
  */
 export const createJobListing = async (
-  wallet: Wallet | typeof DynamicContext['primaryWallet'],
+  wallet: Wallet,
   metadata: JobMetadata
 ): Promise<string | null> => {
   try {
@@ -108,7 +107,7 @@ export const createJobListing = async (
  * @returns Success status
  */
 export const submitJobApplication = async (
-  wallet: Wallet | typeof DynamicContext['primaryWallet'],
+  wallet: Wallet,
   jobId: string,
   applicationDetails: {
     message: string;
@@ -135,7 +134,7 @@ export const submitJobApplication = async (
  * @returns Success status
  */
 export const submitJobReferral = async (
-  wallet: Wallet | typeof DynamicContext['primaryWallet'],
+  wallet: Wallet,
   jobId: string,
   referredUser: string
 ): Promise<boolean> => {
@@ -157,7 +156,7 @@ export const submitJobReferral = async (
  * @returns Success status
  */
 export const acceptJobApplication = async (
-  wallet: Wallet | typeof DynamicContext['primaryWallet'],
+  wallet: Wallet,
   applicationId: string
 ): Promise<boolean> => {
   try {
@@ -178,7 +177,7 @@ export const acceptJobApplication = async (
  * @returns Success status
  */
 export const rejectJobApplication = async (
-  wallet: Wallet | typeof DynamicContext['primaryWallet'],
+  wallet: Wallet,
   applicationId: string
 ): Promise<boolean> => {
   try {
@@ -199,7 +198,7 @@ export const rejectJobApplication = async (
  * @returns Success status
  */
 export const cancelJobListing = async (
-  wallet: Wallet | typeof DynamicContext['primaryWallet'],
+  wallet: Wallet,
   jobId: string
 ): Promise<boolean> => {
   try {

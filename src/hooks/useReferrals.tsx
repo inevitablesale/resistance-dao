@@ -6,13 +6,12 @@ import { ethers } from "ethers";
 import { useToast } from "./use-toast";
 import { NFTClass, getPrimaryRole } from "@/services/alchemyService";
 import { 
-  createReferralPool, 
+  createReferral, 
   submitReferral, 
   claimReferralReward,
   getReferrals,
-  getReferralStatus,
-  ReferralStatus,
-  Referral
+  Referral,
+  ReferralStatus
 } from "@/services/referralService";
 import { ReferralMetadata } from "@/utils/settlementConversion";
 
@@ -60,8 +59,8 @@ export const useReferrals = () => {
   const isCreatingReferral = false;
   const canCreateReferral = userRole === 'Bounty Hunter';
   
-  // Create a new referral pool
-  const createReferral = async (
+  // Create a new referral
+  const createNewReferral = async (
     type: string,
     name: string,
     description: string,
@@ -91,23 +90,14 @@ export const useReferrals = () => {
         description: "Please approve the transaction to create your referral pool.",
       });
       
-      const referrerAddress = await primaryWallet.address;
-      
-      // Create referral metadata
-      const referralMetadata: ReferralMetadata = {
-        title: name, // Use name as title to satisfy ProposalMetadata requirements
-        name,
-        description,
-        type,
-        referrer: referrerAddress,
-        rewardPercentage,
-        createdAt: Math.floor(Date.now() / 1000),
-        // Required ProposalMetadata fields
-        votingDuration: 7 * 24 * 60 * 60, // 7 days default
-        linkedInURL: "https://linkedin.com/in/resistance", // Default placeholder
-      };
-      
-      const referralId = await createReferralPool(primaryWallet, referralMetadata);
+      // Create referral
+      const referralId = await createReferral(
+        primaryWallet as unknown as ethers.Wallet, 
+        type, 
+        name, 
+        description, 
+        rewardPercentage
+      );
       
       if (referralId) {
         toast({
@@ -150,7 +140,11 @@ export const useReferrals = () => {
         description: "Please approve the transaction to submit your referral.",
       });
       
-      const success = await submitReferral(primaryWallet, referralId, referredAddress);
+      const success = await submitReferral(
+        primaryWallet as unknown as ethers.Wallet,
+        referralId,
+        referredAddress
+      );
       
       if (success) {
         toast({
@@ -193,7 +187,10 @@ export const useReferrals = () => {
         description: "Please approve the transaction to claim your referral reward.",
       });
       
-      const success = await claimReferralReward(primaryWallet, referralId);
+      const success = await claimReferralReward(
+        primaryWallet as unknown as ethers.Wallet,
+        referralId
+      );
       
       if (success) {
         toast({
@@ -228,7 +225,7 @@ export const useReferrals = () => {
     userRole,
     userReferrals,
     isLoadingReferrals,
-    createReferral,
+    createReferral: createNewReferral,
     submitNewReferral,
     claimReward,
     generateReferralLink,

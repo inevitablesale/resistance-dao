@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -63,11 +62,15 @@ export const useJobs = () => {
           createdAt: Date.now(),
           applications: [
             {
-              id: 'app-001',
+              id: `app-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
               jobId: 'job-001',
               applicant: '0xabcd...1234',
-              status: 'pending',
-              submittedAt: Date.now() - 24 * 60 * 60 * 1000 // 1 day ago
+              status: 'pending' as const,
+              submittedAt: Math.floor(Date.now() / 1000),
+              createdAt: Math.floor(Date.now() / 1000),
+              message: 'Sample message',
+              experience: 'Sample experience',
+              portfolio: 'Sample portfolio'
             }
           ]
         }

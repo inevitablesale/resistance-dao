@@ -1,8 +1,10 @@
 
-import { DynamicContext } from "@dynamic-labs/sdk-react-core";
-import { Wallet, ethers } from "ethers";
+import { Wallet } from "ethers";
 import { uploadToIPFS } from "./ipfsService";
 import { ReferralMetadata } from "@/utils/settlementConversion";
+
+// Define export type for Referral status
+export type ReferralStatus = 'active' | 'pending' | 'completed' | 'expired';
 
 // Define the Referral type
 export interface Referral {
@@ -15,6 +17,7 @@ export interface Referral {
   rewardPercentage: number;
   rewards: number;
   createdAt: number;
+  status: ReferralStatus; // Added status property
 }
 
 /**
@@ -27,7 +30,7 @@ export interface Referral {
  * @returns Referral ID if successful, null otherwise
  */
 export const createReferral = async (
-  wallet: Wallet | typeof DynamicContext['primaryWallet'],
+  wallet: Wallet,
   type: string,
   name: string,
   description: string,
@@ -67,6 +70,36 @@ export const createReferral = async (
 };
 
 /**
+ * Get referrals for a user
+ * @param userAddress User address
+ * @returns Array of referrals
+ */
+export const getReferrals = async (userAddress: string): Promise<Referral[]> => {
+  try {
+    console.log(`Getting referrals for user ${userAddress}`);
+    
+    // Mock implementation for development
+    return [
+      {
+        id: `ref-${Date.now()}-1`,
+        type: "nft-membership",
+        name: "Sentinel Referral",
+        description: "Earn rewards by referring new Sentinel NFT holders",
+        referrer: userAddress,
+        referredUsers: [],
+        rewardPercentage: 5,
+        rewards: 0,
+        createdAt: Math.floor(Date.now() / 1000) - 86400,
+        status: 'active'
+      }
+    ];
+  } catch (error) {
+    console.error("Error getting referrals:", error);
+    return [];
+  }
+};
+
+/**
  * Submits a new referral for a user
  * @param wallet User wallet
  * @param referralId Referral ID
@@ -74,7 +107,7 @@ export const createReferral = async (
  * @returns Success status
  */
 export const submitReferral = async (
-  wallet: Wallet | typeof DynamicContext['primaryWallet'],
+  wallet: Wallet,
   referralId: string,
   referredAddress: string
 ): Promise<boolean> => {
@@ -96,7 +129,7 @@ export const submitReferral = async (
  * @returns Success status
  */
 export const claimReferralReward = async (
-  wallet: Wallet | typeof DynamicContext['primaryWallet'],
+  wallet: Wallet,
   referralId: string
 ): Promise<boolean> => {
   try {
