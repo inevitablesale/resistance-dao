@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { Progress } from "@/components/ui/progress";
 import { createReferral, storeReferrerAddress } from "@/services/referralService";
+import { Shield, Users, Zap } from "lucide-react";
 
 const ReferralRedirect = () => {
   const { referrerAddress } = useParams();
@@ -13,6 +14,7 @@ const ReferralRedirect = () => {
   const { address, isConnected } = useCustomWallet();
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [processingStep, setProcessingStep] = useState("Validating referrer");
 
   useEffect(() => {
     let intervalId: number;
@@ -24,6 +26,11 @@ const ReferralRedirect = () => {
       intervalId = window.setInterval(() => {
         setProgress(prev => {
           const newProgress = prev + 5;
+          if (newProgress >= 33 && newProgress < 66 && processingStep === "Validating referrer") {
+            setProcessingStep("Storing referral data");
+          } else if (newProgress >= 66 && newProgress < 100 && processingStep === "Storing referral data") {
+            setProcessingStep("Completing setup");
+          }
           return newProgress >= 100 ? 100 : newProgress;
         });
       }, 50);
@@ -32,7 +39,7 @@ const ReferralRedirect = () => {
     return () => {
       if (intervalId) window.clearInterval(intervalId);
     };
-  }, [referrerAddress]);
+  }, [referrerAddress, processingStep]);
 
   useEffect(() => {
     // If progress reaches 100%, redirect
@@ -78,9 +85,26 @@ const ReferralRedirect = () => {
           <h1 className="text-3xl font-bold text-toxic-neon mb-4">Welcome to Resistance DAO</h1>
           <p className="text-white mb-6">Processing your Bounty Hunter referral...</p>
           
-          <div className="w-full mb-6">
+          <div className="w-full mb-4">
             <Progress value={progress} className="h-2" />
           </div>
+          
+          <div className="flex justify-between mb-6 text-sm">
+            <div className={`flex items-center gap-1 ${progress >= 33 ? 'text-toxic-neon' : 'text-white/40'}`}>
+              <Shield className="w-4 h-4" /> 
+              <span>Validating</span>
+            </div>
+            <div className={`flex items-center gap-1 ${progress >= 66 ? 'text-toxic-neon' : 'text-white/40'}`}>
+              <Zap className="w-4 h-4" /> 
+              <span>Storing</span>
+            </div>
+            <div className={`flex items-center gap-1 ${progress >= 100 ? 'text-toxic-neon' : 'text-white/40'}`}>
+              <Users className="w-4 h-4" /> 
+              <span>Complete</span>
+            </div>
+          </div>
+          
+          <p className="text-toxic-neon font-medium mb-4">{processingStep}...</p>
           
           <p className="text-white/60 text-sm">
             You're being referred by a Bounty Hunter from the wasteland. 

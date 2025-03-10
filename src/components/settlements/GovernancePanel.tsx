@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Plus, Check, X, FileText, ShieldCheck, Clock } from "lucide-react";
+import { Plus, Check, X, FileText, ShieldCheck, Clock, LucideVote } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -16,8 +16,10 @@ import {
 } from "@/services/partyProtocolService";
 import { ProposalForm } from "./ProposalForm";
 import { ProposalCard } from "./ProposalCard";
+import { VotingPowerDisplay } from "./VotingPowerDisplay";
 import { useProposals } from "@/hooks/useProposals";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useVotingPower } from "@/hooks/useVotingPower";
 
 export const GovernancePanel = ({ 
   partyAddress, 
@@ -31,6 +33,7 @@ export const GovernancePanel = ({
   const { isConnected, connect } = useWalletConnection();
   const [showForm, setShowForm] = useState(false);
   const { data: proposals = [], isLoading, refetch } = useProposals(partyAddress);
+  const { canPropose, canExecute: hasExecutionPower } = useVotingPower();
 
   const handleProposalSubmit = async (proposal: GovernanceProposal) => {
     if (!isConnected) {
@@ -180,10 +183,10 @@ export const GovernancePanel = ({
                 return;
               }
               
-              if (!isHost) {
+              if (!canPropose) {
                 toast({
-                  title: "Host Permission Required",
-                  description: "Only settlement hosts can create proposals.",
+                  title: "Insufficient Voting Power",
+                  description: "You need more voting power to create proposals. Sentinels can always create proposals, while others need at least 2 NFTs.",
                   variant: "destructive"
                 });
                 return;
@@ -198,6 +201,12 @@ export const GovernancePanel = ({
           </Button>
         )}
       </div>
+      
+      {isConnected && !showForm && (
+        <div className="mb-6">
+          <VotingPowerDisplay />
+        </div>
+      )}
       
       {showForm ? (
         <div className="space-y-4">
@@ -235,7 +244,7 @@ export const GovernancePanel = ({
                       proposal={proposal}
                       onVote={handleVote}
                       onExecute={handleExecute}
-                      canExecute={isHost && proposal.status === 'ready'}
+                      canExecute={hasExecutionPower && proposal.status === 'ready'}
                     />
                   ))
               )}
@@ -260,7 +269,7 @@ export const GovernancePanel = ({
                       proposal={proposal}
                       onVote={handleVote}
                       onExecute={handleExecute}
-                      canExecute={isHost}
+                      canExecute={hasExecutionPower}
                     />
                   ))
               )}
