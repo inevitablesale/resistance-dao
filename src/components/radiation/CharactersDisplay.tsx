@@ -17,21 +17,21 @@ export function CharactersDisplay({ className = "" }: CharactersDisplayProps) {
   return (
     <div className={`space-y-12 ${className}`}>
       <CharacterList
-        type="SENTINEL"
+        characterRole="SENTINEL"
         title="FOUNDER SENTINELS: Governance & Oversight"
         description="Economic commanders with full radiation immunity"
         onCharacterClick={handleCharacterClick}
       />
       
       <CharacterList
-        type="BOUNTY_HUNTER"
+        characterRole="BOUNTY_HUNTER"
         title="BOUNTY HUNTERS: Enforcers & Funders"
         description="Track targets across the wasteland"
         onCharacterClick={handleCharacterClick}
       />
       
       <CharacterList
-        type="SURVIVOR"
+        characterRole="SURVIVOR"
         title="SURVIVORS: Builders & Innovators" 
         description="Crafting the future from the ruins"
         onCharacterClick={handleCharacterClick}

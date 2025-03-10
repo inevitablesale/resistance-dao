@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -140,7 +139,7 @@ const Index = () => {
     bountyHunterRatio: 35
   };
   
-  // Updated NFT listings with proper roles
+  // Updated NFT listings without the 'role' property
   const sentinelListings: MarketplaceListing[] = [
     {
       id: 1,
@@ -159,8 +158,7 @@ const Index = () => {
         { trait: "Investment Ability", value: "Strategic" }
       ],
       status: 'active',
-      role: "Strategic Commander",
-      rank: "Veteran",
+      description: "Strategic Commander with veteran rank",
       modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiheog5wgtnl7ldazmsj3n7xmkgkzpjnix5e4tuxndzw7j3bgkp2n4"
     },
     {
@@ -180,8 +178,7 @@ const Index = () => {
         { trait: "Investment Ability", value: "Economic" }
       ],
       status: 'active',
-      role: "Financial Overseer",
-      rank: "Elite",
+      description: "Financial Overseer with elite rank",
       modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiavqxeov62wgj6upfpvq6g4vpvot4mnwl3ggunxp27sbfjgs4hlfq"
     },
     {
@@ -201,8 +198,7 @@ const Index = () => {
         { trait: "Investment Ability", value: "Diplomatic" }
       ],
       status: 'active',
-      role: "Trade Commissioner",
-      rank: "Legend",
+      description: "Trade Commissioner with legend rank",
       modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeig47okn4sqqbajhje57htkxw6py3tdms7boyc3hkvvr4qlj7zsabu"
     }
   ];
@@ -225,8 +221,7 @@ const Index = () => {
         { trait: "Operating Territory", value: "Wastelands" }
       ],
       status: 'active',
-      role: "Protocol Tracker",
-      rank: "Feared",
+      description: "Protocol Tracker with feared rank",
       modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeifzvpyj5znhgjq22cbjyzav5zsvese3m3klbkc4lcdm3fdbbxiooa"
     },
     {
@@ -246,8 +241,7 @@ const Index = () => {
         { trait: "Operating Territory", value: "Cyber Core" }
       ],
       status: 'active',
-      role: "Asset Recovery",
-      rank: "Respected"
+      description: "Asset Recovery with respected rank"
     },
     {
       id: 6,
@@ -266,8 +260,7 @@ const Index = () => {
         { trait: "Operating Territory", value: "Deep Zone" }
       ],
       status: 'active',
-      role: "Network Infiltrator",
-      rank: "Infamous"
+      description: "Network Infiltrator with infamous rank"
     }
   ];
   
@@ -289,8 +282,7 @@ const Index = () => {
         { trait: "Settlement", value: "New Haven" }
       ],
       status: 'active',
-      role: "Engineer",
-      rank: "Veteran"
+      description: "Engineer Pioneer with veteran rank"
     },
     {
       id: 8,
@@ -309,8 +301,7 @@ const Index = () => {
         { trait: "Settlement", value: "Outpost Alpha" }
       ],
       status: 'active',
-      role: "Medic",
-      rank: "Skilled"
+      description: "Medic Support with skilled rank"
     },
     {
       id: 9,
@@ -329,8 +320,7 @@ const Index = () => {
         { trait: "Settlement", value: "Reactor City" }
       ],
       status: 'active',
-      role: "Settlement Leader",
-      rank: "Master"
+      description: "Settlement Leader with master rank"
     }
   ];
 
@@ -702,3 +692,4 @@ const Index = () => {
 };
 
 export default Index;
+

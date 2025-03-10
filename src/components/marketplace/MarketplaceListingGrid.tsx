@@ -27,11 +27,14 @@ export interface MarketplaceListing {
   status: 'active' | 'sold' | 'expired';
   description?: string;
   modelUrl?: string;
+  // Don't add role as it's not in the existing type
 }
 
 interface MarketplaceListingGridProps {
   listings: MarketplaceListing[];
   className?: string;
+  title?: string;
+  onListingClick?: (listing: MarketplaceListing) => void;
 }
 
 const getTypeIcon = (type: MarketplaceListingType) => {
@@ -57,7 +60,7 @@ const getRadiationColor = (value: number) => {
   return "text-toxic-neon";
 };
 
-export function MarketplaceListingGrid({ listings, className = "" }: MarketplaceListingGridProps) {
+export function MarketplaceListingGrid({ listings, className = "", title, onListingClick }: MarketplaceListingGridProps) {
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -84,63 +87,72 @@ export function MarketplaceListingGrid({ listings, className = "" }: Marketplace
   }
 
   return (
-    <motion.div 
-      className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ${className}`}
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-    >
-      {listings.map((listing) => (
-        <motion.div key={listing.id} variants={itemVariants}>
-          <Link to={`/marketplace/${listing.id}`}>
-            <ToxicCard className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all cursor-pointer overflow-hidden">
-              <div className="p-0">
-                <div className="h-40 bg-gradient-to-b from-toxic-neon/20 to-black/60 relative overflow-hidden">
-                  {listing.modelUrl ? (
-                    <ModelPreview 
-                      modelUrl={listing.modelUrl} 
-                      height="100%"
-                      width="100%"
-                      autoRotate={true}
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <Biohazard className="h-16 w-16 text-toxic-neon/30" />
+    <div className={className}>
+      {title && (
+        <h2 className="text-lg font-mono text-toxic-neon mb-4 pb-2 border-b border-toxic-neon/30">{title}</h2>
+      )}
+      
+      <motion.div 
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+      >
+        {listings.map((listing) => (
+          <motion.div key={listing.id} variants={itemVariants}>
+            <div 
+              onClick={() => onListingClick && onListingClick(listing)}
+              className="cursor-pointer"
+            >
+              <ToxicCard className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all overflow-hidden">
+                <div className="p-0">
+                  <div className="h-40 bg-gradient-to-b from-toxic-neon/20 to-black/60 relative overflow-hidden">
+                    {listing.modelUrl ? (
+                      <ModelPreview 
+                        modelUrl={listing.modelUrl} 
+                        height="100%"
+                        width="100%"
+                        autoRotate={true}
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <Biohazard className="h-16 w-16 text-toxic-neon/30" />
+                      </div>
+                    )}
+                    <div className="absolute top-2 right-2">
+                      <ToxicBadge 
+                        variant={listing.status === 'active' ? 'outline' : 'secondary'} 
+                        className="text-xs bg-black/60 border-toxic-neon/60"
+                      >
+                        {listing.status.toUpperCase()}
+                      </ToxicBadge>
                     </div>
-                  )}
-                  <div className="absolute top-2 right-2">
-                    <ToxicBadge 
-                      variant={listing.status === 'active' ? 'outline' : 'secondary'} 
-                      className="text-xs bg-black/60 border-toxic-neon/60"
-                    >
-                      {listing.status.toUpperCase()}
-                    </ToxicBadge>
-                  </div>
-                </div>
-                
-                <div className="p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <ToxicBadge variant="outline" className="flex items-center gap-1">
-                      {getTypeIcon(listing.type)}
-                      <span className="text-xs">{listing.type.replace('-', ' ')}</span>
-                    </ToxicBadge>
-                    <span className="text-toxic-neon font-mono text-sm">{listing.price}</span>
                   </div>
                   
-                  <h3 className="text-toxic-neon font-mono text-sm mb-1 truncate">{listing.name}</h3>
-                  
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-white/60">Token #{listing.tokenId}</span>
-                    <span className={`${getRadiationColor(listing.radiation.value)} font-mono`}>
-                      RAD {listing.radiation.value}%
-                    </span>
+                  <div className="p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <ToxicBadge variant="outline" className="flex items-center gap-1">
+                        {getTypeIcon(listing.type)}
+                        <span className="text-xs">{listing.type.replace('-', ' ')}</span>
+                      </ToxicBadge>
+                      <span className="text-toxic-neon font-mono text-sm">{listing.price}</span>
+                    </div>
+                    
+                    <h3 className="text-toxic-neon font-mono text-sm mb-1 truncate">{listing.name}</h3>
+                    
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-white/60">Token #{listing.tokenId}</span>
+                      <span className={`${getRadiationColor(listing.radiation.value)} font-mono`}>
+                        RAD {listing.radiation.value}%
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </ToxicCard>
-          </Link>
-        </motion.div>
-      ))}
-    </motion.div>
+              </ToxicCard>
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
   );
 }
