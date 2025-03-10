@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { ProposalEvent, ProposalMetadata } from "@/types/proposals";
-import { NFTClass } from "@/services/nftService";
+import { NFTClass } from "@/services/alchemyService";
 
 export interface JobMetadata {
   title: string;

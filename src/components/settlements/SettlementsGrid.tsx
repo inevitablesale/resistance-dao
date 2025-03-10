@@ -1,9 +1,10 @@
+
 import React, { useEffect, useState } from 'react';
 import { SettlementCard } from './SettlementCard';
 import { ProposalEvent } from '@/types/proposals';
 import { Settlement, convertProposalsToSettlements } from '@/utils/settlementConversion';
 import { useNFTRoles } from '@/hooks/useNFTRoles';
-import { processSettlementPermissions } from '@/services/nftService';
+import { processSettlementPermissions } from '@/services/alchemyService';
 
 interface SettlementsGridProps {
   settlements: ProposalEvent[] | Settlement[];

@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { getNFTBalanceByContract, RESISTANCE_NFT_ADDRESS } from "@/services/nftService";
+import { getNFTBalanceByContract, RESISTANCE_NFT_ADDRESS } from "@/services/alchemyService";
 
 export const useNFTBalance = (address?: string) => {
   return useQuery({

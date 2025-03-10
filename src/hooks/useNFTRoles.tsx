@@ -8,7 +8,7 @@ import {
   ResistanceNFT,
   RESISTANCE_NFT_ADDRESS,
   getNFTBalanceByContract
-} from '@/services/nftService';
+} from '@/services/alchemyService';
 
 interface NFTRolesState {
   isLoading: boolean;
