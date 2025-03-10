@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ResistanceNFT, RESISTANCE_NFT_ADDRESS } from "./alchemyService";
 import { createReferral, getActiveReferral, updateReferralWithPurchase } from "./referralService";
@@ -12,6 +13,7 @@ export interface NFTPurchaseEvent {
   price: ethers.BigNumber;
   timestamp: number;
   isAirdrop?: boolean;
+  transactionHash?: string;
 }
 
 // Keep track of airdropped token IDs
@@ -19,14 +21,69 @@ const airdropTokenIds = new Set<string>();
 
 const NFT_TRANSFER_EVENT = "Transfer(address,address,uint256)";
 
+// Mark token as an airdrop in the registry
 export const markTokenAsAirdrop = (tokenId: string) => {
+  if (!tokenId) return;
+  
   airdropTokenIds.add(tokenId.toString());
   console.log(`Token ${tokenId} marked as airdrop`);
+  
+  // Persist to localStorage for page refreshes
+  try {
+    const storedAirdrops = localStorage.getItem('airdrop_token_ids');
+    const airdrops = storedAirdrops ? JSON.parse(storedAirdrops) : [];
+    if (!airdrops.includes(tokenId.toString())) {
+      airdrops.push(tokenId.toString());
+      localStorage.setItem('airdrop_token_ids', JSON.stringify(airdrops));
+    }
+  } catch (error) {
+    console.error("Error persisting airdrop token ID:", error);
+  }
 };
 
+// Check if a token is marked as an airdrop
 export const isTokenAirdrop = (tokenId: string): boolean => {
-  return airdropTokenIds.has(tokenId.toString());
+  if (!tokenId) return false;
+  
+  // First check memory cache
+  if (airdropTokenIds.has(tokenId.toString())) {
+    return true;
+  }
+  
+  // Then check localStorage
+  try {
+    const storedAirdrops = localStorage.getItem('airdrop_token_ids');
+    if (storedAirdrops) {
+      const airdrops = JSON.parse(storedAirdrops);
+      if (airdrops.includes(tokenId.toString())) {
+        // Add to memory cache for future checks
+        airdropTokenIds.add(tokenId.toString());
+        return true;
+      }
+    }
+  } catch (error) {
+    console.error("Error checking airdrop token ID:", error);
+  }
+  
+  return false;
 };
+
+// Load airdrop token IDs from localStorage on initialization
+const loadAirdropTokenIds = () => {
+  try {
+    const storedAirdrops = localStorage.getItem('airdrop_token_ids');
+    if (storedAirdrops) {
+      const airdrops = JSON.parse(storedAirdrops);
+      airdrops.forEach((tokenId: string) => airdropTokenIds.add(tokenId));
+      console.log(`Loaded ${airdrops.length} airdrop token IDs from storage`);
+    }
+  } catch (error) {
+    console.error("Error loading airdrop token IDs:", error);
+  }
+};
+
+// Initialize the airdrop registry
+loadAirdropTokenIds();
 
 export const subscribeToPurchaseEvents = (
   provider: ethers.providers.Web3Provider,
@@ -46,6 +103,7 @@ export const subscribeToPurchaseEvents = (
   // Listen for all Transfer events
   nftContract.on(NFT_TRANSFER_EVENT, async (from, to, tokenId, event) => {
     const tokenIdStr = tokenId.toString();
+    const transactionHash = event.transactionHash;
     
     // Handle new mints (from zero address)
     if (from === ethers.constants.AddressZero) {
@@ -53,6 +111,7 @@ export const subscribeToPurchaseEvents = (
         from,
         to,
         tokenId: tokenIdStr,
+        transactionHash,
         timestamp: Math.floor(Date.now() / 1000)
       });
 
@@ -66,7 +125,8 @@ export const subscribeToPurchaseEvents = (
           tokenId: tokenIdStr,
           price: ethers.utils.parseEther("0.1"), // Fixed price for now
           timestamp: Math.floor(Date.now() / 1000),
-          isAirdrop: false
+          isAirdrop: false,
+          transactionHash
         };
 
         await processPurchase(purchaseEvent);
@@ -78,6 +138,7 @@ export const subscribeToPurchaseEvents = (
       console.log("Transfer from admin wallet detected:", {
         to,
         tokenId: tokenIdStr,
+        transactionHash,
         timestamp: Math.floor(Date.now() / 1000)
       });
       
@@ -86,6 +147,17 @@ export const subscribeToPurchaseEvents = (
       
       if (isAirdrop) {
         console.log(`Token ${tokenIdStr} is an airdrop - skipping referral processing`);
+        
+        const airdropEvent: NFTPurchaseEvent = {
+          buyer: to,
+          tokenId: tokenIdStr,
+          price: ethers.BigNumber.from(0),
+          timestamp: Math.floor(Date.now() / 1000),
+          isAirdrop: true,
+          transactionHash
+        };
+        
+        onPurchaseSuccess?.(airdropEvent);
       } else {
         console.log(`Processing transfer from admin as a purchase`);
         
@@ -94,7 +166,8 @@ export const subscribeToPurchaseEvents = (
           tokenId: tokenIdStr,
           price: ethers.utils.parseEther("0.1"), // Fixed price for now 
           timestamp: Math.floor(Date.now() / 1000),
-          isAirdrop: false
+          isAirdrop: false,
+          transactionHash
         };
 
         await processPurchase(purchaseEvent);
@@ -128,8 +201,10 @@ const processPurchase = async (purchaseEvent: NFTPurchaseEvent) => {
       // Update referral with purchase information
       await updateReferralWithPurchase(purchaseEvent.buyer);
 
-      // Process $20 reward payment
+      // Process $25 reward payment (changed from $20)
       await processReferralReward(referral.referrerAddress);
+    } else {
+      console.log("No active referral found for buyer or referral already processed:", purchaseEvent.buyer);
     }
   } catch (error) {
     console.error("Error processing NFT purchase:", error);
@@ -140,7 +215,7 @@ const processReferralReward = async (referrerAddress: string) => {
   try {
     // For now, we'll just update the status
     // In production, this would integrate with a payment system
-    console.log("Processing $20 reward payment for referrer:", referrerAddress);
+    console.log("Processing $25 reward payment for referrer:", referrerAddress);
     
     // Mock payment processing - in production this would be replaced
     // with actual payment processing logic
