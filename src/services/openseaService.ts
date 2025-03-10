@@ -1,10 +1,9 @@
-
 import { toast } from "@/components/ui/use-toast";
 
 // OpenSea API base URL for Polygon network
 const OPENSEA_API_BASE_URL = "https://api.opensea.io/api/v2";
-// Update the API key with a mock data fallback system
-const OPENSEA_API_KEY = ""; // We'll leave this empty for now
+// Use the free API without an API key
+const OPENSEA_API_KEY = ""; // Empty API key for free tier
 
 // Mock NFT data for development when API is unavailable
 const MOCK_NFTS = Array.from({ length: 20 }).map((_, index) => ({
@@ -167,23 +166,25 @@ interface OpenSeaResponse<T> {
 // Function to fetch collection info
 export const fetchCollectionInfo = async (contractAddress: string): Promise<OpenSeaCollection | null> => {
   try {
-    // If API key is not provided, use mock data
-    if (!OPENSEA_API_KEY) {
-      console.log("Using mock collection data (no API key provided)");
-      return MOCK_COLLECTION;
-    }
-
+    console.log("Fetching collection info for", contractAddress);
+    
     const response = await fetch(`${OPENSEA_API_BASE_URL}/chain/matic/contract/${contractAddress}`, {
       method: 'GET',
       headers: {
-        'accept': 'application/json',
-        'X-API-KEY': OPENSEA_API_KEY
+        'accept': 'application/json'
       }
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenSea API error:', errorText);
+      console.error('OpenSea API error:', errorText, 'Status:', response.status);
+      
+      // Show toast with the error
+      toast({
+        title: "Using demo collection data",
+        description: `OpenSea API error (${response.status}): Using sample data instead`,
+        variant: "default"
+      });
       
       // Fallback to mock data on error
       console.log("Falling back to mock collection data");
@@ -212,17 +213,8 @@ export const fetchNFTsByContract = async (
   next: string | null = null
 ): Promise<OpenSeaResponse<OpenSeaNFT[]> | null> => {
   try {
-    // If API key is not provided, use mock data
-    if (!OPENSEA_API_KEY) {
-      console.log("Using mock NFT data (no API key provided)");
-      const mockData = MOCK_NFTS.slice(0, limit);
-      return {
-        data: mockData,
-        next: mockData.length >= limit ? "mock-next-cursor" : null,
-        previous: null
-      };
-    }
-
+    console.log("Fetching NFTs for", contractAddress, "limit:", limit, "next:", next);
+    
     let url = `${OPENSEA_API_BASE_URL}/chain/matic/contract/${contractAddress}/nfts?limit=${limit}`;
     
     if (next) {
@@ -232,14 +224,20 @@ export const fetchNFTsByContract = async (
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'accept': 'application/json',
-        'X-API-KEY': OPENSEA_API_KEY
+        'accept': 'application/json'
       }
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenSea API error:', errorText);
+      console.error('OpenSea API error:', errorText, 'Status:', response.status);
+      
+      // Show toast with the error
+      toast({
+        title: "Using demo NFT data",
+        description: `OpenSea API error (${response.status}): Using sample data instead`,
+        variant: "default"
+      });
       
       // Fallback to mock data on error
       console.log("Falling back to mock NFT data");
@@ -277,30 +275,28 @@ export const fetchNFTByTokenId = async (
   tokenId: string
 ): Promise<OpenSeaNFT | null> => {
   try {
-    // If API key is not provided, use mock data
-    if (!OPENSEA_API_KEY) {
-      console.log("Using mock NFT data (no API key provided)");
-      const mockNft = MOCK_NFTS.find(nft => nft.identifier === tokenId) || MOCK_NFTS[0];
-      return {
-        ...mockNft,
-        identifier: tokenId
-      };
-    }
-
+    console.log("Fetching NFT", tokenId, "from contract", contractAddress);
+    
     const response = await fetch(
       `${OPENSEA_API_BASE_URL}/chain/matic/contract/${contractAddress}/nfts/${tokenId}`,
       {
         method: 'GET',
         headers: {
-          'accept': 'application/json',
-          'X-API-KEY': OPENSEA_API_KEY
+          'accept': 'application/json'
         }
       }
     );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenSea API error:', errorText);
+      console.error('OpenSea API error:', errorText, 'Status:', response.status);
+      
+      // Show toast with the error
+      toast({
+        title: "Using demo NFT data",
+        description: `OpenSea API error (${response.status}): Using sample data instead`,
+        variant: "default"
+      });
       
       // Fallback to mock data on error
       console.log("Falling back to mock NFT data");
