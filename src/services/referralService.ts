@@ -1,4 +1,3 @@
-
 import { ReferralStatus } from '@/types/content';
 
 export interface ReferralInfo {
@@ -103,13 +102,14 @@ export const updateReferralWithPurchase = async (referredAddress: string): Promi
       return false;
     }
     
-    // Update the first valid referral found (typically there should only be one)
+    // Update the first valid referral found
     const referral = referrals[0];
     const currentDate = new Date().toISOString();
     
     referral.nftPurchased = true;
     referral.purchaseDate = currentDate;
     referral.status = 'claimed';
+    referral.paymentAmount = 20; // Update to $20 reward
     
     // Update the referral in localStorage
     const referrerKey = `referrals_${referral.referrerAddress}`;

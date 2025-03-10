@@ -8,6 +8,8 @@ import { Progress } from '@/components/ui/progress';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
 import { useToast } from '@/hooks/use-toast';
 import { getReferralsByReferrer, ReferralInfo } from '@/services/referralService';
+import { ethers } from "ethers";
+import { subscribeToPurchaseEvents } from "@/services/nftPurchaseEvents";
 
 interface ReferralSystemProps {
   earnings?: number;
@@ -79,6 +81,27 @@ export function ReferralSystem({ earnings = 0, totalReferrals = 0, className = "
     
     fetchReferralData();
   }, [address, isConnected]);
+
+  // Add event subscription when connected
+  useEffect(() => {
+    if (!isConnected || !address) return;
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    
+    const unsubscribe = subscribeToPurchaseEvents(provider, (event) => {
+      // Refresh referral data when a purchase is detected
+      fetchReferralData();
+      
+      toast({
+        title: "New NFT Purchase!",
+        description: "A referred user has made a purchase. Your reward will be processed soon.",
+      });
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [isConnected, address]);
   
   const copyToClipboard = () => {
     if (!isConnected) return;
