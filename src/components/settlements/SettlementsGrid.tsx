@@ -12,19 +12,21 @@ interface SettlementsGridProps {
   isLoading: boolean;
   formatUSDAmount: (amount: string) => string;
   title?: string;
+  className?: string;
 }
 
 export const SettlementsGrid: React.FC<SettlementsGridProps> = ({ 
   settlements, 
   isLoading,
   formatUSDAmount,
-  title = "Settlements"
+  title = "Settlements",
+  className = ""
 }) => {
   const navigate = useNavigate();
   
   if (isLoading) {
     return (
-      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <div className={`grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${className}`}>
         {Array.from({ length: 6 }).map((_, index) => (
           <div key={index} className="bg-[#0a0a0a] border border-white/5 rounded-lg h-[400px] animate-pulse">
             <div className="h-36 bg-gradient-to-b from-blue-900/20 to-blue-700/5" />
@@ -43,7 +45,7 @@ export const SettlementsGrid: React.FC<SettlementsGridProps> = ({
   
   if (settlements.length === 0) {
     return (
-      <div className="bg-[#0a0a0a] border border-white/5 rounded-lg p-8 text-center">
+      <div className={`bg-[#0a0a0a] border border-white/5 rounded-lg p-8 text-center ${className}`}>
         <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-500" />
         <h3 className="text-xl font-semibold mb-2">No settlements found</h3>
         <p className="text-gray-400 mb-6">There are currently no active settlements to display.</p>
@@ -72,7 +74,7 @@ export const SettlementsGrid: React.FC<SettlementsGridProps> = ({
     s.error);
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${className}`}>
       {title && <h2 className="text-2xl font-bold mb-4">{title}</h2>}
       
       <Tabs defaultValue="all">
@@ -191,7 +193,7 @@ const SettlementCardWrapper = ({ settlement, formatUSDAmount }: {
   const remainingDays = Math.ceil(remainingSeconds / (24 * 60 * 60));
   
   // Determine status
-  let status = metadata.status || 'active';
+  let status = metadata?.status || 'active';
   if (remainingSeconds <= 0 && status === 'active') {
     status = 'failed';
   }

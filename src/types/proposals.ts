@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { IPFSContent } from "./content";
 
@@ -128,6 +129,7 @@ export interface ProposalMetadata {
   isTestMode?: boolean;
   submissionTimestamp?: number;
   submitter?: string;
+  status?: 'active' | 'completed' | 'funded' | 'failed';
 }
 
 export interface StoredProposal {
