@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { File, DollarSign, Users, MessageSquare, Timer, HelpCircle, Beaker } from "lucide-react";
+import { File, DollarSign, Users, MessageSquare, Timer, HelpCircle, Beaker, Shield } from "lucide-react";
 import { VotingDurationInput } from "@/components/thesis/VotingDurationInput";
 import { TargetCapitalInput, convertToWei } from "@/components/thesis/TargetCapitalInput";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -15,9 +15,21 @@ import { ProposalMetadata } from "@/types/proposals";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
-import { createProposal } from "@/services/proposalContractService";
-import { RD_TOKEN_ADDRESS, FACTORY_ADDRESS, SUBMISSION_FEE } from "@/lib/constants";
-import { checkTokenAllowance, approveExactAmount } from "@/services/tokenService";
+import { 
+  createParty, 
+  createEthCrowdfund, 
+  updateSurvivorMetadata, 
+  verifySurvivorOwnership,
+  PartyOptions,
+  CrowdfundOptions
+} from "@/services/partyProtocolService";
+import { 
+  RD_TOKEN_ADDRESS, 
+  FACTORY_ADDRESS, 
+  SUBMISSION_FEE,
+  PARTY_PROTOCOL,
+  SURVIVOR_NFT_ADDRESS
+} from "@/lib/constants";
 import { ethers } from "ethers";
 
 const thesisFormSchema = z.object({
@@ -68,6 +80,21 @@ const thesisFormSchema = z.object({
     discord: z.string().url().optional(),
     telegram: z.string().url().optional(),
   }),
+
+  // Add party specific fields
+  partyName: z.string().min(5, {
+    message: "Party name must be at least 5 characters.",
+  }),
+  allowPublicProposals: z.boolean().default(true),
+  minContribution: z.string().min(1, {
+    message: "Minimum contribution is required."
+  }),
+  maxContribution: z.string().min(1, {
+    message: "Maximum contribution is required."
+  }),
+  crowdfundDuration: z.number().min(1 * 24 * 60 * 60, {
+    message: "Crowdfund duration must be at least 1 day."
+  })
 });
 
 const requiredFormData = {
@@ -139,6 +166,30 @@ export default function ThesisSubmission() {
   const navigate = useNavigate();
   const { primaryWallet } = useDynamicContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasSurvivorNFT, setHasSurvivorNFT] = useState(false);
+  const [survivorTokenId, setSurvivorTokenId] = useState<string | null>(null);
+
+  // Check if user owns a Survivor NFT
+  useEffect(() => {
+    const checkSurvivorOwnership = async () => {
+      if (primaryWallet) {
+        try {
+          const hasNFT = await verifySurvivorOwnership(primaryWallet, SURVIVOR_NFT_ADDRESS);
+          setHasSurvivorNFT(hasNFT);
+          
+          if (hasNFT) {
+            // Get the token ID (would need to be implemented)
+            // This is a placeholder - real implementation would get the token ID
+            setSurvivorTokenId("1");
+          }
+        } catch (error) {
+          console.error("Error checking Survivor ownership:", error);
+        }
+      }
+    };
+    
+    checkSurvivorOwnership();
+  }, [primaryWallet]);
 
   const form = useForm<z.infer<typeof thesisFormSchema>>({
     resolver: zodResolver(thesisFormSchema),
@@ -170,6 +221,13 @@ export default function ThesisSubmission() {
         discord: "",
         telegram: "",
       },
+      
+      // Party Protocol specific fields
+      partyName: "",
+      allowPublicProposals: true,
+      minContribution: "0.1",
+      maxContribution: "100",
+      crowdfundDuration: 14 * 24 * 60 * 60 // 14 days
     }
   });
 
@@ -196,6 +254,10 @@ export default function ThesisSubmission() {
         throw new Error("Wallet is not available");
       }
 
+      if (!hasSurvivorNFT) {
+        throw new Error("You must own a Survivor NFT to create a settlement");
+      }
+
       const walletClient = await primaryWallet.getWalletClient();
       if (!walletClient) {
         throw new Error("Wallet client not available");
@@ -206,44 +268,11 @@ export default function ThesisSubmission() {
       const signerAddress = await signer.getAddress();
 
       toast({
-        title: "Checking Allowance...",
-        description: "Checking if approval is needed for token usage",
+        title: "Creating Settlement...",
+        description: "Setting up your party on Party Protocol",
       });
 
-      const hasAllowance = await checkTokenAllowance(
-        provider,
-        RD_TOKEN_ADDRESS,
-        signerAddress,
-        FACTORY_ADDRESS,
-        ethers.utils.formatEther(SUBMISSION_FEE) // Convert wei to human readable for the check
-      );
-
-      if (!hasAllowance) {
-        toast({
-          title: "Approving Token Usage...",
-          description: "Please approve the transaction to allow token usage",
-        });
-
-        const approveTx = await approveExactAmount(
-          provider,
-          RD_TOKEN_ADDRESS,
-          FACTORY_ADDRESS,
-          ethers.utils.formatEther(SUBMISSION_FEE) // Convert wei to human readable for the approval
-        );
-        
-        toast({
-          title: "Waiting for Approval...",
-          description: "Please wait while the approval transaction is confirmed",
-        });
-
-        await approveTx.wait();
-
-        toast({
-          title: "Token Approved",
-          description: "Now creating your proposal...",
-        });
-      }
-
+      // Create metadata for IPFS
       const metadata: ProposalMetadata = {
         title: values.title,
         description: values.description,
@@ -275,34 +304,70 @@ export default function ThesisSubmission() {
           telegram: values.socials.telegram || undefined
         },
         submissionTimestamp: Math.floor(Date.now() / 1000),
-        submitter: await signer.getAddress(),
+        submitter: signerAddress,
         isTestMode: false
       };
 
+      // Set up Party options
+      const partyOptions: PartyOptions = {
+        name: values.partyName || `${values.title} Settlement`,
+        hosts: [signerAddress],
+        votingDuration: values.votingDuration,
+        executionDelay: PARTY_PROTOCOL.EXECUTION_DELAY,
+        passThresholdBps: PARTY_PROTOCOL.PASS_THRESHOLD_BPS,
+        allowPublicProposals: values.allowPublicProposals,
+        description: values.description,
+        metadataURI: "" // Will be set after IPFS upload
+      };
+
+      // Create the Party
       toast({
-        title: "Creating Proposal...",
-        description: "Please wait while we process your submission.",
+        title: "Creating Party...",
+        description: "Please approve the transaction to create your settlement",
       });
 
-      const tx = await createProposal(metadata, primaryWallet);
+      const partyAddress = await createParty(primaryWallet, partyOptions);
 
+      // Set up Crowdfund options
+      const crowdfundOptions: CrowdfundOptions = {
+        initialContributor: signerAddress,
+        minContribution: ethers.utils.parseEther(values.minContribution).toString(),
+        maxContribution: ethers.utils.parseEther(values.maxContribution).toString(),
+        maxTotalContributions: ethers.utils.parseEther(values.investment.targetCapital).toString(),
+        duration: values.crowdfundDuration
+      };
+
+      // Create the ETH Crowdfund
       toast({
-        title: "Proposal Created!",
-        description: "Your proposal has been successfully created.",
+        title: "Creating Crowdfund...",
+        description: "Please approve the transaction to set up funding",
       });
 
-      const receipt = await tx.wait();
-      const event = receipt.events?.find(e => e.event === 'ProposalCreated');
-      if (event && event.args) {
-        const tokenId = event.args.proposalId.toString();
-        navigate(`/proposals/${tokenId}`);
+      const crowdfundAddress = await createEthCrowdfund(primaryWallet, partyAddress, crowdfundOptions, metadata);
+
+      // Update the Survivor NFT metadata
+      toast({
+        title: "Updating Metadata...",
+        description: "Updating your Survivor NFT with settlement data",
+      });
+
+      if (survivorTokenId) {
+        await updateSurvivorMetadata(primaryWallet, survivorTokenId, partyAddress, crowdfundAddress, metadata);
       }
+
+      toast({
+        title: "Settlement Created!",
+        description: "Your settlement has been successfully created on Party Protocol.",
+      });
+
+      // Navigate to the proposal details page
+      navigate(`/settlements/${partyAddress}`);
 
     } catch (error: any) {
       console.error("Error submitting thesis:", error);
       toast({
-        title: "Error Submitting Thesis",
-        description: error.message || "An error occurred while submitting the thesis.",
+        title: "Error Creating Settlement",
+        description: error.message || "An error occurred while creating the settlement.",
         variant: "destructive",
       });
     } finally {
@@ -316,14 +381,27 @@ export default function ThesisSubmission() {
         <div className="w-full max-w-3xl space-y-8">
           <div className="text-center space-y-4">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-500/10 text-blue-400 text-sm mb-4">
-              🚀 Launch Your Web3 Project
+              🚀 Create Your Settlement
             </div>
             <h1 className="text-5xl font-bold text-white font-mono">
-              Submit Your Proposal
+              Launch Your Settlement
             </h1>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Join the Resistance DAO and shape the future of web3 accounting. Present your proposal to our community of seasoned professionals and find co-builders who share your vision.
+              Create a settlement powered by Party Protocol. Present your vision to Sentinels and gather resources to build in the wasteland.
             </p>
+            
+            {!hasSurvivorNFT && (
+              <div className="p-4 bg-red-900/30 border border-red-500/20 rounded-lg mt-4">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-6 h-6 text-red-400" />
+                  <div className="text-left">
+                    <h3 className="font-medium text-white">Survivor NFT Required</h3>
+                    <p className="text-sm text-gray-300">You must own a Survivor NFT to create a settlement.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="flex items-center justify-center gap-4">
               <Button
                 onClick={fillRequiredData}
@@ -398,11 +476,11 @@ export default function ThesisSubmission() {
                   </div>
                 </div>
               </div>
-
+              
               <div className="bg-[#111] rounded-xl border border-white/5 p-6">
                 <div className="flex items-center gap-2 mb-6">
                   <DollarSign className="w-5 h-5 text-blue-400" />
-                  <h2 className="text-lg font-medium">Investment Details</h2>
+                  <h2 className="text-lg font-medium">Settlement Funding</h2>
                 </div>
                 <div className="space-y-6">
                   <TargetCapitalInput
@@ -410,6 +488,25 @@ export default function ThesisSubmission() {
                     onChange={(value) => form.setValue("investment.targetCapital", value)}
                     error={form.formState.errors.investment?.targetCapital ? [form.formState.errors.investment.targetCapital.message || ""] : undefined}
                   />
+                  
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Minimum Contribution (ETH)</Label>
+                      <Input
+                        {...form.register("minContribution")}
+                        placeholder="0.1"
+                        className="mt-2 bg-black/50 border-white/10"
+                      />
+                    </div>
+                    <div>
+                      <Label>Maximum Contribution (ETH)</Label>
+                      <Input
+                        {...form.register("maxContribution")}
+                        placeholder="100"
+                        className="mt-2 bg-black/50 border-white/10"
+                      />
+                    </div>
+                  </div>
                   
                   {form.watch("fundingBreakdown")?.map((_, index) => (
                     <div key={index} className="grid grid-cols-2 gap-4">
@@ -431,6 +528,19 @@ export default function ThesisSubmission() {
                     onChange={(value) => form.setValue("votingDuration", value[0])}
                     error={form.formState.errors.votingDuration ? [form.formState.errors.votingDuration.message || ""] : undefined}
                   />
+                  
+                  <div>
+                    <Label>Crowdfund Duration (days)</Label>
+                    <Input
+                      type="number"
+                      {...form.register("crowdfundDuration", { 
+                        valueAsNumber: true,
+                        setValueAs: v => parseInt(v) * 24 * 60 * 60 // Convert days to seconds
+                      })}
+                      placeholder="14"
+                      className="mt-2 bg-black/50 border-white/10"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -473,6 +583,32 @@ export default function ThesisSubmission() {
                   </div>
                 </div>
               </div>
+              
+              <div className="bg-[#111] rounded-xl border border-white/5 p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <File className="w-5 h-5 text-blue-400" />
+                  <h2 className="text-lg font-medium">Party Settings</h2>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <Label>Party Name</Label>
+                    <Input
+                      {...form.register("partyName")}
+                      placeholder="Enter your settlement party name"
+                      className="mt-2 bg-black/50 border-white/10"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="allowPublicProposals"
+                      {...form.register("allowPublicProposals")}
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor="allowPublicProposals">Allow public proposals (anyone can propose actions)</Label>
+                  </div>
+                </div>
+              </div>
 
               <div className="bg-[#111] rounded-xl border border-white/5 p-6">
                 <div className="flex items-center gap-2 mb-6">
@@ -506,24 +642,29 @@ export default function ThesisSubmission() {
                     </div>
                   </div>
                   <p className="text-sm text-gray-400">
-                    Your proposal will be minted as an NFT, representing a binding smart contract. A fee of 25 RD tokens is required to submit.
+                    Your settlement will be created as a Party on Party Protocol. This will allow Sentinels to contribute ETH and receive governance rights proportional to their contribution.
                   </p>
                 </div>
               </div>
 
               <Button 
                 type="submit" 
-                disabled={isSubmitting}
+                disabled={isSubmitting || !hasSurvivorNFT}
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white py-6 text-lg font-medium"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-                    Submitting...
+                    Creating Settlement...
                   </div>
+                ) : !hasSurvivorNFT ? (
+                  <span className="flex items-center gap-2">
+                    Survivor NFT Required
+                    <Shield className="h-5 w-5" />
+                  </span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    Launch Proposal
+                    Launch Settlement
                     <span className="text-xl">→</span>
                   </span>
                 )}
