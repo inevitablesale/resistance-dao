@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { ZeroDevSmartWalletConnectorsWithConfig } from "@dynamic-labs/ethereum-aa";
@@ -18,7 +19,6 @@ import ReferralRedirect from "./pages/ReferralRedirect";
 import ToxicTheme from "./pages/ToxicTheme";
 import MarketplaceItemDetails from "./pages/MarketplaceItemDetails";
 import Hunt from "./pages/Hunt";
-import Settlements from "./pages/Settlements";
 import SettlementDetails from "./pages/SettlementDetails";
 import { Toaster } from "./components/ui/toaster";
 import { ResistanceWalletWidget } from "./components/wallet/ResistanceWalletWidget";
@@ -167,10 +167,13 @@ function Layout() {
         <Route path="/referral" element={<ReferralRedirect />} />
         <Route path="/hunt" element={<Hunt />} />
         <Route path="/command" element={<Hunt />} />
-        <Route path="/settlements" element={<Settlements />} />
         <Route path="/settlements/:partyAddress" element={<SettlementDetails />} />
-        <Route path="/governance" element={<Settlements />} />
-        <Route path="/my-settlements" element={<Settlements />} />
+        
+        {/* Redirect redundant paths to /command */}
+        <Route path="/settlements" element={<Navigate to="/command" replace />} />
+        <Route path="/governance" element={<Navigate to="/command" replace />} />
+        <Route path="/my-settlements" element={<Navigate to="/command" replace />} />
+        
         <Route path="*" element={<NotFound />} />
       </Routes>
       <ResistanceWalletWidget />

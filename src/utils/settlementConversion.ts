@@ -33,7 +33,6 @@ export const convertProposalToSettlement = (proposal: ProposalEvent): Settlement
     backers: proposal.voteCount || 0,
     status: 'active',
     remainingTime: "30 days", // Default or placeholder
-    // Adding properties from the other Settlement interface
     partyAddress: "",
     crowdfundAddress: "",
     totalPledged: proposal.pledgedAmount || "0",
