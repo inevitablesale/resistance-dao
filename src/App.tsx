@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -22,6 +21,7 @@ import Hunt from "./pages/Hunt";
 import SettlementDetails from "./pages/SettlementDetails";
 import { Toaster } from "./components/ui/toaster";
 import { ResistanceWalletWidget } from "./components/wallet/ResistanceWalletWidget";
+import { BountyHunterDashboard } from "./components/marketplace/BountyHunterDashboard";
 
 const zeroDevConfig = {
   projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -163,7 +163,7 @@ function Layout() {
         <Route path="/marketplace/:id" element={<MarketplaceItemDetails />} />
         
         {/* Role-based marketplace routes */}
-        <Route path="/marketplace/bounty-hunters" element={<Hunt />} />
+        <Route path="/marketplace/bounty-hunters" element={<BountyHunterDashboard />} />
         <Route path="/marketplace/sentinels" element={<Hunt />} />
         <Route path="/marketplace/survivors" element={<Hunt />} />
         
