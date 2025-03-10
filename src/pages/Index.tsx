@@ -148,7 +148,6 @@ const Index = () => {
     bountyHunterRatio: 35
   };
   
-  // Updated NFT listings with proper roles
   const sentinelListings: MarketplaceListing[] = [
     {
       id: 1,
@@ -425,9 +424,7 @@ const Index = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
-            <div className="mb-8">
-              {/* Sentinel, Bounty Hunter, and Survivor listings sections removed */}
-            </div>
+            {/* Removing the role cards section as requested */}
           </div>
           
           <div className="lg:col-span-1">
