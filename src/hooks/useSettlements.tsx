@@ -6,7 +6,7 @@ import { getPartyDetails } from '@/services/partyProtocolService';
 import { toast } from '@/hooks/use-toast';
 import { uploadToIPFS, getFromIPFS } from '@/services/ipfsService';
 import { PARTY_PROTOCOL } from '@/lib/constants';
-import { Settlement as SettlementType } from '@/utils/settlementConversion';
+import { Settlement } from '@/utils/settlementConversion';
 
 export interface SettlementMetrics {
   activeSettlements: number;
@@ -22,7 +22,7 @@ export interface SettlementMetrics {
 }
 
 export const useSettlements = () => {
-  const [settlements, setSettlements] = useState<SettlementType[]>([]);
+  const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [metrics, setMetrics] = useState<SettlementMetrics>({
     activeSettlements: 0,
     totalInvestors: 0,
@@ -54,7 +54,7 @@ export const useSettlements = () => {
         "0xabcdef123456789abcdef123456789abcdef1234"
       ];
       
-      const fetchedSettlements: SettlementType[] = [];
+      const fetchedSettlements: Settlement[] = [];
       let totalPledged = ethers.BigNumber.from(0);
       let uniqueBackers = new Set<string>();
       

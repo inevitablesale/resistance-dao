@@ -10,13 +10,17 @@ import { ToxicBadge } from '@/components/ui/toxic-badge';
 import { ToxicButton } from '@/components/ui/toxic-button';
 import { Progress } from '@/components/ui/progress';
 import { Users, Calendar, Building2 } from 'lucide-react';
-import { Settlement } from '@/hooks/useSettlements';
+import { Settlement } from '@/utils/settlementConversion';
 
 interface SettlementCardProps {
   settlement: Settlement;
+  formatUSDAmount?: (amount: string) => string;
 }
 
-export const SettlementCard: React.FC<SettlementCardProps> = ({ settlement }) => {
+export const SettlementCard: React.FC<SettlementCardProps> = ({ 
+  settlement,
+  formatUSDAmount = (amount) => `${parseFloat(amount).toFixed(2)} ETH`
+}) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-500/20 text-green-400 border-green-500/30';
@@ -27,8 +31,8 @@ export const SettlementCard: React.FC<SettlementCardProps> = ({ settlement }) =>
     }
   };
 
-  const fundingProgress = parseFloat(settlement.totalPledged) / parseFloat(settlement.targetCapital) * 100;
-  const date = new Date(settlement.createdAt * 1000);
+  const fundingProgress = parseFloat(settlement.totalPledged || '0') / parseFloat(settlement.targetCapital) * 100;
+  const date = new Date(settlement.createdAt);
   const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 
   return (
@@ -56,7 +60,7 @@ export const SettlementCard: React.FC<SettlementCardProps> = ({ settlement }) =>
         <div className="mb-4">
           <div className="flex justify-between text-sm mb-1">
             <span className="text-gray-400">Funding Progress</span>
-            <span className="text-toxic-neon">{parseFloat(settlement.totalPledged).toFixed(2)} / {parseFloat(settlement.targetCapital).toFixed(2)} ETH</span>
+            <span className="text-toxic-neon">{formatUSDAmount(settlement.totalPledged || '0')} / {formatUSDAmount(settlement.targetCapital)}</span>
           </div>
           <Progress value={fundingProgress} className="h-2" />
         </div>
@@ -64,7 +68,7 @@ export const SettlementCard: React.FC<SettlementCardProps> = ({ settlement }) =>
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-1 text-sm text-gray-400">
             <Users className="h-4 w-4" />
-            <span>{settlement.backerCount} backers</span>
+            <span>{settlement.backerCount || settlement.backers} backers</span>
           </div>
           {settlement.category && (
             <ToxicBadge variant="outline" className="bg-black/30">

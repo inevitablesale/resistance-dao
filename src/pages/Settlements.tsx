@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { SettlementsNavBar } from '@/components/settlements/SettlementsNavBar';
 import { SettlementsGrid } from '@/components/settlements/SettlementsGrid';
@@ -6,7 +7,6 @@ import { ToxicCard } from '@/components/ui/toxic-card';
 import { Users, TrendingUp, Building2, AlertCircle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Loader2 } from 'lucide-react';
-import { Settlement } from '@/utils/settlementConversion';
 
 const Settlements = () => {
   const { settlements, metrics, loading, error } = useSettlements();
@@ -150,7 +150,7 @@ const Settlements = () => {
             </button>
           </div>
           
-          <SettlementsGrid settlements={filteredSettlements as Settlement[]} />
+          <SettlementsGrid settlements={filteredSettlements} />
         </>
       )}
     </div>

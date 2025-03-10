@@ -17,6 +17,7 @@ export interface Settlement {
   crowdfundAddress?: string;
   totalPledged?: string;
   backerCount?: number;
+  category?: string; // Added category field
 }
 
 export const convertProposalToSettlement = (proposal: ProposalEvent): Settlement => {
