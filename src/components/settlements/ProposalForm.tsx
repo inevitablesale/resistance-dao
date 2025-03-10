@@ -3,7 +3,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { ToxicButton } from "@/components/ui/toxic-button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { X, Plus, Save } from "lucide-react";
@@ -99,23 +99,23 @@ export const ProposalForm = ({
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="font-medium">Transactions</h3>
-            <Button
+            <ToxicButton
               type="button"
-              variant="outline"
+              variant="tertiary"
               size="sm"
               onClick={handleAddTransaction}
               className="gap-1"
             >
               <Plus className="w-3 h-3" />
               Add
-            </Button>
+            </ToxicButton>
           </div>
 
           {form.watch("transactions").map((transaction, index) => (
-            <div key={index} className="space-y-4 p-4 border border-white/10 rounded-md bg-black/20">
+            <div key={index} className="space-y-4 p-4 border border-toxic-neon/20 rounded-md bg-black/30">
               <div className="flex justify-between items-center">
                 <h4 className="text-sm text-white/70">Transaction {index + 1}</h4>
-                <Button
+                <ToxicButton
                   type="button"
                   variant="ghost"
                   size="sm"
@@ -123,7 +123,7 @@ export const ProposalForm = ({
                   disabled={form.watch("transactions").length <= 1}
                 >
                   <X className="w-4 h-4" />
-                </Button>
+                </ToxicButton>
               </div>
 
               <FormField
@@ -186,13 +186,13 @@ export const ProposalForm = ({
         </div>
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <ToxicButton type="button" variant="tertiary" onClick={onCancel}>
             Cancel
-          </Button>
-          <Button type="submit" className="bg-blue-500 hover:bg-blue-600 gap-2">
+          </ToxicButton>
+          <ToxicButton type="submit" variant="primary" className="gap-2">
             <Save className="w-4 h-4" />
             Create Proposal
-          </Button>
+          </ToxicButton>
         </div>
       </form>
     </Form>

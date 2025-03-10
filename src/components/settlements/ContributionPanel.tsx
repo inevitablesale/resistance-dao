@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { ToxicButton } from "@/components/ui/toxic-button";
 import { Shield, Send } from "lucide-react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
@@ -99,10 +99,11 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
           </div>
         </div>
         
-        <Button
+        <ToxicButton
           onClick={handleContribute}
           disabled={isContributing || !contribution || parseFloat(contribution) <= 0}
-          className="w-full bg-toxic-dark text-toxic-neon border border-toxic-neon/60 shadow-[0_0_10px_rgba(57,255,20,0.3)] hover:bg-toxic-dark/80 hover:shadow-[0_0_15px_rgba(57,255,20,0.4)]"
+          variant="primary"
+          className="w-full"
         >
           {isContributing ? (
             <>
@@ -115,7 +116,7 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
               Contribute to Settlement
             </>
           )}
-        </Button>
+        </ToxicButton>
         
         <div className="text-xs text-toxic-neon/70">
           By contributing, you'll receive governance rights in this settlement proportional to your contribution.

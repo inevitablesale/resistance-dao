@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { ToxicButton } from '@/components/ui/toxic-button';
 import { Plus, Gavel, ShieldCheck, Building2 } from 'lucide-react';
 
 export const SettlementsNavBar = () => {
@@ -18,37 +18,40 @@ export const SettlementsNavBar = () => {
       </div>
       <div className="flex flex-wrap gap-2">
         <Link to="/settlements">
-          <Button 
-            variant={isActive("/settlements") ? "default" : "outline"} 
-            className={`gap-2 ${isActive("/settlements") ? "bg-toxic-dark border border-toxic-neon/60 text-toxic-neon shadow-[0_0_10px_rgba(57,255,20,0.3)]" : "text-gray-300 border-white/10 hover:bg-white/5"}`}
+          <ToxicButton 
+            variant={isActive("/settlements") ? "primary" : "tertiary"} 
+            className="gap-2"
           >
             <Building2 className="w-4 h-4" />
             All Settlements
-          </Button>
+          </ToxicButton>
         </Link>
         <Link to="/governance">
-          <Button 
-            variant={isActive("/governance") ? "default" : "outline"} 
-            className={`gap-2 ${isActive("/governance") ? "bg-toxic-dark border border-toxic-neon/60 text-toxic-neon shadow-[0_0_10px_rgba(57,255,20,0.3)]" : "text-gray-300 border-white/10 hover:bg-white/5"}`}
+          <ToxicButton 
+            variant={isActive("/governance") ? "primary" : "tertiary"} 
+            className="gap-2"
           >
             <Gavel className="w-4 h-4" />
             Governance
-          </Button>
+          </ToxicButton>
         </Link>
         <Link to="/my-settlements">
-          <Button 
-            variant={isActive("/my-settlements") ? "default" : "outline"} 
-            className={`gap-2 ${isActive("/my-settlements") ? "bg-toxic-dark border border-toxic-neon/60 text-toxic-neon shadow-[0_0_10px_rgba(57,255,20,0.3)]" : "text-gray-300 border-white/10 hover:bg-white/5"}`}
+          <ToxicButton 
+            variant={isActive("/my-settlements") ? "primary" : "tertiary"} 
+            className="gap-2"
           >
             <ShieldCheck className="w-4 h-4" />
             My Contributions
-          </Button>
+          </ToxicButton>
         </Link>
         <Link to="/thesis">
-          <Button className="bg-toxic-dark/70 text-toxic-neon border-2 border-toxic-neon font-bold shadow-[0_0_20px_rgba(57,255,20,0.7)] hover:bg-toxic-dark/50 hover:shadow-[0_0_30px_rgba(57,255,20,0.8)] gap-2">
+          <ToxicButton 
+            variant="primary" 
+            className="gap-2"
+          >
             <Plus className="w-4 h-4" />
             Create Settlement
-          </Button>
+          </ToxicButton>
         </Link>
       </div>
     </div>
