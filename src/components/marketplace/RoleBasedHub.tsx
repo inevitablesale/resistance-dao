@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Target, Shield, Zap, ArrowRight, FileText } from "lucide-react";
+import { Target, Shield, Zap, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { useNFTRoles } from "@/hooks/useNFTRoles";
@@ -26,13 +26,8 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
     isSentinel, 
     isSurvivor, 
     isBountyHunter,
-    nfts
+    counts
   } = useNFTRoles();
-  
-  // Count NFTs by class
-  const sentinelCount = nfts.filter(nft => nft.class === 'Sentinel').length;
-  const survivorCount = nfts.filter(nft => nft.class === 'Survivor').length;
-  const bountyHunterCount = nfts.filter(nft => nft.class === 'Bounty Hunter').length;
   
   const roleCards: RoleCard[] = [
     {
@@ -46,7 +41,7 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
         "Deploy reward pools",
         "Monitor hunter performance"
       ],
-      count: sentinelCount,
+      count: counts.sentinel,
       unlocked: isSentinel
     },
     {
@@ -60,7 +55,7 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
         "Manage contributor tasks",
         "Deploy participation pools"
       ],
-      count: survivorCount,
+      count: counts.survivor,
       unlocked: isSurvivor
     },
     {
@@ -74,7 +69,7 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
         "Build hunter reputation",
         "Earn role-based rewards"
       ],
-      count: bountyHunterCount,
+      count: counts.bountyHunter,
       unlocked: isBountyHunter
     }
   ];
