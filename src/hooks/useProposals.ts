@@ -146,14 +146,7 @@ export const useProposals = (partyAddress?: string) => {
     },
     enabled: !!partyAddress,
     refetchInterval: 30000, // Refresh every 30 seconds
-    retry: 2,
-    onError: () => {
-      toast({
-        title: "Error loading proposals",
-        description: "Could not load proposals for this party. Please try again later.",
-        variant: "destructive"
-      });
-    }
+    retry: 2
   });
 };
 
