@@ -17,7 +17,8 @@ import {
   CheckCircle,
   Eye,
   Heart,
-  Share2
+  Share2,
+  RotateCcw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModelPreview } from "@/components/marketplace/ModelPreview";
@@ -239,6 +240,7 @@ export default function MarketplaceItemDetails() {
   const [purchaseStep, setPurchaseStep] = useState(0);
   const [offerAmount, setOfferAmount] = useState('');
   const [revealValue, setRevealValue] = useState(100);
+  const [autoRotate, setAutoRotate] = useState(false);
   
   useEffect(() => {
     setLoading(true);
@@ -343,7 +345,7 @@ export default function MarketplaceItemDetails() {
                         modelUrl={item.modelUrl} 
                         height="400px"
                         width="100%"
-                        autoRotate={true}
+                        autoRotate={autoRotate}
                         radiationLevel={revealValue}
                         animateRadiation={true}
                         useRadiationCloud={true}
@@ -355,7 +357,16 @@ export default function MarketplaceItemDetails() {
                         <Biohazard className="h-24 w-24 text-toxic-neon/30" />
                       </div>
                     )}
-                    <div className="absolute top-2 right-2">
+                    <div className="absolute top-2 right-2 flex space-x-2">
+                      <ToxicButton 
+                        variant="outline" 
+                        size="sm" 
+                        className="bg-black/50 border-toxic-neon/40 text-toxic-neon"
+                        onClick={() => setAutoRotate(!autoRotate)}
+                      >
+                        <RotateCcw className={`h-4 w-4 mr-1 ${autoRotate ? 'animate-spin' : ''}`} />
+                        {autoRotate ? 'Stop' : 'Rotate'}
+                      </ToxicButton>
                       <ToxicButton 
                         variant="outline" 
                         size="sm" 
@@ -594,4 +605,3 @@ export default function MarketplaceItemDetails() {
     </div>
   );
 }
-
