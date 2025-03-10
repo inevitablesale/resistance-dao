@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Shield, Users, BadgeDollarSign, Target, EyeIcon, Clipboard, Plus, Wallet, Scroll, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -211,7 +212,7 @@ export const SentinelHub: React.FC = () => {
                         </div>
                         
                         <div className="flex justify-end mt-4">
-                          <ToxicButton variant="tertiary" size="sm" onClick={() => navigate(`/marketplace/bounty-hunters/${bounty.id}`)}>
+                          <ToxicButton variant="tertiary" size="sm">
                             <EyeIcon className="h-4 w-4 mr-1" />
                             View Details
                           </ToxicButton>
