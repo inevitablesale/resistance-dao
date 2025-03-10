@@ -1,4 +1,4 @@
-<lov-code>
+
 import React, { useRef, useEffect, useState } from 'react';
 import { Loader2, RotateCcw } from 'lucide-react';
 import * as THREE from 'three';
@@ -254,7 +254,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         void main() {
           // Sample the texture
           gl_FragColor = vec4(vColor, opacity * reveal);
-          gl_FragColor = gl_FragColor * texture2D(pointTexture, gl_PointCoord);\
+          gl_FragColor = gl_FragColor * texture2D(pointTexture, gl_PointCoord);
           // Apply reveal opacity
           if (gl_FragColor.a < 0.1) discard;
         }
@@ -381,7 +381,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
             void main() {
               vec3 vNormal = normalize(normalMatrix * normal);
               vec3 vNormel = normalize(normalMatrix * viewVector);
-              intensity = pow(c - dot(vNormal, vNormel), p);\
+              intensity = pow(c - dot(vNormal, vNormel), p);
               gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
             }
           `,
@@ -549,3 +549,155 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
             
             if (Array.isArray(child.material)) {
               child.material.forEach(mat => {
+                // Smoothly transition opacity
+                mat.opacity = targetOpacity;
+                // Enhance material properties as character is revealed
+                mat.emissiveIntensity = 0.2 * targetOpacity;
+                mat.shininess = 10 + (20 * targetOpacity);
+              });
+            } else {
+              // Smoothly transition opacity
+              child.material.opacity = targetOpacity;
+              // Enhance material properties as character is revealed
+              child.material.emissiveIntensity = 0.2 * targetOpacity;
+              if (child.material.shininess !== undefined) {
+                child.material.shininess = 10 + (20 * targetOpacity);
+              }
+            }
+          }
+        });
+      }
+      
+      // Update transition effect if available
+      if (transitionEffect) {
+        transitionEffect.uniforms.revealValue.value = (100 - smoothedRadiationLevel) / 100;
+        transitionEffect.uniforms.transitionDirection.value = 
+          transitionDirection === 'increasing' ? 1.0 : 0.0;
+      }
+      
+      // Update controls and render
+      controls.update();
+      renderer.render(newScene, camera);
+      
+      return animationId;
+    };
+    
+    const animationId = animate();
+    
+    // Handle window resize
+    const handleResize = () => {
+      if (!containerRef.current) return;
+      
+      camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup
+    return () => {
+      cancelAnimationFrame(animationId);
+      
+      if (containerRef.current && containerRef.current.contains(renderer.domElement)) {
+        containerRef.current.removeChild(renderer.domElement);
+      }
+      window.removeEventListener('resize', handleResize);
+      
+      // Dispose resources
+      if (scene) {
+        scene.traverse((object) => {
+          if (object instanceof THREE.Mesh) {
+            object.geometry.dispose();
+            
+            if (Array.isArray(object.material)) {
+              // Handle array of materials
+              object.material.forEach(material => {
+                if (material && typeof material.dispose === 'function') {
+                  material.dispose();
+                }
+              });
+            } else if (object.material) {
+              // Handle single material
+              if (typeof object.material.dispose === 'function') {
+                object.material.dispose();
+              }
+            }
+          }
+        });
+      }
+      
+      if (particleSystem) {
+        if (particleSystem.geometry) particleSystem.geometry.dispose();
+        if (particleSystem.material) {
+          if (Array.isArray(particleSystem.material)) {
+            particleSystem.material.forEach(material => {
+              if (material && typeof material.dispose === 'function') {
+                material.dispose();
+              }
+            });
+          } else if (particleSystem.material && typeof particleSystem.material.dispose === 'function') {
+            particleSystem.material.dispose();
+          }
+        }
+      }
+      
+      if (transitionMesh) {
+        if (transitionMesh.geometry) transitionMesh.geometry.dispose();
+        if (transitionMesh.material) {
+          if (Array.isArray(transitionMesh.material)) {
+            transitionMesh.material.forEach(material => {
+              if (material && typeof material.dispose === 'function') {
+                material.dispose();
+              }
+            });
+          } else if (transitionMesh.material && typeof transitionMesh.material.dispose === 'function') {
+            transitionMesh.material.dispose();
+          }
+        }
+      }
+      
+      renderer.dispose();
+      controls.dispose();
+      if (mixer) mixer.stopAllAction();
+    };
+  }, [processedCloudUrl, processedModelUrl, autoRotate, revealValue, transitionDirection, isAutoRotating]);
+  
+  // Directly render the container for the 3D model
+  return (
+    <div className={`${className}`}>
+      <div 
+        ref={containerRef} 
+        className="w-full h-full rounded-lg overflow-hidden" 
+        style={{ height, width }}
+      >
+        {loading && !error && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+            <Loader2 className="h-8 w-8 text-white animate-spin" />
+          </div>
+        )}
+        
+        {error && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+            <div className="text-red-500 text-center p-4">
+              <p>{error}</p>
+              <p className="text-xs mt-2">Try refreshing or check the model URLs</p>
+            </div>
+          </div>
+        )}
+        
+        <div className="absolute top-2 right-2 flex space-x-2">
+          <ToxicButton 
+            variant="outline" 
+            size="sm" 
+            className="bg-black/50 border-toxic-neon/40 text-toxic-neon"
+            onClick={() => setIsAutoRotating(!isAutoRotating)}
+          >
+            <RotateCcw className={`h-4 w-4 mr-1 ${isAutoRotating ? 'animate-spin' : ''}`} />
+            {isAutoRotating ? 'Stop' : 'Rotate'}
+          </ToxicButton>
+        </div>
+      </div>
+    </div>
+  );
+};
