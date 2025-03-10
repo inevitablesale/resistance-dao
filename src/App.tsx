@@ -168,8 +168,9 @@ function Layout() {
         <Route path="/marketplace/sentinels" element={<Hunt />} />
         <Route path="/marketplace/survivors" element={<Hunt />} />
         
-        {/* Bounty management routes */}
+        {/* Bounty management routes - Added the missing manage route */}
         <Route path="/bounty/management" element={<BountyManagement />} />
+        <Route path="/marketplace/bounty-hunters/manage" element={<BountyManagement />} />
         
         {/* Command/Hunt routes */}
         <Route path="/referral" element={<ReferralRedirect />} />

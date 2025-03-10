@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 
 // Original RD Token and Factory addresses
@@ -111,20 +110,16 @@ export const PARTY_HELPER_ABI = [
   "function getVotingPower(address party, address voter) external view returns (uint256)"
 ];
 
-// Survivor NFT Contract
-export const SURVIVOR_NFT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C"; // Replace with actual address
-export const SURVIVOR_NFT_ABI = [
+// Resistance NFT Contract - single contract for all roles (Sentinel, Survivor, Bounty Hunter)
+export const RESISTANCE_NFT_ADDRESS = "0xdD44d15f54B799e940742195e97A30165A1CD285"; 
+export const RESISTANCE_NFT_ABI = [
   "function balanceOf(address owner) view returns (uint256)",
   "function ownerOf(uint256 tokenId) view returns (address)",
   "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)",
   "function tokenURI(uint256 tokenId) view returns (string)"
 ];
 
-// Sentinel NFT Contract
-export const SENTINEL_NFT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C"; // Replace with actual address if different
-export const SENTINEL_NFT_ABI = [
-  "function balanceOf(address owner) view returns (uint256)",
-  "function ownerOf(uint256 tokenId) view returns (address)",
-  "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)",
-  "function tokenURI(uint256 tokenId) view returns (string)"
-];
+// Removing incorrect separate NFT addresses
+// These variables are used in the codebase and need to reference the correct address
+export const SURVIVOR_NFT_ADDRESS = RESISTANCE_NFT_ADDRESS;
+export const SENTINEL_NFT_ADDRESS = RESISTANCE_NFT_ADDRESS;

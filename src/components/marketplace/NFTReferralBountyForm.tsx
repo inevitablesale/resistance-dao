@@ -20,6 +20,7 @@ import { createBounty } from "@/services/bountyService";
 import { usePartyTransactions } from "@/hooks/usePartyTransactions";
 import { calculatePriceStructure, formatCryptoAmount } from "@/utils/priceCalculator";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { RESISTANCE_NFT_ADDRESS } from "@/lib/constants";
 
 const nftReferralFormSchema = z.object({
   name: z.string().min(3, "Bounty name must be at least 3 characters"),
@@ -57,7 +58,7 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
     maxReferralsPerHunter: 0,
     allowPublicHunters: true,
     requireVerification: false,
-    eligibleNFTs: "0x60534a0b5C8B8119c713f2dDb30f2eB31E31D1F9",
+    eligibleNFTs: RESISTANCE_NFT_ADDRESS,
     successCriteria: "User must mint at least one NFT using the referral link",
   };
   
@@ -107,7 +108,7 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
           title: "Bounty Created!",
           description: "Your NFT referral bounty has been created successfully",
         });
-        navigate("/marketplace/bounty-hunters/manage");
+        navigate("/bounty/management");
       }
     } catch (error: any) {
       console.error("Error creating bounty:", error);
