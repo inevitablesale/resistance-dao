@@ -17,7 +17,11 @@ export interface Settlement {
   crowdfundAddress?: string;
   totalPledged?: string;
   backerCount?: number;
-  category?: string; // Added category field
+  category?: string;
+  // New properties for role-based permissions
+  canInvest?: boolean;
+  canPropose?: boolean;
+  canVote?: boolean;
 }
 
 export const convertProposalToSettlement = (proposal: ProposalEvent): Settlement => {
@@ -36,7 +40,8 @@ export const convertProposalToSettlement = (proposal: ProposalEvent): Settlement
     partyAddress: "",
     crowdfundAddress: "",
     totalPledged: proposal.pledgedAmount || "0",
-    backerCount: proposal.voteCount || 0
+    backerCount: proposal.voteCount || 0,
+    category: proposal.metadata?.category
   };
 };
 

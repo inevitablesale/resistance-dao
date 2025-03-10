@@ -1,8 +1,10 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SettlementCard } from './SettlementCard';
 import { ProposalEvent } from '@/types/proposals';
 import { Settlement, convertProposalsToSettlements } from '@/utils/settlementConversion';
+import { useNFTRoles } from '@/hooks/useNFTRoles';
+import { processSettlementPermissions } from '@/services/alchemyService';
 
 interface SettlementsGridProps {
   settlements: ProposalEvent[] | Settlement[];
@@ -19,12 +21,21 @@ export const SettlementsGrid: React.FC<SettlementsGridProps> = ({
   formatUSDAmount = (amount) => `$${parseFloat(amount).toLocaleString()}`,
   className = ""
 }) => {
-  // Convert ProposalEvent[] to Settlement[] if needed
-  const settlementData = Array.isArray(settlements) && settlements.length > 0 && 'tokenId' in settlements[0] 
-    ? convertProposalsToSettlements(settlements as ProposalEvent[])
-    : settlements as Settlement[];
+  const { primaryRole, isLoading: isLoadingRoles } = useNFTRoles();
+  const [processedSettlements, setProcessedSettlements] = useState<Settlement[]>([]);
+  
+  useEffect(() => {
+    // Convert ProposalEvent[] to Settlement[] if needed
+    const settlementData = Array.isArray(settlements) && settlements.length > 0 && 'tokenId' in settlements[0] 
+      ? convertProposalsToSettlements(settlements as ProposalEvent[])
+      : settlements as Settlement[];
+    
+    // Process settlements with role-based permissions
+    const processed = processSettlementPermissions(settlementData, primaryRole);
+    setProcessedSettlements(processed);
+  }, [settlements, primaryRole]);
 
-  if (isLoading) {
+  if (isLoading || isLoadingRoles) {
     return (
       <div className={`bg-black/60 p-6 rounded-xl border border-toxic-neon/30 ${className}`}>
         <div className="animate-pulse space-y-6">
@@ -39,7 +50,7 @@ export const SettlementsGrid: React.FC<SettlementsGridProps> = ({
     );
   }
 
-  if (!settlementData || settlementData.length === 0) {
+  if (!processedSettlements || processedSettlements.length === 0) {
     return (
       <div className={`bg-black/60 p-6 rounded-xl border border-toxic-neon/30 text-center py-12 ${className}`}>
         <h3 className="text-xl text-toxic-neon mb-2">No Settlements Found</h3>
@@ -52,7 +63,7 @@ export const SettlementsGrid: React.FC<SettlementsGridProps> = ({
     <div className={`bg-black/60 p-6 rounded-xl border border-toxic-neon/30 ${className}`}>
       <h2 className="text-2xl font-mono text-toxic-neon mb-6">{title}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {settlementData.map((settlement) => (
+        {processedSettlements.map((settlement) => (
           <SettlementCard 
             key={settlement.id}
             settlement={settlement}

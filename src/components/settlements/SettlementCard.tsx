@@ -9,7 +9,7 @@ import {
 import { ToxicBadge } from '@/components/ui/toxic-badge';
 import { ToxicButton } from '@/components/ui/toxic-button';
 import { Progress } from '@/components/ui/progress';
-import { Users, Calendar, Building2 } from 'lucide-react';
+import { Users, Calendar, Building2, Lock, ShieldAlert } from 'lucide-react';
 import { Settlement } from '@/utils/settlementConversion';
 
 interface SettlementCardProps {
@@ -35,6 +35,9 @@ export const SettlementCard: React.FC<SettlementCardProps> = ({
   const date = new Date(settlement.createdAt);
   const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 
+  // Check if user has permission to interact with this settlement
+  const canInvest = settlement.canInvest !== false; // Default to true if not specified
+  
   return (
     <StyledSettlementCard>
       <SettlementCardHeader>
@@ -77,9 +80,14 @@ export const SettlementCard: React.FC<SettlementCardProps> = ({
           )}
         </div>
         
-        <Link to={`/settlement/${settlement.id}`}>
-          <ToxicButton variant="primary" className="w-full">
-            View Settlement
+        <Link to={`/settlements/${settlement.partyAddress || settlement.id}`}>
+          <ToxicButton 
+            variant={canInvest ? "primary" : "secondary"} 
+            className="w-full"
+            disabled={!canInvest}
+          >
+            {!canInvest && <ShieldAlert className="h-4 w-4 mr-2" />}
+            {canInvest ? "View Settlement" : "Sentinel Access Only"}
           </ToxicButton>
         </Link>
       </SettlementCardContent>
