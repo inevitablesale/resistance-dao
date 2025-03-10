@@ -1,4 +1,4 @@
-
+import { Network, Alchemy } from "alchemy-sdk";
 import { createPublicClient, http } from "viem";
 import { polygon } from "viem/chains";
 
@@ -22,7 +22,15 @@ export interface ResistanceNFT {
   }>;
 }
 
-// Create Alchemy client
+// Initialize Alchemy SDK
+const settings = {
+  apiKey: "iTtNiAAH4RhVb4DGHCF4RgQ6xWCPLDN7",
+  network: Network.MATIC_MAINNET
+};
+
+const alchemy = new Alchemy(settings);
+
+// Create Viem client
 const client = createPublicClient({
   chain: polygon,
   transport: http("https://polygon-mainnet.g.alchemy.com/v2/iTtNiAAH4RhVb4DGHCF4RgQ6xWCPLDN7"),
@@ -54,42 +62,27 @@ export const fetchNFTsForAddress = async (address: string): Promise<ResistanceNF
   try {
     console.log(`Fetching NFTs for address: ${address}`);
     
-    // Mock implementation for development
-    // In production, this would call Alchemy API
-    const mockNFTs: ResistanceNFT[] = [
-      {
-        tokenId: "1",
-        class: "Sentinel",
-        name: "Sentinel - The DAO Enforcer",
-        image: "https://gateway.pinata.cloud/ipfs/sentinel-image",
-        attributes: [
-          { trait_type: "Class", value: "Sentinel" },
-          { trait_type: "Rank", value: "Enforcer" }
-        ]
-      },
-      {
-        tokenId: "2",
-        class: "Survivor",
-        name: "Survivor - Wasteland Engineer",
-        image: "https://gateway.pinata.cloud/ipfs/survivor-image",
-        attributes: [
-          { trait_type: "Class", value: "Survivor" },
-          { trait_type: "Skill", value: "Engineering" }
-        ]
-      },
-      {
-        tokenId: "3",
-        class: "Bounty Hunter",
-        name: "Bounty Hunter - Contract Killer",
-        image: "https://gateway.pinata.cloud/ipfs/bounty-hunter-image",
-        attributes: [
-          { trait_type: "Class", value: "Bounty Hunter" },
-          { trait_type: "Specialty", value: "Tracking" }
-        ]
-      }
-    ];
-    
-    return mockNFTs;
+    const nftsResponse = await alchemy.nft.getNftsForOwner(address, {
+      contractAddresses: [RESISTANCE_NFT_ADDRESS]
+    });
+
+    const nfts: ResistanceNFT[] = nftsResponse.ownedNfts.map(nft => {
+      const attributes = nft.rawMetadata?.attributes || [];
+      const classAttribute = attributes.find(attr => attr.trait_type === "Class");
+      
+      return {
+        tokenId: nft.tokenId,
+        class: getNFTClassFromAttributes(attributes),
+        name: nft.title || `Resistance NFT #${nft.tokenId}`,
+        description: nft.description,
+        image: nft.media[0]?.gateway || undefined,
+        animation_url: nft.media[1]?.gateway,
+        attributes: attributes
+      };
+    });
+
+    console.log(`Found ${nfts.length} NFTs for address ${address}`);
+    return nfts;
   } catch (error) {
     console.error("Error fetching NFTs:", error);
     return [];
@@ -173,13 +166,10 @@ export const getNFTBalanceByContract = async (
   contractAddress: string
 ): Promise<number> => {
   try {
-    // Mock implementation for development
-    // In production, this would query the blockchain
-    if (contractAddress === RESISTANCE_NFT_ADDRESS) {
-      const nfts = await fetchNFTsForAddress(address);
-      return nfts.length;
-    }
-    return 0;
+    const nftsResponse = await alchemy.nft.getNftsForOwner(address, {
+      contractAddresses: [contractAddress]
+    });
+    return nftsResponse.totalCount;
   } catch (error) {
     console.error("Error getting NFT balance:", error);
     return 0;

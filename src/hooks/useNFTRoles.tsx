@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { useToast } from '@/hooks/use-toast';
 import { 
   checkNFTOwnership, 
   fetchNFTsForAddress, 
@@ -29,6 +30,7 @@ interface NFTRolesState {
 
 export const useNFTRoles = (): NFTRolesState => {
   const { primaryWallet } = useDynamicContext();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [primaryRole, setPrimaryRole] = useState<NFTClass>('Unknown');
@@ -82,7 +84,13 @@ export const useNFTRoles = (): NFTRolesState => {
       setPrimaryRole(role);
     } catch (err) {
       console.error("Error fetching NFT roles:", err);
-      setError(err instanceof Error ? err : new Error(String(err)));
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error);
+      toast({
+        title: "Error fetching NFTs",
+        description: "Failed to load your NFT data. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
