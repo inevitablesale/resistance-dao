@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { alchemyClient } from '@/services/alchemyService';
 import { useNFTRoles } from './useNFTRoles';
 import { ethers } from 'ethers';
 
