@@ -1,13 +1,46 @@
 
-import { IPFSContent } from "./content";
-
 export type JobStatus = 'open' | 'filled' | 'completed' | 'cancelled';
 
-// Mapping job statuses to proposal statuses
+export type JobCategory = 
+  | 'settlement-building' 
+  | 'resource-gathering' 
+  | 'security' 
+  | 'technology' 
+  | 'governance' 
+  | 'scouting' 
+  | 'trading' 
+  | 'protocol-development' 
+  | 'waste-management' 
+  | 'other';
+
+export interface JobMetadata {
+  title: string;
+  description?: string;
+  category: JobCategory;
+  reward: string;
+  deadline?: string;
+  status?: JobStatus;
+  creator?: string;
+  settlement?: string;
+  requirements?: string;
+  location?: string;
+  referralReward?: string;
+  applicants?: string[];
+}
+
+export interface JobApplication {
+  jobId: string;
+  applicantAddress: string;
+  timestamp: number;
+  status: 'pending' | 'accepted' | 'rejected';
+  message?: string;
+}
+
+// Maps job status to proposal status for compatibility with the ProposalMetadata type
 export const mapJobStatusToProposalStatus = (
-  status: JobStatus
+  jobStatus: JobStatus
 ): 'active' | 'completed' | 'funded' | 'failed' => {
-  switch (status) {
+  switch (jobStatus) {
     case 'open':
       return 'active';
     case 'filled':
@@ -21,31 +54,20 @@ export const mapJobStatusToProposalStatus = (
   }
 };
 
-export interface JobMetadata {
-  title: string;
-  description: string;
-  category: string;
-  reward: string;
-  deadline?: number;
-  maxApplicants?: number;
-  referralReward?: string;
-  votingDuration: number;
-  linkedInURL: string;
-  creator?: string;
-  status?: JobStatus;
-  applicants?: string[];
-  [key: string]: any;
-}
-
-export interface JobApplication {
-  applicant: string;
-  jobId: string;
-  appliedAt: number;
-  status: 'pending' | 'approved' | 'rejected';
-}
-
-export interface Job {
-  id: string;
-  metadata: JobMetadata;
-  applications: JobApplication[];
-}
+// Maps proposal status to job status for compatibility
+export const mapProposalStatusToJobStatus = (
+  proposalStatus: 'active' | 'completed' | 'funded' | 'failed'
+): JobStatus => {
+  switch (proposalStatus) {
+    case 'active':
+      return 'open';
+    case 'funded':
+      return 'filled';
+    case 'completed':
+      return 'completed';
+    case 'failed':
+      return 'cancelled';
+    default:
+      return 'open';
+  }
+};

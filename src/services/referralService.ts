@@ -2,12 +2,10 @@
 import { ethers } from "ethers";
 import { uploadToIPFS } from "./ipfsService";
 import { IPFSContent } from "@/types/content";
-import { ProposalMetadata } from "@/types/proposals";
-
-// Import the correct types from the job types file
-import { JobMetadata, JobStatus, mapJobStatusToProposalStatus } from "@/types/jobs";
+import { JobMetadata } from "@/types/jobs";
 
 export interface ReferralMetadata {
+  id?: string; // Adding id for compatibility with ReferralDashboard
   type: string;
   referralCode: string;
   referrerAddress: string;
@@ -17,12 +15,19 @@ export interface ReferralMetadata {
   reward?: string;
   jobId?: string;
   status: 'active' | 'claimed' | 'expired';
+  name?: string;
+  description?: string;
+  rewardPercentage?: number;
   [key: string]: any;
 }
+
+// Re-export ReferralMetadata as Referral for backwards compatibility
+export type Referral = ReferralMetadata;
 
 // Mock referrals data
 const mockReferrals: ReferralMetadata[] = [
   {
+    id: "ref-1",
     type: "job",
     referralCode: "JOB1-REF123",
     referrerAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -30,8 +35,12 @@ const mockReferrals: ReferralMetadata[] = [
     reward: "0.05 ETH",
     jobId: "job-1",
     status: 'active',
+    name: "Resource Gathering Job",
+    description: "Refer others for this resource gathering opportunity",
+    rewardPercentage: 5,
   },
   {
+    id: "ref-2",
     type: "job",
     referralCode: "JOB2-REF456",
     referrerAddress: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
@@ -39,6 +48,9 @@ const mockReferrals: ReferralMetadata[] = [
     reward: "0.03 ETH",
     jobId: "job-2",
     status: 'active',
+    name: "Security Job",
+    description: "Refer others for this security job opportunity",
+    rewardPercentage: 3,
   }
 ];
 
@@ -69,6 +81,7 @@ export const createJobReferral = async (
     
     // Create referral metadata
     const referral: ReferralMetadata = {
+      id: `ref-${Date.now()}`,
       type: "job",
       referralCode,
       referrerAddress: address,
@@ -159,13 +172,83 @@ export const uploadReferralToIPFS = async (
   }
 };
 
+// Function to create a new referral
+export const createNewReferral = async (
+  wallet: any,
+  type: string,
+  name: string,
+  description: string,
+  rewardPercentage: number
+): Promise<ReferralMetadata | null> => {
+  try {
+    const address = await wallet.getAddress();
+    
+    // Generate a unique referral code
+    const referralCode = `${type}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    
+    // Create referral metadata
+    const referral: ReferralMetadata = {
+      id: `ref-${Date.now()}`,
+      type,
+      referralCode,
+      referrerAddress: address,
+      createdAt: Date.now(),
+      status: 'active',
+      name,
+      description,
+      rewardPercentage,
+    };
+    
+    // Add to mock data
+    mockReferrals.push(referral);
+    
+    return referral;
+  } catch (error) {
+    console.error("Error creating new referral:", error);
+    return null;
+  }
+};
+
+// Process referral claim for rewards
+export const processReferralClaim = async (
+  wallet: any,
+  referralId: string
+): Promise<boolean> => {
+  try {
+    const referral = mockReferrals.find(ref => ref.id === referralId);
+    if (!referral || referral.status !== 'completed') {
+      return false;
+    }
+    
+    // Process the claim (in a real app, this would interact with a blockchain)
+    referral.status = 'claimed';
+    referral.claimedAt = Date.now();
+    
+    return true;
+  } catch (error) {
+    console.error("Error processing referral claim:", error);
+    return false;
+  }
+};
+
+// Generate a referral link
+export const generateReferralLink = (referralId: string): string => {
+  const referral = mockReferrals.find(ref => ref.id === referralId);
+  if (!referral) {
+    return '';
+  }
+  
+  // In a real app, this would be a proper URL
+  return `https://wasteland-resistance.com/ref/${referral.referralCode}`;
+};
+
 // Update useReferrals hook to fix the argument mismatch
 export const processReferralCreation = async (
   wallet: any,
   jobId: string,
   jobReward: string,
   jobTitle: string,
-  referralPercentage: number
+  referralPercentage: number = 0.1
 ): Promise<string> => {
   try {
     const address = await wallet.getAddress();
@@ -179,6 +262,7 @@ export const processReferralCreation = async (
     
     // Create referral metadata
     const referral: ReferralMetadata = {
+      id: `ref-${Date.now()}`,
       type: "job",
       referralCode,
       referrerAddress: address,
@@ -186,6 +270,9 @@ export const processReferralCreation = async (
       reward: referralReward,
       jobId,
       status: 'active',
+      name: jobTitle,
+      description: `Referral for ${jobTitle}`,
+      rewardPercentage: referralPercentage * 100,
     };
     
     // Add to mock data

@@ -9,13 +9,19 @@ import {
   validateReferralCode,
   claimReferral,
   ReferralMetadata,
-  processReferralCreation
+  processReferralCreation,
+  createNewReferral,
+  processReferralClaim,
+  generateReferralLink as generateLink
 } from "@/services/referralService";
+import { useNFTRoles } from "./useNFTRoles";
 
 export const useReferrals = () => {
   const { toast } = useToast();
   const { primaryWallet } = useDynamicContext();
+  const { primaryRole } = useNFTRoles();
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [isCreatingReferral, setIsCreatingReferral] = useState(false);
 
   // Get wallet address when it changes
   useEffect(() => {
@@ -53,6 +59,9 @@ export const useReferrals = () => {
     },
     enabled: !!walletAddress,
   });
+
+  // Check if user can create referrals
+  const canCreateReferral = primaryRole === 'Bounty Hunter';
 
   // Create a job referral
   const createReferral = async (
@@ -99,6 +108,66 @@ export const useReferrals = () => {
         variant: "destructive",
       });
       return null;
+    }
+  };
+
+  // Submit a new referral (for the dashboard)
+  const submitNewReferral = async (
+    type: string,
+    name: string,
+    description: string,
+    rewardPercentage: number
+  ) => {
+    if (!primaryWallet) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to create a referral.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    setIsCreatingReferral(true);
+
+    try {
+      toast({
+        title: "Creating Referral",
+        description: "Please wait while we create your referral.",
+      });
+
+      const wallet = await primaryWallet.getWalletClient();
+      const referral = await createNewReferral(
+        wallet,
+        type,
+        name,
+        description,
+        rewardPercentage
+      );
+
+      if (referral) {
+        toast({
+          title: "Referral Created",
+          description: `Your referral has been created successfully.`,
+        });
+
+        // Refresh referrals list
+        refetchReferrals();
+        setIsCreatingReferral(false);
+        return true;
+      }
+
+      setIsCreatingReferral(false);
+      return false;
+    } catch (error) {
+      console.error("Error creating referral:", error);
+      toast({
+        title: "Error Creating Referral",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+      setIsCreatingReferral(false);
+      return false;
     }
   };
 
@@ -152,6 +221,55 @@ export const useReferrals = () => {
       console.error("Error claiming referral:", error);
       toast({
         title: "Error Claiming Referral",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  // Claim a referral reward
+  const claimReward = async (referralId: string) => {
+    if (!primaryWallet) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to claim this reward.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    try {
+      toast({
+        title: "Claiming Reward",
+        description: "Please wait while we process your reward claim.",
+      });
+
+      const wallet = await primaryWallet.getWalletClient();
+      const success = await processReferralClaim(wallet, referralId);
+
+      if (success) {
+        toast({
+          title: "Reward Claimed",
+          description: "You have successfully claimed this reward.",
+        });
+        
+        refetchReferrals();
+        return true;
+      }
+
+      toast({
+        title: "Reward Claim Failed",
+        description: "Unable to claim this reward. It may not be ready yet.",
+        variant: "destructive",
+      });
+
+      return false;
+    } catch (error) {
+      console.error("Error claiming reward:", error);
+      toast({
+        title: "Error Claiming Reward",
         description:
           error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive",
@@ -216,13 +334,24 @@ export const useReferrals = () => {
     }
   };
 
+  // Generate a referral link
+  const generateReferralLink = (referralId: string) => {
+    return generateLink(referralId);
+  };
+
   return {
     referrals,
     isLoadingReferrals,
+    isCreatingReferral,
+    canCreateReferral,
+    userRole: primaryRole,
     createReferral,
     validateReferral,
     claimReferralCode,
     processReferral,
+    submitNewReferral,
+    claimReward,
+    generateReferralLink,
     refetchReferrals,
   };
 };
