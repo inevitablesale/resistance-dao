@@ -2,8 +2,10 @@
 import React from "react";
 import { ReferralSystem } from "@/components/radiation/ReferralSystem";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Target, Users, Code, UserPlus, FileText, GalleryVertical, BadgeDollarSign } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Target, Users, Code, UserPlus, FileText, GalleryVertical, BadgeDollarSign, ArrowRight } from "lucide-react";
+import { ToxicButton } from "@/components/ui/toxic-button";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface BountyCategory {
   title: string;
@@ -12,68 +14,97 @@ interface BountyCategory {
   icon: React.ReactNode;
   partyType: string;
   features: string[];
+  action: string; // URL or action identifier
 }
 
-const bountyCategories: BountyCategory[] = [
-  {
-    title: "NFT Referrals",
-    description: "Earn rewards for referring new NFT holders to the platform",
-    reward: "$25 per sale",
-    icon: <Target className="h-6 w-6 text-toxic-neon" />,
-    partyType: "Reward Party Pool",
-    features: ["Fixed rewards", "Automatic distribution", "Provable attribution"]
-  },
-  {
-    title: "Talent Acquisition",
-    description: "Help match talent with settlement opportunities",
-    reward: "10-20% of placement fee",
-    icon: <Users className="h-6 w-6 text-toxic-neon" />,
-    partyType: "Reward Party Pool",
-    features: ["Commission-based", "Performance tracking", "Long-term relationships"]
-  },
-  {
-    title: "Protocol Development",
-    description: "Contribute to building and improving our protocol",
-    reward: "Project-based",
-    icon: <Code className="h-6 w-6 text-toxic-neon" />,
-    partyType: "Task Party Pool",
-    features: ["Milestone payments", "Multi-sig approval", "Token distribution"]
-  },
-  {
-    title: "Community Growth",
-    description: "Help grow and engage our community",
-    reward: "Task-based rewards",
-    icon: <UserPlus className="h-6 w-6 text-toxic-neon" />,
-    partyType: "Participation Party Pool",
-    features: ["Activity rewards", "Governance rights", "Staking mechanisms"]
-  },
-  {
-    title: "Content Creation",
-    description: "Create engaging content for the community",
-    reward: "$50-200 per piece",
-    icon: <FileText className="h-6 w-6 text-toxic-neon" />,
-    partyType: "Task Party Pool",
-    features: ["Quality voting", "Deliverable verification", "Token incentives"]
-  },
-  {
-    title: "Governance Support",
-    description: "Help maintain and improve governance processes",
-    reward: "DAO tokens + fixed fee",
-    icon: <GalleryVertical className="h-6 w-6 text-toxic-neon" />,
-    partyType: "Participation Party Pool",
-    features: ["Token rewards", "Voting power", "Long-term alignment"]
-  },
-  {
-    title: "Business Development",
-    description: "Expand our network and partnerships",
-    reward: "Commission-based",
-    icon: <BadgeDollarSign className="h-6 w-6 text-toxic-neon" />,
-    partyType: "Revenue Share Party Pool",
-    features: ["Revenue sharing", "Performance rewards", "Partnership rights"]
-  }
-];
-
 export const Hunt = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  const bountyCategories: BountyCategory[] = [
+    {
+      title: "NFT Referrals",
+      description: "Earn rewards for referring new NFT holders to the platform",
+      reward: "$25 per sale",
+      icon: <Target className="h-6 w-6 text-toxic-neon" />,
+      partyType: "Reward Party Pool",
+      features: ["Fixed rewards", "Automatic distribution", "Provable attribution"],
+      action: "/referral" // Redirect to referral system
+    },
+    {
+      title: "Talent Acquisition",
+      description: "Help match talent with settlement opportunities",
+      reward: "10-20% of placement fee",
+      icon: <Users className="h-6 w-6 text-toxic-neon" />,
+      partyType: "Reward Party Pool",
+      features: ["Commission-based", "Performance tracking", "Long-term relationships"],
+      action: "settlements/0x1234..." // Example party address, should come from actual deployed contract
+    },
+    {
+      title: "Protocol Development",
+      description: "Contribute to building and improving our protocol",
+      reward: "Project-based",
+      icon: <Code className="h-6 w-6 text-toxic-neon" />,
+      partyType: "Task Party Pool",
+      features: ["Milestone payments", "Multi-sig approval", "Token distribution"],
+      action: "settlements/0x2345..." // Example party address
+    },
+    {
+      title: "Community Growth",
+      description: "Help grow and engage our community",
+      reward: "Task-based rewards",
+      icon: <UserPlus className="h-6 w-6 text-toxic-neon" />,
+      partyType: "Participation Party Pool",
+      features: ["Activity rewards", "Governance rights", "Staking mechanisms"],
+      action: "settlements/0x3456..." // Example party address
+    },
+    {
+      title: "Content Creation",
+      description: "Create engaging content for the community",
+      reward: "$50-200 per piece",
+      icon: <FileText className="h-6 w-6 text-toxic-neon" />,
+      partyType: "Task Party Pool",
+      features: ["Quality voting", "Deliverable verification", "Token incentives"],
+      action: "settlements/0x4567..." // Example party address
+    },
+    {
+      title: "Governance Support",
+      description: "Help maintain and improve governance processes",
+      reward: "DAO tokens + fixed fee",
+      icon: <GalleryVertical className="h-6 w-6 text-toxic-neon" />,
+      partyType: "Participation Party Pool",
+      features: ["Token rewards", "Voting power", "Long-term alignment"],
+      action: "settlements/0x5678..." // Example party address
+    },
+    {
+      title: "Business Development",
+      description: "Expand our network and partnerships",
+      reward: "Commission-based",
+      icon: <BadgeDollarSign className="h-6 w-6 text-toxic-neon" />,
+      partyType: "Revenue Share Party Pool",
+      features: ["Revenue sharing", "Performance rewards", "Partnership rights"],
+      action: "settlements/0x6789..." // Example party address
+    }
+  ];
+
+  // Handler for button clicks
+  const handleViewOpportunities = (category: BountyCategory) => {
+    if (category.action.startsWith('/')) {
+      // Internal route
+      navigate(category.action);
+    } else if (category.action.startsWith('settlements/')) {
+      // Party protocol settlement
+      navigate(`/${category.action}`);
+    } else {
+      // For any other cases (e.g., when we don't have a deployment yet)
+      toast({
+        title: `${category.title} Opportunities`,
+        description: "This feature is coming soon. Check back later!",
+        variant: "default",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black">
       <div className="bg-gradient-to-r from-gray-900 to-black py-16 px-4 border-b border-gray-800">
@@ -128,12 +159,14 @@ export const Hunt = () => {
                           </li>
                         ))}
                       </ul>
-                      <Button 
-                        className="w-full bg-toxic-neon/10 border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/20"
+                      <ToxicButton 
+                        className="w-full justify-between"
                         variant="outline"
+                        onClick={() => handleViewOpportunities(category)}
                       >
                         View Opportunities
-                      </Button>
+                        <ArrowRight className="h-4 w-4" />
+                      </ToxicButton>
                     </div>
                   </CardContent>
                 </Card>
