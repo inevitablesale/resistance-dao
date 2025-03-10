@@ -5,6 +5,7 @@ import { Shield, User, ChevronUp, ChevronDown, Wallet, LogOut, ExternalLink } fr
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { truncateAddress } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 export const ResistanceWalletWidget = () => {
   const { isConnected, connect, disconnect, address, isPendingInitialization } = useWalletConnection();

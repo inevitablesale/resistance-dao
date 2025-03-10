@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { ToxicButton } from '@/components/ui/toxic-button';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ShoppingBag, Target, Shield, ListFilter, Search, PlusCircle, UserPlus, Settings, Award, Radiation, Star, Coins, Eye, Hammer, Network, Globe } from 'lucide-react';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useNavigate } from 'react-router-dom';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +19,7 @@ export function MarketplaceQuickActions({
   onCreateListing,
   onBrowseListings
 }: MarketplaceQuickActionsProps) {
-  const { setShowAuthFlow } = useWalletConnection();
+  const { setShowAuthFlow } = useDynamicContext();
   const { isConnected } = useCustomWallet();
   const navigate = useNavigate();
   
@@ -33,7 +33,6 @@ export function MarketplaceQuickActions({
   
   return (
     <ToxicCard className={`relative bg-black/70 border-toxic-neon/30 p-6 ${className}`}>
-      {/* Only show scanline effect when not connected */}
       {!isConnected && <div className="scanline"></div>}
       
       <div className="flex flex-col space-y-6">
@@ -112,7 +111,6 @@ export function MarketplaceQuickActions({
           </div>
         </div>
         
-        {/* New NFT pricing & distribution info */}
         {isConnected && (
           <div className="bg-toxic-dark/30 border border-toxic-neon/20 rounded-lg p-4">
             <h4 className="text-toxic-neon font-mono text-sm mb-3 flex items-center">
@@ -146,7 +144,6 @@ export function MarketplaceQuickActions({
           </div>
         )}
         
-        {/* Only show the connect prompt when not connected */}
         {!isConnected && (
           <div className="bg-toxic-neon/5 rounded-lg p-4 border border-toxic-neon/20">
             <div className="flex items-center gap-3">

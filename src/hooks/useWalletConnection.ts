@@ -6,13 +6,13 @@ import { useToast } from '@/hooks/use-toast';
 export const useWalletConnection = () => {
   const [address, setAddress] = useState<string | undefined>(undefined);
   const [isPendingInitialization, setIsPendingInitialization] = useState(true);
-  const { isAuthenticated, primaryWallet, user, setShowAuthFlow, handleLogOut } = useDynamicContext();
+  const { primaryWallet, user, setShowAuthFlow } = useDynamicContext();
   const { toast } = useToast();
 
   useEffect(() => {
     const initWallet = async () => {
       try {
-        if (isAuthenticated && primaryWallet) {
+        if (primaryWallet) {
           const walletClient = await primaryWallet.getWalletClient();
           if (walletClient) {
             const addr = await walletClient.getAddress();
@@ -27,7 +27,7 @@ export const useWalletConnection = () => {
     };
 
     initWallet();
-  }, [isAuthenticated, primaryWallet]);
+  }, [primaryWallet]);
 
   const connect = async () => {
     try {
@@ -44,7 +44,9 @@ export const useWalletConnection = () => {
 
   const disconnect = async () => {
     try {
-      await handleLogOut();
+      if (primaryWallet?.disconnect) {
+        await primaryWallet.disconnect();
+      }
       setAddress(undefined);
     } catch (error) {
       console.error("Error disconnecting wallet:", error);
@@ -63,6 +65,7 @@ export const useWalletConnection = () => {
     disconnect,
     primaryWallet,
     user,
-    isPendingInitialization
+    isPendingInitialization,
+    setShowAuthFlow
   };
 };

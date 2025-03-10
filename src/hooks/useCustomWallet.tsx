@@ -3,7 +3,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useEffect, useState } from "react";
 
 export const useCustomWallet = () => {
-  const { primaryWallet, user } = useDynamicContext();
+  const { primaryWallet, user, setShowAuthFlow } = useDynamicContext();
   const [isInitializing, setIsInitializing] = useState(true);
   
   // Only consider connected if we have both wallet and user data
@@ -42,6 +42,7 @@ export const useCustomWallet = () => {
     address: primaryWallet?.address,
     user,
     isSmartWallet: primaryWallet?.connector?.name?.toLowerCase().includes('zerodev'),
-    getReferrer
+    getReferrer,
+    setShowAuthFlow
   };
 };
