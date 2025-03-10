@@ -2,11 +2,11 @@
 import React from "react";
 import { JobsDashboard } from "@/components/jobs/JobsDashboard";
 import { useNFTRoles } from "@/hooks/useNFTRoles";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSettlements } from "@/hooks/useSettlements";
 import { ReferralSystem } from "@/components/radiation/ReferralSystem";
 import { Shield, Target, AlertTriangle } from "lucide-react";
-import { ToxicButton } from "@/components/ui/toxic-button";
 
 export const Hunt = () => {
   const { primaryRole, isLoading: isLoadingRoles } = useNFTRoles();
@@ -29,7 +29,7 @@ export const Hunt = () => {
         <Card className="max-w-md w-full border-gray-800 bg-gray-900/80 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-3 mb-2">
-              <AlertTriangle className="h-6 w-6 text-toxic-neon" />
+              <AlertTriangle className="h-6 w-6 text-yellow-500" />
               <CardTitle className="text-2xl text-white">Access Restricted</CardTitle>
             </div>
             <CardDescription className="text-gray-400">
@@ -43,9 +43,9 @@ export const Hunt = () => {
             </p>
           </CardContent>
           <CardFooter className="pt-2">
-            <ToxicButton className="w-full" variant="primary" asChild>
+            <Button className="w-full bg-blue-600 hover:bg-blue-700" asChild>
               <a href="/buy-membership-nft">Get Membership NFT</a>
-            </ToxicButton>
+            </Button>
           </CardFooter>
         </Card>
       </div>
@@ -56,7 +56,7 @@ export const Hunt = () => {
     <div className="min-h-screen bg-black">
       <div className="bg-gradient-to-r from-gray-900 to-black py-16 px-4 border-b border-gray-800">
         <div className="container mx-auto">
-          <h1 className="text-4xl font-bold mb-4 text-toxic-neon">Bounty Hunter's Hub</h1>
+          <h1 className="text-4xl font-bold mb-4 text-white">Bounty Hunter's Hub</h1>
           <p className="text-xl text-gray-300 max-w-2xl">
             Find jobs, earn rewards, and grow your bounty hunter network
           </p>
@@ -68,8 +68,8 @@ export const Hunt = () => {
           {/* Referral System - Added to Hunt page */}
           <div className="lg:col-span-4 order-2 lg:order-1">
             <div className="sticky top-20">
-              <h2 className="text-2xl font-bold text-toxic-neon mb-4 flex items-center">
-                <Target className="h-5 w-5 mr-2 text-toxic-neon" />
+              <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+                <Target className="h-5 w-5 mr-2 text-blue-400" />
                 Bounty Network
               </h2>
               <ReferralSystem />
@@ -78,7 +78,7 @@ export const Hunt = () => {
           
           {/* Main content - JobsDashboard */}
           <div className="lg:col-span-8 order-1 lg:order-2">
-            <h2 className="text-2xl font-bold text-toxic-neon mb-4">Available Bounties</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">Available Bounties</h2>
             <JobsDashboard />
           </div>
         </div>
