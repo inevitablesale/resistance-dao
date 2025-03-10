@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Shield, Users, BadgeDollarSign, Target, EyeIcon, Clipboard, Plus, Wallet, Scroll, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { ToxicCard, ToxicCardContent, ToxicCardHeader, ToxicCardTitle, ToxicCardDescription, ToxicCardFooter } from "@/components/ui/toxic-card";
@@ -7,43 +7,8 @@ import { ToxicButton } from "@/components/ui/toxic-button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
-
-// Mock active bounties
-const activeBounties = [
-  {
-    id: 'b001',
-    title: "NFT Referral Program A",
-    type: "Referral Bounty",
-    participants: 8,
-    budget: "$200",
-    allocated: "$125",
-    remaining: "$75",
-    status: "active",
-    successRate: 78
-  },
-  {
-    id: 'b002',
-    title: "Community Growth Initiative",
-    type: "Growth Bounty",
-    participants: 5,
-    budget: "$500",
-    allocated: "$240",
-    remaining: "$260",
-    status: "active",
-    successRate: 65
-  },
-  {
-    id: 'b003',
-    title: "Developer Recruitment",
-    type: "Talent Acquisition",
-    participants: 3,
-    budget: "$1200",
-    allocated: "$800",
-    remaining: "$400",
-    status: "active",
-    successRate: 92
-  }
-];
+import { NFTReferralBountyForm } from "./NFTReferralBountyForm";
+import { getBounties, Bounty } from "@/services/bountyService";
 
 // Mock bounty templates
 const bountyTemplates = [
@@ -73,6 +38,9 @@ const bountyTemplates = [
 export const SentinelHub: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [bounties, setBounties] = useState<Bounty[]>([]);
+  const [loading, setLoading] = useState(false);
   
   // Mock sentinel stats
   const sentinelStats = {
@@ -83,10 +51,39 @@ export const SentinelHub: React.FC = () => {
     treasury: "$2800"
   };
   
+  // Load bounties from service
+  useEffect(() => {
+    const loadBounties = async () => {
+      setLoading(true);
+      try {
+        const fetchedBounties = await getBounties();
+        setBounties(fetchedBounties);
+        
+        // Update sentinel stats based on real data
+        if (fetchedBounties.length > 0) {
+          sentinelStats.activeBounties = fetchedBounties.filter(b => b.status === "active").length;
+          sentinelStats.totalSpent = `$${fetchedBounties.reduce((total, b) => total + b.usedBudget, 0)}`;
+        }
+      } catch (error) {
+        console.error("Error loading bounties:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadBounties();
+  }, [activeTab]);
+  
   // Handler for creating new bounty
   const handleCreateBounty = (template?: any) => {
-    // TODO: Implement bounty creation flow
-    console.log("Creating new bounty", template);
+    setSelectedTemplate(template);
+    setActiveTab("create-form");
+  };
+  
+  // Handler to go back to templates
+  const handleBackToTemplates = () => {
+    setSelectedTemplate(null);
+    setActiveTab("create");
   };
   
   return (
@@ -162,55 +159,67 @@ export const SentinelHub: React.FC = () => {
               <div className="mt-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Active Bounty Programs</h3>
                 <div className="space-y-4">
-                  {activeBounties.map((bounty) => (
-                    <div key={bounty.id} className="bg-black/30 p-4 rounded-lg border border-toxic-neon/30 hover:border-toxic-neon/50 transition-all">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h4 className="text-white font-medium">{bounty.title}</h4>
-                          <p className="text-sm text-gray-400">{bounty.type}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs px-2 py-1 rounded-full bg-toxic-neon/20 text-toxic-neon">
-                            {bounty.status}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
-                        <div>
-                          <p className="text-gray-400">Budget</p>
-                          <p className="text-white font-mono">{bounty.budget}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-400">Allocated</p>
-                          <p className="text-white font-mono">{bounty.allocated}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-400">Remaining</p>
-                          <p className="text-toxic-neon font-mono">{bounty.remaining}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-400">Participants</p>
-                          <p className="text-white font-mono">{bounty.participants} hunters</p>
-                        </div>
-                      </div>
-                      
-                      <div className="mt-3">
-                        <div className="flex justify-between items-center mb-1 text-xs text-gray-400">
-                          <span>Success Rate</span>
-                          <span>{bounty.successRate}%</span>
-                        </div>
-                        <Progress value={bounty.successRate} className="h-1.5" />
-                      </div>
-                      
-                      <div className="flex justify-end mt-4">
-                        <ToxicButton variant="tertiary" size="sm">
-                          <EyeIcon className="h-4 w-4 mr-1" />
-                          View Details
-                        </ToxicButton>
-                      </div>
+                  {loading ? (
+                    <div className="text-center py-8 text-gray-400">Loading bounties...</div>
+                  ) : bounties.length === 0 ? (
+                    <div className="text-center py-8 bg-black/30 rounded-lg border border-toxic-neon/20">
+                      <Clipboard className="h-8 w-8 text-toxic-neon/30 mx-auto mb-3" />
+                      <p className="text-white/70 mb-4">No active bounties yet</p>
+                      <ToxicButton variant="primary" onClick={() => setActiveTab("create")}>
+                        Create Your First Bounty
+                      </ToxicButton>
                     </div>
-                  ))}
+                  ) : (
+                    bounties.map((bounty) => (
+                      <div key={bounty.id} className="bg-black/30 p-4 rounded-lg border border-toxic-neon/30 hover:border-toxic-neon/50 transition-all">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h4 className="text-white font-medium">{bounty.name}</h4>
+                            <p className="text-sm text-gray-400">{bounty.description.substring(0, 50)}...</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs px-2 py-1 rounded-full bg-toxic-neon/20 text-toxic-neon">
+                              {bounty.status}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
+                          <div>
+                            <p className="text-gray-400">Budget</p>
+                            <p className="text-white font-mono">{bounty.totalBudget} MATIC</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400">Used</p>
+                            <p className="text-white font-mono">{bounty.usedBudget} MATIC</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400">Remaining</p>
+                            <p className="text-toxic-neon font-mono">{bounty.remainingBudget} MATIC</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400">Successful</p>
+                            <p className="text-white font-mono">{bounty.successCount} referrals</p>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-3">
+                          <div className="flex justify-between items-center mb-1 text-xs text-gray-400">
+                            <span>Budget Used</span>
+                            <span>{((bounty.usedBudget / bounty.totalBudget) * 100).toFixed(0)}%</span>
+                          </div>
+                          <Progress value={(bounty.usedBudget / bounty.totalBudget) * 100} className="h-1.5" />
+                        </div>
+                        
+                        <div className="flex justify-end mt-4">
+                          <ToxicButton variant="tertiary" size="sm">
+                            <EyeIcon className="h-4 w-4 mr-1" />
+                            View Details
+                          </ToxicButton>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </ToxicCardContent>
@@ -299,6 +308,13 @@ export const SentinelHub: React.FC = () => {
           </Card>
         </TabsContent>
         
+        <TabsContent value="create-form" className="space-y-6">
+          <NFTReferralBountyForm 
+            template={selectedTemplate} 
+            onBack={handleBackToTemplates}
+          />
+        </TabsContent>
+        
         <TabsContent value="manage" className="space-y-6">
           <Card className="bg-gray-900/60 border border-toxic-neon/20">
             <CardHeader>
@@ -308,55 +324,67 @@ export const SentinelHub: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {activeBounties.map((bounty) => (
-                  <div key={bounty.id} className="bg-black/30 p-4 rounded-lg border border-toxic-neon/30 hover:border-toxic-neon/50 transition-all">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="text-white font-medium">{bounty.title}</h4>
-                        <p className="text-sm text-gray-400">{bounty.type}</p>
+              {loading ? (
+                <div className="text-center py-8 text-gray-400">Loading bounties...</div>
+              ) : bounties.length === 0 ? (
+                <div className="text-center py-8 bg-black/30 rounded-lg border border-toxic-neon/20">
+                  <Clipboard className="h-8 w-8 text-toxic-neon/30 mx-auto mb-3" />
+                  <p className="text-white/70 mb-4">No bounties have been created yet</p>
+                  <ToxicButton variant="primary" onClick={() => setActiveTab("create")}>
+                    Create Your First Bounty
+                  </ToxicButton>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {bounties.map((bounty) => (
+                    <div key={bounty.id} className="bg-black/30 p-4 rounded-lg border border-toxic-neon/30 hover:border-toxic-neon/50 transition-all">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="text-white font-medium">{bounty.name}</h4>
+                          <p className="text-sm text-gray-400">{bounty.description.substring(0, 50)}...</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <ToxicButton variant="ghost" size="sm">
+                            <EyeIcon className="h-4 w-4" />
+                          </ToxicButton>
+                          <ToxicButton variant="ghost" size="sm">
+                            <Clipboard className="h-4 w-4" />
+                          </ToxicButton>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <ToxicButton variant="ghost" size="sm">
-                          <EyeIcon className="h-4 w-4" />
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
+                        <div>
+                          <p className="text-gray-400">Budget</p>
+                          <p className="text-white font-mono">{bounty.totalBudget} MATIC</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Used</p>
+                          <p className="text-white font-mono">{bounty.usedBudget} MATIC</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Remaining</p>
+                          <p className="text-toxic-neon font-mono">{bounty.remainingBudget} MATIC</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Successful</p>
+                          <p className="text-white font-mono">{bounty.successCount} referrals</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-end mt-4 gap-2">
+                        <ToxicButton variant="tertiary" size="sm">
+                          Edit Bounty
                         </ToxicButton>
-                        <ToxicButton variant="ghost" size="sm">
-                          <Clipboard className="h-4 w-4" />
+                        <ToxicButton variant="outline" size="sm">
+                          View Submissions
+                          <ArrowRight className="h-4 w-4 ml-1" />
                         </ToxicButton>
                       </div>
                     </div>
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
-                      <div>
-                        <p className="text-gray-400">Budget</p>
-                        <p className="text-white font-mono">{bounty.budget}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Allocated</p>
-                        <p className="text-white font-mono">{bounty.allocated}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Remaining</p>
-                        <p className="text-toxic-neon font-mono">{bounty.remaining}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Hunters</p>
-                        <p className="text-white font-mono">{bounty.participants}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-end mt-4 gap-2">
-                      <ToxicButton variant="tertiary" size="sm">
-                        Edit Bounty
-                      </ToxicButton>
-                      <ToxicButton variant="outline" size="sm">
-                        View Submissions
-                        <ArrowRight className="h-4 w-4 ml-1" />
-                      </ToxicButton>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
