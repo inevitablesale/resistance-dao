@@ -12,12 +12,15 @@ export const useNFTMetadata = (tokenId: string) => {
   const isValidCharacterId = !isNaN(characterId) && characterId >= 1 && characterId <= 16;
   
   // If it's a valid character ID, use our metadata
-  const characterMetadata = useCharacterMetadata(characterId);
+  const characterMetadata = useCharacterMetadata(isValidCharacterId ? characterId : 0);
   
   // Use our character data service instead of OpenSea API
   const openSeaQuery = useQuery({
     queryKey: ['nft', CONTRACT_ADDRESS, tokenId],
-    queryFn: () => getCharacterNFTByTokenId(tokenId),
+    queryFn: async () => {
+      console.log(`Fetching NFT data for token: ${tokenId}`);
+      return await getCharacterNFTByTokenId(tokenId);
+    },
     enabled: !!tokenId && !isValidCharacterId,
   });
   

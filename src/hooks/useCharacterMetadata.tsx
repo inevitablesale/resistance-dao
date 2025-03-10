@@ -25,12 +25,12 @@ export const useCharacterMetadata = (characterId: number) => {
     error: modelError
   } = useQuery({
     queryKey: ['character-model-metadata', character?.character_model_cid],
-    queryFn: () => {
+    queryFn: async () => {
       if (!character?.character_model_cid) {
         throw new Error('No model CID available');
       }
       console.log(`Fetching model metadata for CID: ${character.character_model_cid}`);
-      return fetchMetadataFromCID(character.character_model_cid);
+      return await fetchMetadataFromCID(character.character_model_cid);
     },
     enabled: !!character?.character_model_cid
   });
