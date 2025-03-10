@@ -90,12 +90,17 @@ const Index = () => {
   const [activeRole, setActiveRole] = useState<'sentinel' | 'pioneer'>('sentinel');
   const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
   
-  // New states for radiation system - these will be fetched from the contract now
   const [currentRadiation, setCurrentRadiation] = useState(94); // Start at 94% radiation
+  
+  const [referralEarnings, setReferralEarnings] = useState(0);
   
   useEffect(() => {
     if (isConnected && authState === "unauthenticated") {
       setAuthState("authenticated");
+    }
+    
+    if (isConnected) {
+      setReferralEarnings(25.75); // Example value - in a real app, this would come from an API or blockchain call
     }
   }, [isConnected]);
   
@@ -136,7 +141,6 @@ const Index = () => {
     bountyHunterRatio: 35
   };
   
-  // Updated NFT listings with proper roles
   const sentinelListings: MarketplaceListing[] = [
     {
       id: 1,
@@ -402,7 +406,6 @@ const Index = () => {
         
         <WastelandSurvivalGuideEnhanced className="mb-8" />
         
-        {/* Updated Radiation System Section - Using NFT Contract data */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-1">
             <RadiationSystem className="mb-6" />
