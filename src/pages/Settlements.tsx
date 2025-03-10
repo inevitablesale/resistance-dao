@@ -1,170 +1,164 @@
 
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { SettlementsHistory } from "@/components/settlements/SettlementsHistory";
-import { SettlementsNavBar } from "@/components/settlements/SettlementsNavBar";
-import { Card, CardContent } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { Building2, Users, Archive, Clock, Shield, Gavel, User } from "lucide-react";
+import React, { useState } from 'react';
+import { SettlementsNavBar } from '@/components/settlements/SettlementsNavBar';
+import { SettlementsGrid } from '@/components/settlements/SettlementsGrid';
+import { useSettlements } from '@/hooks/useSettlements';
+import { ToxicCard } from '@/components/ui/toxic-card';
+import { Users, TrendingUp, Building2, AlertCircle } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Loader2 } from 'lucide-react';
 
-export default function Settlements() {
-  const location = useLocation();
-  const currentPath = location.pathname;
-  
-  // Mock data for the dashboard metrics
-  const settlementStats = {
-    activeCount: 8,
-    totalSettlements: 12,
-    totalInvestors: 156,
-    totalFunding: 320, // ETH
-    avgFundingRate: 67, // percent
-  };
-  
-  // Data for pie chart
-  const statusData = [
-    { name: 'Active', value: 8, color: '#39FF14' },
-    { name: 'Funded', value: 3, color: '#3b82f6' },
-    { name: 'Failed', value: 1, color: '#ea384c' },
-  ];
+const Settlements = () => {
+  const { settlements, metrics, loading, error } = useSettlements();
+  const [filter, setFilter] = useState<string | null>(null);
 
-  // Customize view based on current route
-  const renderPageTitle = () => {
-    switch (currentPath) {
-      case "/governance":
-        return {
-          title: "Governance",
-          description: "Participate in governance decisions for settlements you've contributed to as a Sentinel.",
-          icon: <Gavel className="w-8 h-8 text-toxic-neon mb-3" />
-        };
-      case "/my-settlements":
-        return {
-          title: "My Contributions",
-          description: "View and manage all the settlements you've contributed to as a Sentinel.",
-          icon: <User className="w-8 h-8 text-toxic-neon mb-3" />
-        };
-      default:
-        return {
-          title: "Settlements",
-          description: "Discover and support settlements being built in the wasteland.",
-          icon: <Shield className="w-8 h-8 text-toxic-neon mb-3" />
-        };
-    }
-  };
-
-  const { title, description, icon } = renderPageTitle();
+  const filteredSettlements = filter 
+    ? settlements.filter(s => s.status === filter) 
+    : settlements;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white pt-20">
-      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
-        <div className="flex flex-col space-y-8">
-          {/* Custom Header for different routes */}
-          {currentPath !== "/settlements" && (
-            <div className="text-center mb-8">
-              {icon}
-              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-toxic-neon">{title}</h1>
-              <p className="text-gray-300 max-w-2xl mx-auto">{description}</p>
-            </div>
-          )}
-          
-          {/* Regular NavBar for the main settlements page */}
-          {currentPath === "/settlements" && <SettlementsNavBar />}
-          
-          {/* Dashboard Overview - only show on main settlements page */}
-          {currentPath === "/settlements" && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              {/* Key metrics */}
-              <div className="col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card className="bg-[#111] border-toxic-neon/20 shadow-[0_0_10px_rgba(57,255,20,0.1)]">
-                  <CardContent className="p-4 flex flex-col">
-                    <span className="text-gray-400 text-sm mb-2">Active</span>
-                    <div className="flex items-center">
-                      <Building2 className="text-toxic-neon mr-2 w-5 h-5" />
-                      <span className="text-2xl font-bold">{settlementStats.activeCount}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="bg-[#111] border-toxic-neon/20 shadow-[0_0_10px_rgba(57,255,20,0.1)]">
-                  <CardContent className="p-4 flex flex-col">
-                    <span className="text-gray-400 text-sm mb-2">Sentinels</span>
-                    <div className="flex items-center">
-                      <Users className="text-toxic-neon mr-2 w-5 h-5" />
-                      <span className="text-2xl font-bold">{settlementStats.totalInvestors}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="bg-[#111] border-toxic-neon/20 shadow-[0_0_10px_rgba(57,255,20,0.1)]">
-                  <CardContent className="p-4 flex flex-col">
-                    <span className="text-gray-400 text-sm mb-2">Total ETH</span>
-                    <div className="flex items-center">
-                      <Archive className="text-toxic-neon mr-2 w-5 h-5" />
-                      <span className="text-2xl font-bold">{settlementStats.totalFunding}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="bg-[#111] border-toxic-neon/20 shadow-[0_0_10px_rgba(57,255,20,0.1)]">
-                  <CardContent className="p-4 flex flex-col">
-                    <span className="text-gray-400 text-sm mb-2">Avg Funding</span>
-                    <div className="flex items-center">
-                      <Clock className="text-toxic-neon mr-2 w-5 h-5" />
-                      <span className="text-2xl font-bold">{settlementStats.avgFundingRate}%</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-              
-              {/* Status distribution */}
-              <Card className="bg-[#111] border-toxic-neon/20 shadow-[0_0_10px_rgba(57,255,20,0.1)]">
-                <CardContent className="p-4">
-                  <h3 className="text-sm text-gray-400 mb-2">Settlement Status</h3>
-                  <div className="h-[120px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={statusData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={30}
-                          outerRadius={50}
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          {statusData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip 
-                          formatter={(value: number) => [`${value} Settlements`, 'Count']}
-                          labelFormatter={(index: number) => statusData[index].name}
-                          contentStyle={{ background: '#111', border: '1px solid rgba(57,255,20,0.2)', borderRadius: '8px' }}
-                          itemStyle={{ color: '#fff' }}
-                          labelStyle={{ color: '#fff', fontWeight: 'bold' }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="flex justify-around text-xs text-gray-300 mt-2">
-                    {statusData.map((entry, index) => (
-                      <div key={index} className="flex items-center">
-                        <div 
-                          style={{ backgroundColor: entry.color }} 
-                          className="w-3 h-3 rounded-full mr-1"
-                        />
-                        <span>{entry.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-          
-          {/* Settlement Grid */}
-          <SettlementsHistory />
+    <div className="container mx-auto px-4 py-6">
+      <SettlementsNavBar />
+      
+      {loading ? (
+        <div className="flex justify-center items-center h-32">
+          <Loader2 className="h-8 w-8 text-toxic-neon animate-spin" />
         </div>
-      </div>
+      ) : error ? (
+        <ToxicCard className="p-4 mb-8 bg-red-900/20 border-red-500/30">
+          <div className="flex items-center gap-2 text-red-400">
+            <AlertCircle className="h-5 w-5" />
+            <p>{error}</p>
+          </div>
+        </ToxicCard>
+      ) : (
+        <>
+          {/* Dashboard Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <ToxicCard className="p-4 bg-black/80 border-toxic-neon/30">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-gray-400 text-sm">Active Settlements</p>
+                  <h3 className="text-2xl font-mono text-toxic-neon">{metrics.activeSettlements}</h3>
+                </div>
+                <div className="p-2 rounded-full bg-toxic-neon/10">
+                  <Building2 className="h-5 w-5 text-toxic-neon" />
+                </div>
+              </div>
+            </ToxicCard>
+            
+            <ToxicCard className="p-4 bg-black/80 border-toxic-neon/30">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-gray-400 text-sm">Total Investors</p>
+                  <h3 className="text-2xl font-mono text-toxic-neon">{metrics.totalInvestors}</h3>
+                </div>
+                <div className="p-2 rounded-full bg-toxic-neon/10">
+                  <Users className="h-5 w-5 text-toxic-neon" />
+                </div>
+              </div>
+            </ToxicCard>
+            
+            <ToxicCard className="p-4 bg-black/80 border-toxic-neon/30">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-gray-400 text-sm">ETH Raised</p>
+                  <h3 className="text-2xl font-mono text-toxic-neon">{parseFloat(metrics.totalRaised).toFixed(2)} ETH</h3>
+                </div>
+                <div className="p-2 rounded-full bg-toxic-neon/10">
+                  <TrendingUp className="h-5 w-5 text-toxic-neon" />
+                </div>
+              </div>
+            </ToxicCard>
+            
+            <ToxicCard className="p-4 bg-black/80 border-toxic-neon/30">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-gray-400 text-sm">Funding Rate</p>
+                  <h3 className="text-2xl font-mono text-toxic-neon">{metrics.fundingRate.toFixed(0)}%</h3>
+                </div>
+                <div className="p-2 rounded-full bg-toxic-neon/10">
+                  <TrendingUp className="h-5 w-5 text-toxic-neon" />
+                </div>
+              </div>
+            </ToxicCard>
+          </div>
+          
+          {/* Status Distribution */}
+          <ToxicCard className="p-4 mb-8 bg-black/80 border-toxic-neon/30">
+            <h3 className="text-lg font-mono text-toxic-neon mb-2">Status Distribution</h3>
+            <div className="space-y-2">
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-white/60">Active</span>
+                  <span className="text-toxic-neon">{metrics.statusDistribution.active}</span>
+                </div>
+                <Progress value={metrics.statusDistribution.active / metrics.activeSettlements * 100} className="h-2" />
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-white/60">Funding</span>
+                  <span className="text-toxic-neon">{metrics.statusDistribution.funding}</span>
+                </div>
+                <Progress value={metrics.statusDistribution.funding / metrics.activeSettlements * 100} className="h-2" />
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-white/60">Completed</span>
+                  <span className="text-toxic-neon">{metrics.statusDistribution.completed}</span>
+                </div>
+                <Progress value={metrics.statusDistribution.completed / metrics.activeSettlements * 100} className="h-2" />
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-white/60">Failed</span>
+                  <span className="text-toxic-neon">{metrics.statusDistribution.failed}</span>
+                </div>
+                <Progress value={metrics.statusDistribution.failed / metrics.activeSettlements * 100} className="h-2" />
+              </div>
+            </div>
+          </ToxicCard>
+          
+          {/* Filter Buttons */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            <button 
+              className={`px-3 py-1 rounded-md text-sm ${filter === null ? 'bg-toxic-neon text-black' : 'bg-black/50 text-white/70 border border-toxic-neon/30'}`}
+              onClick={() => setFilter(null)}
+            >
+              All
+            </button>
+            <button 
+              className={`px-3 py-1 rounded-md text-sm ${filter === 'active' ? 'bg-toxic-neon text-black' : 'bg-black/50 text-white/70 border border-toxic-neon/30'}`}
+              onClick={() => setFilter('active')}
+            >
+              Active
+            </button>
+            <button 
+              className={`px-3 py-1 rounded-md text-sm ${filter === 'funding' ? 'bg-toxic-neon text-black' : 'bg-black/50 text-white/70 border border-toxic-neon/30'}`}
+              onClick={() => setFilter('funding')}
+            >
+              Funding
+            </button>
+            <button 
+              className={`px-3 py-1 rounded-md text-sm ${filter === 'completed' ? 'bg-toxic-neon text-black' : 'bg-black/50 text-white/70 border border-toxic-neon/30'}`}
+              onClick={() => setFilter('completed')}
+            >
+              Completed
+            </button>
+            <button 
+              className={`px-3 py-1 rounded-md text-sm ${filter === 'failed' ? 'bg-toxic-neon text-black' : 'bg-black/50 text-white/70 border border-toxic-neon/30'}`}
+              onClick={() => setFilter('failed')}
+            >
+              Failed
+            </button>
+          </div>
+          
+          {/* Settlements Grid */}
+          <SettlementsGrid settlements={filteredSettlements} />
+        </>
+      )}
     </div>
   );
-}
+};
+
+export default Settlements;
