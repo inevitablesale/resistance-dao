@@ -1,85 +1,144 @@
 
 import React from "react";
-import { JobsDashboard } from "@/components/jobs/JobsDashboard";
-import { useNFTRoles } from "@/hooks/useNFTRoles";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSettlements } from "@/hooks/useSettlements";
 import { ReferralSystem } from "@/components/radiation/ReferralSystem";
-import { Shield, Target, AlertTriangle } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Target, Users, Code, UserPlus, FileText, GalleryVertical, BadgeDollarSign } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+interface BountyCategory {
+  title: string;
+  description: string;
+  reward: string;
+  icon: React.ReactNode;
+  partyType: string;
+  features: string[];
+}
+
+const bountyCategories: BountyCategory[] = [
+  {
+    title: "NFT Referrals",
+    description: "Earn rewards for referring new NFT holders to the platform",
+    reward: "$25 per sale",
+    icon: <Target className="h-6 w-6 text-toxic-neon" />,
+    partyType: "Reward Party Pool",
+    features: ["Fixed rewards", "Automatic distribution", "Provable attribution"]
+  },
+  {
+    title: "Talent Acquisition",
+    description: "Help match talent with settlement opportunities",
+    reward: "10-20% of placement fee",
+    icon: <Users className="h-6 w-6 text-toxic-neon" />,
+    partyType: "Reward Party Pool",
+    features: ["Commission-based", "Performance tracking", "Long-term relationships"]
+  },
+  {
+    title: "Protocol Development",
+    description: "Contribute to building and improving our protocol",
+    reward: "Project-based",
+    icon: <Code className="h-6 w-6 text-toxic-neon" />,
+    partyType: "Task Party Pool",
+    features: ["Milestone payments", "Multi-sig approval", "Token distribution"]
+  },
+  {
+    title: "Community Growth",
+    description: "Help grow and engage our community",
+    reward: "Task-based rewards",
+    icon: <UserPlus className="h-6 w-6 text-toxic-neon" />,
+    partyType: "Participation Party Pool",
+    features: ["Activity rewards", "Governance rights", "Staking mechanisms"]
+  },
+  {
+    title: "Content Creation",
+    description: "Create engaging content for the community",
+    reward: "$50-200 per piece",
+    icon: <FileText className="h-6 w-6 text-toxic-neon" />,
+    partyType: "Task Party Pool",
+    features: ["Quality voting", "Deliverable verification", "Token incentives"]
+  },
+  {
+    title: "Governance Support",
+    description: "Help maintain and improve governance processes",
+    reward: "DAO tokens + fixed fee",
+    icon: <GalleryVertical className="h-6 w-6 text-toxic-neon" />,
+    partyType: "Participation Party Pool",
+    features: ["Token rewards", "Voting power", "Long-term alignment"]
+  },
+  {
+    title: "Business Development",
+    description: "Expand our network and partnerships",
+    reward: "Commission-based",
+    icon: <BadgeDollarSign className="h-6 w-6 text-toxic-neon" />,
+    partyType: "Revenue Share Party Pool",
+    features: ["Revenue sharing", "Performance rewards", "Partnership rights"]
+  }
+];
 
 export const Hunt = () => {
-  const { primaryRole, isLoading: isLoadingRoles } = useNFTRoles();
-  
-  if (isLoadingRoles) {
-    return (
-      <div className="container mx-auto p-4 h-screen flex items-center justify-center">
-        <div className="animate-pulse text-center">
-          <h2 className="text-2xl font-bold mb-4">Loading role information...</h2>
-          <div className="h-4 w-32 bg-slate-700 rounded mx-auto"></div>
-        </div>
-      </div>
-    );
-  }
-
-  // If user has no NFT role, show access restriction
-  if (primaryRole === 'Unknown') {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <Card className="max-w-md w-full border-gray-800 bg-gray-900/80 backdrop-blur-sm">
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-3 mb-2">
-              <AlertTriangle className="h-6 w-6 text-yellow-500" />
-              <CardTitle className="text-2xl text-white">Access Restricted</CardTitle>
-            </div>
-            <CardDescription className="text-gray-400">
-              You need a membership NFT to access the job marketplace
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-gray-300">
-            <p className="mb-4">
-              The job marketplace is only available to Sentinel, Survivor, and Bounty Hunter NFT holders.
-              Purchase an NFT to access exclusive jobs and earn rewards.
-            </p>
-          </CardContent>
-          <CardFooter className="pt-2">
-            <Button className="w-full bg-blue-600 hover:bg-blue-700" asChild>
-              <a href="/buy-membership-nft">Get Membership NFT</a>
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-black">
       <div className="bg-gradient-to-r from-gray-900 to-black py-16 px-4 border-b border-gray-800">
         <div className="container mx-auto">
-          <h1 className="text-4xl font-bold mb-4 text-white">Bounty Hunter's Hub</h1>
+          <h1 className="text-4xl font-bold mb-4 text-white flex items-center gap-3">
+            <Target className="h-8 w-8 text-toxic-neon" />
+            Bounty Hunter's Hub
+          </h1>
           <p className="text-xl text-gray-300 max-w-2xl">
-            Find jobs, earn rewards, and grow your bounty hunter network
+            Choose your path, complete bounties, and earn rewards in the wasteland
           </p>
         </div>
       </div>
       
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Referral System - Added to Hunt page */}
-          <div className="lg:col-span-4 order-2 lg:order-1">
+          {/* Referral System - Left Side */}
+          <div className="lg:col-span-3 order-2 lg:order-1">
             <div className="sticky top-20">
-              <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
-                <Target className="h-5 w-5 mr-2 text-blue-400" />
-                Bounty Network
-              </h2>
               <ReferralSystem />
             </div>
           </div>
           
-          {/* Main content - JobsDashboard */}
-          <div className="lg:col-span-8 order-1 lg:order-2">
-            <h2 className="text-2xl font-bold text-white mb-4">Available Bounties</h2>
-            <JobsDashboard />
+          {/* Main Content - Bounty Categories */}
+          <div className="lg:col-span-9 order-1 lg:order-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {bountyCategories.map((category, index) => (
+                <Card key={index} className="bg-gray-900/50 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all duration-300">
+                  <CardHeader>
+                    <div className="flex items-center gap-3 mb-2">
+                      {category.icon}
+                      <CardTitle className="text-xl text-white">{category.title}</CardTitle>
+                    </div>
+                    <CardDescription className="text-gray-400">
+                      {category.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="bg-black/30 p-3 rounded-lg border border-toxic-neon/20">
+                        <p className="text-toxic-neon font-mono flex items-center gap-2 mb-1">
+                          <BadgeDollarSign className="h-4 w-4" />
+                          {category.reward}
+                        </p>
+                        <p className="text-sm text-gray-400">{category.partyType}</p>
+                      </div>
+                      <ul className="space-y-2">
+                        {category.features.map((feature, i) => (
+                          <li key={i} className="text-sm text-gray-300 flex items-center gap-2">
+                            <div className="w-1 h-1 bg-toxic-neon rounded-full" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                      <Button 
+                        className="w-full bg-toxic-neon/10 border-toxic-neon/30 text-toxic-neon hover:bg-toxic-neon/20"
+                        variant="outline"
+                      >
+                        View Opportunities
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </div>
