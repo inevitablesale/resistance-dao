@@ -3,10 +3,9 @@ import React from 'react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicProgress } from '@/components/ui/toxic-progress';
 import { ToxicButton } from '@/components/ui/toxic-button';
-import { Shield, Target, Hammer, Radiation } from 'lucide-react';
+import { Shield, Target, Hammer, Radiation, Loader2 } from 'lucide-react';
 import { useContractStats } from '@/hooks/useContractNFTs';
 import { useCustomWallet } from '@/hooks/useCustomWallet';
-import { Loader2 } from 'lucide-react';
 
 interface NFTDistributionStatusProps {
   className?: string;
@@ -23,6 +22,7 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
   
   // Get the total claimed NFTs (from contract stats)
   const totalClaimed = contractStats?.totalMinted || 0;
+  console.log("Total claimed from contract stats:", totalClaimed);
   
   // Calculate the total NFT supply for all types
   const totalNFTs = TOTAL_SENTINELS + TOTAL_BOUNTY_HUNTERS + TOTAL_SURVIVORS;
