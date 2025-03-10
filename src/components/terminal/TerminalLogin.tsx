@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Shield, LockKeyhole, AlertTriangle, Terminal, ExternalLink } from "lucide-react";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { NeonSign } from "@/components/ui/neon-sign";
 
 interface TerminalLoginProps {
   onLoginSuccess: () => void;
@@ -102,11 +101,7 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
-        <NeonSign 
-          text="THE RESISTANCE" 
-          flickerIntensity="high" 
-          className="mb-6"
-        />
+        <h1 className="text-5xl md:text-6xl font-mono text-toxic-neon mb-6 toxic-glow">THE RESISTANCE</h1>
         <p className="text-lg text-white/80 mb-8">
           Enter access code to infiltrate the network
         </p>
