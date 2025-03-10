@@ -65,6 +65,48 @@ export function formatEthAmount(amount: number, decimals: number = 4): string {
 }
 
 /**
+ * Calculate contribution breakdown for Party Protocol
+ * Shows how a contribution is divided between party shares and protocol fees
+ * 
+ * @param contributionAmount Raw amount being contributed in ETH
+ * @returns Detailed breakdown of contribution
+ */
+export function calculateContributionBreakdown(contributionAmount: number): {
+  contributionAmount: number;
+  partyDaoFee: number;
+  partySharesAmount: number;
+  estimatedVotingPower: number;
+} {
+  const partyDaoFee = contributionAmount * PARTY_DAO_FEE_PERCENT;
+  const partySharesAmount = contributionAmount - partyDaoFee;
+  
+  // Simple estimation of voting power (1 ETH = 100 voting power)
+  // This is a simplified model, actual voting power calculation depends on Party implementation
+  const estimatedVotingPower = partySharesAmount * 100;
+  
+  return {
+    contributionAmount,
+    partyDaoFee,
+    partySharesAmount,
+    estimatedVotingPower
+  };
+}
+
+/**
+ * Calculate governance voting threshold based on total contributions
+ * 
+ * @param totalContributions Total ETH contributed to party
+ * @param thresholdPercent Percentage of total needed for proposal to pass (default: 51%)
+ * @returns Voting threshold in ETH
+ */
+export function calculateGovernanceThreshold(
+  totalContributions: number,
+  thresholdPercent: number = 51
+): number {
+  return totalContributions * (thresholdPercent / 100);
+}
+
+/**
  * Example usage:
  * 
  * const price = calculatePriceStructure(0.08);
