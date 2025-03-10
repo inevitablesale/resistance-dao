@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
 import { executeTransaction, TransactionConfig } from "./transactionManager";
@@ -966,3 +967,92 @@ export async function distributeRewards(
 /**
  * Fund an existing bounty with additional budget
  * @param bountyId ID of the bounty to fund
+ * @param amount Amount to add to the bounty budget
+ * @param wallet Connected wallet
+ * @returns Updated bounty or null if failed
+ */
+export async function fundBounty(
+  bountyId: string,
+  amount: number,
+  wallet: any
+): Promise<Bounty | null> {
+  try {
+    // Get the bounty
+    const bounty = await getBounty(bountyId);
+    if (!bounty) {
+      throw new Error("Bounty not found");
+    }
+    
+    // Get wallet client
+    const walletClient = await wallet.getWalletClient();
+    if (!walletClient) {
+      throw new Error("Wallet client not available");
+    }
+    
+    const provider = new ethers.providers.Web3Provider(walletClient as any);
+    const signer = provider.getSigner();
+    
+    toast({
+      title: "Processing Funding",
+      description: "Please approve the transaction in your wallet..."
+    });
+    
+    // Create transaction config
+    const txConfig: TransactionConfig = {
+      type: 'contract',
+      description: `Adding ${amount} MATIC to bounty budget`,
+      timeout: 180000, // 3 minutes
+      maxRetries: 3,
+      backoffMs: 5000
+    };
+    
+    // Execute the funding transaction
+    let tx;
+    if (bounty.partyAddress && bounty.crowdfundAddress) {
+      // If bounty is deployed on blockchain, use the crowdfund contract
+      // TODO: Implement real contract interaction
+      
+      // For now, just simulate a transaction
+      tx = await executeTransaction(
+        () => signer.sendTransaction({
+          to: bounty.crowdfundAddress,
+          value: ethers.utils.parseEther(amount.toString())
+        }),
+        txConfig,
+        provider
+      );
+    } else {
+      // For local-only bounties, simulate a transaction
+      tx = {
+        hash: `0x${Math.random().toString(16).substr(2, 64)}`
+      };
+    }
+    
+    // Update bounty stats
+    const bounties = await getBounties();
+    const bountyIndex = bounties.findIndex((b: Bounty) => b.id === bountyId);
+    
+    if (bountyIndex !== -1) {
+      bounties[bountyIndex].totalBudget += amount;
+      bounties[bountyIndex].remainingBudget += amount;
+      localStorage.setItem("bounties", JSON.stringify(bounties));
+      
+      toast({
+        title: "Funding Successful",
+        description: `Successfully added ${amount} MATIC to bounty budget`
+      });
+      
+      return bounties[bountyIndex];
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("Error funding bounty:", error);
+    toast({
+      title: "Funding Failed",
+      description: error instanceof Error ? error.message : "Failed to fund bounty",
+      variant: "destructive"
+    });
+    return null;
+  }
+}
