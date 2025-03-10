@@ -3,7 +3,101 @@ import { toast } from "@/components/ui/use-toast";
 
 // OpenSea API base URL for Polygon network
 const OPENSEA_API_BASE_URL = "https://api.opensea.io/api/v2";
-const OPENSEA_API_KEY = "5cde1d5bb5304b1e8736b6d12e4c6f11";
+// Update the API key with a mock data fallback system
+const OPENSEA_API_KEY = ""; // We'll leave this empty for now
+
+// Mock NFT data for development when API is unavailable
+const MOCK_NFTS = Array.from({ length: 20 }).map((_, index) => ({
+  identifier: `${index + 1}`,
+  collection: "resistance-wasteland",
+  contract: "0xdD44d15f54B799e940742195e97A30165A1CD285",
+  token_standard: "ERC721",
+  name: `Wasteland Survivor #${index + 1}`,
+  description: "A survivor in the post-apocalyptic wasteland.",
+  image_url: `/placeholder.svg`,
+  metadata_url: "",
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  is_disabled: false,
+  is_nsfw: false,
+  traits: [
+    {
+      trait_type: "Role",
+      value: index % 3 === 0 ? "Survivor" : index % 3 === 1 ? "Bounty Hunter" : "Scavenger",
+      display_type: null,
+    },
+    {
+      trait_type: "Radiation Level",
+      value: `${Math.floor(Math.random() * 100)}`,
+      display_type: null,
+    },
+    {
+      trait_type: "Strength",
+      value: `${Math.floor(Math.random() * 10) + 1}`,
+      display_type: null,
+    },
+    {
+      trait_type: "Agility",
+      value: `${Math.floor(Math.random() * 10) + 1}`,
+      display_type: null,
+    },
+  ],
+  animation_url: null,
+  is_suspicious: false,
+  creator: null,
+  owners: [
+    {
+      address: `0x${Math.random().toString(16).substring(2, 42)}`,
+      quantity: 1,
+    },
+  ],
+  rarity: {
+    rank: Math.floor(Math.random() * 1000) + 1,
+    score: Math.random() * 100,
+    total: 1000,
+  },
+}));
+
+// Mock collection data
+const MOCK_COLLECTION = {
+  collection: "resistance-wasteland",
+  name: "Resistance Wasteland",
+  description: "Survivors, Bounty Hunters, and Scavengers in the post-apocalyptic wasteland.",
+  image_url: "/placeholder.svg",
+  banner_image_url: "",
+  owner: "0xdD44d15f54B799e940742195e97A30165A1CD285",
+  safelist_status: "verified",
+  category: "gaming",
+  is_disabled: false,
+  is_nsfw: false,
+  traits: {
+    "Role": {
+      values: {
+        "Survivor": { count: 8, value: "Survivor" },
+        "Bounty Hunter": { count: 7, value: "Bounty Hunter" },
+        "Scavenger": { count: 5, value: "Scavenger" }
+      },
+      count: 20
+    },
+    "Radiation Level": {
+      values: {
+        "High": { count: 5, value: "High" },
+        "Medium": { count: 8, value: "Medium" },
+        "Low": { count: 7, value: "Low" }
+      },
+      count: 20
+    }
+  },
+  payment_tokens: [
+    {
+      name: "Ethereum",
+      symbol: "ETH",
+      decimals: 18,
+      address: "0x0000000000000000000000000000000000000000"
+    }
+  ],
+  creator_earnings: 2.5
+};
 
 interface OpenSeaNFT {
   identifier: string;
@@ -73,6 +167,12 @@ interface OpenSeaResponse<T> {
 // Function to fetch collection info
 export const fetchCollectionInfo = async (contractAddress: string): Promise<OpenSeaCollection | null> => {
   try {
+    // If API key is not provided, use mock data
+    if (!OPENSEA_API_KEY) {
+      console.log("Using mock collection data (no API key provided)");
+      return MOCK_COLLECTION;
+    }
+
     const response = await fetch(`${OPENSEA_API_BASE_URL}/chain/matic/contract/${contractAddress}`, {
       method: 'GET',
       headers: {
@@ -82,9 +182,12 @@ export const fetchCollectionInfo = async (contractAddress: string): Promise<Open
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenSea API error:', errorData);
-      throw new Error(`Failed to fetch collection: ${response.status}`);
+      const errorText = await response.text();
+      console.error('OpenSea API error:', errorText);
+      
+      // Fallback to mock data on error
+      console.log("Falling back to mock collection data");
+      return MOCK_COLLECTION;
     }
 
     const data = await response.json();
@@ -92,11 +195,13 @@ export const fetchCollectionInfo = async (contractAddress: string): Promise<Open
   } catch (error) {
     console.error('Error fetching collection info:', error);
     toast({
-      title: "Error fetching collection",
-      description: error.message || "Failed to load NFT collection information",
-      variant: "destructive"
+      title: "Using demo NFT data",
+      description: "Could not connect to OpenSea API, using sample data instead",
+      variant: "default"
     });
-    return null;
+    
+    // Return mock data on error
+    return MOCK_COLLECTION;
   }
 };
 
@@ -107,6 +212,17 @@ export const fetchNFTsByContract = async (
   next: string | null = null
 ): Promise<OpenSeaResponse<OpenSeaNFT[]> | null> => {
   try {
+    // If API key is not provided, use mock data
+    if (!OPENSEA_API_KEY) {
+      console.log("Using mock NFT data (no API key provided)");
+      const mockData = MOCK_NFTS.slice(0, limit);
+      return {
+        data: mockData,
+        next: mockData.length >= limit ? "mock-next-cursor" : null,
+        previous: null
+      };
+    }
+
     let url = `${OPENSEA_API_BASE_URL}/chain/matic/contract/${contractAddress}/nfts?limit=${limit}`;
     
     if (next) {
@@ -122,9 +238,17 @@ export const fetchNFTsByContract = async (
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenSea API error:', errorData);
-      throw new Error(`Failed to fetch NFTs: ${response.status}`);
+      const errorText = await response.text();
+      console.error('OpenSea API error:', errorText);
+      
+      // Fallback to mock data on error
+      console.log("Falling back to mock NFT data");
+      const mockData = MOCK_NFTS.slice(0, limit);
+      return {
+        data: mockData,
+        next: mockData.length >= limit ? "mock-next-cursor" : null,
+        previous: null
+      };
     }
 
     const data = await response.json();
@@ -132,11 +256,18 @@ export const fetchNFTsByContract = async (
   } catch (error) {
     console.error('Error fetching NFTs by contract:', error);
     toast({
-      title: "Error fetching NFTs",
-      description: error.message || "Failed to load NFTs from contract",
-      variant: "destructive"
+      title: "Using demo NFT data",
+      description: "Could not connect to OpenSea API, using sample data instead",
+      variant: "default"
     });
-    return null;
+    
+    // Return mock data on error
+    const mockData = MOCK_NFTS.slice(0, limit);
+    return {
+      data: mockData,
+      next: mockData.length >= limit ? "mock-next-cursor" : null,
+      previous: null
+    };
   }
 };
 
@@ -146,6 +277,16 @@ export const fetchNFTByTokenId = async (
   tokenId: string
 ): Promise<OpenSeaNFT | null> => {
   try {
+    // If API key is not provided, use mock data
+    if (!OPENSEA_API_KEY) {
+      console.log("Using mock NFT data (no API key provided)");
+      const mockNft = MOCK_NFTS.find(nft => nft.identifier === tokenId) || MOCK_NFTS[0];
+      return {
+        ...mockNft,
+        identifier: tokenId
+      };
+    }
+
     const response = await fetch(
       `${OPENSEA_API_BASE_URL}/chain/matic/contract/${contractAddress}/nfts/${tokenId}`,
       {
@@ -158,9 +299,16 @@ export const fetchNFTByTokenId = async (
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenSea API error:', errorData);
-      throw new Error(`Failed to fetch NFT: ${response.status}`);
+      const errorText = await response.text();
+      console.error('OpenSea API error:', errorText);
+      
+      // Fallback to mock data on error
+      console.log("Falling back to mock NFT data");
+      const mockNft = MOCK_NFTS.find(nft => nft.identifier === tokenId) || MOCK_NFTS[0];
+      return {
+        ...mockNft,
+        identifier: tokenId
+      };
     }
 
     const data = await response.json();
@@ -168,12 +316,45 @@ export const fetchNFTByTokenId = async (
   } catch (error) {
     console.error('Error fetching NFT by token ID:', error);
     toast({
-      title: "Error fetching NFT",
-      description: error.message || "Failed to load NFT details",
-      variant: "destructive"
+      title: "Using demo NFT data",
+      description: "Could not connect to OpenSea API, using sample data instead",
+      variant: "default"
     });
-    return null;
+    
+    // Return mock data on error
+    const mockNft = MOCK_NFTS.find(nft => nft.identifier === tokenId) || MOCK_NFTS[0];
+    return {
+      ...mockNft,
+      identifier: tokenId
+    };
   }
+};
+
+// Create role-specific NFT groups for the character showcase
+export const getNFTsByRole = () => {
+  const survivors = MOCK_NFTS.filter(nft => 
+    nft.traits.some(trait => 
+      trait.trait_type === 'Role' && trait.value === 'Survivor'
+    )
+  ).slice(0, 3);
+  
+  const bountyHunters = MOCK_NFTS.filter(nft => 
+    nft.traits.some(trait => 
+      trait.trait_type === 'Role' && trait.value === 'Bounty Hunter'
+    )
+  ).slice(0, 3);
+  
+  const scavengers = MOCK_NFTS.filter(nft => 
+    nft.traits.some(trait => 
+      trait.trait_type === 'Role' && trait.value === 'Scavenger'
+    )
+  ).slice(0, 3);
+  
+  return {
+    survivors,
+    bountyHunters,
+    scavengers
+  };
 };
 
 // Export types for use in other files

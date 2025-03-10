@@ -32,6 +32,7 @@ import { CharacterProgress } from "@/components/chronicle/CharacterProgress";
 import { TerritoryStatus } from "@/components/chronicle/TerritoryStatus";
 import { ModelPreview } from '@/components/marketplace/ModelPreview';
 import { NFTCollectionDisplay } from '@/components/nft/NFTCollectionDisplay';
+import { CharacterShowcase } from '@/components/nft/CharacterShowcase';
 
 type AuthState = "unauthenticated" | "authenticating" | "breaching" | "authenticated";
 
@@ -177,6 +178,9 @@ const Index = () => {
         
         {/* Wasteland Operations at the top */}
         <WastelandOperations />
+        
+        {/* Character Showcase - New addition */}
+        <CharacterShowcase />
         
         <StoryTerminal initiallyOpen={storyTerminalOpen} onClose={() => setStoryTerminalOpen(false)} className="mb-8" />
         
