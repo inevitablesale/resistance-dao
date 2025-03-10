@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -90,7 +91,7 @@ export const useReferrals = () => {
         description: "Please approve the transaction to create your referral pool.",
       });
       
-      // Create referral with all required arguments - removing the extraData as the 6th argument
+      // Create referral with all required arguments
       const referralId = await createReferral(
         primaryWallet as unknown as ethers.Wallet, 
         type, 
@@ -127,8 +128,7 @@ export const useReferrals = () => {
   const submitNewReferral = async (
     referralId: string, 
     referredAddress: string,
-    metadata: any = {},
-    referrerTier: string = "Initiate"
+    metadata: any = {}
   ) => {
     if (!primaryWallet) {
       toast({
