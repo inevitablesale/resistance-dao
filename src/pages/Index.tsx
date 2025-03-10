@@ -392,7 +392,7 @@ const Index = () => {
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
           <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
           <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> 
-          Wasteland Status: <span className="text-apocalypse-red font-bold status-critical">Radiation Level: {currentRadiation}%</span>
+          Wasteland Status: <span className="text-apocalypse-red font-semibold status-critical">Radiation Level: {currentRadiation}%</span>
         </div>
         
         <StoryTerminal 
@@ -401,9 +401,6 @@ const Index = () => {
           className="mb-8" 
         />
         
-        <WastelandSurvivalGuideEnhanced className="mb-8" />
-        
-        {/* New Radiation System Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-1">
             <RadiationSystem 
