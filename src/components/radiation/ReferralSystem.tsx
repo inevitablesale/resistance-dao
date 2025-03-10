@@ -43,44 +43,49 @@ export function ReferralSystem({ earnings = 0, totalReferrals = 0, className = "
     }
   }, [getReferrer, isConnected]);
   
-  // Load referral data from using the referral service
-  useEffect(() => {
+  // Define the fetchReferralData function
+  const fetchReferralData = async () => {
     if (!isConnected || !address) return;
     
-    const fetchReferralData = async () => {
-      setLoading(true);
-      try {
-        // Get referral data using the service
-        const referrals = await getReferralsByReferrer(address);
-          
-        if (referrals && referrals.length > 0) {
-          // Count total, pending, and completed referrals
-          const pending = referrals.filter(r => !r.nftPurchased).length;
-          const completed = referrals.filter(r => r.nftPurchased).length;
-          
-          // Calculate earnings ($25 per completed referral)
-          const totalEarnings = completed * 25;
-          
-          // Count pending payouts
-          const pendingPayouts = referrals.filter(r => r.nftPurchased && !r.paymentProcessed).length * 25;
-          
-          setReferralStats({
-            totalReferrals: referrals.length,
-            pendingReferrals: pending,
-            completedReferrals: completed,
-            earnings: totalEarnings,
-            pendingPayouts: pendingPayouts
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching referral data:", error);
-      } finally {
-        setLoading(false);
+    setLoading(true);
+    try {
+      // Get referral data using the service
+      const referrals = await getReferralsByReferrer(address);
+        
+      if (referrals && referrals.length > 0) {
+        // Count total, pending, and completed referrals
+        const pending = referrals.filter(r => !r.nftPurchased).length;
+        const completed = referrals.filter(r => r.nftPurchased).length;
+        
+        // Calculate earnings ($25 per completed referral)
+        const totalEarnings = completed * 25;
+        
+        // Count pending payouts
+        const pendingPayouts = referrals.filter(r => r.nftPurchased && !r.paymentProcessed).length * 25;
+        
+        setReferralStats({
+          totalReferrals: referrals.length,
+          pendingReferrals: pending,
+          completedReferrals: completed,
+          earnings: totalEarnings,
+          pendingPayouts: pendingPayouts
+        });
       }
-    };
-    
+    } catch (error) {
+      console.error("Error fetching referral data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Use the fetchReferralData in useEffect
+  useEffect(() => {
+    if (!isConnected || !address) return;
     fetchReferralData();
   }, [address, isConnected]);
+
+  // Load referral data from using the referral service
+  
 
   // Add event subscription when connected
   useEffect(() => {
