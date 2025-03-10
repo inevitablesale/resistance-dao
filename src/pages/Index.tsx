@@ -9,7 +9,7 @@ import { TerminalLogin } from '@/components/terminal/TerminalLogin';
 import { BreachSequence } from '@/components/terminal/BreachSequence';
 import { StoryTerminal } from '@/components/terminal/StoryTerminal';
 import { RadiationSystem } from '@/components/radiation/RadiationSystem';
-import { NFTDistributionStatus } from '@/components/radiation/NFTDistributionStatus';
+import { NFTDistributionStatus, CHARACTERS } from '@/components/radiation/NFTDistributionStatus';
 import { ReferralSystem } from '@/components/radiation/ReferralSystem';
 
 import { 
@@ -139,12 +139,12 @@ const Index = () => {
     bountyHunterRatio: 35
   };
   
-  // Updated NFT listings without the 'role' property
+  // Updated NFT listings with correct character names from CHARACTERS
   const sentinelListings: MarketplaceListing[] = [
     {
       id: 1,
       type: 'sentinel',
-      name: "Strategic Commander X-35",
+      name: CHARACTERS.SENTINEL_CHARACTERS[0].name, // "DAO Enforcer"
       tokenId: 1,
       price: "15,000 RD",
       seller: "0x1234...5678",
@@ -158,13 +158,12 @@ const Index = () => {
         { trait: "Investment Ability", value: "Strategic" }
       ],
       status: 'active',
-      description: "Strategic Commander with veteran rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiheog5wgtnl7ldazmsj3n7xmkgkzpjnix5e4tuxndzw7j3bgkp2n4"
+      description: "Strategic Commander with veteran rank"
     },
     {
       id: 2,
       type: 'sentinel',
-      name: "Financial Overseer K-42",
+      name: CHARACTERS.SENTINEL_CHARACTERS[1].name, // "Insolvent Medic"
       tokenId: 42,
       price: "32,000 RD",
       seller: "0x8765...4321",
@@ -178,13 +177,12 @@ const Index = () => {
         { trait: "Investment Ability", value: "Economic" }
       ],
       status: 'active',
-      description: "Financial Overseer with elite rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiavqxeov62wgj6upfpvq6g4vpvot4mnwl3ggunxp27sbfjgs4hlfq"
+      description: "Financial Overseer with elite rank"
     },
     {
       id: 3,
       type: 'sentinel',
-      name: "Trade Commissioner B-007",
+      name: CHARACTERS.SENTINEL_CHARACTERS[2].name, // "Liquidation Phantom"
       tokenId: 7,
       price: "50,000 RD",
       seller: "0x9876...5432",
@@ -198,8 +196,7 @@ const Index = () => {
         { trait: "Investment Ability", value: "Diplomatic" }
       ],
       status: 'active',
-      description: "Trade Commissioner with legend rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeig47okn4sqqbajhje57htkxw6py3tdms7boyc3hkvvr4qlj7zsabu"
+      description: "Trade Commissioner with legend rank"
     }
   ];
   
@@ -207,7 +204,7 @@ const Index = () => {
     {
       id: 4,
       type: 'bounty-hunter',
-      name: "Protocol Tracker S-17",
+      name: CHARACTERS.BOUNTY_HUNTER_CHARACTERS[0].name, // "Chain Reaper"
       tokenId: 17,
       price: "18,500 RD",
       seller: "0x2468...1357",
@@ -221,13 +218,12 @@ const Index = () => {
         { trait: "Operating Territory", value: "Wastelands" }
       ],
       status: 'active',
-      description: "Protocol Tracker with feared rank",
-      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeifzvpyj5znhgjq22cbjyzav5zsvese3m3klbkc4lcdm3fdbbxiooa"
+      description: "Protocol Tracker with feared rank"
     },
     {
       id: 5,
       type: 'bounty-hunter',
-      name: "Asset Recovery A-67",
+      name: CHARACTERS.BOUNTY_HUNTER_CHARACTERS[1].name, // "Forked Hunter"
       tokenId: 67,
       price: "24,000 RD",
       seller: "0x1357...2468",
@@ -246,7 +242,7 @@ const Index = () => {
     {
       id: 6,
       type: 'bounty-hunter',
-      name: "Network Infiltrator L-89",
+      name: CHARACTERS.BOUNTY_HUNTER_CHARACTERS[2].name, // "Liquidated Tracker"
       tokenId: 89,
       price: "36,500 RD",
       seller: "0x6543...7890",
@@ -268,7 +264,7 @@ const Index = () => {
     {
       id: 7,
       type: 'survivor',
-      name: "Engineer Pioneer R-12",
+      name: CHARACTERS.SURVIVOR_CHARACTERS[0].name, // "Rugpull Veteran"
       tokenId: 12,
       price: "12,500 RD",
       seller: "0x5555...6666",
@@ -287,7 +283,7 @@ const Index = () => {
     {
       id: 8,
       type: 'survivor',
-      name: "Medic Support M-23",
+      name: CHARACTERS.SURVIVOR_CHARACTERS[1].name, // "Blacklist Exile"
       tokenId: 23,
       price: "9,800 RD",
       seller: "0x7777...8888",
@@ -306,7 +302,7 @@ const Index = () => {
     {
       id: 9,
       type: 'survivor',
-      name: "Settlement Leader T-01",
+      name: CHARACTERS.SURVIVOR_CHARACTERS[2].name, // "Failed Validator"
       tokenId: 1,
       price: "42,000 RD",
       seller: "0x9999...0000",
@@ -692,4 +688,3 @@ const Index = () => {
 };
 
 export default Index;
-
