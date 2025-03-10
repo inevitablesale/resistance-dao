@@ -161,9 +161,13 @@ function Layout() {
         <Route path="/r/:referrerAddress" element={<ReferralRedirect />} />
         <Route path="/toxic-theme" element={<ToxicTheme />} />
         <Route path="/marketplace/:id" element={<MarketplaceItemDetails />} />
+        
+        {/* Role-based marketplace routes */}
         <Route path="/marketplace/bounty-hunters" element={<Hunt />} />
         <Route path="/marketplace/sentinels" element={<Hunt />} />
         <Route path="/marketplace/survivors" element={<Hunt />} />
+        
+        {/* Command/Hunt routes */}
         <Route path="/referral" element={<ReferralRedirect />} />
         <Route path="/hunt" element={<Hunt />} />
         <Route path="/command" element={<Hunt />} />

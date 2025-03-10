@@ -6,7 +6,8 @@ import { useWalletConnection } from "@/hooks/useWalletConnection";
 import Twitter from "./icons/Twitter";
 import Linked from "./icons/Linked";
 import { Button } from "@/components/ui/button";
-import { Rocket, Target } from "lucide-react";
+import { Rocket, Target, Shield, Zap, Users } from "lucide-react";
+import { useNFTRoles } from "@/hooks/useNFTRoles";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,6 +20,7 @@ import {
 const Nav = () => {
   const { primaryWallet } = useDynamicContext();
   const { setShowAuthFlow, isConnected, isPendingInitialization } = useWalletConnection();
+  const { primaryRole, isLoading } = useNFTRoles();
   const location = useLocation();
   
   const hideHomeRoutes = ['/', '/thesis'];
@@ -92,7 +94,7 @@ const Nav = () => {
       );
     }
     
-    if (path === '/hunt') {
+    if (path === '/hunt' || path === '/command') {
       return (
         <Breadcrumb>
           <BreadcrumbList className="text-white/60">
@@ -103,7 +105,7 @@ const Nav = () => {
             </BreadcrumbItem>
             <BreadcrumbSeparator className="text-white/40" />
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-white">Wasteland Hunter</BreadcrumbPage>
+              <BreadcrumbPage className="text-white">Wasteland Command Center</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -115,6 +117,22 @@ const Nav = () => {
 
   const handleLaunchClick = () => {
     setShowAuthFlow(true);
+  };
+
+  // Get role-specific icon
+  const getRoleIcon = () => {
+    if (isLoading) return null;
+    
+    switch(primaryRole) {
+      case 'Sentinel':
+        return <Shield className="h-4 w-4 mr-1 text-blue-400" />;
+      case 'Survivor':
+        return <Zap className="h-4 w-4 mr-1 text-purple-400" />;
+      case 'Bounty Hunter':
+        return <Target className="h-4 w-4 mr-1 text-toxic-neon" />;
+      default:
+        return <Users className="h-4 w-4 mr-1" />;
+    }
   };
 
   return (
@@ -130,8 +148,14 @@ const Nav = () => {
                 </Link>
                 <Link to="/hunt" className="text-white/80 hover:text-white transition-colors flex items-center">
                   <Target className="h-4 w-4 mr-1" />
-                  Hunt
+                  Command
                 </Link>
+                {isConnected && !isLoading && primaryRole !== 'Unknown' && (
+                  <Link to="/hunt" className="text-white/80 hover:text-white transition-colors flex items-center">
+                    {getRoleIcon()}
+                    {primaryRole} Hub
+                  </Link>
+                )}
               </div>
             ) : (
               hideHomeRoutes.includes(location.pathname) ? (
@@ -144,8 +168,14 @@ const Nav = () => {
                   </Link>
                   <Link to="/hunt" className="text-white/80 hover:text-white transition-colors flex items-center">
                     <Target className="h-4 w-4 mr-1" />
-                    Hunt
+                    Command
                   </Link>
+                  {isConnected && !isLoading && primaryRole !== 'Unknown' && (
+                    <Link to="/hunt" className="text-white/80 hover:text-white transition-colors flex items-center">
+                      {getRoleIcon()}
+                      {primaryRole} Hub
+                    </Link>
+                  )}
                 </div>
               ) : (
                 getBreadcrumbs()
