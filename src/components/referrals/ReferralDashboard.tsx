@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Share2, Plus, Check, Clock, Copy, ChevronRight, ExternalLink, Award, Users, ArrowRight } from 'lucide-react';
@@ -10,17 +11,18 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useReferrals } from '@/hooks/useReferrals';
-import { Referral, ReferralMetadata } from '@/services/referralService';
+import { ReferralInfo } from '@/services/referralService';
 import { formatDistanceToNow } from 'date-fns';
 
 export const ReferralDashboard = () => {
   const {
     referrals,
-    createReferral,
-    validateReferral,
-    claimReferralCode,
-    processReferral,
-    isLoadingReferrals
+    isLoading,
+    error,
+    fetchReferrals,
+    addReferral,
+    completeReferral,
+    getSavedReferrer
   } = useReferrals();
   
   const { toast } = useToast();
@@ -62,10 +64,21 @@ export const ReferralDashboard = () => {
   const userRole = "Bounty Hunter";
   
   const handleCreateReferral = async () => {
-    await createReferral(
-      newReferralData.type,
-      newReferralData.name
-    );
+    try {
+      const referredAddress = "0x" + Math.random().toString(16).substring(2, 42);
+      await addReferral(referredAddress);
+      toast({
+        title: "Referral created",
+        description: "Your referral has been created successfully.",
+      });
+    } catch (err) {
+      console.error("Error creating referral:", err);
+      toast({
+        title: "Failed to create referral",
+        description: "An error occurred while creating the referral.",
+        variant: "destructive",
+      });
+    }
   };
   
   const handleShareReferral = (referralId: string) => {
@@ -96,13 +109,13 @@ export const ReferralDashboard = () => {
     );
   };
   
-  const renderReferralCard = (referral: Referral) => (
+  const renderReferralCard = (referral: ReferralInfo) => (
     <ToxicCard key={referral.id} className="overflow-hidden">
       <ToxicCardContent className="p-4 space-y-3">
         <div className="flex justify-between">
           <ToxicBadge variant="outline" className="flex items-center gap-1">
             <Share2 className="w-3 h-3" />
-            {referral.type === 'nft-membership' ? 'NFT Referral' : referral.type}
+            NFT Referral
           </ToxicBadge>
           
           <ToxicBadge 
@@ -117,21 +130,21 @@ export const ReferralDashboard = () => {
         </div>
         
         <div>
-          <h3 className="text-lg font-medium text-white mb-1">{referral.name}</h3>
-          <p className="text-sm text-white/70 line-clamp-2">{referral.description}</p>
+          <h3 className="text-lg font-medium text-white mb-1">Referral to {referral.referredAddress.substring(0, 6)}...</h3>
+          <p className="text-sm text-white/70 line-clamp-2">Invite a new member to join the Resistance</p>
         </div>
         
         <div className="flex justify-between items-center pt-2">
           <div className="flex flex-col">
             <span className="text-sm text-white/60">Reward</span>
-            <span className="font-mono text-toxic-neon">{referral.rewardPercentage}%</span>
+            <span className="font-mono text-toxic-neon">5%</span>
           </div>
           
           <div className="flex flex-col items-end">
             <span className="text-sm text-white/60">Created</span>
             <span className="text-white/80 text-sm flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {formatDistanceToNow(referral.createdAt, { addSuffix: true })}
+              {formatDistanceToNow(new Date(referral.referralDate), { addSuffix: true })}
             </span>
           </div>
         </div>
@@ -211,7 +224,7 @@ export const ReferralDashboard = () => {
         </TabsList>
         
         <TabsContent value="active" className="mt-0">
-          {isLoadingReferrals ? (
+          {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="animate-pulse bg-white/5 rounded-lg h-48"></div>
