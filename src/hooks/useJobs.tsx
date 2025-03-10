@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
@@ -165,7 +166,13 @@ export const useJobs = () => {
         linkedInURL: "https://linkedin.com/in/resistance" // Default placeholder
       };
       
-      const jobId = await createJobListing(primaryWallet, fullMetadata);
+      // Pass all required arguments to createJobListing
+      const jobId = await createJobListing(
+        primaryWallet, 
+        fullMetadata, 
+        fullMetadata.votingDuration,
+        fullMetadata.linkedInURL
+      );
       
       if (jobId) {
         toast({
@@ -192,7 +199,7 @@ export const useJobs = () => {
   };
   
   // Submit a job referral
-  const submitReferral = async (jobId: string, referredUser: string) => {
+  const submitReferral = async (jobId: string, referredUser: string, partyAddress: string = "") => {
     if (!primaryWallet) {
       toast({
         title: "Wallet Required",
@@ -217,7 +224,13 @@ export const useJobs = () => {
         description: "Please approve the transaction to submit your referral.",
       });
       
-      const success = await submitJobReferral(primaryWallet, jobId, referredUser);
+      // Pass all required arguments to submitJobReferral
+      const success = await submitJobReferral(
+        primaryWallet, 
+        jobId, 
+        partyAddress,
+        referredUser
+      );
       
       if (success) {
         toast({
@@ -244,7 +257,7 @@ export const useJobs = () => {
   };
   
   // Accept a job application
-  const acceptApplication = async (applicationId: string) => {
+  const acceptApplication = async (applicationId: string, partyAddress: string = "", proposalId: string = "") => {
     if (!primaryWallet) {
       toast({
         title: "Wallet Required",
@@ -255,7 +268,13 @@ export const useJobs = () => {
     }
     
     try {
-      const success = await acceptJobApplication(primaryWallet, applicationId);
+      // Pass all required arguments to acceptJobApplication
+      const success = await acceptJobApplication(
+        primaryWallet, 
+        partyAddress, 
+        proposalId, 
+        applicationId
+      );
       
       if (success) {
         toast({
@@ -282,7 +301,7 @@ export const useJobs = () => {
   };
   
   // Reject a job application
-  const rejectApplication = async (applicationId: string) => {
+  const rejectApplication = async (applicationId: string, partyAddress: string = "", proposalId: string = "") => {
     if (!primaryWallet) {
       toast({
         title: "Wallet Required",
@@ -293,7 +312,13 @@ export const useJobs = () => {
     }
     
     try {
-      const success = await rejectJobApplication(primaryWallet, applicationId);
+      // Pass all required arguments to rejectJobApplication
+      const success = await rejectJobApplication(
+        primaryWallet, 
+        partyAddress, 
+        proposalId, 
+        applicationId
+      );
       
       if (success) {
         toast({
@@ -320,7 +345,7 @@ export const useJobs = () => {
   };
   
   // Cancel a job listing
-  const cancelJob = async (jobId: string) => {
+  const cancelJob = async (jobId: string, partyAddress: string = "") => {
     if (!primaryWallet) {
       toast({
         title: "Wallet Required",
@@ -331,7 +356,12 @@ export const useJobs = () => {
     }
     
     try {
-      const success = await cancelJobListing(primaryWallet, jobId);
+      // Pass all required arguments to cancelJobListing
+      const success = await cancelJobListing(
+        primaryWallet, 
+        partyAddress, 
+        jobId
+      );
       
       if (success) {
         toast({

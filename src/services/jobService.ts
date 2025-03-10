@@ -1,4 +1,3 @@
-
 import { Wallet } from "ethers";
 import { uploadToIPFS } from "./ipfsService";
 import { JobMetadata } from "@/utils/settlementConversion";
@@ -15,6 +14,7 @@ import {
 import { DynamicContextType } from "@dynamic-labs/sdk-react-core";
 import { executeTransaction } from "./transactionManager";
 import { useToast } from "@/hooks/use-toast";
+import { IPFSContent } from "@/types/content";
 
 // Define the JobCategory type
 export type JobCategory = 
@@ -45,12 +45,11 @@ export interface JobApplication {
   applicant: string;
   status: ApplicationStatus;
   submittedAt: number;
-  createdAt: number;  // Added createdAt property
-  // Additional application details
+  createdAt: number;
   message?: string;
   experience?: string;
   portfolio?: string;
-  referrer?: string; // Added referrer property
+  referrer?: string;
 }
 
 // Define the JobReferral type
@@ -61,8 +60,8 @@ export interface JobReferral {
   applicant: string;
   status: ReferralStatus;
   createdAt: number;
-  reward?: string; // Added reward property for referral reward
-  referrerTier?: string; // Added referrer tier from Bounty Hunter's metadata
+  reward?: string;
+  referrerTier?: string;
 }
 
 // Define the JobListing type
@@ -82,8 +81,8 @@ export interface JobListing {
   settlementId: string;
   createdAt: number;
   applications?: JobApplication[];
-  partyAddress?: string; // Party Protocol address for this job
-  crowdfundAddress?: string; // Crowdfund address for this job if applicable
+  partyAddress?: string;
+  crowdfundAddress?: string;
 }
 
 // Define the PartyJobConfig type for Party Protocol job creation
@@ -140,11 +139,15 @@ const getWalletAddress = async (wallet: WalletLike): Promise<string> => {
  * Creates a job listing using Party Protocol
  * @param wallet User wallet
  * @param metadata Job metadata
+ * @param votingDuration Voting duration in seconds
+ * @param linkedInURL LinkedIn URL for verification
  * @returns Job ID if successful, null otherwise
  */
 export const createJobListing = async (
   wallet: WalletLike,
-  metadata: JobMetadata
+  metadata: JobMetadata,
+  votingDuration: number = 7 * 24 * 60 * 60, // 7 days default
+  linkedInURL: string = "https://linkedin.com/in/default" // Default LinkedIn URL
 ): Promise<string | null> => {
   try {
     console.log("Creating job listing with metadata:", metadata);
@@ -153,8 +156,24 @@ export const createJobListing = async (
       throw new Error("Wallet must be a Dynamic SDK wallet to create a Party Protocol job");
     }
     
+    // Create IPFS content object from job metadata
+    const ipfsContent: IPFSContent = {
+      contentSchema: "job-listing-v1",
+      contentType: "job-listing",
+      title: metadata.title,
+      content: metadata.description,
+      metadata: {
+        author: await getWalletAddress(wallet),
+        publishedAt: Math.floor(Date.now() / 1000),
+        version: 1,
+        language: "en",
+        tags: [metadata.category],
+        coverImage: metadata.image || ""
+      }
+    };
+    
     // Upload metadata to IPFS
-    const ipfsHash = await uploadToIPFS(metadata);
+    const ipfsHash = await uploadToIPFS(ipfsContent);
     if (!ipfsHash) {
       throw new Error("Failed to upload job metadata to IPFS");
     }
@@ -163,7 +182,7 @@ export const createJobListing = async (
     const partyOptions = {
       name: `Job: ${metadata.title}`,
       hosts: [await getWalletAddress(wallet)],
-      votingDuration: 7 * 24 * 60 * 60, // 7 days in seconds
+      votingDuration: votingDuration,
       executionDelay: 1 * 24 * 60 * 60, // 1 day in seconds
       passThresholdBps: 5000, // 50%
       proposers: [], // Anyone can propose (apply for the job)
@@ -236,19 +255,31 @@ export const submitJobApplication = async (
     }
     
     // Create the application metadata
-    const applicationMetadata = {
-      type: "job-application",
-      jobId: jobId,
-      message: applicationDetails.message,
+    const applicationIpfsContent: IPFSContent = {
+      contentSchema: "job-application-v1",
+      contentType: "job-application",
+      title: `Application for Job: ${jobId}`,
+      content: applicationDetails.message,
+      metadata: {
+        author: await getWalletAddress(wallet),
+        publishedAt: Math.floor(Date.now() / 1000),
+        version: 1,
+        language: "en",
+        tags: ["job-application", jobId],
+        attachments: [applicationDetails.portfolio || ""]
+      }
+    };
+    
+    // Add custom fields to metadata
+    const customMetadata = {
+      ...applicationIpfsContent,
+      jobId,
       experience: applicationDetails.experience,
-      portfolio: applicationDetails.portfolio || "",
       referrer: applicationDetails.referrer || "",
-      applicant: await getWalletAddress(wallet),
-      timestamp: Math.floor(Date.now() / 1000)
     };
     
     // Upload application metadata to IPFS
-    const ipfsHash = await uploadToIPFS(applicationMetadata);
+    const ipfsHash = await uploadToIPFS(applicationIpfsContent);
     if (!ipfsHash) {
       throw new Error("Failed to upload application metadata to IPFS");
     }
@@ -306,17 +337,23 @@ export const submitJobReferral = async (
       throw new Error("Wallet must be a Dynamic SDK wallet to submit a Party Protocol referral");
     }
     
-    // Create the referral metadata
-    const referralMetadata = {
-      type: "job-referral",
-      jobId: jobId,
-      referrer: await getWalletAddress(wallet),
-      referredUser: referredUser,
-      timestamp: Math.floor(Date.now() / 1000)
+    // Create the referral metadata as IPFSContent
+    const referralIpfsContent: IPFSContent = {
+      contentSchema: "job-referral-v1",
+      contentType: "job-referral",
+      title: `Referral for Job: ${jobId}`,
+      content: `Referral for ${referredUser} from ${await getWalletAddress(wallet)}`,
+      metadata: {
+        author: await getWalletAddress(wallet),
+        publishedAt: Math.floor(Date.now() / 1000),
+        version: 1,
+        language: "en",
+        tags: ["job-referral", jobId],
+      }
     };
     
     // Upload referral metadata to IPFS
-    const ipfsHash = await uploadToIPFS(referralMetadata);
+    const ipfsHash = await uploadToIPFS(referralIpfsContent);
     if (!ipfsHash) {
       throw new Error("Failed to upload referral metadata to IPFS");
     }
@@ -652,4 +689,3 @@ export const updateSentinelBountyStats = async (
     return false;
   }
 };
-

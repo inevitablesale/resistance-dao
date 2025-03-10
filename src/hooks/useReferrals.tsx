@@ -64,7 +64,8 @@ export const useReferrals = () => {
     type: string,
     name: string,
     description: string,
-    rewardPercentage: number
+    rewardPercentage: number,
+    extraData: any = {}
   ) => {
     if (!primaryWallet) {
       toast({
@@ -90,13 +91,14 @@ export const useReferrals = () => {
         description: "Please approve the transaction to create your referral pool.",
       });
       
-      // Create referral
+      // Create referral with all required arguments
       const referralId = await createReferral(
         primaryWallet as unknown as ethers.Wallet, 
         type, 
         name, 
         description, 
-        rewardPercentage
+        rewardPercentage,
+        extraData
       );
       
       if (referralId) {
@@ -124,7 +126,12 @@ export const useReferrals = () => {
   };
   
   // Submit a referral
-  const submitNewReferral = async (referralId: string, referredAddress: string) => {
+  const submitNewReferral = async (
+    referralId: string, 
+    referredAddress: string,
+    metadata: any = {},
+    referrerTier: string = "Initiate"
+  ) => {
     if (!primaryWallet) {
       toast({
         title: "Wallet Required",
@@ -140,10 +147,13 @@ export const useReferrals = () => {
         description: "Please approve the transaction to submit your referral.",
       });
       
+      // Submit referral with all required arguments
       const success = await submitReferral(
         primaryWallet as unknown as ethers.Wallet,
         referralId,
-        referredAddress
+        referredAddress,
+        metadata,
+        referrerTier
       );
       
       if (success) {
