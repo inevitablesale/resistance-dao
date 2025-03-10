@@ -127,8 +127,9 @@ export function MarketplaceListingGrid({ listings, className = "", title, onList
                         autoRotate={true}
                       />
                     ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <Biohazard className="h-16 w-16 text-toxic-neon/30" />
+                      <div className="flex flex-col items-center justify-center h-full">
+                        <Biohazard className="h-12 w-12 text-toxic-neon/30 mb-2" />
+                        <p className="text-sm text-toxic-neon/60">No 3D model available</p>
                       </div>
                     )}
                     <div className="absolute top-2 right-2">
