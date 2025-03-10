@@ -1,14 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Facebook, Instagram, MessageSquare, Share2, ExternalLink, Shield, ChevronRight, AlertCircle } from "lucide-react";
+import { Facebook, Instagram, MessageSquare, ExternalLink, Shield, ChevronRight, AlertCircle } from "lucide-react";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNavigate } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { ReferralSystem } from "@/components/radiation/ReferralSystem";
 
 const Settings: React.FC = () => {
   const { isConnected, address } = useCustomWallet();
@@ -28,62 +28,21 @@ const Settings: React.FC = () => {
       localStorage.setItem('has_visited_referral', 'true');
     }
   }, [isConnected]);
-  
-  // Generate a referral link using the wallet address
-  const referralLink = isConnected && address
-    ? `https://www.resistancedao.xyz/r/${address}`
-    : "";
 
   const stats = {
-    linkClicks: 0, // Reset to 0 as requested
-    walletsSignedUp: 0, // Changed from appointments
-    nftsPurchased: 0, // Changed from invoicesBilled
+    linkClicks: 0, 
+    walletsSignedUp: 0, 
+    nftsPurchased: 0, 
     pendingRewards: "0.00",
     paidRewards: "0.00"
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(referralLink);
-    toast({
-      title: "Link copied!",
-      description: "Referral link copied to clipboard",
-    });
-  };
-
-  const shareViaChannel = (channel: string) => {
-    let shareUrl = '';
-    
-    const encodedMessage = encodeURIComponent("Join Resistance DAO with my referral link!");
-    const encodedUrl = encodeURIComponent(referralLink);
-    
-    switch (channel) {
-      case 'twitter':
-        shareUrl = `https://twitter.com/intent/tweet?text=${encodedMessage}&url=${encodedUrl}`;
-        break;
-      case 'facebook':
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-        break;
-      case 'telegram':
-        shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedMessage}`;
-        break;
-      case 'instagram':
-        toast({
-          title: "Instagram Sharing",
-          description: "Copy the link and share it on Instagram",
-        });
-        return;
-      case 'sms':
-        shareUrl = `sms:?body=${encodedMessage} ${encodedUrl}`;
-        break;
-    }
-    
-    if (shareUrl) {
-      window.open(shareUrl, '_blank');
-    }
-  };
-
   const handleBuyNFT = () => {
     navigate('/buy-membership-nft');
+  };
+
+  const handleGoToBounties = () => {
+    navigate('/hunt');
   };
 
   return (
@@ -110,13 +69,12 @@ const Settings: React.FC = () => {
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold text-blue-300 mb-2">Welcome to Resistance DAO!</h2>
                 <p className="text-white/80 mb-4">
-                  This is your settings dashboard where you can manage your account, 
-                  referrals, and membership status.
+                  This is your settings dashboard where you can manage your account and membership status.
                 </p>
                 <div className="flex items-center gap-2">
                   <div className="w-1 h-8 bg-blue-500 rounded-full" />
                   <p className="text-blue-200 font-medium">
-                    Share your unique link below to start earning rewards!
+                    Manage your account settings and membership status from here.
                   </p>
                 </div>
               </CardContent>
@@ -134,7 +92,6 @@ const Settings: React.FC = () => {
                 <h2 className="text-xl font-semibold mb-4 text-yellow-300">User Data Debug</h2>
                 <div className="space-y-2 text-white/80 text-sm">
                   <p><span className="font-bold">Wallet Address:</span> {address || 'Not connected'}</p>
-                  <p><span className="font-bold">Referral Link:</span> {referralLink || 'No referral link'}</p>
                 </div>
               </CardContent>
             </Card>
@@ -171,12 +128,21 @@ const Settings: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Replace the old referral system with the new ReferralSystem component */}
-          {isConnected && (
-            <div className="mb-8">
-              <ReferralSystem />
-            </div>
-          )}
+          {/* Link to Bounty Hunter Page */}
+          <Card className="mb-8 bg-black/40 border-purple-500/20 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4 text-white">Bounty Hunter Program</h2>
+              <p className="text-white/70 mb-4">
+                Earn rewards by referring new members and completing bounties. Visit the Bounty Hunter's Hub to manage your referrals and find available bounties.
+              </p>
+              <Button 
+                onClick={handleGoToBounties}
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+              >
+                Go to Bounty Hunter's Hub
+              </Button>
+            </CardContent>
+          </Card>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">

@@ -42,10 +42,10 @@ const ReferralRedirect = () => {
   }, [referrerAddress, processingStep]);
 
   useEffect(() => {
-    // If progress reaches 100%, redirect
+    // If progress reaches 100%, redirect to the Hunt page instead of home
     if (progress === 100) {
       setTimeout(() => {
-        navigate("/");
+        navigate("/hunt");
       }, 500);
     }
   }, [progress, navigate]);
