@@ -219,7 +219,7 @@ const Index = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
-            {/* All role cards have been completely removed */}
+            {/* This area previously contained the role cards that have now been completely removed */}
           </div>
           
           <div className="lg:col-span-1">
