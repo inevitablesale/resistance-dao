@@ -35,6 +35,7 @@ declare module "@dynamic-labs/sdk-react-core" {
       };
     } | null;
     setShowAuthFlow?: (show: boolean) => void;
+    hideDynamicUserProfile?: () => Promise<void>;
     setShowOnRamp?: (
       show: boolean,
       options?: {

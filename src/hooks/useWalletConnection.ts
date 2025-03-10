@@ -13,6 +13,7 @@ export type WalletConnectionResult = {
   address: string | null;
   isPendingInitialization: boolean;
   primaryWallet: any;
+  setShowAuthFlow: (show: boolean) => void;
 };
 
 export const useWalletConnection = (): WalletConnectionResult => {
@@ -132,6 +133,7 @@ export const useWalletConnection = (): WalletConnectionResult => {
     isConnected,
     address: primaryWallet?.address || null,
     isPendingInitialization,
-    primaryWallet
+    primaryWallet,
+    setShowAuthFlow
   };
 };

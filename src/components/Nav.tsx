@@ -19,7 +19,7 @@ import {
 
 const Nav = () => {
   const { primaryWallet } = useDynamicContext();
-  const { setShowAuthFlow, isConnected, isPendingInitialization } = useWalletConnection();
+  const { isConnected, isPendingInitialization, setShowAuthFlow } = useWalletConnection();
   const { primaryRole, isLoading } = useNFTRoles();
   const location = useLocation();
   
