@@ -90,7 +90,6 @@ const Index = () => {
   const [activeRole, setActiveRole] = useState<'sentinel' | 'pioneer'>('sentinel');
   const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
   
-  // New states for radiation system
   const [currentRadiation, setCurrentRadiation] = useState(94); // Start at 94% radiation
   const [totalNFTsClaimed, setTotalNFTsClaimed] = useState(925); // Mock data - total claimed NFTs
   const [referralEarnings, setReferralEarnings] = useState(375); // Mock data - earnings in MATIC
@@ -139,12 +138,11 @@ const Index = () => {
     bountyHunterRatio: 35
   };
   
-  // Updated NFT listings with correct character names from CHARACTERS
   const sentinelListings: MarketplaceListing[] = [
     {
       id: 1,
       type: 'sentinel',
-      name: CHARACTERS.SENTINEL_CHARACTERS[0].name, // "DAO Enforcer"
+      name: "DAO Enforcer",
       tokenId: 1,
       price: "15,000 RD",
       seller: "0x1234...5678",
@@ -158,12 +156,13 @@ const Index = () => {
         { trait: "Investment Ability", value: "Strategic" }
       ],
       status: 'active',
-      description: "Strategic Commander with veteran rank"
+      description: "Strategic Commander with veteran rank",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreibo6bk5dezlsii7imuabncv7tihxwbi4f4urds75l7nuy2rnxfkru"
     },
     {
       id: 2,
       type: 'sentinel',
-      name: CHARACTERS.SENTINEL_CHARACTERS[1].name, // "Insolvent Medic"
+      name: "Insolvent Medic",
       tokenId: 42,
       price: "32,000 RD",
       seller: "0x8765...4321",
@@ -177,12 +176,13 @@ const Index = () => {
         { trait: "Investment Ability", value: "Economic" }
       ],
       status: 'active',
-      description: "Financial Overseer with elite rank"
+      description: "Financial Overseer with elite rank",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreid7oobbrlbxcnnigfcwfbgr5m3dmsl6wemsuaxluzd54ioclneubq"
     },
     {
       id: 3,
       type: 'sentinel',
-      name: CHARACTERS.SENTINEL_CHARACTERS[2].name, // "Liquidation Phantom"
+      name: "Liquidation Phantom",
       tokenId: 7,
       price: "50,000 RD",
       seller: "0x9876...5432",
@@ -196,7 +196,8 @@ const Index = () => {
         { trait: "Investment Ability", value: "Diplomatic" }
       ],
       status: 'active',
-      description: "Trade Commissioner with legend rank"
+      description: "Trade Commissioner with legend rank",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreicfsovqdpu3byxvyfev4y7xdmqz3hggewsuyx4brifoscercektpy"
     }
   ];
   
@@ -204,7 +205,7 @@ const Index = () => {
     {
       id: 4,
       type: 'bounty-hunter',
-      name: CHARACTERS.BOUNTY_HUNTER_CHARACTERS[0].name, // "Chain Reaper"
+      name: "Chain Reaper",
       tokenId: 17,
       price: "18,500 RD",
       seller: "0x2468...1357",
@@ -218,12 +219,13 @@ const Index = () => {
         { trait: "Operating Territory", value: "Wastelands" }
       ],
       status: 'active',
-      description: "Protocol Tracker with feared rank"
+      description: "Protocol Tracker with feared rank",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreifepvbd2shm4uxfysdxtva5mjs7fqnxbxehutcoqfblmcgtp7h7ka"
     },
     {
       id: 5,
       type: 'bounty-hunter',
-      name: CHARACTERS.BOUNTY_HUNTER_CHARACTERS[1].name, // "Forked Hunter"
+      name: "Forked Hunter",
       tokenId: 67,
       price: "24,000 RD",
       seller: "0x1357...2468",
@@ -237,12 +239,13 @@ const Index = () => {
         { trait: "Operating Territory", value: "Cyber Core" }
       ],
       status: 'active',
-      description: "Asset Recovery with respected rank"
+      description: "Asset Recovery with respected rank",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreierebrs3yw24r7wgkezgok6lhbiwqwwgen5fnfqxm6cqul644x3fe"
     },
     {
       id: 6,
       type: 'bounty-hunter',
-      name: CHARACTERS.BOUNTY_HUNTER_CHARACTERS[2].name, // "Liquidated Tracker"
+      name: "Liquidated Tracker",
       tokenId: 89,
       price: "36,500 RD",
       seller: "0x6543...7890",
@@ -256,7 +259,8 @@ const Index = () => {
         { trait: "Operating Territory", value: "Deep Zone" }
       ],
       status: 'active',
-      description: "Network Infiltrator with infamous rank"
+      description: "Network Infiltrator with infamous rank",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreiajc2mwtirx3423mbf55scuniqlwh3ph2cglk7y2nbd764r6g6ine"
     }
   ];
   
@@ -264,7 +268,7 @@ const Index = () => {
     {
       id: 7,
       type: 'survivor',
-      name: CHARACTERS.SURVIVOR_CHARACTERS[0].name, // "Rugpull Veteran"
+      name: "Rugpull Veteran",
       tokenId: 12,
       price: "12,500 RD",
       seller: "0x5555...6666",
@@ -278,12 +282,13 @@ const Index = () => {
         { trait: "Settlement", value: "New Haven" }
       ],
       status: 'active',
-      description: "Engineer Pioneer with veteran rank"
+      description: "Engineer Pioneer with veteran rank",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreiek2ihnc7fmpwzseitea2vflvwdmm6qvn4vydd5ww6wgipntf3w7a"
     },
     {
       id: 8,
       type: 'survivor',
-      name: CHARACTERS.SURVIVOR_CHARACTERS[1].name, // "Blacklist Exile"
+      name: "Blacklist Exile",
       tokenId: 23,
       price: "9,800 RD",
       seller: "0x7777...8888",
@@ -297,12 +302,13 @@ const Index = () => {
         { trait: "Settlement", value: "Outpost Alpha" }
       ],
       status: 'active',
-      description: "Medic Support with skilled rank"
+      description: "Medic Support with skilled rank",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreica5ugau5cjah7hkwz4ko36oqxkg2v4swqpxnhzi7z4wgftl76q5m"
     },
     {
       id: 9,
       type: 'survivor',
-      name: CHARACTERS.SURVIVOR_CHARACTERS[2].name, // "Failed Validator"
+      name: "Failed Validator",
       tokenId: 1,
       price: "42,000 RD",
       seller: "0x9999...0000",
@@ -316,7 +322,8 @@ const Index = () => {
         { trait: "Settlement", value: "Reactor City" }
       ],
       status: 'active',
-      description: "Settlement Leader with master rank"
+      description: "Settlement Leader with master rank",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafkreigw5k75stzjhamdjtwlssbolhxepbeglfs3qoyowgu2q4n2fnfszy"
     }
   ];
 
@@ -392,7 +399,6 @@ const Index = () => {
         
         <WastelandSurvivalGuideEnhanced className="mb-8" />
         
-        {/* New Radiation System Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-1">
             <RadiationSystem 

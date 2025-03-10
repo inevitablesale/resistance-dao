@@ -7,7 +7,6 @@ import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
 import { ToxicButton } from '@/components/ui/toxic-button';
 import { ModelPreview } from './ModelPreview';
-import { CHARACTERS } from '@/components/radiation/NFTDistributionStatus';
 
 export type MarketplaceListingType = 'sentinel' | 'bounty-hunter' | 'survivor' | 'settlement' | 'equipment';
 
@@ -74,28 +73,6 @@ const getOpenSeaLink = (type: MarketplaceListingType) => {
   }
 };
 
-// Get the character model URL based on character name and type directly from CHARACTERS
-const getCharacterModelUrl = (name: string, type: MarketplaceListingType): string | null => {
-  let characterList;
-  
-  switch(type) {
-    case 'sentinel':
-      characterList = CHARACTERS.SENTINEL_CHARACTERS;
-      break;
-    case 'bounty-hunter':
-      characterList = CHARACTERS.BOUNTY_HUNTER_CHARACTERS;
-      break;
-    case 'survivor':
-      characterList = CHARACTERS.SURVIVOR_CHARACTERS;
-      break;
-    default:
-      return null;
-  }
-  
-  const character = characterList.find(char => char.name === name);
-  return character ? `https://gateway.pinata.cloud/ipfs/${character.ipfsCID}` : null;
-};
-
 export function MarketplaceListingGrid({ listings, className = "", title, onListingClick }: MarketplaceListingGridProps) {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -135,8 +112,6 @@ export function MarketplaceListingGrid({ listings, className = "", title, onList
         animate="show"
       >
         {listings.map((listing) => {
-          // Get the model URL directly from our CHARACTERS data structure
-          const modelUrl = getCharacterModelUrl(listing.name, listing.type) || listing.modelUrl;
           const openSeaLink = getOpenSeaLink(listing.type);
           
           return (
@@ -144,9 +119,9 @@ export function MarketplaceListingGrid({ listings, className = "", title, onList
               <ToxicCard className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all overflow-hidden">
                 <div className="p-0">
                   <div className="h-40 bg-gradient-to-b from-toxic-neon/20 to-black/60 relative overflow-hidden">
-                    {modelUrl ? (
+                    {listing.modelUrl ? (
                       <ModelPreview 
-                        modelUrl={modelUrl} 
+                        modelUrl={listing.modelUrl} 
                         height="100%"
                         width="100%"
                         autoRotate={true}
