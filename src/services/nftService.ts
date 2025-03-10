@@ -1,5 +1,5 @@
 
-import { createPublicClient, http, getContract, type PublicClient } from "viem";
+import { createPublicClient, http, type PublicClient } from "viem";
 import { polygon } from "viem/chains";
 
 // NFT Contract address for all Resistance DAO roles
@@ -50,10 +50,10 @@ const NFT_ABI = [
   }
 ] as const;
 
-// Create Viem public client
+// Create Viem public client with a generic Polygon RPC endpoint
 const client = createPublicClient({
   chain: polygon,
-  transport: http("https://polygon-mainnet.g.alchemy.com/v2/iTtNiAAH4RhVb4DGHCF4RgQ6xWCPLDN7")
+  transport: http("https://polygon-rpc.com")
 });
 
 /**

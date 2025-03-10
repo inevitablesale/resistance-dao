@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { getNFTBalanceByContract, RESISTANCE_NFT_ADDRESS } from "@/services/alchemyService";
+import { getNFTBalanceByContract, RESISTANCE_NFT_ADDRESS } from "@/services/nftService";
 
 export const useNFTBalance = (address?: string) => {
   return useQuery({
@@ -8,7 +8,7 @@ export const useNFTBalance = (address?: string) => {
     queryFn: async () => {
       if (!address) return 0;
       
-      // Use the updated Alchemy service to get the NFT balance
+      // Use the updated NFT service to get the NFT balance
       const balance = await getNFTBalanceByContract(address);
       return balance;
     },

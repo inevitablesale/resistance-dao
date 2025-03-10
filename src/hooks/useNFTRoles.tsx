@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { 
@@ -9,7 +8,7 @@ import {
   ResistanceNFT,
   RESISTANCE_NFT_ADDRESS,
   getNFTBalanceByContract
-} from '@/services/alchemyService';
+} from '@/services/nftService';
 
 interface NFTRolesState {
   isLoading: boolean;
