@@ -5,8 +5,7 @@ import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import Twitter from "./icons/Twitter";
 import Linked from "./icons/Linked";
-import { Button } from "@/components/ui/button";
-import { Rocket, Target } from "lucide-react";
+import { Target } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,7 +17,7 @@ import {
 
 const Nav = () => {
   const { primaryWallet } = useDynamicContext();
-  const { setShowAuthFlow, isConnected, isPendingInitialization } = useWalletConnection();
+  const { isPendingInitialization } = useWalletConnection();
   const location = useLocation();
   
   const hideHomeRoutes = ['/', '/thesis'];
@@ -113,10 +112,6 @@ const Nav = () => {
     return null;
   };
 
-  const handleLaunchClick = () => {
-    setShowAuthFlow(true);
-  };
-
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100]">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-md border-b border-white/5" />
@@ -171,14 +166,8 @@ const Nav = () => {
               <Linked className="w-5 h-5" />
             </a>
             <div className="relative z-[101] flex items-center pointer-events-auto">
-              {isPendingInitialization ? (
-                <Button disabled className="opacity-50">
-                  Initializing...
-                </Button>
-              ) : isConnected ? (
+              {!isPendingInitialization && primaryWallet && (
                 <DynamicWidget />
-              ) : (
-                null
               )}
             </div>
           </div>

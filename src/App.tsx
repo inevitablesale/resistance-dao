@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -20,7 +21,6 @@ import MarketplaceItemDetails from "./pages/MarketplaceItemDetails";
 import Hunt from "./pages/Hunt";
 import SettlementDetails from "./pages/SettlementDetails";
 import { Toaster } from "./components/ui/toaster";
-import { ResistanceWalletWidget } from "./components/wallet/ResistanceWalletWidget";
 import BountyHunters from './pages/BountyHunters';
 
 const zeroDevConfig = {
@@ -171,7 +171,6 @@ function Layout() {
         
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <ResistanceWalletWidget />
     </>
   );
 }
