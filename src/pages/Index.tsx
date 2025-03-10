@@ -69,7 +69,6 @@ import { TerminalTypewriter } from "@/components/ui/terminal-typewriter";
 import { MarketplaceListingGrid, MarketplaceListing } from "@/components/marketplace/MarketplaceListingGrid";
 import { MarketplaceStatusPanel } from "@/components/marketplace/MarketplaceStatusPanel";
 import { MarketplaceActivityFeed, MarketplaceActivity } from "@/components/marketplace/MarketplaceActivityFeed";
-import { MarketplaceQuickActions } from "@/components/marketplace/MarketplaceQuickActions";
 import { CharacterProgress } from "@/components/chronicle/CharacterProgress";
 import { TerritoryStatus } from "@/components/chronicle/TerritoryStatus";
 import { ModelPreview } from '@/components/marketplace/ModelPreview';
@@ -114,6 +113,18 @@ const Index = () => {
     setTimeout(() => {
       setIsRefreshingActivity(false);
     }, 1000);
+  };
+
+  const handleListingClick = (listing: MarketplaceListing) => {
+    navigate(`/marketplace/${listing.id}`);
+  };
+  
+  const handleCreateListing = () => {
+    navigate('/marketplace/create');
+  };
+  
+  const handleBrowseListings = () => {
+    navigate('/marketplace');
   };
 
   const formatNumber = (num: number) => {
@@ -368,18 +379,6 @@ const Index = () => {
       address: "0x789...012"
     }
   ];
-
-  const handleListingClick = (listing: MarketplaceListing) => {
-    navigate(`/marketplace/${listing.id}`);
-  };
-  
-  const handleCreateListing = () => {
-    navigate('/marketplace/create');
-  };
-  
-  const handleBrowseListings = () => {
-    navigate('/marketplace');
-  };
 
   const renderMarketplace = () => (
     <motion.div 
