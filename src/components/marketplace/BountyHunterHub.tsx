@@ -339,4 +339,51 @@ export const BountyHunterHub: React.FC = () => {
                     onClick={() => setFilterDifficulty('medium')}
                   >
                     Medium
+                  </ToxicButton>
+                  <ToxicButton 
+                    variant={filterDifficulty === 'hard' ? 'outline' : 'ghost'}
+                    size="sm"
+                    onClick={() => setFilterDifficulty('hard')}
+                  >
+                    Hard
+                  </ToxicButton>
+                </div>
+                
+                <div className="space-x-2">
+                  <span className="text-gray-400">Sort by:</span>
+                  <ToxicButton
+                    variant={sortBy === 'reward' ? 'outline' : 'ghost'}
+                    size="sm"
+                    onClick={() => setSortBy('reward')}
+                  >
+                    Reward
+                  </ToxicButton>
+                  <ToxicButton
+                    variant={sortBy === 'difficulty' ? 'outline' : 'ghost'}
+                    size="sm"
+                    onClick={() => setSortBy('difficulty')}
+                  >
+                    Difficulty
+                  </ToxicButton>
+                  <ToxicButton
+                    variant={sortBy === 'successRate' ? 'outline' : 'ghost'}
+                    size="sm"
+                    onClick={() => setSortBy('successRate')}
+                  >
+                    Success Rate
+                  </ToxicButton>
+                </div>
+              </div>
+            </Tabs>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="referrals" className="mt-0">
+          <NFTReferralDashboard />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
 
+export default BountyHunterHub;
