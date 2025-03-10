@@ -1,15 +1,15 @@
 
 import { Routes, Route, useLocation } from 'react-router-dom';
-import HomePage from '@/pages/HomePage';
-import SettlementPage from '@/pages/SettlementPage';
-import SettlementsPage from '@/pages/SettlementsPage';
-import ThesisSubmission from '@/pages/ThesisSubmission';
-import ProfilePage from '@/pages/ProfilePage';
-import NotFound from '@/pages/NotFound';
-import AppLayout from '@/components/layout/AppLayout';
-import Settings from '@/pages/Settings';
-import ReferralRedirect from '@/pages/ReferralRedirect';
-import ReferralsPage from '@/pages/ReferralsPage';
+import HomePage from './pages/HomePage';
+import SettlementPage from './pages/SettlementPage';
+import SettlementsPage from './pages/SettlementsPage';
+import ThesisSubmission from './pages/ThesisSubmission';
+import ProfilePage from './pages/ProfilePage';
+import NotFound from './pages/NotFound';
+import AppLayout from './components/layout/AppLayout';
+import Settings from './pages/Settings';
+import ReferralRedirect from './pages/ReferralRedirect';
+import ReferralsPage from './pages/ReferralsPage';
 
 export default function App() {
   const location = useLocation();
