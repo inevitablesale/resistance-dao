@@ -27,16 +27,18 @@ export const useNFTCollection = (limit: number = 20) => {
   } = useQuery({
     queryKey: ['nfts', CONTRACT_ADDRESS, limit, nextCursor],
     queryFn: () => fetchNFTsByContract(CONTRACT_ADDRESS, limit, nextCursor),
-    onSuccess: (data) => {
-      if (data) {
-        if (nextCursor === null) {
-          // First page, replace NFTs
-          setNfts(data.data || []);
-        } else {
-          // Subsequent pages, append NFTs
-          setNfts(prev => [...prev, ...(data.data || [])]);
+    meta: {
+      onSuccess: (data: any) => {
+        if (data) {
+          if (nextCursor === null) {
+            // First page, replace NFTs
+            setNfts(data.data || []);
+          } else {
+            // Subsequent pages, append NFTs
+            setNfts(prev => [...prev, ...(data.data || [])]);
+          }
+          setNextCursor(data.next);
         }
-        setNextCursor(data.next);
       }
     },
   });

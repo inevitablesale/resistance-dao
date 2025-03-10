@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -11,8 +12,7 @@ import { StoryTerminal } from '@/components/terminal/StoryTerminal';
 import { RadiationSystem } from '@/components/radiation/RadiationSystem';
 import { NFTDistributionStatus } from '@/components/radiation/NFTDistributionStatus';
 import { ReferralSystem } from '@/components/radiation/ReferralSystem';
-import { Rocket, Coins, Users, Share2, Check, ChevronRight, Building2, CircleDollarSign, Scale, FileText, ChevronRight as ArrowIcon, Clock, Target, Wallet, RefreshCw, Radiation, Skull, Zap, Shield, Image, Biohazard, ShieldX, UserX, Bug, Bomb, Crosshair, PlusCircle, Search, ShoppingBag, Box, Eye, Map, Globe, Network, Wrench, Hammer, Lightbulb, Flag, Scroll } from "lucide-react";
-import { ToxicButton } from "@/components/ui/button";
+import { Rocket, Coins, Users, Share2, Check, ChevronRight, Building2, CircleDollarSign, Scale, FileText, ChevronRight as ArrowIcon, Clock, Target, Wallet, RefreshCw, Radiation, Skull, Zap, Shield, Image, Biohazard, ShieldX, UserX, Bug, Bomb, Crosshair, PlusCircle, Search, ShoppingBag, Box, Eye, Map, Globe, Network, Wrench, Hammer, Lightbulb, Flag, Scroll, FileText2 } from "lucide-react";
 import { ToxicButton as Button } from "@/components/ui/toxic-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ToxicCard, ToxicCardContent, ToxicCardHeader, ToxicCardTitle, ToxicCardDescription, ToxicCardFooter } from "@/components/ui/toxic-card";
@@ -50,7 +50,7 @@ const Index = () => {
   } = useWalletConnection();
   const [authState, setAuthState] = useState<AuthState>("unauthenticated");
   const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
-  const [storyTerminalOpen, setStoryTerminalOpen] = useState(false); // Changed from true to false
+  const [storyTerminalOpen, setStoryTerminalOpen] = useState(false);
 
   // New states for radiation system
   const [currentRadiation, setCurrentRadiation] = useState(94); // Start at 94% radiation
@@ -58,11 +58,6 @@ const Index = () => {
   const [referralEarnings, setReferralEarnings] = useState(375); // Mock data - earnings in MATIC
   const [totalReferrals, setTotalReferrals] = useState(15); // Mock data - total referrals
 
-  useEffect(() => {
-    // Remove this effect to prevent directly setting authenticated state
-    // when wallet is connected, now handled by the TerminalLogin component
-  }, []);
-  
   const handleLoginSuccess = () => {
     setAuthState("breaching");
   };
@@ -132,6 +127,40 @@ const Index = () => {
     address: "0x789...012"
   }];
   
+  // Wasteland Operations component as shown in the image
+  const WastelandOperations = () => (
+    <ToxicCard className="bg-black/80 border-toxic-neon/50 p-6 mx-auto mb-8 max-w-2xl shadow-[0_0_15px_rgba(57,255,20,0.25)]">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-3 rounded-full bg-toxic-neon/10 border border-toxic-neon/30">
+          <Network className="w-8 h-8 text-toxic-neon" />
+        </div>
+        <h2 className="text-2xl font-mono text-toxic-neon">Wasteland Operations</h2>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <Button variant="outline" size="lg" className="border-toxic-neon/40 hover:bg-toxic-neon/10 py-4" onClick={() => navigate('/hunt')}>
+          <Eye className="h-5 w-5 mr-2" />
+          Sentinel Center
+        </Button>
+        
+        <Button variant="outline" size="lg" className="border-toxic-neon/40 hover:bg-toxic-neon/10 py-4" onClick={() => navigate('/marketplace/bounty-hunters')}>
+          <Target className="h-5 w-5 mr-2" />
+          Bounty Hub
+        </Button>
+        
+        <Button variant="outline" size="lg" className="border-toxic-neon/40 hover:bg-toxic-neon/10 py-4" onClick={() => navigate('/chronicles')}>
+          <FileText2 className="h-5 w-5 mr-2" />
+          Chronicles
+        </Button>
+        
+        <Button variant="outline" size="lg" className="border-toxic-neon/40 hover:bg-toxic-neon/10 py-4" onClick={() => navigate('/territories/map')}>
+          <Map className="h-5 w-5 mr-2" />
+          Territory Map
+        </Button>
+      </div>
+    </ToxicCard>
+  );
+  
   const renderMarketplace = () => <motion.div initial={{
     opacity: 0
   }} animate={{
@@ -146,7 +175,13 @@ const Index = () => {
           Wasteland Status: <span className="text-apocalypse-red font-semibold status-critical">Radiation Level: {currentRadiation}%</span>
         </div>
         
+        {/* Wasteland Operations at the top */}
+        <WastelandOperations />
+        
         <StoryTerminal initiallyOpen={storyTerminalOpen} onClose={() => setStoryTerminalOpen(false)} className="mb-8" />
+        
+        {/* NFT Collection Display */}
+        <NFTCollectionDisplay className="mb-8" title="Resistance Wasteland NFTs" />
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-1">
@@ -154,14 +189,10 @@ const Index = () => {
             <ReferralSystem earnings={referralEarnings} totalReferrals={totalReferrals} />
           </div>
           <div className="md:col-span-2">
-            <NFTDistributionStatus className="mb-6" />
+            <NFTDistributionStatus className="mb-8" />
+            <MarketplaceStatusPanel stats={marketplaceStats} isLoading={isLoadingStats} />
           </div>
         </div>
-
-        <MarketplaceStatusPanel stats={marketplaceStats} isLoading={isLoadingStats} className="mb-8" />
-        
-        {/* NFT Collection Display */}
-        <NFTCollectionDisplay className="mb-8" title="Resistance Wasteland NFTs" />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
@@ -169,38 +200,7 @@ const Index = () => {
           </div>
           
           <div className="lg:col-span-1">
-            <MarketplaceActivityFeed activities={recentActivities} isLoading={isRefreshingActivity} onRefresh={handleRefreshActivity} className="mb-6" />
-            
-            {isConnected && <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="p-2 rounded-full bg-toxic-neon/10">
-                    <Network className="w-5 h-5 text-toxic-neon" />
-                  </div>
-                  <h3 className="text-lg font-mono text-toxic-neon">Wasteland Operations</h3>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/hunt')}>
-                    <Eye className="h-4 w-4 mr-1" />
-                    Sentinel Center
-                  </Button>
-                  
-                  <Button variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/marketplace/bounty-hunters')}>
-                    <Network className="h-4 w-4 mr-1" />
-                    Bounty Hub
-                  </Button>
-                  
-                  <Button variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/chronicles')}>
-                    <Scroll className="h-4 w-4 mr-1" />
-                    Chronicles
-                  </Button>
-                  
-                  <Button variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/territories/map')}>
-                    <Map className="h-4 w-4 mr-1" />
-                    Territory Map
-                  </Button>
-                </div>
-              </ToxicCard>}
+            <MarketplaceActivityFeed activities={recentActivities} isLoading={isRefreshingActivity} onRefresh={handleRefreshActivity} />
           </div>
         </div>
       </div>
