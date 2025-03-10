@@ -12,10 +12,12 @@ export const useCharacterMetadata = (characterId: number) => {
   } = useQuery({
     queryKey: ['character', characterId],
     queryFn: () => {
-      console.log(`Fetching character data for ID: ${characterId}`);
+      if (!characterId || characterId === 0) {
+        return null;
+      }
       return getCharacterById(characterId);
     },
-    enabled: !!characterId && !isNaN(characterId)
+    enabled: !!characterId && !isNaN(characterId) && characterId > 0
   });
 
   // Fetch the actual model metadata from Pinata if we have a CID
@@ -29,27 +31,10 @@ export const useCharacterMetadata = (characterId: number) => {
       if (!character?.character_model_cid) {
         throw new Error('No model CID available');
       }
-      console.log(`Fetching model metadata for CID: ${character.character_model_cid}`);
       return await fetchMetadataFromCID(character.character_model_cid);
     },
     enabled: !!character?.character_model_cid
   });
-
-  // Log character data when it's available
-  if (character) {
-    console.log(`Character data for ID ${characterId}:`, {
-      name: character.name,
-      model_url: character.model_url,
-      character_model_cid: character.character_model_cid,
-      role: character.role,
-      traits: character.traits
-    });
-  }
-
-  // Log model metadata when it's available
-  if (modelMetadata) {
-    console.log(`Model metadata for character ${character?.name}:`, modelMetadata);
-  }
 
   // Convert character metadata to OpenSeaNFT format for compatibility
   const nft: OpenSeaNFT | null = character ? {

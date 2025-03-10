@@ -4,7 +4,6 @@ import { type OpenSeaNFT } from "@/services/openseaService";
 import { CONTRACT_ADDRESS } from "@/hooks/useNFTCollection";
 import { useCharacterMetadata } from "@/hooks/useCharacterMetadata";
 import { getCharacterNFTByTokenId } from "@/services/characterMetadata";
-import { fetchMetadataFromCID } from "@/services/cidMetadataService";
 
 export const useNFTMetadata = (tokenId: string) => {
   // Try to use character metadata if the tokenId is a valid number in our character range
@@ -18,7 +17,6 @@ export const useNFTMetadata = (tokenId: string) => {
   const openSeaQuery = useQuery({
     queryKey: ['nft', CONTRACT_ADDRESS, tokenId],
     queryFn: async () => {
-      console.log(`Fetching NFT data for token: ${tokenId}`);
       return await getCharacterNFTByTokenId(tokenId);
     },
     enabled: !!tokenId && !isValidCharacterId,

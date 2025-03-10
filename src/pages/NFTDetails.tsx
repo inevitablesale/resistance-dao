@@ -20,23 +20,22 @@ const NFTDetails: React.FC = () => {
   const { toast } = useToast();
   
   useEffect(() => {
-    if (nft) {
-      console.log(`NFT details for token ${tokenId}:`, {
+    if (nft && !isLoading) {
+      console.log(`NFT details loaded for token ${tokenId}:`, {
         name: nft.name,
         animation_url: nft.animation_url,
         image_url: nft.image_url,
-        traits: nft.traits.map(t => `${t.trait_type}: ${t.value}`).join(', ')
       });
+      
+      if (metadata) {
+        console.log('Metadata loaded:', metadata);
+        toast({
+          title: "Metadata loaded",
+          description: `Successfully loaded metadata for ${nft.name}`,
+        });
+      }
     }
-    
-    if (metadata) {
-      console.log('Metadata from Pinata:', metadata);
-      toast({
-        title: "Metadata loaded",
-        description: `Successfully loaded metadata for ${nft?.name}`,
-      });
-    }
-  }, [nft, tokenId, metadata, toast]);
+  }, [nft, metadata, tokenId, isLoading, toast]);
   
   const handleBack = () => {
     navigate(-1);
@@ -98,7 +97,7 @@ const NFTDetails: React.FC = () => {
             </ToxicCardHeader>
             <ToxicCardContent>
               <p className="text-white/70 mb-4">
-                {error?.message || "Failed to load the requested NFT. It may not exist or there might be a network issue."}
+                {error instanceof Error ? error.message : "Failed to load the requested NFT. It may not exist or there might be a network issue."}
               </p>
               <ToxicButton variant="outline" onClick={handleBack}>
                 <ArrowLeft className="h-4 w-4 mr-1" /> Go Back
@@ -147,7 +146,6 @@ const NFTDetails: React.FC = () => {
             {nft.animation_url ? (
               <div className="w-full h-full flex flex-col">
                 <div className="h-[400px] relative">
-                  {console.log('Passing animation URL to ModelPreview:', nft.animation_url)}
                   <ModelPreview 
                     modelUrl={nft.animation_url}
                     height="100%"
