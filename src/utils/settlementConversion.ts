@@ -25,6 +25,38 @@ export interface Settlement {
   canVote?: boolean;
 }
 
+// Add JobMetadata and ReferralMetadata interfaces
+export interface JobMetadata {
+  title: string;
+  description: string;
+  category: string;
+  reward: string;
+  deadline: number;
+  creator: string;
+  creatorRole: NFTClass;
+  requiredRole: NFTClass;
+  maxApplicants: number;
+  referralReward: string;
+  settlementId: string;
+  createdAt: number;
+  // Required ProposalMetadata fields
+  votingDuration: number;
+  linkedInURL: string;
+}
+
+export interface ReferralMetadata {
+  title: string; // Required for ProposalMetadata
+  name: string;
+  description: string;
+  type: string;
+  referrer: string;
+  rewardPercentage: number;
+  createdAt: number;
+  // Required ProposalMetadata fields
+  votingDuration: number;
+  linkedInURL: string;
+}
+
 export const convertProposalToSettlement = (
   proposal: ProposalEvent,
   userRole?: NFTClass

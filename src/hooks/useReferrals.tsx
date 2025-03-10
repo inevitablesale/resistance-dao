@@ -1,199 +1,244 @@
 
-import { useState, useCallback } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { useToast } from '@/hooks/use-toast';
-import { useNFTRoles } from '@/hooks/useNFTRoles';
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { ethers } from "ethers"; // Import ethers
+import { useToast } from "./use-toast";
+import { NFTClass, getPrimaryRole } from "@/services/alchemyService";
 import { 
-  createReferral, 
-  registerReferralPurchase, 
+  createReferralPool, 
+  submitReferral, 
   claimReferralReward,
-  ReferralInfo,
-  ReferralReward
-} from '@/services/referralService';
+  getReferrals,
+  getReferralStatus,
+  ReferralStatus
+} from "@/services/referralService";
+import { ReferralMetadata } from "@/utils/settlementConversion";
+
+export interface Referral {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  referrer: string;
+  rewardPercentage: number;
+  referredAddress?: string;
+  status: ReferralStatus;
+  reward?: string;
+  createdAt: number;
+}
 
 export const useReferrals = () => {
-  const { primaryWallet } = useDynamicContext();
-  const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { primaryRole, isLoading: isLoadingRole } = useNFTRoles();
-  const [isCreatingReferral, setIsCreatingReferral] = useState(false);
+  const { primaryWallet } = useDynamicContext();
+  const [userRole, setUserRole] = useState<NFTClass>('Unknown');
   
-  // Mock data for development - this would be replaced with real data in production
-  const mockReferrals: ReferralInfo[] = [
-    {
-      referralId: 'ref-123',
-      referrer: primaryWallet?.address || '',
-      referralCode: 'BH-1234ABCD-XYZ',
-      nftType: 'Bounty Hunter',
-      createdAt: Math.floor(Date.now() / 1000) - 86400 * 3,
-      partyAddress: '0x1234567890123456789012345678901234567890',
-      rewardsClaimed: 1,
-      totalEarned: 2,
-      active: true
-    }
-  ];
+  // Check user role on mount
+  useEffect(() => {
+    const checkRole = async () => {
+      if (primaryWallet) {
+        try {
+          const address = await primaryWallet.address;
+          const role = await getPrimaryRole(address);
+          setUserRole(role);
+        } catch (error) {
+          console.error("Error checking user role:", error);
+        }
+      }
+    };
+    
+    checkRole();
+  }, [primaryWallet]);
   
-  const mockRewards: ReferralReward[] = [
-    {
-      referralId: 'ref-123',
-      purchaser: '0x2345678901234567890123456789012345678901',
-      amount: '0.5',
-      timestamp: Math.floor(Date.now() / 1000) - 86400,
-      claimed: true,
-      transactionHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-    },
-    {
-      referralId: 'ref-123',
-      purchaser: '0x3456789012345678901234567890123456789012',
-      amount: '0.75',
-      timestamp: Math.floor(Date.now() / 1000) - 43200,
-      claimed: false,
-      transactionHash: '0x2345678901abcdef2345678901abcdef2345678901abcdef2345678901abcdef'
-    }
-  ];
-  
-  // Query to get all referrals for the current wallet
-  const { 
-    data: referrals = mockReferrals,
-    isLoading: isLoadingReferrals,
-    refetch: refetchReferrals
-  } = useQuery({
-    queryKey: ['referrals', primaryWallet?.address],
+  // Fetch referrals the user has created
+  const { data: userReferrals, isLoading: isLoadingReferrals, refetch: refetchReferrals } = useQuery({
+    queryKey: ['userReferrals', primaryWallet?.address],
     queryFn: async () => {
-      // In production, this would fetch from blockchain or indexed events
-      return mockReferrals;
-    },
-    enabled: !!primaryWallet?.address
-  });
-  
-  // Query to get rewards for a specific referral
-  const useReferralRewards = (referralId: string) => {
-    return useQuery({
-      queryKey: ['referral-rewards', referralId],
-      queryFn: async () => {
-        // In production, this would fetch from blockchain or indexed events
-        return mockRewards.filter(reward => reward.referralId === referralId);
-      },
-      enabled: !!referralId
-    });
-  };
-  
-  // Mutation to create a new referral
-  const createReferralMutation = useMutation({
-    mutationFn: async () => {
-      if (!primaryWallet) throw new Error("Wallet not connected");
-      if (!primaryRole) throw new Error("Role not determined");
+      if (!primaryWallet) return [];
       
-      setIsCreatingReferral(true);
       try {
-        return await createReferral(primaryWallet, primaryRole);
-      } finally {
-        setIsCreatingReferral(false);
+        const address = await primaryWallet.address;
+        return await getReferrals(address);
+      } catch (error) {
+        console.error("Error fetching referrals:", error);
+        return [];
       }
     },
-    onSuccess: (newReferral) => {
-      toast({
-        title: "Referral Created!",
-        description: `Your referral code is ${newReferral.referralCode}`,
-      });
-      queryClient.invalidateQueries({ queryKey: ['referrals'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Failed to create referral",
-        description: error.message || "Unknown error occurred",
-        variant: "destructive"
-      });
-    }
+    enabled: !!primaryWallet,
   });
   
-  // Mutation to register a purchase with a referral
-  const registerPurchaseMutation = useMutation({
-    mutationFn: async ({ 
-      referralCode, 
-      partyAddress, 
-      amount 
-    }: { 
-      referralCode: string; 
-      partyAddress: string; 
-      amount: string;
-    }) => {
-      if (!primaryWallet) throw new Error("Wallet not connected");
+  // Create a new referral pool
+  const createReferral = async (
+    type: string,
+    name: string,
+    description: string,
+    rewardPercentage: number
+  ) => {
+    if (!primaryWallet) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to create a referral.",
+        variant: "destructive",
+      });
+      return null;
+    }
+    
+    if (userRole !== 'Bounty Hunter') {
+      toast({
+        title: "Access Denied",
+        description: "Only Bounty Hunters can create referrals.",
+        variant: "destructive",
+      });
+      return null;
+    }
+    
+    try {
+      toast({
+        title: "Creating Referral",
+        description: "Please approve the transaction to create your referral pool.",
+      });
       
-      return await registerReferralPurchase(
-        primaryWallet,
-        referralCode,
-        partyAddress,
-        amount
-      );
-    },
-    onSuccess: (reward) => {
-      toast({
-        title: "Purchase Registered!",
-        description: `Referral reward of ${ethers.utils.formatEther(reward.amount)} ETH created`,
-      });
-      queryClient.invalidateQueries({ queryKey: ['referral-rewards'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Failed to register purchase",
-        description: error.message || "Unknown error occurred",
-        variant: "destructive"
-      });
-    }
-  });
-  
-  // Mutation to claim a referral reward
-  const claimRewardMutation = useMutation({
-    mutationFn: async ({ 
-      partyAddress, 
-      proposalId 
-    }: { 
-      partyAddress: string; 
-      proposalId: string;
-    }) => {
-      if (!primaryWallet) throw new Error("Wallet not connected");
+      const referrerAddress = await primaryWallet.address;
       
-      return await claimReferralReward(
-        primaryWallet,
-        partyAddress,
-        proposalId
-      );
-    },
-    onSuccess: (txHash) => {
+      // Create referral metadata
+      const referralMetadata: ReferralMetadata = {
+        title: name, // Use name as title to satisfy ProposalMetadata requirements
+        name,
+        description,
+        type,
+        referrer: referrerAddress,
+        rewardPercentage,
+        createdAt: Math.floor(Date.now() / 1000),
+        // Required ProposalMetadata fields
+        votingDuration: 7 * 24 * 60 * 60, // 7 days default
+        linkedInURL: "https://linkedin.com/in/resistance", // Default placeholder
+      };
+      
+      const referralId = await createReferralPool(primaryWallet, referralMetadata);
+      
+      if (referralId) {
+        toast({
+          title: "Referral Created",
+          description: "Your referral pool has been created successfully.",
+        });
+        
+        // Refresh referrals list
+        refetchReferrals();
+        
+        return referralId;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Error creating referral:", error);
       toast({
-        title: "Reward Claimed!",
-        description: `Transaction: ${txHash.substring(0, 10)}...`,
+        title: "Error Creating Referral",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
       });
-      queryClient.invalidateQueries({ queryKey: ['referral-rewards'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Failed to claim reward",
-        description: error.message || "Unknown error occurred",
-        variant: "destructive"
-      });
+      return null;
     }
-  });
+  };
   
-  // Generate a shareable referral link
-  const generateReferralLink = useCallback((referralCode: string) => {
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/referral/${referralCode}`;
-  }, []);
+  // Submit a referral
+  const submitNewReferral = async (referralId: string, referredAddress: string) => {
+    if (!primaryWallet) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to submit a referral.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    try {
+      toast({
+        title: "Submitting Referral",
+        description: "Please approve the transaction to submit your referral.",
+      });
+      
+      const success = await submitReferral(primaryWallet, referralId, referredAddress);
+      
+      if (success) {
+        toast({
+          title: "Referral Submitted",
+          description: "Your referral has been submitted successfully.",
+        });
+        
+        // Refresh referrals list
+        refetchReferrals();
+        
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error("Error submitting referral:", error);
+      toast({
+        title: "Error Submitting Referral",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+  
+  // Claim a referral reward
+  const claimReward = async (referralId: string) => {
+    if (!primaryWallet) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet to claim your reward.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    try {
+      toast({
+        title: "Claiming Reward",
+        description: "Please approve the transaction to claim your referral reward.",
+      });
+      
+      const success = await claimReferralReward(primaryWallet, referralId);
+      
+      if (success) {
+        toast({
+          title: "Reward Claimed",
+          description: "Your referral reward has been claimed successfully.",
+        });
+        
+        // Refresh referrals list
+        refetchReferrals();
+        
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error("Error claiming reward:", error);
+      toast({
+        title: "Error Claiming Reward",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+  
+  // Generate referral link
+  const generateReferralLink = (referralId: string) => {
+    return `${window.location.origin}/referrals/${referralId}`;
+  };
   
   return {
-    referrals,
+    userRole,
+    userReferrals,
     isLoadingReferrals,
-    isCreatingReferral,
-    refetchReferrals,
-    useReferralRewards,
-    createReferral: createReferralMutation.mutate,
-    registerPurchase: registerPurchaseMutation.mutate,
-    claimReward: claimRewardMutation.mutate,
+    createReferral,
+    submitNewReferral,
+    claimReward,
     generateReferralLink,
-    canCreateReferral: primaryRole === 'Bounty Hunter',
-    isLoadingRole
+    refetchReferrals
   };
 };
