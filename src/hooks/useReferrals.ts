@@ -8,11 +8,11 @@ import {
   getReferralStats, 
   createReferral, 
   processPendingReferralPayments, 
-  Referral, 
-  ReferralStats,
   initNFTPolling,
-  stopNFTPolling
-} from "@/services/referralService";
+  stopNFTPolling,
+  Referral, 
+  ReferralStats
+} from "@/services/localReferralService";
 
 export const useReferrals = () => {
   const { toast } = useToast();
@@ -22,7 +22,7 @@ export const useReferrals = () => {
   // Initialize NFT polling when hook is first mounted
   useEffect(() => {
     if (isConnected && address) {
-      const pollingService = initNFTPolling();
+      initNFTPolling();
       
       return () => {
         // Cleanup polling when component unmounts

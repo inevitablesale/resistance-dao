@@ -4,8 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { Progress } from "@/components/ui/progress";
-import { createReferral, initNFTPolling } from "@/services/referralService";
-import { checkBountyHunterOwnership } from "@/services/alchemyNFTService";
+import { createReferral, initNFTPolling, checkBountyHunterOwnership } from "@/services/localReferralService";
 
 const ReferralRedirect = () => {
   const { referrerAddress } = useParams();
@@ -96,7 +95,7 @@ const ReferralRedirect = () => {
         // Initialize NFT polling service
         initNFTPolling();
         
-        // If user is connected, record the referral in Supabase
+        // If user is connected, record the referral in local storage
         if (isConnected && address) {
           try {
             console.log("Recording referral:", referrerAddress, "->", address);
