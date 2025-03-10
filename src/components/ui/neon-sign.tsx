@@ -70,7 +70,8 @@ export const NeonSign = ({
       case 0:   // Completely off
         return {
           opacity: "0.3",
-          textShadow: "none"
+          textShadow: "none",
+          color: "#333" // Dark color for unlit tubes
         };
       case 0.5: // Half lit
         return {
@@ -119,27 +120,35 @@ export const NeonSign = ({
       "font-mono relative text-center py-4",
       className
     )}>
-      {/* Dirty neon tube background */}
-      <div className="absolute inset-0 bg-black/20 rounded-lg filter blur-sm"></div>
+      {/* Dirty neon tube background and wire backing */}
+      <div className="absolute inset-0 bg-black/30 rounded-lg filter blur-sm"></div>
+      
+      {/* Wire backing effect */}
+      <div className="absolute inset-0 rounded-lg overflow-hidden">
+        <div className="absolute inset-0 flex flex-col items-center justify-center opacity-40">
+          <div className="h-0.5 w-4/5 bg-gray-500 mb-2 rounded-full"></div>
+          <div className="h-0.5 w-4/5 bg-gray-500 mt-8 rounded-full"></div>
+        </div>
+      </div>
       
       {/* Broken glass effect */}
       <div className="absolute inset-0 rounded-lg broken-glass opacity-10"></div>
       
       {text ? (
         // Single text prop handling
-        <h1 className="text-6xl md:text-8xl tracking-wider">
+        <h1 className="text-6xl md:text-8xl tracking-wider relative z-10">
           {renderNeonText(text)}
         </h1>
       ) : (
-        // Two-line display
-        <>
+        // Two-line display with proper spacing
+        <div className="relative z-10">
           <h1 className="text-5xl md:text-7xl tracking-wider mb-2 leading-tight">
             {renderNeonText(firstLine)}
           </h1>
           <h1 className="text-5xl md:text-7xl tracking-wider leading-tight">
             {renderNeonText(secondLine, firstLine.length)}
           </h1>
-        </>
+        </div>
       )}
       
       {/* Additional electrical short circuit effect */}
