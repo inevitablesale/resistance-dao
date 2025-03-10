@@ -418,12 +418,6 @@ const Index = () => {
           </div>
         </div>
 
-        <MarketplaceQuickActions 
-          className="mb-8"
-          onCreateListing={handleCreateListing}
-          onBrowseListings={handleBrowseListings}
-        />
-
         <MarketplaceStatusPanel 
           stats={marketplaceStats} 
           isLoading={isLoadingStats}
@@ -433,70 +427,6 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
             <div className="mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <ToxicCard 
-                  className={`bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all ${activeRole === 'sentinel' ? 'border-2 border-purple-500/70' : ''}`}
-                  onClick={() => setActiveRole('sentinel')}
-                >
-                  <h3 className="text-2xl font-mono text-toxic-neon mb-3">SENTINEL</h3>
-                  <p className="text-white/80 mb-4 leading-relaxed">
-                    Governance & Economic Oversight. Hold voting rights on key economic decisions, invest in settlements, and earn a share of marketplace transactions.
-                  </p>
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="text-center">
-                      <div className="text-sm text-white/60">Free Claims</div>
-                      <div className="text-toxic-neon font-mono">495 LEFT</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm text-white/60">Total Supply</div>
-                      <div className="text-toxic-neon font-mono">1,500</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm text-white/60">Radiation Immunity</div>
-                      <div className="text-toxic-neon font-mono">100%</div>
-                    </div>
-                  </div>
-                  <ToxicButton 
-                    variant="outline" 
-                    className="w-full border-toxic-neon/40"
-                    onClick={() => navigate('/hunt')}
-                  >
-                    {isConnected ? "Enter Command Center" : "Become a Sentinel"}
-                  </ToxicButton>
-                </ToxicCard>
-                
-                <ToxicCard 
-                  className={`bg-black/60 border-toxic-neon/30 p-6 hover:bg-black/70 transition-all ${activeRole === 'pioneer' ? 'border-2 border-amber-500/70' : ''}`}
-                  onClick={() => setActiveRole('pioneer')}
-                >
-                  <h3 className="text-2xl font-mono text-toxic-neon mb-3">BOUNTY HUNTER</h3>
-                  <p className="text-white/80 mb-4 leading-relaxed">
-                    Enforcers & Funders of the Wasteland. Earn from referrals, post jobs, track criminals, and drive the economy through investments and missions.
-                  </p>
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="text-center">
-                      <div className="text-sm text-white/60">Free Claims</div>
-                      <div className="text-toxic-neon font-mono">313 LEFT</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm text-white/60">Total Supply</div>
-                      <div className="text-toxic-neon font-mono">500</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm text-white/60">Referral Reward</div>
-                      <div className="text-toxic-neon font-mono">50%</div>
-                    </div>
-                  </div>
-                  <ToxicButton 
-                    variant="outline" 
-                    className="w-full border-toxic-neon/40"
-                    onClick={() => navigate('/marketplace/bounty-hunters')}
-                  >
-                    {isConnected ? "Access Bounty Center" : "Become a Bounty Hunter"}
-                  </ToxicButton>
-                </ToxicCard>
-              </div>
-              
               <MarketplaceListingGrid 
                 listings={sentinelListings} 
                 title="FOUNDER SENTINELS: Governance & Oversight" 
