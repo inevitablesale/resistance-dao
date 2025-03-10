@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NFTCard } from './NFTCard';
@@ -51,7 +50,6 @@ export const CharacterShowcase: React.FC<CharacterShowcaseProps> = ({
     navigate(`/nft/${tokenId}`);
   };
 
-  // Enhanced NFT card with 3D model and radiation cloud
   const EnhancedNFTCard = ({ nft, radiation }: { nft: OpenSeaNFT, radiation: number }) => {
     return (
       <div className="bg-black/70 border border-toxic-neon/30 hover:border-toxic-neon/60 transition-all cursor-pointer rounded-lg overflow-hidden"
@@ -131,7 +129,6 @@ export const CharacterShowcase: React.FC<CharacterShowcaseProps> = ({
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Sentinels Section */}
         <div className="bg-black/80 border border-toxic-neon/30 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
             <Shield className="h-5 w-5 text-toxic-neon" />
@@ -157,7 +154,6 @@ export const CharacterShowcase: React.FC<CharacterShowcaseProps> = ({
           </div>
         </div>
         
-        {/* Survivors Section */}
         <div className="bg-black/80 border border-apocalypse-red/30 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
             <Target className="h-5 w-5 text-apocalypse-red" />
@@ -183,7 +179,6 @@ export const CharacterShowcase: React.FC<CharacterShowcaseProps> = ({
           </div>
         </div>
         
-        {/* Bounty Hunters Section */}
         <div className="bg-black/80 border border-yellow-500/30 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
             <Biohazard className="h-5 w-5 text-yellow-500" />

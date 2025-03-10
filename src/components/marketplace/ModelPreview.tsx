@@ -61,10 +61,15 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
           // Check if radiationCloudUrl is already a full URL or just a hash
           if (radiationCloudUrl.startsWith('http')) {
             setProcessedCloudUrl(radiationCloudUrl);
-          } else {
+          } else if (radiationCloudUrl.startsWith('ipfs://')) {
             // Format as Pinata gateway URL
             const cloudUrl = `https://gateway.pinata.cloud/ipfs/${radiationCloudUrl.replace('ipfs://', '')}`;
-            console.log('Radiation cloud URL:', cloudUrl);
+            console.log('Radiation cloud URL from ipfs://', cloudUrl);
+            setProcessedCloudUrl(cloudUrl);
+          } else {
+            // Assume it's just the hash
+            const cloudUrl = `https://gateway.pinata.cloud/ipfs/${radiationCloudUrl}`;
+            console.log('Radiation cloud URL from hash:', cloudUrl);
             setProcessedCloudUrl(cloudUrl);
           }
         }
@@ -74,10 +79,16 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
           // Check if modelUrl is already a full URL or just a hash
           if (modelUrl.startsWith('http')) {
             setProcessedModelUrl(modelUrl);
-          } else {
+            console.log('Using direct model URL:', modelUrl);
+          } else if (modelUrl.startsWith('ipfs://')) {
             // Format as Pinata gateway URL
             const url = `https://gateway.pinata.cloud/ipfs/${modelUrl.replace('ipfs://', '')}`;
-            console.log('Character model URL:', url);
+            console.log('Character model URL from ipfs://', url);
+            setProcessedModelUrl(url);
+          } else {
+            // Assume it's just the hash
+            const url = `https://gateway.pinata.cloud/ipfs/${modelUrl}`;
+            console.log('Character model URL from hash:', url);
             setProcessedModelUrl(url);
           }
         }

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNFTMetadata } from '@/hooks/useNFTMetadata';
@@ -89,7 +88,6 @@ const NFTDetails: React.FC = () => {
     );
   }
 
-  // Extract traits
   const getTraitValue = (traitType: string): string => {
     const trait = nft.traits.find(t => t.trait_type.toLowerCase() === traitType.toLowerCase());
     return trait ? trait.value : 'Unknown';
@@ -98,7 +96,6 @@ const NFTDetails: React.FC = () => {
   const role = getTraitValue('role') || getTraitValue('class') || 'Unknown';
   const radiationLevel = getTraitValue('radiation') || getTraitValue('radiation level') || '50';
   
-  // Group traits by category
   const groupedTraits: Record<string, Array<{trait_type: string, value: string}>> = {};
   nft.traits.forEach(trait => {
     const category = trait.trait_type.includes('_') 
@@ -124,7 +121,6 @@ const NFTDetails: React.FC = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* NFT Image with 3D Model and Radiation Cloud */}
           <div className="bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-lg overflow-hidden border border-toxic-neon/30">
             {nft.animation_url ? (
               <div className="w-full h-full flex flex-col">
@@ -142,7 +138,6 @@ const NFTDetails: React.FC = () => {
                   />
                 </div>
                 
-                {/* Radiation Reveal Slider */}
                 <div className="p-4 bg-black/60">
                   <CharacterRevealSlider 
                     value={revealValue} 
@@ -163,7 +158,6 @@ const NFTDetails: React.FC = () => {
             )}
           </div>
           
-          {/* NFT Details */}
           <div className="space-y-6">
             <ToxicCard className="bg-black/80 border-toxic-neon/30">
               <ToxicCardContent className="p-4">
@@ -224,7 +218,6 @@ const NFTDetails: React.FC = () => {
               </ToxicCardContent>
             </ToxicCard>
             
-            {/* Traits */}
             {Object.keys(groupedTraits).length > 0 && (
               <ToxicCard className="bg-black/80 border-toxic-neon/30">
                 <ToxicCardHeader className="pb-0">
