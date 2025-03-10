@@ -1,4 +1,5 @@
-import { createPublicClient, http, getContract, type Abi } from "viem";
+
+import { createPublicClient, http, getContract, type PublicClient } from "viem";
 import { polygon } from "viem/chains";
 
 // NFT Contract address for all Resistance DAO roles
@@ -60,11 +61,11 @@ const client = createPublicClient({
  * @returns Contract instance
  */
 const getNFTContract = () => {
-  return getContract({
+  return {
     address: RESISTANCE_NFT_ADDRESS as `0x${string}`,
     abi: NFT_ABI,
-    client
-  });
+    publicClient: client
+  };
 };
 
 /**
@@ -87,7 +88,12 @@ export const getNFTBalanceByContract = async (address: string): Promise<number> 
     const contract = getNFTContract();
     
     // Get balance
-    const balance = await contract.read.balanceOf([address as `0x${string}`]);
+    const balance = await client.readContract({
+      ...contract,
+      functionName: 'balanceOf',
+      args: [address as `0x${string}`]
+    });
+    
     return Number(balance);
   } catch (error) {
     console.error("Error getting NFT balance:", error);
@@ -174,10 +180,14 @@ const getNFTMetadata = async (tokenId: string): Promise<any> => {
     const contract = getNFTContract();
     
     // Get token URI
-    const uri = await contract.read.tokenURI([BigInt(tokenId)]);
+    const uri = await client.readContract({
+      ...contract,
+      functionName: 'tokenURI',
+      args: [BigInt(tokenId)]
+    });
     
     // Fetch metadata from URI
-    const response = await fetch(uri);
+    const response = await fetch(uri as string);
     return await response.json();
   } catch (error) {
     console.error("Error getting NFT metadata:", error);
@@ -202,15 +212,22 @@ const getTokenIdsForOwner = async (address: string): Promise<string[]> => {
     const contract = getNFTContract();
     
     // Get balance
-    const balance = await contract.read.balanceOf([address as `0x${string}`]);
+    const balance = await client.readContract({
+      ...contract,
+      functionName: 'balanceOf',
+      args: [address as `0x${string}`]
+    });
+    
     const tokenIds: string[] = [];
     
     // Get all token IDs
     for (let i = 0; i < Number(balance); i++) {
-      const tokenId = await contract.read.tokenOfOwnerByIndex([
-        address as `0x${string}`,
-        BigInt(i)
-      ]);
+      const tokenId = await client.readContract({
+        ...contract,
+        functionName: 'tokenOfOwnerByIndex',
+        args: [address as `0x${string}`, BigInt(i)]
+      });
+      
       tokenIds.push(tokenId.toString());
     }
     
