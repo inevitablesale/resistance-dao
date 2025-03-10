@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -22,6 +21,7 @@ import Hunt from "./pages/Hunt";
 import Settlements from "./pages/Settlements";
 import SettlementDetails from "./pages/SettlementDetails";
 import { Toaster } from "./components/ui/toaster";
+import { ResistanceWalletWidget } from "./components/wallet/ResistanceWalletWidget";
 
 const zeroDevConfig = {
   projectId: "4b729792-4b38-4d73-8a69-4f7559f2c2cd",
@@ -169,8 +169,11 @@ function Layout() {
         <Route path="/command" element={<Hunt />} />
         <Route path="/settlements" element={<Settlements />} />
         <Route path="/settlements/:partyAddress" element={<SettlementDetails />} />
+        <Route path="/governance" element={<Settlements />} />
+        <Route path="/my-settlements" element={<Settlements />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <ResistanceWalletWidget />
     </>
   );
 }

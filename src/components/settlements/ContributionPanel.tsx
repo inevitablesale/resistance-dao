@@ -92,7 +92,7 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
               placeholder="0.0"
               value={contribution}
               onChange={(e) => setContribution(e.target.value)}
-              className="bg-black/50 border-white/10"
+              className="bg-black/50 border-white/10 text-white"
               min="0"
               step="0.01"
             />
