@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Target, BadgeDollarSign, TrendingUp, Users, ArrowRight, Clock, Award, BarChart } from "lucide-react";
+import { Target, BadgeDollarSign, TrendingUp, Users, ArrowRight, Clock, Award, BarChart, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { ToxicCard, ToxicCardContent, ToxicCardHeader, ToxicCardTitle } from "@/components/ui/toxic-card";
 import { ToxicButton } from "@/components/ui/toxic-button";
