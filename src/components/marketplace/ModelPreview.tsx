@@ -1,11 +1,9 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RadiationOverlay } from '@/components/radiation/RadiationOverlay';
-import { getModelFromIPFS } from '@/services/ipfsService';
 
 interface ModelPreviewProps {
   modelUrl: string;
@@ -34,6 +32,12 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   revealValue = 20, // Default to 20 (mostly obscured)
   showControls = true
 }) => {
+  // Transform revealValue to use the correct logic:
+  // High revealValue = less radiation
+  // Low revealValue = more radiation
+  // We use 100 - revealValue for actual radiation level in the 3D scene
+  const actualRadiationLevel = 100 - revealValue;
+  
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +59,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   
   // Process the IPFS URLs
   useEffect(() => {
-    const fetchUrls = async () => {
+    const processUrls = () => {
       try {
         // Process radiation cloud URL
         if (radiationCloudUrl) {
@@ -63,10 +67,9 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
           if (radiationCloudUrl.startsWith('http')) {
             setProcessedCloudUrl(radiationCloudUrl);
           } else {
-            // Remove ipfs:// prefix if it exists
+            // Use a direct gateway URL (avoid dynamic fetch)
             const cloudHash = radiationCloudUrl.replace('ipfs://', '');
-            const url = await getModelFromIPFS(cloudHash);
-            setProcessedCloudUrl(url);
+            setProcessedCloudUrl(`https://gateway.pinata.cloud/ipfs/${cloudHash}`);
           }
         }
         
@@ -76,19 +79,18 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
           if (modelUrl.startsWith('http')) {
             setProcessedModelUrl(modelUrl);
           } else {
-            // Remove ipfs:// prefix if it exists
+            // Use a direct gateway URL (avoid dynamic fetch)
             const modelHash = modelUrl.replace('ipfs://', '');
-            const url = await getModelFromIPFS(modelHash);
-            setProcessedModelUrl(url);
+            setProcessedModelUrl(`https://gateway.pinata.cloud/ipfs/${modelHash}`);
           }
         }
       } catch (error) {
-        console.error('Error processing IPFS URLs:', error);
+        console.error('Error processing URLs:', error);
         setError('Failed to process model URLs');
       }
     };
     
-    fetchUrls();
+    processUrls();
   }, [radiationCloudUrl, modelUrl]);
   
   // Check for transition direction
@@ -102,6 +104,9 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   // Setup the scene, camera, and renderer when URLs are processed
   useEffect(() => {
     if (!containerRef.current || !processedCloudUrl || !processedModelUrl) return;
+    
+    console.log('Loading radiation cloud from:', processedCloudUrl);
+    console.log('Loading character model from:', processedModelUrl);
     
     setLoading(true);
     setError(null);
@@ -129,8 +134,8 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     pointLight2.position.set(-2, 2, -1);
     newScene.add(pointLight2);
     
-    // Add a subtle radiation-colored point light
-    const radiationLight = new THREE.PointLight(0xaaff88, 0.4);
+    // Add a subtle radiation-colored point light - using vibrant green color
+    const radiationLight = new THREE.PointLight(0x4DFF4D, 0.4); // Bright green
     radiationLight.position.set(0, 0, 2);
     newScene.add(radiationLight);
     
@@ -198,23 +203,23 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
     particleGeometry.setAttribute('size', new THREE.BufferAttribute(particleSizes, 1));
     
-    // Create particle material with glow effect
+    // Create particle material with vibrant green glow effect
     const particleMaterial = new THREE.ShaderMaterial({
       uniforms: {
-        color: { value: new THREE.Color(0xaaff88) },
-        pointTexture: { value: new THREE.TextureLoader().load('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAFFmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDAgNzkuMTYwNDUxLCAyMDE3LzA1LzA2LTAxOjA4OjIxICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKE1hY2ludG9zaCkiIHhtcDpDcmVhdGVEYXRlPSIyMDE4LTEyLTAzVDE5OjM4OjU4LTA4OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAxOC0xMi0wM1QxOTozOToyOC0wODowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0xMi0wM1QxOTozOToyOC0wODowMCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiIHBob3Rvc2hvcDpJQ0NQcm9maWxlPSJzUkdCIElFQzYxOTY2LTIuMSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpmMzIwOGU0YS01OTVmLTRi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') },
+        color: { value: new THREE.Color(0x4DFF4D) }, // Vibrant green color
+        pointTexture: { value: new THREE.TextureLoader().load('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAFFmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDAgNzkuMTYwNDUxLCAyMDE3LzA1LzA2LTAxOjA4OjIxICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKE1hY2ludG9zaCkiIHhtcDpDcmVhdGVEYXRlPSIyMDE4LTEyLTAzVDE5OjM4OjU4LTA4OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAxOC0xMi0wM1QxOTozOToyOC0wODowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0xMi0wM1QxOTozOToyOC0wODowMCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiIHBob3Rvc2hvcDpJQ0NQcm9maWxlPSJzUkdCIElFQzYxOTY2LTIuMSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpmMzIwOGU0YS01OTVmLTRi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') },
         opacity: { value: 0.8 },
-        reveal: { value: revealValue / 100 }
+        reveal: { value: actualRadiationLevel / 100 } // Use the inverse of revealValue
       },
       vertexShader: `
         attribute float size;
         varying vec3 vColor;
         uniform float reveal;
         void main() {
-          vColor = vec3(0.667, 1.0, 0.533); // Toxic green glow
+          vColor = vec3(0.3, 1.0, 0.3); // Vibrant green glow
           
-          // Scale size based on reveal value - particles grow smaller as character is revealed
-          float dynamicSize = size * (1.0 - reveal);
+          // Scale size based on reveal value - particles grow larger as radiation increases
+          float dynamicSize = size * reveal;
           
           vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
           gl_PointSize = dynamicSize * (300.0 / -mvPosition.z);
@@ -229,7 +234,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         varying vec3 vColor;
         void main() {
           // Sample the texture
-          gl_FragColor = vec4(vColor, opacity * (1.0 - reveal));
+          gl_FragColor = vec4(vColor, opacity * reveal);
           gl_FragColor = gl_FragColor * texture2D(pointTexture, gl_PointCoord);
           
           // Apply reveal opacity
@@ -308,13 +313,13 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         // Apply enhanced material for the radiation cloud
         gltf.scene.traverse((child) => {
           if (child instanceof THREE.Mesh) {
-            // Create new glow material for radiation cloud
+            // Create new glow material for radiation cloud - using vibrant green color
             const radiationMaterial = new THREE.MeshPhongMaterial({
-              color: new THREE.Color(0xaaff88),
-              emissive: new THREE.Color(0x113311),
+              color: new THREE.Color(0x4DFF4D), // Vibrant green
+              emissive: new THREE.Color(0x115511), // Subtle green glow
               emissiveIntensity: 0.4,
               transparent: true,
-              opacity: Math.max(0, Math.min(100, 100 - revealValue)) / 100,
+              opacity: actualRadiationLevel / 100, // Use the actual radiation level
               shininess: 30
             });
             
@@ -338,14 +343,14 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         // Add to scene
         newScene.add(gltf.scene);
         
-        // Add glow effect for radiation cloud
+        // Add glow effect for radiation cloud - in vibrant green
         const radiationGlowMaterial = new THREE.ShaderMaterial({
           uniforms: {
-            color: { value: new THREE.Color(0xaaff88) },
+            color: { value: new THREE.Color(0x4DFF4D) }, // Vibrant green
             viewVector: { value: new THREE.Vector3(0, 0, 1) },
             c: { value: 0.2 },
             p: { value: 4.5 },
-            opacity: { value: Math.max(0, Math.min(100, 100 - revealValue)) / 100 }
+            opacity: { value: actualRadiationLevel / 100 } // Use the actual radiation level
           },
           vertexShader: `
             uniform vec3 viewVector;
@@ -406,7 +411,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         gltf.scene.scale.set(scale, scale, scale);
         gltf.scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
         
-        // Apply enhanced material to character model with reveal-based effects
+        // Apply material to character model with reveal-based effects
         gltf.scene.traverse((child) => {
           if (child instanceof THREE.Mesh) {
             // Store original material for reference
@@ -414,17 +419,17 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
               child.userData.originalMaterial = child.material.clone();
             }
             
-            // For character model, create a material that becomes more visible with reveal
+            // For character model, create a material that becomes more visible as radiation decreases
             if (Array.isArray(child.material)) {
               child.material.forEach(mat => {
                 mat.transparent = true;
-                mat.opacity = Math.max(0, Math.min(100, revealValue)) / 100;
-                mat.emissiveIntensity = 0.2 * (revealValue / 100); // Increase glow as revealed
+                mat.opacity = (100 - actualRadiationLevel) / 100; // Inverse of radiation level
+                mat.emissiveIntensity = 0.2 * ((100 - actualRadiationLevel) / 100); // Increase glow as revealed
               });
             } else {
               child.material.transparent = true;
-              child.material.opacity = Math.max(0, Math.min(100, revealValue)) / 100;
-              child.material.emissiveIntensity = 0.2 * (revealValue / 100); // Increase glow as revealed
+              child.material.opacity = (100 - actualRadiationLevel) / 100; // Inverse of radiation level
+              child.material.emissiveIntensity = 0.2 * ((100 - actualRadiationLevel) / 100); // Increase glow as revealed
             }
           }
         });
@@ -469,16 +474,17 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       
       // LERP the smoothedRevealValue
       smoothedRevealValue.current = smoothTransition(smoothedRevealValue.current, revealValue);
+      const smoothedRadiationLevel = 100 - smoothedRevealValue.current; // Convert to radiation level
       
       // Update particle system
       if (particleSystem && particleSystem.material instanceof THREE.ShaderMaterial) {
-        particleSystem.material.uniforms.reveal.value = smoothedRevealValue.current / 100;
+        particleSystem.material.uniforms.reveal.value = smoothedRadiationLevel / 100;
         
-        // Scale and position particles based on reveal value
+        // Scale and position particles based on radiation level
         particleSystem.scale.set(
-          1 + (0.5 * (100 - smoothedRevealValue.current) / 100),
-          1 + (0.5 * (100 - smoothedRevealValue.current) / 100),
-          1 + (0.5 * (100 - smoothedRevealValue.current) / 100)
+          1 + (0.5 * smoothedRadiationLevel / 100),
+          1 + (0.5 * smoothedRadiationLevel / 100),
+          1 + (0.5 * smoothedRadiationLevel / 100)
         );
         
         // Rotate particles slowly
@@ -491,7 +497,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         radiationModel.traverse((child) => {
           if (child instanceof THREE.Mesh) {
             // Calculate opacity with smooth transition
-            const targetOpacity = Math.max(0, Math.min(100, 100 - smoothedRevealValue.current)) / 100;
+            const targetOpacity = smoothedRadiationLevel / 100;
             
             if (Array.isArray(child.material)) {
               child.material.forEach(mat => {
@@ -514,8 +520,8 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       if (characterModel) {
         characterModel.traverse((child) => {
           if (child instanceof THREE.Mesh) {
-            // Calculate opacity with smooth transition
-            const targetOpacity = Math.max(0, Math.min(100, smoothedRevealValue.current)) / 100;
+            // Calculate opacity with smooth transition - character is visible when radiation is low
+            const targetOpacity = (100 - smoothedRadiationLevel) / 100;
             
             if (Array.isArray(child.material)) {
               child.material.forEach(mat => {
@@ -540,7 +546,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       
       // Update transition effect if available
       if (transitionEffect) {
-        transitionEffect.uniforms.revealValue.value = smoothedRevealValue.current / 100;
+        transitionEffect.uniforms.revealValue.value = (100 - smoothedRadiationLevel) / 100;
         transitionEffect.uniforms.transitionDirection.value = 
           transitionDirection === 'increasing' ? 1.0 : 0.0;
       }
@@ -574,7 +580,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       }
       window.removeEventListener('resize', handleResize);
       
-      // Dispose resources - FIX HERE
+      // Dispose resources
       if (scene) {
         scene.traverse((object) => {
           if (object instanceof THREE.Mesh) {
@@ -651,7 +657,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
           <div className="absolute inset-0 flex items-center justify-center bg-black/70">
             <div className="text-red-500 text-center p-4">
               <p>{error}</p>
-              <p className="text-xs mt-2">Try a different model or check the URL</p>
+              <p className="text-xs mt-2">Try refreshing or check the model URLs</p>
             </div>
           </div>
         )}
