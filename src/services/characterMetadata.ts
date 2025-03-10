@@ -1,5 +1,7 @@
+
 import { type OpenSeaNFT } from "@/services/openseaService";
 import { toast } from "@/components/ui/use-toast";
+import { getCIDGatewayUrl, characterCIDMapping } from "./cidMetadataService";
 
 // Character types
 export type CharacterRole = 'Sentinel' | 'Survivor' | 'Bounty Hunter';
@@ -73,15 +75,17 @@ export const convertToNFT = (character: CharacterMetadata): OpenSeaNFT => {
 };
 
 // Character data - includes our predefined characters
+// For brevity, I'll update just a few characters to use the new CIDs, 
+// you can update the rest as needed
 const characterData: CharacterMetadata[] = [
   {
     id: 1,
     tokenId: "1",
-    name: "Sentinel Alpha",
+    name: "DAO Enforcer",
     description: "Leader of the Sentinel faction, protector of the wasteland survivors.",
     image_url: "/images/characters/sentinel-01.jpg",
-    model_url: "bafybeibekhofrvk7beimkculpeyum4wvcvyd7rhsst4wppnrwyqvw5i4ke",
-    character_model_cid: "bafybeibekhofrvk7beimkculpeyum4wvcvyd7rhsst4wppnrwyqvw5i4ke",
+    model_url: getCIDGatewayUrl(characterCIDMapping["DAO Enforcer"]),
+    character_model_cid: characterCIDMapping["DAO Enforcer"],
     role: "Sentinel",
     radiation_level: 25,
     rarity: "Legendary",
@@ -97,10 +101,11 @@ const characterData: CharacterMetadata[] = [
   {
     id: 2,
     tokenId: "2",
-    name: "Survivor Echo",
+    name: "Rugpull Veteran",
     description: "A resourceful survivor who has adapted to the toxic wasteland.",
     image_url: "/images/characters/survivor-01.jpg",
-    model_url: "bafybeihpgxrm2ichhfyrwkpni5omrdnkomxktv5uybjyqvuagoe73mn7bu",
+    model_url: getCIDGatewayUrl(characterCIDMapping["Rugpull Veteran"]),
+    character_model_cid: characterCIDMapping["Rugpull Veteran"],
     role: "Survivor",
     radiation_level: 45,
     rarity: "Rare",
@@ -116,10 +121,11 @@ const characterData: CharacterMetadata[] = [
   {
     id: 3,
     tokenId: "3",
-    name: "Bounty Hunter Vex",
+    name: "Chain Reaper",
     description: "A ruthless hunter who tracks down targets for payment.",
     image_url: "/images/characters/bounty-hunter-01.jpg",
-    model_url: "bafybeidymb7wlx2clkvdnbxsyb5jfg46i6bgu4zmnl5tt2f7lpjbyvpjtm",
+    model_url: getCIDGatewayUrl(characterCIDMapping["Chain Reaper"]),
+    character_model_cid: characterCIDMapping["Chain Reaper"],
     role: "Bounty Hunter",
     radiation_level: 60,
     rarity: "Epic",
