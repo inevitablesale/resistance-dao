@@ -5,11 +5,11 @@ import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 export const StepContent = () => {
   const [durationType, setDurationType] = useState<"" | "short-term" | "long-term">("");
-  const { wallet } = useWalletConnection();
+  const { primaryWallet } = useWalletConnection();
 
   return (
     <div>
-      <MintNFTForm wallet={wallet} durationType={durationType} />
+      <MintNFTForm wallet={primaryWallet} durationType={durationType} />
     </div>
   );
 };
