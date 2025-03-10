@@ -69,6 +69,20 @@ export interface JobListing {
   applications?: JobApplication[];
 }
 
+// Define a type that accepts either ethers.Wallet or Dynamic SDK wallet
+export type WalletLike = Wallet | {
+  address?: string;
+  isConnected?: () => Promise<boolean> | boolean;
+  getWalletClient?: () => Promise<any>;
+  disconnect?: () => Promise<void>;
+  connector?: {
+    name?: string;
+    chainId?: number;
+    showWallet?: (options: any) => void;
+    openWallet?: (options: any) => void;
+  };
+};
+
 /**
  * Creates a job listing
  * @param wallet User wallet
@@ -76,7 +90,7 @@ export interface JobListing {
  * @returns Job ID if successful, null otherwise
  */
 export const createJobListing = async (
-  wallet: Wallet,
+  wallet: WalletLike,
   metadata: JobMetadata
 ): Promise<string | null> => {
   try {
@@ -107,7 +121,7 @@ export const createJobListing = async (
  * @returns Success status
  */
 export const submitJobApplication = async (
-  wallet: Wallet,
+  wallet: WalletLike,
   jobId: string,
   applicationDetails: {
     message: string;
@@ -134,7 +148,7 @@ export const submitJobApplication = async (
  * @returns Success status
  */
 export const submitJobReferral = async (
-  wallet: Wallet,
+  wallet: WalletLike,
   jobId: string,
   referredUser: string
 ): Promise<boolean> => {
@@ -156,7 +170,7 @@ export const submitJobReferral = async (
  * @returns Success status
  */
 export const acceptJobApplication = async (
-  wallet: Wallet,
+  wallet: WalletLike,
   applicationId: string
 ): Promise<boolean> => {
   try {
@@ -177,7 +191,7 @@ export const acceptJobApplication = async (
  * @returns Success status
  */
 export const rejectJobApplication = async (
-  wallet: Wallet,
+  wallet: WalletLike,
   applicationId: string
 ): Promise<boolean> => {
   try {
@@ -198,7 +212,7 @@ export const rejectJobApplication = async (
  * @returns Success status
  */
 export const cancelJobListing = async (
-  wallet: Wallet,
+  wallet: WalletLike,
   jobId: string
 ): Promise<boolean> => {
   try {
