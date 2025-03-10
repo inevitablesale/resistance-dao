@@ -36,7 +36,11 @@ export const convertToNFT = (character: CharacterMetadata): OpenSeaNFT => {
     updated_at: new Date().toISOString(),
     is_disabled: false,
     is_nsfw: false,
-    traits: character.traits,
+    traits: character.traits.map(trait => ({
+      trait_type: trait.trait_type,
+      value: trait.value,
+      display_type: null // Add the required display_type property
+    })),
     animation_url: character.model_url || null,
     is_suspicious: false,
     creator: null,

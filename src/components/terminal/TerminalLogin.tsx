@@ -196,7 +196,7 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
           onClick={handleWalletConnect} 
           disabled={isAuthenticating}
           variant="secondary"
-          size="md" // Changed from lg to md for a more compact look
+          size="lg" // Changed from 'md' (which was invalid) to 'lg' which is valid
           className="w-full uppercase font-mono inline-flex items-center justify-center py-2.5 text-base mb-6" // Reduced py-3 to py-2.5 and mb-8 to mb-6
         >
           <Shield className="h-4 w-4 mr-2" /> {/* Reduced from h-5 w-5 */}
