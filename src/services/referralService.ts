@@ -1,36 +1,53 @@
 
-import { Wallet } from "ethers";
 import { DynamicContext } from "@dynamic-labs/sdk-react-core";
+import { Wallet, ethers } from "ethers";
 import { uploadToIPFS } from "./ipfsService";
 import { ReferralMetadata } from "@/utils/settlementConversion";
 
-export type ReferralStatus = 'pending' | 'active' | 'completed' | 'expired' | 'claimed';
-
+// Define the Referral type
 export interface Referral {
   id: string;
+  type: string;
   name: string;
   description: string;
-  type: string;
   referrer: string;
+  referredUsers: string[];
   rewardPercentage: number;
-  referredAddress?: string;
-  status: ReferralStatus;
-  reward?: string;
+  rewards: number;
   createdAt: number;
 }
 
 /**
- * Creates a referral pool
+ * Creates a new referral
  * @param wallet User wallet
- * @param metadata Referral metadata
+ * @param type Referral type
+ * @param name Referral name
+ * @param description Referral description
+ * @param rewardPercentage Reward percentage
  * @returns Referral ID if successful, null otherwise
  */
-export const createReferralPool = async (
-  wallet: Wallet | DynamicContext['primaryWallet'],
-  metadata: ReferralMetadata
+export const createReferral = async (
+  wallet: Wallet | typeof DynamicContext['primaryWallet'],
+  type: string,
+  name: string,
+  description: string,
+  rewardPercentage: number
 ): Promise<string | null> => {
   try {
-    console.log("Creating referral pool with metadata:", metadata);
+    console.log(`Creating ${type} referral: ${name}`);
+    
+    // Create referral metadata
+    const metadata: ReferralMetadata = {
+      title: name, // Required for ProposalMetadata
+      name,
+      description,
+      type,
+      referrer: wallet.address || "",
+      rewardPercentage,
+      createdAt: Math.floor(Date.now() / 1000),
+      votingDuration: 86400 * 3, // 3 days in seconds
+      linkedInURL: "" // Required field for ProposalMetadata
+    };
     
     // Upload metadata to IPFS
     const ipfsHash = await uploadToIPFS(metadata);
@@ -39,30 +56,30 @@ export const createReferralPool = async (
     }
     
     // Mock implementation for development
-    const referralId = `referral-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    console.log(`Created referral pool with ID: ${referralId}`);
+    const referralId = `ref-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    console.log(`Created referral with ID: ${referralId}`);
     
     return referralId;
   } catch (error) {
-    console.error("Error creating referral pool:", error);
+    console.error("Error creating referral:", error);
     return null;
   }
 };
 
 /**
- * Submits a referral
+ * Submits a new referral for a user
  * @param wallet User wallet
  * @param referralId Referral ID
- * @param referredAddress Referred address
+ * @param referredAddress Address of the referred user
  * @returns Success status
  */
 export const submitReferral = async (
-  wallet: Wallet | DynamicContext['primaryWallet'],
+  wallet: Wallet | typeof DynamicContext['primaryWallet'],
   referralId: string,
   referredAddress: string
 ): Promise<boolean> => {
   try {
-    console.log(`Submitting referral ${referralId} for address ${referredAddress}`);
+    console.log(`Submitting referral ${referralId} for user ${referredAddress}`);
     
     // Mock implementation for development
     return true;
@@ -79,7 +96,7 @@ export const submitReferral = async (
  * @returns Success status
  */
 export const claimReferralReward = async (
-  wallet: Wallet | DynamicContext['primaryWallet'],
+  wallet: Wallet | typeof DynamicContext['primaryWallet'],
   referralId: string
 ): Promise<boolean> => {
   try {
@@ -90,52 +107,5 @@ export const claimReferralReward = async (
   } catch (error) {
     console.error("Error claiming referral reward:", error);
     return false;
-  }
-};
-
-/**
- * Gets referrals for a user
- * @param address User address
- * @returns Array of referrals
- */
-export const getReferrals = async (address: string): Promise<Referral[]> => {
-  try {
-    console.log(`Getting referrals for address ${address}`);
-    
-    // Mock implementation for development
-    const mockReferrals: Referral[] = [
-      {
-        id: "ref-001",
-        name: "NFT Membership Referral",
-        description: "Earn rewards for referring new members to purchase NFTs",
-        type: "nft-membership",
-        referrer: address,
-        rewardPercentage: 10,
-        status: 'active',
-        createdAt: Date.now()
-      }
-    ];
-    
-    return mockReferrals;
-  } catch (error) {
-    console.error("Error getting referrals:", error);
-    return [];
-  }
-};
-
-/**
- * Gets referral status
- * @param referralId Referral ID
- * @returns Referral status
- */
-export const getReferralStatus = async (referralId: string): Promise<ReferralStatus> => {
-  try {
-    console.log(`Getting status for referral ${referralId}`);
-    
-    // Mock implementation for development
-    return 'active';
-  } catch (error) {
-    console.error("Error getting referral status:", error);
-    return 'expired';
   }
 };

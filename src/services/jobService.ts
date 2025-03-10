@@ -34,6 +34,7 @@ export interface JobApplication {
   applicant: string;
   status: ApplicationStatus;
   submittedAt: number;
+  createdAt: number;  // Added createdAt property
   // Additional application details
   message?: string;
   experience?: string;
@@ -76,7 +77,7 @@ export interface JobListing {
  * @returns Job ID if successful, null otherwise
  */
 export const createJobListing = async (
-  wallet: Wallet | DynamicContext['primaryWallet'],
+  wallet: Wallet | typeof DynamicContext['primaryWallet'],
   metadata: JobMetadata
 ): Promise<string | null> => {
   try {
@@ -107,7 +108,7 @@ export const createJobListing = async (
  * @returns Success status
  */
 export const submitJobApplication = async (
-  wallet: Wallet | DynamicContext['primaryWallet'],
+  wallet: Wallet | typeof DynamicContext['primaryWallet'],
   jobId: string,
   applicationDetails: {
     message: string;
@@ -134,7 +135,7 @@ export const submitJobApplication = async (
  * @returns Success status
  */
 export const submitJobReferral = async (
-  wallet: Wallet | DynamicContext['primaryWallet'],
+  wallet: Wallet | typeof DynamicContext['primaryWallet'],
   jobId: string,
   referredUser: string
 ): Promise<boolean> => {
@@ -156,7 +157,7 @@ export const submitJobReferral = async (
  * @returns Success status
  */
 export const acceptJobApplication = async (
-  wallet: Wallet | DynamicContext['primaryWallet'],
+  wallet: Wallet | typeof DynamicContext['primaryWallet'],
   applicationId: string
 ): Promise<boolean> => {
   try {
@@ -177,7 +178,7 @@ export const acceptJobApplication = async (
  * @returns Success status
  */
 export const rejectJobApplication = async (
-  wallet: Wallet | DynamicContext['primaryWallet'],
+  wallet: Wallet | typeof DynamicContext['primaryWallet'],
   applicationId: string
 ): Promise<boolean> => {
   try {
@@ -198,7 +199,7 @@ export const rejectJobApplication = async (
  * @returns Success status
  */
 export const cancelJobListing = async (
-  wallet: Wallet | DynamicContext['primaryWallet'],
+  wallet: Wallet | typeof DynamicContext['primaryWallet'],
   jobId: string
 ): Promise<boolean> => {
   try {

@@ -1,5 +1,5 @@
 
-import { Buildings, Pickaxe, Shield, Cpu, GalleryVertical, Crosshair, BarChart4, Code, Trash2, HelpCircle } from "lucide-react";
+import { Building, Pickaxe, Shield, Cpu, GalleryVertical, Crosshair, BarChart4, Code, Trash2, HelpCircle } from "lucide-react";
 import { JobCategory } from "@/services/jobService";
 
 interface JobCategoryIconProps {
@@ -12,7 +12,7 @@ export const JobCategoryIcon = ({ category, className = "w-4 h-4" }: JobCategory
   
   switch (category) {
     case 'settlement-building':
-      Icon = Buildings;
+      Icon = Building;
       break;
     case 'resource-gathering':
       Icon = Pickaxe;

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Briefcase, Search, Plus, Clock, Zap, ClipboardList, Users, ChevronRight, Layers, Calendar, ArrowRight, Filter, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -265,7 +264,7 @@ export const JobsDashboard = () => {
                         <div className="flex flex-col">
                           <span className="text-sm text-white/60">Applied</span>
                           <span className="text-white/80 text-sm">
-                            {formatDistanceToNow(application.createdAt * 1000, { addSuffix: true })}
+                            {formatDistanceToNow(application.submittedAt * 1000, { addSuffix: true })}
                           </span>
                         </div>
                         
