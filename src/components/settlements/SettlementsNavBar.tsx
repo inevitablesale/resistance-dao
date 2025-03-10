@@ -2,11 +2,11 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, Gavel, ShieldCheck } from 'lucide-react';
+import { Plus, Gavel, ShieldCheck, Building2, Layers } from 'lucide-react';
 
 export const SettlementsNavBar = () => {
   const location = useLocation();
-  const isActive = (path: string) => location.pathname.startsWith(path);
+  const isActive = (path: string) => location.pathname === path;
   
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -16,17 +16,32 @@ export const SettlementsNavBar = () => {
           Discover and support settlements being built in the wasteland. Sentinels can contribute ETH to fund and govern promising projects.
         </p>
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
+        <Link to="/settlements">
+          <Button 
+            variant={isActive("/settlements") ? "default" : "outline"} 
+            className={`gap-2 ${isActive("/settlements") ? "bg-blue-500 hover:bg-blue-600" : ""}`}
+          >
+            <Building2 className="w-4 h-4" />
+            All Settlements
+          </Button>
+        </Link>
         <Link to="/governance">
-          <Button variant="outline" className="gap-2">
+          <Button 
+            variant={isActive("/governance") ? "default" : "outline"} 
+            className={`gap-2 ${isActive("/governance") ? "bg-blue-500 hover:bg-blue-600" : ""}`}
+          >
             <Gavel className="w-4 h-4" />
             Governance
           </Button>
         </Link>
-        <Link to="/settlements">
-          <Button variant="outline" className="gap-2">
+        <Link to="/my-settlements">
+          <Button 
+            variant={isActive("/my-settlements") ? "default" : "outline"} 
+            className={`gap-2 ${isActive("/my-settlements") ? "bg-blue-500 hover:bg-blue-600" : ""}`}
+          >
             <ShieldCheck className="w-4 h-4" />
-            All Settlements
+            My Contributions
           </Button>
         </Link>
         <Link to="/thesis">

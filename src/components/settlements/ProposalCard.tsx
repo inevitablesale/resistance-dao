@@ -1,9 +1,21 @@
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { FileText, ThumbsUp, ThumbsDown, Play, Calendar, User, CheckCircle, XCircle, Clock } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { PartyProposal } from "@/types/proposals";
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
+import { Check, X, Clock, FileText, ExternalLink, Shield, Play } from 'lucide-react';
+import { PartyProposal } from '@/types/proposals';
+import { GovernanceProposal } from '@/services/partyProtocolService';
+import { ethers } from 'ethers';
+
+interface ProposalCardProps {
+  proposal: PartyProposal;
+  onVote?: (proposalId: string, support: boolean) => Promise<void>;
+  onExecute?: (proposalId: string, proposal: GovernanceProposal) => Promise<void>;
+  canExecute?: boolean;
+  showVoting?: boolean;
+}
 
 export const ProposalCard = ({
   proposal,
@@ -11,161 +23,200 @@ export const ProposalCard = ({
   onExecute,
   canExecute = false,
   showVoting = true
-}: {
-  proposal: PartyProposal;
-  onVote: (proposalId: string, support: boolean) => void;
-  onExecute: (proposalId: string, proposal: any) => void;
-  canExecute?: boolean;
-  showVoting?: boolean;
-}) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+}: ProposalCardProps) => {
+  const totalVotes = proposal.votesFor + proposal.votesAgainst;
+  const forPercentage = totalVotes > 0 ? (proposal.votesFor / totalVotes) * 100 : 0;
+  
+  // Format transaction value
+  const formatValue = (value: string) => {
+    try {
+      const valueInEth = ethers.utils.formatEther(value);
+      return `${parseFloat(valueInEth).toFixed(4)} ETH`;
+    } catch (error) {
+      return value;
+    }
   };
-
+  
+  const statusIndicator = () => {
+    switch (proposal.status) {
+      case 'active':
+        return (
+          <div className="flex items-center gap-1.5 bg-yellow-500/20 px-2.5 py-1 rounded-full text-yellow-400 text-xs">
+            <Clock className="w-3 h-3" />
+            <span>Active</span>
+          </div>
+        );
+      case 'passed':
+        return (
+          <div className="flex items-center gap-1.5 bg-green-500/20 px-2.5 py-1 rounded-full text-green-400 text-xs">
+            <Check className="w-3 h-3" />
+            <span>Passed</span>
+          </div>
+        );
+      case 'ready':
+        return (
+          <div className="flex items-center gap-1.5 bg-blue-500/20 px-2.5 py-1 rounded-full text-blue-400 text-xs">
+            <Play className="w-3 h-3" />
+            <span>Ready</span>
+          </div>
+        );
+      case 'executed':
+        return (
+          <div className="flex items-center gap-1.5 bg-purple-500/20 px-2.5 py-1 rounded-full text-purple-400 text-xs">
+            <Shield className="w-3 h-3" />
+            <span>Executed</span>
+          </div>
+        );
+      case 'failed':
+        return (
+          <div className="flex items-center gap-1.5 bg-red-500/20 px-2.5 py-1 rounded-full text-red-400 text-xs">
+            <X className="w-3 h-3" />
+            <span>Failed</span>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+  
+  // Convert the proposal to the format expected by the execute function
+  const formatForExecution = (): GovernanceProposal => {
+    return {
+      title: proposal.title,
+      description: proposal.description,
+      transactions: proposal.transactions.map(tx => ({
+        target: tx.target,
+        value: tx.value,
+        calldata: tx.calldata,
+        signature: tx.signature
+      }))
+    };
+  };
+  
   return (
-    <div className="bg-[#0a1020] p-4 rounded-xl border border-white/5">
-      <div className="flex items-start gap-4">
-        <div className="bg-blue-500/10 p-2 rounded-full">
-          <FileText className="w-5 h-5 text-blue-400" />
+    <Card className="bg-[#0a0a0a] border border-white/5 hover:border-blue-500/20 transition-all">
+      <CardContent className="p-4">
+        <div className="flex justify-between items-start mb-3">
+          <h3 className="text-lg font-semibold">{proposal.title}</h3>
+          {statusIndicator()}
         </div>
         
-        <div className="flex-1">
-          <div className="flex justify-between items-start">
-            <h3 className="font-medium text-lg">{proposal.title}</h3>
-            <div className={`px-2 py-1 rounded-full text-xs ${
-              proposal.status === 'active' 
-                ? 'bg-blue-500/20 text-blue-400' 
-                : proposal.status === 'passed' || proposal.status === 'ready'
-                  ? 'bg-green-500/20 text-green-400'
-                  : proposal.status === 'executed'
-                    ? 'bg-purple-500/20 text-purple-400'
-                    : 'bg-red-500/20 text-red-400'
-            }`}>
-              {proposal.status === 'ready' ? 'Ready to Execute' : proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1)}
+        <p className="text-gray-400 text-sm mb-4 line-clamp-2">{proposal.description}</p>
+        
+        {showVoting && (
+          <>
+            <div className="flex justify-between text-xs text-gray-400 mb-1">
+              <span>Votes For: {proposal.votesFor}</span>
+              <span>Votes Against: {proposal.votesAgainst}</span>
+            </div>
+            
+            <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden mb-3">
+              <div className="flex h-full">
+                <div 
+                  className="h-full bg-green-500" 
+                  style={{ width: `${forPercentage}%` }} 
+                />
+                <div 
+                  className="h-full bg-red-500" 
+                  style={{ width: `${100 - forPercentage}%` }} 
+                />
+              </div>
+            </div>
+          </>
+        )}
+        
+        {proposal.transactions.length > 0 && (
+          <div className="mt-4">
+            <div className="flex items-center gap-1 text-gray-400 text-xs mb-2">
+              <FileText className="w-3.5 h-3.5" />
+              <span>Transactions ({proposal.transactions.length})</span>
+            </div>
+            
+            <div className="space-y-2">
+              {proposal.transactions.map((tx, index) => (
+                <div key={index} className="text-xs p-2 bg-black/30 rounded border border-white/5">
+                  <div className="flex justify-between text-gray-400 mb-1">
+                    <span>Target:</span>
+                    <span className="font-mono truncate max-w-[180px]">{tx.target.substring(0, 10)}...{tx.target.substring(tx.target.length - 6)}</span>
+                  </div>
+                  
+                  {tx.value !== "0" && (
+                    <div className="flex justify-between text-gray-400">
+                      <span>Value:</span>
+                      <span className="font-mono">{formatValue(tx.value)}</span>
+                    </div>
+                  )}
+                  
+                  {tx.signature && (
+                    <div className="flex justify-between text-gray-400">
+                      <span>Function:</span>
+                      <span className="font-mono">{tx.signature}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
-          
-          <div className="flex items-center gap-2 text-sm text-gray-400 mt-2">
-            <User className="w-3 h-3" />
-            <span>{proposal.proposer.slice(0, 6)}...{proposal.proposer.slice(-4)}</span>
-            <span className="mx-1">•</span>
-            <Calendar className="w-3 h-3" />
-            <span>{formatDate(proposal.createdAt)}</span>
-          </div>
-          
-          <div className="mt-3">
-            <p className={`text-sm text-gray-300 ${!isExpanded && 'line-clamp-2'}`}>
-              {proposal.description}
-            </p>
-            <button 
-              className="text-xs text-blue-400 mt-1 hover:text-blue-300"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? 'Show less' : 'Show more'}
-            </button>
-          </div>
-          
-          {isExpanded && (
-            <>
-              <Separator className="my-3 bg-white/10" />
-              
-              <div className="space-y-3">
-                <h4 className="text-sm font-medium">Transaction Details</h4>
-                
-                {proposal.transactions.map((tx, index) => (
-                  <div key={index} className="bg-black/30 p-2 rounded text-xs">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Target:</span>
-                      <span className="font-mono">{tx.target.slice(0, 10)}...{tx.target.slice(-8)}</span>
-                    </div>
-                    <div className="flex justify-between mt-1">
-                      <span className="text-gray-400">Value:</span>
-                      <span className="font-mono">{tx.value} ETH</span>
-                    </div>
-                    {tx.signature && (
-                      <div className="flex justify-between mt-1">
-                        <span className="text-gray-400">Function:</span>
-                        <span className="font-mono">{tx.signature}</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-              
-              <div className="mt-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Voting Status:</span>
-                  <span>{proposal.votesFor} for / {proposal.votesAgainst} against</span>
-                </div>
-                
-                <div className="w-full bg-black/50 h-2 rounded-full overflow-hidden">
-                  <div 
-                    className="bg-blue-500 h-full" 
-                    style={{ 
-                      width: `${Math.min(
-                        100, 
-                        (proposal.votesFor / (proposal.votesFor + proposal.votesAgainst || 1)) * 100
-                      )}%` 
-                    }}
-                  />
-                </div>
-                
-                {proposal.status === 'active' && (
-                  <div className="flex items-center gap-1 text-xs text-gray-400">
-                    <Clock className="w-3 h-3" />
-                    <span>Voting ends in {proposal.timeRemaining}</span>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-          
-          <div className="mt-4 flex gap-2 justify-end">
-            {showVoting && proposal.status === 'active' && (
-              <>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="gap-1"
-                  onClick={() => onVote(proposal.id, false)}
-                >
-                  <ThumbsDown className="w-3 h-3" />
-                  Against
-                </Button>
-                <Button 
-                  size="sm"
-                  className="gap-1 bg-blue-500 hover:bg-blue-600"
-                  onClick={() => onVote(proposal.id, true)}
-                >
-                  <ThumbsUp className="w-3 h-3" />
-                  Support
-                </Button>
-              </>
-            )}
-            
-            {canExecute && (proposal.status === 'passed' || proposal.status === 'ready') && (
-              <Button 
-                size="sm"
-                className="gap-1 bg-green-500 hover:bg-green-600"
-                onClick={() => onExecute(proposal.id, {
-                  title: proposal.title,
-                  description: proposal.description,
-                  transactions: proposal.transactions
-                })}
-              >
-                <Play className="w-3 h-3" />
-                Execute
-              </Button>
+        )}
+        
+        <div className="flex justify-between items-center mt-4">
+          <div className="text-xs text-gray-400 flex items-center gap-1">
+            <Clock className="w-3.5 h-3.5" />
+            {proposal.status === 'active' ? (
+              <span>Ends in {proposal.timeRemaining}</span>
+            ) : (
+              <span>Created {new Date(proposal.createdAt * 1000).toLocaleDateString()}</span>
             )}
           </div>
+          
+          <a 
+            href={`https://etherscan.io/address/${proposal.proposer}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-xs text-blue-400 flex items-center gap-1 hover:underline"
+          >
+            <span>Proposer</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
         </div>
-      </div>
-    </div>
+      </CardContent>
+      
+      {showVoting && proposal.status === 'active' && onVote && (
+        <CardFooter className="border-t border-white/5 p-4 flex justify-between gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full border-green-500/30 text-green-400 hover:bg-green-500/10"
+            onClick={() => onVote(proposal.id, true)}
+          >
+            <Check className="w-4 h-4 mr-1" />
+            Vote For
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10"
+            onClick={() => onVote(proposal.id, false)}
+          >
+            <X className="w-4 h-4 mr-1" />
+            Vote Against
+          </Button>
+        </CardFooter>
+      )}
+      
+      {(proposal.status === 'passed' || proposal.status === 'ready') && canExecute && onExecute && (
+        <CardFooter className="border-t border-white/5 p-4">
+          <Button 
+            variant="default" 
+            size="sm" 
+            className="w-full bg-blue-500 hover:bg-blue-600"
+            onClick={() => onExecute(proposal.id, formatForExecution())}
+          >
+            <Play className="w-4 h-4 mr-1" />
+            Execute Proposal
+          </Button>
+        </CardFooter>
+      )}
+    </Card>
   );
 };
