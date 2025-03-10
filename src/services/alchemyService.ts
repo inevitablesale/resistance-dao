@@ -29,6 +29,23 @@ const client = createPublicClient({
 });
 
 /**
+ * Determines the NFT class from metadata attributes
+ * @param attributes NFT metadata attributes
+ * @returns The NFT class
+ */
+export const getNFTClassFromAttributes = (attributes: Array<{trait_type: string, value: string}>): NFTClass => {
+  const classAttribute = attributes.find(attr => attr.trait_type === "Class");
+  if (!classAttribute) return 'Unknown';
+  
+  switch (classAttribute.value) {
+    case "Sentinel": return 'Sentinel';
+    case "Survivor": return 'Survivor';
+    case "Bounty Hunter": return 'Bounty Hunter';
+    default: return 'Unknown';
+  }
+};
+
+/**
  * Fetches all NFTs owned by an address
  * @param address Owner address
  * @returns Array of ResistanceNFT objects
@@ -59,6 +76,16 @@ export const fetchNFTsForAddress = async (address: string): Promise<ResistanceNF
           { trait_type: "Class", value: "Survivor" },
           { trait_type: "Skill", value: "Engineering" }
         ]
+      },
+      {
+        tokenId: "3",
+        class: "Bounty Hunter",
+        name: "Bounty Hunter - Contract Killer",
+        image: "https://gateway.pinata.cloud/ipfs/bounty-hunter-image",
+        attributes: [
+          { trait_type: "Class", value: "Bounty Hunter" },
+          { trait_type: "Specialty", value: "Tracking" }
+        ]
       }
     ];
     
@@ -81,6 +108,34 @@ export const checkNFTOwnership = async (address: string): Promise<boolean> => {
   } catch (error) {
     console.error("Error checking NFT ownership:", error);
     return false;
+  }
+};
+
+/**
+ * Gets all roles an address has based on their NFTs
+ * @param address Owner address
+ * @returns Object with role boolean flags
+ */
+export const getAllRoles = async (address: string): Promise<{
+  isSentinel: boolean;
+  isSurvivor: boolean;
+  isBountyHunter: boolean;
+}> => {
+  try {
+    const nfts = await fetchNFTsForAddress(address);
+    
+    return {
+      isSentinel: nfts.some(nft => nft.class === 'Sentinel'),
+      isSurvivor: nfts.some(nft => nft.class === 'Survivor'),
+      isBountyHunter: nfts.some(nft => nft.class === 'Bounty Hunter')
+    };
+  } catch (error) {
+    console.error("Error getting roles:", error);
+    return {
+      isSentinel: false,
+      isSurvivor: false,
+      isBountyHunter: false
+    };
   }
 };
 

@@ -4,7 +4,8 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { 
   checkNFTOwnership, 
   fetchNFTsForAddress, 
-  getPrimaryRole, 
+  getPrimaryRole,
+  getAllRoles,
   NFTClass, 
   ResistanceNFT 
 } from '@/services/alchemyService';
@@ -17,7 +18,13 @@ interface NFTRolesState {
   isSurvivor: boolean;
   isBountyHunter: boolean;
   nfts: ResistanceNFT[];
+  nftsByRole: {
+    sentinel: ResistanceNFT[];
+    survivor: ResistanceNFT[];
+    bountyHunter: ResistanceNFT[];
+  };
   refetch: () => Promise<void>;
+  hasMultipleRoles: boolean;
 }
 
 export const useNFTRoles = (): NFTRolesState => {
@@ -26,6 +33,18 @@ export const useNFTRoles = (): NFTRolesState => {
   const [error, setError] = useState<Error | null>(null);
   const [primaryRole, setPrimaryRole] = useState<NFTClass>('Unknown');
   const [nfts, setNfts] = useState<ResistanceNFT[]>([]);
+  const [isSentinel, setIsSentinel] = useState(false);
+  const [isSurvivor, setIsSurvivor] = useState(false);
+  const [isBountyHunter, setIsBountyHunter] = useState(false);
+  const [nftsByRole, setNftsByRole] = useState<{
+    sentinel: ResistanceNFT[];
+    survivor: ResistanceNFT[];
+    bountyHunter: ResistanceNFT[];
+  }>({
+    sentinel: [],
+    survivor: [],
+    bountyHunter: []
+  });
   
   const fetchData = async () => {
     if (!primaryWallet?.address) {
@@ -40,6 +59,23 @@ export const useNFTRoles = (): NFTRolesState => {
       // Fetch all NFTs
       const fetchedNfts = await fetchNFTsForAddress(primaryWallet.address);
       setNfts(fetchedNfts);
+      
+      // Sort NFTs by role
+      const sentinelNfts = fetchedNfts.filter(nft => nft.class === 'Sentinel');
+      const survivorNfts = fetchedNfts.filter(nft => nft.class === 'Survivor');
+      const bountyHunterNfts = fetchedNfts.filter(nft => nft.class === 'Bounty Hunter');
+      
+      setNftsByRole({
+        sentinel: sentinelNfts,
+        survivor: survivorNfts,
+        bountyHunter: bountyHunterNfts
+      });
+      
+      // Get role flags
+      const roles = await getAllRoles(primaryWallet.address);
+      setIsSentinel(roles.isSentinel);
+      setIsSurvivor(roles.isSurvivor);
+      setIsBountyHunter(roles.isBountyHunter);
       
       // Determine primary role
       const role = await getPrimaryRole(primaryWallet.address);
@@ -56,14 +92,22 @@ export const useNFTRoles = (): NFTRolesState => {
     fetchData();
   }, [primaryWallet?.address]);
 
+  // Determine if user has multiple roles
+  const hasMultipleRoles = 
+    (isSentinel ? 1 : 0) + 
+    (isSurvivor ? 1 : 0) + 
+    (isBountyHunter ? 1 : 0) > 1;
+
   return {
     isLoading,
     error,
     primaryRole,
-    isSentinel: primaryRole === 'Sentinel',
-    isSurvivor: primaryRole === 'Survivor',
-    isBountyHunter: primaryRole === 'Bounty Hunter',
+    isSentinel,
+    isSurvivor,
+    isBountyHunter,
     nfts,
-    refetch: fetchData
+    nftsByRole,
+    refetch: fetchData,
+    hasMultipleRoles
   };
 };

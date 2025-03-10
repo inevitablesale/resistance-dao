@@ -5,13 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { useNFTRoles } from "@/hooks/useNFTRoles";
 import { ToxicBadge } from "@/components/ui/toxic-badge";
+import { NFTClass } from "@/services/alchemyService";
 
 interface RoleBasedHubProps {
   onSelectRole: (role: string) => void;
 }
 
 interface RoleCard {
-  title: string;
+  title: NFTClass;
   description: string;
   icon: React.ReactNode;
   color: string;
@@ -26,13 +27,13 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
     isSentinel, 
     isSurvivor, 
     isBountyHunter,
-    nfts
+    nftsByRole
   } = useNFTRoles();
   
   // Count NFTs by class
-  const sentinelCount = nfts.filter(nft => nft.class === 'Sentinel').length;
-  const survivorCount = nfts.filter(nft => nft.class === 'Survivor').length;
-  const bountyHunterCount = nfts.filter(nft => nft.class === 'Bounty Hunter').length;
+  const sentinelCount = nftsByRole.sentinel.length;
+  const survivorCount = nftsByRole.survivor.length;
+  const bountyHunterCount = nftsByRole.bountyHunter.length;
   
   const roleCards: RoleCard[] = [
     {
@@ -84,7 +85,7 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
       <div className="p-6 rounded-lg bg-gradient-to-r from-gray-900 to-black border border-gray-800">
         <h2 className="text-2xl font-bold text-white mb-4">Wasteland Role Hub</h2>
         <p className="text-gray-300 mb-4">
-          Access role-specific interfaces for creating, managing, and completing bounties based on your NFT role.
+          Access role-specific interfaces for creating, managing, and completing bounties based on your NFT roles.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {roleCards.map((role, index) => (
