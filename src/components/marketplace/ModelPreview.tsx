@@ -1,10 +1,10 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { Loader2, RotateCcw } from 'lucide-react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RadiationOverlay } from '@/components/radiation/RadiationOverlay';
+import { ToxicButton } from '@/components/ui/toxic-button';
 
 interface ModelPreviewProps {
   modelUrl: string;
@@ -54,10 +54,11 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   const [lastRevealValue, setLastRevealValue] = useState(revealValue);
   const [transitionDirection, setTransitionDirection] = useState<'increasing' | 'decreasing' | null>(null);
   const [particleSystem, setParticleSystem] = useState<THREE.Points | null>(null);
+  const [isAutoRotating, setIsAutoRotating] = useState(autoRotate);
   
   // Create a buffer to smooth the transition
   const smoothedRevealValue = useRef(revealValue);
-  
+
   // Process the IPFS URLs
   useEffect(() => {
     const processUrls = () => {
@@ -179,7 +180,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.autoRotate = autoRotate;
+    controls.autoRotate = isAutoRotating;
     controls.autoRotateSpeed = 1.5;
     controls.enableZoom = true;
     controls.enablePan = false;
@@ -429,7 +430,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         const maxDim = Math.max(size.x, size.y, size.z);
         const scale = 2.8 / maxDim; // Set appropriate scale
         gltf.scene.scale.set(scale, scale, scale);
-        gltf.scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+        gltf.scene.position.set(-center.x * scale, -center.y * scale, -center.z scale);
         
         // Rotate the character model slightly to show better silhouette
         gltf.scene.rotation.y = -Math.PI * 0.15; // Rotate left slightly
@@ -690,10 +691,10 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
             variant="outline" 
             size="sm" 
             className="bg-black/50 border-toxic-neon/40 text-toxic-neon"
-            onClick={() => setAutoRotate(!autoRotate)}
+            onClick={() => setIsAutoRotating(!isAutoRotating)}
           >
-            <RotateCcw className={`h-4 w-4 mr-1 ${autoRotate ? 'animate-spin' : ''}`} />
-            {autoRotate ? 'Stop' : 'Rotate'}
+            <RotateCcw className={`h-4 w-4 mr-1 ${isAutoRotating ? 'animate-spin' : ''}`} />
+            {isAutoRotating ? 'Stop' : 'Rotate'}
           </ToxicButton>
         </div>
       </div>
