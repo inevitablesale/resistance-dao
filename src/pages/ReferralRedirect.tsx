@@ -20,20 +20,33 @@ const ReferralRedirect = () => {
   useEffect(() => {
     const verifyReferrer = async () => {
       if (referrerAddress) {
-        const isValid = await checkBountyHunterOwnership(referrerAddress);
-        setIsValidReferrer(isValid);
-        
-        if (!isValid) {
+        try {
+          console.log("Verifying referrer address:", referrerAddress);
+          const isValid = await checkBountyHunterOwnership(referrerAddress);
+          console.log("Referrer validation result:", isValid);
+          setIsValidReferrer(isValid);
+          
+          if (!isValid) {
+            toast({
+              title: "Invalid Referrer",
+              description: "This referrer does not own a Bounty Hunter NFT.",
+              variant: "destructive"
+            });
+            
+            // Redirect after a short delay
+            setTimeout(() => {
+              navigate("/");
+            }, 3000);
+          }
+        } catch (error) {
+          console.error("Error verifying referrer:", error);
+          setIsValidReferrer(false);
           toast({
-            title: "Invalid Referrer",
-            description: "This referrer does not own a Bounty Hunter NFT.",
+            title: "Verification Error",
+            description: "Could not verify the referrer. Try again later.",
             variant: "destructive"
           });
-          
-          // Redirect after a short delay
-          setTimeout(() => {
-            navigate("/");
-          }, 3000);
+          setTimeout(() => navigate("/"), 3000);
         }
       }
     };
@@ -86,6 +99,7 @@ const ReferralRedirect = () => {
         // If user is connected, record the referral in Supabase
         if (isConnected && address) {
           try {
+            console.log("Recording referral:", referrerAddress, "->", address);
             // Record the referral using our service
             const result = await createReferral(referrerAddress, address);
             
