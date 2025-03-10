@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Radiation } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 
@@ -37,19 +37,19 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
   };
   
   // Get the description text based on reveal value
-  // Reversed logic: Low value = more radiation, high value = less radiation
-  const getRevealDescription = (revealValue: number) => {
-    if (revealValue < 10) {
+  // Higher value = more radiation (less visibility)
+  const getRevealDescription = (radiationLevel: number) => {
+    if (radiationLevel < 10) {
       return "Character fully visible, minimal radiation";
-    } else if (revealValue < 25) {
+    } else if (radiationLevel < 25) {
       return "Character mostly revealed, slight radiation haze";
-    } else if (revealValue < 40) {
+    } else if (radiationLevel < 40) {
       return "Character features clearly visible through radiation";
-    } else if (revealValue < 60) {
+    } else if (radiationLevel < 60) {
       return "Character features becoming obscured by radiation";
-    } else if (revealValue < 75) {
+    } else if (radiationLevel < 75) {
       return "Radiation increasing, character partially obscured";
-    } else if (revealValue < 90) {
+    } else if (radiationLevel < 90) {
       return "Character silhouette barely visible through dense radiation";
     } else {
       return "Fully obscured by toxic radiation cloud";
@@ -60,11 +60,7 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
     <div className={`flex flex-col ${className}`}>
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {value > 50 ? (
-            <EyeOff className="h-4 w-4 text-toxic-neon" />
-          ) : (
-            <Eye className="h-4 w-4 text-toxic-neon" />
-          )}
+          <Radiation className="h-4 w-4 text-toxic-neon" />
           <span className="text-sm text-toxic-neon font-mono">RADIATION LEVEL</span>
         </div>
         <span className={cn(
@@ -87,7 +83,7 @@ export const CharacterRevealSlider: React.FC<CharacterRevealSliderProps> = ({
           min={0}
           max={100}
           step={1}
-          onValueChange={handleChange}
+          onValueChange={(vals) => handleChange(vals)}
           className={cn(
             "flex-1",
             isIncreasing === true ? "animate-pulse" : "",
