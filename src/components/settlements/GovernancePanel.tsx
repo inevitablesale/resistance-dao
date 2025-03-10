@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { ethers } from "ethers";
@@ -28,7 +27,7 @@ export const GovernancePanel = ({
   const { toast } = useToast();
   const { primaryWallet } = useDynamicContext();
   const [showForm, setShowForm] = useState(false);
-  const { proposals, isLoading, refetch } = useProposals(partyAddress);
+  const { data: proposals = [], isLoading, refetch } = useProposals(partyAddress);
 
   const handleProposalSubmit = async (proposal: GovernanceProposal) => {
     if (!primaryWallet) {
