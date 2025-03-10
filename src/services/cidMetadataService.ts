@@ -56,13 +56,15 @@ export const fetchMetadataFromCID = async (cid: string): Promise<any> => {
   
   try {
     const url = getCIDGatewayUrl(cid);
+    console.log('Fetching from Pinata URL:', url);
+    
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
     // Direct request to Pinata gateway
     const response = await fetch(url, { 
       signal: controller.signal,
-      cache: 'force-cache', // Try to use cached response if available
+      cache: 'no-store', // Don't use cache to ensure we get fresh data
       headers: {
         'Accept': 'application/json'
       }
@@ -71,10 +73,21 @@ export const fetchMetadataFromCID = async (cid: string): Promise<any> => {
     clearTimeout(timeoutId);
     
     if (!response.ok) {
+      console.error(`Pinata request failed: ${response.status} ${response.statusText}`);
       throw new Error(`Failed to fetch metadata: ${response.status} ${response.statusText}`);
     }
     
-    const metadata = await response.json();
+    const responseText = await response.text();
+    console.log('Raw Pinata response:', responseText);
+    
+    let metadata;
+    try {
+      metadata = JSON.parse(responseText);
+      console.log('Parsed Pinata metadata:', metadata);
+    } catch (e) {
+      console.error('Failed to parse Pinata response as JSON:', e);
+      throw new Error('Invalid JSON response from Pinata');
+    }
     
     // Add a property to track whether we've already shown a notification for this metadata
     metadata.notified = false;

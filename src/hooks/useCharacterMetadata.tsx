@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { getCharacterById, getCharacterNFTByTokenId, type CharacterMetadata } from "@/services/characterMetadata";
+import { getCharacterById, type CharacterMetadata } from "@/services/characterMetadata";
 import { type OpenSeaNFT } from "@/services/openseaService";
 import { fetchMetadataFromCID } from "@/services/cidMetadataService";
 
@@ -33,7 +33,10 @@ export const useCharacterMetadata = (characterId: number) => {
       if (!character?.character_model_cid) {
         throw new Error('No model CID available');
       }
-      return await fetchMetadataFromCID(character.character_model_cid);
+      console.log('Fetching metadata from CID:', character.character_model_cid);
+      const metadata = await fetchMetadataFromCID(character.character_model_cid);
+      console.log('Pinata metadata response:', metadata);
+      return metadata;
     },
     enabled: !!character?.character_model_cid,
     staleTime: 300000, // 5 minutes

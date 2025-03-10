@@ -1,9 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { type OpenSeaNFT } from "@/services/openseaService";
 import { CONTRACT_ADDRESS } from "@/hooks/useNFTCollection";
 import { useCharacterMetadata } from "@/hooks/useCharacterMetadata";
-import { getCharacterNFTByTokenId } from "@/services/characterMetadata";
 
 export const useNFTMetadata = (tokenId: string) => {
   // Try to use character metadata if the tokenId is a valid number in our character range
@@ -13,17 +11,7 @@ export const useNFTMetadata = (tokenId: string) => {
   // If it's a valid character ID, use our metadata
   const characterMetadata = useCharacterMetadata(isValidCharacterId ? characterId : 0);
   
-  // Use our character data service instead of OpenSea API
-  const openSeaQuery = useQuery({
-    queryKey: ['nft', CONTRACT_ADDRESS, tokenId],
-    queryFn: async () => {
-      return await getCharacterNFTByTokenId(tokenId);
-    },
-    enabled: !!tokenId && !isValidCharacterId,
-    staleTime: 300000, // 5 minutes
-    gcTime: 600000, // 10 minutes (formerly cacheTime)
-  });
-  
+  // No OpenSea call - only use character data
   if (isValidCharacterId) {
     return {
       data: characterMetadata.nft,
@@ -33,8 +21,11 @@ export const useNFTMetadata = (tokenId: string) => {
     };
   }
   
+  // Return null data if not a valid character ID
   return {
-    ...openSeaQuery,
+    data: null,
+    isLoading: false,
+    error: new Error("Not a valid character token ID"),
     metadata: null
   };
 };
