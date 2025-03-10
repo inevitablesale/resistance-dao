@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, Gavel } from 'lucide-react';
+import { Plus, Gavel, ShieldCheck } from 'lucide-react';
 
 export const SettlementsNavBar = () => {
   const location = useLocation();
@@ -21,6 +21,12 @@ export const SettlementsNavBar = () => {
           <Button variant="outline" className="gap-2">
             <Gavel className="w-4 h-4" />
             Governance
+          </Button>
+        </Link>
+        <Link to="/settlements">
+          <Button variant="outline" className="gap-2">
+            <ShieldCheck className="w-4 h-4" />
+            All Settlements
           </Button>
         </Link>
         <Link to="/thesis">

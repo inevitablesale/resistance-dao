@@ -1,118 +1,112 @@
 
-import { ProposalEvent } from "@/types/proposals";
-import { Link } from "react-router-dom";
-import { Shield, Users } from "lucide-react";
+import { useState } from 'react';
+import { SettlementCard } from './SettlementCard';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Search, Filter } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-interface SettlementsGridProps {
-  settlements: ProposalEvent[];
-  isLoading: boolean;
-  formatUSDAmount: (amount: string) => string;
-  title: string;
-  className?: string;
+interface Settlement {
+  id: string;
+  name: string;
+  description: string;
+  totalRaised: string;
+  targetAmount: string;
+  remainingTime: string;
+  status: string;
+  image?: string;
 }
 
-export const SettlementsGrid = ({ settlements, isLoading, formatUSDAmount, title, className }: SettlementsGridProps) => {
+interface SettlementsGridProps {
+  settlements: Settlement[];
+  isLoading?: boolean;
+}
+
+export const SettlementsGrid = ({ settlements, isLoading = false }: SettlementsGridProps) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  
+  const filteredSettlements = settlements.filter(settlement => {
+    const matchesSearch = settlement.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          settlement.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || settlement.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
+  
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent" />
-      </div>
-    );
-  }
-
-  if (settlements.length === 0) {
-    return (
-      <div className="text-center py-20">
-        <h2 className="text-2xl font-bold mb-4">{title}</h2>
-        <p className="text-gray-400">No settlements found. Be the first to create one!</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className={`space-y-6 ${className || ''}`}>
-      <h2 className="text-2xl font-bold">{title}</h2>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {settlements.map((settlement) => {
-          // Provide a complete fallback object with all potentially accessed properties
-          const metadata = settlement.metadata || {
-            title: "Loading...",
-            description: "Settlement details loading...",
-            category: "Unknown",
-            investment: { targetCapital: "0", description: "" },
-            image: ""
-          };
-          
-          // Calculate progress percentage - safely access investment props
-          const targetCapital = metadata.investment?.targetCapital || "0";
-          const pledgedAmount = settlement.pledgedAmount || "0";
-          const progress = parseFloat(targetCapital) > 0 
-            ? Math.min(100, (parseFloat(pledgedAmount) / parseFloat(targetCapital)) * 100) 
-            : 0;
-          
-          // Determine status
-          let status = 'active';
-          if (progress >= 100) status = 'completed';
-          else if (settlement.error) status = 'failed';
-          
-          return (
-            <Link 
-              key={settlement.tokenId} 
-              to={`/settlements/${settlement.tokenId}`}
-              className="bg-[#111] rounded-xl border border-white/5 overflow-hidden hover:border-blue-500/30 transition-colors"
-            >
-              <div 
-                className="h-48 bg-center bg-cover bg-gradient-to-r from-blue-900/30 to-purple-900/30" 
-                style={{ backgroundImage: metadata.image ? `url(${metadata.image})` : '' }}
-              />
-              <div className="p-5 space-y-4">
-                <div className="flex justify-between items-start">
-                  <h2 className="text-xl font-semibold">{metadata.title}</h2>
-                  <div className={`px-2 py-1 rounded-full text-xs ${
-                    status === 'active' 
-                      ? 'bg-green-500/20 text-green-400' 
-                      : status === 'completed'
-                        ? 'bg-blue-500/20 text-blue-400'
-                        : 'bg-red-500/20 text-red-400'
-                  }`}>
-                    {status === 'active' 
-                      ? 'Active' 
-                      : status === 'completed' 
-                        ? 'Funded' 
-                        : 'Failed'}
-                  </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3, 4, 5, 6].map((index) => (
+          <div key={index} className="animate-pulse">
+            <div className="bg-gray-900 rounded-xl h-[350px]">
+              <div className="h-36 bg-gray-800 rounded-t-xl"></div>
+              <div className="p-4 space-y-3">
+                <div className="h-6 bg-gray-800 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-800 rounded w-full"></div>
+                <div className="h-4 bg-gray-800 rounded w-5/6"></div>
+                <div className="mt-6 h-2 bg-gray-800 rounded w-full"></div>
+                <div className="flex justify-between">
+                  <div className="h-4 bg-gray-800 rounded w-1/4"></div>
+                  <div className="h-4 bg-gray-800 rounded w-1/4"></div>
                 </div>
-                
-                <p className="text-gray-300 text-sm line-clamp-2">{metadata.description}</p>
-                
-                <div className="bg-black/50 h-2 w-full rounded-full overflow-hidden">
-                  <div 
-                    className="bg-blue-500 h-full rounded-full" 
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-                
-                <div className="flex justify-between text-sm text-gray-400">
-                  <span>{pledgedAmount} ETH</span>
-                  <span>{progress.toFixed(0)}%</span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-1 text-sm text-gray-400">
-                    <Users className="w-4 h-4 text-blue-400" />
-                    <span>{settlement.voteCount || 0}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-1 text-sm text-gray-400">
-                    <Shield className="w-4 h-4 text-blue-400" />
-                    <span>Join</span>
-                  </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="h-10 bg-gray-800 rounded"></div>
+                  <div className="h-10 bg-gray-800 rounded"></div>
                 </div>
               </div>
-            </Link>
-          );
-        })}
+            </div>
+          </div>
+        ))}
       </div>
+    );
+  }
+  
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input 
+            placeholder="Search settlements..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="bg-[#111] border-white/10 pl-10"
+          />
+        </div>
+        <div className="flex gap-2">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[130px] bg-[#111] border-white/10">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                <SelectValue placeholder="Status" />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="bg-[#111] border-white/10">
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="completed">Funded</SelectItem>
+              <SelectItem value="failed">Failed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      
+      {filteredSettlements.length === 0 ? (
+        <div className="text-center py-20">
+          <div className="inline-flex items-center justify-center bg-blue-900/20 h-20 w-20 rounded-full mb-4">
+            <Search className="h-10 w-10 text-blue-400/70" />
+          </div>
+          <h3 className="text-lg font-medium mb-1">No settlements found</h3>
+          <p className="text-gray-400">Try adjusting your search or filter criteria</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredSettlements.map((settlement) => (
+            <SettlementCard key={settlement.id} settlement={settlement} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
