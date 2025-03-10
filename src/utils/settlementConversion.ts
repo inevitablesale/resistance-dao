@@ -13,9 +13,14 @@ export interface JobMetadata {
   referralReward?: string;
   settlementId?: string;
   coverImage?: string;
-  votingDuration: number; // Make required to match ProposalMetadata
-  linkedInURL: string; // Make required to match ProposalMetadata
-  creator?: string; // Add creator property to fix the error in useJobs.tsx
+  votingDuration: number;
+  linkedInURL: string;
+  creator?: string;
+  type?: string;
+  status?: 'open' | 'filled' | 'completed' | 'cancelled';
+  applicants?: string[];
+  selectedApplicant?: string;
+  createdAt?: number;
 }
 
 export interface ReferralMetadata {
@@ -23,12 +28,13 @@ export interface ReferralMetadata {
   description: string;
   rewardPercentage: number;
   extraData?: any;
-  title: string; // Make required to match ProposalMetadata
-  votingDuration: number; // Make required to match ProposalMetadata
-  linkedInURL: string; // Make required to match ProposalMetadata
-  type?: string; // Add type property to fix error in referralService.ts
-  referrer?: string; // Add for referralService.ts
-  createdAt?: number; // Add for referralService.ts
+  title: string;
+  votingDuration: number;
+  linkedInURL: string;
+  type?: string;
+  referrer?: string;
+  createdAt?: number;
+  status?: 'active' | 'pending' | 'completed' | 'expired';
 }
 
 export interface Settlement {
@@ -47,7 +53,7 @@ export interface Settlement {
   category?: string;
   remainingTime?: string;
   canInvest?: boolean;
-  crowdfundAddress?: string; // Add to fix error in useSettlements.tsx
+  crowdfundAddress?: string;
 }
 
 export const formatEther = (amount: ethers.BigNumberish | undefined): string => {
