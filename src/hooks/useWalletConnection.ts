@@ -70,7 +70,7 @@ export const useWalletConnection = (): WalletConnectionResult => {
         throw new Error("Wallet client not available");
       }
       
-      console.log("[Wallet] Creating provider");
+      console.log("[Wallet] Creating provider with wallet client", walletClient);
       const provider = new ethers.providers.Web3Provider(walletClient);
       
       // Test provider to ensure it's working
