@@ -1,5 +1,6 @@
 
 import { ProposalEvent } from "@/types/proposals";
+import { NFTClass } from "@/services/alchemyService";
 
 export interface Settlement {
   id: string;
@@ -18,14 +19,17 @@ export interface Settlement {
   totalPledged?: string;
   backerCount?: number;
   category?: string;
-  // New properties for role-based permissions
+  // Role-based permissions
   canInvest?: boolean;
   canPropose?: boolean;
   canVote?: boolean;
 }
 
-export const convertProposalToSettlement = (proposal: ProposalEvent): Settlement => {
-  return {
+export const convertProposalToSettlement = (
+  proposal: ProposalEvent,
+  userRole?: NFTClass
+): Settlement => {
+  const settlement: Settlement = {
     id: proposal.tokenId,
     name: proposal.metadata?.title || "Untitled Settlement",
     description: proposal.metadata?.description || "No description available",
@@ -43,8 +47,20 @@ export const convertProposalToSettlement = (proposal: ProposalEvent): Settlement
     backerCount: proposal.voteCount || 0,
     category: proposal.metadata?.category
   };
+  
+  // Apply default permissions based on user role if provided
+  if (userRole) {
+    settlement.canInvest = userRole === 'Sentinel';
+    settlement.canPropose = ['Sentinel', 'Survivor'].includes(userRole);
+    settlement.canVote = userRole !== 'Unknown';
+  }
+  
+  return settlement;
 };
 
-export const convertProposalsToSettlements = (proposals: ProposalEvent[]): Settlement[] => {
-  return proposals.map(convertProposalToSettlement);
+export const convertProposalsToSettlements = (
+  proposals: ProposalEvent[],
+  userRole?: NFTClass
+): Settlement[] => {
+  return proposals.map(proposal => convertProposalToSettlement(proposal, userRole));
 };

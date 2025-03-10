@@ -27,7 +27,7 @@ export const SettlementsGrid: React.FC<SettlementsGridProps> = ({
   useEffect(() => {
     // Convert ProposalEvent[] to Settlement[] if needed
     const settlementData = Array.isArray(settlements) && settlements.length > 0 && 'tokenId' in settlements[0] 
-      ? convertProposalsToSettlements(settlements as ProposalEvent[])
+      ? convertProposalsToSettlements(settlements as ProposalEvent[], primaryRole)
       : settlements as Settlement[];
     
     // Process settlements with role-based permissions
