@@ -1,4 +1,3 @@
-
 import { ethers } from "ethers";
 import { ProposalError } from "./errorHandlingService";
 import { executeTransaction, TransactionConfig } from "./transactionManager";
@@ -40,6 +39,7 @@ export interface Bounty {
   hunterCount: number;
   partyAddress?: string;
   crowdfundAddress?: string;
+  eligibleNFTs?: string[]; // Added this property to fix the TypeScript error
 }
 
 /**
