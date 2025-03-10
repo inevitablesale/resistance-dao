@@ -6,9 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import { uploadToIPFS } from "./ipfsService";
 import { EventConfig, subscribeToProposalEvents } from "./eventListenerService";
 import { IPFSContent } from "@/types/content";
-
-// Bounty Protocol addresses
-const BOUNTY_FACTORY_ADDRESS = "0x4a5EA76571F47E7d92B5040E8C7FF12eacd35087"; // Polygon mainnet
+import { BOUNTY_FACTORY_ADDRESS, BOUNTY_FACTORY_ABI } from "@/lib/constants";
 
 // Hunter verification status
 export type HunterVerificationStatus = "unverified" | "pending" | "verified" | "rejected";
@@ -100,7 +98,7 @@ function formatBountyForIPFS(bountyData: any, creator: string): IPFSContent {
 }
 
 /**
- * Creates a new bounty using Party Protocol
+ * Creates a new bounty using the Bounty Protocol
  * @param options Bounty creation options
  * @param wallet Connected wallet to use for transaction
  * @returns Promise resolving to the bounty object
@@ -112,14 +110,27 @@ export async function createBounty(
   try {
     console.log("Creating bounty with options:", options);
     
-    const walletClient = await wallet.getWalletClient();
-    if (!walletClient) {
-      throw new Error("Wallet client not available");
+    // Get provider and signer directly rather than using walletClient
+    const provider = await getProviderFromWallet(wallet);
+    if (!provider) {
+      throw new Error("Failed to get provider from wallet");
     }
     
-    const provider = new ethers.providers.Web3Provider(walletClient as any);
     const signer = provider.getSigner();
     const signerAddress = await signer.getAddress();
+    
+    // Validate network
+    const network = await provider.getNetwork();
+    console.log("Connected to network:", network);
+    
+    if (network.chainId !== 137) { // Polygon mainnet
+      toast({
+        title: "Wrong Network",
+        description: "Please connect to the Polygon network",
+        variant: "destructive"
+      });
+      throw new Error("Please connect to the Polygon network");
+    }
     
     // Create bounty metadata for IPFS
     const bountyData = {
@@ -156,55 +167,148 @@ export async function createBounty(
       throw new Error("Failed to upload bounty metadata to IPFS");
     }
     
-    // Initialize the bounty in localStorage for now
-    // In production, this would be a contract transaction
-    const bountyId = `b-${Date.now().toString(36)}`;
-    const now = Math.floor(Date.now() / 1000);
+    // For testing, use localStorage storage
+    // In production environment, we would use the contract
+    const shouldUseContract = false; // Set to true to enable contract interaction when ready
     
-    // TODO: Replace with actual contract interaction
-    // Prepare bounty factory contract
-    const bountyFactory = new ethers.Contract(
-      BOUNTY_FACTORY_ADDRESS,
-      [
-        "function createBounty(string name, string metadataURI, uint256 rewardAmount, uint256 totalBudget, uint256 duration) external returns (uint256)"
-      ],
-      signer
-    );
-    
-    // For now, store in localStorage but with real metadata
-    const bounty: Bounty = {
-      id: bountyId,
-      name: options.name,
-      description: options.description,
-      rewardAmount: options.rewardAmount,
-      totalBudget: options.totalBudget,
-      usedBudget: 0,
-      remainingBudget: options.totalBudget,
-      createdAt: now,
-      expiresAt: now + (options.duration * 24 * 60 * 60),
-      status: "active",
-      successCount: 0,
-      hunterCount: 0,
-      eligibleNFTs: options.eligibleNFTs
-    };
-    
-    // Store in localStorage
-    const storedBounties = localStorage.getItem("bounties") || "[]";
-    const bounties = JSON.parse(storedBounties);
-    bounties.push(bounty);
-    localStorage.setItem("bounties", JSON.stringify(bounties));
-    
-    // Also initialize hunters and tasks storage if not exist
-    if (!localStorage.getItem("hunters")) {
-      localStorage.setItem("hunters", "[]");
+    if (shouldUseContract) {
+      // Initialize bounty factory contract
+      const bountyFactory = new ethers.Contract(
+        BOUNTY_FACTORY_ADDRESS,
+        BOUNTY_FACTORY_ABI,
+        signer
+      );
+      
+      toast({
+        title: "Creating Bounty",
+        description: "Please approve the transaction in your wallet..."
+      });
+      
+      // Create transaction config
+      const txConfig: TransactionConfig = {
+        type: 'contract',
+        description: `Creating bounty: ${options.name}`,
+        timeout: 180000, // 3 minutes
+        maxRetries: 3,
+        backoffMs: 5000
+      };
+      
+      // Execute the transaction
+      try {
+        const tx = await executeTransaction(
+          () => bountyFactory.createBounty(
+            options.name,
+            metadataURI,
+            ethers.utils.parseEther(options.rewardAmount.toString()),
+            ethers.utils.parseEther(options.totalBudget.toString()),
+            options.duration * 24 * 60 * 60 // convert days to seconds
+          ),
+          txConfig,
+          provider
+        );
+        
+        const receipt = await tx.wait();
+        console.log("Transaction receipt:", receipt);
+        
+        // Parse events to get the bountyId
+        const event = receipt.events?.find(e => e.event === "BountyCreated");
+        if (!event) {
+          throw new Error("Failed to find BountyCreated event");
+        }
+        
+        const bountyId = event.args?.bountyId.toString();
+        console.log("Created bounty with ID:", bountyId);
+        
+        // Now use the bountyId to get the full bounty details
+        const bountyDetails = await bountyFactory.getBounty(bountyId);
+        
+        // Create a Bounty object from the contract data
+        const bounty: Bounty = {
+          id: bountyId,
+          name: bountyDetails.name,
+          description: options.description, // Not stored on-chain
+          rewardAmount: parseFloat(ethers.utils.formatEther(bountyDetails.rewardAmount)),
+          totalBudget: parseFloat(ethers.utils.formatEther(bountyDetails.totalBudget)),
+          usedBudget: 0,
+          remainingBudget: parseFloat(ethers.utils.formatEther(bountyDetails.totalBudget)),
+          createdAt: bountyDetails.createdAt.toNumber(),
+          expiresAt: bountyDetails.expiresAt?.toNumber() || 0,
+          status: bountyDetails.active ? "active" : "paused",
+          successCount: 0,
+          hunterCount: 0,
+          eligibleNFTs: options.eligibleNFTs
+        };
+        
+        toast({
+          title: "Bounty Created!",
+          description: "Your bounty has been successfully created on the blockchain"
+        });
+        
+        return bounty;
+      } catch (error: any) {
+        console.error("Transaction error:", error);
+        
+        if (error.code === 4001) {
+          toast({
+            title: "Transaction Rejected",
+            description: "You rejected the transaction",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Transaction Failed",
+            description: error.message || "Failed to create bounty",
+            variant: "destructive"
+          });
+        }
+        
+        throw error;
+      }
+    } else {
+      // FOR DEVELOPMENT/TESTING: Use localStorage instead of blockchain
+      // Initialize the bounty in localStorage
+      const bountyId = `b-${Date.now().toString(36)}`;
+      const now = Math.floor(Date.now() / 1000);
+      
+      const bounty: Bounty = {
+        id: bountyId,
+        name: options.name,
+        description: options.description,
+        rewardAmount: options.rewardAmount,
+        totalBudget: options.totalBudget,
+        usedBudget: 0,
+        remainingBudget: options.totalBudget,
+        createdAt: now,
+        expiresAt: now + (options.duration * 24 * 60 * 60),
+        status: "active",
+        successCount: 0,
+        hunterCount: 0,
+        eligibleNFTs: options.eligibleNFTs
+      };
+      
+      // Store in localStorage
+      const storedBounties = localStorage.getItem("bounties") || "[]";
+      const bounties = JSON.parse(storedBounties);
+      bounties.push(bounty);
+      localStorage.setItem("bounties", JSON.stringify(bounties));
+      
+      // Also initialize hunters and tasks storage if not exist
+      if (!localStorage.getItem("hunters")) {
+        localStorage.setItem("hunters", "[]");
+      }
+      
+      if (!localStorage.getItem("bountyTasks")) {
+        localStorage.setItem("bountyTasks", "[]");
+      }
+      
+      console.log("Bounty created successfully (localStorage):", bounty);
+      toast({
+        title: "Bounty Created!",
+        description: "Your test bounty has been created successfully"
+      });
+      
+      return bounty;
     }
-    
-    if (!localStorage.getItem("bountyTasks")) {
-      localStorage.setItem("bountyTasks", "[]");
-    }
-    
-    console.log("Bounty created successfully:", bounty);
-    return bounty;
   } catch (error) {
     console.error("Error creating bounty:", error);
     toast({
@@ -221,6 +325,41 @@ export async function createBounty(
         'Try again with different parameters'
       ]
     });
+  }
+}
+
+/**
+ * Helper function to get provider from wallet
+ */
+async function getProviderFromWallet(wallet: any): Promise<ethers.providers.Web3Provider | null> {
+  try {
+    if (!wallet) {
+      throw new Error("Wallet not provided");
+    }
+    
+    // Check if wallet has getProvider method (from our hook)
+    if (typeof wallet.getProvider === 'function') {
+      return await wallet.getProvider();
+    }
+    
+    // Otherwise, try to get wallet client and create provider
+    if (typeof wallet.getWalletClient === 'function') {
+      const walletClient = await wallet.getWalletClient();
+      if (!walletClient) {
+        throw new Error("Wallet client not available");
+      }
+      return new ethers.providers.Web3Provider(walletClient);
+    }
+    
+    // Final fallback
+    if (wallet.provider) {
+      return new ethers.providers.Web3Provider(wallet.provider);
+    }
+    
+    throw new Error("Unable to get provider from wallet");
+  } catch (error) {
+    console.error("Error getting provider from wallet:", error);
+    return null;
   }
 }
 

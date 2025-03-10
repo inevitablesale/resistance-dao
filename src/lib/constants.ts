@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 
 // Original RD Token and Factory addresses
@@ -123,3 +124,26 @@ export const RESISTANCE_NFT_ABI = [
 // These variables are used in the codebase and need to reference the correct address
 export const SURVIVOR_NFT_ADDRESS = RESISTANCE_NFT_ADDRESS;
 export const SENTINEL_NFT_ADDRESS = RESISTANCE_NFT_ADDRESS;
+
+// Bounty Factory Contract
+export const BOUNTY_FACTORY_ADDRESS = "0x4a5EA76571F47E7d92B5040E8C7FF12eacd35087"; // Polygon mainnet
+export const BOUNTY_FACTORY_ABI = [
+  // Core Functions
+  "function createBounty(string name, string metadataURI, uint256 rewardAmount, uint256 totalBudget, uint256 duration) external returns (uint256)",
+  "function getBounty(uint256 bountyId) external view returns (tuple(address creator, string name, string metadataURI, uint256 rewardAmount, uint256 totalBudget, uint256 remainingBudget, uint256 duration, uint256 createdAt, uint256 expiresAt, bool active))",
+  "function updateBountyStatus(uint256 bountyId, bool active) external",
+  "function fundBounty(uint256 bountyId) external payable",
+  
+  // View Functions
+  "function getBountyCount() external view returns (uint256)",
+  "function getBountyIdsByCreator(address creator) external view returns (uint256[])",
+  "function getBountyIdsByHunter(address hunter) external view returns (uint256[])",
+  
+  // Events
+  "event BountyCreated(uint256 indexed bountyId, address indexed creator, string name, uint256 timestamp)",
+  "event BountyFunded(uint256 indexed bountyId, address funder, uint256 amount, uint256 timestamp)",
+  "event BountyStatusUpdated(uint256 indexed bountyId, bool active, uint256 timestamp)",
+  "event ReferralSubmitted(uint256 indexed bountyId, address indexed hunter, address referred, uint256 timestamp)",
+  "event ReferralVerified(uint256 indexed bountyId, address indexed hunter, address referred, bool approved, uint256 timestamp)",
+  "event RewardDistributed(uint256 indexed bountyId, address indexed hunter, uint256 amount, uint256 timestamp)"
+];

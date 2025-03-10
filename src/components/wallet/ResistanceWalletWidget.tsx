@@ -5,7 +5,6 @@ import { Shield, User, ChevronUp, ChevronDown, Wallet, LogOut, ExternalLink } fr
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { truncateAddress } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 export const ResistanceWalletWidget = () => {
   const { isConnected, connect, disconnect, address, isPendingInitialization } = useWalletConnection();
@@ -82,7 +81,7 @@ export const ResistanceWalletWidget = () => {
                 <div className="text-sm flex items-center">
                   <span className="font-mono">{truncateAddress(address || '')}</span>
                   <a 
-                    href={`https://etherscan.io/address/${address}`}
+                    href={`https://polygonscan.com/address/${address}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 ml-2"

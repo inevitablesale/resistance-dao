@@ -47,7 +47,8 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
   const { toast } = useToast();
   const { createSettlement, isProcessing } = usePartyTransactions();
   const [estimatedGasCost, setEstimatedGasCost] = useState("~1.2 MATIC");
-  const { primaryWallet } = useWalletConnection();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isConnected, address, primaryWallet } = useWalletConnection();
   
   const defaultValues: NFTReferralFormValues = {
     name: template?.title || "NFT Referral Program",
@@ -79,7 +80,7 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
   
   const onSubmit = async (data: NFTReferralFormValues) => {
     try {
-      if (!primaryWallet) {
+      if (!isConnected || !address) {
         toast({
           title: "Wallet Not Connected",
           description: "Please connect your wallet to create a bounty",
@@ -87,6 +88,14 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
         });
         return;
       }
+      
+      setIsSubmitting(true);
+      
+      console.log("Wallet state during submission:", {
+        isConnected,
+        address,
+        primaryWallet: !!primaryWallet
+      });
       
       const result = await createBounty({
         name: data.name,
@@ -112,11 +121,28 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
       }
     } catch (error: any) {
       console.error("Error creating bounty:", error);
-      toast({
-        title: "Failed to Create Bounty",
-        description: error.message || "There was an error creating your bounty",
-        variant: "destructive",
-      });
+      
+      if (error.code === 4001) {
+        toast({
+          title: "Transaction Rejected",
+          description: "You rejected the transaction in your wallet",
+          variant: "destructive"
+        });
+      } else if (error.message?.includes("network")) {
+        toast({
+          title: "Network Error",
+          description: "Please make sure you're connected to Polygon network",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Failed to Create Bounty",
+          description: error.message || "There was an error creating your bounty",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -384,8 +410,11 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
                   Cancel
                 </Button>
               )}
-              <ToxicButton type="submit" disabled={isProcessing}>
-                {isProcessing ? "Creating Bounty..." : "Create Bounty"}
+              <ToxicButton 
+                type="submit" 
+                disabled={isSubmitting || isProcessing}
+              >
+                {isSubmitting ? "Creating Bounty..." : "Create Bounty"}
               </ToxicButton>
             </div>
           </form>
@@ -394,3 +423,4 @@ export function NFTReferralBountyForm({ template, onBack }: NFTReferralBountyFor
     </Card>
   );
 }
+
