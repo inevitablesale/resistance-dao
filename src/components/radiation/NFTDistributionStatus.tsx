@@ -3,40 +3,7 @@ import React from 'react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicProgress } from '@/components/ui/toxic-progress';
 import { ToxicButton } from '@/components/ui/toxic-button';
-import { Shield, Target, Hammer, Radiation, ExternalLink } from 'lucide-react';
-
-// Define character data based on the contract
-export const CHARACTERS = {
-  // SENTINELS (1..7)
-  SENTINEL_CHARACTERS: [
-    { id: 1, name: "DAO Enforcer", ipfsCID: "bafkreibo6bk5dezlsii7imuabncv7tihxwbi4f4urds75l7nuy2rnxfkru" },
-    { id: 2, name: "Insolvent Medic", ipfsCID: "bafkreid7oobbrlbxcnnigfcwfbgr5m3dmsl6wemsuaxluzd54ioclneubq" },
-    { id: 3, name: "Liquidation Phantom", ipfsCID: "bafkreicfsovqdpu3byxvyfev4y7xdmqz3hggewsuyx4brifoscercektpy" },
-    { id: 4, name: "Margin Call Marauder", ipfsCID: "bafkreiaasojzt45tw5jkohgwvibtth6nl4jlognknercfpgir6zjpw335u" },
-    { id: 5, name: "Overleveraged Berserker", ipfsCID: "bafkreihigf4xjzy4jrqkm7wsxxdtokwew4m3njdxt6hheb67nuit47byta" },
-    { id: 6, name: "Rugged Nomad", ipfsCID: "bafkreibhb3upqoifbl77jbrqxp2puudelcrjf45jnfkdqipef6skzpewti" },
-    { id: 7, name: "Yield Farm Executioner", ipfsCID: "bafkreibo5yjsmqlt2cc7olqeuz2wxref7oe54bmallzl4mgwkt3xsnjlqi" }
-  ],
-  // SURVIVORS (8..10)
-  SURVIVOR_CHARACTERS: [
-    { id: 8, name: "Rugpull Veteran", ipfsCID: "bafkreiek2ihnc7fmpwzseitea2vflvwdmm6qvn4vydd5ww6wgipntf3w7a" },
-    { id: 9, name: "Blacklist Exile", ipfsCID: "bafkreica5ugau5cjah7hkwz4ko36oqxkg2v4swqpxnhzi7z4wgftl76q5m" },
-    { id: 10, name: "Failed Validator", ipfsCID: "bafkreigw5k75stzjhamdjtwlssbolhxepbeglfs3qoyowgu2q4n2fnfszy" }
-  ],
-  // BOUNTY HUNTERS (11..16)
-  BOUNTY_HUNTER_CHARACTERS: [
-    { id: 11, name: "Chain Reaper", ipfsCID: "bafkreifepvbd2shm4uxfysdxtva5mjs7fqnxbxehutcoqfblmcgtp7h7ka" },
-    { id: 12, name: "Forked Hunter", ipfsCID: "bafkreierebrs3yw24r7wgkezgok6lhbiwqwwgen5fnfqxm6cqul644x3fe" },
-    { id: 13, name: "Liquidated Tracker", ipfsCID: "bafkreiajc2mwtirx3423mbf55scuniqlwh3ph2cglk7y2nbd764r6g6ine" },
-    { id: 14, name: "Oracle Stalker", ipfsCID: "bafkreieytk2bsis7fdavqu74t3dgquew36ppycxnlbxt6dgzudjakcrexq" },
-    { id: 15, name: "Slippage Sniper", ipfsCID: "bafkreidrcpfmaken4gsbeweqthzrg3bkcxi344bftqwndiapeo6pm4msda" },
-    { id: 16, name: "Sandwich Hunter", ipfsCID: "bafkreigxfbvntll522na4la6b4cdvp5g74jztgjhgdmz2b5uv7uaieywie" }
-  ]
-};
-
-// Constants for supply caps
-const SENTINEL_PER_TYPE = 100;
-const OTHER_ROLES_PER_TYPE = 150;
+import { Shield, Target, Hammer, Radiation } from 'lucide-react';
 
 interface NFTSupply {
   type: 'sentinel' | 'bounty-hunter' | 'survivor';
@@ -47,9 +14,6 @@ interface NFTSupply {
   free: number;
   cost: number | 'Free';
   description: string;
-  // New fields for OpenSea integration
-  openSeaLink?: string;
-  characterList: Array<{ id: number, name: string, ipfsCID: string }>;
 }
 
 interface NFTDistributionStatusProps {
@@ -62,37 +26,31 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
       type: 'sentinel',
       name: "Founder Sentinels",
       icon: <Shield className="h-5 w-5 text-purple-400" />,
-      total: SENTINEL_PER_TYPE * CHARACTERS.SENTINEL_CHARACTERS.length,
+      total: 1500,
       claimed: 326,
       free: 821,
       cost: 50,
-      description: "Governance & Economic Oversight",
-      openSeaLink: "https://opensea.io/collection/resistance-sentinels",
-      characterList: CHARACTERS.SENTINEL_CHARACTERS
+      description: "Governance & Economic Oversight"
     },
     {
       type: 'bounty-hunter',
       name: "Bounty Hunters",
       icon: <Target className="h-5 w-5 text-apocalypse-red" />,
-      total: OTHER_ROLES_PER_TYPE * CHARACTERS.BOUNTY_HUNTER_CHARACTERS.length,
+      total: 500,
       claimed: 187,
       free: 500,
       cost: 'Free',
-      description: "Enforcers & Funders",
-      openSeaLink: "https://opensea.io/collection/resistance-bounty-hunters",
-      characterList: CHARACTERS.BOUNTY_HUNTER_CHARACTERS
+      description: "Enforcers & Funders"
     },
     {
       type: 'survivor',
       name: "Survivors",
       icon: <Hammer className="h-5 w-5 text-amber-400" />,
-      total: OTHER_ROLES_PER_TYPE * CHARACTERS.SURVIVOR_CHARACTERS.length,
+      total: 1500,
       claimed: 412,
       free: 0,
       cost: 50,
-      description: "Builders & Innovators",
-      openSeaLink: "https://opensea.io/collection/resistance-survivors",
-      characterList: CHARACTERS.SURVIVOR_CHARACTERS
+      description: "Builders & Innovators"
     }
   ];
 
@@ -103,6 +61,29 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
   
   // Calculate radiation reduction
   const radiationReduction = totalClaimed * 0.1;
+  
+  // Calculate radiation visibility level based on claimed Sentinels
+  const getRadiationVisibility = (claimedSentinels: number): string => {
+    if (claimedSentinels <= 100) return "10% Exposed";
+    if (claimedSentinels <= 300) return "25% Exposed";
+    if (claimedSentinels <= 600) return "50% Exposed";
+    if (claimedSentinels <= 1000) return "75% Exposed";
+    return "100% Exposed";
+  };
+  
+  // Get radiation effect description
+  const getRadiationEffect = (claimedSentinels: number): string => {
+    if (claimedSentinels <= 100) return "Heavy Fog, Intense Radiation Glow";
+    if (claimedSentinels <= 300) return "Pulsing Radiation with Small Breaks";
+    if (claimedSentinels <= 600) return "Thin Fog, Radiation Dissipating";
+    if (claimedSentinels <= 1000) return "Faint Radiation Glow Remaining";
+    return "No More Radiation, Full Detail";
+  };
+
+  // Get sentinel claimed count
+  const sentinelClaimed = nftSupplies.find(supply => supply.type === 'sentinel')?.claimed || 0;
+  const visibilityStatus = getRadiationVisibility(sentinelClaimed);
+  const radiationEffect = getRadiationEffect(sentinelClaimed);
 
   return (
     <ToxicCard className={`bg-black/80 border-toxic-neon/30 p-5 ${className}`}>
@@ -126,6 +107,29 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
           variant="radiation" 
           className="h-3" 
         />
+      </div>
+      
+      {/* Radiation Reveal Status Section */}
+      <div className="mb-6 bg-black/40 rounded-lg p-3 border border-toxic-neon/20">
+        <h3 className="text-toxic-neon font-mono mb-2">Radiation Dissipation Status</h3>
+        <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
+          <div>
+            <span className="text-white/70 block mb-1">Sentinel Reveal Progress</span>
+            <span className="text-toxic-neon font-mono">{sentinelClaimed} / 1500</span>
+            <ToxicProgress 
+              value={(sentinelClaimed / 1500) * 100}
+              variant="radiation" 
+              className="h-2 mt-1" 
+            />
+          </div>
+          <div>
+            <span className="text-white/70 block mb-1">Current Visibility</span>
+            <span className="text-toxic-neon font-mono">{visibilityStatus}</span>
+          </div>
+        </div>
+        <div className="text-xs text-white/60 italic">
+          Current Effect: <span className="text-toxic-neon">{radiationEffect}</span>
+        </div>
       </div>
       
       <div className="space-y-4">
@@ -165,13 +169,11 @@ export function NFTDistributionStatus({ className = "" }: NFTDistributionStatusP
             </div>
             
             <ToxicButton 
-              variant={supply.type === 'sentinel' ? 'default' : supply.type === 'bounty-hunter' ? 'secondary' : 'outline'}
+              variant={supply.type === 'sentinel' ? 'default' : supply.type === 'bounty-hunter' ? 'primary' : 'outline'}
               size="sm"
               className="w-full"
-              onClick={() => window.open(supply.openSeaLink, '_blank')}
             >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Get on OpenSea
+              Claim {supply.name.replace('s', '')}
             </ToxicButton>
           </div>
         ))}

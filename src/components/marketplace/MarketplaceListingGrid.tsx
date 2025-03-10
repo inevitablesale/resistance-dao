@@ -1,14 +1,12 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Shield, Target, AlertTriangle, Biohazard, Clock, User, ExternalLink } from 'lucide-react';
-import { ToxicCard } from '@/components/ui/toxic-card';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Biohazard, Radiation, Shield, Target, User } from 'lucide-react';
 import { ToxicBadge } from '@/components/ui/toxic-badge';
-import { ToxicButton } from '@/components/ui/toxic-button';
-import { ModelPreview } from './ModelPreview';
+import { ToxicCard, ToxicCardContent, ToxicCardFooter } from '@/components/ui/toxic-card';
+import { ModelPreview } from '@/components/marketplace/ModelPreview';
 
-export type MarketplaceListingType = 'sentinel' | 'bounty-hunter' | 'survivor' | 'settlement' | 'equipment';
+export type MarketplaceListingType = 'bounty-hunter' | 'survivor' | 'equipment' | 'settlement' | 'sentinel';
 
 export interface MarketplaceListing {
   id: number;
@@ -21,36 +19,40 @@ export interface MarketplaceListing {
     level: string;
     value: number;
   };
-  attributes: {
-    trait: string;
-    value: string;
-  }[];
   status: 'active' | 'sold' | 'expired';
+  attributes?: Array<{
+    trait: string;
+    value: string | number;
+  }>;
   description?: string;
   modelUrl?: string;
+  role?: string;
+  rank?: string;
 }
 
 interface MarketplaceListingGridProps {
   listings: MarketplaceListing[];
-  className?: string;
+  isLoading?: boolean;
   title?: string;
+  className?: string;
   onListingClick?: (listing: MarketplaceListing) => void;
+  currentRadiationLevel?: number;
 }
 
 const getTypeIcon = (type: MarketplaceListingType) => {
   switch(type) {
-    case 'sentinel':
-      return <Shield className="h-4 w-4 text-purple-400" />;
-    case 'bounty-hunter':
-      return <Target className="h-4 w-4 text-apocalypse-red" />;
     case 'survivor':
-      return <User className="h-4 w-4 text-amber-400" />;
-    case 'settlement':
-      return <Clock className="h-4 w-4 text-blue-400" />;
+      return <Shield className="h-5 w-5 text-toxic-neon" />;
+    case 'bounty-hunter':
+      return <Target className="h-5 w-5 text-apocalypse-red" />;
     case 'equipment':
-      return <Biohazard className="h-4 w-4 text-toxic-neon" />;
+      return <Radiation className="h-5 w-5 text-toxic-neon" />;
+    case 'settlement':
+      return <User className="h-5 w-5 text-toxic-muted" />;
+    case 'sentinel':
+      return <Shield className="h-5 w-5 text-purple-500" />;
     default:
-      return <Biohazard className="h-4 w-4 text-toxic-neon" />;
+      return <Biohazard className="h-5 w-5 text-toxic-neon" />;
   }
 };
 
@@ -60,136 +62,104 @@ const getRadiationColor = (value: number) => {
   return "text-toxic-neon";
 };
 
-const getOpenSeaLink = (type: MarketplaceListingType) => {
-  switch(type) {
-    case 'sentinel':
-      return "https://opensea.io/collection/resistance-sentinels";
-    case 'bounty-hunter':
-      return "https://opensea.io/collection/resistance-bounty-hunters";
-    case 'survivor':
-      return "https://opensea.io/collection/resistance-survivors";
-    default:
-      return "https://opensea.io/collection/resistance";
-  }
-};
-
-export function MarketplaceListingGrid({ listings, className = "", title, onListingClick }: MarketplaceListingGridProps) {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+export const MarketplaceListingGrid: React.FC<MarketplaceListingGridProps> = ({ 
+  listings, 
+  isLoading = false,
+  title,
+  className = "",
+  onListingClick,
+  currentRadiationLevel
+}) => {
+  const navigate = useNavigate();
+  
+  const handleItemClick = (listing: MarketplaceListing) => {
+    if (onListingClick) {
+      onListingClick(listing);
+    } else {
+      navigate(`/marketplace/${listing.id}`);
     }
   };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
-  if (listings.length === 0) {
+  
+  if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 mt-8 bg-black/40 border border-toxic-neon/20 rounded-lg">
-        <AlertTriangle className="h-12 w-12 text-yellow-400 mb-4" />
-        <h3 className="text-lg font-mono text-toxic-neon mb-2">No Listings Found</h3>
-        <p className="text-white/70 text-center">No wasteland assets match your search criteria.</p>
+      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${className}`}>
+        {[...Array(8)].map((_, index) => (
+          <ToxicCard key={index} className="bg-black/40 border-toxic-neon/20 animate-pulse">
+            <ToxicCardContent className="p-0">
+              <div className="h-48 bg-black/40"></div>
+              <div className="p-4">
+                <div className="h-4 w-3/4 bg-toxic-neon/20 rounded mb-2"></div>
+                <div className="h-3 w-1/2 bg-toxic-neon/10 rounded"></div>
+              </div>
+            </ToxicCardContent>
+          </ToxicCard>
+        ))}
       </div>
     );
   }
-
+  
   return (
     <div className={className}>
-      {title && (
-        <h2 className="text-lg font-mono text-toxic-neon mb-4 pb-2 border-b border-toxic-neon/30">{title}</h2>
-      )}
-      
-      <motion.div 
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-      >
-        {listings.map((listing) => {
-          const openSeaLink = getOpenSeaLink(listing.type);
-          
-          return (
-            <motion.div key={listing.id} variants={itemVariants}>
-              <ToxicCard className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all overflow-hidden">
-                <div className="p-0">
-                  <div className="h-40 bg-gradient-to-b from-toxic-neon/20 to-black/60 relative overflow-hidden">
-                    {listing.modelUrl ? (
-                      <ModelPreview 
-                        modelUrl={listing.modelUrl} 
-                        height="100%"
-                        width="100%"
-                        autoRotate={true}
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full">
-                        <Biohazard className="h-12 w-12 text-toxic-neon/30 mb-2" />
-                        <p className="text-sm text-toxic-neon/60">No model available</p>
-                      </div>
-                    )}
-                    <div className="absolute top-2 right-2">
-                      <ToxicBadge 
-                        variant={listing.status === 'active' ? 'outline' : 'secondary'} 
-                        className="text-xs bg-black/60 border-toxic-neon/60"
-                      >
-                        {listing.status.toUpperCase()}
-                      </ToxicBadge>
-                    </div>
+      {title && <h2 className="text-2xl font-mono text-toxic-neon mb-4">{title}</h2>}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {listings.map(listing => (
+          <ToxicCard 
+            key={listing.id} 
+            className="bg-black/70 border-toxic-neon/30 hover:border-toxic-neon/60 transition-all cursor-pointer"
+            onClick={() => handleItemClick(listing)}
+          >
+            <ToxicCardContent className="p-0">
+              <div className="h-48 bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-t-lg relative overflow-hidden">
+                {listing.modelUrl ? (
+                  <ModelPreview 
+                    modelUrl={listing.modelUrl} 
+                    height="100%"
+                    width="100%"
+                    autoRotate={true}
+                    radiationLevel={listing.radiation.value}
+                    useRadiationCloud={true}
+                    radiationCloudUrl="bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
+                    revealValue={20} // Show just a hint of the character
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <Biohazard className="h-12 w-12 text-toxic-neon/30" />
                   </div>
-                  
-                  <div className="p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <ToxicBadge variant="outline" className="flex items-center gap-1">
-                        {getTypeIcon(listing.type)}
-                        <span className="text-xs">{listing.type.replace('-', ' ')}</span>
-                      </ToxicBadge>
-                      <span className="text-toxic-neon font-mono text-sm">{listing.price}</span>
-                    </div>
-                    
-                    <h3 className="text-toxic-neon font-mono text-sm mb-1 truncate">{listing.name}</h3>
-                    
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-white/60">Token #{listing.tokenId}</span>
-                      <span className={`${getRadiationColor(listing.radiation.value)} font-mono`}>
-                        RAD {listing.radiation.value}%
-                      </span>
-                    </div>
-                    
-                    <div className="mt-3 grid grid-cols-2 gap-2">
-                      <ToxicButton 
-                        variant="outline" 
-                        size="sm"
-                        className="border-toxic-neon/30"
-                        onClick={() => onListingClick && onListingClick(listing)}
-                      >
-                        View Details
-                      </ToxicButton>
-                      
-                      <ToxicButton 
-                        variant="outline" 
-                        size="sm"
-                        className="border-toxic-neon/30"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.open(openSeaLink, '_blank');
-                        }}
-                      >
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        OpenSea
-                      </ToxicButton>
-                    </div>
+                )}
+                <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60">
+                  <div className="flex items-center justify-between">
+                    <ToxicBadge variant="outline" className="flex items-center gap-1 text-xs">
+                      {getTypeIcon(listing.type)}
+                      <span>#{listing.tokenId}</span>
+                    </ToxicBadge>
+                    <span className="text-toxic-neon text-xs font-mono">{listing.price}</span>
                   </div>
                 </div>
-              </ToxicCard>
-            </motion.div>
-          );
-        })}
-      </motion.div>
+              </div>
+              <div className="p-4">
+                <h3 className="text-toxic-neon font-mono text-lg truncate mb-2">{listing.name}</h3>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-white/70">{listing.type.replace('-', ' ')}</span>
+                  <span className={`${getRadiationColor(listing.radiation.value)}`}>
+                    RAD {listing.radiation.value}%
+                  </span>
+                </div>
+                {listing.role && (
+                  <div className="text-xs text-white/70 mt-1">
+                    Role: <span className="text-toxic-neon">{listing.role}</span>
+                    {listing.rank && <span> • Rank: <span className="text-toxic-neon">{listing.rank}</span></span>}
+                  </div>
+                )}
+                {listing.status !== 'active' && (
+                  <div className="mt-2 text-xs uppercase font-mono text-apocalypse-red">
+                    {listing.status}
+                  </div>
+                )}
+              </div>
+            </ToxicCardContent>
+          </ToxicCard>
+        ))}
+      </div>
     </div>
   );
-}
+};

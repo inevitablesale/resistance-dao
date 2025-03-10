@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModelPreview } from "@/components/marketplace/ModelPreview";
+import { CharacterRevealSlider } from "@/components/marketplace/CharacterRevealSlider";
 import { 
   Card, 
   CardContent, 
@@ -44,14 +45,9 @@ import { DrippingSlime } from "@/components/ui/dripping-slime";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
-import { MarketplaceListing } from "@/components/marketplace/MarketplaceListingGrid";
+import { MarketplaceListing, MarketplaceListingType } from "@/components/marketplace/MarketplaceListingGrid";
 
-interface ExtendedMarketplaceListing extends MarketplaceListing {
-  description: string;
-  modelUrl?: string;
-}
-
-const MOCKUP_LISTINGS: Record<string, ExtendedMarketplaceListing> = {
+const MOCKUP_LISTINGS: Record<string, MarketplaceListing> = {
   "1": {
     id: 1,
     type: 'bounty-hunter',
@@ -195,7 +191,7 @@ const MOCKUP_ACTIVITY: ItemActivity[] = [
   }
 ];
 
-const getTypeIcon = (type: string) => {
+const getTypeIcon = (type: MarketplaceListingType) => {
   switch(type) {
     case 'survivor':
       return <Shield className="h-5 w-5 text-toxic-neon" />;
@@ -238,10 +234,11 @@ export default function MarketplaceItemDetails() {
   const navigate = useNavigate();
   const { isConnected, address } = useCustomWallet();
   const { connect } = useWalletConnection();
-  const [item, setItem] = useState<ExtendedMarketplaceListing | null>(null);
+  const [item, setItem] = useState<MarketplaceListing | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchaseStep, setPurchaseStep] = useState(0);
   const [offerAmount, setOfferAmount] = useState('');
+  const [revealValue, setRevealValue] = useState(20);
   
   useEffect(() => {
     setLoading(true);
@@ -347,6 +344,11 @@ export default function MarketplaceItemDetails() {
                         height="400px"
                         width="100%"
                         autoRotate={true}
+                        radiationLevel={item.radiation.value}
+                        animateRadiation={true}
+                        useRadiationCloud={true}
+                        radiationCloudUrl="bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
+                        revealValue={revealValue}
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full bg-gradient-to-b from-toxic-neon/20 to-black/60">
@@ -364,6 +366,13 @@ export default function MarketplaceItemDetails() {
                     </div>
                   </div>
                 </ToxicCardContent>
+                <ToxicCardFooter className="p-3">
+                  <CharacterRevealSlider
+                    value={revealValue}
+                    onChange={setRevealValue}
+                    className="w-full"
+                  />
+                </ToxicCardFooter>
               </ToxicCard>
               
               <ToxicCard className="bg-black/70 border-toxic-neon/30">
@@ -649,6 +658,10 @@ export default function MarketplaceItemDetails() {
                             height="100%"
                             width="100%"
                             autoRotate={true}
+                            radiationLevel={relatedItem.radiation.value}
+                            useRadiationCloud={true}
+                            radiationCloudUrl="bafybeiayvmbutisgus45sujbr65sqnpeqcd3vtu6tjxwbmwadf35frszp4"
+                            revealValue={20}
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full">

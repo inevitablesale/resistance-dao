@@ -9,7 +9,7 @@ import { TerminalLogin } from '@/components/terminal/TerminalLogin';
 import { BreachSequence } from '@/components/terminal/BreachSequence';
 import { StoryTerminal } from '@/components/terminal/StoryTerminal';
 import { RadiationSystem } from '@/components/radiation/RadiationSystem';
-import { NFTDistributionStatus, CHARACTERS } from '@/components/radiation/NFTDistributionStatus';
+import { NFTDistributionStatus } from '@/components/radiation/NFTDistributionStatus';
 import { ReferralSystem } from '@/components/radiation/ReferralSystem';
 
 import { 
@@ -90,6 +90,7 @@ const Index = () => {
   const [activeRole, setActiveRole] = useState<'sentinel' | 'pioneer'>('sentinel');
   const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
   
+  // New states for radiation system
   const [currentRadiation, setCurrentRadiation] = useState(94); // Start at 94% radiation
   const [totalNFTsClaimed, setTotalNFTsClaimed] = useState(925); // Mock data - total claimed NFTs
   const [referralEarnings, setReferralEarnings] = useState(375); // Mock data - earnings in MATIC
@@ -138,11 +139,12 @@ const Index = () => {
     bountyHunterRatio: 35
   };
   
+  // Updated NFT listings with proper roles
   const sentinelListings: MarketplaceListing[] = [
     {
       id: 1,
       type: 'sentinel',
-      name: "DAO Enforcer",
+      name: "Strategic Commander X-35",
       tokenId: 1,
       price: "15,000 RD",
       seller: "0x1234...5678",
@@ -156,13 +158,14 @@ const Index = () => {
         { trait: "Investment Ability", value: "Strategic" }
       ],
       status: 'active',
-      description: "Strategic Commander with veteran rank",
-      modelUrl: "bafkreibo6bk5dezlsii7imuabncv7tihxwbi4f4urds75l7nuy2rnxfkru"
+      role: "Strategic Commander",
+      rank: "Veteran",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiheog5wgtnl7ldazmsj3n7xmkgkzpjnix5e4tuxndzw7j3bgkp2n4"
     },
     {
       id: 2,
       type: 'sentinel',
-      name: "Insolvent Medic",
+      name: "Financial Overseer K-42",
       tokenId: 42,
       price: "32,000 RD",
       seller: "0x8765...4321",
@@ -176,13 +179,14 @@ const Index = () => {
         { trait: "Investment Ability", value: "Economic" }
       ],
       status: 'active',
-      description: "Financial Overseer with elite rank",
-      modelUrl: "bafkreid7oobbrlbxcnnigfcwfbgr5m3dmsl6wemsuaxluzd54ioclneubq"
+      role: "Financial Overseer",
+      rank: "Elite",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeiavqxeov62wgj6upfpvq6g4vpvot4mnwl3ggunxp27sbfjgs4hlfq"
     },
     {
       id: 3,
       type: 'sentinel',
-      name: "Liquidation Phantom",
+      name: "Trade Commissioner B-007",
       tokenId: 7,
       price: "50,000 RD",
       seller: "0x9876...5432",
@@ -196,8 +200,9 @@ const Index = () => {
         { trait: "Investment Ability", value: "Diplomatic" }
       ],
       status: 'active',
-      description: "Trade Commissioner with legend rank",
-      modelUrl: "bafkreicfsovqdpu3byxvyfev4y7xdmqz3hggewsuyx4brifoscercektpy"
+      role: "Trade Commissioner",
+      rank: "Legend",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeig47okn4sqqbajhje57htkxw6py3tdms7boyc3hkvvr4qlj7zsabu"
     }
   ];
   
@@ -205,7 +210,7 @@ const Index = () => {
     {
       id: 4,
       type: 'bounty-hunter',
-      name: "Chain Reaper",
+      name: "Protocol Tracker S-17",
       tokenId: 17,
       price: "18,500 RD",
       seller: "0x2468...1357",
@@ -219,13 +224,14 @@ const Index = () => {
         { trait: "Operating Territory", value: "Wastelands" }
       ],
       status: 'active',
-      description: "Protocol Tracker with feared rank",
-      modelUrl: "bafkreifepvbd2shm4uxfysdxtva5mjs7fqnxbxehutcoqfblmcgtp7h7ka"
+      role: "Protocol Tracker",
+      rank: "Feared",
+      modelUrl: "https://gateway.pinata.cloud/ipfs/bafybeifzvpyj5znhgjq22cbjyzav5zsvese3m3klbkc4lcdm3fdbbxiooa"
     },
     {
       id: 5,
       type: 'bounty-hunter',
-      name: "Forked Hunter",
+      name: "Asset Recovery A-67",
       tokenId: 67,
       price: "24,000 RD",
       seller: "0x1357...2468",
@@ -239,13 +245,13 @@ const Index = () => {
         { trait: "Operating Territory", value: "Cyber Core" }
       ],
       status: 'active',
-      description: "Asset Recovery with respected rank",
-      modelUrl: "bafkreierebrs3yw24r7wgkezgok6lhbiwqwwgen5fnfqxm6cqul644x3fe"
+      role: "Asset Recovery",
+      rank: "Respected"
     },
     {
       id: 6,
       type: 'bounty-hunter',
-      name: "Liquidated Tracker",
+      name: "Network Infiltrator L-89",
       tokenId: 89,
       price: "36,500 RD",
       seller: "0x6543...7890",
@@ -259,8 +265,8 @@ const Index = () => {
         { trait: "Operating Territory", value: "Deep Zone" }
       ],
       status: 'active',
-      description: "Network Infiltrator with infamous rank",
-      modelUrl: "bafkreiajc2mwtirx3423mbf55scuniqlwh3ph2cglk7y2nbd764r6g6ine"
+      role: "Network Infiltrator",
+      rank: "Infamous"
     }
   ];
   
@@ -268,7 +274,7 @@ const Index = () => {
     {
       id: 7,
       type: 'survivor',
-      name: "Rugpull Veteran",
+      name: "Engineer Pioneer R-12",
       tokenId: 12,
       price: "12,500 RD",
       seller: "0x5555...6666",
@@ -282,13 +288,13 @@ const Index = () => {
         { trait: "Settlement", value: "New Haven" }
       ],
       status: 'active',
-      description: "Engineer Pioneer with veteran rank",
-      modelUrl: "bafkreiek2ihnc7fmpwzseitea2vflvwdmm6qvn4vydd5ww6wgipntf3w7a"
+      role: "Engineer",
+      rank: "Veteran"
     },
     {
       id: 8,
       type: 'survivor',
-      name: "Blacklist Exile",
+      name: "Medic Support M-23",
       tokenId: 23,
       price: "9,800 RD",
       seller: "0x7777...8888",
@@ -302,13 +308,13 @@ const Index = () => {
         { trait: "Settlement", value: "Outpost Alpha" }
       ],
       status: 'active',
-      description: "Medic Support with skilled rank",
-      modelUrl: "bafkreica5ugau5cjah7hkwz4ko36oqxkg2v4swqpxnhzi7z4wgftl76q5m"
+      role: "Medic",
+      rank: "Skilled"
     },
     {
       id: 9,
       type: 'survivor',
-      name: "Failed Validator",
+      name: "Settlement Leader T-01",
       tokenId: 1,
       price: "42,000 RD",
       seller: "0x9999...0000",
@@ -322,8 +328,8 @@ const Index = () => {
         { trait: "Settlement", value: "Reactor City" }
       ],
       status: 'active',
-      description: "Settlement Leader with master rank",
-      modelUrl: "bafkreigw5k75stzjhamdjtwlssbolhxepbeglfs3qoyowgu2q4n2fnfszy"
+      role: "Settlement Leader",
+      rank: "Master"
     }
   ];
 
@@ -399,6 +405,7 @@ const Index = () => {
         
         <WastelandSurvivalGuideEnhanced className="mb-8" />
         
+        {/* New Radiation System Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-1">
             <RadiationSystem 
@@ -500,6 +507,7 @@ const Index = () => {
                 listings={sentinelListings} 
                 title="FOUNDER SENTINELS: Governance & Oversight" 
                 onListingClick={handleListingClick}
+                currentRadiationLevel={currentRadiation}
                 className="mb-8"
               />
               
@@ -507,6 +515,7 @@ const Index = () => {
                 listings={bountyHunterListings} 
                 title="BOUNTY HUNTERS: Enforcers & Funders" 
                 onListingClick={handleListingClick}
+                currentRadiationLevel={currentRadiation}
                 className="mb-8"
               />
               
@@ -514,6 +523,7 @@ const Index = () => {
                 listings={survivorListings} 
                 title="SURVIVORS: Builders & Innovators" 
                 onListingClick={handleListingClick}
+                currentRadiationLevel={currentRadiation}
               />
             </div>
           </div>
