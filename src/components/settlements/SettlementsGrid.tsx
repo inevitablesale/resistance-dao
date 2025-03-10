@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { SettlementCard } from './SettlementCard';
 import { ProposalEvent } from '@/types/proposals';

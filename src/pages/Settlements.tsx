@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { SettlementsNavBar } from '@/components/settlements/SettlementsNavBar';
 import { SettlementsGrid } from '@/components/settlements/SettlementsGrid';
@@ -7,6 +6,7 @@ import { ToxicCard } from '@/components/ui/toxic-card';
 import { Users, TrendingUp, Building2, AlertCircle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Loader2 } from 'lucide-react';
+import { Settlement } from '@/utils/settlementConversion';
 
 const Settlements = () => {
   const { settlements, metrics, loading, error } = useSettlements();
@@ -33,7 +33,6 @@ const Settlements = () => {
         </ToxicCard>
       ) : (
         <>
-          {/* Dashboard Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <ToxicCard className="p-4 bg-black/80 border-toxic-neon/30">
               <div className="flex justify-between items-start">
@@ -84,7 +83,6 @@ const Settlements = () => {
             </ToxicCard>
           </div>
           
-          {/* Status Distribution */}
           <ToxicCard className="p-4 mb-8 bg-black/80 border-toxic-neon/30">
             <h3 className="text-lg font-mono text-toxic-neon mb-2">Status Distribution</h3>
             <div className="space-y-2">
@@ -119,7 +117,6 @@ const Settlements = () => {
             </div>
           </ToxicCard>
           
-          {/* Filter Buttons */}
           <div className="flex flex-wrap gap-2 mb-4">
             <button 
               className={`px-3 py-1 rounded-md text-sm ${filter === null ? 'bg-toxic-neon text-black' : 'bg-black/50 text-white/70 border border-toxic-neon/30'}`}
@@ -153,8 +150,7 @@ const Settlements = () => {
             </button>
           </div>
           
-          {/* Settlements Grid */}
-          <SettlementsGrid settlements={filteredSettlements} />
+          <SettlementsGrid settlements={filteredSettlements as Settlement[]} />
         </>
       )}
     </div>

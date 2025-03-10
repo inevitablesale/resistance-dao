@@ -11,8 +11,12 @@ export interface Settlement {
   targetCapital: string;
   pledgedAmount: string;
   backers: number;
-  status: 'active' | 'completed' | 'failed';
+  status: 'active' | 'funding' | 'completed' | 'failed';
   remainingTime?: string;
+  partyAddress?: string;
+  crowdfundAddress?: string;
+  totalPledged?: string;
+  backerCount?: number;
 }
 
 export const convertProposalToSettlement = (proposal: ProposalEvent): Settlement => {
@@ -27,7 +31,12 @@ export const convertProposalToSettlement = (proposal: ProposalEvent): Settlement
     pledgedAmount: proposal.pledgedAmount || "0",
     backers: proposal.voteCount || 0,
     status: 'active',
-    remainingTime: "30 days" // Default or placeholder
+    remainingTime: "30 days", // Default or placeholder
+    // Adding properties from the other Settlement interface
+    partyAddress: "",
+    crowdfundAddress: "",
+    totalPledged: proposal.pledgedAmount || "0",
+    backerCount: proposal.voteCount || 0
   };
 };
 

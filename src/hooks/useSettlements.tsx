@@ -6,23 +6,7 @@ import { getPartyDetails } from '@/services/partyProtocolService';
 import { toast } from '@/hooks/use-toast';
 import { uploadToIPFS, getFromIPFS } from '@/services/ipfsService';
 import { PARTY_PROTOCOL } from '@/lib/constants';
-
-export interface Settlement {
-  id: string;
-  name: string;
-  description: string;
-  createdAt: number;
-  partyAddress: string;
-  crowdfundAddress: string;
-  image?: string;
-  status: 'active' | 'funding' | 'completed' | 'failed';
-  totalPledged: string;
-  targetCapital: string;
-  backerCount: number;
-  category?: string;
-}
-
-export type SettlementStatus = 'active' | 'funding' | 'completed' | 'failed';
+import { Settlement as SettlementType } from '@/utils/settlementConversion';
 
 export interface SettlementMetrics {
   activeSettlements: number;
@@ -38,7 +22,7 @@ export interface SettlementMetrics {
 }
 
 export const useSettlements = () => {
-  const [settlements, setSettlements] = useState<Settlement[]>([]);
+  const [settlements, setSettlements] = useState<SettlementType[]>([]);
   const [metrics, setMetrics] = useState<SettlementMetrics>({
     activeSettlements: 0,
     totalInvestors: 0,
@@ -70,7 +54,7 @@ export const useSettlements = () => {
         "0xabcdef123456789abcdef123456789abcdef1234"
       ];
       
-      const fetchedSettlements: Settlement[] = [];
+      const fetchedSettlements: SettlementType[] = [];
       let totalPledged = ethers.BigNumber.from(0);
       let uniqueBackers = new Set<string>();
       
@@ -81,7 +65,7 @@ export const useSettlements = () => {
           
           // In a real implementation, you would fetch metadata from IPFS using the URI from the contract
           // For now, we'll use mock data
-          const status: SettlementStatus = Math.random() > 0.5 ? 'active' : 'funding';
+          const status: 'active' | 'funding' | 'completed' | 'failed' = Math.random() > 0.5 ? 'active' : 'funding';
           const pledgedAmount = ethers.utils.parseEther((Math.random() * 10).toFixed(2));
           const backers = Math.floor(Math.random() * 50) + 1;
           
@@ -96,12 +80,15 @@ export const useSettlements = () => {
             id: address,
             name: details.name || 'Unnamed Settlement',
             description: 'A settlement in the wasteland',
-            createdAt: Math.floor(Date.now() / 1000) - Math.floor(Math.random() * 2592000), // Random time in the last 30 days
+            createdAt: new Date().toISOString(),
+            creator: 'unknown',
             partyAddress: address,
             crowdfundAddress: `0x${Math.random().toString(16).substring(2, 42)}`,
             status,
             totalPledged: ethers.utils.formatEther(pledgedAmount),
+            pledgedAmount: ethers.utils.formatEther(pledgedAmount),
             targetCapital: ethers.utils.formatEther(ethers.utils.parseEther('20')),
+            backers,
             backerCount: backers,
             category: Math.random() > 0.5 ? 'Expansion' : 'Infrastructure'
           });
