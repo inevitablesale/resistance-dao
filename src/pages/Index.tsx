@@ -149,7 +149,7 @@ const Index = () => {
         </Button>
         
         <Button variant="outline" size="lg" className="border-toxic-neon/40 hover:bg-toxic-neon/10 py-4" onClick={() => navigate('/chronicles')}>
-          <FileText2 className="h-5 w-5 mr-2" />
+          <FileText className="h-5 w-5 mr-2" />
           Chronicles
         </Button>
         
