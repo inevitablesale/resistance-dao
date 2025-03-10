@@ -18,13 +18,21 @@ export const TerminalLogin: React.FC<TerminalLoginProps> = ({ onLoginSuccess }) 
     "> SECURE CONNECTION ESTABLISHED",
     "> AWAITING AUTHENTICATION..."
   ]);
-  const { connect, isConnected } = useWalletConnection();
+  const { connect, isConnected, isConnecting } = useWalletConnection();
 
   useEffect(() => {
     if (isConnected) {
+      addTerminalMessage("> WALLET AUTHENTICATION SUCCESSFUL");
       handleLoginSuccess();
     }
   }, [isConnected]);
+
+  useEffect(() => {
+    if (isConnecting) {
+      setIsAuthenticating(true);
+      addTerminalMessage("> INITIALIZING WALLET CONNECTION...");
+    }
+  }, [isConnecting]);
 
   const addTerminalMessage = (message: string) => {
     setTerminalMessages(prev => [...prev, message]);

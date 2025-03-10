@@ -31,7 +31,9 @@ import { MarketplaceActivityFeed, MarketplaceActivity } from "@/components/marke
 import { CharacterProgress } from "@/components/chronicle/CharacterProgress";
 import { TerritoryStatus } from "@/components/chronicle/TerritoryStatus";
 import { ModelPreview } from '@/components/marketplace/ModelPreview';
+
 type AuthState = "unauthenticated" | "authenticating" | "breaching" | "authenticated";
+
 const Index = () => {
   const navigate = useNavigate();
   const {
@@ -60,16 +62,18 @@ const Index = () => {
   const [totalReferrals, setTotalReferrals] = useState(15); // Mock data - total referrals
 
   useEffect(() => {
-    if (isConnected && authState === "unauthenticated") {
-      setAuthState("authenticated");
-    }
-  }, [isConnected]);
+    // Remove this effect to prevent directly setting authenticated state
+    // when wallet is connected, now handled by the TerminalLogin component
+  }, []);
+  
   const handleLoginSuccess = () => {
     setAuthState("breaching");
   };
+  
   const handleBreachComplete = () => {
     setAuthState("authenticated");
   };
+  
   const handleRefreshActivity = () => {
     setIsRefreshingActivity(true);
     // Simulate refresh delay
@@ -77,9 +81,11 @@ const Index = () => {
       setIsRefreshingActivity(false);
     }, 1000);
   };
+  
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(Math.round(num));
   };
+  
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -87,6 +93,7 @@ const Index = () => {
       maximumFractionDigits: 0
     }).format(amount);
   };
+  
   const marketplaceStats = {
     tradingVolume: 2450000,
     activeListings: 472,
@@ -95,6 +102,7 @@ const Index = () => {
     successfulTrades: 389,
     bountyHunterRatio: 35
   };
+  
   const recentActivities: MarketplaceActivity[] = [{
     id: "act-1",
     type: "listing",
@@ -126,6 +134,7 @@ const Index = () => {
     timestamp: "2 hours ago",
     address: "0x789...012"
   }];
+  
   const renderMarketplace = () => <motion.div initial={{
     opacity: 0
   }} animate={{
@@ -198,6 +207,7 @@ const Index = () => {
         </div>
       </div>
     </motion.div>;
+  
   return <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
       <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} />
       <div className="dust-particles"></div>
@@ -217,4 +227,5 @@ const Index = () => {
       </section>
     </div>;
 };
+
 export default Index;
