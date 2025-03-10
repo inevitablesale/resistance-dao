@@ -7,9 +7,7 @@ import {
   getPrimaryRole, 
   NFTClass, 
   ResistanceNFT,
-  SENTINEL_NFT_ADDRESS,
-  SURVIVOR_NFT_ADDRESS,
-  BOUNTY_HUNTER_NFT_ADDRESS,
+  RESISTANCE_NFT_ADDRESS,
   getNFTBalanceByContract
 } from '@/services/alchemyService';
 
@@ -55,10 +53,10 @@ export const useNFTRoles = (): NFTRolesState => {
       const fetchedNfts = await fetchNFTsForAddress(primaryWallet.address);
       setNfts(fetchedNfts);
       
-      // Get direct balance counts from contracts
-      const sentinelCount = await getNFTBalanceByContract(primaryWallet.address, SENTINEL_NFT_ADDRESS);
-      const survivorCount = await getNFTBalanceByContract(primaryWallet.address, SURVIVOR_NFT_ADDRESS);
-      const bountyHunterCount = await getNFTBalanceByContract(primaryWallet.address, BOUNTY_HUNTER_NFT_ADDRESS);
+      // Count NFTs by class
+      const sentinelCount = fetchedNfts.filter(nft => nft.class === 'Sentinel').length;
+      const survivorCount = fetchedNfts.filter(nft => nft.class === 'Survivor').length;
+      const bountyHunterCount = fetchedNfts.filter(nft => nft.class === 'Bounty Hunter').length;
       
       setCounts({
         sentinel: sentinelCount,

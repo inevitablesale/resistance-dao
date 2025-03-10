@@ -8,8 +8,8 @@ export const useNFTBalance = (address?: string) => {
     queryFn: async () => {
       if (!address) return 0;
       
-      // Use the Alchemy service to get the NFT balance
-      const balance = await getNFTBalanceByContract(address, RESISTANCE_NFT_ADDRESS);
+      // Use the updated Alchemy service to get the NFT balance
+      const balance = await getNFTBalanceByContract(address);
       return balance;
     },
     enabled: !!address,

@@ -2,11 +2,8 @@
 import { createPublicClient, http, getContract, type GetContractReturnType } from "viem";
 import { polygon } from "viem/chains";
 
-// NFT Contract addresses for Resistance DAO roles
+// NFT Contract address for all Resistance DAO roles
 export const RESISTANCE_NFT_ADDRESS = "0xdD44d15f54B799e940742195e97A30165A1CD285";
-export const SENTINEL_NFT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
-export const SURVIVOR_NFT_ADDRESS = "0xd3F9cA9d44728611dA7128ec71E40D0314FCE89C";
-export const BOUNTY_HUNTER_NFT_ADDRESS = "0xdD44d15f54B799e940742195e97A30165A1CD285";
 
 // Define the supported NFT classes
 export type NFTClass = 'Sentinel' | 'Survivor' | 'Bounty Hunter' | 'Unknown';
@@ -63,43 +60,35 @@ const client = createPublicClient({
 });
 
 /**
- * Get contract instance for a specific NFT contract
- * @param contractAddress The NFT contract address
+ * Get contract instance for the NFT contract
  * @returns Contract instance
  */
-const getNFTContract = (contractAddress: string): NFTContract => {
+const getNFTContract = (): NFTContract => {
   return getContract({
-    address: contractAddress as `0x${string}`,
+    address: RESISTANCE_NFT_ADDRESS as `0x${string}`,
     abi: NFT_ABI,
     publicClient: client
   });
 };
 
 /**
- * Gets the NFT balance for a specific address and contract
+ * Gets the NFT balance for a specific address from the Resistance NFT contract
  * @param address Owner address
- * @param contractAddress NFT contract address
  * @returns Number of NFTs owned
  */
-export const getNFTBalanceByContract = async (
-  address: string, 
-  contractAddress: string
-): Promise<number> => {
+export const getNFTBalanceByContract = async (address: string): Promise<number> => {
   try {
     if (!address) return 0;
     
     // For development/testing
     if (process.env.NODE_ENV === 'development') {
-      console.log(`Development mode: Mocking NFT balance for ${contractAddress}`);
-      // Return mock data based on contract address
-      if (contractAddress === SENTINEL_NFT_ADDRESS) return 1;
-      if (contractAddress === SURVIVOR_NFT_ADDRESS) return 2;
-      if (contractAddress === BOUNTY_HUNTER_NFT_ADDRESS) return 3;
-      return 0;
+      console.log(`Development mode: Mocking NFT balance for ${address}`);
+      // Return mock data for testing
+      return 3; // Mock total balance of NFTs
     }
     
     // Get contract instance
-    const contract = getNFTContract(contractAddress);
+    const contract = getNFTContract();
     
     // Get balance
     const balance = await contract.read.balanceOf([address as `0x${string}`]);
@@ -117,11 +106,8 @@ export const getNFTBalanceByContract = async (
  */
 export const checkNFTOwnership = async (address: string): Promise<boolean> => {
   try {
-    const sentinelBalance = await getNFTBalanceByContract(address, SENTINEL_NFT_ADDRESS);
-    const survivorBalance = await getNFTBalanceByContract(address, SURVIVOR_NFT_ADDRESS);
-    const bountyHunterBalance = await getNFTBalanceByContract(address, BOUNTY_HUNTER_NFT_ADDRESS);
-    
-    return sentinelBalance > 0 || survivorBalance > 0 || bountyHunterBalance > 0;
+    const balance = await getNFTBalanceByContract(address);
+    return balance > 0;
   } catch (error) {
     console.error("Error checking NFT ownership:", error);
     return false;
@@ -129,23 +115,51 @@ export const checkNFTOwnership = async (address: string): Promise<boolean> => {
 };
 
 /**
+ * Determines the NFT class from attributes
+ * @param attributes Array of NFT attributes
+ * @returns The NFT class
+ */
+const getNFTClassFromAttributes = (attributes: Array<{trait_type: string; value: string}>): NFTClass => {
+  // Find the Class attribute
+  const classAttribute = attributes.find(
+    attr => attr.trait_type === "Class"
+  );
+  
+  if (!classAttribute) return 'Unknown';
+  
+  // Check if the value matches one of our known classes
+  switch (classAttribute.value) {
+    case 'Sentinel':
+      return 'Sentinel';
+    case 'Survivor':
+      return 'Survivor';
+    case 'Bounty Hunter':
+      return 'Bounty Hunter';
+    default:
+      return 'Unknown';
+  }
+};
+
+/**
  * Get NFT metadata by token ID
- * @param contractAddress Contract address
  * @param tokenId Token ID
  * @returns NFT metadata
  */
-const getNFTMetadata = async (contractAddress: string, tokenId: string): Promise<any> => {
+const getNFTMetadata = async (tokenId: string): Promise<any> => {
   try {
     // For development/testing
     if (process.env.NODE_ENV === 'development') {
-      // Return mock metadata
-      if (contractAddress === SENTINEL_NFT_ADDRESS) {
+      // Return mock metadata based on token ID pattern
+      // Token IDs 100-199: Sentinels, 200-299: Survivors, 300-399: Bounty Hunters
+      const tokenNum = parseInt(tokenId);
+      
+      if (tokenNum >= 100 && tokenNum < 200) {
         return {
           name: "Sentinel #" + tokenId,
           description: "Sentinel NFT",
           attributes: [{ trait_type: "Class", value: "Sentinel" }]
         };
-      } else if (contractAddress === SURVIVOR_NFT_ADDRESS) {
+      } else if (tokenNum >= 200 && tokenNum < 300) {
         return {
           name: "Survivor #" + tokenId,
           description: "Survivor NFT",
@@ -161,7 +175,7 @@ const getNFTMetadata = async (contractAddress: string, tokenId: string): Promise
     }
     
     // Get contract instance
-    const contract = getNFTContract(contractAddress);
+    const contract = getNFTContract();
     
     // Get token URI
     const uri = await contract.read.tokenURI([BigInt(tokenId)]);
@@ -176,24 +190,20 @@ const getNFTMetadata = async (contractAddress: string, tokenId: string): Promise
 };
 
 /**
- * Gets token IDs owned by an address for a specific contract
+ * Gets token IDs owned by an address
  * @param address Owner address
- * @param contractAddress NFT contract address
  * @returns Array of token IDs
  */
-const getTokenIdsForOwner = async (address: string, contractAddress: string): Promise<string[]> => {
+const getTokenIdsForOwner = async (address: string): Promise<string[]> => {
   try {
     // For development/testing
     if (process.env.NODE_ENV === 'development') {
-      // Return mock token IDs
-      if (contractAddress === SENTINEL_NFT_ADDRESS) return ["101"];
-      if (contractAddress === SURVIVOR_NFT_ADDRESS) return ["201", "202"];
-      if (contractAddress === BOUNTY_HUNTER_NFT_ADDRESS) return ["301", "302", "303"];
-      return [];
+      // Return mock token IDs - a mix of classes for testing
+      return ["101", "201", "301"]; // Sentinel, Survivor, Bounty Hunter
     }
     
     // Get contract instance
-    const contract = getNFTContract(contractAddress);
+    const contract = getNFTContract();
     
     // Get balance
     const balance = await contract.read.balanceOf([address as `0x${string}`]);
@@ -226,52 +236,27 @@ export const fetchNFTsForAddress = async (address: string): Promise<ResistanceNF
     
     if (!address) return [];
     
-    // Fetch token IDs for each contract
-    const sentinelTokenIds = await getTokenIdsForOwner(address, SENTINEL_NFT_ADDRESS);
-    const survivorTokenIds = await getTokenIdsForOwner(address, SURVIVOR_NFT_ADDRESS);
-    const bountyHunterTokenIds = await getTokenIdsForOwner(address, BOUNTY_HUNTER_NFT_ADDRESS);
+    // Fetch token IDs owned by the address
+    const tokenIds = await getTokenIdsForOwner(address);
     
     const nfts: ResistanceNFT[] = [];
     
-    // Process Sentinel NFTs
-    for (const tokenId of sentinelTokenIds) {
-      const metadata = await getNFTMetadata(SENTINEL_NFT_ADDRESS, tokenId);
+    // Process each token and fetch its metadata
+    for (const tokenId of tokenIds) {
+      const metadata = await getNFTMetadata(tokenId);
+      if (!metadata) continue;
+      
+      // Determine the NFT class from metadata attributes
+      const nftClass = getNFTClassFromAttributes(metadata?.attributes || []);
+      
       nfts.push({
         tokenId,
-        class: 'Sentinel',
-        name: metadata?.name || `Sentinel #${tokenId}`,
+        class: nftClass,
+        name: metadata?.name || `NFT #${tokenId}`,
         description: metadata?.description,
         image: metadata?.image,
         animation_url: metadata?.animation_url,
-        attributes: metadata?.attributes || [{ trait_type: "Class", value: "Sentinel" }]
-      });
-    }
-    
-    // Process Survivor NFTs
-    for (const tokenId of survivorTokenIds) {
-      const metadata = await getNFTMetadata(SURVIVOR_NFT_ADDRESS, tokenId);
-      nfts.push({
-        tokenId,
-        class: 'Survivor',
-        name: metadata?.name || `Survivor #${tokenId}`,
-        description: metadata?.description,
-        image: metadata?.image,
-        animation_url: metadata?.animation_url,
-        attributes: metadata?.attributes || [{ trait_type: "Class", value: "Survivor" }]
-      });
-    }
-    
-    // Process Bounty Hunter NFTs
-    for (const tokenId of bountyHunterTokenIds) {
-      const metadata = await getNFTMetadata(BOUNTY_HUNTER_NFT_ADDRESS, tokenId);
-      nfts.push({
-        tokenId,
-        class: 'Bounty Hunter',
-        name: metadata?.name || `Bounty Hunter #${tokenId}`,
-        description: metadata?.description,
-        image: metadata?.image,
-        animation_url: metadata?.animation_url,
-        attributes: metadata?.attributes || [{ trait_type: "Class", value: "Bounty Hunter" }]
+        attributes: metadata?.attributes || []
       });
     }
     
