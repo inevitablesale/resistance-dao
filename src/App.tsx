@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -18,6 +19,8 @@ import ReferralRedirect from "./pages/ReferralRedirect";
 import ToxicTheme from "./pages/ToxicTheme";
 import MarketplaceItemDetails from "./pages/MarketplaceItemDetails";
 import Hunt from "./pages/Hunt";
+import Settlements from "./pages/Settlements";
+import SettlementDetails from "./pages/SettlementDetails";
 import { Toaster } from "./components/ui/toaster";
 
 const zeroDevConfig = {
@@ -164,6 +167,8 @@ function Layout() {
         <Route path="/referral" element={<ReferralRedirect />} />
         <Route path="/hunt" element={<Hunt />} />
         <Route path="/command" element={<Hunt />} />
+        <Route path="/settlements" element={<Settlements />} />
+        <Route path="/settlements/:partyAddress" element={<SettlementDetails />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
