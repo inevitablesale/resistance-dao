@@ -12,8 +12,8 @@ import { RadiationSystem } from '@/components/radiation/RadiationSystem';
 import { NFTDistributionStatus } from '@/components/radiation/NFTDistributionStatus';
 import { ReferralSystem } from '@/components/radiation/ReferralSystem';
 import { Rocket, Coins, Users, Share2, Check, ChevronRight, Building2, CircleDollarSign, Scale, FileText, ChevronRight as ArrowIcon, Clock, Target, Wallet, RefreshCw, Radiation, Skull, Zap, Shield, Image, Biohazard, ShieldX, UserX, Bug, Bomb, Crosshair, PlusCircle, Search, ShoppingBag, Box, Eye, Map, Globe, Network, Wrench, Hammer, Lightbulb, Flag, Scroll } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ToxicButton } from "@/components/ui/toxic-button";
+import { ToxicButton } from "@/components/ui/button";
+import { ToxicButton as Button } from "@/components/ui/toxic-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ToxicCard, ToxicCardContent, ToxicCardHeader, ToxicCardTitle, ToxicCardDescription, ToxicCardFooter } from "@/components/ui/toxic-card";
 import { ToxicProgress } from "@/components/ui/toxic-progress";
@@ -31,6 +31,7 @@ import { MarketplaceActivityFeed, MarketplaceActivity } from "@/components/marke
 import { CharacterProgress } from "@/components/chronicle/CharacterProgress";
 import { TerritoryStatus } from "@/components/chronicle/TerritoryStatus";
 import { ModelPreview } from '@/components/marketplace/ModelPreview';
+import { NFTCollectionDisplay } from '@/components/nft/NFTCollectionDisplay';
 
 type AuthState = "unauthenticated" | "authenticating" | "breaching" | "authenticated";
 
@@ -40,10 +41,6 @@ const Index = () => {
     data: stats,
     isLoading: isLoadingStats
   } = useProposalStats();
-  const {
-    data: nftBalance = 0,
-    isLoading: isLoadingNFT
-  } = useNFTBalance("0x1234..."); // Demo address
   const {
     isConnected,
     address
@@ -145,7 +142,7 @@ const Index = () => {
       <div className="text-left mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
           <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
-          <Biohazard className="h-4 w-4 mr-1 toxic-glow" /> 
+          <Radiation className="h-4 w-4 mr-1 toxic-glow" /> 
           Wasteland Status: <span className="text-apocalypse-red font-semibold status-critical">Radiation Level: {currentRadiation}%</span>
         </div>
         
@@ -163,6 +160,9 @@ const Index = () => {
 
         <MarketplaceStatusPanel stats={marketplaceStats} isLoading={isLoadingStats} className="mb-8" />
         
+        {/* NFT Collection Display */}
+        <NFTCollectionDisplay className="mb-8" title="Resistance Wasteland NFTs" />
+        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
             {/* All role cards have been completely removed */}
@@ -170,8 +170,6 @@ const Index = () => {
           
           <div className="lg:col-span-1">
             <MarketplaceActivityFeed activities={recentActivities} isLoading={isRefreshingActivity} onRefresh={handleRefreshActivity} className="mb-6" />
-            
-            
             
             {isConnected && <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4">
                 <div className="flex items-center gap-2 mb-4">
@@ -182,25 +180,25 @@ const Index = () => {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2">
-                  <ToxicButton variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/hunt')}>
+                  <Button variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/hunt')}>
                     <Eye className="h-4 w-4 mr-1" />
                     Sentinel Center
-                  </ToxicButton>
+                  </Button>
                   
-                  <ToxicButton variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/marketplace/bounty-hunters')}>
-                    <Target className="h-4 w-4 mr-1" />
+                  <Button variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/marketplace/bounty-hunters')}>
+                    <Network className="h-4 w-4 mr-1" />
                     Bounty Hub
-                  </ToxicButton>
+                  </Button>
                   
-                  <ToxicButton variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/chronicles')}>
+                  <Button variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/chronicles')}>
                     <Scroll className="h-4 w-4 mr-1" />
                     Chronicles
-                  </ToxicButton>
+                  </Button>
                   
-                  <ToxicButton variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/territories/map')}>
+                  <Button variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/territories/map')}>
                     <Map className="h-4 w-4 mr-1" />
                     Territory Map
-                  </ToxicButton>
+                  </Button>
                 </div>
               </ToxicCard>}
           </div>
