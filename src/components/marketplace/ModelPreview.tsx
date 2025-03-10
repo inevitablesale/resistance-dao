@@ -43,14 +43,14 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
   const [clock] = useState(new THREE.Clock());
   const [processedCloudUrl, setProcessedCloudUrl] = useState<string | null>(null);
   const [processedModelUrl, setProcessedModelUrl] = useState<string | null>(null);
-  const [transitionEffect, setTransitionEffect] = useState<THREE.ShaderMaterial | null>(null);
-  const [transitionMesh, setTransitionMesh] = useState<THREE.Mesh | null>(null);
-  const [lastRevealValue, setLastRevealValue] = useState(revealValue);
-  const [transitionDirection, setTransitionDirection] = useState<'increasing' | 'decreasing' | null>(null);
-  const [particleSystem, setParticleSystem] = useState<THREE.Points | null>(null);
   
   // Create a buffer to smooth the transition
   const smoothedRevealValue = useRef(revealValue);
+  const lastRevealValue = useRef(revealValue);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const controlsRef = useRef<OrbitControls | null>(null);
+  const particleSystemRef = useRef<THREE.Points | null>(null);
   
   // Process the IPFS URLs
   useEffect(() => {
@@ -63,18 +63,18 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
             setProcessedCloudUrl(radiationCloudUrl);
           } else if (radiationCloudUrl.startsWith('ipfs://')) {
             // Format as Pinata gateway URL
-            const cloudUrl = `https://gateway.pinata.cloud/ipfs/${radiationCloudUrl.replace('ipfs://', '')}`;
+            const cloudUrl = `https://blue-shaggy-halibut-668.mypinata.cloud/ipfs/${radiationCloudUrl.replace('ipfs://', '')}`;
             console.log('Radiation cloud URL from ipfs://', cloudUrl);
             setProcessedCloudUrl(cloudUrl);
           } else {
             // Assume it's just the hash
-            const cloudUrl = `https://gateway.pinata.cloud/ipfs/${radiationCloudUrl}`;
+            const cloudUrl = `https://blue-shaggy-halibut-668.mypinata.cloud/ipfs/${radiationCloudUrl}`;
             console.log('Radiation cloud URL from hash:', cloudUrl);
             setProcessedCloudUrl(cloudUrl);
           }
         }
         
-        // Process character model URL - log initial modelUrl
+        // Process character model URL
         console.log('Processing character model URL:', modelUrl);
         
         if (modelUrl) {
@@ -84,12 +84,12 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
             console.log('Using direct model URL:', modelUrl);
           } else if (modelUrl.startsWith('ipfs://')) {
             // Format as Pinata gateway URL
-            const url = `https://gateway.pinata.cloud/ipfs/${modelUrl.replace('ipfs://', '')}`;
+            const url = `https://blue-shaggy-halibut-668.mypinata.cloud/ipfs/${modelUrl.replace('ipfs://', '')}`;
             console.log('Character model URL from ipfs://', url);
             setProcessedModelUrl(url);
           } else {
             // Assume it's just the hash
-            const url = `https://gateway.pinata.cloud/ipfs/${modelUrl}`;
+            const url = `https://blue-shaggy-halibut-668.mypinata.cloud/ipfs/${modelUrl}`;
             console.log('Character model URL from hash:', url);
             setProcessedModelUrl(url);
           }
@@ -105,13 +105,15 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     processUrls();
   }, [radiationCloudUrl, modelUrl]);
   
-  // Check for transition direction
+  // Update on reveal value change
   useEffect(() => {
-    if (revealValue !== lastRevealValue) {
-      setTransitionDirection(revealValue > lastRevealValue ? 'increasing' : 'decreasing');
-      setLastRevealValue(revealValue);
-    }
-  }, [revealValue, lastRevealValue]);
+    // Save the last reveal value for comparison
+    lastRevealValue.current = revealValue;
+    
+    // Update models based on new reveal value
+    updateModelsVisibility(revealValue);
+    
+  }, [revealValue]);
   
   // Setup the scene, camera, and renderer when URLs are processed
   useEffect(() => {
@@ -164,6 +166,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
       1000
     );
     camera.position.z = 5;
+    cameraRef.current = camera;
     
     // Renderer setup with improved settings
     const renderer = new THREE.WebGLRenderer({ 
@@ -179,6 +182,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     containerRef.current.appendChild(renderer.domElement);
+    rendererRef.current = renderer;
     
     // Controls
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -190,12 +194,128 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     controls.enablePan = false;
     controls.minDistance = 3;
     controls.maxDistance = 10;
+    controlsRef.current = controls;
     
     // Animation mixer
     const newMixer = new THREE.AnimationMixer(newScene);
     setMixer(newMixer);
     
-    // Create particle system for transition effects
+    // Create particle system for radiation effect
+    createParticleSystem(newScene);
+    
+    // Load models
+    loadModels(newScene);
+    
+    // Animation loop
+    const animate = () => {
+      const animationId = requestAnimationFrame(animate);
+      
+      // Update mixer for animations
+      if (mixer) {
+        const delta = clock.getDelta();
+        mixer.update(delta);
+      }
+      
+      // Smoothly update reveal value
+      smoothedRevealValue.current = smoothTransition(smoothedRevealValue.current, revealValue);
+      
+      // Update particle effect
+      updateParticleEffect(smoothedRevealValue.current);
+      
+      // Update controls and render
+      if (controlsRef.current) {
+        controlsRef.current.update();
+      }
+      
+      if (rendererRef.current && cameraRef.current && scene) {
+        rendererRef.current.render(scene, cameraRef.current);
+      }
+      
+      return animationId;
+    };
+    
+    const animationId = animate();
+    
+    // Handle window resize
+    const handleResize = () => {
+      if (!containerRef.current) return;
+      
+      if (cameraRef.current) {
+        cameraRef.current.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
+        cameraRef.current.updateProjectionMatrix();
+      }
+      
+      if (rendererRef.current) {
+        rendererRef.current.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup
+    return () => {
+      cancelAnimationFrame(animationId);
+      
+      if (containerRef.current && rendererRef.current && containerRef.current.contains(rendererRef.current.domElement)) {
+        containerRef.current.removeChild(rendererRef.current.domElement);
+      }
+      
+      window.removeEventListener('resize', handleResize);
+      disposeResources();
+    };
+  }, [processedCloudUrl, processedModelUrl, autoRotate]);
+  
+  // Helper function to update models visibility based on reveal value
+  const updateModelsVisibility = (value: number) => {
+    if (!characterModel || !radiationModel) return;
+    
+    // Calculate opacities - character becomes more visible as value increases
+    const characterOpacity = Math.max(0, Math.min(1, value / 100));
+    // Radiation becomes less visible as value increases
+    const radiationOpacity = Math.max(0, Math.min(1, 1 - (value / 100)));
+    
+    // Update character model materials
+    characterModel.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.material) {
+        if (Array.isArray(child.material)) {
+          child.material.forEach(mat => {
+            mat.transparent = true;
+            mat.opacity = characterOpacity;
+            mat.needsUpdate = true;
+          });
+        } else {
+          child.material.transparent = true;
+          child.material.opacity = characterOpacity;
+          child.material.needsUpdate = true;
+        }
+      }
+    });
+    
+    // Update radiation model materials
+    radiationModel.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.material) {
+        if (Array.isArray(child.material)) {
+          child.material.forEach(mat => {
+            mat.transparent = true;
+            mat.opacity = radiationOpacity * 0.9; // Slightly transparent even at maximum
+            mat.needsUpdate = true;
+          });
+        } else {
+          child.material.transparent = true;
+          child.material.opacity = radiationOpacity * 0.9; // Slightly transparent even at maximum
+          child.material.needsUpdate = true;
+        }
+      }
+    });
+  };
+  
+  // Helper function for smooth transitions
+  const smoothTransition = (current: number, target: number, factor = 0.1) => {
+    return current + (target - current) * factor;
+  };
+  
+  // Create particle system for radiation effect
+  const createParticleSystem = (scene: THREE.Scene) => {
     const particleGeometry = new THREE.BufferGeometry();
     const particleCount = 5000;
     const particlePositions = new Float32Array(particleCount * 3);
@@ -264,50 +384,31 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
     });
     
     const particles = new THREE.Points(particleGeometry, particleMaterial);
-    newScene.add(particles);
-    setParticleSystem(particles);
+    scene.add(particles);
+    particleSystemRef.current = particles;
+  };
+  
+  // Update particle effect
+  const updateParticleEffect = (revealValue: number) => {
+    if (!particleSystemRef.current) return;
     
-    // Create a fullscreen quad for transition effects
-    const transitionGeometry = new THREE.PlaneGeometry(5, 5);
-    const transitionMat = new THREE.ShaderMaterial({
-      uniforms: {
-        baseTexture: { value: null },
-        revealTexture: { value: null },
-        mixRatio: { value: 0.0 },
-        threshold: { value: 0.1 },
-        useTexture: { value: 0.0 },
-        revealValue: { value: revealValue / 100 },
-        transitionDirection: { value: transitionDirection === 'increasing' ? 1.0 : 0.0 }
-      },
-      vertexShader: `
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform float revealValue;
-        uniform float transitionDirection;
-        varying vec2 vUv;
-        
-        void main() {
-          // This shader doesn't render anything directly
-          // It's just a placeholder for more complex transition effects
-          gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-        }
-      `,
-      transparent: true,
-      opacity: 0
-    });
-    
-    const transitionPlane = new THREE.Mesh(transitionGeometry, transitionMat);
-    transitionPlane.visible = false; // Hidden by default
-    newScene.add(transitionPlane);
-    setTransitionMesh(transitionPlane);
-    setTransitionEffect(transitionMat);
-    
-    // Loader for both models
+    const particles = particleSystemRef.current;
+    if (particles.material instanceof THREE.ShaderMaterial) {
+      // Update uniforms
+      particles.material.uniforms.reveal.value = revealValue / 100;
+      
+      // Scale particles inversely to reveal value
+      const scale = 1 + (0.5 * (100 - revealValue) / 100);
+      particles.scale.set(scale, scale, scale);
+      
+      // Rotate particles slowly for effect
+      particles.rotation.y += 0.002;
+      particles.rotation.x += 0.001;
+    }
+  };
+  
+  // Load both models
+  const loadModels = (scene: THREE.Scene) => {
     const loader = new GLTFLoader();
     let loadedCount = 0;
     
@@ -323,20 +424,20 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         
         // Normalize and center
         const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 3.0 / maxDim; // Increased scale for better coverage
+        const scale = 3.0 / maxDim;
         gltf.scene.scale.set(scale, scale, scale);
         gltf.scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
         
-        // Apply enhanced material for the radiation cloud
+        // Apply radiation material
         gltf.scene.traverse((child) => {
           if (child instanceof THREE.Mesh) {
-            // Create new glow material for radiation cloud
+            // Create glowing radiation material
             const radiationMaterial = new THREE.MeshPhongMaterial({
               color: new THREE.Color(0xaaff88),
               emissive: new THREE.Color(0x113311),
               emissiveIntensity: 0.4,
               transparent: true,
-              opacity: Math.max(0, Math.min(100, 100 - revealValue)) / 100,
+              opacity: Math.max(0, Math.min(1, 1 - (revealValue / 100))),
               shininess: 30
             });
             
@@ -358,42 +459,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         setRadiationModel(gltf.scene);
         
         // Add to scene
-        newScene.add(gltf.scene);
-        
-        // Add glow effect for radiation cloud
-        const radiationGlowMaterial = new THREE.ShaderMaterial({
-          uniforms: {
-            color: { value: new THREE.Color(0xaaff88) },
-            viewVector: { value: new THREE.Vector3(0, 0, 1) },
-            c: { value: 0.2 },
-            p: { value: 4.5 },
-            opacity: { value: Math.max(0, Math.min(100, 100 - revealValue)) / 100 }
-          },
-          vertexShader: `
-            uniform vec3 viewVector;
-            uniform float c;
-            uniform float p;
-            varying float intensity;
-            void main() {
-              vec3 vNormal = normalize(normalMatrix * normal);
-              vec3 vNormel = normalize(normalMatrix * viewVector);
-              intensity = pow(c - dot(vNormal, vNormel), p);
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `,
-          fragmentShader: `
-            uniform vec3 color;
-            uniform float opacity;
-            varying float intensity;
-            void main() {
-              vec3 glow = color * intensity;
-              gl_FragColor = vec4(glow, opacity);
-            }
-          `,
-          side: THREE.BackSide,
-          blending: THREE.AdditiveBlending,
-          transparent: true
-        });
+        scene.add(gltf.scene);
         
         // Increment loaded count
         loadedCount++;
@@ -402,7 +468,6 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         }
       },
       (xhr) => {
-        // Progress callback for radiation cloud
         console.log(`${(xhr.loaded / xhr.total) * 100}% loaded - Radiation cloud`);
       },
       (error) => {
@@ -424,31 +489,29 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         
         // Normalize and center
         const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 2.8 / maxDim; // Set appropriate scale
+        const scale = 2.8 / maxDim;
         gltf.scene.scale.set(scale, scale, scale);
         gltf.scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
         
-        // Apply enhanced material to character model with reveal-based effects
+        // Apply enhanced material to character model
         gltf.scene.traverse((child) => {
           if (child instanceof THREE.Mesh) {
-            // Store original material for reference
+            // Store original material
             if (!child.userData.originalMaterial) {
               child.userData.originalMaterial = child.material.clone();
             }
             
-            // For character model, create a material that becomes more visible with reveal
+            // Set initial opacity based on reveal value
             if (Array.isArray(child.material)) {
               child.material.forEach(mat => {
                 mat.transparent = true;
-                mat.opacity = Math.max(0, Math.min(100, revealValue)) / 100;
-                mat.emissiveIntensity = 0.3 * (revealValue / 100); // Increase glow as revealed
-                mat.depthWrite = true; // Enable depth writing for correct render order
+                mat.opacity = Math.max(0, Math.min(1, revealValue / 100));
+                mat.depthWrite = true;
               });
             } else {
               child.material.transparent = true;
-              child.material.opacity = Math.max(0, Math.min(100, revealValue)) / 100;
-              child.material.emissiveIntensity = 0.3 * (revealValue / 100); // Increase glow as revealed
-              child.material.depthWrite = true; // Enable depth writing for correct render order
+              child.material.opacity = Math.max(0, Math.min(1, revealValue / 100));
+              child.material.depthWrite = true;
             }
           }
         });
@@ -457,7 +520,7 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         setCharacterModel(gltf.scene);
         
         // Add to scene
-        newScene.add(gltf.scene);
+        scene.add(gltf.scene);
         
         // Increment loaded count
         loadedCount++;
@@ -466,7 +529,6 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         }
       },
       (xhr) => {
-        // Progress callback for character model
         console.log(`${(xhr.loaded / xhr.total) * 100}% loaded - Character model`);
       },
       (error) => {
@@ -475,196 +537,61 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
         setLoading(false);
       }
     );
-    
-    // Create a smooth transition effect using LERP
-    const smoothTransition = (current, target, factor = 0.05) => {
-      return current + (target - current) * factor;
-    };
-    
-    // Animation loop
-    const animate = () => {
-      const animationId = requestAnimationFrame(animate);
-      
-      // Update mixer for animations
-      if (mixer) {
-        const delta = clock.getDelta();
-        mixer.update(delta);
-      }
-      
-      // LERP the smoothedRevealValue
-      smoothedRevealValue.current = smoothTransition(smoothedRevealValue.current, revealValue);
-      
-      // Update particle system
-      if (particleSystem && particleSystem.material instanceof THREE.ShaderMaterial) {
-        particleSystem.material.uniforms.reveal.value = smoothedRevealValue.current / 100;
-        
-        // Scale and position particles based on reveal value
-        particleSystem.scale.set(
-          1 + (0.8 * (100 - smoothedRevealValue.current) / 100), // Increased scale for better coverage
-          1 + (0.8 * (100 - smoothedRevealValue.current) / 100),
-          1 + (0.8 * (100 - smoothedRevealValue.current) / 100)
-        );
-        
-        // Rotate particles slowly
-        particleSystem.rotation.y += 0.001;
-        particleSystem.rotation.x += 0.0005;
-      }
-      
-      // Update radiation model opacity and scale
-      if (radiationModel) {
-        // Scale radiation model slightly larger to ensure complete coverage
-        radiationModel.scale.set(
-          1 + (0.2 * (100 - smoothedRevealValue.current) / 100),
-          1 + (0.2 * (100 - smoothedRevealValue.current) / 100),
-          1 + (0.2 * (100 - smoothedRevealValue.current) / 100)
-        );
-        
-        radiationModel.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            // Calculate opacity with smooth transition, capped at 0.9 for some visibility
-            const targetOpacity = Math.min(0.9, Math.max(0, Math.min(100, 100 - smoothedRevealValue.current)) / 100);
-            
-            if (Array.isArray(child.material)) {
-              child.material.forEach(mat => {
-                // Smoothly transition opacity
-                mat.opacity = targetOpacity;
-                // Adjust emissive intensity for glow effect
-                mat.emissiveIntensity = 0.4 * targetOpacity;
-              });
-            } else {
-              // Smoothly transition opacity
-              child.material.opacity = targetOpacity;
-              // Adjust emissive intensity for glow effect
-              child.material.emissiveIntensity = 0.4 * targetOpacity;
-            }
-          }
-        });
-      }
-      
-      // Update character model opacity and effects
-      if (characterModel) {
-        characterModel.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
-            // Calculate opacity with smooth transition
-            const targetOpacity = Math.max(0, Math.min(100, smoothedRevealValue.current)) / 100;
-            
-            if (Array.isArray(child.material)) {
-              child.material.forEach(mat => {
-                // Smoothly transition opacity
-                mat.opacity = targetOpacity;
-                // Enhance material properties as character is revealed
-                mat.emissiveIntensity = 0.3 * targetOpacity;
-                mat.shininess = 10 + (20 * targetOpacity);
-              });
-            } else {
-              // Smoothly transition opacity
-              child.material.opacity = targetOpacity;
-              // Enhance material properties as character is revealed
-              child.material.emissiveIntensity = 0.3 * targetOpacity;
-              if (child.material.shininess !== undefined) {
-                child.material.shininess = 10 + (20 * targetOpacity);
-              }
-            }
-          }
-        });
-      }
-      
-      // Update transition effect if available
-      if (transitionEffect) {
-        transitionEffect.uniforms.revealValue.value = smoothedRevealValue.current / 100;
-        transitionEffect.uniforms.transitionDirection.value = 
-          transitionDirection === 'increasing' ? 1.0 : 0.0;
-      }
-      
-      // Update controls and render
-      controls.update();
-      renderer.render(newScene, camera);
-      
-      return animationId;
-    };
-    
-    const animationId = animate();
-    
-    // Handle window resize
-    const handleResize = () => {
-      if (!containerRef.current) return;
-      
-      camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-    };
-    
-    window.addEventListener('resize', handleResize);
-    
-    // Cleanup
-    return () => {
-      cancelAnimationFrame(animationId);
-      
-      if (containerRef.current && containerRef.current.contains(renderer.domElement)) {
-        containerRef.current.removeChild(renderer.domElement);
-      }
-      window.removeEventListener('resize', handleResize);
-      
-      // Dispose resources
-      if (scene) {
-        scene.traverse((object) => {
-          if (object instanceof THREE.Mesh) {
-            object.geometry.dispose();
-            
-            if (Array.isArray(object.material)) {
-              // Handle array of materials
-              object.material.forEach(material => {
-                if (material && typeof material.dispose === 'function') {
-                  material.dispose();
-                }
-              });
-            } else if (object.material) {
-              // Handle single material
-              if (typeof object.material.dispose === 'function') {
-                object.material.dispose();
-              }
-            }
-          }
-        });
-      }
-      
-      if (particleSystem) {
-        if (particleSystem.geometry) particleSystem.geometry.dispose();
-        if (particleSystem.material) {
-          if (Array.isArray(particleSystem.material)) {
-            particleSystem.material.forEach(material => {
-              if (material && typeof material.dispose === 'function') {
-                material.dispose();
-              }
-            });
-          } else if (particleSystem.material && typeof particleSystem.material.dispose === 'function') {
-            particleSystem.material.dispose();
-          }
-        }
-      }
-      
-      if (transitionMesh) {
-        if (transitionMesh.geometry) transitionMesh.geometry.dispose();
-        if (transitionMesh.material) {
-          if (Array.isArray(transitionMesh.material)) {
-            transitionMesh.material.forEach(material => {
-              if (material && typeof material.dispose === 'function') {
-                material.dispose();
-              }
-            });
-          } else if (transitionMesh.material && typeof transitionMesh.material.dispose === 'function') {
-            transitionMesh.material.dispose();
-          }
-        }
-      }
-      
-      renderer.dispose();
-      controls.dispose();
-      if (mixer) mixer.stopAllAction();
-    };
-  }, [processedCloudUrl, processedModelUrl, autoRotate, revealValue, transitionDirection]);
+  };
   
-  // Directly render the container for the 3D model
+  // Clean up Three.js resources
+  const disposeResources = () => {
+    if (scene) {
+      scene.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+          if (object.geometry) {
+            object.geometry.dispose();
+          }
+          
+          if (Array.isArray(object.material)) {
+            object.material.forEach(material => {
+              if (material && typeof material.dispose === 'function') {
+                material.dispose();
+              }
+            });
+          } else if (object.material && typeof object.material.dispose === 'function') {
+            object.material.dispose();
+          }
+        }
+      });
+    }
+    
+    if (particleSystemRef.current) {
+      if (particleSystemRef.current.geometry) {
+        particleSystemRef.current.geometry.dispose();
+      }
+      if (particleSystemRef.current.material) {
+        if (Array.isArray(particleSystemRef.current.material)) {
+          particleSystemRef.current.material.forEach(material => {
+            if (material && typeof material.dispose === 'function') {
+              material.dispose();
+            }
+          });
+        } else if (particleSystemRef.current.material && typeof particleSystemRef.current.material.dispose === 'function') {
+          particleSystemRef.current.material.dispose();
+        }
+      }
+    }
+    
+    if (rendererRef.current) {
+      rendererRef.current.dispose();
+    }
+    
+    if (controlsRef.current) {
+      controlsRef.current.dispose();
+    }
+    
+    if (mixer) {
+      mixer.stopAllAction();
+    }
+  };
+  
+  // Render component
   return (
     <div className={`${className}`}>
       <div 
