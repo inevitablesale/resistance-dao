@@ -106,7 +106,7 @@ export interface ProposalMetadata {
   title: string;
   description?: string;
   category?: string;
-  image?: string; // Added image property to fix type error
+  image?: string; 
   investment?: {
     targetCapital: string;
     description: string;
@@ -187,5 +187,5 @@ export interface ProposalEvent {
   nftMetadata?: NFTMetadata;
   pledgedAmount?: string;
   error?: string;
-  voteCount?: number;  // Added this property
+  voteCount?: number;
 }

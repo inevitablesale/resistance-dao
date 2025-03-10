@@ -8,7 +8,7 @@ interface SettlementsGridProps {
   isLoading: boolean;
   formatUSDAmount: (amount: string) => string;
   title: string;
-  className?: string; // Added className prop to support Hunt.tsx
+  className?: string;
 }
 
 export const SettlementsGrid = ({ settlements, isLoading, formatUSDAmount, title, className }: SettlementsGridProps) => {
@@ -34,10 +34,13 @@ export const SettlementsGrid = ({ settlements, isLoading, formatUSDAmount, title
       <h2 className="text-2xl font-bold">{title}</h2>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {settlements.map((settlement) => {
+          // Provide a complete fallback object with all potentially accessed properties
           const metadata = settlement.metadata || {
             title: "Loading...",
             description: "Settlement details loading...",
-            category: "Unknown"
+            category: "Unknown",
+            investment: { targetCapital: "0", description: "" },
+            image: ""
           };
           
           // Calculate progress percentage - safely access investment props
