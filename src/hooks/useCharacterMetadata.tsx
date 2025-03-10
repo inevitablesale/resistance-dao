@@ -10,8 +10,22 @@ export const useCharacterMetadata = (characterId: number) => {
     error
   } = useQuery({
     queryKey: ['character', characterId],
-    queryFn: () => getCharacterById(characterId),
+    queryFn: () => {
+      console.log(`Fetching character data for ID: ${characterId}`);
+      return getCharacterById(characterId);
+    },
     enabled: !!characterId && !isNaN(characterId),
+    onSuccess: (data) => {
+      if (data) {
+        console.log(`Character data for ID ${characterId}:`, {
+          name: data.name,
+          model_url: data.model_url,
+          character_model_ci: data.character_model_ci,
+          role: data.role,
+          traits: data.traits
+        });
+      }
+    }
   });
 
   // Convert character metadata to OpenSeaNFT format for compatibility
@@ -32,7 +46,8 @@ export const useCharacterMetadata = (characterId: number) => {
       ...trait,
       display_type: null // Add the required display_type property
     })),
-    animation_url: character.model_url || null,
+    // Use character_model_ci if available, fall back to model_url if not
+    animation_url: character.character_model_ci || character.model_url || null,
     is_suspicious: false,
     creator: null,
     owners: [

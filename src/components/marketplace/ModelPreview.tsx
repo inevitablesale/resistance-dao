@@ -74,7 +74,9 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
           }
         }
         
-        // Process character model URL
+        // Process character model URL - log initial modelUrl
+        console.log('Processing character model URL:', modelUrl);
+        
         if (modelUrl) {
           // Check if modelUrl is already a full URL or just a hash
           if (modelUrl.startsWith('http')) {
@@ -91,6 +93,8 @@ export const ModelPreview: React.FC<ModelPreviewProps> = ({
             console.log('Character model URL from hash:', url);
             setProcessedModelUrl(url);
           }
+        } else {
+          console.warn('No model URL provided');
         }
       } catch (error) {
         console.error('Error processing IPFS URLs:', error);

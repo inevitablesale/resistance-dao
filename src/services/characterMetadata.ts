@@ -1,4 +1,3 @@
-
 import { type OpenSeaNFT } from "@/services/openseaService";
 import { toast } from "@/components/ui/use-toast";
 
@@ -12,6 +11,7 @@ export interface CharacterMetadata {
   description: string;
   image_url: string;
   model_url?: string;
+  character_model_ci?: string;
   role: CharacterRole;
   radiation_level: number;
   rarity: string;
@@ -23,6 +23,13 @@ export interface CharacterMetadata {
 
 // Convert character metadata to OpenSeaNFT format for compatibility
 export const convertToNFT = (character: CharacterMetadata): OpenSeaNFT => {
+  console.log("Converting character to NFT format:", {
+    id: character.id,
+    name: character.name,
+    model_url: character.model_url,
+    character_model_ci: character.character_model_ci
+  });
+  
   return {
     identifier: character.tokenId,
     collection: "resistance-wasteland",
@@ -41,7 +48,8 @@ export const convertToNFT = (character: CharacterMetadata): OpenSeaNFT => {
       value: trait.value,
       display_type: null // Add the required display_type property
     })),
-    animation_url: character.model_url || null,
+    // Use character_model_ci if available, fall back to model_url if not
+    animation_url: character.character_model_ci || character.model_url || null,
     is_suspicious: false,
     creator: null,
     owners: [
@@ -67,6 +75,7 @@ const characterData: CharacterMetadata[] = [
     description: "Leader of the Sentinel faction, protector of the wasteland survivors.",
     image_url: "/images/characters/sentinel-01.jpg",
     model_url: "bafybeibekhofrvk7beimkculpeyum4wvcvyd7rhsst4wppnrwyqvw5i4ke",
+    character_model_ci: "bafybeibekhofrvk7beimkculpeyum4wvcvyd7rhsst4wppnrwyqvw5i4ke",
     role: "Sentinel",
     radiation_level: 25,
     rarity: "Legendary",
@@ -433,3 +442,6 @@ export const getCharacterNFTByTokenId = async (tokenId: string): Promise<OpenSea
     return null;
   }
 };
+
+// Add
+

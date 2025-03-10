@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNFTMetadata } from '@/hooks/useNFTMetadata';
 import { ToxicCard, ToxicCardContent, ToxicCardHeader, ToxicCardTitle, ToxicCardFooter } from '@/components/ui/toxic-card';
@@ -15,6 +15,17 @@ const NFTDetails: React.FC = () => {
   const navigate = useNavigate();
   const { data: nft, isLoading, error } = useNFTMetadata(tokenId || '');
   const [revealValue, setRevealValue] = useState(20); // Start with character mostly obscured
+  
+  useEffect(() => {
+    if (nft) {
+      console.log(`NFT details for token ${tokenId}:`, {
+        name: nft.name,
+        animation_url: nft.animation_url,
+        image_url: nft.image_url,
+        traits: nft.traits.map(t => `${t.trait_type}: ${t.value}`).join(', ')
+      });
+    }
+  }, [nft, tokenId]);
   
   const handleBack = () => {
     navigate(-1);
@@ -125,6 +136,7 @@ const NFTDetails: React.FC = () => {
             {nft.animation_url ? (
               <div className="w-full h-full flex flex-col">
                 <div className="h-[400px] relative">
+                  {console.log('Passing animation URL to ModelPreview:', nft.animation_url)}
                   <ModelPreview 
                     modelUrl={nft.animation_url}
                     height="100%"
