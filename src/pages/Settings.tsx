@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { useCustomWallet } from "@/hooks/useCustomWallet";
 import { useNFTBalance } from "@/hooks/useNFTBalance";
 import { useNavigate } from "react-router-dom";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { ReferralSystem } from "@/components/radiation/ReferralSystem";
 
 const Settings: React.FC = () => {
   const { isConnected, address } = useCustomWallet();
@@ -171,71 +171,14 @@ const Settings: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Only show Referral Link Section when connected */}
-          {isConnected && referralLink && (
-            <>
-              <Card className="mb-6 bg-black/40 border-white/10 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <h2 className="text-xl font-semibold mb-4 text-white">Your Referral Link</h2>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Input 
-                      value={referralLink}
-                      readOnly
-                      className="bg-black/40 border-white/10 text-white p-4 flex-grow"
-                    />
-                    <Button 
-                      onClick={copyToClipboard}
-                      className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
-                    >
-                      <Copy className="h-4 w-4" /> Copy Link
-                    </Button>
-                  </div>
-                  <p className="mt-2 text-sm text-blue-300">This referral is stored permanently once a user visits your link</p>
-                </CardContent>
-              </Card>
-
-              {/* Sharing Options */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mb-8">
-                <Button 
-                  variant="outline" 
-                  className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
-                  onClick={() => shareViaChannel('twitter')}
-                >
-                  <Share2 size={16} /> Share on X
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
-                  onClick={() => shareViaChannel('facebook')}
-                >
-                  <Facebook size={16} /> Share on Facebook
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
-                  onClick={() => shareViaChannel('telegram')}
-                >
-                  <ExternalLink size={16} /> Share on Telegram
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
-                  onClick={() => shareViaChannel('instagram')}
-                >
-                  <Instagram size={16} /> Share on Instagram
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="flex items-center justify-center gap-2 bg-black/40 border-white/10 hover:bg-white/5 text-white"
-                  onClick={() => shareViaChannel('sms')}
-                >
-                  <MessageSquare size={16} /> Share via SMS
-                </Button>
-              </div>
-            </>
+          {/* Replace the old referral system with the new ReferralSystem component */}
+          {isConnected && (
+            <div className="mb-8">
+              <ReferralSystem />
+            </div>
           )}
 
-          {/* Stats Cards - Updated labels and removed Invoices Paid */}
+          {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <Card className="bg-black/40 border-white/10 backdrop-blur-sm">
               <CardContent className="p-6 flex flex-col items-center justify-center">

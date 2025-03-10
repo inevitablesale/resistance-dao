@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { Shield, Send } from "lucide-react";
@@ -7,6 +7,8 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { sentinelContributeToParty } from "@/services/partyProtocolService";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
+import { useCustomWallet } from "@/hooks/useCustomWallet";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ContributionPanelProps {
   settlementId: string;
@@ -19,7 +21,51 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
   const [isContributing, setIsContributing] = useState(false);
   const { primaryWallet } = useDynamicContext();
   const { isConnected, connect } = useWalletConnection();
+  const { address, getReferrer } = useCustomWallet();
   const { toast } = useToast();
+  const [referrer, setReferrer] = useState<string | null>(null);
+
+  // Check for referrer when component mounts
+  useEffect(() => {
+    if (isConnected && address) {
+      const storedReferrer = getReferrer();
+      if (storedReferrer) {
+        setReferrer(storedReferrer);
+        console.log("Contribution will be credited to referrer:", storedReferrer);
+      }
+    }
+  }, [isConnected, address, getReferrer]);
+
+  // Function to update referral status after successful NFT purchase
+  const updateReferralStatus = async () => {
+    if (!referrer || !address) return;
+    
+    try {
+      // Update the referral to mark NFT as purchased
+      const { error } = await supabase
+        .from('referrals')
+        .update({
+          nft_purchased: true,
+          purchase_date: new Date().toISOString(),
+          payment_amount: 25 // $25 per referral
+        })
+        .eq('referrer_address', referrer)
+        .eq('referred_address', address)
+        .is('nft_purchased', false);
+        
+      if (error) throw error;
+      
+      console.log("Referral updated - NFT purchase recorded");
+      
+      // Notify the user about the referral bonus
+      toast({
+        title: "Referral Recorded",
+        description: "Your purchase has been credited to your referrer.",
+      });
+    } catch (error) {
+      console.error("Error updating referral status:", error);
+    }
+  };
 
   const handleContribute = async () => {
     if (!isConnected) {
@@ -59,6 +105,11 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
         title: "Contribution Successful!",
         description: `You've contributed ${contribution} ETH to the settlement.`,
       });
+      
+      // If this user was referred, update the referral status
+      if (referrer) {
+        await updateReferralStatus();
+      }
       
       // Reset form and notify parent component
       setContribution("");
@@ -120,6 +171,11 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
         
         <div className="text-xs text-toxic-neon/70">
           By contributing, you'll receive governance rights in this settlement proportional to your contribution.
+          {referrer && (
+            <div className="mt-1 text-amber-400">
+              Your purchase will credit your referrer with a $25 bounty reward.
+            </div>
+          )}
         </div>
       </div>
     </div>

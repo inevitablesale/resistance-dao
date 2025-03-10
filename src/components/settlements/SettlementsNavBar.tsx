@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ToxicButton } from '@/components/ui/toxic-button';
-import { Plus, Gavel, ShieldCheck, Building2 } from 'lucide-react';
+import { Plus, Gavel, ShieldCheck, Building2, Target } from 'lucide-react';
 
 export const SettlementsNavBar = () => {
   const location = useLocation();
@@ -42,6 +42,15 @@ export const SettlementsNavBar = () => {
           >
             <ShieldCheck className="w-4 h-4" />
             My Contributions
+          </ToxicButton>
+        </Link>
+        <Link to="/referrals">
+          <ToxicButton 
+            variant={isActive("/referrals") ? "primary" : "tertiary"} 
+            className="gap-2"
+          >
+            <Target className="w-4 h-4" />
+            Referrals
           </ToxicButton>
         </Link>
         <Link to="/thesis">
