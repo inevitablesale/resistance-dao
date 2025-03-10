@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Target, Hammer, Radiation, Biohazard } from 'lucide-react';
@@ -12,10 +11,20 @@ import { CharacterType } from '@/types/character';
 interface CharacterListProps {
   className?: string;
   filterRole?: 'sentinel' | 'survivor' | 'bounty-hunter' | 'all';
+  characterRole?: string;
+  title?: string;
+  description?: string;
+  onCharacterClick?: (ipfsCID: string) => void;
 }
 
-const getCharactersByRole = (role: 'sentinel' | 'survivor' | 'bounty-hunter' | 'all'): CharacterType[] => {
-  if (role === 'all') {
+const getCharactersByRole = (role: 'sentinel' | 'survivor' | 'bounty-hunter' | 'all' | string): CharacterType[] => {
+  if (role === 'SENTINEL' || role === 'sentinel') {
+    return CHARACTERS.SENTINEL_CHARACTERS;
+  } else if (role === 'SURVIVOR' || role === 'survivor') {
+    return CHARACTERS.SURVIVOR_CHARACTERS;
+  } else if (role === 'BOUNTY_HUNTER' || role === 'bounty-hunter') {
+    return CHARACTERS.BOUNTY_HUNTER_CHARACTERS;
+  } else if (role === 'all') {
     return [
       ...CHARACTERS.SENTINEL_CHARACTERS,
       ...CHARACTERS.SURVIVOR_CHARACTERS,
@@ -23,16 +32,7 @@ const getCharactersByRole = (role: 'sentinel' | 'survivor' | 'bounty-hunter' | '
     ];
   }
   
-  switch (role) {
-    case 'sentinel':
-      return CHARACTERS.SENTINEL_CHARACTERS;
-    case 'survivor':
-      return CHARACTERS.SURVIVOR_CHARACTERS;
-    case 'bounty-hunter':
-      return CHARACTERS.BOUNTY_HUNTER_CHARACTERS;
-    default:
-      return [];
-  }
+  return [];
 };
 
 const getRoleIcon = (role: 'sentinel' | 'survivor' | 'bounty-hunter') => {
@@ -54,8 +54,16 @@ const getCharacterRole = (id: number): 'sentinel' | 'survivor' | 'bounty-hunter'
   return 'bounty-hunter';
 };
 
-export function CharacterList({ className = "", filterRole = 'all' }: CharacterListProps) {
-  const characters = getCharactersByRole(filterRole);
+export function CharacterList({ 
+  className = "", 
+  filterRole = 'all',
+  characterRole,
+  title,
+  description,
+  onCharacterClick
+}: CharacterListProps) {
+  const role = characterRole || filterRole;
+  const characters = getCharactersByRole(role);
   const [selectedCharacter, setSelectedCharacter] = useState<CharacterType | null>(null);
   const [revealedCharacters, setRevealedCharacters] = useState<number[]>([]);
 
@@ -87,7 +95,8 @@ export function CharacterList({ className = "", filterRole = 'all' }: CharacterL
   return (
     <div className={className}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-mono text-toxic-neon">Wasteland Characters</h2>
+        <h2 className="text-xl font-mono text-toxic-neon">{title || "Wasteland Characters"}</h2>
+        {description && <p className="text-white/70 text-sm">{description}</p>}
         {revealedCharacters.length > 0 && (
           <ToxicButton 
             variant="outline" 
@@ -159,7 +168,13 @@ export function CharacterList({ className = "", filterRole = 'all' }: CharacterL
             <motion.div key={character.id} variants={itemVariants}>
               <ToxicCard 
                 className="bg-black/70 border-toxic-neon/30 cursor-pointer hover:border-toxic-neon/60 transition-all"
-                onClick={() => setSelectedCharacter(character)}
+                onClick={() => {
+                  if (onCharacterClick) {
+                    onCharacterClick(character.ipfsCID);
+                  } else {
+                    setSelectedCharacter(character);
+                  }
+                }}
               >
                 <div className="p-3">
                   <div className="h-24 bg-gradient-to-b from-toxic-neon/20 to-black/60 rounded-lg flex items-center justify-center mb-2">

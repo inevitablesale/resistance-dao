@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -27,7 +26,6 @@ export interface MarketplaceListing {
   status: 'active' | 'sold' | 'expired';
   description?: string;
   modelUrl?: string;
-  // Don't add role as it's not in the existing type
 }
 
 interface MarketplaceListingGridProps {
