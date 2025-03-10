@@ -1,19 +1,25 @@
+
 import { Buffer } from 'buffer';
 import { ProposalMetadata } from '@/types/proposals';
 import { IPFSContent } from '@/types/content';
-import { supabase } from "@/integrations/supabase/client";
+
+// Mock credentials for development purposes
+// In production, these would be securely retrieved from environment variables or a secure API
+const PINATA_CREDENTIALS = {
+  PINATA_API_KEY: process.env.PINATA_API_KEY || 'mock-api-key',
+  PINATA_API_SECRET: process.env.PINATA_API_SECRET || 'mock-api-secret'
+};
 
 export const getFromIPFS = async <T extends ProposalMetadata | IPFSContent>(
   hash: string,
   type: 'proposal' | 'content'
 ): Promise<T> => {
   try {
-    console.log('Getting Pinata credentials from Supabase...');
-    const { data: credentials, error: credentialsError } = await supabase
-      .functions.invoke('get-pinata-credentials');
+    console.log('Getting Pinata credentials...');
+    const credentials = PINATA_CREDENTIALS;
 
-    if (credentialsError || !credentials.PINATA_API_KEY || !credentials.PINATA_API_SECRET) {
-      console.error('Error getting Pinata credentials:', credentialsError);
+    if (!credentials.PINATA_API_KEY || !credentials.PINATA_API_SECRET) {
+      console.error('Error getting Pinata credentials');
       throw new Error('Failed to get Pinata credentials');
     }
 
@@ -83,12 +89,11 @@ export const uploadToIPFS = async <T extends ProposalMetadata | IPFSContent>(
     console.log('\n=== Starting IPFS Upload ===');
     console.log('Content to upload:', JSON.stringify(content, null, 2));
     
-    console.log('Getting Pinata credentials from Supabase...');
-    const { data: credentials, error: credentialsError } = await supabase
-      .functions.invoke('get-pinata-credentials');
+    console.log('Getting Pinata credentials...');
+    const credentials = PINATA_CREDENTIALS;
 
-    if (credentialsError || !credentials.PINATA_API_KEY || !credentials.PINATA_API_SECRET) {
-      console.error('Error getting Pinata credentials:', credentialsError);
+    if (!credentials.PINATA_API_KEY || !credentials.PINATA_API_SECRET) {
+      console.error('Error getting Pinata credentials');
       throw new Error('Failed to get Pinata credentials');
     }
 
@@ -127,12 +132,11 @@ export const getModelFromIPFS = async (hash: string): Promise<string> => {
     console.log('\n=== Retrieving 3D Model from IPFS ===');
     console.log('Model hash:', hash);
     
-    console.log('Getting Pinata credentials from Supabase...');
-    const { data: credentials, error: credentialsError } = await supabase
-      .functions.invoke('get-pinata-credentials');
+    console.log('Getting Pinata credentials...');
+    const credentials = PINATA_CREDENTIALS;
 
-    if (credentialsError || !credentials.PINATA_API_KEY || !credentials.PINATA_API_SECRET) {
-      console.error('Error getting Pinata credentials:', credentialsError);
+    if (!credentials.PINATA_API_KEY || !credentials.PINATA_API_SECRET) {
+      console.error('Error getting Pinata credentials');
       throw new Error('Failed to get Pinata credentials');
     }
 
@@ -154,12 +158,11 @@ export const uploadModelToIPFS = async (
     console.log('\n=== Starting 3D Model Upload to IPFS ===');
     console.log('Uploading model:', modelFile.name);
     
-    console.log('Getting Pinata credentials from Supabase...');
-    const { data: credentials, error: credentialsError } = await supabase
-      .functions.invoke('get-pinata-credentials');
+    console.log('Getting Pinata credentials...');
+    const credentials = PINATA_CREDENTIALS;
 
-    if (credentialsError || !credentials.PINATA_API_KEY || !credentials.PINATA_API_SECRET) {
-      console.error('Error getting Pinata credentials:', credentialsError);
+    if (!credentials.PINATA_API_KEY || !credentials.PINATA_API_SECRET) {
+      console.error('Error getting Pinata credentials');
       throw new Error('Failed to get Pinata credentials');
     }
 

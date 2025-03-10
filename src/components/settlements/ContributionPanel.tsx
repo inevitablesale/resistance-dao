@@ -8,7 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { sentinelContributeToParty } from "@/services/partyProtocolService";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
-import { supabase } from "@/integrations/supabase/client";
 
 interface ContributionPanelProps {
   settlementId: string;
@@ -35,37 +34,6 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
       }
     }
   }, [isConnected, address, getReferrer]);
-
-  // Function to update referral status after successful NFT purchase
-  const updateReferralStatus = async () => {
-    if (!referrer || !address) return;
-    
-    try {
-      // Update the referral to mark NFT as purchased
-      const { error } = await supabase
-        .from('referrals')
-        .update({
-          nft_purchased: true,
-          purchase_date: new Date().toISOString(),
-          payment_amount: 25 // $25 per referral
-        })
-        .eq('referrer_address', referrer)
-        .eq('referred_address', address)
-        .is('nft_purchased', false);
-        
-      if (error) throw error;
-      
-      console.log("Referral updated - NFT purchase recorded");
-      
-      // Notify the user about the referral bonus
-      toast({
-        title: "Referral Recorded",
-        description: "Your purchase has been credited to your referrer.",
-      });
-    } catch (error) {
-      console.error("Error updating referral status:", error);
-    }
-  };
 
   const handleContribute = async () => {
     if (!isConnected) {
@@ -106,9 +74,15 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
         description: `You've contributed ${contribution} ETH to the settlement.`,
       });
       
-      // If this user was referred, update the referral status
+      // If this user was referred, log it
       if (referrer) {
-        await updateReferralStatus();
+        console.log(`Referral purchase completed. Referrer: ${referrer}, Buyer: ${address}`);
+        
+        // Notify the user about the referral bonus
+        toast({
+          title: "Referral Recorded",
+          description: "Your purchase has been credited to your referrer.",
+        });
       }
       
       // Reset form and notify parent component
