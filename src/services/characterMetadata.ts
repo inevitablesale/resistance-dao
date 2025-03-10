@@ -11,7 +11,7 @@ export interface CharacterMetadata {
   description: string;
   image_url: string;
   model_url?: string;
-  character_model_ci?: string;
+  character_model_cid?: string;
   role: CharacterRole;
   radiation_level: number;
   rarity: string;
@@ -27,8 +27,15 @@ export const convertToNFT = (character: CharacterMetadata): OpenSeaNFT => {
     id: character.id,
     name: character.name,
     model_url: character.model_url,
-    character_model_ci: character.character_model_ci
+    character_model_cid: character.character_model_cid
   });
+  
+  // Properly format the animation_url based on character_model_cid or model_url
+  const animation_url = character.character_model_cid 
+    ? `https://gateway.pinata.cloud/ipfs/${character.character_model_cid}`
+    : character.model_url || null;
+  
+  console.log("Using animation URL:", animation_url);
   
   return {
     identifier: character.tokenId,
@@ -48,8 +55,7 @@ export const convertToNFT = (character: CharacterMetadata): OpenSeaNFT => {
       value: trait.value,
       display_type: null // Add the required display_type property
     })),
-    // Use character_model_ci if available, fall back to model_url if not
-    animation_url: character.character_model_ci || character.model_url || null,
+    animation_url,
     is_suspicious: false,
     creator: null,
     owners: [
@@ -75,7 +81,7 @@ const characterData: CharacterMetadata[] = [
     description: "Leader of the Sentinel faction, protector of the wasteland survivors.",
     image_url: "/images/characters/sentinel-01.jpg",
     model_url: "bafybeibekhofrvk7beimkculpeyum4wvcvyd7rhsst4wppnrwyqvw5i4ke",
-    character_model_ci: "bafybeibekhofrvk7beimkculpeyum4wvcvyd7rhsst4wppnrwyqvw5i4ke",
+    character_model_cid: "bafybeibekhofrvk7beimkculpeyum4wvcvyd7rhsst4wppnrwyqvw5i4ke",
     role: "Sentinel",
     radiation_level: 25,
     rarity: "Legendary",
@@ -442,6 +448,3 @@ export const getCharacterNFTByTokenId = async (tokenId: string): Promise<OpenSea
     return null;
   }
 };
-
-// Add
-
