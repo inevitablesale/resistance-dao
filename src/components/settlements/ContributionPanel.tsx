@@ -2,12 +2,18 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { ToxicButton } from "@/components/ui/toxic-button";
-import { Shield, Send } from "lucide-react";
+import { Shield, Send, Info } from "lucide-react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useToast } from "@/hooks/use-toast";
 import { sentinelContributeToParty } from "@/services/partyProtocolService";
 import { useWalletConnection } from "@/hooks/useWalletConnection";
 import { useCustomWallet } from "@/hooks/useCustomWallet";
+import { 
+  calculatePriceStructure, 
+  formatEthAmount,
+  PriceBreakdown 
+} from "@/utils/priceCalculator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ReferralInfo {
   referrerAddress: string;
@@ -26,6 +32,7 @@ interface ContributionPanelProps {
 export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: ContributionPanelProps) => {
   const [contribution, setContribution] = useState("");
   const [isContributing, setIsContributing] = useState(false);
+  const [priceBreakdown, setPriceBreakdown] = useState<PriceBreakdown | null>(null);
   const { primaryWallet } = useDynamicContext();
   const { isConnected, connect } = useWalletConnection();
   const { address, getReferrer } = useCustomWallet();
@@ -42,6 +49,18 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
       }
     }
   }, [isConnected, address, getReferrer]);
+
+  // Calculate price breakdown when contribution changes
+  useEffect(() => {
+    if (contribution && !isNaN(parseFloat(contribution))) {
+      const desiredAmount = parseFloat(contribution);
+      // Calculate price breakdown including Party DAO fees and referral rewards
+      const breakdown = calculatePriceStructure(desiredAmount);
+      setPriceBreakdown(breakdown);
+    } else {
+      setPriceBreakdown(null);
+    }
+  }, [contribution]);
 
   const handleContribute = async () => {
     if (!isConnected) {
@@ -69,17 +88,22 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
         description: "Please approve the transaction",
       });
       
+      // If we have a price breakdown, use the gross amount for the transaction
+      const contributionAmount = priceBreakdown 
+        ? formatEthAmount(priceBreakdown.grossPrice) 
+        : contribution;
+      
       await sentinelContributeToParty(
         primaryWallet, 
         settlementId,
-        contribution,
+        contributionAmount,
         undefined,
         `Contributing to ${settlementName}`
       );
       
       toast({
         title: "Contribution Successful!",
-        description: `You've contributed ${contribution} ETH to the settlement.`,
+        description: `You've contributed ${contributionAmount} ETH to the settlement.`,
       });
       
       // If this user was referred, record the purchase completion
@@ -144,6 +168,39 @@ export const ContributionPanel = ({ settlementId, settlementName, onSuccess }: C
               step="0.01"
             />
           </div>
+          
+          {priceBreakdown && (
+            <div className="mt-2 text-xs space-y-1 bg-black/30 p-2 rounded border border-toxic-neon/10">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex justify-between items-center">
+                      <span className="flex items-center gap-1 text-gray-400">
+                        Party DAO Fee (2.5%)
+                        <Info className="h-3 w-3 text-gray-500" />
+                      </span>
+                      <span className="text-red-400">-{formatEthAmount(priceBreakdown.partyDaoFee)} ETH</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-black border border-toxic-neon/30 text-xs">
+                    <p>Party Protocol charges a 2.5% fee on all transactions</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              {referrer && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Referral Reward</span>
+                  <span className="text-amber-400">-{formatEthAmount(priceBreakdown.referralAmount)} ETH</span>
+                </div>
+              )}
+              
+              <div className="flex justify-between pt-1 border-t border-toxic-neon/10">
+                <span className="font-medium text-toxic-neon">Final Settlement Amount</span>
+                <span className="font-medium">{formatEthAmount(priceBreakdown.finalRevenue)} ETH</span>
+              </div>
+            </div>
+          )}
         </div>
         
         <ToxicButton
