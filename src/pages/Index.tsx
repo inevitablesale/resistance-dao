@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -12,48 +11,7 @@ import { StoryTerminal } from '@/components/terminal/StoryTerminal';
 import { RadiationSystem } from '@/components/radiation/RadiationSystem';
 import { NFTDistributionStatus } from '@/components/radiation/NFTDistributionStatus';
 import { ReferralSystem } from '@/components/radiation/ReferralSystem';
-
-import { 
-  Rocket, 
-  Coins, 
-  Users, 
-  Share2, 
-  Check, 
-  ChevronRight, 
-  Building2, 
-  CircleDollarSign,
-  Scale,
-  FileText,
-  ChevronRight as ArrowIcon,
-  Clock,
-  Target,
-  Wallet,
-  RefreshCw,
-  Radiation,
-  Skull,
-  Zap,
-  Shield,
-  Image,
-  Biohazard,
-  ShieldX,
-  UserX,
-  Bug,
-  Bomb,
-  Crosshair,
-  PlusCircle,
-  Search,
-  ShoppingBag,
-  Box,
-  Eye, 
-  Map,
-  Globe,
-  Network,
-  Wrench,
-  Hammer,
-  Lightbulb,
-  Flag,
-  Scroll
-} from "lucide-react";
+import { Rocket, Coins, Users, Share2, Check, ChevronRight, Building2, CircleDollarSign, Scale, FileText, ChevronRight as ArrowIcon, Clock, Target, Wallet, RefreshCw, Radiation, Skull, Zap, Shield, Image, Biohazard, ShieldX, UserX, Bug, Bomb, Crosshair, PlusCircle, Search, ShoppingBag, Box, Eye, Map, Globe, Network, Wrench, Hammer, Lightbulb, Flag, Scroll } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -73,40 +31,45 @@ import { MarketplaceActivityFeed, MarketplaceActivity } from "@/components/marke
 import { CharacterProgress } from "@/components/chronicle/CharacterProgress";
 import { TerritoryStatus } from "@/components/chronicle/TerritoryStatus";
 import { ModelPreview } from '@/components/marketplace/ModelPreview';
-
 type AuthState = "unauthenticated" | "authenticating" | "breaching" | "authenticated";
-
 const Index = () => {
   const navigate = useNavigate();
-  const { data: stats, isLoading: isLoadingStats } = useProposalStats();
-  const { data: nftBalance = 0, isLoading: isLoadingNFT } = useNFTBalance("0x1234..."); // Demo address
-  const { isConnected, address } = useCustomWallet();
-  const { connect } = useWalletConnection();
-  
+  const {
+    data: stats,
+    isLoading: isLoadingStats
+  } = useProposalStats();
+  const {
+    data: nftBalance = 0,
+    isLoading: isLoadingNFT
+  } = useNFTBalance("0x1234..."); // Demo address
+  const {
+    isConnected,
+    address
+  } = useCustomWallet();
+  const {
+    connect
+  } = useWalletConnection();
   const [authState, setAuthState] = useState<AuthState>("unauthenticated");
   const [isRefreshingActivity, setIsRefreshingActivity] = useState(false);
   const [storyTerminalOpen, setStoryTerminalOpen] = useState(true);
-  
+
   // New states for radiation system
   const [currentRadiation, setCurrentRadiation] = useState(94); // Start at 94% radiation
   const [totalNFTsClaimed, setTotalNFTsClaimed] = useState(925); // Mock data - total claimed NFTs
   const [referralEarnings, setReferralEarnings] = useState(375); // Mock data - earnings in MATIC
   const [totalReferrals, setTotalReferrals] = useState(15); // Mock data - total referrals
-  
+
   useEffect(() => {
     if (isConnected && authState === "unauthenticated") {
       setAuthState("authenticated");
     }
   }, [isConnected]);
-  
   const handleLoginSuccess = () => {
     setAuthState("breaching");
   };
-  
   const handleBreachComplete = () => {
     setAuthState("authenticated");
   };
-  
   const handleRefreshActivity = () => {
     setIsRefreshingActivity(true);
     // Simulate refresh delay
@@ -114,11 +77,9 @@ const Index = () => {
       setIsRefreshingActivity(false);
     }, 1000);
   };
-
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US').format(Math.round(num));
   };
-
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -126,7 +87,6 @@ const Index = () => {
       maximumFractionDigits: 0
     }).format(amount);
   };
-  
   const marketplaceStats = {
     tradingVolume: 2450000,
     activeListings: 472,
@@ -135,52 +95,44 @@ const Index = () => {
     successfulTrades: 389,
     bountyHunterRatio: 35
   };
-  
-  const recentActivities: MarketplaceActivity[] = [
-    {
-      id: "act-1",
-      type: "listing",
-      title: "New Bounty Hunter Listed",
-      timestamp: "2 minutes ago",
-      itemId: "BH-724"
-    },
-    {
-      id: "act-2",
-      type: "purchase",
-      title: "Survivor Token Purchased",
-      timestamp: "15 minutes ago",
-      amount: "24,500 RD"
-    },
-    {
-      id: "act-3",
-      type: "offer",
-      title: "Offer Made on Equipment",
-      timestamp: "32 minutes ago",
-      amount: "8,750 RD"
-    },
-    {
-      id: "act-4",
-      type: "trade",
-      title: "Successful Trade Completed",
-      timestamp: "1 hour ago",
-      itemId: "S-198"
-    },
-    {
-      id: "act-5",
-      type: "mint",
-      title: "New Survivor NFT Minted",
-      timestamp: "2 hours ago",
-      address: "0x789...012"
-    }
-  ];
-
-  const renderMarketplace = () => (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-5xl mx-auto"
-    >
+  const recentActivities: MarketplaceActivity[] = [{
+    id: "act-1",
+    type: "listing",
+    title: "New Bounty Hunter Listed",
+    timestamp: "2 minutes ago",
+    itemId: "BH-724"
+  }, {
+    id: "act-2",
+    type: "purchase",
+    title: "Survivor Token Purchased",
+    timestamp: "15 minutes ago",
+    amount: "24,500 RD"
+  }, {
+    id: "act-3",
+    type: "offer",
+    title: "Offer Made on Equipment",
+    timestamp: "32 minutes ago",
+    amount: "8,750 RD"
+  }, {
+    id: "act-4",
+    type: "trade",
+    title: "Successful Trade Completed",
+    timestamp: "1 hour ago",
+    itemId: "S-198"
+  }, {
+    id: "act-5",
+    type: "mint",
+    title: "New Survivor NFT Minted",
+    timestamp: "2 hours ago",
+    address: "0x789...012"
+  }];
+  const renderMarketplace = () => <motion.div initial={{
+    opacity: 0
+  }} animate={{
+    opacity: 1
+  }} transition={{
+    duration: 0.5
+  }} className="max-w-5xl mx-auto">
       <div className="text-left mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-toxic-neon/10 border border-toxic-neon/20 text-toxic-neon text-sm mb-4 font-mono broken-glass">
           <span className="w-2 h-2 bg-apocalypse-red rounded-full animate-pulse flash-critical" />
@@ -188,34 +140,19 @@ const Index = () => {
           Wasteland Status: <span className="text-apocalypse-red font-semibold status-critical">Radiation Level: {currentRadiation}%</span>
         </div>
         
-        <StoryTerminal 
-          initiallyOpen={storyTerminalOpen} 
-          onClose={() => setStoryTerminalOpen(false)} 
-          className="mb-8" 
-        />
+        <StoryTerminal initiallyOpen={storyTerminalOpen} onClose={() => setStoryTerminalOpen(false)} className="mb-8" />
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-1">
-            <RadiationSystem 
-              currentRadiation={currentRadiation} 
-              totalNFTsClaimed={totalNFTsClaimed} 
-              className="mb-6"
-            />
-            <ReferralSystem
-              earnings={referralEarnings}
-              totalReferrals={totalReferrals}
-            />
+            <RadiationSystem currentRadiation={currentRadiation} totalNFTsClaimed={totalNFTsClaimed} className="mb-6" />
+            <ReferralSystem earnings={referralEarnings} totalReferrals={totalReferrals} />
           </div>
           <div className="md:col-span-2">
             <NFTDistributionStatus className="mb-6" />
           </div>
         </div>
 
-        <MarketplaceStatusPanel 
-          stats={marketplaceStats} 
-          isLoading={isLoadingStats}
-          className="mb-8"
-        />
+        <MarketplaceStatusPanel stats={marketplaceStats} isLoading={isLoadingStats} className="mb-8" />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
@@ -223,60 +160,11 @@ const Index = () => {
           </div>
           
           <div className="lg:col-span-1">
-            <MarketplaceActivityFeed 
-              activities={recentActivities} 
-              isLoading={isRefreshingActivity}
-              onRefresh={handleRefreshActivity}
-              className="mb-6"
-            />
+            <MarketplaceActivityFeed activities={recentActivities} isLoading={isRefreshingActivity} onRefresh={handleRefreshActivity} className="mb-6" />
             
-            <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4 mb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="p-2 rounded-full bg-toxic-neon/10">
-                  <Shield className="w-5 h-5 text-toxic-neon" />
-                </div>
-                <h3 className="text-lg font-mono text-toxic-neon">Resistance Status</h3>
-              </div>
-              
-              {isConnected ? (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">Network Influence</span>
-                    <span className="text-toxic-neon font-mono">42</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">Wasteland Reputation</span>
-                    <div className="flex items-center">
-                      <ToxicBadge variant="rating" className="text-toxic-neon">★ 3.8</ToxicBadge>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">Radiation Level</span>
-                    <span className="text-toxic-neon font-mono">
-                      <span className="text-amber-400">MEDIUM (28%)</span>
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">Referral Earnings</span>
-                    <span className="text-toxic-neon font-mono">{referralEarnings} MATIC</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-6 bg-toxic-neon/5 rounded-lg">
-                  <p className="text-white/70 mb-4">Connect to view your resistance status</p>
-                  <ToxicButton 
-                    variant="marketplace"
-                    onClick={connect}
-                  >
-                    <Radiation className="h-4 w-4 mr-2" />
-                    ACTIVATE SURVIVAL BEACON
-                  </ToxicButton>
-                </div>
-              )}
-            </ToxicCard>
             
-            {isConnected && (
-              <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4">
+            
+            {isConnected && <ToxicCard className="bg-black/70 border-toxic-neon/30 p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="p-2 rounded-full bg-toxic-neon/10">
                     <Network className="w-5 h-5 text-toxic-neon" />
@@ -285,63 +173,37 @@ const Index = () => {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2">
-                  <ToxicButton 
-                    variant="outline" 
-                    size="sm"
-                    className="border-toxic-neon/30"
-                    onClick={() => navigate('/hunt')}
-                  >
+                  <ToxicButton variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/hunt')}>
                     <Eye className="h-4 w-4 mr-1" />
                     Sentinel Center
                   </ToxicButton>
                   
-                  <ToxicButton 
-                    variant="outline" 
-                    size="sm"
-                    className="border-toxic-neon/30"
-                    onClick={() => navigate('/marketplace/bounty-hunters')}
-                  >
+                  <ToxicButton variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/marketplace/bounty-hunters')}>
                     <Target className="h-4 w-4 mr-1" />
                     Bounty Hub
                   </ToxicButton>
                   
-                  <ToxicButton 
-                    variant="outline" 
-                    size="sm"
-                    className="border-toxic-neon/30"
-                    onClick={() => navigate('/chronicles')}
-                  >
+                  <ToxicButton variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/chronicles')}>
                     <Scroll className="h-4 w-4 mr-1" />
                     Chronicles
                   </ToxicButton>
                   
-                  <ToxicButton 
-                    variant="outline" 
-                    size="sm"
-                    className="border-toxic-neon/30"
-                    onClick={() => navigate('/territories/map')}
-                  >
+                  <ToxicButton variant="outline" size="sm" className="border-toxic-neon/30" onClick={() => navigate('/territories/map')}>
                     <Map className="h-4 w-4 mr-1" />
                     Territory Map
                   </ToxicButton>
                 </div>
-              </ToxicCard>
-            )}
+              </ToxicCard>}
           </div>
         </div>
       </div>
-    </motion.div>
-  );
-
-  return (
-    <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
+    </motion.div>;
+  return <div className="min-h-screen bg-black text-white relative post-apocalyptic-bg">
       <DrippingSlime position="top" dripsCount={15} showIcons={false} toxicGreen={true} />
       <div className="dust-particles"></div>
       <div className="fog-overlay"></div>
 
-      {authState === "breaching" && (
-        <BreachSequence onComplete={handleBreachComplete} />
-      )}
+      {authState === "breaching" && <BreachSequence onComplete={handleBreachComplete} />}
 
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0">
@@ -350,15 +212,9 @@ const Index = () => {
         </div>
         
         <div className="container px-4 relative">
-          {authState === "unauthenticated" ? (
-            <TerminalLogin onLoginSuccess={handleLoginSuccess} />
-          ) : authState === "authenticated" ? (
-            renderMarketplace()
-          ) : null}
+          {authState === "unauthenticated" ? <TerminalLogin onLoginSuccess={handleLoginSuccess} /> : authState === "authenticated" ? renderMarketplace() : null}
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
