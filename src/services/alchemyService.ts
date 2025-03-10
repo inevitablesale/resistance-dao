@@ -22,6 +22,18 @@ export interface ResistanceNFT {
   }>;
 }
 
+// Helper function to validate attribute structure
+function isValidAttribute(attr: any): attr is { trait_type: string; value: string } {
+  return (
+    typeof attr === 'object' &&
+    attr !== null &&
+    'trait_type' in attr &&
+    'value' in attr &&
+    typeof attr.trait_type === 'string' &&
+    typeof attr.value === 'string'
+  );
+}
+
 // Initialize Alchemy SDK
 const settings = {
   apiKey: "iTtNiAAH4RhVb4DGHCF4RgQ6xWCPLDN7",
@@ -67,17 +79,19 @@ export const fetchNFTsForAddress = async (address: string): Promise<ResistanceNF
     });
 
     const nfts: ResistanceNFT[] = nftsResponse.ownedNfts.map(nft => {
-      const attributes = nft.rawMetadata?.attributes || [];
-      const classAttribute = attributes.find(attr => attr.trait_type === "Class");
+      const rawAttributes = nft.rawMetadata?.attributes || [];
+      const validAttributes = Array.isArray(rawAttributes) 
+        ? rawAttributes.filter(isValidAttribute)
+        : [];
       
       return {
         tokenId: nft.tokenId,
-        class: getNFTClassFromAttributes(attributes),
+        class: getNFTClassFromAttributes(validAttributes),
         name: nft.title || `Resistance NFT #${nft.tokenId}`,
         description: nft.description,
         image: nft.media[0]?.gateway || undefined,
         animation_url: nft.media[1]?.gateway,
-        attributes: attributes
+        attributes: validAttributes
       };
     });
 
