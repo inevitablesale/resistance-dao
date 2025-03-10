@@ -1,17 +1,32 @@
-
 import { ethers } from "ethers";
 import { ResistanceNFT, RESISTANCE_NFT_ADDRESS } from "./alchemyService";
 import { createReferral, getActiveReferral, updateReferralWithPurchase } from "./referralService";
 import { useToast } from "@/hooks/use-toast";
+
+// Admin wallet address that performs airdrops
+export const ADMIN_WALLET_ADDRESS = "0x1d60Fbd2d31E5Ea8ea9565ef1b186D90639583d5";
 
 export interface NFTPurchaseEvent {
   buyer: string;
   tokenId: string;
   price: ethers.BigNumber;
   timestamp: number;
+  isAirdrop?: boolean;
 }
 
+// Keep track of airdropped token IDs
+const airdropTokenIds = new Set<string>();
+
 const NFT_TRANSFER_EVENT = "Transfer(address,address,uint256)";
+
+export const markTokenAsAirdrop = (tokenId: string) => {
+  airdropTokenIds.add(tokenId.toString());
+  console.log(`Token ${tokenId} marked as airdrop`);
+};
+
+export const isTokenAirdrop = (tokenId: string): boolean => {
+  return airdropTokenIds.has(tokenId.toString());
+};
 
 export const subscribeToPurchaseEvents = (
   provider: ethers.providers.Web3Provider,
@@ -26,27 +41,65 @@ export const subscribeToPurchaseEvents = (
     provider
   );
 
-  console.log("Subscribing to NFT purchase events...");
+  console.log("Subscribing to NFT purchase events and airdrops...");
 
-  // Listen for Transfer events where 'from' is the zero address (new mints)
+  // Listen for all Transfer events
   nftContract.on(NFT_TRANSFER_EVENT, async (from, to, tokenId, event) => {
-    // Only process new mints (from zero address)
+    const tokenIdStr = tokenId.toString();
+    
+    // Handle new mints (from zero address)
     if (from === ethers.constants.AddressZero) {
-      console.log("New NFT purchase detected:", {
-        buyer: to,
-        tokenId: tokenId.toString(),
+      console.log("New NFT mint detected:", {
+        from,
+        to,
+        tokenId: tokenIdStr,
         timestamp: Math.floor(Date.now() / 1000)
       });
 
-      const purchaseEvent: NFTPurchaseEvent = {
-        buyer: to,
-        tokenId: tokenId.toString(),
-        price: ethers.utils.parseEther("0.1"), // Fixed price for now
-        timestamp: Math.floor(Date.now() / 1000)
-      };
+      // If it's from zero address directly to user (not through admin), it's a direct mint
+      const isDirectMint = to.toLowerCase() !== ADMIN_WALLET_ADDRESS.toLowerCase();
+      
+      // If direct mint, process as a purchase
+      if (isDirectMint) {
+        const purchaseEvent: NFTPurchaseEvent = {
+          buyer: to,
+          tokenId: tokenIdStr,
+          price: ethers.utils.parseEther("0.1"), // Fixed price for now
+          timestamp: Math.floor(Date.now() / 1000),
+          isAirdrop: false
+        };
 
-      await processPurchase(purchaseEvent);
-      onPurchaseSuccess?.(purchaseEvent);
+        await processPurchase(purchaseEvent);
+        onPurchaseSuccess?.(purchaseEvent);
+      }
+    }
+    // Handle transfers from admin wallet (could be airdrops or sales)
+    else if (from.toLowerCase() === ADMIN_WALLET_ADDRESS.toLowerCase()) {
+      console.log("Transfer from admin wallet detected:", {
+        to,
+        tokenId: tokenIdStr,
+        timestamp: Math.floor(Date.now() / 1000)
+      });
+      
+      // Check if this token was explicitly marked as an airdrop
+      const isAirdrop = isTokenAirdrop(tokenIdStr);
+      
+      if (isAirdrop) {
+        console.log(`Token ${tokenIdStr} is an airdrop - skipping referral processing`);
+      } else {
+        console.log(`Processing transfer from admin as a purchase`);
+        
+        const purchaseEvent: NFTPurchaseEvent = {
+          buyer: to,
+          tokenId: tokenIdStr,
+          price: ethers.utils.parseEther("0.1"), // Fixed price for now 
+          timestamp: Math.floor(Date.now() / 1000),
+          isAirdrop: false
+        };
+
+        await processPurchase(purchaseEvent);
+        onPurchaseSuccess?.(purchaseEvent);
+      }
     }
   });
 
@@ -57,6 +110,12 @@ export const subscribeToPurchaseEvents = (
 
 const processPurchase = async (purchaseEvent: NFTPurchaseEvent) => {
   try {
+    // Skip processing for airdrops
+    if (purchaseEvent.isAirdrop) {
+      console.log("Skipping referral processing for airdrop token:", purchaseEvent.tokenId);
+      return;
+    }
+    
     // Check if buyer has an active referral
     const referral = await getActiveReferral(purchaseEvent.buyer);
     

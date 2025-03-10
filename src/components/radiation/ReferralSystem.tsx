@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ToxicCard } from '@/components/ui/toxic-card';
 import { ToxicButton } from '@/components/ui/toxic-button';
@@ -9,7 +10,7 @@ import { useCustomWallet } from '@/hooks/useCustomWallet';
 import { useToast } from '@/hooks/use-toast';
 import { getReferralsByReferrer, ReferralInfo } from '@/services/referralService';
 import { ethers } from "ethers";
-import { subscribeToPurchaseEvents } from "@/services/nftPurchaseEvents";
+import { subscribeToPurchaseEvents, ADMIN_WALLET_ADDRESS } from "@/services/nftPurchaseEvents";
 
 interface ReferralSystemProps {
   earnings?: number;
@@ -84,9 +85,6 @@ export function ReferralSystem({ earnings = 0, totalReferrals = 0, className = "
     fetchReferralData();
   }, [address, isConnected]);
 
-  // Load referral data from using the referral service
-  
-
   // Add event subscription when connected
   useEffect(() => {
     if (!isConnected || !address) return;
@@ -94,13 +92,18 @@ export function ReferralSystem({ earnings = 0, totalReferrals = 0, className = "
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     
     const unsubscribe = subscribeToPurchaseEvents(provider, (event) => {
-      // Refresh referral data when a purchase is detected
-      fetchReferralData();
-      
-      toast({
-        title: "New NFT Purchase!",
-        description: "A referred user has made a purchase. Your reward will be processed soon.",
-      });
+      // Only refresh data for non-airdrop purchases
+      if (!event.isAirdrop) {
+        console.log("NFT purchase detected (not an airdrop) - refreshing referral data");
+        fetchReferralData();
+        
+        toast({
+          title: "New NFT Purchase!",
+          description: "A referred user has made a purchase. Your reward will be processed soon.",
+        });
+      } else {
+        console.log("Airdrop detected - not refreshing referral data");
+      }
     });
 
     return () => {
