@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Target, Shield, Zap, ArrowRight } from "lucide-react";
+import { Target, Shield, Zap, ArrowRight, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToxicButton } from "@/components/ui/toxic-button";
 import { useNFTRoles } from "@/hooks/useNFTRoles";
@@ -26,7 +26,7 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
       title: "Sentinel",
       description: "Create and manage bounties, fund projects, and oversee wasteland operations",
       icon: <Shield className="h-8 w-8 text-blue-400" />,
-      color: "from-blue-900/20 to-blue-600/10",
+      color: "bg-slate-800/90",
       abilities: [
         "Create bounty programs",
         "Fund survivor projects",
@@ -39,7 +39,7 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
       title: "Survivor",
       description: "Develop technical solutions, create content, and build community projects",
       icon: <Zap className="h-8 w-8 text-purple-400" />,
-      color: "from-purple-900/20 to-purple-600/10",
+      color: "bg-slate-800/90",
       abilities: [
         "Create technical projects",
         "Request development funding",
@@ -52,7 +52,7 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
       title: "Bounty Hunter",
       description: "Complete bounties, earn rewards, and build your reputation in the wasteland",
       icon: <Target className="h-8 w-8 text-toxic-neon" />,
-      color: "from-green-900/20 to-green-600/10",
+      color: "bg-slate-800/90",
       abilities: [
         "Accept available bounties",
         "Track completion status",
@@ -74,19 +74,19 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
           {roleCards.map((role, index) => (
             <Card 
               key={index} 
-              className={`bg-gradient-to-b ${role.color} border-gray-800 hover:border-gray-700 transition-all ${!role.unlocked && 'opacity-60'}`}
+              className={`border border-gray-700 ${role.color} hover:border-toxic-neon/40 transition-all duration-300 ${!role.unlocked && 'opacity-80'}`}
             >
-              <CardHeader>
+              <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   {role.icon}
                   {role.unlocked ? (
-                    <span className="text-xs px-2 py-1 rounded-full bg-toxic-neon/20 text-toxic-neon">Unlocked</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-toxic-neon/20 text-toxic-neon font-medium">Unlocked</span>
                   ) : (
-                    <span className="text-xs px-2 py-1 rounded-full bg-gray-800 text-gray-400">Locked</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-gray-800 text-gray-300 font-medium">Locked</span>
                   )}
                 </div>
-                <CardTitle className="text-white mt-3">{role.title}</CardTitle>
-                <CardDescription className="text-gray-300">
+                <CardTitle className="text-white mt-3 text-2xl">{role.title}</CardTitle>
+                <CardDescription className="text-gray-300 mt-1">
                   {role.description}
                 </CardDescription>
               </CardHeader>
@@ -94,19 +94,19 @@ export const RoleBasedHub: React.FC<RoleBasedHubProps> = ({ onSelectRole }) => {
                 <div className="space-y-2 mb-4">
                   {role.abilities.map((ability, idx) => (
                     <div key={idx} className="flex items-center gap-2 text-sm text-gray-300">
-                      <div className="w-1 h-1 rounded-full bg-toxic-neon/60"></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-toxic-neon/80"></div>
                       {ability}
                     </div>
                   ))}
                 </div>
                 <ToxicButton
-                  variant={role.unlocked ? "outline" : "ghost"}
-                  className="w-full justify-between mt-2"
+                  variant={role.unlocked ? "default" : "ghost"}
+                  className="w-full justify-between mt-3"
                   disabled={!role.unlocked}
                   onClick={() => onSelectRole(role.title)}
                 >
                   {role.unlocked ? "Access Interface" : "NFT Required"}
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 ml-2" />
                 </ToxicButton>
               </CardContent>
             </Card>
