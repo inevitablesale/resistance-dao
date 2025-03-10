@@ -21,7 +21,7 @@ let cachedProposalStats: ProposalStats | null = null;
 let statsCacheTimestamp = 0;
 const STATS_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-export const useProposalStats = () => {
+export const useProposalStats = (enabled = true) => {
   return useQuery({
     queryKey: ['proposal-stats'],
     queryFn: async (): Promise<ProposalStats> => {
@@ -175,5 +175,6 @@ export const useProposalStats = () => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
+    enabled // Add enabled flag to control when the query runs
   });
 };

@@ -80,7 +80,7 @@ type AuthState = "unauthenticated" | "authenticating" | "breaching" | "authentic
 
 const Index = () => {
   const navigate = useNavigate();
-  const { data: stats, isLoading: isLoadingStats } = useProposalStats();
+  const { data: stats, isLoading: isLoadingStats } = useProposalStats(false); // Disable proposal stats fetching on index page
   const { data: nftBalance = 0, isLoading: isLoadingNFT } = useNFTBalance("0x1234..."); // Demo address
   const { isConnected, address } = useCustomWallet();
   const { connect } = useWalletConnection();
