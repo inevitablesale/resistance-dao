@@ -3,22 +3,38 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ethers } from "ethers";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { ResistanceWalletWidget } from "@/components/wallet/ResistanceWalletWidget";
-import { sentinelContributeToParty } from "@/services/partyProtocolService";
-import { Shield, Users, Zap, Clock, Send } from "lucide-react";
+import { ContributionPanel } from "@/components/settlements/ContributionPanel";
+import { useWalletProvider } from "@/hooks/useWalletProvider";
+import { Shield, Users, Zap, Clock } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { 
+  FACTORY_ADDRESS, 
+  FACTORY_ABI 
+} from "@/lib/constants";
+import { getFromIPFS } from "@/services/ipfsService";
+import { ProposalMetadata } from "@/types/proposals";
 
 export default function SettlementDetails() {
-  const { settlementId } = useParams<{ settlementId: string }>();
+  const { partyAddress } = useParams<{ partyAddress: string }>();
   const { toast } = useToast();
   const { primaryWallet } = useDynamicContext();
+  const { getProvider } = useWalletProvider();
   const [loading, setLoading] = useState(true);
-  const [contribution, setContribution] = useState("");
-  const [isContributing, setIsContributing] = useState(false);
-  const [settlementData, setSettlementData] = useState({
+  const [settlement, setSettlement] = useState<{
+    id: string;
+    name: string;
+    description: string;
+    totalRaised: string;
+    targetAmount: string;
+    backerCount: number;
+    remainingTime: string;
+    creator: string;
+    status: string;
+  }>({
+    id: "",
     name: "Loading...",
     description: "Loading settlement details...",
     totalRaised: "0",
@@ -28,62 +44,86 @@ export default function SettlementDetails() {
     creator: "0x...",
     status: "active"
   });
+  
+  const [metadata, setMetadata] = useState<ProposalMetadata | null>(null);
 
-  useEffect(() => {
-    // In a real implementation, this would fetch the settlement data from the Party contract
-    // For now, we'll use placeholder data
-    setTimeout(() => {
-      setSettlementData({
-        name: "Decentralized Identity Protocol",
-        description: "A protocol for self-sovereign identity management using zero-knowledge proofs",
-        totalRaised: "125.5",
-        targetAmount: "500",
-        backerCount: 12,
-        remainingTime: "13 days",
-        creator: "0x7b1B2b967923bC3EB4d9Bf5472EA017Ac644e4A2",
-        status: "active"
-      });
-      setLoading(false);
-    }, 1500);
-  }, [settlementId]);
-
-  const handleContribute = async () => {
-    if (!primaryWallet || !contribution || !settlementId) return;
+  const fetchSettlementData = async () => {
+    if (!partyAddress || !primaryWallet) return;
     
-    setIsContributing(true);
     try {
-      toast({
-        title: "Processing Contribution...",
-        description: "Please approve the transaction",
-      });
+      setLoading(true);
+      const walletProvider = await getProvider();
       
-      // In a real implementation, this would use the crowdfund address
-      await sentinelContributeToParty(
-        primaryWallet, 
-        settlementId, // This would actually be the crowdfund address
-        contribution,
-        undefined,
-        "Supporting the settlement"
+      const factoryContract = new ethers.Contract(
+        FACTORY_ADDRESS,
+        FACTORY_ABI,
+        walletProvider.provider
       );
       
-      toast({
-        title: "Contribution Successful!",
-        description: `You've contributed ${contribution} ETH to the settlement.`,
+      // Fetch proposal data from contract
+      const proposalData = await factoryContract.proposals(partyAddress);
+      console.log("Proposal data:", proposalData);
+      
+      // Fetch vote events to count backers
+      const voteEvents = await factoryContract.queryFilter(
+        factoryContract.filters.ProposalVoted(partyAddress)
+      );
+      
+      // Calculate remaining time
+      const currentTime = Math.floor(Date.now() / 1000);
+      const votingEnds = proposalData.votingEnds.toNumber();
+      const timeRemaining = votingEnds > currentTime ? votingEnds - currentTime : 0;
+      const daysRemaining = Math.ceil(timeRemaining / (24 * 60 * 60));
+      
+      // Fetch metadata from IPFS
+      const metadataUri = proposalData.metadataURI;
+      let metadata = null;
+      if (metadataUri) {
+        metadata = await getFromIPFS<ProposalMetadata>(
+          metadataUri.replace('ipfs://', ''),
+          'proposal'
+        );
+        setMetadata(metadata);
+      }
+      
+      // Determine status
+      let status = "active";
+      if (proposalData.totalPledged.gte(proposalData.targetCapital)) {
+        status = "completed";
+      } else if (votingEnds < currentTime) {
+        status = "failed";
+      }
+      
+      setSettlement({
+        id: partyAddress,
+        name: metadata?.title || proposalData.title,
+        description: metadata?.description || "No description available",
+        totalRaised: ethers.utils.formatEther(proposalData.totalPledged),
+        targetAmount: ethers.utils.formatEther(proposalData.targetCapital),
+        backerCount: proposalData.backerCount.toNumber(),
+        remainingTime: `${daysRemaining} days`,
+        creator: proposalData.creator,
+        status
       });
       
-      // Reset form and refresh data
-      setContribution("");
-      
-    } catch (error: any) {
-      console.error("Error contributing:", error);
+    } catch (error) {
+      console.error("Error fetching settlement data:", error);
       toast({
-        title: "Contribution Failed",
-        description: error.message || "An error occurred while processing your contribution.",
-        variant: "destructive",
+        title: "Error Loading Settlement",
+        description: "Could not load settlement details. Please try again.",
+        variant: "destructive"
       });
     } finally {
-      setIsContributing(false);
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchSettlementData();
+  }, [partyAddress, primaryWallet]);
+
+  const refreshData = () => {
+    fetchSettlementData();
   };
 
   return (
@@ -99,122 +139,173 @@ export default function SettlementDetails() {
               >
                 <span>←</span> All Settlements
               </Link>
-              <h1 className="text-4xl font-bold">{settlementData.name}</h1>
+              <h1 className="text-4xl font-bold">{settlement.name}</h1>
             </div>
             <div className="flex items-center gap-2">
               <div className={`px-3 py-1 rounded-full text-sm ${
-                settlementData.status === 'active' 
+                settlement.status === 'active' 
                   ? 'bg-green-500/20 text-green-400' 
-                  : 'bg-yellow-500/20 text-yellow-400'
+                  : settlement.status === 'completed'
+                    ? 'bg-blue-500/20 text-blue-400'
+                    : 'bg-red-500/20 text-red-400'
               }`}>
-                {settlementData.status === 'active' ? 'Active Funding' : 'Funding Complete'}
+                {settlement.status === 'active' ? 'Active Funding' : 
+                 settlement.status === 'completed' ? 'Funding Complete' : 'Funding Failed'}
               </div>
             </div>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Main content */}
-            <div className="md:col-span-2">
-              <div className="bg-[#111] rounded-xl border border-white/5 p-6 space-y-6">
-                <h2 className="text-xl font-semibold">Settlement Vision</h2>
-                <p className="text-gray-300">{settlementData.description}</p>
-                
-                <Separator className="my-6 bg-white/10" />
-                
-                <h2 className="text-xl font-semibold">Funding Progress</h2>
-                <div className="bg-black/50 h-4 w-full rounded-full overflow-hidden">
-                  <div 
-                    className="bg-blue-500 h-full rounded-full" 
-                    style={{ 
-                      width: `${Math.min(
-                        100, 
-                        (parseFloat(settlementData.totalRaised) / parseFloat(settlementData.targetAmount)) * 100
-                      )}%` 
-                    }}
-                  />
-                </div>
-                <div className="flex justify-between text-sm text-gray-400">
-                  <span>{settlementData.totalRaised} ETH raised</span>
-                  <span>Target: {settlementData.targetAmount} ETH</span>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-4 mt-4">
-                  <div className="bg-[#0a1020] p-4 rounded-xl">
-                    <div className="flex items-center gap-2 text-blue-400 mb-2">
-                      <Users className="w-4 h-4" />
-                      <span className="text-sm">Backers</span>
-                    </div>
-                    <span className="text-2xl font-bold">{settlementData.backerCount}</span>
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent" />
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Main content */}
+              <div className="md:col-span-2">
+                <div className="bg-[#111] rounded-xl border border-white/5 p-6 space-y-6">
+                  <h2 className="text-xl font-semibold">Settlement Vision</h2>
+                  <p className="text-gray-300">{settlement.description}</p>
+                  
+                  {metadata?.fundingBreakdown && metadata.fundingBreakdown.length > 0 && (
+                    <>
+                      <Separator className="my-6 bg-white/10" />
+                      <h2 className="text-xl font-semibold">Funding Breakdown</h2>
+                      <div className="space-y-2">
+                        {metadata.fundingBreakdown.map((item, index) => (
+                          <div key={index} className="flex justify-between">
+                            <span className="text-gray-400">{item.category}</span>
+                            <span className="font-mono">{item.amount} ETH</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                  
+                  <Separator className="my-6 bg-white/10" />
+                  
+                  <h2 className="text-xl font-semibold">Funding Progress</h2>
+                  <div className="bg-black/50 h-4 w-full rounded-full overflow-hidden">
+                    <div 
+                      className="bg-blue-500 h-full rounded-full" 
+                      style={{ 
+                        width: `${Math.min(
+                          100, 
+                          (parseFloat(settlement.totalRaised) / parseFloat(settlement.targetAmount)) * 100
+                        )}%` 
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-400">
+                    <span>{settlement.totalRaised} ETH raised</span>
+                    <span>Target: {settlement.targetAmount} ETH</span>
                   </div>
                   
-                  <div className="bg-[#0a1020] p-4 rounded-xl">
-                    <div className="flex items-center gap-2 text-blue-400 mb-2">
-                      <Zap className="w-4 h-4" />
-                      <span className="text-sm">Progress</span>
+                  <div className="grid grid-cols-3 gap-4 mt-4">
+                    <div className="bg-[#0a1020] p-4 rounded-xl">
+                      <div className="flex items-center gap-2 text-blue-400 mb-2">
+                        <Users className="w-4 h-4" />
+                        <span className="text-sm">Backers</span>
+                      </div>
+                      <span className="text-2xl font-bold">{settlement.backerCount}</span>
                     </div>
-                    <span className="text-2xl font-bold">
-                      {Math.round((parseFloat(settlementData.totalRaised) / parseFloat(settlementData.targetAmount)) * 100)}%
-                    </span>
+                    
+                    <div className="bg-[#0a1020] p-4 rounded-xl">
+                      <div className="flex items-center gap-2 text-blue-400 mb-2">
+                        <Zap className="w-4 h-4" />
+                        <span className="text-sm">Progress</span>
+                      </div>
+                      <span className="text-2xl font-bold">
+                        {Math.round((parseFloat(settlement.totalRaised) / parseFloat(settlement.targetAmount)) * 100)}%
+                      </span>
+                    </div>
+                    
+                    <div className="bg-[#0a1020] p-4 rounded-xl">
+                      <div className="flex items-center gap-2 text-blue-400 mb-2">
+                        <Clock className="w-4 h-4" />
+                        <span className="text-sm">Remaining</span>
+                      </div>
+                      <span className="text-2xl font-bold">{settlement.remainingTime}</span>
+                    </div>
                   </div>
                   
-                  <div className="bg-[#0a1020] p-4 rounded-xl">
-                    <div className="flex items-center gap-2 text-blue-400 mb-2">
-                      <Clock className="w-4 h-4" />
-                      <span className="text-sm">Remaining</span>
-                    </div>
-                    <span className="text-2xl font-bold">{settlementData.remainingTime}</span>
-                  </div>
+                  {metadata?.team && metadata.team.length > 0 && (
+                    <>
+                      <Separator className="my-6 bg-white/10" />
+                      <h2 className="text-xl font-semibold">Settlement Team</h2>
+                      <div className="grid grid-cols-2 gap-4">
+                        {metadata.team.map((member, index) => (
+                          <div key={index} className="bg-[#0a1020] p-4 rounded-xl">
+                            <h3 className="font-medium">{member.name}</h3>
+                            <p className="text-gray-400 text-sm">{member.role}</p>
+                            <div className="flex gap-2 mt-2">
+                              {member.linkedin && (
+                                <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs">
+                                  LinkedIn
+                                </a>
+                              )}
+                              {member.github && (
+                                <a href={member.github} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs">
+                                  GitHub
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
-            </div>
-            
-            {/* Sidebar */}
-            <div>
-              <div className="bg-[#111] rounded-xl border border-white/5 p-6 space-y-6">
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-blue-400" />
-                  Sentinel Contribution
-                </h2>
+              
+              {/* Sidebar */}
+              <div>
+                <ContributionPanel 
+                  settlementId={partyAddress || ''} 
+                  settlementName={settlement.name}
+                  onSuccess={refreshData}
+                />
                 
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm text-gray-400">Contribution Amount (ETH)</label>
-                    <div className="flex mt-1">
-                      <Input
-                        type="number"
-                        placeholder="0.0"
-                        value={contribution}
-                        onChange={(e) => setContribution(e.target.value)}
-                        className="bg-black/50 border-white/10"
-                      />
+                {metadata?.socials && (
+                  <div className="bg-[#111] rounded-xl border border-white/5 p-6 space-y-4 mt-6">
+                    <h2 className="text-lg font-semibold">Connect</h2>
+                    <div className="grid grid-cols-2 gap-2">
+                      {metadata.socials.twitter && (
+                        <a 
+                          href={metadata.socials.twitter} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="bg-[#0a1020] p-2 rounded-lg text-center text-sm text-blue-400 hover:bg-[#0a1030]"
+                        >
+                          Twitter
+                        </a>
+                      )}
+                      {metadata.socials.discord && (
+                        <a 
+                          href={metadata.socials.discord} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="bg-[#0a1020] p-2 rounded-lg text-center text-sm text-blue-400 hover:bg-[#0a1030]"
+                        >
+                          Discord
+                        </a>
+                      )}
+                      {metadata.socials.telegram && (
+                        <a 
+                          href={metadata.socials.telegram} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="bg-[#0a1020] p-2 rounded-lg text-center text-sm text-blue-400 hover:bg-[#0a1030]"
+                        >
+                          Telegram
+                        </a>
+                      )}
                     </div>
                   </div>
-                  
-                  <Button
-                    onClick={handleContribute}
-                    disabled={isContributing || !contribution}
-                    className="w-full bg-blue-500 hover:bg-blue-600"
-                  >
-                    {isContributing ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4 mr-2" />
-                        Contribute to Settlement
-                      </>
-                    )}
-                  </Button>
-                  
-                  <div className="text-xs text-gray-400">
-                    By contributing, you'll receive governance rights in this settlement proportional to your contribution.
-                  </div>
-                </div>
+                )}
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
       <ResistanceWalletWidget />

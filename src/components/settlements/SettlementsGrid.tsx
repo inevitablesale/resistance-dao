@@ -1,91 +1,113 @@
 
-import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Biohazard, Target, Filter, Shield, Home, Building2 } from "lucide-react";
-import { ToxicButton } from "@/components/ui/toxic-button";
-import { useNavigate } from "react-router-dom";
 import { ProposalEvent } from "@/types/proposals";
-import { SettlementCard } from "./SettlementCard";
+import { Link } from "react-router-dom";
+import { Shield, Users } from "lucide-react";
 
 interface SettlementsGridProps {
   settlements: ProposalEvent[];
   isLoading: boolean;
   formatUSDAmount: (amount: string) => string;
-  title?: string;
-  className?: string;
+  title: string;
 }
 
-export const SettlementsGrid = ({
-  settlements,
-  isLoading,
-  formatUSDAmount,
-  title = "Active Settlements",
-  className = ""
-}: SettlementsGridProps) => {
-  const navigate = useNavigate();
-
+export const SettlementsGrid = ({ settlements, isLoading, formatUSDAmount, title }: SettlementsGridProps) => {
   if (isLoading) {
     return (
-      <Card className="bg-black/40 border-white/10">
-        <CardContent className="p-6 text-center text-white/60">
-          <p>Scanning for settlements...</p>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent" />
+      </div>
     );
   }
 
   if (settlements.length === 0) {
     return (
-      <Card className="bg-black/40 border-white/10">
-        <CardContent className="p-6 text-center">
-          <p className="text-white/60 mb-4">No settlements discovered in the wasteland</p>
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/thesis')}
-            className="bg-toxic-dark/50 border-toxic-neon/50 text-toxic-neon hover:bg-toxic-dark"
-          >
-            <Home className="h-4 w-4 mr-2" />
-            Establish Settlement
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="text-center py-20">
+        <h2 className="text-2xl font-bold mb-4">{title}</h2>
+        <p className="text-gray-400">No settlements found. Be the first to create one!</p>
+      </div>
     );
   }
 
   return (
-    <div className={className}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-2xl font-mono text-toxic-neon flex items-center toxic-glow">
-          <Building2 className="h-5 w-5 mr-2" /> {title}
-        </h3>
-        
-        <div className="flex items-center gap-2">
-          <ToxicButton 
-            variant="ghost" 
-            size="sm" 
-            className="text-toxic-neon hover:bg-toxic-dark/20"
-          >
-            <Filter className="h-4 w-4 mr-1" />
-            Filter
-          </ToxicButton>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {settlements.map((settlement, index) => (
-          <SettlementCard
-            key={settlement.tokenId}
-            tokenId={settlement.tokenId}
-            blockNumber={settlement.blockNumber}
-            pledgedAmount={settlement.pledgedAmount}
-            metadata={settlement.metadata}
-            formatUSDAmount={formatUSDAmount}
-            index={index}
-            isLoading={settlement.isLoading}
-            error={settlement.error}
-          />
-        ))}
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">{title}</h2>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {settlements.map((settlement) => {
+          const metadata = settlement.metadata || {
+            title: "Loading...",
+            description: "Settlement details loading...",
+            category: "Unknown"
+          };
+          
+          // Calculate progress percentage
+          const targetCapital = metadata.investment?.targetCapital || "0";
+          const pledgedAmount = settlement.pledgedAmount || "0";
+          const progress = parseFloat(targetCapital) > 0 
+            ? Math.min(100, (parseFloat(pledgedAmount) / parseFloat(targetCapital)) * 100) 
+            : 0;
+          
+          // Determine status
+          let status = 'active';
+          if (progress >= 100) status = 'completed';
+          else if (settlement.error) status = 'failed';
+          
+          return (
+            <Link 
+              key={settlement.tokenId} 
+              to={`/settlements/${settlement.tokenId}`}
+              className="bg-[#111] rounded-xl border border-white/5 overflow-hidden hover:border-blue-500/30 transition-colors"
+            >
+              <div 
+                className="h-48 bg-center bg-cover bg-gradient-to-r from-blue-900/30 to-purple-900/30" 
+                style={{ backgroundImage: metadata.image ? `url(${metadata.image})` : '' }}
+              />
+              <div className="p-5 space-y-4">
+                <div className="flex justify-between items-start">
+                  <h2 className="text-xl font-semibold">{metadata.title}</h2>
+                  <div className={`px-2 py-1 rounded-full text-xs ${
+                    status === 'active' 
+                      ? 'bg-green-500/20 text-green-400' 
+                      : status === 'completed'
+                        ? 'bg-blue-500/20 text-blue-400'
+                        : 'bg-red-500/20 text-red-400'
+                  }`}>
+                    {status === 'active' 
+                      ? 'Active' 
+                      : status === 'completed' 
+                        ? 'Funded' 
+                        : 'Failed'}
+                  </div>
+                </div>
+                
+                <p className="text-gray-300 text-sm line-clamp-2">{metadata.description}</p>
+                
+                <div className="bg-black/50 h-2 w-full rounded-full overflow-hidden">
+                  <div 
+                    className="bg-blue-500 h-full rounded-full" 
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                
+                <div className="flex justify-between text-sm text-gray-400">
+                  <span>{pledgedAmount} ETH</span>
+                  <span>{progress.toFixed(0)}%</span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-1 text-sm text-gray-400">
+                    <Users className="w-4 h-4 text-blue-400" />
+                    <span>{settlement.voteCount || 0}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-1 text-sm text-gray-400">
+                    <Shield className="w-4 h-4 text-blue-400" />
+                    <span>Join</span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
